@@ -1,0 +1,252 @@
+window:
+    name: Surface Toolkit
+    size:
+        - 640
+        - 640
+#
+properties:
+    asset: None
+    step: None
+    task: None
+#
+central:
+    groups:
+        Utility(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                layout_selected:
+                    enable: True
+                    name: Layout Selected
+                    icon: python
+                    description: Layout by selected node(s)
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_selected_layout
+        scene:
+            name: Scene(s)
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                create_system_workspace:
+                    enable: True
+                    name: Create System-workspace
+                    icon: python
+                    description: Create workspace folder(s) in work-directory
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_system_workspace_create
+                open_system_workspace:
+                    enable: True
+                    name: Open System-workspace
+                    icon: python
+                    description: Open System-workspace
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_system_workspace_open
+                #
+                create_dcc_workspace:
+                    enable: True
+                    name: Create Dcc-workspace
+                    icon: python
+                    description: Create workspace node(s) in katana
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_dcc_workspace_create
+        geometry:
+            name: Geometry(s)
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                import_work_set_usd:
+                    enable: True
+                    name: Import / Update Work-set-usd
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_set_usd_import
+                #
+                import_set_usd:
+                    enable: True
+                    name: Import / Update Set-usd
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_set_usd_import
+        look:
+            name: Look(s)
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                create_material:
+                    enable: True
+                    name: Create Material
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_material_create
+                #
+                add_look_pass:
+                    enable: True
+                    name: Add Look-pass
+                    icon: python
+                    description: Add look-pass
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_look_pass_add
+                    option:
+                        attributes:
+                            look_pass:
+                                name: Look-pass
+                                type: string
+                                value: new
+                #
+                export_work_look_ass:
+                    enable: True
+                    name: Export Work Look-ass
+                    icon: python
+                    description: 'export ".ass" to "Work-directory"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_look_ass_export
+                #
+                import_work_look_ass:
+                    enable: True
+                    name: Import Work Look-ass
+                    icon: python
+                    description: 'export ".ass" from "Work-directory"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_look_ass_import
+                    option:
+                        attributes:
+                            look_ass_file:
+                                name: Look-ass-file
+                                type: enumerate
+                                value: fnc(self.get_work_look_ass_files())
+                            look_pass:
+                                name: Look-pass
+                                type: enumerate
+                                value: fnc(self.get_look_passes())
+                #
+                create_standard_surface_user_data:
+                    enable: True
+                    name: Add User-data
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_standard_surface_user_data_create
+                    option:
+                        attributes:
+                            data_type:
+                                name: Data-type
+                                type: string
+                                value: 'float'
+                            port:
+                                name: Port
+                                type: string
+                                value: 'opacity'
+                            attribute:
+                                name: Attribute
+                                type: string
+                                value: 'displayOpacity'
+                            default_value:
+                                name: Default-value
+                                type: float
+                                value: 1.0
+                  #
+                update_look:
+                    enable: True
+                    name: Update Look
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_look_update
+                    option:
+                        attributes:
+                            project:
+                                name: Project-name
+                                type: string
+                                value: fnc(self.get_project())
+                            scene_src_file:
+                                name: Scene-src-file
+                                type: enumerate
+                                value: fnc(self.get_scene_src_files())
+        #
+        Texture(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Load Texture-tx(s):
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'convert "texture-tx(s)" to latest and repath'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_texture_tx_load
+                    click_status_enable: True
+                #
+                Open Texture Manager Panel:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description: 'show "Texture Manager" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+        Light(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                load_light_rig:
+                    enable: True
+                    name: Import / Update Light-rig
+                    icon: python
+                    description: ''
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_light_rig_import
+        td:
+            name: TD(s)
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                method_runner_panel:
+                    enable: True
+                    name: Open Method-runner-panel
+                    icon: python
+                    description: ''
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_method_runner_panel_open
+                open_scene_packager_panel:
+                    enable: True
+                    name: Open Scene-packager-panel
+                    icon: python
+                    description: ''
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_scene_packager_panel_open
+                #
+                open_scene_shader_viewer_panel:
+                    enable: True
+                    name: Open Scene-shader-viewer-panel
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_scene_shader_viewer_panel_open

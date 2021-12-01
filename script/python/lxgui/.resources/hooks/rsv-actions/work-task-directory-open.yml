@@ -1,0 +1,35 @@
+option:
+    type: unit
+    #
+    systems:
+        - 'linux-python'
+        - '*-maya'
+        - '*-houdini'
+        - '*-katana'
+    #
+    gui:
+        group_name: Directory
+        #
+        name: 'Open Work Task Directory'
+        icon_name: 'file/folder'
+#
+variants:
+    project: ''
+    branch: ''
+    #
+    role: ''
+    asset: ''
+    #
+    sequence: ''
+    shot: ''
+    #
+    step: ''
+    task: ''
+    #
+    application: ''
+#
+resolver:
+    rsv_unit:
+        keyword: '{branch}-work-task-dir'
+        version: latest
+

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+export LYNXI_BIN_PYTHON=$REZ_LXDCC_LIB_BASE/bin/linux-x64-python-2.7.18/bin/python
+#
+$LYNXI_BIN_PYTHON $REZ_LXDCC_BASE/script/bin/lxhash.py $@

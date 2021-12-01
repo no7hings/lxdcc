@@ -1,0 +1,5 @@
+window:
+    name: Shotgun Entity Creator
+    size:
+        - 480
+        - 320

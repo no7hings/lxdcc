@@ -1,0 +1,54 @@
+{
+	"tool": {
+		"scene_validation": {
+			"label": "Scene-validation",
+			"chn_label": null,
+			"eng_description": null,
+			"chn_description": null,
+			"icon": null,
+			"size": [720, 576],
+        	"command": "from lxhoudini_gui.hou_panel import hou_pnl_widgets; hou_pnl_widgets.ValidationToolPanel().set_window_show()"
+		},
+		"scene_build": {
+			"label": "Scene-build",
+			"chn_label": "",
+			"icon": "",
+			"size": [1280, 720],
+        	"command": "from lxhoudini_gui.hou_panel import hou_pnl_widgets; hou_pnl_widgets.SceneBuildToolPanel().set_window_show()"
+		},
+		"scene_switcher": {
+			"label": "Scene-switcher",
+			"chn_label": "",
+			"icon": "",
+			"size": [720, 720],
+        	"command": "from lxhoudini_gui.hou_panel import hou_pnl_widgets; hou_pnl_widgets.SceneSwitcherToolPanel().set_window_show()"
+		},
+		"scene_packager": {
+			"label": "Scene-packager",
+			"chn_label": "",
+			"icon": "",
+			"size": [1280, 720],
+        	"command": "from lxhoudini_gui.hou_panel import hou_pnl_widgets; hou_pnl_widgets.ScenePackagerToolPanel().set_window_show()"
+		},
+		"reload_package": {
+			"label": "Reload Package(s)",
+			"chn_label": "",
+			"icon": "",
+			"size": [720, 560],
+        	"command": "from lxutil.dcc import utl_dcc_objects; reload(utl_dcc_objects); p = utl_dcc_objects.PyReloader(['lxscheme', 'lxobj', 'lxutil', 'lxarnold', 'lxar2mtx', 'lxutil_prd', 'lxutil_fnc', 'lxutil_gui', 'lxshotgun', 'lxshotgun_fnc', 'lxshotgun_gui', 'lxhoudini', 'lxhoudini_prd', 'lxhoudini_fnc', 'lxhoudini_gui']); p.set_reload()"
+		}
+	},
+	"menu": {
+		"label": "TD-tool(s)",
+		"tools": [
+			"scene_validation",
+			"scene_build",
+			"separator",
+			"scene_switcher",
+			"separator",
+			"scene_packager",
+			"separator",
+			"reload_package"
+		]
+	}
+}

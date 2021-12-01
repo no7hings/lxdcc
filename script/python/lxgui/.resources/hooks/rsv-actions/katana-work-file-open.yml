@@ -1,0 +1,32 @@
+option:
+    type: unit
+    #
+    systems:
+        - 'linux-python'
+    #
+    gui:
+        group_name: Scene
+        #
+        name: 'Open Katana Work File'
+        icon_name: 'application/katana'
+#
+variants:
+    project: ''
+    branch: ''
+    #
+    role: ''
+    asset: ''
+    #
+    sequence: ''
+    shot: ''
+    #
+    step: ''
+    task: ''
+    #
+    application: ''
+#
+resolver:
+    rsv_unit:
+        keyword: '{branch}-work-katana-scene-src-file'
+        version: latest
+

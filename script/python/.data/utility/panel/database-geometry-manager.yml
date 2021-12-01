@@ -1,0 +1,5 @@
+window:
+    name: Database Geometry Manager
+    size:
+        - 480
+        - 640

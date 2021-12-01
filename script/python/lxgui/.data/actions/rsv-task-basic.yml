@@ -1,0 +1,104 @@
+#
+option:
+    step_mapper:
+        surface:
+            - surface
+            - srf
+        model:
+            - model
+            - mod
+#
+entities:
+    # project
+    project:
+        properties:
+            action:
+                maya:
+                    - /actions/maya_work_scene_src_new
+                    - /actions/maya_work_user_scene_src_new
+                houdini:
+                    - /actions/houdini_work_scene_src_new
+                    - /actions/houdini_work_user_scene_src_new
+    # branch-asset
+    asset:
+        properties: {}
+        # asset-step
+        srf:
+            properties: {}
+    # branch-shot
+    shot:
+        properties: {}
+#
+actions:
+    # maya
+    maya_work_scene_src_new:
+        properties:
+            gui:
+                name: 'New Work-scene-src'
+                description: ''
+                icon: ''
+                icon_name: 'application/maya'
+                enable: True
+            #
+            method:
+                module: lxgui_fnc.actions.maya_work_scene_src_new
+    #
+    maya_work_user_scene_src_new:
+        properties:
+            gui:
+                name: 'New Work-scene-src for "{user}"'
+                description: ''
+                icon: ''
+                icon_name: 'application/maya'
+                enable: True
+            #
+            method:
+                module: lxgui_fnc.actions.maya_work_user_scene_src_new
+    # houdini
+    houdini_work_scene_src_new:
+        properties:
+            gui:
+                name: 'New Work-scene-src'
+                description: ''
+                icon: ''
+                icon_name: 'application/houdini'
+                enable: True
+            #
+            method:
+                module: lxgui_fnc.actions.houdini_work_scene_src_new
+    #
+    houdini_work_user_scene_src_new:
+        properties:
+            gui:
+                name: 'New Work-scene-src for "{user}"'
+                description: ''
+                icon: ''
+                icon_name: 'application/houdini'
+                enable: True
+            #
+            method:
+                module: lxgui_fnc.actions.houdini_work_user_scene_src_new
+    # katana
+    katana_work_scene_src_new:
+        properties:
+            gui:
+                name: 'New Work-scene-src'
+                description: ''
+                icon: ''
+                icon_name: 'application/katana'
+                enable: True
+            #
+            method:
+                module: lxgui_fnc.actions.katana_work_scene_src_new
+    #
+    katana_work_user_scene_src_new:
+        properties:
+            gui:
+                name: 'New Work-scene-src for "{user}"'
+                description: ''
+                icon: ''
+                icon_name: 'application/katana'
+                enable: True
+            #
+            method:
+                module: lxgui_fnc.actions.katana_work_user_scene_src_new

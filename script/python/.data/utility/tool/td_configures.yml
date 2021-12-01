@@ -1,0 +1,14 @@
+menu:
+    label: TD-tool(s)
+    tools:
+        - shot_builder
+# tool
+tool:
+    shot_builder:
+        chn_label: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneBuildToolPanel().set_window_show()
+        icon: None
+        label: Shot-builder
+        size:
+            - 1280
+            - 720

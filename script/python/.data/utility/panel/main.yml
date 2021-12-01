@@ -1,0 +1,92 @@
+panels:
+    scene_method_runner:
+        window:
+            name: Scene Method-runner
+            size:
+                - 960
+                - 720
+            description:
+    #
+    scene_package:
+        window:
+            name: Scene Packger
+            size:
+                - 1280
+                - 720
+    #
+    asset_look_viewer:
+        window:
+            name: Asset Look-viewer
+            size:
+                - 1280
+                - 720
+    #
+    scene_texture_manager:
+        window:
+            name: Scene Texture-viewer
+            size:
+                - 1280
+                - 720
+    #
+    asset_comparer:
+        window:
+            name: Asset Comparer
+            size:
+                - 960
+                - 720
+    #
+    asset_look_comparer:
+        window:
+            name: Asset Look-comparer
+            size:
+                - 1280
+                - 720
+    #
+    scene_shader_viewer:
+        window:
+            name: Scene Shader-viewer
+            size:
+                - 1280
+                - 720
+    #
+    asset_loader:
+        window:
+            name: Asset Loader
+            size:
+                - 1280
+                - 960
+    #
+    lib_asset_loader:
+        window:
+            name: Lib-asset Loader
+            size:
+                - 1280
+                - 960
+    #
+    lib_asset_shader_loader:
+        window:
+            name: Lib-asset Shader Loader
+            size:
+                - 1280
+                - 960
+    #
+    shot_loader:
+        window:
+            name: Shot Loader
+            size:
+                - 1280
+                - 960
+    #
+    scene_checker:
+        window:
+            name: Scene-checker
+            size:
+                - 940
+                - 640
+    #
+    scene_cleaner:
+        window:
+            name: Scene Clearner
+            size:
+                - 640
+                - 480

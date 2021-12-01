@@ -1,0 +1,27 @@
+#usda 1.0
+(
+    defaultPrim = "{{ root }}"
+)
+
+over "{{ root }}" (
+    variants = {
+        string pass = "default"
+    }
+    prepend variantSets="pass"
+)
+{
+    def Xform "{{ look_root }}" ()
+    {
+{{ '%sasset userProperties:klfPath = @%s@' | format(option.indent*2*' ', look_file_path) }}
+    }
+
+    variantSet "pass" = {
+{% for look_pass_name in look_pass_names -%}
+    {%- if loop.last -%}
+        {{ '%s"%s" (){}' | format(option.indent*2*' ', look_pass_name) }}
+    {%- else -%}
+        {{ '%s"%s" (){}%s' | format(option.indent*2*' ', look_pass_name, option.linesep) }}
+    {%- endif -%}
+{%- endfor %}
+       }
+}

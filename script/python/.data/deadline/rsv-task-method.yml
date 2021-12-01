@@ -1,0 +1,105 @@
+method:
+    type: ''
+    name: ''
+    path: ''
+    #
+    configure: ''
+    #
+    engine: ''
+    script: ''
+    tag: ''
+    #
+    user: ''
+    time_tag: ''
+    #
+    extra:
+        platform: ''
+        application: ''
+        project: ''
+        #
+        root: ''
+        workspace: ''
+        role: ''
+        asset: ''
+        #
+        sequence: ''
+        shot: ''
+        #
+        step: ''
+        task: ''
+        version: ''
+    #
+    job:
+        name: '[<method.engine>][<method.script>][<method.extra.step>.<method.extra.task>.<method.extra.version>][<method.time_tag>]'
+        group_name: '[<method.type>][<method.name>]'
+        #
+        output_directory: ''
+        output_file: ''
+        #
+        group: "subprogress"
+        #
+        pool: "subprogress"
+        pool2: ''
+        #
+        command: ''
+#
+job:
+    info:
+        Plugin: "Rocket"
+        #
+        BatchName: <method.job.group_name>
+        Name: <method.job.name>
+        #
+        Frame: "0"
+        Department: <method.extra.step>
+        ChunkSize: "1"
+        Priority: 50
+        Pool: <method.job.pool>
+        SecondaryPool: <method.job.pool2>
+        #
+        Group: <method.job.group>
+        #
+        Project: <method.extra.project>
+        #
+        OutputDirectory0: <method.job.output_directory>
+        OutputFilename0: <method.job.output_file>
+        #
+        UserName: <method.user>
+        MachineLimit: 10
+        #
+        Comment: ''
+        #
+        Whitelist: ''
+        #
+        PreTaskScript: ''
+        PostTaskScript: ''
+        PreJobScript: ''
+        PostJobScript: ''
+        #
+        OnJobComplete: Nothing
+        #
+        JobDependencies: ''
+        #
+        StartupDirectory: <method.job.output_directory>
+        #
+        ResumeOnCompleteDependencies: False
+        ResumeOnFailedDependencies: False
+        #
+        OverrideTaskFailureDetection: True
+        FailureDetectionTaskErrors: 2
+        #
+        ExtraInfo0: <method.extra.platform>
+        ExtraInfo1: <method.extra.project>
+        ExtraInfo2: <method.extra.workspace>
+        ExtraInfo3: <method.extra.entity>
+        ExtraInfo4: <method.extra.step>
+        ExtraInfo5: <method.extra.task>
+        ExtraInfo6: <method.extra.version>
+        ExtraInfo7: <method.extra.application>
+    plug:
+        Arguments: <method.job.command>
+        Shell: "default"
+        ShellExecute: True
+        Executable: ''
+        Software: ''
+        ErrorCatch: "job-kill"

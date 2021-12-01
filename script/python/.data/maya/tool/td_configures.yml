@@ -1,0 +1,88 @@
+menu:
+    label: TD-tool(s)
+    tools:
+        - scene_checker
+        - separator
+        #
+        - asset_comparer
+        - separator
+        #
+        - scene_method_runner
+        - separator
+        #
+        - scene_cleaner
+        - separator
+        #
+        - scene_packager
+        - separator
+        #
+        - package_reloader
+tool:
+    package_reloader:
+        label: Package-reloader
+        icon: None
+        command: import lxmaya;lxmaya.Packages.set_reload()
+    # builder
+    shot_builder:
+        chn_label: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneBuildToolPanel().set_window_show()
+        icon: None
+        label: Shot-builder
+        size:
+            - 1280
+            - 720
+    # cleaner
+    scene_cleaner:
+        chn_label: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneCleanerToolPanel().set_window_show()
+        icon: None
+        label: Scene-cleaner
+        size:
+            - 480
+            - 240
+    #
+    scene_compose:
+        chn_label: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneComposePanel().set_window_show()
+        icon: None
+        label: Scene-compose
+        size:
+            - 720
+            - 576
+    #
+    asset_comparer:
+        label: Asset-comparer
+        icon: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.AssetComparerPanel().set_window_show()
+    #
+    scene_importer:
+        chn_label: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneImporterToolPanel().set_window_show()
+        icon: None
+        label: Scene-importer
+        size:
+            - 480
+            - 240
+    #
+    scene_method_runner:
+        label: Scene-method-runner
+        icon: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneMethodRunnerPanel().set_window_show()
+    #
+    scene_packager:
+        chn_label: None
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.ScenePackagerToolPanel().set_window_show()
+        icon: None
+        label: Scene-packager
+        size:
+            - 1280
+            - 720
+    #
+    scene_checker:
+        chn_label: null
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneCheckerToolPanel().set_window_show()
+        icon: null
+        label: Scene-checker
+        size:
+            - 720
+            - 576

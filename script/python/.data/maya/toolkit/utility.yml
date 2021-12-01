@@ -1,0 +1,80 @@
+window:
+    name: Utility Toolkit
+    size:
+        - 640
+        - 640
+#
+central:
+    groups:
+        Geometry(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Open Database-geometry Manager Panel:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'open "Database-geometry Manager" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.DatabaseGeometryManagerPanel().set_window_show()'
+        Texture(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Load Texture-tx(s):
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'convert "texture-tx(s)" to latest and repath'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_texture_tx_load
+                    click_status_enable: True
+                #
+                Open Texture Manager Panel:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description: 'show "Texture Manager" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+                #
+                switch_color_spaces:
+                    enable: True
+                    name: Switch texture-color-space(s)
+                    icon: python
+                    description:
+                        - 'switch "file" color-space'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_texture_color_spaces_switch
+                generate_texture_tiles_preview:
+                    enable: True
+                    name: Generate texture-tile(s) preview
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_texture_tiles_preview_generate
+        Light(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                load_light_rig:
+                    enable: True
+                    name: Import / Update Light-rig
+                    icon: python
+                    description: None
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; from lxutil import utl_core; mya_dcc_objects.Scene.set_file_reference(utl_core.Path.set_map_to_platform("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma"))'

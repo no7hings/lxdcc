@@ -1,0 +1,48 @@
+window:
+    name: Utility-toolkit
+    size:
+        - 640
+        - 640
+#
+central:
+    groups:
+        scene:
+            name: Scene(s)
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Create Dcc-workspace:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_dcc_workspace_create
+        #
+        texture:
+            name: Texture(s)
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Load Texture-tx(s):
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'convert "texture-tx(s)" to latest and repath'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: 'set_texture_tx_load'
+                    click_status_enable: True
+                #
+                Open Texture Manager Panel:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description: 'show "Texture Manager" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+

@@ -1,0 +1,329 @@
+#
+option:
+    step_mapper:
+        surface:
+            - surface
+            - srf
+        model:
+            - model
+            - mod
+#
+entities:
+    project:
+        properties: {}
+        #
+        asset:
+            properties: {}
+            #
+            model:
+                properties:
+                    method:
+                        maya:
+                            # asset
+                            - /methods/asset_scene
+                            - /methods/asset_model_geometry
+                            - /methods/asset_look
+                            - /methods/asset_shotgun
+            #
+            surface:
+                properties:
+                    method:
+                        katana:
+                            # asset
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                            - /methods/asset_look
+                            - /methods/asset_usd
+                            - /methods/asset_shotgun
+                        maya:
+                            # asset
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                            - /methods/asset_look
+                            - /methods/asset_usd
+                            - /methods/asset_shotgun
+        #
+        shot:
+            properties: {}
+#
+methods:
+    properties:
+        obj_type: group
+        obj_path: /<...key>
+        #
+        obj_attributes:
+            gui:
+                label: Methods
+                description: None
+                icon: group
+    #
+    asset_scene:
+        properties:
+            obj_type: method
+            obj_path: <...properties.obj_path>/<...key>
+            #
+            obj_attributes:
+                gui:
+                    label: Asset-scene
+                    description: None
+                    icon: python
+                #
+                method:
+                    katana:
+                        module: lxutil_fnc.methods.asset.utility.katana_scene
+                        dependent: []
+                    #
+                    maya:
+                        module: lxutil_fnc.methods.asset.utility.maya_scene
+                        dependent: []
+                    #
+                    check:
+                        label: Asset Scene-check
+                        #
+                        description:
+                            index_0:
+                                - 'scene has modifier to save'
+                    #
+                    export:
+                        label: Asset Scene-export
+                        #
+                        description:
+                            index_0:
+                                - 'export "scene-src"'
+                            index_1:
+                                - 'export "scene"'
+    #
+    asset_model_geometry:
+        properties:
+            obj_type: method
+            obj_path: <...properties.obj_path>/<...key>
+            #
+            obj_attributes:
+                gui:
+                    label: Asset-model-geometry
+                    description: None
+                    icon: python
+                #
+                method:
+                    maya:
+                        module: lxutil_fnc.methods.asset.model.maya_geometry
+                        dependent:
+                            - /methods/asset_scene
+                    #
+                    check:
+                        label: Asset-model Geometry-check
+                        #
+                        description:
+                            index_0:
+                                - '"asset-root" "/master" is non-exists'
+                                - '找不到资产根结点 "/master"'
+                    #
+                    export:
+                        label: Asset-model Geometry-export
+                        #
+                        description:
+                            index_0:
+                                - 'export "geometry-usd"'
+    #
+    asset_surface_geometry:
+        properties:
+            obj_type: method
+            obj_path: <...properties.obj_path>/<...key>
+            #
+            obj_attributes:
+                gui:
+                    label: Asset-surface-geometry
+                    description: None
+                    icon: python
+                #
+                method:
+                    maya:
+                        module: lxutil_fnc.methods.asset.surface.maya_geometry
+                        dependent:
+                            - /methods/asset_scene
+                    #
+                    katana:
+                        module: lxutil_fnc.methods.asset.surface.katana_geometry
+                        dependent:
+                            - /methods/asset_scene
+                    #
+                    check:
+                        label: Asset-surface Geometry-check
+                        #
+                        description:
+                            index_0:
+                                - '"geometry-root" "/master/hi" is non-exists'
+                                - '找不到模型根结点 "/master/hi"'
+                            index_1:
+                                - '"geometry usd-file" from "model" is non-exists'
+                            index_2:
+                                - '"mesh-geometry" is "addition" / "deletion" / "path-changed" / "path-exchanged" / "face-vertices-changed"'
+                            index_3:
+                                - '"mesh-uv-map-name" "map1 / st" is non-exists'
+                            index_4:
+                                - '"mesh-face-uv-map" in "map1 / st" is non-data'
+                            index_5:
+                                - '"mesh-face" has material-assign(s)'
+                            index_6:
+                                - '"geometry usd-file" is changed'
+                    #
+                    export:
+                        label: Asset-surface Geometry-export
+                        #
+                        description:
+                            index_0:
+                                - 'export "geometry-usd"'
+    #
+    asset_look:
+        properties:
+            obj_type: method
+            obj_path: <...properties.obj_path>/<...key>
+            #
+            obj_attributes:
+                gui:
+                    label: Asset-look
+                    description: None
+                    icon: python
+                #
+                method:
+                    maya:
+                        module: lxutil_fnc.methods.asset.utility.maya_look
+                        dependent:
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                    #
+                    katana:
+                        module: lxutil_fnc.methods.asset.utility.katana_look
+                        dependent:
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                    #
+                    check:
+                        label: Asset Look-check
+                        #
+                        description:
+                            index_0:
+                                - '"texture" is "non-exists"'
+                                - '贴图不存在'
+                            index_1:
+                                - '"node" is not path to "texture-tx"'
+                                - '节点没有指向贴图（.tx）'
+                            #
+                            index_2:
+                                - '"texture-tx" is "changed / non-exists"'
+                                - '贴图（.tx）改变了 / 不存在'
+                            index_3:
+                                - '"texture-path / name" is contain "chinese"'
+                                - '贴图路径/名字包含中文'
+                            index_4:
+                                - '"texture-path / name" is contain "space"'
+                                - '贴图路径 / 名字包含空格'
+                            index_5:
+                                - '"texture-name" is "override"'
+                                - '贴图名字重复'
+                            #
+                            index_6:
+                                - '"node" is not path to "texture-jpg"'
+                            index_7:
+                                - '"texture-jpg" is "changed / non-exists"'
+                    #
+                    export:
+                        label: Asset Look-export
+                        #
+                        description:
+                            index_0:
+                                - 'export "look-klf"'
+                            index_1:
+                                - 'export "look-ass"'
+                            index_2:
+                                - 'export "texture-tx"'
+    #
+    asset_usd:
+        properties:
+            obj_type: method
+            obj_path: <...properties.obj_path>/<...key>
+            #
+            obj_attributes:
+                gui:
+                    label: Asset-usd
+                    description: None
+                    icon: python
+                #
+                method:
+                    katana:
+                        module: lxutil_fnc.methods.asset.utility.usd
+                        dependent:
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                            - /methods/asset_look
+                    #
+                    maya:
+                        module: lxutil_fnc.methods.asset.utility.usd
+                        dependent:
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                            - /methods/asset_look
+                    #
+                    check:
+                        label: Asset Usd-check
+                        #
+                        description:
+                            index_0:
+                                - 'non-check'
+                    #
+                    export:
+                        label: Asset Usd-export
+                        #
+                        description:
+                            index_0:
+                                - 'export "geometry-uv-map-usd"'
+                            index_1:
+                                - 'export "material-usd"'
+                            index_2:
+                                - 'export "set-usd"'
+    #
+    asset_shotgun:
+        properties:
+            obj_type: method
+            obj_path: <...properties.obj_path>/<...key>
+            #
+            obj_attributes:
+                gui:
+                    label: Asset-shotgun
+                    description: None
+                    icon: python
+                #
+                method:
+                    katana:
+                        module: lxutil_fnc.methods.asset.utility.shotgun
+                        dependent:
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                            - /methods/asset_look
+                            - /methods/asset_usd
+                    #
+                    maya:
+                        module: lxutil_fnc.methods.asset.utility.shotgun
+                        dependent:
+                            - /methods/asset_scene
+                            - /methods/asset_surface_geometry
+                            - /methods/asset_look
+                            - /methods/asset_usd
+                    #
+                    check:
+                        label: Asset Shotgun-check
+                        #
+                        description:
+                            index_0:
+                                - '"shotgun-task" is "non-exists"'
+                            index_1:
+                                - '"shotgun-task" is "omit" or "hold"'
+                    #
+                    export:
+                        label: Asset Shotgun-export
+                        #
+                        description:
+                            index_0:
+                                - 'export "shotgun-version"'
+                            index_1:
+                                - 'create "no-version-link"'

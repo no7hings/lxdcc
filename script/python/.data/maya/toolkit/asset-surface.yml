@@ -1,0 +1,205 @@
+window:
+    name: Asset-surface Toolkit
+    size:
+        - 640
+        - 640
+#
+central:
+    groups:
+        Scene(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                create_system_workspace:
+                    enable: True
+                    name: Create System-workspace
+                    icon: python
+                    description:
+                        - 'press to create folder(s) in "System"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_system_workspace_create
+                open_system_workspace:
+                    enable: True
+                    name: Open System-workspace
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_system_workspace_open
+                create_katana_scene_src:
+                    enable: True
+                    name: Create Katana-scene-src-file
+                    icon: python
+                    description: ''
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_katana_scene_src_create
+        Geometry(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Export Work Geometry UV-map ():
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'export "Geometry UV-map" to latest "Work Surface-task" ".usd"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_surface_geometry_uv_map_export
+                #
+                Import Work Geometry UV-map:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import "Geometry UV-map" from latest "Work Surface-task" ".usd"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_surface_geometry_uv_map_import
+                    click_command: ''
+                #
+                update_geometry:
+                    enable: True
+                    name: Update Geometry
+                    icon: python
+                    description:
+                        - 'update geometry to "srf/surfacing" and "latest / new version"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_geometry_update
+                    option:
+                        attributes:
+                            scheme:
+                                name: Scheme(s)
+                                type: enumerate
+                                value: fnc(self.get_geometry_update_schemes())
+                #
+                Import Groom Geometry:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import "Geometry" from latest "Groom-task" ".xgen"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_groom_geometry_xgen_import
+        Texture(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Load Texture-tx(s):
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'convert "texture-tx(s)" to latest and repath'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_texture_tx_load
+                    click_status_enable: True
+                #
+                Open Texture Manager Panel:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'show "Texture Manager" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+        Look(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Export Work Look:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'export ".ass" file to current work-task for render, use new-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_look_ass_export
+                #
+                Import Work Look:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".ass" file from current work-task for render, use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_look_ass_import
+                    option:
+                        attributes:
+                            look_ass_file:
+                                name: Look-ass-file
+                                type: enumerate
+                                value: fnc(self.get_work_look_ass_files())
+                            look_pass:
+                                name: Look-pass
+                                type: enumerate
+                                value: fnc(self.get_look_passes())
+                #
+                Export Work Look-preview:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'export ".yml" file to current work-task for preview, use new-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_look_yml_export
+        Light(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                load_light_rig:
+                    enable: True
+                    name: Import / Update Light-rig
+                    icon: python
+                    description: None
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_command: 'import lxmaya.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_reference("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma")'
+        TD(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                asset_comparer:
+                    enable: True
+                    name: Open Asset Comparer-panel
+                    icon: python
+                    description: None
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_asset_comparer_panel_open
+                method_runner_panel:
+                    enable: True
+                    name: Open Method-runner-panel
+                    icon: python
+                    description: None
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_method_runner_panel_open
+                package_panel:
+                    enable: True
+                    name: Open Scene-packager-panel
+                    icon: python
+                    description: None
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_scene_packager_panel_open

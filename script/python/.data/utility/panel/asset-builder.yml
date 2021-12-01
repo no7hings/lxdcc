@@ -1,0 +1,5 @@
+window:
+    name: Asset Builder
+    size:
+        - 960
+        - 320

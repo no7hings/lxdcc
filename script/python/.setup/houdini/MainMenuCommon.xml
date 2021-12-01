@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+    <menuBar>
+        <subMenu id="tool_menu_0">
+            <label>TD-tool(s)</label>
+            <insertBefore>help_menu</insertBefore>
+            <subMenu id="loader">
+                <label>Loader(s)</label>
+                <scriptItem id="asset_loader">
+                    <label>Asset Loader</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/asset-loader")]]></scriptCode>
+                </scriptItem>
+                <scriptItem id="asset_proxy_loader">
+                    <label>Asset-proxy Loader</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/asset-proxy-loader")]]></scriptCode>
+                </scriptItem>
+                <separatorItem />
+                <scriptItem id="lib_asset_loader">
+                    <label>Lib Asset Loader</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/lib-asset-loader")]]></scriptCode>
+                </scriptItem>
+                <scriptItem id="lib_asset_look_loader">
+                    <label>Lib Asset-look Loader</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/lib-asset-look-loader")]]></scriptCode>
+                </scriptItem>
+                <separatorItem />
+                <scriptItem id="shot_loader">
+                    <label>Shot Loader</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/shot-loader")]]></scriptCode>
+                </scriptItem>
+                <scriptItem id="shot_camera_loader">
+                    <label>Shot-camera Loader</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/shot-camera-loader")]]></scriptCode>
+                </scriptItem>
+            </subMenu>
+            <separatorItem />
+            <scriptItem id="package_reloader">
+                <label>Package-reloader</label>
+                <scriptCode><![CDATA[import lxhoudini;lxhoudini.Packages.set_reload()]]></scriptCode>
+            </scriptItem>
+        </subMenu>
+    </menuBar>
+</mainMenu>

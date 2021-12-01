@@ -1,0 +1,5 @@
+window:
+    name: Texture Manager
+    size:
+        - 1280
+        - 720

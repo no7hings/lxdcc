@@ -1,0 +1,29 @@
+{
+    "tool": {
+        "/project/asset/surface": {
+        	"label": "Asset-look-develop",
+			"chn_label": null,
+			"eng_description": null,
+			"chn_description": null,
+			"icon": null,
+			"size": [720, 560],
+        	"command": "from lxhoudini.panel import widgets; widgets.SceneCheckerToolPanel('/project/asset/surface').set_window_show()"
+        },
+		"/project/shot/light/render": {
+			"label": "Shot-light-render",
+			"chn_label": null,
+			"eng_description": null,
+			"chn_description": null,
+			"icon": null,
+			"size": [720, 560],
+        	"command": "from lxhoudini.panel import widgets; widgets.SceneCheckerToolPanel('/project/shot/light/render').set_window_show()"
+		}
+    },
+    "menu": {
+		"label": "Validation-tool(s)",
+		"tools": [
+			"/project/asset/surface",
+			"/project/shot/light/render"
+		]
+	}
+}

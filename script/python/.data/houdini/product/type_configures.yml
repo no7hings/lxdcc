@@ -1,0 +1,297 @@
+# container
+extra/container:
+    sot_asb/gmt_abc/houdini/use_ist:
+        raw: True
+    # entities
+    houdini/entities/dcc_type:
+        # houdini null type
+        raw: 'null'
+    houdini/entities/dcc_name:
+        raw: <extra/container.entities.raw>
+    houdini/entities/dcc_path:
+        raw: <extra/container.hou_opt/dcc_path.raw>/<extra/container.houdini/entities/dcc_name.raw>
+    # role
+    houdini/role/dcc_type:
+        # houdini null type
+        raw: 'null'
+    houdini/role/dcc_name:
+        raw: <extra/container.role.raw>
+    houdini/role/dcc_path:
+        raw: <extra/container.hou_opt/dcc_path.raw>/<extra/container.houdini/role/dcc_name.raw>
+    # role-tag
+    houdini/role_tag/dcc_type:
+        raw: subnet
+    houdini/role_tag/dcc_name:
+        raw: <extra/container.role_tag.raw>
+    houdini/role_tag/dcc_path:
+        raw: <extra/container.hou_opt/dcc_path.raw>/<extra/container.houdini/role_tag/dcc_name.raw>
+    # namespace
+    houdini/namespace/dcc_type:
+        # houdini null type
+        raw: 'null'
+    houdini/namespace/dcc_name:
+        raw: <extra/container.namespace.raw>
+    houdini/namespace/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.houdini/namespace/dcc_name.raw>
+    #
+    cmr_abc/houdini/hou_opt/dcc_path:
+        raw: /obj
+    cmr_abc/houdini/dcc_type:
+        raw: alembicarchive
+    cmr_abc/houdini/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>
+    cmr_abc/houdini/dcc_path:
+        raw: <extra/container.cmr_abc/houdini/hou_opt/dcc_path.raw>/<extra/container.cmr_abc/houdini/dcc_name.raw>
+    #
+    mtl_mtx/houdini/hou_opt/dcc_path:
+        raw: /out
+    mtl_mtx/houdini/dcc_type:
+        raw: arnold::materialx
+    mtl_mtx/houdini/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>
+    mtl_mtx/houdini/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.mtl_mtx/houdini/dcc_name.raw>
+    #
+    mtl_mtx/houdini/mrg/dcc_type:
+        raw: arnold::materialx
+    mtl_mtx/houdini/mrg/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>
+    mtl_mtx/houdini/mrg/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.mtl_mtx/houdini/dcc_name.raw>
+    #
+    mtl_mtx/houdini/ist/dcc_type:
+        raw: arnold::materialx
+    mtl_mtx/houdini/ist/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>
+    mtl_mtx/houdini/ist/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.mtl_mtx/houdini/dcc_name.raw>
+    #
+    gmt_abc/houdini/hou_opt/dcc_path:
+        raw: /obj
+    gmt_abc/houdini/dcc_type:
+        raw: geo
+    gmt_abc/houdini/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>__<extra/container.variant.raw>
+    gmt_abc/houdini/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.gmt_abc/houdini/dcc_name.raw>
+    # instance: ist
+    gmt_abc/houdini/ist/dcc_type:
+        raw: <extra/container.gmt_abc/houdini/dcc_type.raw>
+    gmt_abc/houdini/ist/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>__<extra/container.variant.raw>__instance_source
+    gmt_abc/houdini/ist/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.gmt_abc/houdini/ist/dcc_name.raw>
+    # instance: ist_cmp
+    gmt_abc/houdini/ist_cmp/dcc_type:
+        raw: instance
+    gmt_abc/houdini/ist_cmp/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>__<extra/container.variant.raw>
+    gmt_abc/houdini/ist_cmp/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.gmt_abc/houdini/ist_cmp/dcc_name.raw>
+    gmt_abc/houdini/ist_cmp/dcc_port:
+        raw: instancepath
+    # plt_dta
+    plt_dta/houdini/hou_opt/dcc_path:
+        raw: /obj
+    plt_dta/houdini/dcc_type:
+        raw: subnet
+    plt_dta/houdini/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>
+    plt_dta/houdini/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.plt_dta/houdini/dcc_name.raw>
+    #
+    har_xgn/houdini/hou_opt/dcc_path:
+        raw: /obj
+    har_xgn/houdini/dcc_type:
+        raw: 'null'
+    har_xgn/houdini/dcc_name:
+        raw: <extra/container.namespace.raw>__xgn
+    har_xgn/houdini/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.har_xgn/houdini/dcc_name.raw>
+    #
+    xgn_glo_abc/houdini/hou_opt/dcc_path:
+        raw: <extra/container.har_xgn/houdini/hou_opt/dcc_path.raw>
+    xgn_glo_abc/houdini/dcc_type:
+        raw: <extra/container.har_xgn/houdini/dcc_type.raw>
+    xgn_glo_abc/houdini/dcc_name:
+        raw: <extra/container.har_xgn/houdini/dcc_name.raw>
+    xgn_glo_abc/houdini/dcc_path:
+        raw: <extra/container.har_xgn/houdini/dcc_path.raw>
+    #
+    crd_abc/houdini/hou_opt/dcc_path:
+        raw: /obj
+    crd_abc/houdini/dcc_type:
+        raw: geo
+    crd_abc/houdini/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>
+    crd_abc/houdini/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.crd_abc/houdini/dcc_name.raw>
+    #
+    crd_abc/houdini/mrg/dcc_type:
+        raw: geo
+    crd_abc/houdini/mrg/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>
+    crd_abc/houdini/mrg/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.crd_abc/houdini/mrg/dcc_name.raw>
+    #
+    hou_dta/houdini/hou_opt/dcc_path:
+        raw: /obj
+    hou_dta/houdini/dcc_type:
+        raw: geo
+    hou_dta/houdini/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>
+    hou_dta/houdini/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/container.hou_dta/houdini/dcc_name.raw>
+# element
+extra/element:
+     # dcc-node
+    cmr_abc/houdini/dcc_type:
+        raw: <extra/container.cmr_abc/houdini/dcc_type.raw>
+    cmr_abc/houdini/dcc_name:
+        raw: <extra/container.cmr_abc/houdini/dcc_name.raw>
+    cmr_abc/houdini/dcc_path:
+        raw: <extra/container.cmr_abc/houdini/dcc_path.raw>
+    # dcc-port
+    cmr_abc/houdini/dcc_port:
+        raw: fileName
+    #
+    mtl_mtx/houdini/dcc_type:
+        raw: <extra/container.mtl_mtx/houdini/dcc_type.raw>
+    mtl_mtx/houdini/dcc_name:
+        raw: <extra/container.mtl_mtx/houdini/dcc_name.raw>
+    mtl_mtx/houdini/dcc_path:
+        raw: <extra/container.mtl_mtx/houdini/dcc_path.raw>
+    mtl_mtx/houdini/dcc_port:
+        raw: filename
+    #
+    mtl_mtx/houdini/mrg/dcc_type:
+        raw: <extra/container.mtl_mtx/houdini/dcc_type.raw>
+    mtl_mtx/houdini/mrg/dcc_name:
+        raw: <extra/container.mtl_mtx/houdini/dcc_name.raw>
+    mtl_mtx/houdini/mrg/dcc_path:
+        raw: <extra/container.mtl_mtx/houdini/dcc_path.raw>
+    #
+    gmt_abc/houdini/dcc_type:
+        raw: alembic
+    gmt_abc/houdini/dcc_name:
+        raw: <extra/element.entity_branch.raw>_<extra/container.data_scheme.raw>
+    gmt_abc/houdini/dcc_path:
+        raw: <extra/container.gmt_abc/houdini/dcc_path.raw>/<extra/element.gmt_abc/houdini/dcc_name.raw>
+    gmt_abc/houdini/dcc_port:
+        raw: fileName
+    #
+    gmt_abc/houdini/ist/dcc_type:
+        raw: <extra/element.gmt_abc/houdini/dcc_type.raw>
+    gmt_abc/houdini/ist/dcc_name:
+        raw: <extra/element.gmt_abc/houdini/dcc_name.raw>
+    gmt_abc/houdini/ist/dcc_path:
+        raw: <extra/container.gmt_abc/houdini/ist/dcc_path.raw>/<extra/element.gmt_abc/houdini/ist/dcc_name.raw>
+    gmt_abc/houdini/ist/dcc_port:
+        raw: fileName
+    # har_xgn
+    har_xgn/houdini/branch:
+        raw: True
+    #
+    har_xgn/houdini/use_brh:
+        raw: True
+    har_xgn/houdini/dcc_type:
+        raw: <extra/container.har_xgn/houdini/dcc_type.raw>
+    har_xgn/houdini/dcc_name:
+        raw: <extra/container.har_xgn/houdini/dcc_name.raw>
+    har_xgn/houdini/dcc_path:
+        raw: <extra/container.har_xgn/houdini/dcc_path.raw>
+    #
+    har_xgn/houdini/asset/dcc_port:
+        raw: xgn_file_path
+    har_xgn/houdini/shot/dcc_port:
+        raw: xgn_dlt_file_path
+    #
+    har_xgn/houdini/cmp/dcc_type:
+        raw: xGen
+    har_xgn/houdini/cmp/dcc_name:
+        raw: <extra/container.namespace.raw>__xgn__cmp_var
+    har_xgn/houdini/cmp/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/element.har_xgn/houdini/cmp/dcc_name.raw>
+    har_xgn/houdini/asset/cmp/dcc_port:
+        raw: xGenFile
+    har_xgn/houdini/shot/cmp/dcc_port:
+        raw: xGenDeltaFile
+    #
+    har_xgn/asset/houdini/dcc_port:
+        raw: xGenFile
+    har_xgn/shot/houdini/dcc_port:
+        raw: xGenDeltaFile
+    # xgn_glo_abc/dcc
+    xgn_glo_abc/houdini/dcc_type:
+        raw: <extra/element.har_xgn/houdini/dcc_type.raw>
+    xgn_glo_abc/houdini/dcc_name:
+        raw: <extra/element.har_xgn/houdini/dcc_name.raw>
+    xgn_glo_abc/houdini/dcc_path:
+        raw: <extra/element.har_xgn/houdini/dcc_path.raw>
+    xgn_glo_abc/houdini/dcc_port:
+        raw: xgn_glo_abc_file_path
+    #
+    xgn_glo_abc/houdini/cmp/dcc_type:
+        raw: xGen
+    xgn_glo_abc/houdini/cmp/dcc_name:
+        raw: <extra/container.namespace.raw>__xgn__cmp_var
+    xgn_glo_abc/houdini/cmp/dcc_path:
+        raw: <extra/container.houdini/role_tag/dcc_path.raw>/<extra/element.har_xgn/houdini/cmp/dcc_name.raw>
+    xgn_glo_abc/houdini/cmp/dcc_port:
+        raw: skinAbcFile
+    #
+    plt_dta/houdini/dcc_type:
+        raw: subnet
+    plt_dta/houdini/dcc_name:
+        raw: <extra/element.entity_branch.raw>_<extra/container.data_scheme.raw>
+    plt_dta/houdini/dcc_path:
+        raw: <extra/container.plt_dta/houdini/dcc_path.raw>/<extra/element.plt_dta/houdini/dcc_name.raw>
+    plt_dta/houdini/dcc_port:
+        raw: file_path
+    #
+    plt_dta/houdini/cmp/dcc_type:
+        raw: pntInstance
+    plt_dta/houdini/cmp/dcc_name:
+        raw: <extra/element.cmp_name.raw>_pnt_instance
+    plt_dta/houdini/cmp/dcc_path:
+        raw: <extra/element.plt_dta/houdini/dcc_path.raw>/<extra/element.plt_dta/houdini/cmp/dcc_name.raw>
+    plt_dta/houdini/cmp/dcc_port:
+        raw: pntFile
+    # crowd-alembic
+    # dcc-node
+    crd_abc/houdini/dcc_type:
+        raw: alembic
+    crd_abc/houdini/dcc_name:
+        raw: <extra/element.entity_branch.raw>_<extra/container.data_scheme.raw>
+    crd_abc/houdini/dcc_path:
+        raw: <extra/container.crd_abc/houdini/dcc_path.raw>/<extra/element.crd_abc/houdini/dcc_name.raw>
+    crd_abc/houdini/dcc_port:
+        raw: fileName
+    # dcc-node
+    crd_abc/houdini/mrg/dcc_type:
+        raw: merge
+    crd_abc/houdini/mrg/dcc_name:
+        raw: <extra/element.entity_branch.raw>_<extra/container.data_scheme.raw>
+    crd_abc/houdini/mrg/dcc_path:
+        raw: <extra/container.crd_abc/houdini/mrg/dcc_path.raw>/<extra/element.crd_abc/houdini/mrg/dcc_name.raw>
+    crd_abc/houdini/mrg/dcc_port:
+        raw: file_path
+    #
+    crd_abc/houdini/mrg_cmp/dcc_type:
+        raw: alembic
+    crd_abc/houdini/mrg_cmp/dcc_name:
+        raw: <extra/element.entity_branch.raw>_<extra/container.data_scheme.raw>
+    crd_abc/houdini/mrg_cmp/dcc_path:
+        raw: <extra/container.crd_abc/houdini/mrg/dcc_path.raw>/<extra/element.crd_abc/houdini/mrg_cmp/dcc_name.raw>
+    #
+    crd_abc/houdini/mrg_cmp/dcc_port:
+        raw: fileName
+    #
+    hou_dta/houdini/dcc_type:
+        raw: file
+    hou_dta/houdini/dcc_name:
+        raw: <extra/element.entity_branch.raw>_<extra/container.data_scheme.raw>
+    hou_dta/houdini/dcc_path:
+        raw: <extra/container.hou_dta/houdini/dcc_path.raw>/<extra/element.hou_dta/houdini/dcc_name.raw>
+    hou_dta/houdini/dcc_port:
+        raw: file

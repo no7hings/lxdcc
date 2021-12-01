@@ -1,0 +1,98 @@
+option:
+    name: TD-tool(s)
+    tool:
+        - loader
+        - separator
+        #
+        - toolkit
+        - separator
+        #
+        - package_reloader
+    action:
+        loader:
+            type: group
+            name: Loader(s)
+#
+tools:
+    package_reloader:
+        type: item
+        name: Package-reloader
+        icon: None
+        command: import lxkatana;lxkatana.Packages.set_reload()
+    #
+    loader:
+        type: group
+        name: Loader(s)
+        icon: None
+        items:
+            - asset_loader
+            - asset_proxy_loader
+            - separator
+            - lib_asset_loader
+            - lib_asset_look_loader
+            - separator
+            - shot_loader
+            - shot_camera_loader
+    #
+    asset_loader:
+        type: item
+        name: Asset Loader
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/asset-loader")'
+    #
+    asset_proxy_loader:
+        type: item
+        name: Asset-proxy Loader
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/asset-proxy-loader")'
+    #
+    lib_asset_loader:
+        type: item
+        name: Lib Asset Loader
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/lib-asset-loader")'
+    #
+    lib_asset_look_loader:
+        type: item
+        name: Lib Asset-look Loader
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/lib-asset-look-loader")'
+    #
+    shot_loader:
+        type: item
+        name: Shot Loader
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/shot-loader")'
+    #
+    shot_camera_loader:
+        type: item
+        name: Shot-camera Loader
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/shot-camera-loader")'
+    #
+    toolkit:
+      type: group
+      name: Toolkit(s)
+      icon: None
+      items:
+        - utility_toolkit
+#        - asset_toolkit
+        - asset_surface_toolkit
+  #
+    utility_toolkit:
+      type: item
+      name: Utility Toolkit
+      icon: None
+      command: import lxmaya_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.UtilityToolkitPanel().set_window_show()
+  #
+    asset_toolkit:
+      type: item
+      name: Asset Toolkit
+      icon: None
+      command: import lxmaya_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.AssetToolkitPanel().set_window_show()
+  #
+    asset_surface_toolkit:
+      type: item
+      name: Asset-surface Toolkit
+      icon: None
+      command: import lxmaya_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SurfaceToolkitPanel().set_window_show()

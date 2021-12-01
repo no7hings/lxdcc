@@ -1,0 +1,27 @@
+#usda 1.0
+(
+    defaultPrim = "{{ properties.dcc.asset_root }}"
+    metersPerUnit = {{ usd.presets.linear_unit }}
+    upAxis = "{{ usd.presets.up_axis }}"
+{% if usd.layers -%}
+    {{ '%ssubLayers = [%s' | format(option.indent*1*' ', option.linesep) }}
+    {%- for layer, layer_files in usd.layers.iteritems() -%}
+        {%- if loop.last -%}
+            {{ '%s@%s.usda@%s' | format(option.indent*2*' ', layer, option.linesep) }}
+        {%- else -%}
+            {{ '%s@%s.usda@,%s' | format(option.indent*2*' ', layer, option.linesep) }}
+        {%- endif -%}
+    {%- endfor -%}
+    {{ '%s]%s' | format(option.indent*1*' ', option.linesep) }}
+{%- else -%}
+    {{ '%ssubLayers = []%s' | format(option.indent*1*' ', option.linesep) }}
+{%- endif -%}
+)
+
+def Xform "{{ properties.dcc.asset_root }}" (
+    kind = "component"
+    assetInfo = {
+        string name = "{{ properties.asset }}"
+    }
+)
+{}

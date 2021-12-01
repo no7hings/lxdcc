@@ -1,0 +1,5 @@
+window:
+    name: Geometry Checker
+    size:
+        - 960
+        - 480

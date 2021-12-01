@@ -1,0 +1,36 @@
+option:
+    #
+    systems:
+        - 'linux-python'
+        #
+        - '*-maya'
+        - '*-houdini'
+        - '*-katana'
+    #
+    gui:
+        name: 'Lib Asset-look Loader'
+        icon_name: ''
+        #
+        size: [1280, 960]
+        item_frame_icon_size: [40, 128]
+        item_frame_image_size: [128, 128]
+        item_frame_name_size: [128, 40]
+#
+resolver:
+    filter: 'project=lib&branch=asset&workspace=work&role=sdr&step=srf'
+    #
+    task_unit:
+        keywords:
+            - 'asset-look-ass-file'
+#
+actions:
+    task: ''
+    task_unit:
+        hooks:
+            - 'rsv-actions/maya/work-file-open'
+            - 'rsv-actions/houdini/work-file-open'
+            - 'rsv-actions/katana/work-file-open'
+            #
+            - 'rsv-actions/asset/maya/look-material-load'
+            #
+            - 'rsv-actions/review-file-open'

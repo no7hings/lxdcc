@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+{% for key, value in objs.iteritems() recursive -%}
+    {%- if key != 'properties' -%}
+        {% if value is not string -%}
+            {% if value | length > 1 %}
+                {{- '%s<%s name="%s"' | format(option.indent*(loop.depth-1)*' ', value.properties.type, key) -}}
+                {{- '>%s' | format(option.linesep) -}}
+                {{- loop(value.iteritems()) -}}
+                {{- '%s</%s>%s' | format(option.indent*(loop.depth-1)*' ', value.properties.type, option.linesep) -}}
+            {%- else -%}
+                {{- '%s<%s name="%s"' | format(option.indent*(loop.depth-1)*' ', value.properties.type, key) -}}
+                {%- if value.properties.attributes -%}
+                    {% for k, v in value.properties.attributes.iteritems() recursive -%}
+                    {{ ' %s="%s"' | format(k, v) }}
+                    {%- endfor -%}
+                {%- endif -%}
+                {{- ' />%s' | format(option.linesep) -}}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endif -%}
+{%- endfor -%}

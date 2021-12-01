@@ -1,0 +1,49 @@
+{
+    "ray_switch_rgba": {
+        "datatype": "color4",
+        "port": [
+            {
+                "portpath": "camera",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            },
+            {
+                "portpath": "shadow",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            },
+            {
+                "portpath": "diffuse_reflection",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            },
+            {
+                "portpath": "diffuse_transmission",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            },
+            {
+                "portpath": "specular_reflection",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            },
+            {
+                "portpath": "specular_transmission",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            },
+            {
+                "portpath": "volume",
+                "datatype": "color4",
+                "portraw": "0, 0, 0, 1",
+                "assign": "inport"
+            }
+        ]
+    }
+}

@@ -1,0 +1,35 @@
+option:
+    type: unit
+    #
+    systems:
+        - 'linux-python'
+        - '*-maya'
+        - '*-houdini'
+        - '*-katana'
+    #
+    gui:
+        group_name: Review
+        #
+        name: 'Open Review File'
+        icon_name: 'application/rv'
+#
+variants:
+    project: ''
+    branch: ''
+    #
+    role: ''
+    asset: ''
+    #
+    sequence: ''
+    shot: ''
+    #
+    step: ''
+    task: ''
+    #
+    application: ''
+#
+resolver:
+    rsv_unit:
+        keyword: '{branch}-review-file'
+        version: latest
+

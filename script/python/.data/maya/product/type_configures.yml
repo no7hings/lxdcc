@@ -1,0 +1,192 @@
+# container
+extra/container:
+    # entities
+    maya/entities/dcc_type:
+        raw: transform
+    maya/entities/dcc_name:
+        raw: <extra/container.entities.raw>
+    maya/entities/dcc_path:
+        raw: /<extra/container.maya/entities/dcc_name.raw>
+    # role
+    maya/role/dcc_type:
+        raw: transform
+    maya/role/dcc_name:
+        raw: <extra/container.role.raw>
+    maya/role/dcc_path:
+        raw: /<extra/container.maya/role/dcc_name.raw>
+    # role-tag
+    maya/role_tag/dcc_type:
+        raw: transform
+    maya/role_tag/dcc_name:
+        raw: <extra/container.role_tag.raw>
+    maya/role_tag/dcc_path:
+        raw: <extra/container.maya/entities/dcc_path.raw>/<extra/container.maya/role_tag/dcc_name.raw>
+    # namespace
+    maya/namespace/dcc_type:
+        raw: transform
+    maya/namespace/dcc_name:
+        raw: <extra/container.namespace.raw>
+    maya/namespace/dcc_path:
+        raw: <extra/container.maya/role_tag/dcc_path.raw>/<extra/container.maya/namespace/dcc_name.raw>
+    #
+    cmr_abc/maya/dcc_type:
+        raw: transform
+    cmr_abc/maya/dcc_name:
+        raw: <extra/container.data_scheme.raw>
+    cmr_abc/maya/dcc_path:
+        raw: /camera/<extra/container.maya/namespace/dcc_name.raw>/<extra/container.cmr_abc/maya/dcc_name.raw>
+    #
+    mtl_mtx/maya/dcc_type:
+        raw: aiMaterialx
+    mtl_mtx/maya/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>
+    mtl_mtx/maya/dcc_path:
+        raw: <extra/container.mtl_mtx/maya/dcc_name.raw>
+    #
+    mtl_mtx/maya/ist/dcc_type:
+        raw: aiMaterialx
+    mtl_mtx/maya/ist/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>
+    mtl_mtx/maya/ist/dcc_path:
+        raw: <extra/container.mtl_mtx/maya/dcc_name.raw>
+    #
+    gmt_abc/maya/dcc_type:
+        raw: transform
+    gmt_abc/maya/dcc_name:
+        raw: <extra/container.data_scheme.raw>__<extra/container.variant.raw>
+    gmt_abc/maya/dcc_path:
+        raw: <extra/container.maya/namespace/dcc_path.raw>/<extra/container.gmt_abc/maya/dcc_name.raw>
+    #
+    gmt_abc/maya/ist/dcc_type:
+        raw: transform
+    gmt_abc/maya/ist/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>__<extra/container.variant.raw>__instance_source
+    gmt_abc/maya/ist/dcc_path:
+        raw: <extra/container.maya/role_tag/dcc_path.raw>/<extra/container.gmt_abc/maya/ist/dcc_name.raw>
+    #
+    gmt_abc/maya/ist_cmp/dcc_type:
+        raw: transform
+    gmt_abc/maya/ist_cmp/dcc_name:
+        raw: <extra/container.data_scheme.raw>__<extra/container.variant.raw>
+    gmt_abc/maya/ist_cmp/dcc_path:
+        raw: <extra/container.maya/namespace/dcc_path.raw>/<extra/container.gmt_abc/maya/dcc_name.raw>
+    #
+    har_xgn/maya/dcc_type:
+        raw: transform
+    har_xgn/maya/dcc_name:
+        raw: <extra/container.namespace.raw>__xgn__<extra/container.xgen/variant.raw>
+    har_xgn/maya/dcc_path:
+        raw: <extra/container.maya/namespace/dcc_path.raw>/<extra/container.har_xgn/maya/dcc_name.raw>
+    #
+    xgn_glo_abc/maya/dcc_type:
+        raw: transform
+    xgn_glo_abc/maya/dcc_name:
+        raw: <extra/container.namespace.raw>__xgn__<extra/container.xgen/variant.raw>
+    xgn_glo_abc/maya/dcc_path:
+        raw: <extra/container.maya/namespace/dcc_path.raw>/<extra/container.xgn_glo_abc/maya/dcc_name.raw>
+    #
+    crd_abc/maya/dcc_type:
+        raw: transform
+    crd_abc/maya/dcc_name:
+        raw: <extra/container.data_scheme.raw>
+    crd_abc/maya/dcc_path:
+        raw: <extra/container.maya/namespace/dcc_path.raw>/<extra/container.crd_abc/maya/dcc_name.raw>
+    #
+    hou_dta/maya/dcc_type:
+        raw: transform
+    hou_dta/maya/dcc_name:
+        raw: <extra/container.data_scheme.raw>
+    hou_dta/maya/dcc_path:
+        raw: <extra/container.maya/namespace/dcc_path.raw>/<extra/container.hou_dta/maya/dcc_name.raw>
+# element
+extra/element:
+     # dcc-node
+    cmr_abc/maya/dcc_type:
+        raw: reference
+    cmr_abc/maya/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>RN
+    cmr_abc/maya/dcc_namespace:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>
+    cmr_abc/maya/dcc_path:
+        raw: /<extra/element.cmr_abc/maya/dcc_name.raw>
+    # dcc-port
+    cmr_abc/maya/dcc_port:
+        raw: fileName
+    # dcc-node
+    mtl_mtx/maya/dcc_type:
+        raw: <extra/container.mtl_mtx/maya/dcc_type.raw>
+    mtl_mtx/maya/dcc_name:
+        raw: <extra/container.mtl_mtx/maya/dcc_name.raw>
+    mtl_mtx/maya/dcc_path:
+        raw: <extra/container.mtl_mtx/maya/dcc_path.raw>
+    mtl_mtx/maya/dcc_port:
+        raw: filename
+    # dcc-node
+    gmt_abc/maya/dcc_type:
+        raw: gpuCache
+    gmt_abc/maya/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>__<extra/element.entity_branch.raw>__<extra/container.variant.raw>
+    gmt_abc/maya/dcc_namespace:
+        raw: <extra/element.gmt_abc/maya/dcc_name.raw>
+    gmt_abc/maya/dcc_path:
+        raw: <extra/container.gmt_abc/maya/dcc_path.raw>/<extra/element.gmt_abc/maya/dcc_name.raw>
+    gmt_abc/maya/dcc_port:
+        raw: cacheFileName
+    #
+    gmt_abc/maya/ist/dcc_type:
+        raw: gpuCache
+    gmt_abc/maya/ist/dcc_name:
+        raw: <extra/container.asset_name.raw>__<extra/container.data_scheme.raw>__<extra/element.entity_branch.raw>__<extra/container.variant.raw>__instance_source
+    gmt_abc/maya/ist/dcc_path:
+        raw: <extra/container.gmt_abc/maya/ist/dcc_path.raw>/<extra/element.gmt_abc/maya/ist/dcc_name.raw>
+    gmt_abc/maya/ist/dcc_port:
+        raw: cacheFileName
+    #
+    gmt_abc/maya/ist_cmp/dcc_type:
+        raw: gpuCache
+    gmt_abc/maya/ist_cmp/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>__<extra/element.entity_branch.raw>__<extra/container.variant.raw>
+    gmt_abc/maya/ist_cmp/dcc_path:
+        raw: <extra/container.gmt_abc/maya/dcc_path.raw>/<extra/element.gmt_abc/maya/ist_cmp/dcc_name.raw>
+    # dcc-node
+    har_xgn/maya/dcc_type:
+        raw: <extra/container.har_xgn/maya/dcc_type.raw>
+    har_xgn/maya/dcc_name:
+        raw: <extra/container.har_xgn/maya/dcc_name.raw>
+    har_xgn/maya/dcc_path:
+        raw: <extra/container.har_xgn/maya/dcc_path.raw>
+    # branch
+    har_xgn/maya/branch:
+        raw: True
+    har_xgn/asset/maya/dcc_port:
+        raw: xGenFile
+    har_xgn/shot/maya/dcc_port:
+        raw: xGenDeltaFile
+    # xgn_glo_abc/dcc
+    xgn_glo_abc/maya/dcc_type:
+        raw: <extra/container.har_xgn/maya/dcc_type.raw>
+    xgn_glo_abc/maya/dcc_name:
+        raw: <extra/container.har_xgn/maya/dcc_name.raw>
+    xgn_glo_abc/maya/dcc_path:
+        raw: <extra/container.har_xgn/maya/dcc_path.raw>
+    xgn_glo_abc/maya/dcc_port:
+        raw: skinAbcFile
+    # crowd-alembic
+    # dcc-node
+    crd_abc/maya/dcc_type:
+        raw: gpuCache
+    crd_abc/maya/dcc_name:
+        raw: <extra/container.namespace.raw>__<extra/container.data_scheme.raw>
+    crd_abc/maya/dcc_path:
+        raw: <extra/container.crd_abc/maya/dcc_path.raw>/<extra/element.crd_abc/maya/dcc_name.raw>
+    crd_abc/maya/dcc_port:
+        raw: cacheFileName
+    #
+    hou_dta/maya/dcc_type:
+        raw: aiVolume
+    hou_dta/maya/dcc_name:
+        raw: <extra/container.data_scheme.raw>
+    hou_dta/maya/dcc_path:
+        raw: <extra/container.hou_dta/maya/dcc_path.raw>/<extra/element.hou_dta/maya/dcc_name.raw>
+    hou_dta/maya/dcc_port:
+        raw: file

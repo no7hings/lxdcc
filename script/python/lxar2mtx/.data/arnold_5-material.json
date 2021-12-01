@@ -1,0 +1,19 @@
+{
+    "lynxi/material": {
+        "target_typepath": "material",
+        "port_converter": {
+            "inputs:surface": {
+                "target_portpath": "surfaceshader"
+            },
+            "inputs:displacement": {
+                "target_portpath": "displacementshader"
+            },
+            "inputs:volume": {
+                "target_portpath": "displacementshader"
+            },
+            "outputs:material": {
+                "target_portpath": "material"
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+option:
+    type: unit
+    #
+    systems:
+        - 'linux-python'
+    #
+    gui:
+        group_name: Scene
+        #
+        name: 'Open Maya Work File'
+        icon_name: 'application/maya'
+#
+variants:
+    project: ''
+    branch: ''
+    #
+    role: ''
+    asset: ''
+    #
+    sequence: ''
+    shot: ''
+    #
+    step: ''
+    task: ''
+    #
+    application: ''
+#
+resolver:
+    rsv_unit:
+        keyword: '{branch}-work-maya-scene-src-file'
+        version: latest
+

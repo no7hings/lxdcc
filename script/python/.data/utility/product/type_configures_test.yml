@@ -1,0 +1,1921 @@
+# root
+root:
+    plf_root:
+        raw: '{self.root.plf_root}'
+# projects
+projects:
+    # gui
+    icon:
+        raw: projects
+    # main
+    name:
+        raw: projects
+    path:
+        raw: /<projects.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.projects.plf_name}'
+    plf_path:
+        raw: '{self.root.plf_root}/{self.projects.plf_name}'
+# projects-movies
+projects/movies:
+    # platform
+    plf_name:
+        raw: prod
+    plf_path:
+        raw: <root.plf_root.raw>/<projects/movies.plf_name.raw>
+# project
+project:
+    # gui
+    icon:
+        raw: project
+    # main
+    name:
+        raw: <project.plf_name.raw>
+    path:
+        raw: /<project.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.project.plf_name}'
+    plf_path:
+        raw: <projects.plf_path.raw>/<project.plf_name.raw>
+# project-movie
+project/movie: {}
+# stage
+stage:
+    # gui
+    icon:
+        raw: stage
+    # main
+    name:
+        raw: <stage.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<stage.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.stage.plf_name}'
+    plf_path:
+        raw: <project.plf_path.raw>/<stage.plf_name.raw>
+# stage-source / work
+stage/source:
+    plf_name:
+        raw: work
+    plf_path:
+        raw: <project.plf_path.raw>/<stage/source.plf_name.raw>
+# stage-product / publish
+stage/product:
+    plf_name:
+        raw: publish
+    plf_path:
+        raw: <project.plf_path.raw>/<stage/product.plf_name.raw>
+# stage-temporary / output
+stage/temporary:
+    plf_name:
+        raw: output
+    plf_path:
+        raw: <project.plf_path.raw>/<stage/temporary.plf_name.raw>
+# entities
+entities:
+    icon:
+        raw: entities
+    # main
+    name:
+        raw: <entities.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<entities.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.entities.plf_name}'
+    plf_path:
+        raw: <project.plf_path.raw>/<stage.plf_name.raw>/<entities.plf_name.raw>
+    # dcc
+    dcc_name:
+        raw: <entities/assets.plf_name.raw>
+    # reference
+    reference/key:
+        raw: create
+    reference/name:
+        raw: <entities/assets.name.raw>
+    reference/path:
+        raw: <project.path.raw>/<entities.reference/name.raw>
+    reference/maya/dcc_name:
+        raw: <entities/assets.dcc_name.raw>
+    reference/maya/dcc_path:
+        raw: /<entities.reference/maya/dcc_name.raw>
+# entities-assets
+entities/assets:
+    # main
+    name:
+        raw: <entities/assets.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<entities/assets.name.raw>
+    # platform
+    plf_name:
+        raw: assets
+    plf_path:
+        raw: <project.plf_path.raw>/<stage.plf_name.raw>/<entities/assets.plf_name.raw>
+    #
+    src/plf_name:
+        raw: <entities/assets.plf_name.raw>
+    src/plf_path:
+        raw: <project.plf_path.raw>/<stage/source.plf_name.raw>/<entities/assets.src/plf_name.raw>
+    prd/plf_name:
+        raw: <entities/assets.plf_name.raw>
+    prd/plf_path:
+        raw: <project.plf_path.raw>/<stage/product.plf_name.raw>/<entities/assets.prd/plf_name.raw>
+    tmp/plf_name:
+        raw: <entities/assets.plf_name.raw>
+    tmp/plf_path:
+        raw: <project.plf_path.raw>/<stage/temporary.plf_name.raw>/<entities/assets.tmp/plf_name.raw>
+    # dcc
+    dcc_name:
+        raw: <entities/assets.plf_name.raw>
+# entities-shots
+entities/shots:
+    name:
+        raw: <entities/shots.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<entities/shots.name.raw>
+    plf_name:
+        raw: shots
+    plf_path:
+        raw: <project.plf_path.raw>/<stage.plf_name.raw>/<entities/shots.plf_name.raw>
+    #
+    src/plf_name:
+        raw: <entities/shots.plf_name.raw>
+    src/plf_path:
+        raw: <project.plf_path.raw>/<stage/source.plf_name.raw>/<entities/shots.src/plf_name.raw>
+    prd/plf_name:
+        raw: <entities/shots.plf_name.raw>
+    prd/plf_path:
+        raw: <project.plf_path.raw>/<stage/product.plf_name.raw>/<entities/shots.prd/plf_name.raw>
+    tmp/plf_name:
+        raw: <entities/shots.plf_name.raw>
+    tmp/plf_path:
+        raw: <project.plf_path.raw>/<stage/temporary.plf_name.raw>/<entities/shots.tmp/plf_name.raw>
+# entities-shots
+entities/sets:
+    name:
+        raw: <entities/sets.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<entities/shots.name.raw>
+    plf_name:
+        raw: sets
+    plf_path:
+        raw: <project.plf_path.raw>/<stage.plf_name.raw>/<entities/sets.plf_name.raw>
+# tag
+tag:
+    # gui
+    icon:
+        raw: tag
+    # main
+    name:
+        raw: <tag.plf_name.raw>
+    #
+    asset/name:
+        raw: <tag.asset/plf_name.raw>
+    shot/name:
+        raw: <tag.shot/plf_name.raw>
+    # platform
+    plf_name:
+        raw: '{self.tag.plf_name}'
+    #
+    asset/plf_name:
+        raw: '{self.role.plf_name}'
+    shot/plf_name:
+        raw: '{self.sequence.plf_name}'
+    # dcc
+    dcc_name:
+        raw: <tag.plf_name.raw>
+    dcc_path:
+        raw: '{self.tag.dcc_path}'
+    # reference
+    reference/key:
+        raw: create
+    reference/name:
+        raw: <tag.name.raw>
+    reference/path:
+        raw: <entities.reference/path.raw>/<tag.reference/name.raw>
+    reference/maya/dcc_name:
+        raw: <tag.plf_name.raw>
+    reference/maya/dcc_path:
+        raw: <entities.reference/maya/dcc_path.raw>/<tag.reference/maya/dcc_name.raw>
+# tag-character / chr
+tag/character:
+    category:
+        raw: role
+    # main
+    name:
+        raw: <tag/character.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/character.name.raw>
+    # platform
+    plf_name:
+        raw: chr
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/character.plf_name.raw>
+tag/prop:
+    category:
+        raw: role
+    #
+    name:
+        raw: <tag/prop.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/prop.name.raw>
+    plf_name:
+        raw: prp
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/prop.plf_name.raw>
+tag/environment:
+    category:
+        raw: role
+    #
+    name:
+        raw: <tag/environment.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/environment.name.raw>
+    plf_name:
+        raw: env
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/environment.plf_name.raw>
+tag/assembly:
+    category:
+        raw: role
+    #
+    name:
+        raw: <tag/assembly.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/assembly.name.raw>
+    plf_name:
+        raw: asb
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/assembly.plf_name.raw>
+tag/scenery:
+    category:
+        raw: role
+    #
+    name:
+        raw: <tag/scenery.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/scenery.name.raw>
+    plf_name:
+        raw: scn
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/scenery.plf_name.raw>
+tag/camera:
+    category:
+        raw: role
+    #
+    dcc_name:
+        raw: camera
+    name:
+        raw: <tag/camera.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/camera.name.raw>
+    plf_name:
+        raw: cam
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/camera.plf_name.raw>
+    # reference  override by /cameras/name
+    reference/path:
+        raw: <entities.reference/path.raw>/<tag.asset/name.raw>
+    reference/maya/dcc_name:
+        raw: <tag/camera.dcc_name.raw>
+    reference/maya/dcc_path:
+        raw: /<tag/camera.reference/maya/dcc_name.raw>
+tag/efx:
+    category:
+        raw: role
+    # data-base
+    name:
+        raw: <tag/efx.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/efx.name.raw>
+    # platform
+    plf_name:
+        raw: efx
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/efx.plf_name.raw>
+tag/crd:
+    category:
+        raw: role
+    # data-base
+    name:
+        raw: <tag/crd.plf_name.raw>
+    path:
+        raw: <entities/assets.path.raw>/<tag/crd.name.raw>
+    # platform
+    plf_name:
+        raw: crd
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag/crd.plf_name.raw>
+# tag-sequence
+tag/sequence:
+    category:
+        raw: sequence
+    # data-base
+    name:
+        raw: <tag/sequence.plf_name.raw>
+    path:
+        raw: <entities/shots.path.raw>/<tag.shot/name.raw>
+    # platform
+    plf_name:
+        raw: <tag.shot/plf_name.raw>
+    plf_path:
+        raw: <entities/shots.plf_path.raw>/<tag/sequence.plf_name.raw>
+# entity
+entity:
+    # is branch
+    branch:
+        raw: True
+    #
+    icon:
+        raw: entity
+    # main
+    name:
+        raw: <entity.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<entity.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.entity.plf_name}'
+    plf_path:
+        raw: <entities.plf_path.raw>/<tag.plf_name.raw>/<entity.plf_name.raw>
+# entity-asset
+entity/asset:
+    # is branch
+    branch:
+        raw: True
+    # main
+    name:
+        raw: <entity/asset.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<tag.asset/name.raw>/<entity/asset.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.asset.plf_name}'
+    plf_path:
+        raw: <entities/assets.plf_path.raw>/<tag.asset/plf_name.raw>/<entity/asset.plf_name.raw>
+    #
+    src/plf_name:
+        raw: <entity/asset.plf_name.raw>
+    src/plf_path:
+        raw: <entities/assets.src/plf_path.raw>/<tag.asset/plf_name.raw>/<entity/asset.src/plf_name.raw>
+    prd/plf_name:
+        raw: <entity/asset.plf_name.raw>
+    prd/plf_path:
+        raw: <entities/assets.prd/plf_path.raw>/<tag.asset/plf_name.raw>/<entity/asset.prd/plf_name.raw>
+    tmp/plf_name:
+        raw: <entity/asset.plf_name.raw>
+    tmp/plf_path:
+        raw: <entities/assets.tmp/plf_path.raw>/<tag.asset/plf_name.raw>/<entity/asset.tmp/plf_name.raw>
+    # dcc
+    dcc_name:
+        raw: <entity/asset.plf_name.raw>
+    # dcc-maya
+    maya/dcc_name:
+        raw: <entity/asset.dcc_name.raw>
+    maya/dcc_path:
+        raw: /<entity/asset.maya/dcc_name.raw>
+    # maya
+    maya/dcc_group_paths:
+        raw:
+            - <entity/asset.maya/dcc_path.raw>
+    # reference
+    reference/key:
+        raw: reference
+    reference/namespace:
+        raw: '{self.reference.namespace}'
+    reference/name:
+        raw: <extra/reference.namespace.raw>:<entity/asset.name.raw>
+    reference/path:
+        raw: <entities/assets.path.raw>/<tag.asset/name.raw>/<entity/asset.reference/name.raw>
+    # reference-maya
+    reference/maya/dcc_name:
+        raw: <extra/reference.namespace.raw>:<entity/asset.dcc_name.raw>
+    reference/maya/dcc_path:
+        raw: '{self.reference.tag.dcc_path}/<entity/asset.reference/maya/dcc_name.raw>'
+    #
+    maya/geometry_deform/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/shape
+    maya/geometry_high/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/hi
+    maya/geometry_lower/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/lo
+    maya/geometry_proxy/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/proxy
+    maya/hair/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/hair
+    maya/rig/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/rig
+# entity-shot
+entity/shot:
+    # is branch
+    branch:
+        raw: True
+    # main
+    name:
+        raw: <entity/shot.plf_name.raw>
+    path:
+        raw: <project.path.raw>/<tag.shot/name.raw>/<entity/shot.name.raw>
+    # platform
+    plf_name:
+        raw: '{self.shot.plf_name}'
+    plf_path:
+        raw: <entities/shots.plf_path.raw>/<tag.shot/plf_name.raw>/<entity/shot.plf_name.raw>
+    #
+    prd/plf_name:
+        raw: <entity/shot.plf_name.raw>
+    prd/plf_path:
+        raw: <entities/shots.prd/plf_path.raw>/<tag.shot/plf_name.raw>/<entity/shot.prd/plf_name.raw>
+    tmp/plf_name:
+        raw: <entity/shot.plf_name.raw>
+    tmp/plf_path:
+        raw: <entities/shots.tmp/plf_path.raw>/<tag.shot/plf_name.raw>/<entity/shot.tmp/plf_name.raw>
+    # maya
+    maya/dcc_group_paths:
+        raw: []
+    #
+    maya/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+# step
+step:
+    icon:
+        raw: step
+    name:
+        raw: <step.plf_name.raw>
+    # platform
+    plf_name:
+        raw: '{self.step.plf_name}'
+    # dcc
+    dcc_name:
+        raw: '{self.step.dcc_name}'
+    # branch
+    ett_brhs:
+        raw: []
+    # main
+    asset/name:
+        raw: <step.plf_name.raw>
+    asset/path:
+        raw: <entity/asset.path.raw>/<step.asset/name.raw>
+    # dcc-maya
+    asset/maya/dcc_name:
+        raw: <step.dcc_name.raw>
+    asset/maya/dcc_path:
+        raw: <entity/asset.maya/dcc_path.raw>/<step.asset/maya/dcc_name.raw>
+    # dcc-maya-reference
+    reference/asset/maya/dcc_name:
+        raw: <extra/reference.namespace.raw>:<step.dcc_name.raw>
+    reference/asset/maya/dcc_path:
+        raw: '{self.reference.entity.dcc_path}/<step.reference/asset/maya/dcc_name.raw>'
+    #
+    shot/name:
+        raw: <step.plf_name.raw>
+    shot/path:
+        raw: <entity/shot.path.raw>/<step.shot/name.raw>
+    # reference
+    reference/key:
+        raw: reference
+    reference/asset/name:
+        raw: <extra/task.name.raw>
+    reference/asset/path:
+        raw: <entity/asset.reference/path.raw>/<extra/task.name.raw>
+    reference/asset/rlt_plf_path:
+        raw:
+    # version-key
+    asset/vsn_key:
+        raw: <entity/asset.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>
+    shot/vsn_key:
+        raw: <entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>
+    # data-scheme
+    dta_scms:
+        raw:
+            - mtl_mtx
+            - gmt_abc
+            - prx_ass
+    # use multiply
+    hou_dta/use_mtp:
+        raw: True
+    # use compose
+    har_xgn/use_cmp:
+        raw: True
+    xgn_glo_abc/use_cmp:
+        raw: True
+    plt_dta/use_cmp:
+        raw: True
+    # use merge
+    crd_abc/use_mrg:
+        raw: True
+    # data-category
+    # manifest
+    anm_scm/dta_ctg:
+        raw: manifest
+    asb_scm/dta_ctg:
+        raw: manifest
+    crd_scm/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    efx_scm/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    # container
+    cmr_abc/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    mtl_mtx/dta_ctg:
+        raw: <extra/dta_ctg.look/plf_name.raw>
+    gmt_abc/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    prx_ass/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    plt_dta/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    har_xgn/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    xgn_glo_abc/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    crd_abc/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    hou_dta/dta_ctg:
+        raw: <extra/dta_ctg.cache/plf_name.raw>
+    # entity-branches
+    cmr_abc/ett_brhs:
+        raw:
+            - shot
+    cmr_abc/shot/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+    mtl_mtx/ett_brhs:
+        raw:
+            - asset
+    mtl_mtx/asset/stp_brhs:
+        raw:
+            - surface
+    gmt_abc/ett_brhs:
+        raw:
+            - asset
+            - shot
+    gmt_abc/asset/stp_brhs:
+        raw:
+            - model
+            - surface
+    gmt_abc/shot/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+            - character_effect
+    prx_ass/ett_brhs:
+        raw:
+            - asset
+    prx_ass/asset/stp_brhs:
+        raw:
+            - model
+            - surface
+    plt_dta/ett_brhs:
+        raw:
+            - asset
+    plt_dta/asset/stp_brhs:
+        raw:
+            - plant
+    har_xgn/ett_brhs:
+        raw:
+            - asset
+            - shot
+    har_xgn/asset/stp_brhs:
+        raw:
+            - groom
+    har_xgn/shot/stp_brhs:
+        raw:
+            - character_effect
+    xgn_glo_abc/ett_brhs:
+        raw:
+            - asset
+            - shot
+    xgn_glo_abc/asset/stp_brhs:
+        raw:
+            - groom
+    xgn_glo_abc/shot/stp_brhs:
+        raw:
+            - character_effect
+    hou_dta/ett_brhs:
+        raw:
+            - shot
+    hou_dta/shot/stp_brhs:
+        raw:
+            - effect
+    # source-asset-file-name
+    source/asset/maya/plf_file_name:
+        raw: <entity/asset.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>.ma
+    # source-asset-file-path
+    source/asset/maya/rlt_plf_file_path:
+        raw: <extra/task.plf_name.raw>/maya/scenes/<step.source/asset/maya/plf_file_name.raw>
+    # source-asset-image
+    source/asset/image/rlt_plf_path:
+        raw: <extra/task.plf_name.raw>/images
+    # relative-file-paths
+    source/asset/maya/rlt_plf_file_paths:
+        raw:
+            dcc: <step.source/asset/maya/rlt_plf_file_path.raw>
+    # product-asset-file-name
+    product/asset/maya/plf_file_name:
+        raw: <entity/asset.plf_name.raw>.ma
+    # product-asset-image
+    product/asset/rlt_plf_path/image/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.image/plf_name.raw>
+    product/asset/rlt_plf_path/image/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.image/plf_name.raw>
+    # product-asset-dcc
+    product/asset/maya/rlt_plf_file_path/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.maya/plf_name.raw>/<step.product/asset/maya/plf_file_name.raw>
+    product/asset/maya/rlt_plf_file_path/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.maya/plf_name.raw>/<step.product/asset/maya/plf_file_name.raw>
+    # relative-file-paths
+    product/asset/maya/rlt_plf_file_paths:
+        raw:
+            dcc:
+                - <step.product/asset/maya/rlt_plf_file_path/vsn_dnm.raw>
+                - <step.product/asset/maya/rlt_plf_file_path/vsn_stc.raw>
+    # shot
+    # shot-source-relative-file
+    source/shot/maya/plf_file_name:
+        raw: <entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>.ma
+    source/shot/maya/rlt_plf_file_path:
+        raw: <extra/task.plf_name.raw>/maya/scenes/<step.source/shot/maya/plf_file_name.raw>
+    # relative-file-paths
+    source/shot/maya/rlt_plf_file_paths:
+        raw:
+            dcc: <step.source/shot/maya/rlt_plf_file_path.raw>
+    # shot-product-relative-file
+    product/shot/maya/plf_file_name:
+        raw: <entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.ma
+    # shot-product-version
+    product/shot/maya/rlt_plf_path/vsn_dnm:
+        raw: <extra/task.plf_name.raw>/<entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>/<extra/dta_ctg.plf_name.raw>
+    product/shot/version/maya/rlt_plf_file_path:
+        raw: <step.product/shot/maya/rlt_plf_path/vsn_dnm.raw>/<step.product/shot/maya/plf_file_name.raw>
+    # manifest
+    product/shot/manifest/rlt_plf_path:
+        raw: <extra/task.plf_name.raw>/<entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>/<extra/dta_ctg.manifest/plf_name.raw>
+    product/shot/manifest/rlt_plf_file_name:
+        raw: <entity/shot.plf_name.raw>.yml
+    product/shot/manifest/rlt_plf_file_path:
+        raw: <step.product/shot/manifest/rlt_plf_path.raw>/<step.product/shot/manifest/rlt_plf_file_name.raw>
+    # source
+    # relative-paths
+    source/asset/maya/rlt_plf_paths:
+        raw:
+            image: <step.source/asset/image/rlt_plf_path.raw>
+    # product
+    # relative-paths
+    product/asset/maya/rlt_plf_paths:
+        raw:
+            main:
+                - <step.product/asset/rlt_plf_path/vsn_dnm.raw>
+                - <step.product/asset/rlt_plf_path/vsn_stc.raw>
+            image:
+                - <step.product/asset/rlt_plf_path/image/vsn_dnm.raw>
+                - <step.product/asset/rlt_plf_path/image/vsn_stc.raw>
+            cache:
+                - <step.product/asset/rlt_plf_path/cache/vsn_dnm.raw>
+                - <step.product/asset/rlt_plf_path/cache/vsn_stc.raw>
+    # alembic
+    # asset
+    # asset
+    product/asset/rlt_plf_path/vsn_dnm:
+        raw: <extra/task.plf_name.raw>/<entity/asset.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>
+    product/asset/rlt_plf_path/vsn_stc:
+        raw: <extra/task.plf_name.raw>/<entity/asset.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>
+    # shot
+    product/shot/rlt_plf_path/vsn_dnm:
+        raw: <extra/task.plf_name.raw>/<entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>.<extra/version.plf_name.raw>
+    product/shot/rlt_plf_path/vsn_stc:
+        raw: <extra/task.plf_name.raw>/<entity/shot.plf_name.raw>.<step.plf_name.raw>.<extra/task.plf_name.raw>
+    # asset
+    # asset/scene
+    product/asset/rlt_plf_path/scene/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.scene/plf_name.raw>
+    product/asset/rlt_plf_path/scene/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.scene/plf_name.raw>
+    # asset/cache
+    product/asset/rlt_plf_path/cache/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.cache/plf_name.raw>
+    product/asset/rlt_plf_path/cache/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.cache/plf_name.raw>
+    # shot
+    # shot/scene
+    product/shot/rlt_plf_path/scene/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.scene/plf_name.raw>
+    product/shot/rlt_plf_path/scene/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.scene/plf_name.raw>
+    # shot/cache
+    product/shot/rlt_plf_path/cache/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.cache/plf_name.raw>
+    product/shot/rlt_plf_path/cache/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.cache/plf_name.raw>
+    # folder-har_xgn
+    product/asset/rlt_plf_file_path/cache/har_xgn/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_dnm.raw>/<extra/dta_typ.xgen/plf_name.raw>
+    product/asset/rlt_plf_file_path/cache/har_xgn/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_stc.raw>/<extra/dta_typ.xgen/plf_name.raw>
+    #
+    product/asset/rlt_plf_file_path/cache/har_xgn/cmp:
+        raw: <extra/container.xgen/variant.raw>.xgen
+    # file/gmt_abc
+    product/asset/rlt_plf_file_path/cache/gmt_abc/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_dnm.raw>/abc/<extra/container.variant.raw>.abc
+    product/asset/rlt_plf_file_path/cache/gmt_abc/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_stc.raw>/abc/<extra/container.variant.raw>.abc
+    #
+    product/asset/rlt_plf_file_path/cache/prx_ass/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_dnm.raw>/ass/<extra/container.variant.raw>.ass
+    product/asset/rlt_plf_file_path/cache/prx_ass/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_stc.raw>/ass/<extra/container.variant.raw>.ass
+    # file/plt_dta
+    product/asset/rlt_plf_file_path/cache/plt_dta/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_dnm.raw>
+    product/asset/rlt_plf_file_path/cache/plt_dta/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_stc.raw>
+    # file/plt_dta/compose
+    product/asset/rlt_plf_file_path/cache/plt_dta/cmp:
+        raw: <extra/element.cmp_name.raw>/pnt/<extra/element.cmp_name.raw>.pnt
+    # look
+    # sub-path
+    product/asset/rlt_plf_path/look/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.look/plf_name.raw>
+    product/asset/rlt_plf_path/look/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.look/plf_name.raw>
+    # look-materialx / mtlx
+    # file
+    product/asset/rlt_plf_file_path/look/mtl_mtx/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/look/vsn_dnm.raw>/mtlx/<entity/asset.plf_name.raw>.mtlx
+    product/asset/rlt_plf_file_path/look/mtl_mtx/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/look/vsn_stc.raw>/mtlx/<extra/container.variant.raw>.mtlx
+    # shot
+    # path-scene-mya_asc
+    product/shot/rlt_plf_file_path/scene/mya_asc/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/scene/vsn_dnm.raw>/<entity/shot.plf_name.raw>.ma
+    product/shot/rlt_plf_file_path/scene/mya_asc/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/scene/vsn_stc.raw>/<entity/shot.plf_name.raw>.ma
+    # path-manifest
+    product/shot/rlt_plf_path/manifest/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.manifest/plf_name.raw>
+    product/shot/rlt_plf_path/manifest/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.manifest/plf_name.raw>
+    # path-scene-anm_scm
+    product/shot/rlt_plf_file_path/manifest/anm_scm/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/manifest/vsn_dnm.raw>/<entity/shot.plf_name.raw>.yml
+    product/shot/rlt_plf_file_path/manifest/anm_scm/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/manifest/vsn_stc.raw>/<entity/shot.plf_name.raw>.yml
+    # path-scene-anm_asb
+    product/shot/rlt_plf_file_path/manifest/asb_scm/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/manifest/vsn_dnm.raw>/<entity/shot.plf_name.raw>.yml
+    product/shot/rlt_plf_file_path/manifest/asb_scm/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/manifest/vsn_stc.raw>/<entity/shot.plf_name.raw>.yml
+    # path-scene-crd_scm
+    product/shot/rlt_plf_file_path/cache/crd_scm/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>
+    product/shot/rlt_plf_file_path/cache/crd_scm/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>
+    # rile-crd_abc
+    product/shot/rlt_plf_file_path/cache/crd_abc/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/manifest.container/sot_crd/crd_abc/rlt_plf_file_name.raw>
+    product/shot/rlt_plf_file_path/cache/crd_abc/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>/<extra/manifest.container/sot_crd/crd_abc/rlt_plf_file_name.raw>
+    #
+    product/shot/rlt_plf_file_path/cache/crd_abc/mrg/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/manifest.container/sot_crd/crd_abc/rlt_plf_file_name.raw>
+    product/shot/rlt_plf_file_path/cache/crd_abc/mrg/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>/<extra/manifest.container/sot_crd/crd_abc/rlt_plf_file_name.raw>
+    # path-scene-efx_scm
+    product/shot/rlt_plf_file_path/cache/efx_scm/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>
+    product/shot/rlt_plf_file_path/cache/efx_scm/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>
+    # folder-har_xgn
+    product/shot/rlt_plf_file_path/cache/har_xgn/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/container.namespace.raw>/xgen/collections
+    product/shot/rlt_plf_file_path/cache/har_xgn/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/container.namespace.raw>/xgen/collections
+    product/shot/rlt_plf_file_path/cache/har_xgn/cmp:
+        raw: <extra/container.xgen/variant.raw>/<extra/container.xgen/variant.raw>.xgd
+    # folder-xgn_glo_abc
+    product/asset/rlt_plf_file_path/cache/xgn_glo_abc/vsn_dnm:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_dnm.raw>/<extra/container.asset_name.raw>/abc
+    product/asset/rlt_plf_file_path/cache/xgn_glo_abc/vsn_stc:
+        raw: <step.product/asset/rlt_plf_path/cache/vsn_stc.raw>/<extra/container.asset_name.raw>/abc
+    product/asset/rlt_plf_file_path/cache/xgn_glo_abc/cmp:
+        raw: grow_mesh.abc
+    # folder-xgn_glo_abc
+    product/shot/rlt_plf_file_path/cache/xgn_glo_abc/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/container.asset_name.raw>/xgen/collections
+    product/shot/rlt_plf_file_path/cache/xgn_glo_abc/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>/<extra/container.asset_name.raw>/xgen/collections
+    product/shot/rlt_plf_file_path/cache/xgn_glo_abc/cmp:
+        raw: <extra/container.xgen/variant.raw>/patch/<extra/container.xgen/variant.raw>.abc
+    # folder-hou_dta
+    product/shot/rlt_plf_file_path/cache/hou_dta/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/manifest.container/sot_efx/hou_dta/rlt_plf_file_name.raw>
+    product/shot/rlt_plf_file_path/cache/hou_dta/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>/<extra/manifest.container/sot_efx/hou_dta/rlt_plf_file_name.raw>
+    # file-cache-gmt_abc
+    product/shot/rlt_plf_file_path/cache/gmt_abc/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_dnm.raw>/<extra/container.namespace.raw>/abc/<extra/container.variant.raw>.abc
+    product/shot/rlt_plf_file_path/cache/gmt_abc/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cache/vsn_stc.raw>/<extra/container.namespace.raw>/abc/<extra/container.variant.raw>.abc
+    # path-camera
+    product/shot/rlt_plf_path/cmr_abc/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/vsn_dnm.raw>/<extra/dta_ctg.camera/plf_name.raw>
+    product/shot/rlt_plf_path/cmr_abc/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/vsn_stc.raw>/<extra/dta_ctg.camera/plf_name.raw>
+    # file-camera
+    product/shot/rlt_plf_file_path/cache/cmr_abc/vsn_dnm:
+        raw: <step.product/shot/rlt_plf_path/cmr_abc/vsn_dnm.raw>/abc/<entity/shot.plf_name.raw>.abc
+    product/shot/rlt_plf_file_path/cache/cmr_abc/vsn_stc:
+        raw: <step.product/shot/rlt_plf_path/cmr_abc/vsn_stc.raw>/abc/<entity/shot.plf_name.raw>.abc
+# step-model / mdl / mod
+step/model:
+    # main
+    name:
+        raw: model
+    path:
+        raw: <entity/asset.path.raw>/<step/model.plf_name.raw>
+    # platform
+    plf_name:
+        raw: mod
+    # dcc
+    dcc_name:
+        raw: 'hi'
+    # branch
+    ett_brhs:
+        raw:
+            - asset
+    # branch-asset
+    asset/plf_name:
+        raw: <step/model.plf_name.raw>
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/model.asset/plf_name.raw>
+    #
+    asset/prd/plf_name:
+        raw: <step/model.asset/plf_name.raw>
+    asset/prd/plf_path:
+        raw: <entity/asset.prd/plf_path.raw>/<step/model.asset/prd/plf_name.raw>
+    asset/tmp/plf_name:
+        raw: <step/model.asset/plf_name.raw>
+    asset/tmp/plf_path:
+        raw: <entity/asset.tmp/plf_path.raw>/<step/model.asset/tmp/plf_name.raw>
+    # dcc-maya
+    asset/maya/dcc_name:
+        raw: <step/model.dcc_name.raw>
+    # dcc-maya-reference
+    reference/asset/maya/dcc_name:
+        raw: <extra/reference.namespace.raw>:<step/model.dcc_name.raw>
+    # dcc-groups
+    asset/maya/dcc_group_paths:
+        raw:
+            - <entity/asset.maya/geometry_high/dcc_path.raw>
+            - <entity/asset.maya/geometry_lower/dcc_path.raw>
+            - <entity/asset.maya/geometry_proxy/dcc_path.raw>
+            - shape
+            - asb
+            - plt
+    # product-label
+    product/asset/label/plf_name:
+        raw: <extra/dta_ctg.maya/plf_name.raw>
+step/plant:
+    # main
+    name:
+        raw: plant
+    path:
+        raw: <entity/asset.path.raw>/<step/plant.plf_name.raw>
+    # platform
+    plf_name:
+        raw: plt
+    # branch
+    ett_brhs:
+        raw:
+            - asset
+    # branch-asset
+    asset/plf_name:
+        raw: <step/plant.plf_name.raw>
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/plant.asset/plf_name.raw>
+    #
+    asset/prd/plf_name:
+        raw: <step/plant.asset/plf_name.raw>
+    asset/prd/plf_path:
+        raw: <entity/asset.prd/plf_path.raw>/<step/plant.asset/prd/plf_name.raw>
+    asset/tmp/plf_name:
+        raw: <step/plant.asset/plf_name.raw>
+    asset/tmp/plf_path:
+        raw: <entity/asset.tmp/plf_path.raw>/<step/plant.asset/tmp/plf_name.raw>
+# step-rig
+step/rig:
+    # lynxi
+    name:
+        raw: <step/rig.plf_name.raw>
+    path:
+        raw: <entity/asset.path.raw>/<step/rig.plf_name.raw>
+    # platform
+    plf_name:
+        raw: rig
+    # dcc
+    dcc_name:
+        raw: <step/rig.plf_name.raw>
+    # branch
+    ett_brhs:
+        raw:
+            - asset
+    # branch-asset-platform
+    asset/plf_name:
+        raw: rig
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/rig.asset/plf_name.raw>
+    #
+    asset/prd/plf_name:
+        raw: <step/rig.asset/plf_name.raw>
+    asset/prd/plf_path:
+        raw: <entity/asset.prd/plf_path.raw>/<step/rig.asset/prd/plf_name.raw>
+    asset/tmp/plf_name:
+        raw: <step/rig.asset/plf_name.raw>
+    asset/tmp/plf_path:
+        raw: <entity/asset.tmp/plf_path.raw>/<step/rig.asset/tmp/plf_name.raw>
+    # branch-asset-dcc-maya
+    asset/maya/dcc_name:
+        raw: <step/rig.dcc_name.raw>
+    # dcc path from step
+    # branch-asset-dcc-maya-reference
+    reference/asset/maya/dcc_name:
+        raw: <extra/reference.namespace.raw>:<step/rig.dcc_name.raw>
+    #
+    asset/maya/dcc_group_paths:
+        raw:
+            - <entity/asset.maya/rig/dcc_path.raw>
+            - <entity/asset.maya/geometry_deform/dcc_path.raw>
+    # dependents
+    asset/dependents:
+        raw:
+            - step/model
+    # product-label
+    product/asset/label/plf_name:
+        raw: <extra/dta_ctg.maya/plf_name.raw>
+step/groom:
+    name:
+        raw: <step/groom.plf_name.raw>
+    path:
+        raw: <entity/asset.path.raw>/<step/groom.plf_name.raw>
+    # platform
+    plf_name:
+        raw: grm
+    #
+    dcc_name:
+        raw: hair
+    # branch
+    ett_brhs:
+        raw:
+            - asset
+    # branch-asset-platform
+    asset/plf_name:
+        raw: <step/groom.plf_name.raw>
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/groom.asset/plf_name.raw>
+    #
+    asset/prd/plf_name:
+        raw: <step/groom.asset/plf_name.raw>
+    asset/prd/plf_path:
+        raw: <entity/asset.prd/plf_path.raw>/<step/groom.asset/prd/plf_name.raw>
+    asset/tmp/plf_name:
+        raw: <step/groom.asset/plf_name.raw>
+    asset/tmp/plf_path:
+        raw: <entity/asset.tmp/plf_path.raw>/<step/groom.asset/tmp/plf_name.raw>
+    # branch-asset-dcc-maya
+    asset/maya/dcc_name:
+        raw: <step/groom.dcc_name.raw>
+    #
+    asset/dependents:
+        raw:
+            - step/model
+    #
+    asset/maya/dcc_group_paths:
+        raw:
+            - <entity/asset.maya/hair/dcc_path.raw>
+step/surface:
+    #
+    name:
+        raw: surface
+    path:
+        raw: <entity/asset.path.raw>/<step/surface.plf_name.raw>
+    #
+    plf_name:
+        raw: srf
+    #
+    dcc_name:
+        raw: None
+    # branch
+    ett_brhs:
+        raw:
+            - asset
+    # branch-asset-platform
+    asset/plf_name:
+        raw: srf
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/surface.asset/plf_name.raw>
+    #
+    asset/prd/plf_name:
+        raw: <step/surface.asset/plf_name.raw>
+    asset/prd/plf_path:
+        raw: <entity/asset.prd/plf_path.raw>/<step/surface.asset/prd/plf_name.raw>
+    asset/tmp/plf_name:
+        raw: <step/surface.asset/plf_name.raw>
+    asset/tmp/plf_path:
+        raw: <entity/asset.tmp/plf_path.raw>/<step/surface.asset/tmp/plf_name.raw>
+    #
+    asset/dependents:
+        raw:
+            - step/model
+            - step/groom
+step/set_dress:
+    asset/plf_name:
+        raw: asb
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/set_dress.asset/plf_name.raw>
+    ett_brhs:
+        raw: None
+    name:
+        raw: set_dress
+    path:
+        raw: <entity/asset.path.raw>/<step/set_dress.plf_name.raw>
+    plf_name:
+        raw: asb
+# step-layout / rlo
+step/layout:
+    ett_brhs:
+        raw:
+            - shot
+    dcc_name:
+        raw: lay
+    name:
+        raw: layout
+    path:
+        raw: <entity/asset.path.raw>/<step/layout.plf_name.raw>
+    plf_name:
+        raw: rlo
+    #
+    shot/plf_name:
+        raw: <step/layout.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/layout.plf_name.raw>
+    #
+    shot/prd/plf_name:
+        raw: <step/layout.plf_name.raw>
+    shot/prd/plf_path:
+        raw: <entity/shot.prd/plf_path.raw>/<step/layout.shot/prd/plf_name.raw>
+    shot/tmp/plf_name:
+        raw: <step/layout.plf_name.raw>
+    shot/tmp/plf_path:
+        raw: <entity/shot.tmp/plf_path.raw>/<step/layout.shot/tmp/plf_name.raw>
+    #
+    shot/maya/dcc_group_paths:
+        raw: [ ]
+# step-animation / ani
+step/animation:
+    ett_brhs:
+        raw:
+            - shot
+    dcc_name:
+        raw: None
+    name:
+        raw: animation
+    path:
+        raw: <entity/asset.path.raw>/<step/animation.plf_name.raw>
+    plf_name:
+        raw: ani
+    # branch-shot
+    shot/maya/dcc_group_paths:
+        raw: []
+    shot/plf_name:
+        raw: <step/animation.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/animation.plf_name.raw>
+# step-polish / flo
+step/polish:
+    ett_brhs:
+        raw:
+            - shot
+    dcc_name:
+        raw: None
+    name:
+        raw: polish
+    path:
+        raw: <entity/asset.path.raw>/<step/polish.plf_name.raw>
+    plf_name:
+        raw: flo
+    shot/maya/dcc_group_paths:
+        raw: []
+    shot/plf_name:
+        raw: <step/polish.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/polish.plf_name.raw>
+step/light:
+    ett_brhs:
+        raw:
+            - shot
+    dcc_name:
+        raw: None
+    name:
+        raw: light
+    path:
+        raw: <entity/asset.path.raw>/<step/light.plf_name.raw>
+    plf_name:
+        raw: lgt
+    shot/maya/dcc_group_paths:
+        raw: []
+    shot/plf_name:
+        raw: <step/light.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/light.plf_name.raw>
+# step-cfx
+step/character_effect:
+    plf_name:
+        raw: cfx
+    #
+    name:
+        raw: character_effect
+    path:
+        raw: <entity/asset.path.raw>/<step/character_effect.plf_name.raw>
+    #
+    asset/plf_name:
+        raw: <step/character_effect.plf_name.raw>
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/character_effect.asset/plf_name.raw>
+    #
+    asset/prd/plf_name:
+        raw: <step/character_effect.asset/plf_name.raw>
+    asset/prd/plf_path:
+        raw: <entity/asset.prd/plf_path.raw>/<step/character_effect.asset/prd/plf_name.raw>
+    asset/tmp/plf_name:
+        raw: <step/character_effect.asset/plf_name.raw>
+    asset/tmp/plf_path:
+        raw: <entity/asset.tmp/plf_path.raw>/<step/character_effect.asset/tmp/plf_name.raw>
+    #
+    shot/plf_name:
+        raw: <step/character_effect.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/character_effect.shot/plf_name.raw>
+    #
+    shot/prd/plf_name:
+        raw: <step/character_effect.shot/plf_name.raw>
+    shot/prd/plf_path:
+        raw: <entity/shot.prd/plf_path.raw>/<step/character_effect.shot/prd/plf_name.raw>
+    shot/tmp/plf_name:
+        raw: <step/character_effect.shot/plf_name.raw>
+    shot/tmp/plf_path:
+        raw: <entity/shot.tmp/plf_path.raw>/<step/character_effect.shot/tmp/plf_name.raw>
+    #
+    ett_brhs:
+        raw:
+            - asset
+            - shot
+    dcc_name:
+        raw: None
+    #
+    asset/maya/dcc_path:
+        raw: None
+step/effect:
+    asset/maya/dcc_path:
+        raw: None
+    asset/plf_name:
+        raw: <step/effect.plf_name.raw>
+    asset/plf_path:
+        raw: <entity/asset.plf_path.raw>/<step/effect.asset/plf_name.raw>
+    ett_brhs:
+        raw:
+            - asset
+            - shot
+    dcc_name:
+        raw: <step/effect.plf_name.raw>
+    name:
+        raw: effect
+    path:
+        raw: <entity/asset.path.raw>/<step/effect.plf_name.raw>
+    plf_name:
+        raw: efx
+    shot/plf_name:
+        raw: <step/effect.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/effect.shot/plf_name.raw>
+step/render:
+    ett_brhs:
+        raw:
+            - asset
+            - shot
+    dcc_name:
+        raw: None
+    name:
+        raw: render
+    path:
+        raw: <entity/asset.path.raw>/<step/render.plf_name.raw>
+    plf_name:
+        raw: rdr
+    shot/maya/dcc_group_paths:
+        raw: []
+    shot/plf_name:
+        raw: <step/render.plf_name.raw>
+    shot/plf_path:
+        raw: <entity/shot.plf_path.raw>/<step/render.plf_name.raw>
+# extra-task
+extra/task:
+    name:
+        raw: <extra/task.plf_name.raw>
+    path:
+        raw: '{self.step.plf_path}/<extra/task.name.raw>'
+    plf_name:
+        raw: '{self.task.plf_name}'
+    asset/plf_name:
+        raw: '{self.asset.task.plf_name}'
+    shot/plf_name:
+        raw: '{self.shot.task.plf_name}'
+# extra-variant
+extra/variant:
+    high:
+        raw: hi
+# extra-version
+extra/version:
+    name:
+        raw: <extra/version.plf_name.raw>
+    path:
+        raw: None
+    plf_name:
+        raw: '{self.version.plf_name}'
+# extra-dta_ctg
+extra/dta_ctg:
+    name:
+        raw: <extra/dta_ctg.plf_name.raw>
+    path:
+        raw: None
+    plf_name:
+        raw: '{self.dta_ctg.plf_name}'
+    # data tag definition
+    scene/plf_name:
+        raw: scene
+    maya/plf_name:
+        raw: maya
+    cache/plf_name:
+        raw: cache
+    look/plf_name:
+        raw: look
+    #
+    asset/plf_name:
+        raw: asset
+    camera/plf_name:
+        raw: camera
+    crowd/plf_name:
+        raw: crowd
+    manifest/plf_name:
+        raw: manifest
+    image/plf_name:
+        raw: images
+# data
+extra/dta_typ:
+    name:
+        raw: <extra/dta_typ.plf_name.raw>
+    path:
+        raw: None
+    plf_name:
+        raw: '{self.data_scheme.plf_name}'
+    #
+    xgen/plf_name:
+        raw: xgen
+    alembic/plf_name:
+        raw: abc
+#
+extra/reference:
+    namespace:
+        raw: '{self.reference.namespace}'
+#
+extra/manifest:
+    icon:
+        raw: list
+    category:
+        raw: manifest
+    #
+    path:
+        raw: '{self.manifest.path}'
+    #
+    schemes:
+        raw:
+            - anm_scm
+            - asb_scm
+            - crd_scm
+            - efx_scm
+    scheme:
+        raw: '{self.manifest.scheme}'
+    #
+    name:
+        raw: vsn_key
+    vsn_key:
+        raw: '{self.manifest.vsn_key}'
+    vsn_raw:
+        raw: '{self.manifest.vsn_raw}'
+    # animation-scheme
+    anm_scm/shot/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+            - character_effect
+    anm_scm/name:
+        raw: <extra/manifest.name.raw>
+    anm_scm/path:
+        raw: <entity/shot.path.raw>/<extra/manifest.scheme.raw>/<extra/manifest.anm_scm/name.raw>
+    # assembly-scheme
+    asb_scm/shot/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+    asb_scm/name:
+        raw: <extra/manifest.name.raw>
+    asb_scm/path:
+        raw: <entity/shot.path.raw>/<extra/manifest.scheme.raw>/<extra/manifest.asb_scm/name.raw>
+    # crowd-data
+    crd_scm/shot/stp_brhs:
+        raw:
+            - effect
+    crd_scm/shot/task_include:
+        raw:
+            - efx_crowd
+    crd_scm/name:
+        raw: <extra/manifest.name.raw>
+    crd_scm/path:
+        raw: <entity/shot.path.raw>/<extra/manifest.scheme.raw>/<extra/manifest.crd_scm/name.raw>
+    # effect-data
+    efx_scm/shot/stp_brhs:
+        raw:
+            - effect
+    efx_scm/shot/task_exclude:
+        raw:
+            - efx_crowd
+    #
+    efx_scm/name:
+        raw: <extra/manifest.name.raw>
+    efx_scm/path:
+        raw: <entity/shot.path.raw>/<extra/manifest.scheme.raw>/<extra/manifest.efx_scm/name.raw>
+    # role-tag
+    anm_scm/container/role_tag:
+        raw: '{self.role.plf_name}'
+    asb_scm/container/role_tag:
+        raw: '{self.role.plf_name}'
+    crd_scm/container/role_tag:
+        raw: <tag/crd.plf_name.raw>
+    efx_scm/container/role_tag:
+        raw: '{self.role.plf_name}'
+    # scene-description-yaml
+    anm_scm/container/schemes:
+        raw:
+            # shot-camera
+            - sot_cmr
+            # shot-animation
+            - sot_anm
+    #
+    asb_scm/container/schemes:
+        raw:
+            # set-assembly
+            - sot_asb
+    # crowd-data
+    crd_scm/container/schemes:
+        raw:
+            - sot_crd
+    #
+    efx_scm/container/schemes:
+        raw:
+            # shot-effect-vsn_stc
+            - sot_efx
+    #
+    container/sot_cmr/role_include:
+        raw:
+            - cam
+    container/sot_anm/role_include:
+        raw:
+            - chr
+            - prp
+            - env
+            - flg
+            - oth
+    container/sot_asb/role_include:
+        raw:
+            - chr
+            - prp
+            - env
+            - flg
+            - oth
+    container/sot_cmr/scheme_key:
+        raw: current/<extra/container.role.raw>/<extra/container.asset_name.raw>/<extra/container.namespace.raw>/<extra/container.container/var_2.raw>@<extra/container.container/var_1.raw>/publish_path
+    container/sot_anm/scheme_key:
+        raw: current/<extra/container.role.raw>/<extra/container.asset_name.raw>/<extra/container.namespace.raw>/<extra/container.container/var_2.raw>@<extra/container.container/var_1.raw>/publish_path
+    container/sot_asb/scheme_key:
+        raw: current/<extra/container.role.raw>/<extra/container.asset_name.raw>/<extra/container.namespace.raw>/<extra/container.container/var_2.raw>@<extra/container.container/var_1.raw>/transformation
+    # sot_crd/crd_abc
+    container/sot_crd/crd_abc/rlt_plf_file_name:
+        raw: <extra/dta_ctg.crowd/plf_name.raw>/<extra/dta_typ.alembic/plf_name.raw>/{self.container.asset_name}__{self.container.index}.abc
+    # sot_efx/hou_dta
+    container/sot_efx/hou_dta/rlt_plf_file_name:
+        raw: <extra/container.namespace.raw>/<extra/container.data_tag.raw>
+# instance
+extra/instance:
+    icon:
+        raw: file/files
+    category:
+        raw: instance
+# container
+extra/container:
+    icon:
+        raw: file/files
+    category:
+        raw: container
+    path:
+        raw: '{self.container.path}'
+    #
+    manifest:
+        raw: '{self.container.manifest}'
+    #
+    scheme:
+        raw: '{self.container.scheme}'
+    # use-ignore
+    har_xgn/use_ign:
+        raw: True
+    #
+    xgn_glo_abc/use_ign:
+        raw: True
+    # data-types
+    # sot_cmr
+    sot_cmr/data_schemes:
+        raw:
+            - cmr_abc
+    #
+    sot_cmr/cmr_abc/variants:
+        raw:
+            - main
+    # entity-branches
+    element/sot_cmr/cmr_abc/ett_brhs:
+        raw:
+            - shot
+    element/sot_cmr/cmr_abc/shot/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+    # sot_anm
+    sot_anm/data_schemes:
+        raw:
+            - mtl_mtx
+            - gmt_abc
+            - har_xgn
+            - xgn_glo_abc
+    #
+    sot_anm/mtl_mtx/variants:
+        raw:
+            - main
+    #
+    sot_anm/gmt_abc/variants:
+        raw:
+            - hi
+            - shape
+    # entity-branches
+    element/sot_anm/mtl_mtx/ett_brhs:
+        raw:
+            - asset
+    element/sot_anm/mtl_mtx/asset/stp_brhs:
+        raw:
+            - surface
+    # entity-branches
+    element/sot_anm/gmt_abc/ett_brhs:
+        raw:
+            - asset
+            - shot
+    element/sot_anm/gmt_abc/asset/stp_brhs:
+        raw:
+            - model
+            - surface
+    element/sot_anm/gmt_abc/shot/stp_brhs:
+        raw:
+            - layout
+            - animation
+            - polish
+            - character_effect
+    # sot_asb
+    sot_asb/data_schemes:
+        raw:
+            - mtl_mtx
+            - gmt_abc
+            # - prx_ass
+            - plt_dta
+    #
+    sot_asb/mtl_mtx/variants:
+        raw:
+            - main
+    sot_asb/mtl_mtx/use_ist:
+        raw: True
+    #
+    sot_asb/gmt_abc/variants:
+        raw:
+            - hi
+    sot_asb/gmt_abc/use_ist:
+        raw: True
+    #
+    sot_asb/prx_ass/variants:
+        raw:
+            - hi
+    sot_asb/prx_ass/use_ist:
+        raw: True
+    #
+    sot_asb/plt_dta/variants:
+        raw:
+            - main
+    # ett_brhs
+    element/sot_asb/mtl_mtx/ett_brhs:
+        raw:
+            - asset
+    element/sot_asb/mtl_mtx/asset/stp_brhs:
+        raw:
+            - surface
+    #
+    element/sot_asb/gmt_abc/ett_brhs:
+        raw:
+            - asset
+    element/sot_asb/gmt_abc/asset/stp_brhs:
+        raw:
+            - model
+            # - surface
+    #
+    element/sot_asb/prx_ass/ett_brhs:
+        raw:
+            - asset
+    #
+    element/sot_asb/prx_ass/asset/stp_brhs:
+        raw:
+            - model
+            - surface
+    #
+    element/sot_asb/plt_dta/ett_brhs:
+        raw:
+            - asset
+    element/sot_asb/plt_dta/asset/stp_brhs:
+        raw:
+            - plant
+    #
+    sot_anm/har_xgn/variants:
+        raw:
+            - sub
+    sot_anm/xgn_glo_abc/variants:
+        raw:
+            - sub
+    # ett_brhs
+    element/sot_anm/har_xgn/ett_brhs:
+        raw:
+            - asset
+            - shot
+    element/sot_anm/har_xgn/asset/stp_brhs:
+        raw:
+            - groom
+    #
+    element/sot_anm/har_xgn/shot/stp_brhs:
+        raw:
+            - character_effect
+    element/sot_anm/xgn_glo_abc/ett_brhs:
+        raw:
+            - shot
+    element/sot_anm/xgn_glo_abc/shot/stp_brhs:
+        raw:
+            - character_effect
+    #
+    sot_crd/data_schemes:
+        raw:
+            - mtl_mtx
+            - crd_abc
+    #
+    sot_crd/crd_abc/variants:
+        raw:
+            - main
+    #
+    sot_crd/mtl_mtx/variants:
+        raw:
+            - main
+    # entity-branches
+    element/sot_crd/mtl_mtx/ett_brhs:
+        raw:
+            - asset
+    # step-branches
+    element/sot_crd/mtl_mtx/asset/stp_brhs:
+        raw:
+            - surface
+    #
+    element/sot_crd/crd_abc/ett_brhs:
+        raw:
+            - shot
+    element/sot_crd/crd_abc/shot/stp_brhs:
+        raw:
+            - effect
+    #
+    sot_efx/data_schemes:
+        raw:
+            - hou_dta
+    #
+    sot_efx/hou_dta/variants:
+        raw:
+            - main
+    # ett_brhs
+    element/sot_efx/hou_dta/ett_brhs:
+        raw:
+            - shot
+    element/sot_efx/hou_dta/shot/stp_brhs:
+        raw:
+            - effect
+    # data_scheme
+    data_scheme:
+        raw: '{self.container.data_scheme}'
+    # data-tag
+    data_tag:
+        raw: '{self.container.data_tag}'
+    # group
+    role_tag:
+        raw: '{self.container.role_tag}'
+    # variants
+    xgen/variant:
+        raw: '{self.container.xgen.variant}'
+    #
+    variant:
+        raw: '{self.container.variant}'
+    # origin
+    asset/org_name:
+        raw: <extra/container.scheme.raw>_<extra/container.data_scheme.raw>_<extra/container.variant.raw>
+    asset/org_path:
+        raw: <entity/asset.path.raw>/<extra/container.asset/org_name.raw>
+    shot/org_name:
+        raw: <extra/container.scheme.raw>_<extra/container.data_scheme.raw>_<extra/container.variant.raw>
+    shot/org_path:
+        raw: <entity/shot.path.raw>/<extra/container.namespace.raw>/<extra/container.shot/org_name.raw>
+    # entities
+    entities:
+        raw: <entities/assets.plf_name.raw>
+    # role
+    role:
+        raw: '{self.container.role}'
+    # namespace
+    format/sot_crd/namespace:
+        raw: '{self.container.asset_name}__{self.container.index}'
+    #
+    name:
+        raw: '{self.container.name}'
+    namespace:
+        raw: '{self.container.namespace}'
+    #
+    index:
+        raw: '{self.container.index}'
+    #
+    use_ist:
+        raw: '{self.container.use_ist}'
+    #
+    asset_name:
+        raw: '{self.container.asset_name}'
+    #
+    container/var_0:
+        raw: '{self.container.var_0}'
+    container/var_1:
+        raw: '{self.container.var_1}'
+    container/var_2:
+        raw: '{self.container.var_2}'
+    # camera-alembic
+    sot_cmr/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.namespace.raw>
+    sot_cmr/cmr_abc/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_cmr/cmr_abc/path:
+        raw: <extra/container.sot_cmr/path.raw>/<extra/container.sot_cmr/cmr_abc/name.raw>
+    #
+    sot_anm/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.namespace.raw>
+    #
+    sot_anm/mtl_mtx/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_anm/mtl_mtx/path:
+        raw: <extra/container.sot_anm/path.raw>/<extra/container.sot_anm/mtl_mtx/name.raw>
+    # sot_anm/gmt_abc
+    sot_anm/gmt_abc/name:
+        raw: <extra/container.data_scheme.raw>_<extra/container.variant.raw>
+    sot_anm/gmt_abc/path:
+        raw: <extra/container.sot_anm/path.raw>/<extra/container.sot_anm/gmt_abc/name.raw>
+    # sot_anm/xgn
+    sot_anm/har_xgn/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_anm/har_xgn/path:
+        raw: <extra/container.sot_anm/path.raw>/<extra/container.sot_anm/har_xgn/name.raw>
+    sot_anm/har_xgn/use_cmp:
+        raw: True
+    # sot_anm/xgn_glo_abc
+    sot_anm/xgn_glo_abc/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_anm/xgn_glo_abc/path:
+        raw: <extra/container.sot_anm/path.raw>/<extra/container.sot_anm/xgn_glo_abc/name.raw>
+    sot_anm/xgn_glo_abc/use_cmp:
+        raw: True
+    #
+    sot_asb/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.namespace.raw>
+    sot_asb/ist/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.asset_name.raw>
+    #
+    sot_asb/mtl_mtx/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_asb/mtl_mtx/path:
+        raw: <extra/container.sot_asb/path.raw>/<extra/container.sot_asb/mtl_mtx/name.raw>
+    #
+    sot_asb/mtl_mtx/ist/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_asb/mtl_mtx/ist/path:
+        raw: <extra/container.sot_asb/ist/path.raw>/<extra/container.sot_asb/mtl_mtx/name.raw>
+    #
+    sot_asb/gmt_abc/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_asb/gmt_abc/path:
+        raw: <extra/container.sot_asb/path.raw>/<extra/container.sot_asb/gmt_abc/name.raw>
+    #
+    sot_asb/gmt_abc/ist/name:
+        raw: <extra/container.data_scheme.raw>_<extra/container.variant.raw>_instance_source
+    sot_asb/gmt_abc/ist/path:
+        raw: <extra/container.sot_asb/ist/path.raw>/<extra/container.sot_asb/gmt_abc/ist/name.raw>
+    #
+    sot_asb/gmt_abc/ist_cmp/name:
+        raw: <extra/container.sot_asb/gmt_abc/name.raw>
+    sot_asb/gmt_abc/ist_cmp/path:
+        raw: <extra/container.sot_asb/gmt_abc/path.raw>
+    #
+    sot_asb/prx_ass/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_asb/prx_ass/path:
+        raw: <extra/container.sot_asb/path.raw>/<extra/container.sot_asb/prx_ass/name.raw>
+    #
+    sot_asb/plt_dta/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_asb/plt_dta/path:
+        raw: <extra/container.sot_asb/path.raw>/<extra/container.sot_asb/plt_dta/name.raw>
+    # use compose
+    sot_asb/plt_dta/use_cmp:
+        raw: True
+    #
+    sot_crd/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.namespace.raw>
+    sot_crd/mrg/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.asset_name.raw>
+    #
+    sot_crd/mtl_mtx/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_crd/mtl_mtx/path:
+        raw: <extra/container.sot_crd/path.raw>/<extra/container.sot_crd/mtl_mtx/name.raw>
+    # use merge
+    sot_crd/mtl_mtx/use_mrg:
+        raw: True
+    #
+    sot_crd/mtl_mtx/mrg/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_crd/mtl_mtx/mrg/path:
+        raw: <extra/container.sot_crd/mrg/path.raw>/<extra/container.sot_crd/mtl_mtx/name.raw>
+    #
+    sot_crd/crd_abc/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_crd/crd_abc/path:
+        raw: <extra/container.sot_crd/path.raw>/<extra/container.sot_crd/crd_abc/name.raw>
+    # use merge
+    sot_crd/crd_abc/use_mrg:
+        raw: True
+    # merge
+    sot_crd/crd_abc/mrg/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_crd/crd_abc/mrg/path:
+        raw: <extra/container.sot_crd/mrg/path.raw>/<extra/container.sot_crd/crd_abc/name.raw>
+    #
+    sot_efx/path:
+        raw: <entity/shot.path.raw>/<extra/container.role_tag.raw>/<extra/container.namespace.raw>
+    sot_efx/hou_dta/name:
+        raw: <extra/container.data_scheme.raw>
+    sot_efx/hou_dta/path:
+        raw: <extra/container.sot_crd/path.raw>/<extra/container.sot_efx/hou_dta/name.raw>
+    sot_efx/hou_dta/use_mtp:
+        raw: True
+    #
+    # houdini operate
+    hou_opt/dcc_path:
+        raw: '{self.container.hou_opt.dcc_path}'
+#
+extra/element:
+    icon:
+        raw: file/file
+    category:
+        raw: element
+    #
+    schemes:
+        raw:
+            - gmt_abc
+            - cmr_abc
+    entity_branch:
+        raw: '{self.element.entity_branch}'
+    #
+    vsn_key:
+        raw: '{self.element.vsn_key}'
+    vsn_raw:
+        raw: '{self.element.vsn_raw}'
+    cmp_name:
+        raw: '{self.element.cmp_name}'
+    #
+    format/name:
+        raw: <extra/element.entity_branch.raw>_vsn_key
+    #
+    container/path:
+        raw: '{self.container.path}'
+    container/name:
+        raw: '{self.container.name}'
+    #
+    container/ist/name:
+        raw: '{self.container.ist.name}'
+    container/ist/path:
+        raw: '{self.container.ist.path}'
+    #
+    container/mrg/name:
+        raw: '{self.container.mrg.name}'
+    container/mrg/path:
+        raw: '{self.container.mrg.path}'
+    #
+    plf_file_path:
+        raw: '{self.element.plf_file_path}'
+    # camera-alembic
+    cmr_abc/name:
+        raw: <extra/element.format/name.raw>
+    cmr_abc/path:
+        raw: <extra/element.container/path.raw>/<extra/element.cmr_abc/name.raw>
+    #
+    mtl_mtx/name:
+        raw: <extra/element.format/name.raw>
+    mtl_mtx/path:
+        raw: <extra/element.container/path.raw>/<extra/element.mtl_mtx/name.raw>
+    #
+    mtl_mtx/ist/name:
+        raw: <extra/element.format/name.raw>
+    mtl_mtx/ist/path:
+        raw: <extra/element.container/ist/path.raw>/<extra/element.mtl_mtx/name.raw>
+    #
+    mtl_mtx/mrg/name:
+        raw: <extra/element.format/name.raw>
+    mtl_mtx/mrg/path:
+        raw: <extra/element.container/mrg/path.raw>/<extra/element.mtl_mtx/mrg/name.raw>
+    #
+    gmt_abc/name:
+        raw: <extra/element.format/name.raw>
+    gmt_abc/path:
+        raw: <extra/element.container/path.raw>/<extra/element.gmt_abc/name.raw>
+    #
+    gmt_abc/ist/name:
+        raw: <extra/element.format/name.raw>_instance_source
+    gmt_abc/ist/path:
+        raw: <extra/element.container/ist/path.raw>/<extra/element.gmt_abc/ist/name.raw>
+    #
+    plt_dta/name:
+        raw: <extra/element.format/name.raw>
+    plt_dta/path:
+        raw: <extra/element.container/path.raw>/<extra/element.plt_dta/name.raw>
+    #
+    har_xgn/name:
+        raw: <extra/element.format/name.raw>
+    har_xgn/path:
+        raw: <extra/element.container/path.raw>/<extra/element.har_xgn/name.raw>
+    #
+    xgn_glo_abc/name:
+        raw: <extra/element.format/name.raw>
+    xgn_glo_abc/path:
+        raw: <extra/element.container/path.raw>/<extra/element.xgn_glo_abc/name.raw>
+    #
+    crd_abc/name:
+        raw: <extra/element.format/name.raw>
+    crd_abc/path:
+        raw: <extra/element.container/path.raw>/<extra/element.crd_abc/name.raw>
+    #
+    crd_abc/mrg/name:
+        raw: <extra/element.format/name.raw>
+    crd_abc/mrg/path:
+        raw: <extra/element.container/mrg/path.raw>/<extra/element.crd_abc/mrg/name.raw>
+    #
+    hou_dta/name:
+        raw: <extra/element.format/name.raw>
+    hou_dta/path:
+        raw: <extra/element.container/path.raw>/<extra/element.hou_dta/name.raw>
+    # origin
+    asset/org_name:
+        raw: <extra/element.format/name.raw>
+    asset/org_path:
+        raw: <extra/container.asset/org_path.raw>/<extra/element.asset/org_name.raw>
+    #
+    shot/org_name:
+        raw: <extra/element.format/name.raw>
+    shot/org_path:
+        raw: <extra/container.shot/org_path.raw>/<extra/element.shot/org_name.raw>

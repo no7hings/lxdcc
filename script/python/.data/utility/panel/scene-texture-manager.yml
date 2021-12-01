@@ -1,0 +1,5 @@
+window:
+    name: Scene Texture Manager
+    size:
+        - 1280
+        - 720

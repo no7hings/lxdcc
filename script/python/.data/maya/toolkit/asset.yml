@@ -1,0 +1,187 @@
+window:
+    name: Asset Toolkit
+    size:
+        - 640
+        - 640
+#
+central:
+    groups:
+        Scene(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Import Model Scene:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".ma" from task "mod/modeling", use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_model_scene_import
+                    click_command: ''
+        Geometry(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Import Model Geometry:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".usd" from task "mod/modeling", use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_model_geometry_import
+                    click_command: ''
+                #
+                Import Surface Geometry UV-map:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".usd" from task "srf-surfacing", use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_surface_geometry_uv_map_import
+                    click_command: ''
+                #
+                Import Work-surface Geometry UV-map:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".usd" from work-task "srf-surfacing", use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_work_surface_geometry_uv_map_import
+                    click_command: ''
+                #
+                Import Groom Geometry:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import "Geometry" from latest "Groom-task" ".xgen"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_groom_geometry_import
+                    click_command: ''
+        Look(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Import Surface Look:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".ass" from task "srf-surfacing" for render, use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_asset_look_ass_import
+                    click_command: ''
+                Import Work-surface Look-preview:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".yml" file to current work-task for preview, use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_asset_work_look_preview_import
+                    click_command: ''
+                Import Surface Look-preview:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'import ".yml" file to current work-task for preview, use latest-version'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_asset_look_preview_import
+                    click_command: ''
+        Texture(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Load Texture-tx(s):
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'convert "texture-tx(s)" to latest and repath'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_texture_tx_load
+                    click_status_enable: True
+                #
+                Open Texture Manager Panel:
+                    enable: True
+                    name: <..key>
+                    icon: python
+                    description: 'show "Texture Manager" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+        Light(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                load_light_rig:
+                    enable: True
+                    name: Import / Update Light-rig
+                    icon: python
+                    description: None
+                    #
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; from lxutil import utl_core; mya_dcc_objects.Scene.set_file_reference(utl_core.Path.set_map_to_platform("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma"))'
+        TD(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Open Asset Comparer-panel:
+                    enable: True
+                    check_enable: False
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'show "Asset-comparer" panel'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.AssetComparerPanel().set_window_show()'

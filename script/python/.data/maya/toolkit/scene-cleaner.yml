@@ -1,0 +1,156 @@
+window:
+    name: Scene Cleaner Toolkit
+    size:
+        - 640
+        - 640
+#
+central:
+    groups:
+        Unused(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            #
+            items:
+                Script(s) & Script-job(s):
+                    enable: True
+                    check_enable: True
+                    checked: True
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'delete unused script(s) / script-job(s), etc: "breed_gene", "vaccine_gene", ...'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_unused_scripts_clear
+                    click_command: ''
+                Window(s):
+                    enable: True
+                    check_enable: True
+                    checked: True
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'delete unused window(s)'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_window_clear()'
+                Namespace(s):
+                    enable: True
+                    check_enable: True
+                    checked: True
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'remove unused namespace(s) not from reference / assembly-reference'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_namespaces_clear()'
+                Name(s):
+                    enable: True
+                    check_enable: True
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'remove unused name(s) match "pasted__*"'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_name_clear()'
+                Shader(s):
+                    enable: True
+                    check_enable: True
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'remove unused shader(s)'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_shader_clear()'
+                Display-layer(s):
+                    enable: True
+                    check_enable: True
+                    checked: False
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'remove unused display-layer(s)'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_display_layers_clear()'
+        #
+        Unknown(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Plug-in(s):
+                    enable: True
+                    check_enable: True
+                    checked: True
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'delete unknown plug-in(s)'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unknown_plug_ins_clear()'
+                Node(s):
+                    enable: True
+                    check_enable: True
+                    checked: True
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'delete unknown node(s)'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unknown_nodes_clear()'
+        #
+        Unload(s):
+            name: <..key>
+            type: PrxExpandedGroup
+            path: /<...key>
+            items:
+                Reference(s):
+                    enable: True
+                    check_enable: True
+                    checked: True
+                    #
+                    name: <..key>
+                    icon: python
+                    description:
+                        - 'delete unloaded reference(s)'
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: ''
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unload_references_clear()'
+#
+bottom:
+    buttons:
+        Run-all:
+            enable: True
+            name: <..key>
+            icon: python
+            description:
+                - 'run all checked button'
+            type: PrxPressItem
+            path: /<..key>
+            click_method: set_all_run
+            click_command: ''

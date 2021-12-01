@@ -1,0 +1,22 @@
+task-templates:
+    chr:
+        entity-key: asset/chr
+        task-keys:
+            - mod/modeling
+            - rig/rigging
+            - grm/groom
+            - srf/surfacing
+    sdr:
+        entity-key: asset/sdr
+        task-keys:
+            - srf/surfacing
+    #
+    flg:
+        entity-key: asset/flg
+        task-keys:
+            - mod/modeling
+            - mod/mod_dynamic
+            - rig/rigging
+            - srf/surfacing
+
+

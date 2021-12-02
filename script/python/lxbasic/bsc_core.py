@@ -35,6 +35,8 @@ import gzip
 
 import copy
 
+import glob
+
 from lxbasic import bsc_configure
 
 
@@ -338,6 +340,9 @@ class StoragePathMtd(object):
     def set_directory_create(cls, directory_path):
         if os.path.isdir(directory_path) is False:
             os.makedirs(directory_path)
+    @classmethod
+    def get_relpath(cls, src_path, tgt_path):
+        return os.path.relpath(src_path, tgt_path)
 
 
 class StoragePathOpt(object):
@@ -393,6 +398,165 @@ class StoragePathOpt(object):
 
     def __str__(self):
         return self._path
+
+
+class MultiplyPatternMtd(object):
+    RE_UDIM_KEYS = [
+        (r'<udim>', r'{}', 4),
+    ]
+    #
+    RE_SEQUENCE_KEYS = [
+        (r'#', r'{}', -1),
+        # houdini
+        (r'$F', r'\{}[^\d]', 4),
+    ]
+    # houdini
+    for i in range(4):
+        RE_SEQUENCE_KEYS.append(
+            (r'$F0{}'.format(i+1), r'\{}', i+1)
+        )
+    # katana
+    for i in range(4):
+        RE_SEQUENCE_KEYS.append(
+            (r'%0{}d'.format(i+1), r'{}', i+1)
+        )
+    #
+    RE_MULTIPLY_KEYS = RE_UDIM_KEYS + RE_SEQUENCE_KEYS
+    @classmethod
+    def to_fnmatch_style_(cls, pattern):
+        re_keys = cls.RE_MULTIPLY_KEYS
+        #
+        new_name_base = pattern
+        for i_k, i_f, i_c in re_keys:
+            itr = re.finditer(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            for i in itr:
+                start, end = i.span()
+                if i_c == -1:
+                    s = r'[0-9]'
+                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
+                else:
+                    s = r'[0-9]'*i_c
+                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
+        return new_name_base
+    @classmethod
+    def to_fnmatch_style(cls, pattern):
+        re_keys = cls.RE_MULTIPLY_KEYS
+        #
+        new_name_base = pattern
+        for i_k, i_f, i_c in re_keys:
+            results = re.findall(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            if results:
+                if i_c == -1:
+                    i_count = len(results)
+                    i_key = i_count * i_k
+                else:
+                    i_count = i_c
+                    i_key = i_k
+                #
+                new_name_base = new_name_base.replace(i_key, '[0-9]'*i_count, 1)
+        return new_name_base
+    @classmethod
+    def get_args(cls, pattern):
+        re_keys = cls.RE_MULTIPLY_KEYS
+        #
+        key_args = []
+        for i_k, i_f, i_c in re_keys:
+            results = re.findall(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            if results:
+                if i_c == -1:
+                    i_count = len(results)
+                    i_key = i_count * i_k
+                else:
+                    i_count = i_c
+                    i_key = i_k
+                #
+                key_args.append(
+                    (i_key, i_count)
+                )
+        return key_args
+
+
+class FnmatchPatternMtd(object):
+    @classmethod
+    def to_re_style(cls, pattern):
+        pattern_ = pattern
+        args = MultiplyPatternMtd.get_args(pattern)
+        for i, (i_key, i_count) in enumerate(args):
+            pattern_ = pattern_.replace(
+                i_key, r'[PATTERN-PLACEHOLDER-{}]'.format(i), 1
+            )
+        #
+        re_pattern_ = fnmatch.translate(pattern_)
+        for i, (i_key, i_count) in enumerate(args):
+            re_pattern_ = re_pattern_.replace(
+                r'[PATTERN-PLACEHOLDER-{}]'.format(i),
+                r'(\d{{{}}})'.format(i_count)
+            )
+        return re_pattern_
+
+
+class MultiplyFileNameMtd(object):
+    @classmethod
+    def get_match_args(cls, file_name, name_pattern):
+        new_file_name = file_name
+        args = MultiplyPatternMtd.get_args(
+            name_pattern
+        )
+        re_pattern = FnmatchPatternMtd.to_re_style(name_pattern)
+        numbers = re.findall(re_pattern, file_name)
+        if numbers:
+            if len(args) > 1:
+                numbers = numbers[0]
+            #
+            for i, (i_key, i_count) in enumerate(args):
+                new_file_name = new_file_name.replace(
+                    numbers[i], i_key, 1
+                )
+            return new_file_name, map(int, numbers)
+
+
+class DirectoryMtd(object):
+    @classmethod
+    def get_all_file_paths(cls, directory_path):
+        def rcs_fnc_(path_):
+            _results = glob.glob(u'{}/*'.format(path_)) or []
+            _results.sort()
+            for _path in _results:
+                if os.path.isfile(_path):
+                    lis.append(_path)
+                elif os.path.isdir(_path):
+                    rcs_fnc_(_path)
+        lis = []
+        rcs_fnc_(directory_path)
+        return lis
+    @classmethod
+    def get_file_relative_path(cls, directory_path, file_path):
+        return os.path.relpath(file_path, directory_path)
+
+
+class MultiplyDirectoryMtd(object):
+    @classmethod
+    def get_all_multiply_file_dict(cls, directory_path, name_pattern):
+        dic = collections.OrderedDict()
+        _ = DirectoryMtd.get_all_file_paths(directory_path)
+        for i_file_path in _:
+            i_opt = StorageFileOpt(i_file_path)
+            i_match_args = MultiplyFileNameMtd.get_match_args(
+                i_opt.name, name_pattern
+            )
+            if i_match_args:
+                i_pattern, i_numbers = i_match_args
+                if len(i_numbers) == 1:
+                    i_relative_path_dir_path = DirectoryMtd.get_file_relative_path(
+                        directory_path, i_opt.directory_path
+                    )
+                    i_key = '{}/{}'.format(
+                        i_relative_path_dir_path, i_pattern
+                    )
+                    dic.setdefault(
+                        i_key, []
+                    ).append(i_numbers[0])
+        return dic
 
 
 class EnvironMtd(object):
@@ -638,7 +802,7 @@ class SubProcessMtd(object):
             shell=True,
             universal_newlines=True,
             stdout=subprocess.PIPE,
-            # stderr=subprocess.STDOUT,
+            stderr=subprocess.STDOUT,
             startupinfo=cls.NO_WINDOW,
         )
         return _sp
@@ -928,42 +1092,6 @@ class StorageZipFileOpt(object):
         #             os.rename(f, element_file_path)
 
 
-class MultiplyPattern(object):
-    RE_UDIM_KEYS = [
-        ('<udim>', 4),
-    ]
-    #
-    RE_SEQUENCE_KEYS = [
-        ('#', -1),
-        (r'\$F04', 4),
-        (r'\$F', 4),
-        (r'(\()[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9](\))(%04d)', 4),
-        (r'%04d', 4),
-    ]
-    #
-    RE_MULTIPLY_KEYS = RE_UDIM_KEYS + RE_SEQUENCE_KEYS
-    def __init__(self, name_base):
-        self._name_base = name_base
-
-    def get_fnmatch_pattern(self):
-        re_keys = self.RE_MULTIPLY_KEYS
-        #
-        name_base = self._name_base
-        new_name_base = self._name_base
-        for k, c in re_keys:
-            r = re.finditer(k, name_base, re.IGNORECASE) or []
-            for i in r:
-                start, end = i.span()
-                if c == -1:
-                    s = '[0-9]'
-                    new_name_base = new_name_base.replace(name_base[start:end], s, 1)
-                else:
-                    s = '[0-9]' * c
-                    new_name_base = new_name_base.replace(name_base[start:end], s, 1)
-                break
-        return new_name_base
-
-
 class TimestampOpt(object):
     TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
     TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S'
@@ -1099,6 +1227,14 @@ class IntegerOpt(object):
 class TextMtd(object):
     def set_text_join(self):
         pass
+    @classmethod
+    def to_number_embedded_args(cls, string):
+        pieces = re.compile(r'(\d+)').split(unicode(string))
+        pieces[1::2] = map(int, pieces[1::2])
+        return pieces
+    @classmethod
+    def to_glob_pattern(cls, string):
+        return re.sub(r'(\d)', '[0-9]', string)
 
 
 class StrUnderlineOpt(object):
@@ -1224,22 +1360,25 @@ class DccPathDagOpt(object):
     def __init__(self, path):
         self._pathsep = path[0]
         self._path = path
-    @property
-    def name(self):
+
+    def get_name(self):
         return DccPathDagMtd.get_dag_name(
             path=self._path, pathsep=self._pathsep
         )
+    name = property(get_name)
 
     def set_name(self, name):
         self._path = self._pathsep.join(
             [self.get_parent_path(), name]
         )
-    @property
-    def pathsep(self):
+
+    def get_pathsep(self):
         return self._pathsep
-    @property
-    def path(self):
+    pathsep = property(get_pathsep)
+
+    def get_path(self):
         return self._path
+    path = property(get_path)
 
     def get_value(self):
         return self._path
@@ -1296,6 +1435,12 @@ class DccPathDagOpt(object):
             )
         )
 
+    def get_name_namespace(self, namespacesep=':'):
+        name = self.get_name()
+        _ = name.split(namespacesep)
+        print _
+        return namespacesep.join(_[:-1])
+
     def __str__(self):
         return self._path
 
@@ -1337,15 +1482,9 @@ class TextsOpt(object):
     def __init__(self, raw):
         self._raw = raw
 
-    @classmethod
-    def _str_to_number_embedded_args_(cls, string):
-        pieces = re.compile(r'(\d+)').split(unicode(string))
-        pieces[1::2] = map(int, pieces[1::2])
-        return pieces
-
     def set_sort_to(self):
         _ = self._raw
-        _.sort(key=lambda x: self._str_to_number_embedded_args_(x))
+        _.sort(key=lambda x: TextMtd.to_number_embedded_args(x))
         return _
 
 
@@ -1552,7 +1691,7 @@ class VedioOpt(object):
     def get_thumbnail_file_path(self, ext='.jpg'):
         return TemporaryThumbnailMtd.get_file_path(self._file_path, ext=ext)
     #
-    def get_thumbnail(self, size=128, ext='.jpg'):
+    def get_thumbnail(self, width=128, ext='.jpg'):
         thumbnail_file_path = self.get_thumbnail_file_path(ext=ext)
         if os.path.exists(self._file_path):
             if os.path.exists(thumbnail_file_path) is False:
@@ -1563,7 +1702,7 @@ class VedioOpt(object):
                 cmd_args = [
                     Bin.get_ffmpeg(),
                     u'-i "{}"'.format(self.path),
-                    '-vf scale={}:-1'.format(size),
+                    '-vf scale={}:-1'.format(width),
                     '-vframes 1',
                     '"{}"'.format(thumbnail_file_path)
                 ]
@@ -1572,6 +1711,24 @@ class VedioOpt(object):
                     ' '.join(cmd_args)
                 )
         return thumbnail_file_path
+
+    def get_thumbnail_create_args(self, width=128, ext='.jpg'):
+        thumbnail_file_path = self.get_thumbnail_file_path(ext=ext)
+        if os.path.exists(self._file_path):
+            if os.path.exists(thumbnail_file_path) is False:
+                directory_path = os.path.dirname(thumbnail_file_path)
+                if os.path.exists(directory_path) is False:
+                    os.makedirs(directory_path)
+                #
+                cmd_args = [
+                    Bin.get_ffmpeg(),
+                    u'-i "{}"'.format(self.path),
+                    '-vf scale={}:-1'.format(width),
+                    '-vframes 1',
+                    '"{}"'.format(thumbnail_file_path)
+                ]
+                return thumbnail_file_path, ' '.join(cmd_args)
+        return thumbnail_file_path, None
 
     def set_convert_to(self):
         pass
@@ -2112,6 +2269,57 @@ class NestedArrayMtd(object):
         return lis
 
 
+class IntegerArrayMtd(object):
+    @staticmethod
+    def set_merge_to(array):
+        lis = []
+        #
+        if array:
+            if len(array) == 1:
+                return array
+            else:
+                minimum, maximum = min(array), max(array)
+                #
+                start, end = None, None
+                count = len(array)
+                cur_index = 0
+                #
+                array.sort()
+                for i_index in array:
+                    if cur_index > 0:
+                        pre = array[cur_index - 1]
+                    else:
+                        pre = None
+                    #
+                    if cur_index < (count - 1):
+                        nex = array[cur_index + 1]
+                    else:
+                        nex = None
+                    #
+                    if pre is None and nex is not None:
+                        start = minimum
+                        if i_index - nex != -1:
+                            lis.append(start)
+                    elif pre is not None and nex is None:
+                        end = maximum
+                        if i_index - pre == 1:
+                            lis.append((start, end))
+                        else:
+                            lis.append(end)
+                    elif pre is not None and nex is not None:
+                        if i_index - pre != 1 and i_index - nex != -1:
+                            lis.append(i_index)
+                        elif i_index - pre == 1 and i_index - nex != -1:
+                            end = i_index
+                            lis.append((start, end))
+                        elif i_index - pre != 1 and i_index - nex == -1:
+                            start = i_index
+                    #
+                    cur_index += 1
+                #
+        return lis
+
+
 class ExceptionMtd(object):
     @classmethod
     def set_print(cls):
@@ -2155,6 +2363,6 @@ class GuiCacheMtd(object):
 
 
 if __name__ == '__main__':
-    print SystemMtd.get_is_matched(
-        ['*-python']
-    )
+    print DccPathDagOpt(
+        '/a:b:Female_red_b'
+    ).get_name_namespace()

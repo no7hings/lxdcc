@@ -1,5 +1,5 @@
 option:
-    type: task
+    type: unit
     #
     systems:
         - '*-katana'

@@ -12,7 +12,15 @@ def post_method_fnc_(file_path_):
     hou.hscript(cmd)
 
 
-file_path = session.rsv_unit.get_result(
+rsv_task = session.rsv_obj
+#
+rsv_unit = rsv_task.get_rsv_unit(
+    keyword='{branch}-work-maya-scene-src-file'.format(
+        **session.variants
+    )
+)
+#
+file_path = rsv_unit.get_result(
     version='new'
 )
 file_ = utl_dcc_objects.OsFile(file_path)

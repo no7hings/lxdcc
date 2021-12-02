@@ -69,9 +69,12 @@ class SubProcessStatus(enum.EnumMeta):
     None 在运行
     """
     Unknown = 2
-    Waiting = 1
+    # sleep
+    Failed = 1
     Completed = 0
     Running = None
+    # kill
+    Stopped = 5
     Error = -15
 
 

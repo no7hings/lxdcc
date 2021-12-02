@@ -69,6 +69,7 @@ class _Pattern(object):
 
 
 class Log(object):
+    PRINT_ENABLE = True
     def __init__(self, file_path):
         self._file_path = file_path
     @classmethod
@@ -84,7 +85,8 @@ class Log(object):
             if isinstance(print_method, (types.FunctionType, types.MethodType)):
                 print_method(text)
             # else:
-            print(text)
+            if cls.PRINT_ENABLE is True:
+                print(text)
             #
             if isinstance(LOG_WRITE_METHOD, (types.FunctionType, types.MethodType)):
                 # noinspection PyCallingNonCallable
@@ -619,6 +621,10 @@ class Environ(object):
     def get(cls, key):
         return os.environ.get(key)
     @classmethod
+    def get_as_array(cls, key):
+        _ = os.environ.get(key) or ''
+        return _.split(os.pathsep)
+    @classmethod
     def set(cls, key, value):
         os.environ[key] = value
         Log.set_module_result_trace(
@@ -823,6 +829,7 @@ class Path(object):
 class AppLauncher(object):
     LOCAL_ROOT = '/home/dongchangbao/packages/pglauncher/9.9.99'
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
+    #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
     APP_CONFIGURE_FILE_PATTERN = '{root}/{project}_config/bin/config/{application}.yml'
     BIN_PATTERN = '{root}/{project}_config/bin/{application}'
@@ -1334,6 +1341,48 @@ class KatanaLauncher(object):
         )
 
 
+class RvLauncher(object):
+    def __init__(self, **kwargs):
+        """
+        :param kwargs:
+            project: <project-name>
+        """
+        self._args = [
+            'pgrv',
+        ]
+
+    def set_file_open(self, file_path):
+        run_args = copy.copy(self._args)
+        if bsc_core.SystemMtd.get_is_windows():
+            bins = Path._get_stg_paths_by_parse_pattern_(
+                'C:/Program Files/Shotgun/*/bin/rvio_hw.exe'
+            )
+            if bins:
+                run_args += [
+                    '--',
+                    '"{}"'.format(bins[0]),
+                    '"{}"'.format(file_path)
+                ]
+            else:
+                return
+        elif bsc_core.SystemMtd.get_is_linux():
+            bins = Path._get_stg_paths_by_parse_pattern_(
+                '/opt/rv/bin/rv'
+            )
+            if bins:
+                run_args += [
+                    '--',
+                    '"{}"'.format(bins[0]),
+                    '"{}"'.format(file_path)
+                ]
+            else:
+                return
+        #
+        AppLauncher._set_run_(
+            *run_args
+        )
+
+
 def _plf__get_is_windows_():
     return platform.system() == 'Windows'
 
@@ -1381,8 +1430,32 @@ def _print_time_(fnc):
     return fnc_
 
 
-if __name__ == '__main__':
-    if __name__ == '__main__':
-        print(
-            Icon._get_file_path_('@application/maya@')
+class Resources(object):
+    ENVIRON_KEY = 'LYNXI_RESOURCES'
+    @classmethod
+    def get_search_paths(cls):
+        return Environ.get_as_array(
+            cls.ENVIRON_KEY
         )
+    @classmethod
+    def get(cls, sub_key):
+        for i_path in cls.get_search_paths():
+            i_path_opt = bsc_core.StoragePathOpt(i_path)
+            if i_path_opt.get_is_exists() is True:
+                i_glob_pattern = '{}/{}'.format(i_path_opt.path, sub_key)
+                i_results = Path._get_stg_paths_by_parse_pattern_(
+                    i_glob_pattern
+                )
+                if i_results:
+                    return i_results[0]
+
+
+if __name__ == '__main__':
+    Environ.set_add(
+        Resources.ENVIRON_KEY, '/data/e/myworkspace/td/lynxi/script/python/.resources'
+    )
+    print(
+        Resources.get(
+            'hooks/rsv-panels/asset-loader.py'
+        )
+    )

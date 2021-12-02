@@ -1,6 +1,8 @@
 # coding:utf-8
 import os
 
+from lxutil import utl_core
+
 
 class Root(object):
     MAIN = os.path.dirname(__file__.replace('\\', '/'))
@@ -14,4 +16,11 @@ class Hooks(object):
     ROOT = Root.HOOKS
     @classmethod
     def get_python_file(cls, key):
-        return '{}/{}.py'.format(cls.ROOT, key)
+        return utl_core.Resources.get(
+            'hooks/{}.py'.format(key)
+        )
+    @classmethod
+    def get_yaml_file(cls, key):
+        return utl_core.Resources.get(
+            'hooks/{}.yml'.format(key)
+        )

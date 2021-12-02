@@ -1,9 +1,11 @@
 # coding:utf-8
 import re
 
+import os
+
 import threading
 
-from lxbasic import bsc_configure
+from lxbasic import bsc_configure, bsc_core
 
 THREAD_MAXIMUM = threading.Semaphore(1024)
 
@@ -321,3 +323,66 @@ class ProcessMonitor(object):
 
     def get_element_statuses(self):
         return self._element_statuses
+
+
+class SubProcess(object):
+    Status = bsc_configure.Status
+    SubProcessStatus = bsc_configure.SubProcessStatus
+    def __init__(self, cmds):
+        self._cmds = cmds
+        self._sp = None
+        #
+        self._status = self.Status.Waiting
+        #
+        self._status_dict = {
+            self.SubProcessStatus.Unknown: self.Status.Unknown,
+            self.SubProcessStatus.Running: self.Status.Running,
+            self.SubProcessStatus.Completed: self.Status.Completed,
+            self.SubProcessStatus.Failed: self.Status.Failed,
+            self.SubProcessStatus.Stopped: self.Status.Stopped,
+            #
+            self.SubProcessStatus.Error: self.Status.Error,
+        }
+
+    def set_start(self):
+        self._sp = bsc_core.SubProcessMtd.set_run(
+            self._cmds
+        )
+        if self._sp is not None:
+            self._status = self.Status.Started
+
+    def set_update(self):
+        if self._sp is not None:
+            status = self._sp.poll()
+            self._status = self._status_dict[
+                status
+            ]
+        else:
+            self._status = self.Status.Failed
+
+    def get_status(self):
+        return self._status
+
+    def get_is_termination(self):
+        return self._status in [
+            self.Status.Completed,
+            self.Status.Failed,
+            self.Status.Stopped,
+            self.Status.Error,
+        ]
+
+    def get_is_normal_termination(self):
+        return self._status in [
+            self.Status.Completed,
+        ]
+
+    def get_is_abnormal_termination(self):
+        return self._status in [
+            self.Status.Stopped,
+            self.Status.Failed,
+            self.Status.Error,
+        ]
+
+
+if __name__ == '__main__':
+    pass

@@ -12,14 +12,9 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 from lxutil_gui.panel import utl_gui_pnl_abs_resolver
 
 
-class RsvEntityActionSession(gui_obj_abs.AbsRsvEntitySession):
+class RsvObjActionSession(gui_obj_abs.AbsRsvObjActionSession):
     def __init__(self, *args, **kwargs):
-        super(RsvEntityActionSession, self).__init__(*args, **kwargs)
-
-
-class RsvTaskActionSession(gui_obj_abs.AbsRsvTaskSession):
-    def __init__(self, *args, **kwargs):
-        super(RsvTaskActionSession, self).__init__(*args, **kwargs)
+        super(RsvObjActionSession, self).__init__(*args, **kwargs)
 
 
 class RsvUnitActionSession(gui_obj_abs.AbsRsvUnitActionSession):
@@ -28,8 +23,7 @@ class RsvUnitActionSession(gui_obj_abs.AbsRsvUnitActionSession):
 
 
 class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
-    RSV_ENTITY_ACTION_SESSION_CLASS = RsvEntityActionSession
-    RSV_TASK_ACTION_SESSION_CLASS = RsvTaskActionSession
+    RSV_OBJ_ACTION_SESSION_CLASS = RsvObjActionSession
     RSV_UNIT_ACTION_SESSION_CLASS = RsvUnitActionSession
     def __init__(self, *args, **kwargs):
         self._configure = kwargs['configure']
@@ -169,33 +163,30 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
             return self._session_dict[session_path]
         else:
             python_file_path = gui_configure.Hooks.get_python_file(key)
-            python_file = utl_dcc_objects.OsPythonFile(python_file_path)
-            yaml_file_path = '{}.yml'.format(python_file.path_base)
-            yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
-            if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
-                configure = bsc_objects.Configure(value=yaml_file.path)
-                type_name = configure.get('option.type')
-                if type_name is not None:
-                    kwargs['configure'] = configure
-                    #
-                    if type_name in ['asset', 'shot']:
-                        session = self.RSV_ENTITY_ACTION_SESSION_CLASS(
-                            *args, **kwargs
-                        )
-                    elif type_name in ['task']:
-                        session = self.RSV_TASK_ACTION_SESSION_CLASS(
-                            *args, **kwargs
-                        )
-                    elif type_name in ['unit']:
-                        session = self.RSV_UNIT_ACTION_SESSION_CLASS(
-                            *args, **kwargs
-                        )
-                    else:
-                        raise TypeError()
-                    #
-                    raw = python_file.set_read()
-                    self._session_dict[session_path] = session, execute_fnc
-                    return session, execute_fnc
+            yaml_file_path = gui_configure.Hooks.get_yaml_file(key)
+            if python_file_path and yaml_file_path:
+                python_file = utl_dcc_objects.OsPythonFile(python_file_path)
+                yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
+                if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
+                    configure = bsc_objects.Configure(value=yaml_file.path)
+                    type_name = configure.get('option.type')
+                    if type_name is not None:
+                        kwargs['configure'] = configure
+                        #
+                        if type_name in ['asset', 'shot', 'step', 'task']:
+                            session = self.RSV_OBJ_ACTION_SESSION_CLASS(
+                                *args, **kwargs
+                            )
+                        elif type_name in ['unit']:
+                            session = self.RSV_UNIT_ACTION_SESSION_CLASS(
+                                *args, **kwargs
+                            )
+                        else:
+                            raise TypeError()
+                        #
+                        raw = python_file.set_read()
+                        self._session_dict[session_path] = session, execute_fnc
+                        return session, execute_fnc
 
 
 class RsvPanelSession(gui_obj_abs.AbsRsvPanelSession):

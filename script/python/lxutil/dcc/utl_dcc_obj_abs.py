@@ -89,17 +89,17 @@ class AbsOsDirectory(
             )
 
     def get_all_file_paths(self):
-        def _rcs_fnc(path_):
+        def rcs_fnc_(path_):
             _results = glob.glob(u'{}/*'.format(path_)) or []
             _results.sort()
             for _path in _results:
                 if os.path.isfile(_path):
                     lis.append(_path)
                 elif os.path.isdir(_path):
-                    _rcs_fnc(_path)
+                    rcs_fnc_(_path)
 
         lis = []
-        _rcs_fnc(self.path)
+        rcs_fnc_(self.path)
         return lis
 
     def get_directory_paths(self):

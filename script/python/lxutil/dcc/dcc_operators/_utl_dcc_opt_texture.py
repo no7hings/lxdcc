@@ -348,7 +348,7 @@ class DccTexturesOpt(object):
                     src_ext_key = src_ext.lower()
                     #
                     search_name_bases = search_dict.keys()
-                    name_base_fnmatch_pattern = bsc_core.MultiplyPattern(src_name_base).get_fnmatch_pattern()
+                    name_base_fnmatch_pattern = bsc_core.MultiplyPatternMtd.to_fnmatch_style(src_name_base)
                     #
                     match_name_base_keys = fnmatch.filter(search_name_bases, name_base_fnmatch_pattern)
                     if match_name_base_keys:

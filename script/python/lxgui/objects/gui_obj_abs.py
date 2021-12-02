@@ -172,23 +172,12 @@ class AbsRsvObjActionDef(object):
         return self._gui_group_name
 
 
-class AbsRsvEntitySession(
+class AbsRsvObjActionSession(
     AbsRsvObjSession,
     AbsRsvObjActionDef
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvEntitySession, self).__init__(*args, **kwargs)
-        #
-        if self.get_is_loadable():
-            self._set_rsv_obj_action_def_init_(self._configure)
-
-
-class AbsRsvTaskSession(
-    AbsRsvObjSession,
-    AbsRsvObjActionDef
-):
-    def __init__(self, *args, **kwargs):
-        super(AbsRsvTaskSession, self).__init__(*args, **kwargs)
+        super(AbsRsvObjActionSession, self).__init__(*args, **kwargs)
         #
         if self.get_is_loadable():
             self._set_rsv_obj_action_def_init_(self._configure)

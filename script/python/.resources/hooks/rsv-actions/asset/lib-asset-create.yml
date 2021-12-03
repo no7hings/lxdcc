@@ -1,0 +1,27 @@
+option:
+    type: asset
+    #
+    systems:
+        - 'linux-python'
+        - '*-maya'
+    #
+    gui:
+        group_name: TD
+        #
+        name: 'Send to LIB'
+#        icon_name: 'application/maya'
+#
+variants:
+    project: ''
+    branch: ''
+    #
+    role: ''
+    asset: ''
+    #
+    sequence: ''
+    shot: ''
+    #
+    step: ''
+    task: ''
+    #
+    application: ''

@@ -40,6 +40,7 @@ class AbsOsDirectory(
     obj_abstract.AbsObjGuiDef,
     AbsStorageGuiDef
 ):
+    LOG = utl_core.Log
     def __init__(self, path):
         super(AbsOsDirectory, self).__init__(path)
         self._set_obj_gui_def_init_()
@@ -87,20 +88,6 @@ class AbsOsDirectory(
                 'path-link-create',
                 u'connection="{} >> {}"'.format(self.path, tgt_directory.path)
             )
-
-    def get_all_file_paths(self):
-        def rcs_fnc_(path_):
-            _results = glob.glob(u'{}/*'.format(path_)) or []
-            _results.sort()
-            for _path in _results:
-                if os.path.isfile(_path):
-                    lis.append(_path)
-                elif os.path.isdir(_path):
-                    rcs_fnc_(_path)
-
-        lis = []
-        rcs_fnc_(self.path)
-        return lis
 
     def get_directory_paths(self):
         lis = []

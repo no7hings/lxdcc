@@ -483,6 +483,25 @@ node:
             connections:
                 - <.path>.out
                 - <workspace.geometries.main.path>.<..label>
+    geometry_xgen:
+        keyword: geometries
+        label: <..key>
+        main:
+            name: 'geometry_xgen__{xgen}'
+            path: <option.root>/<.name>
+            output: out
+            obj_type: ArnoldXGen
+            attributes:
+                ns_colorr: 0.75
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            parameters:
+                location: '<option.asset_root>/hair/{xgen}'
+                name_scheme: '\<description\>'
+            file_parameter: xgen_file
+            connections:
+                - <.path>.<.output>
+                - '<workspace.geometries.main.path>.<.name>'
     geometry_usd:
         keyword: geometries
         label: <..key>

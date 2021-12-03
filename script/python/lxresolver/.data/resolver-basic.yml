@@ -205,6 +205,8 @@ asset-nuke-scene-src-file: <asset-nuke-scene-src-dir>/<asset-name>.nk
 #
 asset-scene-xgen-dir: <asset-task-version-dir>/scene
 asset-scene-xgen-file: <asset-scene-xgen-dir>/<asset-name>__<xgen-name>.xgen
+# <asset-cache>
+asset-cache-dir: <asset-task-version-dir>/cache
 # <asset-geometry>
 asset-geometry-dir: <asset-task-version-dir>/cache
 # <asset-geometry-abc>

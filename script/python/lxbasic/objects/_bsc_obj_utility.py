@@ -350,6 +350,8 @@ class SubProcess(object):
         )
         if self._sp is not None:
             self._status = self.Status.Started
+        else:
+            self._status = self.Status.Failed
 
     def set_update(self):
         if self._sp is not None:

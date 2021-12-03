@@ -115,9 +115,8 @@ class OsTexture(utl_dcc_obj_abs.AbsOsTexture):
 
 
 if __name__ == '__main__':
-    import os
-    os.environ['OCIO'] = '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
-    t = OsTexture(
-        '/data/f/tx-convert-test/Old_Wood_v2_Diffuse.exr'
+    OsDirectory_(
+        '/l/prod/shl/publish/assets/chr/shuitao/srf/surfacing/shuitao.srf.surfacing.v070/texture'
+    ).set_copy_to_directory(
+       '/l/prod/lib/publish/assets/chr/shl__shuitao/srf/surfacing/shl__shuitao.srf.surfacing.v001/texture'
     )
-    print t.get_used_color_space()

@@ -125,6 +125,9 @@ class AbsSession(object):
             utl_core.ExceptionCatcher.set_create()
             raise
 
+    def get_is_system_matched(self, system_key):
+        return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
+
 
 class AbsRsvObjSession(AbsSession):
     def __init__(self, *args, **kwargs):

@@ -1,0 +1,26 @@
+option:
+    type: asset
+    #
+    systems:
+        - 'linux-python'
+    #
+    gui:
+        group_name: TD
+        #
+        name: 'Publish Asset-surface'
+#        icon_name: 'application/maya'
+#
+variants:
+    project: ''
+    branch: ''
+    #
+    role: ''
+    asset: ''
+    #
+    sequence: ''
+    shot: ''
+    #
+    step: ''
+    task: ''
+    #
+    application: ''

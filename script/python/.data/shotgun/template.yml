@@ -1,11 +1,20 @@
 task-templates:
+    default:
+        entity-key: asset/chr
+        task-keys:
+            - mod/modeling
+            - srf/surfacing
     chr:
         entity-key: asset/chr
         task-keys:
             - mod/modeling
+            #
             - rig/rigging
+            #
             - grm/groom
+            #
             - srf/surfacing
+            - srf/src_anishading
     sdr:
         entity-key: asset/sdr
         task-keys:

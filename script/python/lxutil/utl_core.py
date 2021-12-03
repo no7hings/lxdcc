@@ -270,7 +270,8 @@ class DialogWindow(object):
             #
             cancel_fnc=None,
             cancel_label=None,
-            button_size=160
+            button_size=160,
+            status=None
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
@@ -293,6 +294,11 @@ class DialogWindow(object):
             w.set_cancel_method_add(cancel_fnc)
         if cancel_label is not None:
             w.set_cancel_label(cancel_label)
+        #
+        if status is not None:
+            w.set_window_title('[ {} ] {}'.format(str(status).split('.')[-1], label))
+            w.set_status(status)
+        #
         w.set_window_show()
         return w
 
@@ -886,11 +892,7 @@ class AppLauncher(object):
                 i_run_args = configure.get(key)
                 lis.extend(i_run_args)
         else:
-            raise SystemError(
-                'App-launcher-configure Error: file="{}" is non-exists'.format(
-                    configure_file_path
-                )
-            )
+            return AppLauncher(project='default', application=application).get_run_args()
         return lis
 
     def set_cmd_run(self, command=None):
@@ -946,7 +948,10 @@ class MayaLauncher(object):
             #
             '-- maya',
             '-file',
-            '"{}"'.format(file_path)
+            '"{}"'.format(file_path),
+            # r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open(\\\"{}\\\")\")"'.format(
+            #     file_path
+            # )
         ]
         cmd = ' '.join(args)
         AppLauncher(**self._kwargs).set_cmd_run(
@@ -1451,11 +1456,4 @@ class Resources(object):
 
 
 if __name__ == '__main__':
-    Environ.set_add(
-        Resources.ENVIRON_KEY, '/data/e/myworkspace/td/lynxi/script/python/.resources'
-    )
-    print(
-        Resources.get(
-            'hooks/rsv-panels/asset-loader.py'
-        )
-    )
+    print(AppLauncher(project='default', application='maya').get_run_args())

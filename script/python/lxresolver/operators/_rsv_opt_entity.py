@@ -92,7 +92,44 @@ class AbsAssetQuery(object):
                 version=_kwargs['version']
             )
 
-    def _get_rsv_unit_(self, key, sub_key, **kwargs):
+    def _get_file_args_(self, key, sub_key, **kwargs):
+        task_properties = self._task_properties
+        resolver = self._resolver
+        #
+        definition_kwargs = self._file_configure.get('{}.{}'.format(key, sub_key))
+        custom_kwargs = kwargs
+        #
+        _kwargs = copy.copy(
+            task_properties.value
+        )
+        #
+        for k, v in definition_kwargs.items():
+            _kwargs[k] = v
+        #
+        for k, v in custom_kwargs.items():
+            if k in _kwargs:
+                _kwargs[k] = v
+            else:
+                _kwargs[k] = v
+        #
+        rsv_task = resolver.get_rsv_task(**self._task_properties.value)
+        rsv_unit = rsv_task.get_rsv_unit(
+            **_kwargs
+        )
+        lis = []
+        if rsv_unit:
+            results = rsv_unit.get_results(
+                version=_kwargs['version']
+            )
+            if results:
+                for i_result in results:
+                    extend_variants = rsv_unit.get_extend_variants(i_result)
+                    lis.append(
+                        (i_result, extend_variants)
+                    )
+        return lis
+
+    def _project__get_rsv_unit_(self, key, sub_key, **kwargs):
         task_properties = self._task_properties
         resolver = self._resolver
         #
@@ -281,6 +318,14 @@ class RsvAssetGeometryQuery(AbsAssetQuery):
         sub_key = 'xgen.file'
         return self.get(sub_key, **kwargs)
 
+    def get_xgen_files(self, **kwargs):
+        sub_key = 'xgen.file'
+        return self._get_results_(self.KEY, sub_key, **kwargs)
+
+    def get_xgen_file_args(self, **kwargs):
+        sub_key = 'xgen.file'
+        return self._get_file_args_(self.KEY, sub_key, **kwargs)
+
     def get_xgen_grow_file(self, **kwargs):
         sub_key = 'xgen.grow-file'
         return self.get(sub_key, **kwargs)
@@ -407,7 +452,7 @@ class RsvAssetUsdQuery(AbsAssetQuery):
         return self._get_results_(self.KEY, sub_key, **kwargs) or []
 
     def get_rsv_unit(self, sub_key, **kwargs):
-        return self._get_rsv_unit_(self.KEY, sub_key, **kwargs)
+        return self._project__get_rsv_unit_(self.KEY, sub_key, **kwargs)
 
     def get_model_registry_file(self, **kwargs):
         sub_key = 'registry.model-file'

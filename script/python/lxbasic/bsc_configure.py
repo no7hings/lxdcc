@@ -60,6 +60,12 @@ class Status(enum.IntEnum):
     Error = 8
 
 
+class GuiStatus(enum.IntEnum):
+    Normal = 0x00
+    Warning = 0x01
+    Error = 0x02
+
+
 class SubProcessStatus(enum.EnumMeta):
     """
     0 正常结束

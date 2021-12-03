@@ -8,7 +8,7 @@ option:
         - '*-katana'
     #
     gui:
-        name: 'Asset Loader'
+        name: 'Asset Batcher'
         icon_name: ''
         #
         size: [1280, 960]
@@ -36,6 +36,8 @@ actions:
     asset:
         hooks:
             - 'rsv-actions/asset/maya/scene-build'
+            - 'rsv-actions/asset/lib-asset-create'
+            - 'rsv-actions/asset/asset-surface-publish'
     task:
         hooks:
             - 'rsv-actions/maya/work-file-new'

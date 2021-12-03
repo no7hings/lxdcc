@@ -37,7 +37,24 @@ import copy
 
 import glob
 
+import threading
+
 from lxbasic import bsc_configure
+
+THREAD_MAXIMUM = threading.Semaphore(1024)
+
+
+class PyThread(threading.Thread):
+    def __init__(self, fnc, *args, **kwargs):
+        threading.Thread.__init__(self)
+        self._fnc = fnc
+        self._args = args
+        self._kwargs = kwargs
+    #
+    def run(self):
+        THREAD_MAXIMUM.acquire()
+        self._fnc(*self._args, **self._kwargs)
+        THREAD_MAXIMUM.release()
 
 
 class OrderedYamlMtd(object):
@@ -802,7 +819,7 @@ class SubProcessMtd(object):
             shell=True,
             universal_newlines=True,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            # stderr=subprocess.STDOUT,
             startupinfo=cls.NO_WINDOW,
         )
         return _sp
@@ -1691,7 +1708,7 @@ class VedioOpt(object):
     def get_thumbnail_file_path(self, ext='.jpg'):
         return TemporaryThumbnailMtd.get_file_path(self._file_path, ext=ext)
     #
-    def get_thumbnail(self, width=128, ext='.jpg'):
+    def get_thumbnail(self, width=128, ext='.jpg', block=False):
         thumbnail_file_path = self.get_thumbnail_file_path(ext=ext)
         if os.path.exists(self._file_path):
             if os.path.exists(thumbnail_file_path) is False:
@@ -1707,9 +1724,14 @@ class VedioOpt(object):
                     '"{}"'.format(thumbnail_file_path)
                 ]
                 #
-                SubProcessMtd.set_run(
-                    ' '.join(cmd_args)
-                )
+                if block is True:
+                    SubProcessMtd.set_run_with_result(
+                        ' '.join(cmd_args)
+                    )
+                else:
+                    SubProcessMtd.set_run(
+                        ' '.join(cmd_args)
+                    )
         return thumbnail_file_path
 
     def get_thumbnail_create_args(self, width=128, ext='.jpg'):
@@ -1725,6 +1747,7 @@ class VedioOpt(object):
                     u'-i "{}"'.format(self.path),
                     '-vf scale={}:-1'.format(width),
                     '-vframes 1',
+                    '-y',
                     '"{}"'.format(thumbnail_file_path)
                 ]
                 return thumbnail_file_path, ' '.join(cmd_args)

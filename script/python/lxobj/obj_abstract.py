@@ -3105,6 +3105,7 @@ class AbsOsDirectory(
     AbsObjOsDef
 ):
     # <obj-pathsep>
+    LOG = None
     PATHSEP = '/'
     def __init__(self, path):
         self._set_obj_dag_def_init_(path)
@@ -3174,6 +3175,57 @@ class AbsOsDirectory(
             shutil.copytree(
                 self.path, tgt_directory_path
             )
+
+    def get_all_file_paths(self):
+        def rcs_fnc_(path_):
+            _results = glob.glob(u'{}/*'.format(path_)) or []
+            _results.sort()
+            for _path in _results:
+                if os.path.isfile(_path):
+                    lis.append(_path)
+                elif os.path.isdir(_path):
+                    rcs_fnc_(_path)
+
+        lis = []
+        rcs_fnc_(self.path)
+        return lis
+
+    def set_copy_to_directory(self, tgt_directory_path):
+        def copy_fnc_(src_file_path_, tgt_file_path_):
+            shutil.copy2(src_file_path_, tgt_file_path_)
+            self.LOG.set_module_result_trace(
+                'file-copy',
+                u'file="{}" >> "{}"'.format(src_file_path_, tgt_file_path_)
+            )
+        #
+        src_directory_path = self.path
+        file_paths = self.get_all_file_paths()
+        #
+        threads = []
+        for i_src_file_path in file_paths:
+            i_local_file_path = i_src_file_path[len(src_directory_path):]
+            #
+            i_tgt_file_path = tgt_directory_path + i_local_file_path
+            if os.path.exists(i_tgt_file_path) is False:
+                i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
+                if os.path.exists(i_tgt_dir_path) is False:
+                    os.makedirs(i_tgt_dir_path)
+                    self.LOG.set_module_result_trace(
+                        'directory-create',
+                        u'directory="{}"'.format(i_tgt_dir_path)
+                    )
+                #
+                i_thread = bsc_core.PyThread(
+                    copy_fnc_, i_src_file_path, i_tgt_file_path
+                )
+                threads.append(i_thread)
+                i_thread.start()
+        #
+        [i.join() for i in threads]
+
+    def set_open(self):
+        if os.path.exists(self.path):
+            bsc_core.SystemMtd.set_directory_open(self.path)
 
     def __str__(self):
         return u'{}(path="{}")'.format(

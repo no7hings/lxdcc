@@ -504,12 +504,16 @@ class AbsRsvMatcher(object):
             pattern, result
         )
         if p:
-            variants = copy.copy(properties.value)
+            variants = collections.OrderedDict()
             variants.update(p.named)
             return variants
 
-    def get_variants(self):
-        pass
+    def get_variants(self, result):
+        return self._get_variants_by_result_(
+            self._var_pattern,
+            self._rsv_properties,
+            result
+        )
 
     def get_new(self):
         matches = self.get_matches(trim=(-1, None))
@@ -704,20 +708,20 @@ class AbsRsvDef(object):
         #
         self._pattern_keys_dict = {}
 
-    def _get_obj_args_(self, variants, extend_keys=None):
-        keyword = variants['keyword']
-        obj_parameters = collections.OrderedDict()
+    def _get_obj_args_(self, input_variants, extend_keys=None):
+        keyword = input_variants['keyword']
+        output_variants = collections.OrderedDict()
         pattern = self.get_pattern(keyword)
         keys = MtdBasic._get_keys_by_parse_pattern_(pattern)
         #
-        obj_path = MtdBasic._get_rsv_obj_path_(keys, variants)
+        obj_path = MtdBasic._get_rsv_obj_path_(keys, input_variants)
         if isinstance(extend_keys, (tuple, list)):
             keys.extend(list(extend_keys))
         #
         for key in keys:
-            if key in variants:
-                obj_parameters[key] = variants[key]
-        return obj_path, pattern, obj_parameters
+            if key in input_variants:
+                output_variants[key] = input_variants[key]
+        return obj_path, pattern, output_variants
 
     def _set_obj_parameters_completes_(self, kwargs, parent_parameters, extend_keys=None):
         keyword = kwargs['keyword']
@@ -922,6 +926,7 @@ class AbsRsvUnit(
             if check_exists is True:
                 return self._set_exists_results_filter_(results)
             return results
+        return []
 
     def get_other_result(self, **kwargs):
         pass
@@ -955,8 +960,18 @@ class AbsRsvUnit(
             pattern,
             dict(type='unit', workspace='publish')
         )
-        file_properties = rsv_matcher.get_properties(result=file_path)
-        return file_properties
+        cur_properties = rsv_matcher.get_properties(result=file_path)
+        return cur_properties
+
+    def get_extend_variants(self, file_path):
+        variants = self.properties.value
+        pattern = self._pattern
+        rsv_matcher = self._rsv_project._set_rsv_matcher_create_(
+            pattern,
+            dict(type='unit', workspace='publish')
+        )
+        cur_variants = rsv_matcher.get_variants(result=file_path)
+        return {k: v for k, v in cur_variants.items() if k not in variants}
 
     def get_properties_by_result(self, file_path, override_variants=None):
         pattern = self._pattern
@@ -1165,7 +1180,7 @@ class AbsRsvTask(
         return self._set_rsv_file_create_(**obj_parameters)
 
     def get_rsv_unit(self, **kwargs):
-        return self.rsv_project._get_rsv_unit_(
+        return self.rsv_project._project__get_rsv_unit_(
             rsv_obj=self,
             **kwargs
         )
@@ -1188,7 +1203,7 @@ class AbsRsvStep(
         super(AbsRsvStep, self).__init__(*args, **kwargs)
 
     def get_rsv_unit(self, **kwargs):
-        return self.rsv_project._get_rsv_unit_(
+        return self.rsv_project._project__get_rsv_unit_(
             rsv_obj=self,
             **kwargs
         )
@@ -1271,7 +1286,7 @@ class AbsRsvEntity(
         )
 
     def get_rsv_unit(self, **kwargs):
-        return self.rsv_project._get_rsv_unit_(
+        return self.rsv_project._project__get_rsv_unit_(
             rsv_obj=self,
             **kwargs
         )
@@ -1577,13 +1592,13 @@ class AbsRsvProject(
         # asset/shot
         kwargs_[type_] = name
         #
-        obj_path, pattern, obj_properties_raw = self._get_obj_args_(
+        obj_path, pattern, variants = self._get_obj_args_(
             kwargs_,
             extend_keys=['type', 'branch']
         )
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._project__set_rsv_tag_create_(obj_path, pattern, **obj_properties_raw)
+        return self._project__set_rsv_tag_create_(obj_path, pattern, **variants)
 
     def _project__set_rsv_tag_create_(self, *args, **kwargs):
         self.__set_workspace_kwargs_(kwargs)
@@ -1669,13 +1684,13 @@ class AbsRsvProject(
         # asset/shot
         kwargs_[type_] = name
         #
-        obj_path, pattern, obj_properties_raw = self._get_obj_args_(
+        obj_path, pattern, variants = self._get_obj_args_(
             kwargs_,
             extend_keys=['type', 'branch']
         )
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._set_rsv_entity_create_(obj_path, pattern, **obj_properties_raw)
+        return self._set_rsv_entity_create_(obj_path, pattern, **variants)
     #
     def _set_rsv_entity_create_(self, *args, **kwargs):
         self.__set_workspace_kwargs_(kwargs)
@@ -1758,7 +1773,7 @@ class AbsRsvProject(
         kwargs_['keyword'] = keyword
         kwargs_[type_] = name
         #
-        obj_path, pattern, obj_properties_raw = self._get_obj_args_(
+        obj_path, pattern, variants = self._get_obj_args_(
             kwargs_,
             extend_keys=['type', 'branch']
         )
@@ -1767,7 +1782,7 @@ class AbsRsvProject(
         return self._set_rsv_step_create_(
             obj_path,
             pattern,
-            **obj_properties_raw
+            **variants
         )
     #
     def _set_rsv_step_create_(self, *args, **kwargs):
@@ -1852,13 +1867,13 @@ class AbsRsvProject(
         kwargs_['keyword'] = keyword
         kwargs_[type_] = name
         #
-        obj_path, pattern, obj_properties_raw = self._get_obj_args_(
+        obj_path, pattern, variants = self._get_obj_args_(
             kwargs_,
             extend_keys=['type', 'branch']
         )
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._set_rsv_task_create_(obj_path, pattern, **obj_properties_raw)
+        return self._set_rsv_task_create_(obj_path, pattern, **variants)
     #
     def get_rsv_task(self, **kwargs):
         if 'step' in kwargs:
@@ -1899,7 +1914,7 @@ class AbsRsvProject(
         if rsv_task is not None:
             return rsv_task.get_rsv_unit(**kwargs)
 
-    def _get_rsv_unit_(self, rsv_obj, **kwargs):
+    def _project__get_rsv_unit_(self, rsv_obj, **kwargs):
         kwargs_ = collections.OrderedDict()
         for k, v in rsv_obj.properties.value.items():
             kwargs_[k] = v
@@ -1915,14 +1930,14 @@ class AbsRsvProject(
         if 'version' not in kwargs_:
             kwargs_['version'] = rsv_configure.Version.LATEST
         #
-        obj_path, pattern, obj_properties_raw = self._get_obj_args_(
+        obj_path, pattern, variants = self._get_obj_args_(
             kwargs_,
             extend_keys=['type', 'branch', 'platform', 'application', 'keyword']
         )
         obj_path = '{}/{}'.format(obj_path, keyword)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._set_rsv_unit_create_(obj_path, pattern, **obj_properties_raw)
+        return self._set_rsv_unit_create_(obj_path, pattern, **variants)
 
     def _set_rsv_unit_create_(self, *args, **kwargs):
         rsv_obj = self.RSV_UNIT_CLASS(self, *args, **kwargs)
@@ -2193,7 +2208,10 @@ class AbsResolver(
         keyword = '{}-dir'.format(type_)
         kwargs_['keyword'] = keyword
         #
-        obj_path, pattern, obj_properties_raw = self._get_obj_args_(kwargs_, extend_keys=['type'])
+        obj_path, pattern, variants = self._get_obj_args_(
+            kwargs_,
+            extend_keys=['type']
+        )
         if self._rsv_project_stack.get_object_exists(obj_path) is True:
             rsv_project = self._rsv_project_stack.get_object(obj_path)
             if 'platform' in kwargs_:
@@ -2202,7 +2220,7 @@ class AbsResolver(
                 platform_ = self.get_platform()
                 rsv_project._set_root_properties_update_(platform_)
             return rsv_project
-        return self._set_rsv_project_create_(obj_path, pattern, **obj_properties_raw)
+        return self._set_rsv_project_create_(obj_path, pattern, **variants)
 
     def _set_rsv_project_create_(self, *args, **kwargs):
         rsv_obj = self.RSV_PROJECT_CLASS(self, *args, **kwargs)

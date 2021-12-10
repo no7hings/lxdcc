@@ -8,7 +8,7 @@ option:
         - '*-katana'
     #
     gui:
-        group_name: Review
+        group_name: review
         #
         name: 'Open Review File'
         icon_name: 'application/rv'

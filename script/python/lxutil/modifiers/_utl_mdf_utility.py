@@ -23,3 +23,4 @@ def set_ignore_run(fnc):
         except:
             bsc_core.ExceptionMtd.set_print()
     return fnc_
+

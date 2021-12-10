@@ -109,6 +109,8 @@ tools:
             - lib_asset_loader
             - lib_asset_look_loader
             - separator
+            - asset_batcher
+            - separator
             - shot_loader
             - shot_camera_loader
     #
@@ -135,6 +137,12 @@ tools:
         name: Lib Asset-look Loader
         icon: None
         command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/lib-asset-look-loader")'
+    #
+    asset_batcher:
+        type: item
+        name: Asset Batcher
+        icon: None
+        command: 'import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/asset-batcher")'
     #
     shot_loader:
         type: item

@@ -73,6 +73,8 @@ def main():
         #
         elif script == 'asset-loader':
             set_asset_loader_panel_show()
+        elif script == 'asset-batcher':
+            set_asset_batcher_panel_show()
         elif script == 'shot-loader':
             set_shot_loader_panel_show()
     #
@@ -325,6 +327,10 @@ def set_test_window_show():
 
 def set_asset_loader_panel_show():
     import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run('rsv-panels/asset-loader')
+
+
+def set_asset_batcher_panel_show():
+    import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run('rsv-panels/asset-batcher')
 
 
 def set_shot_loader_panel_show():

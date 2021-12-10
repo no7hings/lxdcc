@@ -261,7 +261,7 @@ class DialogWindow(object):
             label,
             content=None,
             content_text_size=10,
-            window_size=(480, 320),
+            window_size=(480, 160),
             yes_method=None,
             yes_label=None,
             #
@@ -271,14 +271,20 @@ class DialogWindow(object):
             cancel_fnc=None,
             cancel_label=None,
             button_size=160,
-            status=None
+            status=None,
+            show=True,
+            use_exec=True
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
-        w = prx_widgets.PrxDialogWindow1()
+        if use_exec is True:
+            w = prx_widgets.PrxDialogWindow1()
+        else:
+            w = prx_widgets.PrxDialogWindow0()
+        #
         w.set_window_title(label)
         w.set_content(content)
-        w.set_content_text_size(content_text_size)
+        w.set_content_font_size(content_text_size)
         w.set_definition_window_size(window_size)
         if yes_method is not None:
             w.set_yes_method_add(yes_method)
@@ -299,7 +305,8 @@ class DialogWindow(object):
             w.set_window_title('[ {} ] {}'.format(str(status).split('.')[-1], label))
             w.set_status(status)
         #
-        w.set_window_show()
+        if show is True:
+            w.set_window_show()
         return w
 
 
@@ -314,12 +321,12 @@ class ExceptionCatcher(object):
         #
         import lxutil_gui.proxy.widgets as prx_widgets
         #
-        w_cls = prx_widgets.PrxDialogWindow
+        w_cls = prx_widgets.PrxTipWindow
         _ = utl_gui_prx_core.get_gui_proxy_by_class(w_cls)
         if _:
             return _[0]
         #
-        __ = prx_widgets.PrxDialogWindow()
+        __ = prx_widgets.PrxTipWindow()
         #
         __.set_window_title('Exception')
         __.set_definition_window_size((640, 320))
@@ -877,6 +884,8 @@ class AppLauncher(object):
             kwargs['application'] = 'maya'
         elif application == 'usd':
             kwargs['application'] = 'maya'
+        elif application == 'gui':
+            kwargs['application'] = 'maya'
         #
         configure_file_path = self._get_application_configure_file_path_(**kwargs)
         if os.path.exists(configure_file_path):
@@ -1423,13 +1432,29 @@ def _debug_(fnc):
 def _print_time_(fnc):
     def fnc_(*args, **kwargs):
         start_timestamp = time.time()
-        message = u'start function: "{}.{}"'.format(fnc.__module__, fnc.__name__)
+        #
+        message = u'start function: "{}.{}" at {}'.format(
+            fnc.__module__,
+            fnc.__name__,
+            time.strftime(
+                System.TIME_FORMAT,
+                time.localtime(start_timestamp)
+            )
+        )
         print(message)
 
         _fnc = fnc(*args, **kwargs)
 
         end_timestamp = time.time()
-        message = u'complete function: "{}.{}" in {}s'.format(fnc.__module__, fnc.__name__, (end_timestamp - start_timestamp))
+        message = u'complete function: "{}.{}" at {} use {}s'.format(
+            fnc.__module__,
+            fnc.__name__,
+            time.strftime(
+                System.TIME_FORMAT,
+                time.localtime(end_timestamp)
+            ),
+            (end_timestamp - start_timestamp)
+        )
         print(message)
         return _fnc
     return fnc_
@@ -1456,4 +1481,4 @@ class Resources(object):
 
 
 if __name__ == '__main__':
-    print(AppLauncher(project='default', application='maya').get_run_args())
+    print(AppLauncher(project='lib', application='gui').get_run_args())

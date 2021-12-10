@@ -27,17 +27,27 @@ resolver:
     #
     task_unit:
         keywords:
-            - '{branch}-work-maya-scene-src-file': {systems: ['linux-python', '*-maya']}
-            - '{branch}-work-houdini-scene-src-file': {systems: ['linux-python', '*-houdini']}
-            - '{branch}-work-katana-scene-src-file': {systems: ['linux-python', '*-katana']}
-            - '{branch}-work-nuke-scene-src-file': {systems: ['linux-python', '*-nuke']}
+            - '{branch}-maya-scene-file'
+            - '{branch}-houdini-scene-file'
+            - '{branch}-katana-scene-file'
+            - '{branch}-nuke-scene-file'
 #
 actions:
     asset:
         hooks:
+            # custom
             - 'rsv-actions/asset/maya/scene-build'
-            - 'rsv-actions/asset/lib-asset-create'
+            # lib
+            - 'rsv-actions/asset/lib-asset-push'
+            - 'rsv-actions/asset/lib-asset-pull'
+            # lib-batch
+            - 'rsv-actions/assets/lib-assets-push'
+            - 'rsv-actions/assets/lib-assets-pull'
+            # render
+            - 'rsv-actions/asset/asset-surface-katana-render'
+            # publish
             - 'rsv-actions/asset/asset-surface-publish'
+            - 'rsv-actions/assets/assets-surface-publish'
     task:
         hooks:
             - 'rsv-actions/maya/work-file-new'
@@ -56,6 +66,7 @@ actions:
             - 'rsv-actions/katana/work-file-open'
             # review
             - 'rsv-actions/review-file-open'
+            - 'rsv-actions/render-mov-file-open'
             # directory
             - 'rsv-actions/work-task-directory-open'
             - 'rsv-actions/task-directory-open'

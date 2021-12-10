@@ -1,0 +1,63 @@
+option:
+    method-option-pattern: 'type={type}&name={name}&configure={configure}&engine={engine}&script={script}&group={group}&pool={pool}'
+# houdini
+# houdini-method
+geometry-unify:
+    type: method
+    name: database
+    #
+    engine: houdini-python
+    script: set_geometry_unify_by_usd_file
+    #
+    pool: emergency
+    group: all
+#
+geometry-uv-assign:
+    type: method
+    name: database
+    #
+    engine: houdini-python
+    script: set_geometry_uv_map_assign_by_usd_file
+    #
+    pool: emergency
+    group: all
+# gui-method
+lib-asset-push:
+    type: method
+    name: gui
+    #
+    engine: gui-python
+    script: set_lib_asset_push
+    #
+    pool: subprogress
+    group: subprogress
+#
+lib-asset-pull:
+    type: method
+    name: gui
+    #
+    engine: gui-python
+    script: set_lib_asset_pull
+    #
+    pool: subprogress
+    group: subprogress
+#
+lib-assets-push:
+    type: method
+    name: gui
+    #
+    engine: gui-python
+    script: set_lib_assets_push
+    #
+    pool: subprogress
+    group: subprogress
+#
+lib-assets-pull:
+    type: method
+    name: gui
+    #
+    engine: gui-python
+    script: set_lib_assets_pull
+    #
+    pool: subprogress
+    group: subprogress

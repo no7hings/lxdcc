@@ -61,9 +61,10 @@ class Status(enum.IntEnum):
 
 
 class GuiStatus(enum.IntEnum):
-    Normal = 0x00
-    Warning = 0x01
-    Error = 0x02
+    Normal = 0x20
+    Warning = 0x21
+    Error = 0x22
+    Correct = 0x23
 
 
 class SubProcessStatus(enum.EnumMeta):

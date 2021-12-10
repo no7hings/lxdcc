@@ -5,7 +5,7 @@ option:
         - '*-maya'
     #
     gui:
-        group_name: Look
+        group_name: look
         #
         name: 'Look Material Load'
         icon_name: 'file/ass'

@@ -5,7 +5,7 @@ option:
         - '*-katana'
     #
     gui:
-        group_name: Scene
+        group_name: scene
         #
         name: 'Open Work Katana File'
         icon_name: 'application/katana'

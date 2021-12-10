@@ -5,7 +5,7 @@ option:
         - '*-maya'
     #
     gui:
-        group_name: Proxy
+        group_name: proxy
         #
         name: 'Import Proxy File'
         icon_name: 'file/ass'

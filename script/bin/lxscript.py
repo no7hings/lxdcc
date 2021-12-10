@@ -148,10 +148,19 @@ def set_script_run(project, engine, script, option):
         #         option
         #     )
         # ]
+    elif engine == 'gui-python':
+        cmd_args = [
+            r'-c "mayapy {}/script/bin/scp_gui_run.py \"{}\" \"{}\""'.format(
+                os.environ.get('REZ_LXDCC_BASE'),
+                script,
+                option
+            )
+        ]
     else:
         raise TypeError()
     #
     application = engine.split('-')[0]
+    #
     utl_core.AppLauncher(
         project=project, application=application
     ).set_cmd_run_with_result(

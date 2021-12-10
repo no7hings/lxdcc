@@ -6,9 +6,9 @@ from lxutil import utl_core
 
 def main(session):
     def yes_method():
-        import lxgui_fnc.methods as gui_fnc_methods
+        import lxgui.fnc.methods as gui_fnc_methods
         #
-        gui_fnc_methods.AssetBatch(
+        gui_fnc_methods.AssetBatcher(
             project=project,
             assets=[
                 asset,
@@ -23,12 +23,16 @@ def main(session):
     project = rsv_entity.get('project')
     asset = rsv_entity.get('asset')
     #
-    dialog = utl_core.DialogWindow.set_create(
-        'Asset-surface Publish',
-        content='Surface Publish, press "Yes" to Continue...',
-        yes_method=yes_method,
-        status=bsc_configure.GuiStatus.Warning
+    utl_core.DialogWindow.set_create(
+        'Publish Asset Surface',
+        content=(
+            'publish asset surface:\n'
+            '"{}",\n'
+            'press "Yes" to continue...'
+        ).format(asset),
+        yes_method=yes_method
     )
 
 
+# noinspection PyUnresolvedReferences
 main(session)

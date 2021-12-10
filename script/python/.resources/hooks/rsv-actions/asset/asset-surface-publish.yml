@@ -3,12 +3,14 @@ option:
     #
     systems:
         - 'linux-python'
+        - '*-maya'
+        - '*-houdini'
+        - '*-katana'
     #
     gui:
-        group_name: TD
+        group_name: 'publish'
         #
-        name: 'Publish Asset-surface'
-#        icon_name: 'application/maya'
+        name: 'Publish Asset Surface'
 #
 variants:
     project: ''

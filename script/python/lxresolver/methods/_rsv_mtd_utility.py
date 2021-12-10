@@ -109,6 +109,29 @@ class RsvPermissionMtd(object):
         task_directory_paths = r.get_rsv_entity_task_directory_paths(**kwargs)
         for i_task_directory_path in task_directory_paths:
             bsc_core.StoragePathMtd.set_directory_create(i_task_directory_path)
+            utl_core.Log.set_module_result_trace(
+                'directory-create',
+                'directory="{}"'.format(i_task_directory_path)
+            )
+        #
+        step_directory_paths = r.get_rsv_entity_step_directory_paths(**kwargs)
+        for i_step_directory_path in step_directory_paths:
+            i_group_name = '{}_grp'.format(kwargs['step'])
+            i_group_id = cls.GROUP_ID_DICT[i_group_name]
+            i_path = bsc_core.StoragePathMtd.set_map_to_nas(i_step_directory_path)
+            i_kwargs = dict(
+                group_id=i_group_id,
+                path=i_path
+            )
+            cmd = 'chmod -R +a group {group_id} allow dir_gen_all,object_inherit,container_inherit "{path}"'.format(
+                **i_kwargs
+            )
+            cls.set_nas_cmd_run(cmd)
+    @classmethod
+    def set_create(cls, **kwargs):
+        import lxresolver.commands as rsv_commands
+        #
+        r = rsv_commands.get_resolver()
         #
         step_directory_paths = r.get_rsv_entity_step_directory_paths(**kwargs)
         for i_step_directory_path in step_directory_paths:

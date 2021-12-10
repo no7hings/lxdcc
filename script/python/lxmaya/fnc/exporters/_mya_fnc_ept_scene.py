@@ -407,7 +407,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         cmds.camera(
             camera_shape,
             edit=1,
-            focalLength=102.083,
+            focalLength=67.177,
         )
         return camera_transform, camera_shape
     @mya_modifiers.set_undo_mark_mdf

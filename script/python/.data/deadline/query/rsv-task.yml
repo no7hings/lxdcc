@@ -1,0 +1,175 @@
+option:
+    method-option-pattern: 'type={type}&name={name}&configure={configure}&engine={engine}&script={script}&group={group}&pool={pool}'
+# maya
+# maya-export
+maya-scene-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_scene_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+maya-geometry-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_geometry_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+maya-look-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_look_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+maya-cfx-look-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_cfx_look_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+maya-camera-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_camera_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# maya-import
+maya-geometry-import:
+    type: rsv-task-method
+    engine: maya
+    script: set_geometry_import_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+maya-look-import:
+    type: rsv-task-method
+    engine: maya
+    script: set_look_import_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# houdini
+# houdini-export
+houdini-scene-export:
+    type: rsv-task-method
+    engine: houdini-python
+    script: set_scene_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+houdini-geometry-export:
+    type: rsv-task-method
+    engine: houdini-python
+    script: set_geometry_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+houdini-look-export:
+    type: rsv-task-method
+    engine: houdini-python
+    script: set_look_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# katana
+# katana-export
+katana-scene-export:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_scene_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+katana-geometry-export:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_geometry_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+katana-look-export:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_look_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+katana-cfx-look-export:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_cfx_look_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+katana-render-export:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_render_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# katana-create
+katana-render-scene-create:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_render_scene_create_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+katana-render-create:
+    type: rsv-task-method
+    engine: katana-python
+    script: set_render_create_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# usd
+# usd-export
+usd-export:
+    type: rsv-task-method
+    engine: usd
+    script: set_usd_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# shotgun
+# shotgun-export
+shotgun-export:
+    type: rsv-task-method
+    engine: shotgun
+    script: set_shotgun_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
+shotgun-render-export:
+    type: rsv-task-method
+    engine: shotgun
+    script: set_render_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+# render
+katana-render:
+    type: rsv-task-render
+    engine: katana-render
+    script: scene_render
+  #
+    pool: emergency
+    group: 32cpus

@@ -5,7 +5,7 @@ from lxbasic import bsc_configure
 
 import lxbasic.objects as bsc_objects
 
-from lxutil import utl_configure
+from lxutil import utl_configure, utl_core
 
 from lxdeadline import ddl_configure, ddl_core
 
@@ -284,6 +284,9 @@ class DdlJobSender(AbsDdlObj):
 
     def set_submit(self):
         self._configure.set_flatten()
+        return self._set_ddl_submit_()
+
+    def _set_ddl_submit_(self):
         self._result = CON.Jobs.SubmitJob(self.info.value, self.plug.value)
         return self._result
 
@@ -360,10 +363,15 @@ class AbsDdlJobSender(AbsDdlObj):
                     'ExtraInfoKeyValue{}'.format(seq),
                     '{}={}'.format(k, content.get(k))
                 )
-
+    @utl_core._print_time_
     def set_job_submit(self):
         self.properties.set_flatten()
-        self._result = CON.Jobs.SubmitJob(self.job_info.value, self.job_plug.value)
+        info = self.job_info.value
+        plug = self.job_plug.value
+        return self._set_job_submit_(info, plug)
+    @utl_core._print_time_
+    def _set_job_submit_(self, info, plug):
+        self._result = CON.Jobs.SubmitJob(info, plug)
         return self._result
 
     def get_job_is_submit(self):
@@ -712,9 +720,18 @@ class DdlJobProcess(object):
         return self._element_statuses
 
 
+class DdlMethodQuery(ddl_obj_abs.AbsDdlMethodQuery):
+    CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file(
+        'deadline/query/method'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(DdlMethodQuery, self).__init__(*args, **kwargs)
+
+
 class DdlRsvTaskQuery(ddl_obj_abs.AbsDdlRsvTaskQuery):
     CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file(
-        'deadline/rsv-task'
+        'deadline/query/rsv-task'
     )
     def __init__(self, *args, **kwargs):
         super(DdlRsvTaskQuery, self).__init__(*args, **kwargs)

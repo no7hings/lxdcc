@@ -5,7 +5,7 @@ option:
         - 'linux-python'
     #
     gui:
-        group_name: Scene
+        group_name: scene
         #
         name: 'Open Maya Work File'
         icon_name: 'application/maya'

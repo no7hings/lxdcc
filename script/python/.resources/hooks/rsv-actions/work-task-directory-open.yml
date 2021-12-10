@@ -8,9 +8,9 @@ option:
         - '*-katana'
     #
     gui:
-        group_name: Directory
+        group_name: directory
         #
-        name: 'Open Work Task Directory'
+        name: 'Open Task Work Directory'
         icon_name: 'file/folder'
 #
 variants:

@@ -5,7 +5,7 @@ option:
         - '*-katana'
     #
     gui:
-        group_name: Surface Scene
+        group_name: surface scene
         #
         name: 'New Work Katana Surface File'
         icon_name: 'application/katana'

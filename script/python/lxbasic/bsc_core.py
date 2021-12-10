@@ -879,6 +879,9 @@ class KeywordArgumentsOpt(object):
                 return [_]
             return self._option_dict[key]
 
+    def get_as(self, key, type_):
+        pass
+
     def set(self, key, value):
         self._option_dict[key] = value
 
@@ -886,15 +889,15 @@ class KeywordArgumentsOpt(object):
         return key in self._option_dict
 
     def to_option(self):
-        vars_ = []
-        for k, v in self._option_dict.items():
-            vars_.append('{}={}'.format(k, v))
-        return self.ARGUMENT_SEP.join(vars_)
+        return self._to_string_(**self._option_dict)
     @classmethod
     def _to_string_(cls, **kwargs):
         vars_ = []
         for k, v in kwargs.items():
-            vars_.append('{}={}'.format(k, v))
+            if isinstance(v, (tuple, list)):
+                vars_.append('{}={}'.format(k, '+'.join(v)))
+            else:
+                vars_.append('{}={}'.format(k, v))
         return cls.ARGUMENT_SEP.join(vars_)
 
     # def __str__(self):
@@ -1074,7 +1077,7 @@ class DirectoryOpt(object):
         return os.path.exists(self.path)
 
 
-class StorageZipFileOpt(object):
+class StorageZipFileOpt(StorageFileOpt):
     def __init__(self, file_path):
         self._file_path = file_path
 
@@ -1084,9 +1087,10 @@ class StorageZipFileOpt(object):
 
     def get_element_names(self):
         file_path = self.get_path()
-        if zipfile.is_zipfile(file_path):
-            with zipfile.ZipFile(file_path) as z:
-                return z.namelist()
+        if self.get_is_exists() is True:
+            if zipfile.is_zipfile(file_path):
+                with zipfile.ZipFile(file_path) as z:
+                    return z.namelist()
         # else:
         #     from unrar import rarfile
         #     if rarfile.is_rarfile(file_path):
@@ -1095,11 +1099,12 @@ class StorageZipFileOpt(object):
         return []
 
     def set_element_extract_to(self, element_name, element_file_path):
-        if zipfile.is_zipfile(self.path):
-            with zipfile.ZipFile(self.path) as z:
-                directory_path = os.path.dirname(element_file_path)
-                f = z.extract(element_name, directory_path)
-                os.rename(f, element_file_path)
+        if self.get_is_exists() is True:
+            if zipfile.is_zipfile(self.path):
+                with zipfile.ZipFile(self.path) as z:
+                    directory_path = os.path.dirname(element_file_path)
+                    f = z.extract(element_name, directory_path)
+                    os.rename(f, element_file_path)
         # else:
         #     from unrar import rarfile
         #     if rarfile.is_rarfile(self.path):
@@ -2386,6 +2391,6 @@ class GuiCacheMtd(object):
 
 
 if __name__ == '__main__':
-    print DccPathDagOpt(
-        '/a:b:Female_red_b'
-    ).get_name_namespace()
+    print IntegerArrayMtd.set_merge_to(
+        [1, 2, 3, 9, 10, 11, 100]
+    )

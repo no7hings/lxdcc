@@ -10,7 +10,7 @@ method:
     tag: ''
     #
     user: ''
-    time: ''
+    time_tag: ''
     #
     extra:
         platform: ''
@@ -18,7 +18,7 @@ method:
         project: '<method.configure>'
     #
     job:
-        name: '[<method.engine>][<method.script>][<method.time>]'
+        name: '[<method.engine>][<method.script>][<method.time_tag>]'
         group_name: '[<method.type>][<method.name>]'
         #
         output_directory: ''

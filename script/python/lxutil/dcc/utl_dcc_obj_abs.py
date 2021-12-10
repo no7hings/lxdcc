@@ -456,6 +456,8 @@ class AbsOsFile(
                     )
         #
         if tgt_file.get_is_exists() is False:
+            tgt_file.set_directory_create()
+            #
             self._set_symlink_create_(self.path, tgt_file.path)
             utl_core.Log.set_module_result_trace(
                 'path-link-create',

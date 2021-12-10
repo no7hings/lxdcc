@@ -11,20 +11,12 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxutil_gui.panel import utl_gui_pnl_abs_resolver
 
-
-class RsvObjActionSession(gui_obj_abs.AbsRsvObjActionSession):
-    def __init__(self, *args, **kwargs):
-        super(RsvObjActionSession, self).__init__(*args, **kwargs)
-
-
-class RsvUnitActionSession(gui_obj_abs.AbsRsvUnitActionSession):
-    def __init__(self, *args, **kwargs):
-        super(RsvUnitActionSession, self).__init__(*args, **kwargs)
+from lxresolver.objects import _rsv_obj_session
 
 
 class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
-    RSV_OBJ_ACTION_SESSION_CLASS = RsvObjActionSession
-    RSV_UNIT_ACTION_SESSION_CLASS = RsvUnitActionSession
+    RSV_OBJ_ACTION_SESSION_CLASS = _rsv_obj_session.RsvObjActionSession
+    RSV_UNIT_ACTION_SESSION_CLASS = _rsv_obj_session.RsvUnitActionSession
     def __init__(self, *args, **kwargs):
         self._configure = kwargs['configure']
         #
@@ -91,7 +83,15 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
                             )
         return enable, lis
 
-    def get_rsv_entity_menu_content(self, rsv_entity):
+    def get_rsv_assets_menu_content(self, rsv_entity):
+        hook_keys = self._configure.get(
+            'actions.assets.hooks'
+        ) or []
+        return self.__get_menu_content_by_hook_keys_(
+            hook_keys, rsv_entity
+        )
+
+    def get_rsv_asset_menu_content(self, rsv_entity):
         hook_keys = self._configure.get(
             'actions.asset.hooks'
         ) or []

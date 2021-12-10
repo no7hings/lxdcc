@@ -42,10 +42,10 @@ class MtdBasic(object):
     URL_PATTERN = 'url://resolver?{parameters}'
     URL_PARAMETERS_PATTERN = '{key}={value}'
     @classmethod
-    def _set_pattern_update_(cls, pattern, **format_variant):
-        if pattern is not None:
-            keys = cls._get_keys_by_parse_pattern_(pattern)
-            s = pattern
+    def _set_pattern_update_(cls, raw, **format_variant):
+        if raw is not None:
+            keys = cls._get_keys_by_parse_pattern_(raw)
+            s = raw
             if keys:
                 for key in keys:
                     if key in format_variant:
@@ -53,7 +53,7 @@ class MtdBasic(object):
                         if v is not None and v != '*':
                             s = s.replace('{{{}}}'.format(key), format_variant[key])
             return s
-        return pattern
+        return raw
     @classmethod
     def _get_scheme_raw_(cls, file_path):
         if os.path.exists(file_path):
@@ -639,8 +639,8 @@ class AbsRsvObj(
         self.set_gui_menu_raw(
             [
                 ('{}-directory'.format(self.type_name), ),
-                ('Open Work-directory', 'file/folder', (self._get_work_directory_is_enable_, self._set_work_directory_open_, False)),
-                ('Open Publish-directory', 'file/folder', (self._get_publish_directory_is_enable_, self._set_publish_directory_open_, False)),
+                ('Open Work Directory', 'file/folder', (self._get_work_directory_is_enable_, self._set_work_directory_open_, False)),
+                ('Open Publish Directory', 'file/folder', (self._get_publish_directory_is_enable_, self._set_publish_directory_open_, False)),
             ]
         )
 

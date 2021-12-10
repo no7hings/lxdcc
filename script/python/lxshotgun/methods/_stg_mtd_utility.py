@@ -41,22 +41,28 @@ class StgTaskMtd(object):
                 task_keys = cls.SHOTGUN_TEMPLATE_CONFIGURE.get(
                     'task-templates.{}.task-keys'.format(task_template)
                 )
-                for task_key in task_keys:
-                    i_task_kwargs = copy.copy(i_entity_kwargs)
-                    step, task = task_key.split('/')
-                    i_task_kwargs['step'] = step
-                    i_task_kwargs['task'] = task
-                    #
-                    stg_connector.set_stg_task_create(
-                        **i_task_kwargs
-                    )
-                    #
-                    rsv_methods.RsvPermissionMtd.set_entity_task_create(
-                        **i_task_kwargs
+                if task_keys is None:
+                    task_keys = cls.SHOTGUN_TEMPLATE_CONFIGURE.get(
+                        'task-templates.default.task-keys'
                     )
                 #
-                # cls.set_entity_directories_create(**i_entity_kwargs)
-                #
+                if task_keys:
+                    for i_task_key in task_keys:
+                        i_task_kwargs = copy.copy(i_entity_kwargs)
+                        i_step, i_task = i_task_key.split('/')
+                        i_task_kwargs['step'] = i_step
+                        i_task_kwargs['task'] = i_task
+                        #
+                        stg_connector.set_stg_task_create(
+                            **i_task_kwargs
+                        )
+                        #
+                        rsv_methods.RsvPermissionMtd.set_entity_task_create(
+                            **i_task_kwargs
+                        )
+                    #
+                    # cls.set_entity_directories_create(**i_entity_kwargs)
+                    #
             #
             gp.set_stop()
     @classmethod
@@ -80,15 +86,16 @@ class StgTaskMtd(object):
                     'task-templates.default.task-keys'
                 )
             #
-            for task_key in task_keys:
-                i_task_kwargs = copy.copy(rsv_entity_properties.value)
-                step, task = task_key.split('/')
-                i_task_kwargs['step'] = step
-                i_task_kwargs['task'] = task
-                #
-                stg_connector.set_stg_task_create(
-                    **i_task_kwargs
-                )
+            if task_keys:
+                for i_task_key in task_keys:
+                    i_task_kwargs = copy.copy(rsv_entity_properties.value)
+                    i_step, i_task = i_task_key.split('/')
+                    i_task_kwargs['step'] = i_step
+                    i_task_kwargs['task'] = i_task
+                    #
+                    stg_connector.set_stg_task_create(
+                        **i_task_kwargs
+                    )
             #
             cls.set_entity_directories_create(**entity_kwargs)
     @classmethod
@@ -107,21 +114,27 @@ class StgTaskMtd(object):
         task_keys = cls.SHOTGUN_TEMPLATE_CONFIGURE.get(
             'task-templates.{}.task-keys'.format(role)
         )
-        for task_key in task_keys:
-            i_task_kwargs = copy.copy(entity_kwargs)
-            step, task = task_key.split('/')
-            i_task_kwargs['step'] = step
-            i_task_kwargs['task'] = task
-            #
-            stg_connector.set_stg_task_create(
-                **i_task_kwargs
-            )
-            #
-            rsv_methods.RsvPermissionMtd.set_entity_task_create(
-                **i_task_kwargs
+        if task_keys is None:
+            task_keys = cls.SHOTGUN_TEMPLATE_CONFIGURE.get(
+                'task-templates.default.task-keys'
             )
         #
-        cls.set_entity_directories_create(**entity_kwargs)
+        if task_keys:
+            for i_task_key in task_keys:
+                i_task_kwargs = copy.copy(entity_kwargs)
+                i_step, i_task = i_task_key.split('/')
+                i_task_kwargs['step'] = i_step
+                i_task_kwargs['task'] = i_task
+                #
+                stg_connector.set_stg_task_create(
+                    **i_task_kwargs
+                )
+                #
+                rsv_methods.RsvPermissionMtd.set_entity_task_create(
+                    **i_task_kwargs
+                )
+        #
+        # cls.set_entity_directories_create(**entity_kwargs)
     @classmethod
     def set_entities_create_by_template_(cls, project, entity_keys, task_template):
         pass

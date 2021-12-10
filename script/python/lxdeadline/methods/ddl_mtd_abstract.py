@@ -219,12 +219,20 @@ class AbsDdlMethodRunner(AbsJobSender2):
         self._ddl_job_sender.method.set('job.group', self.get_method_option_opt().get('group'))
         self._ddl_job_sender.method.set('job.pool', self.get_method_option_opt().get('pool'))
         #
+        batch_key = script_option_opt.get('batch_key')
+        if batch_key:
+            batch_list = script_option_opt.get(batch_key, as_array=True) or []
+            self._ddl_job_sender.job_info.set(
+                'Frames', ','.join(map(str, range(len(batch_list))))
+            )
+        #
         if isinstance(self._job_dependencies, (tuple, list)):
             self._ddl_job_sender.job_info.set('JobDependencies', ','.join(self._job_dependencies))
             self._ddl_job_sender.job_info.set('ResumeOnCompleteDependencies', True)
         #
+        o_td_enable = script_option_opt.get('td_enable') or False
         td_enable = utl_core.Environ.get_td_enable()
-        if td_enable is True:
+        if td_enable is True or o_td_enable is True:
             self._ddl_job_sender.job_info.set(
                 'Pool', 'td'
             )

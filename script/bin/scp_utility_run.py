@@ -10,7 +10,7 @@ argv = sys.argv
 key, option = argv[1], argv[2]
 
 utl_core.Log.set_module_result_trace(
-    'lynxi-python-run',
+    'gui-python-run',
     'method="lxutil_fnc.scripts.{}(option="{}")"'.format(
         key, option
     )

@@ -24,6 +24,11 @@
                     <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/lib-asset-look-loader")]]></scriptCode>
                 </scriptItem>
                 <separatorItem />
+                <scriptItem id="asset_batcher">
+                    <label>Asset Batcher</label>
+                    <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/asset-batcher")]]></scriptCode>
+                </scriptItem>
+                <separatorItem />
                 <scriptItem id="shot_loader">
                     <label>Shot Loader</label>
                     <scriptCode><![CDATA[import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run("rsv-panels/shot-loader")]]></scriptCode>

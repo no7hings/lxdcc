@@ -331,6 +331,8 @@ class AbsFileReader(object):
 
 
 class AbsProcess(object):
+    LOGGER = None
+    #
     Status = bsc_configure.Status
     SubProcessStatus = bsc_configure.SubProcessStatus
     def __init__(self, *args, **kwargs):
@@ -359,12 +361,16 @@ class AbsProcess(object):
 
     def __set_completed_(self):
         self.__set_status_(self.Status.Completed)
-        self._set_completed_fnc_()
+        self._set_finished_fnc_run_()
+
+    def __set_failed_(self):
+        self.__set_status_(self.Status.Failed)
+        self._set_finished_fnc_run_()
 
     def _set_sub_process_create_fnc_(self):
         raise NotImplementedError()
 
-    def _set_completed_fnc_(self):
+    def _set_finished_fnc_run_(self):
         raise NotImplementedError()
 
     def __get_is_completed_(self):
@@ -372,6 +378,8 @@ class AbsProcess(object):
         if isinstance(sp, subprocess.Popen):
             if sp.poll() is self.SubProcessStatus.Completed:
                 return True
+            elif sp.poll() is self.SubProcessStatus.Failed:
+                self.__set_failed_()
             elif sp.poll() is self.SubProcessStatus.Error:
                 self.__set_error_occurred_()
             return False
@@ -411,18 +419,25 @@ class AbsProcess(object):
         pre_status = self._status
         if pre_status != status:
             self._status = status
-            print '"{}" status is change to "{}"'.format(
-                self._name,
-                str(self._status)
-            )
+            if self.LOGGER is not None:
+                self.LOGGER.set_module_result_trace(
+                    'process-status-changed',
+                    '"{}" status is change to "{}"'.format(
+                        self._name,
+                        str(self._status)
+                    )
+                )
 
     def __set_error_occurred_(self):
         self._status = self.Status.Error
-        #
-        print '"{}" status is change to "{}"'.format(
-            self._name,
-            str(self._status)
-        )
+        if self.LOGGER is not None:
+            self.LOGGER.set_module_error_trace(
+                'process-error-occurred',
+                '"{}" status is change to "{}"'.format(
+                    self._name,
+                    str(self._status)
+                )
+            )
 
     def set_start(self):
         if self.get_elements():

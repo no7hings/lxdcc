@@ -1,0 +1,6 @@
+# Arnold MetaData File 
+[node osl_window_box]
+    desc STRING "[OSL]"
+    maya.name STRING "osl_window_box"
+    maya.id INT 0x00f000001
+    maya.classification STRING "utility/OSL"

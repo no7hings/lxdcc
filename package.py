@@ -1,7 +1,7 @@
 # coding:utf-8
 name = 'lxdcc'
 
-version = '0.0.111'
+version = '0.0.114'
 
 description = ''
 
@@ -30,6 +30,8 @@ def commands():
         env.PATH.append('{root}/script/bin/windows')
     # script
     env.PYTHONPATH.append('{root}/script/python')
+    # resouces
+    # env.LYNXI_RESOURCES.append('{root}/script/python/.resources')
     # startup in dcc
     # maya
     env.PYTHONPATH.append('{root}/script/python/.setup/maya/scripts')
@@ -37,8 +39,10 @@ def commands():
     env.HOUDINI_PATH.append('{root}/script/python/.setup/houdini:&')
     # katana
     env.KATANA_RESOURCES.append('{root}/script/python/.setup/katana')
+    # arnold
+    # env.ARNOLD_PLUGIN_PATH.append('{root}/script/python/.setup/arnold/shaders')
 
 
-timestamp = 1639363837
+timestamp = 1639389924
 
 format_version = 2

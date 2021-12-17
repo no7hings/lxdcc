@@ -15,19 +15,6 @@ from lxutil import utl_core
 class AbsSession(object):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
-    @classmethod
-    def _get_current_platform_(cls):
-        return utl_core.System.get_platform()
-    @classmethod
-    def _get_current_application_(cls):
-        return utl_core.System.get_application()
-    @classmethod
-    def _get_current_system_(cls):
-        return '{}-{}'.format(
-            cls._get_current_platform_(),
-            cls._get_current_application_()
-        )
-    #
     def __init__(self, *args, **kwargs):
         if 'configure' in kwargs:
             self._configure = kwargs['configure']
@@ -53,9 +40,8 @@ class AbsSession(object):
             'option.gui.icon_name'
         )
         #
-        self._platform = self._get_current_platform_()
-        #
-        self._application = self._get_current_application_()
+        self._platform = bsc_core.SystemMtd.get_platform()
+        self._application = bsc_core.SystemMtd.get_application()
         self._system = bsc_core.SystemMtd.get_current()
         self._system_includes = bsc_core.SystemMtd.get_system_includes(
             self._configure.get(
@@ -63,6 +49,16 @@ class AbsSession(object):
             ) or []
         )
         self._variants['application'] = self._application
+        #
+        self._hook_python_file = None
+        self._hook_yaml_file = None
+    @property
+    def configure(self):
+        return self._configure
+    @property
+    def gui_configure(self):
+        return self._configure.get_content('option.gui')
+    #
     @property
     def platform(self):
         return self._platform
@@ -75,6 +71,7 @@ class AbsSession(object):
     @property
     def system_includes(self):
         return self._system_includes
+    # gui
     @property
     def gui_name(self):
         return self._gui_name
@@ -114,21 +111,45 @@ class AbsSession(object):
             from lxutil import utl_core
             utl_core.ExceptionCatcher.set_create()
             raise
-
-    def _set_code_execute_(self, raw):
-        try:
-            # noinspection PyUnusedLocal
-            session = self
-            code_exec = compile(raw, '<string>', 'exec')
-            exec code_exec
+    @staticmethod
+    def _set_file_execute_(file_path, kwargs):
+        # use for python 3
+        # with open(file_path, 'r') as f:
+        #     exec (f.read())
         #
-        except Exception:
-            from lxutil import utl_core
-            utl_core.ExceptionCatcher.set_create()
-            raise
+        # use for python 2
+        kwargs['__name__'] = '__main__'
+        execfile(file_path, kwargs)
 
     def get_is_system_matched(self, system_key):
         return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
+
+    def set_execute_fnc(self, fnc):
+        pass
+
+    def set_hook_python_file(self, file_path):
+        self._hook_python_file = file_path
+
+    def get_hook_python_file(self):
+        return self._hook_python_file
+
+    def set_hook_yaml_file(self, file_path):
+        self._hook_yaml_file = file_path
+
+    def get_hook_yaml_file(self):
+        return self._hook_yaml_file
+
+    def set_hook_python_file_open(self):
+        cmd = 'rez-env sublime_text -- sublime_text "{}"'.format(
+            self._hook_python_file
+        )
+        bsc_core.SubProcessMtd.set_run(cmd)
+
+    def set_hook_yaml_file_open(self):
+        cmd = 'rez-env sublime_text -- sublime_text "{}"'.format(
+            self._hook_yaml_file
+        )
+        bsc_core.SubProcessMtd.set_run(cmd)
 
 
 class AbsRsvObjSession(AbsSession):
@@ -233,34 +254,11 @@ class AbsRsvUnitActionSession(
         return False
 
 
-class AbsRsvPanelSession(AbsSession):
-    RSV_PANEL_CLASS = None
+class AbsToolPanelSession(AbsSession):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvPanelSession, self).__init__(*args, **kwargs)
+        super(AbsToolPanelSession, self).__init__(*args, **kwargs)
 
-    def set_execute(self):
-        if self.application in [
-            self.Application.Python
-        ]:
-            import sys
-            #
-            from PySide2 import QtWidgets
-            #
-            app = QtWidgets.QApplication(sys.argv)
-            #
-            w = self.RSV_PANEL_CLASS(
-                configure=self._configure
-            )
-            w.set_window_show()
-            #
-            sys.exit(app.exec_())
-        #
-        elif self.application in [
-            self.Application.Maya,
-            self.Application.Houdini,
-            self.Application.Katana,
-        ]:
-            w = self.RSV_PANEL_CLASS(
-                configure=self._configure
-            )
-            w.set_window_show()
+
+class AbsKitPanelSession(AbsSession):
+    def __init__(self, *args, **kwargs):
+        super(AbsKitPanelSession, self).__init__(*args, **kwargs)

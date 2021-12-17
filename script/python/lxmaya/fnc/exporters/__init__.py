@@ -7,4 +7,7 @@ from ._mya_fnc_ept_look import *
 
 from ._mya_fnc_ept_texture import *
 
+from ._mya_fnc_ept_proxy import *
+
+
 

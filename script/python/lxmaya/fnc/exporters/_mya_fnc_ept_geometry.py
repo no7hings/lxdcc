@@ -12,9 +12,9 @@ from lxobj import obj_core
 
 from lxutil import utl_core
 
-from lxutil.dcc.dcc_objects import _utl_dcc_obj_storage
+import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-from lxmaya import ma_configure
+from lxmaya import ma_configure, ma_core
 
 import lxobj.core_objects as core_objects
 
@@ -172,7 +172,7 @@ class GeometryAbcExporter(object):
             self._get_file_(self._file_path)
         ]
         #
-        file_ = _utl_dcc_obj_storage.OsFile(self._file_path)
+        file_ = utl_dcc_objects.OsFile(self._file_path)
         directory_ = file_.directory
         if directory_.get_is_exists() is False:
             directory_.set_create()
@@ -247,7 +247,7 @@ class GeometryUsdExporter(object):
         return cmds.file(file_path, **kwargs)
 
     def set_run(self):
-        os_file = _utl_dcc_obj_storage.OsFile(self._file_path)
+        os_file = utl_dcc_objects.OsFile(self._file_path)
         os_file.set_directory_create()
         #
         usd_option = self._get_usd_option_(self._option)

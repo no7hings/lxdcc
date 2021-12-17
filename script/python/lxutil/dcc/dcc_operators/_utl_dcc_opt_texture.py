@@ -17,6 +17,8 @@ import lxutil.dcc.dcc_objects as utl_dcc_objets
 
 import multiprocessing
 
+CPU_COUNT = multiprocessing.cpu_count()
+
 
 class DccTexturesOpt(object):
     def __init__(self, texture_references, includes=None, force=False):
@@ -536,6 +538,8 @@ class DccTexturesOpt(object):
 
 
 class TextureTxSubProcess(bsc_obj_abs.AbsProcess):
+    LOGGER = utl_core.Log
+    #
     def __init__(self, file_path):
         super(TextureTxSubProcess, self).__init__()
         self._file_path = file_path
@@ -551,14 +555,16 @@ class TextureTxSubProcess(bsc_obj_abs.AbsProcess):
             result = None
         return result
 
-    def _set_completed_fnc_(self):
+    def _set_finished_fnc_run_(self):
         pre_count = TextureTxMainProcess.PROCESS_COUNT
         TextureTxMainProcess.PROCESS_COUNT = pre_count - 1
 
 
 class TextureTxMainProcess(bsc_obj_abs.AbsProcess):
+    LOGGER = utl_core.Log
+    #
     PROCESS_COUNT = 0
-    PROCESS_COUNT_MAXIMUM = multiprocessing.cpu_count() - 4
+    PROCESS_COUNT_MAXIMUM = 4
     ELEMENT_PROCESS_CLS = TextureTxSubProcess
     def __init__(self, file_paths):
         super(TextureTxMainProcess, self).__init__()
@@ -571,34 +577,38 @@ class TextureTxMainProcess(bsc_obj_abs.AbsProcess):
     def _set_sub_process_create_fnc_(self):
         return True
 
-    def _set_completed_fnc_(self):
+    def _set_finished_fnc_run_(self):
         return True
 
 
 class TextureJpgSubProcess(bsc_obj_abs.AbsProcess):
+    LOGGER = utl_core.Log
+    #
     def __init__(self, file_path):
         super(TextureJpgSubProcess, self).__init__()
         self._file_path = file_path
         self._f = utl_dcc_objets.OsTexture(self._file_path)
 
     def _set_sub_process_create_fnc_(self):
-        pre_count = TextureTxMainProcess.PROCESS_COUNT
-        maximum = TextureTxMainProcess.PROCESS_COUNT_MAXIMUM
+        pre_count = TextureJpgMainProcess.PROCESS_COUNT
+        maximum = TextureJpgMainProcess.PROCESS_COUNT_MAXIMUM
         if pre_count < maximum:
             result = self._f._set_unit_jpg_create_(self._file_path)
-            TextureTxMainProcess.PROCESS_COUNT = pre_count + 1
+            TextureJpgMainProcess.PROCESS_COUNT = pre_count + 1
         else:
             result = None
         return result
 
-    def _set_completed_fnc_(self):
-        pre_count = TextureTxMainProcess.PROCESS_COUNT
-        TextureTxMainProcess.PROCESS_COUNT = pre_count - 1
+    def _set_finished_fnc_run_(self):
+        pre_count = TextureJpgMainProcess.PROCESS_COUNT
+        TextureJpgMainProcess.PROCESS_COUNT = pre_count - 1
 
 
 class TextureJpgMainProcess(bsc_obj_abs.AbsProcess):
+    LOGGER = utl_core.Log
+    #
     PROCESS_COUNT = 0
-    PROCESS_COUNT_MAXIMUM = 2
+    PROCESS_COUNT_MAXIMUM = 4
     ELEMENT_PROCESS_CLS = TextureJpgSubProcess
     def __init__(self, file_paths):
         super(TextureJpgMainProcess, self).__init__()
@@ -611,5 +621,5 @@ class TextureJpgMainProcess(bsc_obj_abs.AbsProcess):
     def _set_sub_process_create_fnc_(self):
         return True
 
-    def _set_completed_fnc_(self):
+    def _set_finished_fnc_run_(self):
         return True

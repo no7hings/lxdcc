@@ -508,7 +508,10 @@ class AbsObjScene(
                 dcc_material_name = '{}__material__{}'.format(self._look_pass_name, len(self._material_name_dict))
                 dcc_obj = self._set_dcc_material_build_(
                     dcc_material_name,
-                    (and_surface_shader_obj_name, and_displacement_shader_obj_name, and_volume_shader_obj_name)
+                    (
+                        and_surface_shader_obj_name,
+                        and_displacement_shader_obj_name,
+                        and_volume_shader_obj_name)
                 )
                 self._material_name_dict[material_key] = dcc_material_name
             else:
@@ -531,11 +534,11 @@ class AbsObjScene(
             (and_displacement_shader_obj_name, and_configure.MaterialPort.DISPLACEMENT),
             (and_volume_shader_obj_name, and_configure.MaterialPort.VOLUME)
         ]
-        for shader_ar_obj_name, material_dcc_port_name in shader_build_args:
+        for shader_and_obj_name, material_dcc_port_name in shader_build_args:
             self._set_dcc_material_bind_port_build_(
                 dcc_obj=dcc_obj,
                 dcc_port_name=material_dcc_port_name,
-                dcc_port_raw=shader_ar_obj_name
+                dcc_port_raw=shader_and_obj_name
             )
         return dcc_obj
 
@@ -571,6 +574,10 @@ class AbsObjScene(
         # node iterator start
         and_obj_iterator = ai.AiUniverseGetNodeIterator(self._and_universe, sum(self.AR_OBJ_CATEGORY_MASK))
         self.get_index_dict()
+        utl_core.Log.set_module_result_trace(
+            'ass-load',
+            'file="{}"'.format(file_path)
+        )
         l_p = utl_core.LogProgressRunner(maximum=len(self._index_dict.keys()), label='ass-load')
         while not ai.AiNodeIteratorFinished(and_obj_iterator):
             l_p.set_update()

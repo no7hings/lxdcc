@@ -1138,7 +1138,8 @@ class AbsRsvTask(
                     #
                     task_unit_properties.set('application', application)
                     task_unit_properties.set('user', utl_core.System.get_user_name())
-                    task_unit_properties.set('time_tag', utl_core.System.get_time())
+                    task_unit_properties.set('time', utl_core.System.get_time())
+                    task_unit_properties.set('time_tag', utl_core.System.get_time_tag())
                     for file_path_key in file_path_keys:
                         task_unit_properties.set(file_path_key, file_path)
                     #

@@ -4,6 +4,10 @@ import copy
 #
 import fnmatch
 
+import os
+
+import parse
+
 from lxbasic import bsc_core
 #
 from lxutil import utl_configure, utl_core
@@ -23,6 +27,8 @@ import lxdeadline.methods as ddl_methods
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 #
 import lxutil.fnc.exporters as utl_fnc_exporters
+
+import lxutil_fnc.scripts as utl_fnc_scripts
 
 
 class AssetBatcher(object):
@@ -66,23 +72,67 @@ class AssetBatcher(object):
             #
             g_p.set_stop()
     @classmethod
-    def _set_i_rsv_asset_surface_publish_(cls, i_rsv_asset_tgt):
-        import lxutil_fnc.scripts as utl_fnc_scripts
+    def _set_i_rsv_asset_surface_publish_(cls, i_rsv_asset_tgt, user=None, time_tag=None):
+        #
+        if user is None:
+            user = bsc_core.SystemMtd.get_user_name()
+        #
+        if time_tag is None:
+            time_tag = bsc_core.SystemMtd.get_time_tag()
         #
         i_rsv_task = i_rsv_asset_tgt.get_rsv_task(step='srf', task='surfacing')
         if i_rsv_task:
             i_katana_scene_src_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
             i_katana_scene_src_src_file_path = i_katana_scene_src_src_file_unit.get_result(version='latest')
             if i_katana_scene_src_src_file_path:
+                i_katana_scene_src_src_file_properties = i_katana_scene_src_src_file_unit.get_properties(
+                    i_katana_scene_src_src_file_path
+                )
+                version = i_katana_scene_src_src_file_properties.get('version')
+                # must clear ass file first
+                i_look_ass_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-look-ass-file')
+                i_look_ass_file_path = i_look_ass_file_unit.get_result(version=version)
+                i_look_ass_file = utl_dcc_objects.OsFile(i_look_ass_file_path)
+                if i_look_ass_file.get_is_exists() is True:
+                    i_look_ass_file.set_delete()
+                #
+                i_look_klf_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-look-klf-file')
+                i_look_klf_file_path = i_look_klf_file_unit.get_result(version=version)
+                i_look_klf_file = utl_dcc_objects.OsFile(i_look_klf_file_path)
+                if i_look_klf_file.get_is_exists() is True:
+                    element_names = bsc_core.ZipFileOpt(i_look_klf_file_path).get_element_names()
+                    look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
+                    for j_look_pass_name in look_pass_names:
+                        if j_look_pass_name != 'default':
+                            j_look_ass_sub_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-look-ass-sub-file')
+                            j_look_ass_sub_file_path = j_look_ass_sub_file_unit.get_result(
+                                version=version, extend_variants=dict(look_pass=j_look_pass_name)
+                            )
+                            j_look_ass_sub_file = utl_dcc_objects.OsFile(j_look_ass_sub_file_path)
+                            if j_look_ass_sub_file.get_is_exists() is True:
+                                j_look_ass_sub_file.set_delete()
+                #
                 utl_fnc_scripts.set_asset_publish_by_katana_scene_src(
-                    option='file={}'.format(i_katana_scene_src_src_file_path)
+                    option='file={file}&user={user}&time_tag={time_tag}'.format(
+                        **dict(
+                            file=i_katana_scene_src_src_file_path,
+                            #
+                            user=user, time_tag=time_tag
+                        )
+                    )
                 )
             else:
                 i_maya_scene_src_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-maya-scene-src-file')
                 i_maya_scene_src_src_file_path = i_maya_scene_src_src_file_unit.get_result(version='latest')
                 if i_maya_scene_src_src_file_path:
-                    utl_fnc_scripts.set_asset_publish_by_katana_scene_src(
-                        option='file={}'.format(i_maya_scene_src_src_file_path)
+                    utl_fnc_scripts.set_asset_publish_by_maya_scene_src(
+                        option='file={file}&user={user}&time_tag={time_tag}'.format(
+                            **dict(
+                                file=i_maya_scene_src_src_file_path,
+                                #
+                                user=user, time_tag=time_tag
+                            )
+                        )
                     )
 
     def _set_i_rsv_asset_surface_katana_render_(self, i_rsv_asset_tgt):
@@ -362,7 +412,12 @@ class AbsLibMethod(
     @classmethod
     def _get_lib_asset_(cls, project, asset):
         if fnmatch.filter([asset], 'ast_*_*'):
-            pass
+            p = parse.parse(
+                'ast_{project}_{asset}', asset
+            )
+            if p:
+                asset = p.named['asset']
+        #
         elif '__' in asset:
             if fnmatch.filter([asset], '[a-z][a-z][a-z0-9]__*'):
                 asset = asset.split('__')[-1]
@@ -383,6 +438,9 @@ class LibAssetPusher(AbsLibMethod):
         #
         self._resolver = rsv_commands.get_resolver()
 
+    def get_option(self):
+        return self._option
+
     def set_run(self):
         for i_asset_src in self._assets_src:
             self._set_i_rsv_asset_run_(i_asset_src)
@@ -401,6 +459,9 @@ class LibAssetPusher(AbsLibMethod):
             with_shotgun_create = self._option.get('with_shotgun_create') or False
             with_file_copy = self._option.get('with_file_copy') or False
             with_surface_publish = self._option.get('with_surface_publish') or False
+            #
+            user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
+            time_tag = self._option.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = self._get_lib_asset_(
@@ -437,7 +498,8 @@ class LibAssetPusher(AbsLibMethod):
                 # surface-publish
                 if with_surface_publish is True:
                     AssetBatcher._set_i_rsv_asset_surface_publish_(
-                        i_rsv_asset_tgt
+                        i_rsv_asset_tgt,
+                        user, time_tag
                     )
 
 
@@ -473,6 +535,9 @@ class LibAssetPuller(AbsLibMethod):
             with_file_copy = self._option.get('with_file_copy') or False
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
+            user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
+            time_tag = self._option.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+            #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = i_asset_src
             if with_system_create is True:
@@ -505,22 +570,12 @@ class LibAssetPuller(AbsLibMethod):
                 # surface-publish
                 if with_surface_publish is True:
                     AssetBatcher._set_i_rsv_asset_surface_publish_(
-                        i_rsv_asset_tgt
+                        i_rsv_asset_tgt,
+                        user, time_tag
                     )
 
 
 if __name__ == '__main__':
-    LibAssetPuller(
-        'shl',
-        ['ast_shl_cao_b'],
-        option=dict(
-            with_system_create=True,
-            with_system_permission_create=True,
-            #
-            # with_shotgun_create=True,
-            # #
-            # with_file_copy=True,
-            # #
-            # with_surface_publish=True,
-        )
-    ).set_run()
+    print AbsLibMethod._get_lib_asset_(
+        'cjd', 'ast_shl_cao_a'
+    )

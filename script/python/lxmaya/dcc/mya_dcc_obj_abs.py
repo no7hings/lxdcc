@@ -633,7 +633,8 @@ class AbsMyaObj(
                     cmds.createNode('transform', name=name, parent=parent_path, skipSelect=1)
                     cmds.createNode(obj_type, name=shape_name, parent=obj_path, skipSelect=1)
             else:
-                cmds.createNode(obj_type, name=name, parent=parent_path, skipSelect=1)
+                self.set_create(obj_type)
+                # cmds.createNode(obj_type, name=name, parent=parent_path, skipSelect=1)
         return _, is_create
 
     def set_create(self, obj_type):

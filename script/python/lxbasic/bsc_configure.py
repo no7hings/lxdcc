@@ -103,13 +103,17 @@ class Application(object):
     Katana = 'katana'
     Nuke = 'nuke'
     #
+    Lynxi = 'lynxi'
+    #
     All = [
         Python,
         #
         Maya,
         Houdini,
         Katana,
-        Nuke
+        Nuke,
+        #
+        Lynxi
     ]
 
 

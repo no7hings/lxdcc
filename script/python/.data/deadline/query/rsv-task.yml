@@ -26,6 +26,14 @@ maya-look-export:
     pool: subprogress
     group: subprogress
 #
+maya-proxy-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_proxy_export_by_any_scene_file
+    #
+    pool: subprogress
+    group: subprogress
+#
 maya-cfx-look-export:
     type: rsv-task-method
     engine: maya

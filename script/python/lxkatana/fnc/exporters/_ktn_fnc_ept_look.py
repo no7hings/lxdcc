@@ -7,6 +7,8 @@ from UI4 import Manifest
 
 from lxutil import utl_core
 
+import lxutil.scripts as utl_scripts
+
 from lxutil.fnc import utl_fnc_obj_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -97,18 +99,22 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
             #
             render_obj.get_port('args.arnoldGlobalStatements.assFile.enable').set(True)
             if frame[0] != frame[1]:
-                for current_frame in range(frame[0], frame[1] + 1):
-                    output_file_path = u'{}.{}{}'.format(path_base, str(current_frame).zfill(4), ext)
-                    render_obj.get_port('args.arnoldGlobalStatements.assFile.value').set(output_file_path)
-                    NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(current_frame, 0)
-                    ktn_dcc_objects.Scene.set_current_frame(current_frame)
-                    render_set.frame = current_frame
+                for i_current_frame in range(frame[0], frame[1] + 1):
+                    i_output_file_path = u'{}.{}{}'.format(path_base, str(i_current_frame).zfill(4), ext)
+                    render_obj.get_port('args.arnoldGlobalStatements.assFile.value').set(i_output_file_path)
+                    NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(i_current_frame, 0)
+                    ktn_dcc_objects.Scene.set_current_frame(i_current_frame)
+                    render_set.frame = i_current_frame
                     RenderManager.StartRender(
                         self.RENDER_MODE,
                         node=render_obj.ktn_obj,
                         views=[camera],
                         settings=render_set
                     )
+                    #
+                    fr = utl_scripts.DotAssFileReader(i_output_file_path)
+                    fr._set_file_paths_convert_()
+                    #
                     utl_core.Log.set_module_result_trace(
                         'katana-ass-sequence-export',
                         u'file="{}"'.format(file_path)
@@ -123,6 +129,10 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
                     views=[camera],
                     settings=render_set
                 )
+                #
+                fr = utl_scripts.DotAssFileReader(output_file_path)
+                fr._set_file_paths_convert_()
+                #
                 utl_core.Log.set_module_result_trace(
                     'katana-ass-export',
                     u'file="{}"'.format(file_path)

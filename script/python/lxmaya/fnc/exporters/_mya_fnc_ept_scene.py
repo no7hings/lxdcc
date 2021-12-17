@@ -320,10 +320,16 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             self._root,
             frame=frame
         )
+        jpg_seq_file = utl_dcc_objects.OsFile(jpg_file_seq_path)
         if self._option.get('convert_to_dot_mov') is True:
             stg_operators.ImageOpt(
-                utl_dcc_objects.OsFile(jpg_file_seq_path)
+                jpg_seq_file
             ).set_convert_to(mov_file_path)
+        else:
+            jpg_seq_file = utl_dcc_objects.OsFile(jpg_file_seq_path)
+            jpg_seq_file.get_exists_files()[0].set_copy_to_file(
+                self._file_path
+            )
         #
         self._results = [mov_file_path]
 

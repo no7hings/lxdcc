@@ -256,8 +256,17 @@ looks:
             keyword: asset-look-ass-file
             workspace: publish
             version: latest
-        pass-file:
+        sub-file:
             keyword: asset-look-ass-sub-file
+            workspace: publish
+            version: latest
+        #
+        app-file:
+            keyword: asset-look-ass-app-file
+            workspace: publish
+            version: latest
+        app-sub-file:
+            keyword: asset-look-ass-app-sub-file
             workspace: publish
             version: latest
         surface-anm-pass-file:

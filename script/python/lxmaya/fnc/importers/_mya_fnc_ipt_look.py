@@ -211,9 +211,16 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         material_dcc_obj_name = material_and_obj_name
         #
         material_dcc_obj = mya_dcc_objects.Material(material_dcc_obj_name)
-        material_dcc_obj.set_create(mya_dcc_objects.Material.OBJ_TYPE)
-
-        self._set_material_shaders_create_(material_and_obj, material_dcc_obj)
+        if material_dcc_obj.get_is_exists() is False:
+            material_dcc_obj.set_create(mya_dcc_objects.Material.OBJ_TYPE)
+            #
+            self._set_material_shaders_create_(material_and_obj, material_dcc_obj)
+            #
+            ma_core.CmdObjOpt(material_dcc_obj.path).set_customize_attributes_create(
+                dict(
+                    arnold_name=material_and_obj_name
+                )
+            )
     #
     def _set_material_shaders_create_(self, material_and_obj, material_dcc_obj):
         convert_dict = {
@@ -221,27 +228,34 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
             'displacement': 'displacementShader',
             'volume': 'volumeShader'
         }
-        for shader_and_bind_port_name in convert_dict.keys():
-            raw = material_and_obj.get_input_port(shader_and_bind_port_name).get()
+        for i_shader_and_bind_port_name in convert_dict.keys():
+            raw = material_and_obj.get_input_port(i_shader_and_bind_port_name).get()
             if raw is not None:
                 shader_and_obj = self._and_obj_universe.get_obj(raw)
                 shader_dcc_obj, is_create = self._set_material_shader_obj_create_(shader_and_obj)
                 if shader_dcc_obj is not None:
-                    if is_create is True:
-                        shader_dcc_bind_port_name = convert_dict[shader_and_bind_port_name]
-                        shader_dcc_obj.get_port('outColor').set_target(
-                            material_dcc_obj.get_port(shader_dcc_bind_port_name)
-                        )
-                        #
-                        # self._set_material_shader_node_graph_rename_(material_seq, shader_and_bind_port_name, shader_and_obj)
+                    # debug
+                    # do not check create, material can use same shader
+                    i_shader_dcc_bind_port_name = convert_dict[i_shader_and_bind_port_name]
+                    shader_dcc_obj.get_port('outColor').set_target(
+                        material_dcc_obj.get_port(i_shader_dcc_bind_port_name)
+                    )
+                    #
+                    # self._set_material_shader_node_graph_rename_(material_seq, i_shader_and_bind_port_name, shader_and_obj)
 
     def _set_material_shader_obj_create_(self, shader_and_obj):
-        _ = self._set_shader_obj_create_(shader_and_obj)
-        if _ is not None:
-            shader_dcc_obj, is_create = _
+        create_args = self._set_shader_obj_create_(shader_and_obj)
+        if create_args is not None:
+            shader_dcc_obj, is_create = create_args
             if is_create is True:
                 self._set_shader_obj_ports_(shader_and_obj, shader_dcc_obj)
                 self._set_shader_obj_node_graph_create_(shader_and_obj)
+                #
+                ma_core.CmdObjOpt(shader_dcc_obj.path).set_customize_attributes_create(
+                    dict(
+                        arnold_name=shader_and_obj.name
+                    )
+                )
             return shader_dcc_obj, is_create
 
     def _set_material_shader_node_graph_rename_(self, material_seq, shader_and_bind_port_name, shader_and_obj):
@@ -372,6 +386,11 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
             dcc_obj = mya_dcc_objects.AndShader(dcc_obj_name)
             if dcc_obj.get_is_exists() is False:
                 dcc_obj.set_create(dcc_type)
+                ma_core.CmdObjOpt(dcc_obj.path).set_customize_attributes_create(
+                    dict(
+                        arnold_name=and_obj.name
+                    )
+                )
                 return dcc_obj, True
             return dcc_obj, False
         else:

@@ -8,14 +8,13 @@ class AbsRsvPanelSession(rsv_obj_session_abs.AbsSession):
         super(AbsRsvPanelSession, self).__init__(*args, **kwargs)
 
     def set_execute(self):
-        if self.application in [
-            self.Application.Python
-        ]:
+        from lxutil_gui.qt import utl_gui_qt_core
+        #
+        exists_app = utl_gui_qt_core.QtWidgets.QApplication.instance()
+        if exists_app is None:
             import sys
             #
-            from PySide2 import QtWidgets
-            #
-            app = QtWidgets.QApplication(sys.argv)
+            app = utl_gui_qt_core.QtWidgets.QApplication(sys.argv)
             #
             w = self.RSV_PANEL_CLASS(
                 configure=self._configure
@@ -24,11 +23,7 @@ class AbsRsvPanelSession(rsv_obj_session_abs.AbsSession):
             #
             sys.exit(app.exec_())
         #
-        elif self.application in [
-            self.Application.Maya,
-            self.Application.Houdini,
-            self.Application.Katana,
-        ]:
+        else:
             w = self.RSV_PANEL_CLASS(
                 configure=self._configure
             )

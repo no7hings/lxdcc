@@ -7,6 +7,8 @@ from lxgui import gui_configure
 
 from lxgui.objects import gui_obj_abs
 
+from lxresolver.objects import rsv_obj_session_abs
+
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxutil_gui.panel import utl_gui_pnl_abs_resolver
@@ -29,9 +31,8 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
         else:
             self.RESOLVER_FILTER = self._configure.get('resolver.filter')
         #
-        self.ITEM_FRAME_ICON_SIZE = self._configure.get('option.gui.item_frame_icon_size')
-        self.ITEM_FRAME_IMAGE_SIZE = self._configure.get('option.gui.item_frame_image_size')
-        self.ITEM_FRAME_NAME_SIZE = self._configure.get('option.gui.item_frame_name_size')
+        self.ITEM_FRAME_SIZE = self._configure.get('option.gui.item_frame_size')
+        #
         super(RsvEntitiesPanel, self).__init__()
         #
         self._session_dict = {}
@@ -69,12 +70,31 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
             elif isinstance(i_raw, dict):
                 for j_keyword, j_raw in i_raw.items():
                     j_keyword = j_keyword.format(**rsv_task.properties.value)
-                    system_keys = j_raw.get('systems') or []
-                    if bsc_core.SystemMtd.get_is_matched(system_keys):
+                    j_system_keys = j_raw.get('systems') or []
+                    j_extend_variants = j_raw.get('extend_variants') or {}
+                    if j_system_keys:
+                        if bsc_core.SystemMtd.get_is_matched(j_system_keys):
+                            j_rsv_unit = rsv_task.get_rsv_unit(
+                                keyword=j_keyword
+                            )
+                            j_rsv_unit_file_path = j_rsv_unit.get_result(
+                                version='latest',
+                                extend_variants=j_extend_variants
+                            )
+                            if j_rsv_unit_file_path:
+                                enable = True
+                                #
+                                lis.append(
+                                    (True, j_rsv_unit, j_rsv_unit_file_path)
+                                )
+                    else:
                         j_rsv_unit = rsv_task.get_rsv_unit(
                             keyword=j_keyword
                         )
-                        j_rsv_unit_file_path = j_rsv_unit.get_result(version='latest')
+                        j_rsv_unit_file_path = j_rsv_unit.get_result(
+                            version='latest',
+                            extend_variants=j_extend_variants
+                        )
                         if j_rsv_unit_file_path:
                             enable = True
                             #
@@ -155,7 +175,7 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
 
     def __get_rsv_unit_action_hook_args_(self, key, *args, **kwargs):
         def execute_fnc():
-            session._set_code_execute_(raw)
+            session._set_file_execute_(python_file_path, dict(session=session))
         #
         rsv_task = args[0]
         session_path = '{}/{}'.format(rsv_task.path, key)
@@ -184,12 +204,21 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
                         else:
                             raise TypeError()
                         #
-                        raw = python_file.set_read()
                         self._session_dict[session_path] = session, execute_fnc
                         return session, execute_fnc
 
 
-class RsvPanelSession(gui_obj_abs.AbsRsvPanelSession):
+class KitPanelSession(rsv_obj_session_abs.AbsKitPanelSession):
+    def __init__(self, *args, **kwargs):
+        super(KitPanelSession, self).__init__(*args, **kwargs)
+
+
+class ToolPanelSession(rsv_obj_session_abs.AbsToolPanelSession):
+    def __init__(self, *args, **kwargs):
+        super(ToolPanelSession, self).__init__(*args, **kwargs)
+
+
+class RsvLoaderSession(gui_obj_abs.AbsRsvPanelSession):
     RSV_PANEL_CLASS = RsvEntitiesPanel
     def __init__(self, *args, **kwargs):
-        super(RsvPanelSession, self).__init__(*args, **kwargs)
+        super(RsvLoaderSession, self).__init__(*args, **kwargs)

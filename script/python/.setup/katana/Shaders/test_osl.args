@@ -1,0 +1,21 @@
+<args format="1.0">
+ <help>
+  Node that compiles OSL code from its parameters.  For more information please see the
+  <a href="https://docs.arnoldrenderer.com/x/NgY6Ag">documentation</a>.
+ </help>
+ <param name="code" widget="scriptEditor" supportsNonmodalExternalEditing="True" resistLabelResize="True">
+  <help>
+   OSL shader code.
+  </help>
+ </param>
+ <param name="shadername">
+  <help>
+   Name of the shader to use.
+  </help>
+ </param>
+ <param name="__recompile__" widget="scriptButton" buttonText="Compile" scriptText="import sys;import os;import RenderingAPI;sys.path.append(os.path.join(RenderingAPI.RenderPlugins.GetRendererPluginDir('arnold'), '..', 'python'));import ktoa.recompileOSLShader;reload(ktoa.recompileOSLShader);ktoa.recompileOSLShader.recompileOSL(node)">
+  <help>
+   Compiles the OSL shader code.
+  </help>
+ </param>
+</args>

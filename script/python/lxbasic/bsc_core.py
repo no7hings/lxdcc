@@ -119,19 +119,32 @@ class ApplicationMtd(object):
             return True
         return False
     @classmethod
+    def get_is_lynxi(cls):
+        _ = os.environ.get('LYNXI_ROOT')
+        if _:
+            return True
+        return False
+    @classmethod
     def get_is_dcc(cls):
-        for i in [cls.get_is_maya(), cls.get_is_houdini(), cls.get_is_katana()]:
-            if i is True:
+        for i_fnc in [
+            cls.get_is_maya,
+            cls.get_is_houdini,
+            cls.get_is_katana,
+            # cls.get_is_lynxi
+        ]:
+            if i_fnc() is True:
                 return True
         return False
     @classmethod
     def get_current(cls):
-        if cls.get_is_maya():
-            return bsc_configure.Application.Maya
-        elif cls.get_is_houdini():
-            return bsc_configure.Application.Houdini
-        elif cls.get_is_katana():
-            return bsc_configure.Application.Katana
+        for i_fnc, i_app in [
+            (cls.get_is_maya, bsc_configure.Application.Maya),
+            (cls.get_is_houdini, bsc_configure.Application.Houdini),
+            (cls.get_is_katana, bsc_configure.Application.Katana),
+            # (cls.get_is_lynxi, bsc_configure.Application.Lynxi)
+        ]:
+            if i_fnc() is True:
+                return i_app
         return bsc_configure.Application.Python
 
 
@@ -440,22 +453,6 @@ class MultiplyPatternMtd(object):
     #
     RE_MULTIPLY_KEYS = RE_UDIM_KEYS + RE_SEQUENCE_KEYS
     @classmethod
-    def to_fnmatch_style_(cls, pattern):
-        re_keys = cls.RE_MULTIPLY_KEYS
-        #
-        new_name_base = pattern
-        for i_k, i_f, i_c in re_keys:
-            itr = re.finditer(i_f.format(i_k), pattern, re.IGNORECASE) or []
-            for i in itr:
-                start, end = i.span()
-                if i_c == -1:
-                    s = r'[0-9]'
-                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
-                else:
-                    s = r'[0-9]'*i_c
-                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
-        return new_name_base
-    @classmethod
     def to_fnmatch_style(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
         #
@@ -491,6 +488,15 @@ class MultiplyPatternMtd(object):
                     (i_key, i_count)
                 )
         return key_args
+    @classmethod
+    def get_is_valid(cls, pattern):
+        re_keys = cls.RE_MULTIPLY_KEYS
+        #
+        for i_k, i_f, i_c in re_keys:
+            results = re.findall(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            if results:
+                return True
+        return False
 
 
 class FnmatchPatternMtd(object):
@@ -1077,7 +1083,7 @@ class DirectoryOpt(object):
         return os.path.exists(self.path)
 
 
-class StorageZipFileOpt(StorageFileOpt):
+class ZipFileOpt(StorageFileOpt):
     def __init__(self, file_path):
         self._file_path = file_path
 

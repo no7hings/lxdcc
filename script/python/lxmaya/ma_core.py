@@ -2084,7 +2084,6 @@ class CmdObjOpt(object):
         # 'long2'
         obj_path = self.get_path()
         for i_port_path, i_value in attributes.items():
-
             if isinstance(i_value, (str, unicode)):
                 type_name = 'string'
             elif isinstance(i_value, int):
@@ -2164,9 +2163,9 @@ class CmdMeshesOpt(object):
     }
 
     def __init__(self, root):
-        self._mya_root = root
-        self._mesh_mya_paths = cmds.ls(
-            self._mya_root,
+        self._root = root
+        self._mesh_paths = cmds.ls(
+            self._root,
             type='mesh',
             noIntermediate=1,
             dagObjects=1,
@@ -2192,10 +2191,10 @@ class CmdMeshesOpt(object):
         dic_0 = {}
         for i in keys:
             v = cmds.polyEvaluate(
-                self._mesh_mya_paths, **{i: True}
+                self._mesh_paths, **{i: True}
             )
             dic_0[i] = v
-        count = len(self._mesh_mya_paths)
+        count = len(self._mesh_paths)
         box = dic_0['boundingBox']
         #
         dic['geometry'] = count
@@ -2248,3 +2247,41 @@ class CmdMeshesOpt(object):
                 (key, src_value, tgt_value)
             )
         return radar_chart_data
+
+    def set_reduce_by(self, percent):
+        for i_mesh_path in self._mesh_paths:
+            self._set_mesh_reduce_(i_mesh_path, percent)
+    @classmethod
+    def _set_mesh_reduce_(cls, mesh_path, percent):
+        cmds.polyReduce(
+            mesh_path,
+            version=1,
+            termination=0,
+            percentage=percent*100,
+            symmetryPlaneX=0,
+            symmetryPlaneY=1,
+            symmetryPlaneZ=0,
+            symmetryPlaneW=0,
+            keepQuadsWeight=0,
+            vertexCount=0,
+            triangleCount=0,
+            sharpness=0,
+            keepColorBorder=0,
+            keepFaceGroupBorder=0,
+            keepHardEdge=1,
+            keepCreaseEdge=1,
+            keepBorderWeight=0.5,
+            keepMapBorderWeight=1,
+            keepColorBorderWeight=0.5,
+            keepFaceGroupBorderWeight=0.5,
+            keepHardEdgeWeight=0.5,
+            keepCreaseEdgeWeight=0.5,
+            useVirtualSymmetry=0,
+            symmetryTolerance=0.01,
+            vertexMapName='',
+            replaceOriginal=1,
+            cachingReduce=1,
+            constructionHistory=0
+        )
+        cmds.polyTriangulate(mesh_path, constructionHistory=0)
+        cmds.delete(mesh_path, constructionHistory=1)

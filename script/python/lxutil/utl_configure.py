@@ -172,8 +172,11 @@ class EnvironKey(object):
 
 
 class Jinja(object):
-    USDA = ENVIRONMENT2 = jinja2.Environment(
+    USDA = jinja2.Environment(
         loader=jinja2.FileSystemLoader(MainData.get_directory('jinja/usda'))
+    )
+    XARC = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(MainData.get_directory('jinja/xarc'))
     )
 
 

@@ -14,7 +14,9 @@ step-name: '{step}'
 task-name: '{task}'
 version-name: '{version}'
 #
+act-name: '{act}'
 var-name: '{var}'
+lod-level: '{lod}'
 xgen-name: '{xgen}'
 texture-name: '{texture}'
 ext-name: '{ext}'
@@ -69,6 +71,7 @@ asset-output-step-dir: <asset-dir>/<step-name>
 # <asset-task>
 asset-task-dir: <asset-step-dir>/<task-name>
 asset-work-task-dir: <asset-work-step-dir>/<task-name>
+asset-work-task-user-dir: <asset-work-step-dir>/<task-name>/<user-name>
 asset-output-task-dir: <asset-output-step-dir>/<task-name>
 asset-output-render-dir: <asset-output-task-dir>/katana/images/<asset-task-version-name>
 # <asset-dcc>
@@ -211,9 +214,25 @@ asset-cache-dir: <asset-task-version-dir>/cache
 asset-geometry-dir: <asset-task-version-dir>/cache
 # <asset-geometry-abc>
 asset-geometry-abc-dir: <asset-geometry-dir>/abc
-asset-geometry-abc-file: <asset-geometry-abc-dir>/<var-name>.abc
+asset-geometry-abc-var-file: <asset-geometry-abc-dir>/<var-name>.abc
 asset-geometry-abc-hi-file: <asset-geometry-abc-dir>/hi.abc
 asset-geometry-abc-lo-file: <asset-geometry-abc-dir>/lo.abc
+# <asset-proxy>
+asset-proxy-dir: <asset-task-version-dir>/proxy
+# <asset-proxy-gpu>
+asset-proxy-gpu-dir: <asset-proxy-dir>/gpu
+asset-proxy-gpu-sub-act-file: <asset-proxy-gpu-dir>/<look-pass-name>/<act-name>.abc
+asset-proxy-gpu-sub-act-lod-file: <asset-proxy-gpu-dir>/<look-pass-name>/<act-name>.lod<lod-level>.abc
+#
+asset-proxy-ass-dir: <asset-proxy-dir>/ass
+asset-proxy-ass-sub-act-file: <asset-proxy-ass-dir>/<look-pass-name>/<act-name>.ass
+asset-proxy-ass-sub-act-lod-file: <asset-proxy-ass-dir>/<look-pass-name>/<act-name>.lod<lod-level>.ass
+#
+asset-proxy-jpg-sub-dir: <asset-proxy-dir>/jpg
+asset-proxy-jpg-sub-file: <asset-proxy-jpg-sub-dir>/<look-pass-name>.jpg
+#
+asset-proxy-xarc-dir: <asset-proxy-dir>/xarc
+asset-proxy-xarc-sub-act-file: <asset-proxy-xarc-dir>/<look-pass-name>/<act-name>.xarc
 #
 asset-geometry-abc-hi-dyn-file: <asset-geometry-abc-dir>/dynamic.abc
 # <asset-geometry-usd>
@@ -258,6 +277,10 @@ asset-look-dir: <asset-task-version-dir>/look
 asset-look-ass-dir: <asset-look-dir>/ass
 asset-look-ass-file: <asset-look-ass-dir>/<asset-name>.ass
 asset-look-ass-sub-file: <asset-look-ass-dir>/<asset-name>.<look-pass-name>.ass
+#
+asset-look-ass-app-file: <asset-look-ass-dir>/<app-name>/<asset-name>.ass
+asset-look-ass-app-sub-file: <asset-look-ass-dir>/<app-name>/<asset-name>.<look-pass-name>.ass
+#
 # <asset-look-mtlx>
 asset-look-mtlx-dir: <asset-look-dir>/mtlx
 asset-look-mtlx-file: <asset-look-mtlx-dir>/<asset-name>.mtlx

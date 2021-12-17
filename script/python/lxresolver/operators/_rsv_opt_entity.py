@@ -379,8 +379,16 @@ class RsvAssetLookQuery(AbsAssetQuery):
         return self.get(sub_key, **kwargs)
 
     def get_ass_sub_file(self, look_pass, **kwargs):
-        sub_key = 'ass.pass-file'
+        sub_key = 'ass.sub-file'
         return self.get(sub_key, look_pass=look_pass, **kwargs)
+
+    def get_ass_app_file(self, app, **kwargs):
+        sub_key = 'ass.app-file'
+        return self.get(sub_key, app=app, **kwargs)
+
+    def get_ass_app_sub_file(self, app, look_pass, **kwargs):
+        sub_key = 'ass.app-sub-file'
+        return self.get(sub_key, app=app, look_pass=look_pass, **kwargs)
 
     def get_ass_surface_anm_sub_file(self, look_pass, **kwargs):
         sub_key = 'ass.surface-anm-pass-file'

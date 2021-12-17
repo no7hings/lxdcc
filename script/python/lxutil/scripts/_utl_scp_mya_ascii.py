@@ -693,10 +693,26 @@ class DotAssFileReader(AbsFileReader):
 
         utl_core.File.set_write(self._file_path, ''.join(self._lines))
 
+    def get_is_from_maya(self):
+        if self._lines:
+            if len(self._lines) >= 3:
+                _ = self._lines[2]
+                if fnmatch.filter([_], '### host app: MtoA *'):
+                    return True
+        return False
+
+    def get_is_from_katana(self):
+        if self._lines:
+            if len(self._lines) >= 3:
+                _ = self._lines[2]
+                if fnmatch.filter([_], '### host app: KtoA *'):
+                    return True
+        return False
+
 
 if __name__ == '__main__':
     d = DotAssFileReader(
-        '/l/prod/shl/publish/assets/flg/cao_a/srf/surfacing/cao_a.srf.surfacing.v004/cache/ass/cao_a.ass'
+        '/l/prod/cjd/publish/assets/flg/ast_shl_cao_a/srf/surfacing/ast_shl_cao_a.srf.surfacing.v001/cache/ass/ast_shl_cao_a.ass'
     )
 
-    d._set_file_paths_convert_()
+    print d.get_is_from_maya()

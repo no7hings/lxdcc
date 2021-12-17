@@ -10,6 +10,9 @@ def set_lib_asset_push(option):
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
+    user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
+    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    #
     gui_fnc_methods.LibAssetPusher(
         project=project,
         assets=assets,
@@ -19,7 +22,9 @@ def set_lib_asset_push(option):
             #
             with_shotgun_create=option_opt.get('with_shotgun_create') or False,
             with_file_copy=option_opt.get('with_file_copy') or False,
-            with_surface_publish=option_opt.get('with_surface_publish') or False
+            with_surface_publish=option_opt.get('with_surface_publish') or False,
+            #
+            user=user, time_tag=time_tag,
         )
     ).set_run()
 
@@ -33,6 +38,9 @@ def set_lib_asset_pull(option):
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
+    user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
+    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    #
     gui_fnc_methods.LibAssetPuller(
         project=project,
         assets=assets,
@@ -42,7 +50,9 @@ def set_lib_asset_pull(option):
             #
             with_shotgun_create=option_opt.get('with_shotgun_create') or False,
             with_file_copy=option_opt.get('with_file_copy') or False,
-            with_surface_publish=option_opt.get('with_surface_publish') or False
+            with_surface_publish=option_opt.get('with_surface_publish') or False,
+            #
+            user=user, time_tag=time_tag,
         )
     ).set_run()
 
@@ -56,6 +66,9 @@ def set_lib_assets_push(option):
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
+    user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
+    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    #
     start_index = option_opt.get('start_index')
     end_index = option_opt.get('end_index')
     #
@@ -68,7 +81,9 @@ def set_lib_assets_push(option):
             #
             with_shotgun_create=option_opt.get('with_shotgun_create') or False,
             with_file_copy=option_opt.get('with_file_copy') or False,
-            with_surface_publish=option_opt.get('with_surface_publish') or False
+            with_surface_publish=option_opt.get('with_surface_publish') or False,
+            #
+            user=user, time_tag=time_tag,
         )
     ).set_run()
 
@@ -82,6 +97,9 @@ def set_lib_assets_pull(option):
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
+    user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
+    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    #
     start_index = option_opt.get('start_index')
     end_index = option_opt.get('end_index')
     #
@@ -94,6 +112,8 @@ def set_lib_assets_pull(option):
             #
             with_shotgun_create=option_opt.get('with_shotgun_create') or False,
             with_file_copy=option_opt.get('with_file_copy') or False,
-            with_surface_publish=option_opt.get('with_surface_publish') or False
+            with_surface_publish=option_opt.get('with_surface_publish') or False,
+            #
+            user=user, time_tag=time_tag,
         )
     ).set_run()

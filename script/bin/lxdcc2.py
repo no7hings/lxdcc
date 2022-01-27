@@ -71,6 +71,9 @@ def main():
         elif script == 'maya-geometry-import':
             set_maya_geometry_import_run(option)
         #
+        elif script == 'hook':
+            set_hook_run(option)
+        #
         elif script == 'asset-loader':
             set_asset_loader_panel_show()
         elif script == 'asset-batcher':
@@ -325,16 +328,20 @@ def set_test_window_show():
     sys.exit(app.exec_())
 
 
+def set_hook_run(key):
+    import lxsession.commands as ssn_commands; ssn_commands.set_hook_execute(key)
+
+
 def set_asset_loader_panel_show():
-    import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run('rsv-panels/asset-loader')
+    set_hook_run('rsv-panels/asset-loader')
 
 
 def set_asset_batcher_panel_show():
-    import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run('rsv-panels/asset-batcher')
+    set_hook_run('rsv-panels/asset-batcher')
 
 
 def set_shot_loader_panel_show():
-    import lxgui_fnc.scripts as gui_fnc_scripts; gui_fnc_scripts.set_session_hook_run('rsv-panels/shot-loader')
+    set_hook_run('rsv-panels/shot-loader')
 
 
 if __name__ == '__main__':

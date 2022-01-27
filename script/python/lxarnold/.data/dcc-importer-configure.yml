@@ -227,6 +227,7 @@ shaders:
         volume_sample_float: aiVolumeSampleFloat
         volume_sample_rgb: aiVolumeSampleRgb
         wireframe: aiWireframe
+        switch_rgba: aiSwitch
 #
 input-ports:
     to-maya:

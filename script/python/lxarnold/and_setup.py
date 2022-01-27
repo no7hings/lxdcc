@@ -1,11 +1,11 @@
 # coding:utf-8
 from __future__ import print_function
 
-import sys
-
 import os
 
 import fnmatch
+
+from lxbasic import bsc_core
 
 from lxutil import utl_core, utl_abstract
 
@@ -48,6 +48,29 @@ class MayaSetup(object):
     def __init__(self):
         pass
     @classmethod
+    def _set_maya_ae_setup_(cls):
+        from lxmaya import ma_ae_setup
+
+        _ = utl_core.Environ.get_as_array(
+            'LYNXI_MAYA_RESOURCES'
+        )
+        lis = []
+        for i in _:
+            path_opt = bsc_core.StoragePathOpt(i)
+            if path_opt.get_is_exists() is True:
+                i_ae_path = '{}/ae'.format(path_opt.get_path())
+                if bsc_core.StoragePathOpt(i_ae_path).get_is_exists() is True:
+                    lis.append(i_ae_path)
+        #
+        if lis:
+            ma_ae_setup.set_ae_procs_setup(
+                lis
+            )
+            utl_core.Log.set_module_result_trace(
+                'maya-ae setup',
+                'path="{}"'.format(', '.join(lis))
+            )
+    @classmethod
     def run(cls):
         raw = os.environ.get('MAYA_PLUG_IN_PATH')
         if raw:
@@ -58,3 +81,6 @@ class MayaSetup(object):
                 if results:
                     mtoa_plugin_path = results[0]
                     MtoaSetup(mtoa_plugin_path).set_run()
+        #
+        if bsc_core.ApplicationMtd.get_is_maya():
+            cls._set_maya_ae_setup_()

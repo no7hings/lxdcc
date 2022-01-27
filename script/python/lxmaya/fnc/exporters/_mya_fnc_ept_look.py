@@ -1,12 +1,14 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
-from maya import cmds
+from maya import cmds, mel
 
 import os
 
 import collections
 
 import copy
+
+import glob
 
 from lxutil import utl_core
 
@@ -20,7 +22,7 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 from lxmaya_fnc import ma_fnc_configure, ma_fnc_core
 
-from lxmaya.modifiers import _ma_mdf_utility
+from lxmaya.modifiers import _mya_mdf_utility
 
 from lxobj import obj_configure, obj_core
 
@@ -29,6 +31,10 @@ import lxutil.scripts as utl_scripts
 from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
+
+from lxutil.fnc import utl_fnc_obj_abs
+
+import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 
 class LookAssExporter(object):
@@ -89,8 +95,9 @@ class LookAssExporter(object):
         These are the node types you can filter on.
         """
         cmds.loadPlugin(cls.PLUG_NAME, quiet=1)
+        # noinspection PyArgumentList
         return cmds.arnoldExportAss(**kwargs)
-    @_ma_mdf_utility.set_undo_mark_mdf
+    @_mya_mdf_utility.set_undo_mark_mdf
     def set_run(self):
         # noinspection PyUnresolvedReferences
         import arnold as ai
@@ -183,7 +190,7 @@ class LookMtlxExporter(object):
         ar_mtx_obectjs.GRH_OBJ_QUEUE.restore()
         # restore arnold to materialx
         ar2mtx_objects.GRH_TRS_OBJ_QUEUE.restore()
-    @_ma_mdf_utility.set_undo_mark_mdf
+    @_mya_mdf_utility.set_undo_mark_mdf
     def set_run(self):
         from lxarnold import and_configure
         #
@@ -390,6 +397,7 @@ class LookYamlExporter(object):
                     self._set_geometry_attributes_create_(
                         'geometry', i_mya_obj.path, i_mesh_opt.get_material_assigns()
                     )
+                    #
                     materials = i_mesh_opt.get_materials()
                     for i_material in materials:
                         i_material = mya_dcc_objects.Node(i_material.path)
@@ -402,7 +410,13 @@ class LookYamlExporter(object):
                             source_objs = i_material.get_all_source_objs()
                             for i_source_node in source_objs:
                                 i_source_node_obj_type_name = i_source_node.type_name
-                                if i_source_node_obj_type_name not in ['transform', 'mesh', 'shadingEngine', 'groupId', 'displayLayer']:
+                                if i_source_node_obj_type_name not in [
+                                    'transform', 'mesh',
+                                    'shadingEngine',
+                                    'groupId',
+                                    'displayLayer',
+                                    'xgmSplineGuide', 'xgmSplineGuide', 'xgmGuideData', 'xgmMakeGuide', 'xgmSubdPatch'
+                                ]:
                                     if self._set_obj_create_('node-graph', i_source_node.path) is True:
                                         self._set_obj_attributes_create_(
                                             'node-graph', i_source_node.path,
@@ -498,3 +512,265 @@ class LookYamlExporter(object):
             i_port_raw['value'] = i_port.get()
             dic[i_port.get_port_path()] = i_port_raw
         return dic
+
+
+class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+        directory='',
+        location='',
+        frame=None,
+        resolution=512,
+        aa_samples=3
+    )
+    @classmethod
+    def _set_cmd_run_(cls, mya_mesh_path, **kwargs):
+        # folder = '',
+        # shader=shader,
+        # resolution=512,
+        # aa_samples=3,
+        # filter='gaussian',
+        # filter_width=2.0,
+        # all_udims=True,
+        # udims=udims,
+        # uv_set=uv_set,
+        # normal_offset=normalOffset,
+        # enable_aovs=enableAovs,
+        # extend_edges=extendEdges,
+        # u_start=uStart,
+        # u_scale=uScale,
+        # v_start=vStart,
+        # v_scale=vScale,
+        # sequence=useSequence,
+        # frame_start=frameStart,
+        # frame_end=frameEnd,
+        # frame_step=frameStep,
+        # frame_padding=framePadding
+        #
+        cmds.select(mya_mesh_path)
+        cmds.arnoldRenderToTexture(
+            **kwargs
+        )
+        cmds.select(clear=1)
+    @classmethod
+    def _set_arnold_visibilities_create_(cls, mya_set):
+        from lxarnold import and_configure
+        #
+        c = and_configure.Visibility.MAYA_VISIBILITY_DICT
+        cmd_obj_opt = ma_core.CmdObjOpt(mya_set.path)
+        for k, v in c.items():
+            cmd_obj_opt.set_customize_attribute_create(v, False)
+    @classmethod
+    def _set_preview_shader_convert_(cls, directory, mya_mesh):
+        beauty_texture_exr_path_pattern = '{}/*_{}_[0-9][0-9][0-9][0-9].exr'.format(
+            directory.path, mya_mesh.name
+        )
+        transmission_texture_exr_path_pattern = '{}/*_{}_[0-9][0-9][0-9][0-9].transmission.exr'.format(
+            directory.path, mya_mesh.name
+        )
+        opacity_texture_exr_path_pattern = '{}/*_{}_[0-9][0-9][0-9][0-9].opacity.exr'.format(
+            directory.path, mya_mesh.name
+        )
+        texture_exr_path_patterns = [
+            ('beauty', beauty_texture_exr_path_pattern),
+            ('transmission', transmission_texture_exr_path_pattern),
+            ('opacity', opacity_texture_exr_path_pattern),
+        ]
+        dic = cls._set_texture_jpg_convert_(texture_exr_path_patterns)
+        beauty_texture_jpgs = dic.get('beauty') or []
+        if beauty_texture_jpgs:
+            beauty_texture_jpg = beauty_texture_jpgs[0]
+            cls._set_preview_shader_create_(mya_mesh, beauty_texture_jpg)
+    @classmethod
+    def _set_texture_jpg_convert_(cls, patterns):
+        dic = {}
+        for i_key, i_pattern in patterns:
+            i_texture_exr_paths = glob.glob(i_pattern) or []
+            for j_texture_exr_path in i_texture_exr_paths:
+                j_texture_exr = utl_dcc_objects.OsTexture(j_texture_exr_path)
+                j_texture_jpg = j_texture_exr.get_as_tgt_ext('.jpg')
+                #
+                dic.setdefault(
+                    i_key, []
+                ).append(
+                    j_texture_jpg
+                )
+                if j_texture_jpg.get_is_exists() is False:
+                    j_texture_exr._set_unit_jpg_create_(
+                        j_texture_exr_path
+                    )
+        return dic
+    @classmethod
+    def _set_preview_shader_create_(cls, mya_mesh, texture_jpg):
+        material_name = '{}__material'.format(mya_mesh.name)
+        material = mya_dcc_objects.Material(material_name)
+        if material.get_is_exists() is False:
+            material.set_create(
+                'shadingEngine'
+            )
+        #
+        shader_name = '{}__shader'.format(mya_mesh.name)
+        shader = mya_dcc_objects.Shader(shader_name)
+        if shader.get_is_exists() is False:
+            shader.set_create(
+                'lambert'
+            )
+            material.get_port('surfaceShader').set_source(
+                shader.get_port('outColor')
+            )
+        #
+        image_name = '{}__image'.format(mya_mesh.name)
+        image = mya_dcc_objects.Shader(image_name)
+        if image.get_is_exists() is False:
+            image.set_create('file')
+            shader.get_port('color').set_source(
+                image.get_port('outColor')
+            )
+        #
+        image.get_port('fileTextureName').set(texture_jpg.path)
+        image.get_port('uvTilingMode').set(3)
+        #
+        mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(mya_mesh)
+        mya_mesh_look_opt.set_material(material.path)
+        #
+        if ma_core._get_is_ui_mode_() is True:
+            mel.eval('generateUvTilePreview {}'.format(image.path))
+    @classmethod
+    def _set_arnold_options_create_(cls):
+        # noinspection PyUnresolvedReferences
+        import mtoa.core as core
+        core.createOptions()
+    @classmethod
+    def _set_arnold_light_create_(cls):
+        light = mya_dcc_objects.Shape('light')
+        if light.get_is_exists() is False:
+            light = light.set_create('aiStandIn')
+        #
+        atr_raw = dict(dso='/l/resource/td/asset/ass/look-preview-light.ass')
+        [light.get_port(k).set(v) for k, v in atr_raw.items()]
+        return light.transform.path
+    @classmethod
+    def _set_arnold_aovs_create_(cls):
+        from lxarnold import and_configure
+        #
+        dic = {
+            'transmission': {'type': 'rgb'},
+            'opacity': {'type': 'rgb'}
+        }
+        lis = []
+        for k, v in dic.items():
+            i_aov_name = 'aiAOV_{}'.format(k)
+            if cmds.objExists(i_aov_name) is False:
+                i_aov = cmds.createNode(
+                    'aiAOV', name='aiAOV_{}'.format(k), skipSelect=True
+                )
+                cmds.setAttr('{}.name'.format(i_aov), k, type='string')
+                cmds.setAttr('{}.type'.format(i_aov), and_configure.Aov.get_index(v['type']))
+                lis.append(i_aov)
+
+        cls.set_aovs_link_create(lis)
+    @classmethod
+    def set_aovs_link_create(cls, aovs):
+        def set_option_link_create_fnc_(aov_):
+            _maximum = 100
+            _is_end = False
+            _index = 0
+            _output_atr_path = '{}.message'.format(aov_)
+            while _is_end is False:
+                _input_atr_path = 'defaultArnoldRenderOptions.aovList[{}]'.format(_index)
+                if cmds.objExists(_input_atr_path) is True:
+                    if cmds.connectionInfo(_input_atr_path, isExactDestination=1) is True:
+                        _index += 1
+                    else:
+                        cmds.connectAttr(_output_atr_path, _input_atr_path)
+                        _is_end = True
+                        break
+                #
+                if _index == _maximum:
+                    _is_end = True
+                    break
+        #
+        def set_driver_create_fnc_(aov_):
+            _output_atr_path = 'defaultArnoldDriver.message'
+            _input_atr_path = '{}.outputs[0].driver'.format(aov_)
+            if cmds.connectionInfo(_input_atr_path, isExactDestination=1) is False:
+                cmds.connectAttr(_output_atr_path, _input_atr_path)
+        #
+        def set_filter_create_fnc_(aov_):
+            _output_atr_path = 'defaultArnoldFilter.message'
+            _input_atr_path = '{}.outputs[0].filter'.format(aov_)
+            if cmds.connectionInfo(_input_atr_path, isExactDestination=1) is False:
+                cmds.connectAttr(_output_atr_path, _input_atr_path)
+        #
+        if aovs:
+            for i_aov in aovs:
+                set_option_link_create_fnc_(i_aov)
+                set_driver_create_fnc_(i_aov)
+                set_filter_create_fnc_(i_aov)
+
+    def __init__(self, option):
+        super(LookPreviewExporter, self).__init__(option)
+
+    def set_run(self):
+        directory_path = self.option.get('directory')
+        directory = utl_dcc_objects.OsDirectory_(directory_path)
+        directory.set_create()
+        #
+        mya_hide_set = mya_dcc_objects.Set('look_preview_export_hide_set')
+        #
+        if mya_hide_set.get_is_exists() is False:
+            mya_hide_set.set_create(
+                'set'
+            )
+            self._set_arnold_visibilities_create_(mya_hide_set)
+        #
+        mya_hide_set.set_elements_clear()
+        #
+        mya_show_set = mya_dcc_objects.Set('look_preview_export_show_set')
+        if mya_show_set.get_is_exists() is False:
+            mya_show_set.set_create(
+                'set'
+            )
+            self._set_arnold_visibilities_create_(mya_show_set)
+            mya_show_set.get_port('primaryVisibility').set(True)
+        #
+        location_path = self.option.get('location')
+        #
+        mya_location_path = bsc_core.DccPathDagOpt(location_path).set_translate_to('|').get_value()
+        #
+        mya_group = mya_dcc_objects.Group(mya_location_path)
+        mya_mesh_paths = mya_group.get_all_shape_paths(
+            include_obj_type=['mesh']
+        )
+        for i_mya_mesh_path in mya_mesh_paths:
+            mya_hide_set.set_element_add(i_mya_mesh_path)
+        #
+        self._set_arnold_options_create_()
+        self._set_arnold_light_create_()
+        self._set_arnold_aovs_create_()
+        #
+        with utl_core.log_progress(maximum=len(mya_mesh_paths), label='look-preview-export') as l_p:
+            for i_mya_mesh_path in mya_mesh_paths:
+                l_p.set_update()
+                #
+                mya_hide_set.set_element_remove(i_mya_mesh_path)
+                mya_show_set.set_element_add(i_mya_mesh_path)
+                #
+                self._set_cmd_run_(
+                    i_mya_mesh_path,
+                    folder=directory.path,
+                    resolution=self.option.get('resolution'),
+                    aa_samples=self.option.get('aa_samples'),
+                    filter='gaussian',
+                    filter_width=2.0,
+                    #
+                    all_udims=True,
+                    extend_edges=True,
+                    enable_aovs=True
+                )
+                #
+                mya_hide_set.set_element_add(i_mya_mesh_path)
+                mya_show_set.set_element_remove(i_mya_mesh_path)
+                #
+                i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
+                #
+                self._set_preview_shader_convert_(directory, i_mya_mesh)

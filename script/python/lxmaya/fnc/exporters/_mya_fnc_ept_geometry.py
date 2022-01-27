@@ -72,7 +72,7 @@ class GeometryAbcExporter(object):
         self._file_path = file_path
         #
         dcc_root_dag_opt = bsc_core.DccPathDagOpt(root)
-        self._root = dcc_root_dag_opt.set_translate_to('|').get_value()
+        self._root = dcc_root_dag_opt.set_translate_to('|').to_string()
         self._star_frame, self._end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         self._step = step
         self._attribute = attribute
@@ -180,6 +180,10 @@ class GeometryAbcExporter(object):
         j = self._get_j_(js)
         if j:
             self._results = self._set_cmd_run_(j)
+            utl_core.Log.set_module_result_trace(
+                'alembic export',
+                'file="{}"'.format(file_.path)
+            )
             if self._results:
                 for i in self._results:
                     utl_core.Log.set_result_trace(
@@ -326,6 +330,9 @@ class GeometryUsdExporter_(object):
         root_lstrip=None,
         use_override=False,
         export_selected=False,
+        namespace_clear=True,
+        with_visible=True,
+        with_display_color=True,
     )
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
@@ -342,6 +349,8 @@ class GeometryUsdExporter_(object):
         default_prim_path = self._option.get('default_prim_path')
         use_override = self._option['use_override']
         usd_root_lstrip = self._option['root_lstrip']
+        with_visible = self._option['with_visible']
+        with_display_color = self._option['with_display_color']
         #
         if self._root.startswith('|'):
             self._root = self._root.replace('|', '/')
@@ -353,50 +362,97 @@ class GeometryUsdExporter_(object):
         #
         root_mya_obj = mya_dcc_objects.Group(mya_root)
         if root_mya_obj.get_is_exists() is True:
-            objs = root_mya_obj.get_descendants()
-            if objs:
+            mya_objs = root_mya_obj.get_descendants()
+            if mya_objs:
                 usd_geometry_exporter = usd_fnc_exporters.GeometryExporter(
                     file_path=self._file_path, root=self._root,
                     option=dict(
                         default_prim_path=default_prim_path
                     )
                 )
-                c = len(objs)
+                c = len(mya_objs)
                 l_p = utl_core.LogProgressRunner(maximum=c, label='geometry-usd-export')
-                for obj in objs:
+                #
+                for i_mya_obj in mya_objs:
                     l_p.set_update()
-                    obj_mya_type = obj.type
-                    obj_mya_path = obj.path
+                    i_mya_obj_type = i_mya_obj.type
+                    i_mya_obj_path = i_mya_obj.path
                     #
-                    obj_usd_path = obj_core.DccPathDagMtd.get_dag_pathsep_replace(
-                        obj_mya_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
+                    i_usd_obj_path = obj_core.DccPathDagMtd.get_dag_pathsep_replace(
+                        i_mya_obj_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
                     )
-                    obj_usd_path = obj_core.DccPathDagMtd.get_dag_path_lstrip(obj_usd_path, usd_root_lstrip)
-                    if obj_mya_type == ma_configure.Util.TRANSFORM_TYPE:
-                        transform_mya_obj = mya_dcc_objects.Transform(obj_mya_path)
+                    i_usd_obj_path = obj_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
+                    # clean namespace
+                    if ':' in i_usd_obj_path:
+                        utl_core.Log.set_module_warning_trace(
+                            'usd-mesh export',
+                            'obj="{}" has namespace'.format(i_usd_obj_path)
+                        )
+                    i_usd_obj_path = obj_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
+                        i_usd_obj_path
+                    )
+                    if i_mya_obj_type == ma_configure.Util.TRANSFORM_TYPE:
+                        transform_mya_obj = mya_dcc_objects.Transform(i_mya_obj_path)
                         transform_mya_obj_opt = mya_dcc_operators.TransformOpt(transform_mya_obj)
-                        transform_usd_obj_opt = usd_geometry_exporter._set_transform_obj_opt_create_(
-                            obj_usd_path, use_override=use_override
+                        transform_usd_obj_opt = usd_geometry_exporter._set_transform_opt_create_(
+                            i_usd_obj_path, use_override=use_override
                         )
                         matrix = transform_mya_obj_opt.get_matrix()
                         transform_usd_obj_opt.set_matrix(matrix)
-                    elif obj_mya_type == ma_configure.Util.MESH_TYPE:
-                        mesh_obj = mya_dcc_objects.Mesh(obj_mya_path)
-                        if mesh_obj.get_port('intermediateObject').get() is False:
-                            mesh_mya_obj_opt = mya_dcc_operators.MeshOpt(mesh_obj)
-                            if mesh_mya_obj_opt.get_is_invalid() is False:
-                                mesh_usd_obj_opt = usd_geometry_exporter._set_mesh_obj_opt_create_(
-                                    obj_usd_path, use_override=use_override
+                        #
+                        if with_visible is True:
+                            transform_usd_obj_opt.set_visible(
+                                transform_mya_obj.get_visible()
+                            )
+                    #
+                    elif i_mya_obj_type == ma_configure.Util.MESH_TYPE:
+                        i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
+                        if i_mya_mesh.get_port('intermediateObject').get() is False:
+                            i_mya_mesh_opt = mya_dcc_operators.MeshOpt(i_mya_mesh)
+                            if i_mya_mesh_opt.get_is_invalid() is False:
+                                i_usd_mesh_opt = usd_geometry_exporter._set_mesh_opt_create_(
+                                    i_usd_obj_path, use_override=use_override
                                 )
-                                mesh_usd_obj_opt.set_create(
-                                    face_vertices=mesh_mya_obj_opt.get_face_vertices(),
-                                    points=mesh_mya_obj_opt.get_points(),
-                                    uv_maps=mesh_mya_obj_opt.get_uv_maps()
+                                i_usd_mesh_opt.set_create(
+                                    face_vertices=i_mya_mesh_opt.get_face_vertices(),
+                                    points=i_mya_mesh_opt.get_points(),
+                                    uv_maps=i_mya_mesh_opt.get_uv_maps()
                                 )
+                                # export visibility
+                                if with_visible is True:
+                                    i_usd_mesh_opt.set_visible(
+                                        i_mya_mesh.get_visible()
+                                    )
+                                # export color use name
+                                if with_display_color is True:
+                                    color = bsc_core.TextOpt(i_mya_mesh.name).to_rgb(
+                                        maximum=1
+                                    )
+                                    i_usd_mesh_opt.set_display_color(
+                                        color
+                                    )
                             else:
                                 utl_core.Log.set_module_error_trace(
-                                    'usd-mesh-export',
-                                    'obj="{}" is invalid'.format(obj.path)
+                                    'usd-mesh export',
+                                    'obj="{}" is invalid'.format(i_mya_obj.path)
+                                )
+                    elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
+                        i_mya_xgen_spline_guide = mya_dcc_objects.XgenSplineGuide(i_mya_obj_path)
+                        i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(i_mya_xgen_spline_guide)
+                        if i_mya_xgen_spline_guide_opt.get_is_invalid() is False:
+                            i_usd_curve_opt = usd_geometry_exporter._set_curve_create_(
+                                i_usd_obj_path, use_override=use_override
+                            )
+                            points, knots, ranges, widths, order = i_mya_xgen_spline_guide_opt.get_usd_curve_data()
+                            i_usd_curve_opt.set_create(
+                                points, knots, ranges, widths, order
+                            )
+                            if with_display_color is True:
+                                color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb(
+                                    maximum=1
+                                )
+                                i_usd_curve_opt.set_display_color(
+                                    color
                                 )
                 #
                 l_p.set_stop()

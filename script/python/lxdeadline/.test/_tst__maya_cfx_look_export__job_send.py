@@ -33,7 +33,7 @@ utl_dcc_objects.OsFile(surface_cfx_katana_scene_src_file_path).set_directory_cre
 katana_cfx_look_export_query = ddl_objects.DdlRsvTaskQuery(
     'katana-cfx-look-export'
 )
-katana_cfx_look_export = ddl_methods.DdlRsvTaskMethodRunner(
+katana_cfx_look_export = ddl_methods.RsvTaskHookExecutor(
     method_option=katana_cfx_look_export_query.get_method_option(),
     script_option=katana_cfx_look_export_query.get_script_option(
         file=surface_cfx_katana_scene_src_file_path,

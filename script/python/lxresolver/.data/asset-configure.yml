@@ -24,11 +24,11 @@ main:
             workspace: work
 
         task-version-directory:
-            keyword: asset-task-version-dir
+            keyword: asset-version-dir
             workspace: publish
 
         task-no-version-directory:
-            keyword: asset-task-no-version-dir
+            keyword: asset-no-version-dir
             workspace: publish
     #
     scene:
@@ -40,6 +40,9 @@ main:
             keyword: asset-maya-scene-src-file
             application: maya
             workspace: publish
+        work-maya-src-file:
+            keyword: asset-work-maya-scene-src-file
+            application: maya
         houdini-file:
             keyword: asset-houdini-scene-file
             application: houdini
@@ -302,11 +305,11 @@ looks:
             version: latest
     yml:
         file:
-            keyword: asset-look-preview-yml-file
+            keyword: asset-look-yml-file
             workspace: publish
             version: latest
         surface-anm-file:
-            keyword: asset-look-preview-yml-file
+            keyword: asset-look-yml-file
             workspace: publish
             step: <option.steps.surface>
             task: <option.tasks.surface-anm>
@@ -365,7 +368,7 @@ usds:
             version: latest
         #
         properties-file:
-            keyword: asset-usd-look-properties-file
+            keyword: asset-usd-look-properties-usd-file
             workspace: publish
             version: latest
     payload:

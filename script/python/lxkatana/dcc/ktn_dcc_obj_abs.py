@@ -54,7 +54,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         )
         if ktn_port is None:
             utl_core.Log.set_module_result_trace(
-                'port-create',
+                'port create',
                 'atr-path="{}"'.format(self.path)
             )
             if self.port_assign == obj_configure.PortAssign.VARIANTS:
@@ -265,7 +265,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                 #
                 ktn_obj.setName(self.name)
                 utl_core.Log.set_module_result_trace(
-                    'obj-create',
+                    'obj create',
                     'obj="{}", type="{}"'.format(self.path, self.type)
                 )
                 return ktn_obj

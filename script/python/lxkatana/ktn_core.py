@@ -6,6 +6,10 @@ from UI4 import App
 
 from lxbasic import bsc_core
 
+import lxbasic.objects as bsc_objects
+
+import lxkatana.modifiers as ktn_modifiers
+
 from lxutil import utl_core
 
 from lxobj import obj_core
@@ -278,6 +282,11 @@ class NGObjOpt(object):
         if port:
             NGPortOpt(port).set(raw)
 
+    def set_port_enumerate_raw(self, port_path, raw):
+        port = self.ktn_obj.getParameter(port_path)
+        if port:
+            NGPortOpt(port).set_enumerate_strings(raw)
+
     def get_port(self, port_path):
         return self.ktn_obj.getParameter(port_path)
 
@@ -405,6 +414,35 @@ class NGPortOpt(object):
                 _value = str(value)
             #
             self.ktn_port.setValue(_value, frame)
+
+    def set_help_string(self, value):
+        hint_string = self.ktn_port.getHintString()
+        if hint_string:
+            hint_dict = eval(hint_string)
+        else:
+            hint_dict = {}
+        #
+        hint_dict['help'] = value
+        #
+        self.ktn_port.setHintString(
+            str(hint_dict)
+        )
+
+    def set_enumerate_strings(self, value, frame=0):
+        hint_string = self.ktn_port.getHintString()
+        if hint_string:
+            hint_dict = eval(hint_string)
+        else:
+            hint_dict = {}
+        #
+        hint_dict['options'] = list(value)
+        #
+        self.ktn_port.setHintString(
+            str(hint_dict)
+        )
+        self.ktn_port.setValue(
+            str(value[0]), frame
+        )
 
     def set_connect_to(self, input_port):
         pass
@@ -776,7 +814,6 @@ class NGNmeOpt(object):
             if _get_is_ui_mode_() is True:
                 ktn_obj._NetworkMaterialEditNode__notifyUpdated()
             return status
-
     @classmethod
     def _populate_fromInput_material(cls, ktn_obj, incomingMaterial, materialAttr):
         mod = sys.modules[ktn_obj.__class__.__module__]
@@ -917,17 +954,23 @@ class NGObjCustomizePortOpt(object):
             elif isinstance(default, (int, float)):
                 ktn_port = ktn_group_port.createChildNumber(name, value)
             elif isinstance(default, (tuple, )):
-                c = len(default)
-                if isinstance(default[0], (str, unicode)):
-                    ktn_port = ktn_group_port.createChildStringArray(name, c)
-                elif isinstance(default[0], (int, float)):
-                    ktn_port = ktn_group_port.createChildNumberArray(name, c)
+                if scheme in ['enumerate']:
+                    ktn_port = ktn_group_port.createChildString(name, value[0])
+                    ktn_port.setHintString(
+                        str(dict(widget='popup', options=list(value)))
+                    )
                 else:
-                    raise TypeError()
-                #
-                for i in range(c):
-                    i_ktn_port = ktn_port.getChildByIndex(i)
-                    i_ktn_port.setValue(default[i], 0)
+                    c = len(default)
+                    if isinstance(default[0], (str, unicode)):
+                        ktn_port = ktn_group_port.createChildStringArray(name, c)
+                    elif isinstance(default[0], (int, float)):
+                        ktn_port = ktn_group_port.createChildNumberArray(name, c)
+                    else:
+                        raise TypeError()
+                    #
+                    for i in range(c):
+                        i_ktn_port = ktn_port.getChildByIndex(i)
+                        i_ktn_port.setValue(default[i], 0)
             else:
                 raise TypeError()
             #
@@ -941,6 +984,132 @@ class NGObjCustomizePortOpt(object):
             ktn_port.setHintString(
                 str(hint_dict)
             )
+
+
+class NGMacro(object):
+    def __init__(self, ktn_port):
+        self._ktn_obj = ktn_port
+
+    def set_input_port_create(self, port_path):
+        _ = self._ktn_obj.getInputPort(port_path)
+        if _ is None:
+            self._ktn_obj.addInputPort(port_path)
+
+    def set_output_port_create(self, port_path):
+        _ = self._ktn_obj.getOutputPort(port_path)
+        if _ is None:
+            self._ktn_obj.addOutputPort(port_path)
+
+    def set_parameter_create(self, port_path, port_raw):
+        ktn_root_port = self._ktn_obj.getParameters()
+        #
+        _port_path = port_path.split('.')
+        group_names = _port_path[:-1]
+        port_name = _port_path[-1]
+        current_group_port = ktn_root_port
+        for i_group_name in group_names:
+            i_ktn_group_port = current_group_port.getChild(i_group_name)
+            if i_ktn_group_port is None:
+                i_ktn_group_port = current_group_port.createChildGroup(i_group_name)
+            #
+            i_group_label = bsc_core.StrUnderlineOpt(i_group_name).to_prettify(capitalize=False)
+            i_ktn_group_port.setHintString(
+                str(
+                    str({'label': i_group_label})
+                )
+            )
+            current_group_port = i_ktn_group_port
+        #
+        ktn_group_port = current_group_port
+        #
+        self._set_type_parameter_create_(
+            ktn_group_port,
+            widget=port_raw.get('widget'),
+            name=port_name,
+            value=port_raw.get('value'),
+            tool_tip=port_raw.get('tool_tip')
+        )
+    @classmethod
+    def _set_type_parameter_create_(cls, ktn_group_port, name, widget, value, tool_tip):
+        label = bsc_core.StrUnderlineOpt(name).to_prettify(capitalize=False)
+        ktn_port = ktn_group_port.getChild(name)
+        if ktn_port is None:
+            if isinstance(value, (bool,)):
+                ktn_port = ktn_group_port.createChildNumber(name, value)
+                ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
+            elif isinstance(value, (str, unicode)):
+                ktn_port = ktn_group_port.createChildString(name, value)
+                if widget in ['path']:
+                    ktn_port.setHintString(
+                        str({'widget': 'scenegraphLocation'})
+                    )
+                elif widget in ['file']:
+                    ktn_port.setHintString(
+                        str({'widget': 'fileInput'})
+                    )
+                elif widget in ['script']:
+                    ktn_port.setHintString(
+                        str({'widget': 'scriptEditor'})
+                    )
+                elif widget in ['resolution']:
+                    ktn_port.setHintString(
+                        str({'widget': 'resolution'})
+                    )
+                elif widget in ['button']:
+                    ktn_port.setHintString(
+                        str({'widget': 'scriptButton', 'buttonText': label, 'scriptText': value})
+                    )
+            elif isinstance(value, (int, float)):
+                ktn_port = ktn_group_port.createChildNumber(name, value)
+            elif isinstance(value, (list,)):
+                if widget in ['enumerate']:
+                    ktn_port = ktn_group_port.createChildString(name, value[0])
+                    ktn_port.setHintString(
+                        str(dict(widget='popup', options=list(value)))
+                    )
+                else:
+                    c = len(value)
+                    if isinstance(value[0], (str, unicode)):
+                        ktn_port = ktn_group_port.createChildStringArray(name, c)
+                    elif isinstance(value[0], (int, float)):
+                        ktn_port = ktn_group_port.createChildNumberArray(name, c)
+                    else:
+                        raise TypeError()
+                    #
+                    for i in range(c):
+                        i_ktn_port = ktn_port.getChildByIndex(i)
+                        i_ktn_port.setValue(value[i], 0)
+            else:
+                raise TypeError()
+            #
+            hint_string = ktn_port.getHintString()
+            if hint_string:
+                hint_dict = eval(hint_string)
+            else:
+                hint_dict = {'constant': 'True'}
+            #
+            if tool_tip is not None:
+                hint_dict['help'] = tool_tip
+            hint_dict['label'] = label
+            ktn_port.setHintString(
+                str(hint_dict)
+            )
+    @ktn_modifiers.set_undo_mark_mdf
+    def set_create_by_configure_file(self, file_path):
+        configure = bsc_objects.Configure(value=file_path)
+        input_ports = configure.get('input_ports') or []
+        #
+        for i_input_port_path in input_ports:
+            self.set_input_port_create(i_input_port_path)
+        #
+        output_ports = configure.get('output_ports') or []
+        for i_output_port_path in output_ports:
+            self.set_output_port_create(i_output_port_path)
+        #
+        parameters = configure.get('parameters') or {}
+        for k, v in parameters.items():
+            k = k.replace('/', '.')
+            self.set_parameter_create(k, v)
 
 
 class LXRenderSettingsOpt(object):

@@ -62,7 +62,7 @@ class DccTexturesOpt(object):
                         tx_create_queue.append(i_texture_orig)
                     else:
                         utl_core.Log.set_module_warning_trace(
-                            'texture-tx-create',
+                            'texture-tx create',
                             u'file="{}" orig is non-exists'.format(i_file_path)
                         )
         #
@@ -87,7 +87,7 @@ class DccTexturesOpt(object):
     def _set_tx_create_queue_run_(cls, queue, use_deferred):
         lis = []
         utl_core.Log.set_module_result_trace(
-            'texture-tx-process-create',
+            'texture-tx process create',
             'start'
         )
         if queue:
@@ -107,14 +107,14 @@ class DccTexturesOpt(object):
         #
         process = TextureTxMainProcess(lis)
         process.PROCESS_COUNT = 0
-        process.set_name('texture-tx-create')
+        process.set_name('texture-tx create')
         if use_deferred is True:
             pass
         else:
             process.set_start()
         #
         utl_core.Log.set_module_result_trace(
-            'texture-tx-process-create',
+            'texture-tx process create',
             'complete'
         )
         return process
@@ -152,7 +152,7 @@ class DccTexturesOpt(object):
                         jpg_create_queue.append(i_tgt_ext_texture_orig)
                     else:
                         utl_core.Log.set_module_warning_trace(
-                            'texture-tx-create',
+                            'texture-tx create',
                             u'file="{}" orig is non-exists'.format(i_file_path)
                         )
         #
@@ -177,7 +177,7 @@ class DccTexturesOpt(object):
     def _set_jpg_create_queue_run_(cls, queue, use_deferred):
         lis = []
         utl_core.Log.set_module_result_trace(
-            'texture-jpg-process-create',
+            'texture-jpg-process create',
             'start'
         )
         if queue:
@@ -205,7 +205,7 @@ class DccTexturesOpt(object):
             process.set_start()
         #
         utl_core.Log.set_module_result_trace(
-            'texture-jpg-process-create',
+            'texture-jpg-process create',
             'complete'
         )
         return process
@@ -534,6 +534,7 @@ class DccTexturesOpt(object):
                     #
                     tgt_stg_texture = utl_dcc_objects.OsTexture(tgt_stg_texture_path)
                     port = obj.get_port(i_port_path)
+                    #
                     self._set_port_repath_(port, tgt_stg_texture)
 
 

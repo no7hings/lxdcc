@@ -22,11 +22,11 @@ if __name__ == '__main__':
     maya_camera_export_query = ddl_objects.DdlRsvTaskQuery(
         'maya-camera-export', rsv_task_properties
     )
-    maya_camera_export = ddl_methods.DdlRsvTaskMethodRunner(
+    maya_camera_export = ddl_methods.RsvTaskHookExecutor(
         method_option=maya_camera_export_query.get_method_option(),
         script_option=maya_camera_export_query.get_script_option(
             file=scene_file_path,
-            with_camera_abc=True,
+            with_camera_persp_abc=True,
             #
             user=user, time_tag=time_tag,
         )

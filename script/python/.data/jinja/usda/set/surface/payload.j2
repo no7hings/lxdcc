@@ -1,0 +1,45 @@
+#usda 1.0
+(
+    defaultPrim = "{{ dcc.root }}"
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def "{{ dcc.root }}" (
+    prepend references = [
+        @{{ usdas.material }}@,
+        @geo/hi.usd@,
+        @geo/shape.usd@,
+        @geo/hair.usd@,
+        @{{ usdas.proxy }}@
+    ]
+)
+{
+    over "hi" (
+        kind = "subcomponent"
+    )
+    {
+        uniform token purpose = "render"
+    }
+
+    over "shape" (
+        active = false
+        kind = "subcomponent"
+    )
+    {
+    }
+
+    over "hair" (
+        active = false
+        kind = "subcomponent"
+    )
+    {
+    }
+
+    over "proxy" (
+        kind = "subcomponent"
+    )
+    {
+        uniform token purpose = "proxy"
+    }
+}

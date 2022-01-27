@@ -1,8 +1,8 @@
 # coding:utf-8
-from lxresolver.objects import rsv_obj_session_abs
+from lxsession.objects import ssn_obj_abs
 
 
-class AbsRsvPanelSession(rsv_obj_session_abs.AbsSession):
+class AbsRsvPanelSession(ssn_obj_abs.AbsSession):
     RSV_PANEL_CLASS = None
     def __init__(self, *args, **kwargs):
         super(AbsRsvPanelSession, self).__init__(*args, **kwargs)

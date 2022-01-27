@@ -6,6 +6,7 @@ import platform
 import os
 
 import glob
+import threading
 
 import time
 
@@ -24,6 +25,8 @@ import subprocess
 import re
 
 import fnmatch
+
+import functools
 
 import copy
 
@@ -222,6 +225,16 @@ class GuiProgressesRunner(object):
         if self._log_progress_runner is not None:
             self._log_progress_runner.set_stop()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.set_stop()
+
+
+def gui_progress(maximum, label=None):
+    return GuiProgressesRunner(maximum, label)
+
 
 class LogProgressRunner(object):
     def __init__(self, maximum, label):
@@ -253,8 +266,19 @@ class LogProgressRunner(object):
             'complete'
         )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.set_stop()
+
+
+def log_progress(maximum, label):
+    return LogProgressRunner(maximum, label)
+
 
 class DialogWindow(object):
+    GuiStatus = bsc_configure.GuiStatus
     @classmethod
     def set_create(
             cls,
@@ -264,12 +288,16 @@ class DialogWindow(object):
             window_size=(480, 160),
             yes_method=None,
             yes_label=None,
+            yes_visible=True,
             #
             no_method=None,
             no_label=None,
+            no_visible=True,
             #
             cancel_fnc=None,
             cancel_label=None,
+            cancel_visible=True,
+            #
             button_size=160,
             status=None,
             show=True,
@@ -286,20 +314,23 @@ class DialogWindow(object):
         w.set_content(content)
         w.set_content_font_size(content_text_size)
         w.set_definition_window_size(window_size)
-        if yes_method is not None:
-            w.set_yes_method_add(yes_method)
         if yes_label is not None:
             w.set_yes_label(yes_label)
+        if yes_method is not None:
+            w.set_yes_method_add(yes_method)
+        w.set_yes_visible(yes_visible)
         #
-        if no_method is not None:
-            w.set_no_method_add(no_method)
         if no_label is not None:
             w.set_no_label(no_label)
+        if no_method is not None:
+            w.set_no_method_add(no_method)
+        w.set_no_visible(no_visible)
         #
-        if cancel_fnc is not None:
-            w.set_cancel_method_add(cancel_fnc)
         if cancel_label is not None:
             w.set_cancel_label(cancel_label)
+        if cancel_fnc is not None:
+            w.set_cancel_method_add(cancel_fnc)
+        w.set_cancel_visible(cancel_visible)
         #
         if status is not None:
             w.set_window_title('[ {} ] {}'.format(str(status).split('.')[-1], label))
@@ -386,52 +417,26 @@ class SubProcessRunner(object):
         pass
     @classmethod
     def set_run_with_result(cls, cmd):
-        sp = subprocess.Popen(
-            cmd,
-            shell=True,
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            startupinfo=cls.NO_WINDOW
-        )
-        #
         Log.set_module_result_trace(
-            'sub-progress-run',
-            u'command=`{}`'.format(cmd)
+            'sub-progress run with result',
+            u'command=`{}` is started'.format(cmd)
         )
-        while True:
-            next_line = sp.stdout.readline()
-            return_line = next_line.decode("utf-8", "ignore")
-            if return_line == '' and sp.poll() is not None:
-                break
-            #
-            return_line = return_line.replace(u"\u2018", "'").replace(u"\u2019", "'")
-            print(return_line.rstrip())
-        #
-        return_code = sp.wait()
-        if return_code:
-            raise subprocess.CalledProcessError(
-                return_code, sp
-            )
-        #
-        sp.stdout.close()
+        bsc_core.SubProcessMtd.set_run_with_result(
+            cmd
+        )
+        # Log.set_module_result_trace(
+        #     'sub-progress run with result',
+        #     u'command=`{}` is completed'.format(cmd)
+        # )
     @classmethod
     def set_run(cls, cmd):
-        _sp = subprocess.Popen(
-            cmd,
-            shell=True,
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            # env=dict(os.environ),
-            startupinfo=cls.NO_WINDOW
-        )
-        #
         Log.set_module_result_trace(
-            'sub-progress-run',
+            'sub-progress run',
             u'command=`{}`'.format(cmd)
         )
-        return _sp
+        return bsc_core.SubProcessMtd.set_run(
+            cmd
+        )
     @classmethod
     def set_run_with_log(cls, name, cmd):
         import lxutil_gui.proxy.widgets as prx_widgets
@@ -442,6 +447,15 @@ class SubProcessRunner(object):
         w.set_process_name(name)
         w.set_process_cmd(cmd)
         w.set_process_start()
+    @classmethod
+    def set_run_with_result_use_thread(cls, cmd):
+        t = threading.Thread(
+            target=functools.partial(
+                cls.set_run_with_result,
+                cmd=cmd
+            )
+        )
+        t.start()
 
 
 class Icons(object):
@@ -460,7 +474,8 @@ class Icon(object):
         glob_pattern = '{}/{}.*'.format(cls.ROOT_PATH, icon_name)
         results = glob.glob(glob_pattern) or []
         if results:
-            return results[-1]
+
+            return bsc_core.StoragePathOpt(results[-1]).get_path()
     @classmethod
     def get_katana_obj(cls):
         return cls.get('application/katana', ext='.png')
@@ -600,11 +615,7 @@ class System(object):
         )
     @classmethod
     def get_time_tag(cls):
-        timestamp = time.time()
-        return time.strftime(
-            cls.TIME_TAG_FORMAT,
-            time.localtime(timestamp)
-        )
+        return bsc_core.SystemMtd.get_time_tag()
     @classmethod
     def get_application(cls):
         return Application.get_current()
@@ -641,7 +652,7 @@ class Environ(object):
     def set(cls, key, value):
         os.environ[key] = value
         Log.set_module_result_trace(
-            'environ-set',
+            'environ set',
             u'key="{}", value="{}"'.format(key, value)
         )
     @classmethod
@@ -651,7 +662,7 @@ class Environ(object):
             if value not in v:
                 os.environ[key] += os.pathsep + value
                 Log.set_module_result_trace(
-                    'environ-add',
+                    'environ add',
                     u'key="{}", value="{}"'.format(key, value)
                 )
         else:
@@ -840,12 +851,14 @@ class Path(object):
 
 
 class AppLauncher(object):
-    LOCAL_ROOT = '/home/dongchangbao/packages/pglauncher/9.9.99'
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
     #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
     APP_CONFIGURE_FILE_PATTERN = '{root}/{project}_config/bin/config/{application}.yml'
     BIN_PATTERN = '{root}/{project}_config/bin/{application}'
+    APP_CONFIGURE_MAP_DICT = {
+        'usdview': 'usd_view'
+    }
     def __init__(self, **kwargs):
         """
         :param kwargs:
@@ -860,17 +873,30 @@ class AppLauncher(object):
         )
     @classmethod
     def _get_application_configure_file_path_(cls, **kwargs):
+        kwargs_ = copy.copy(kwargs)
+        application = kwargs['application']
+        if application in cls.APP_CONFIGURE_MAP_DICT:
+            application_ = cls.APP_CONFIGURE_MAP_DICT[application]
+            kwargs_['application'] = application_
         return cls.APP_CONFIGURE_FILE_PATTERN.format(
-            **kwargs
+            **kwargs_
         )
     @classmethod
-    def _set_run_(cls, *args):
+    def _set_cmd_run_(cls, *args):
         SubProcessRunner.set_run(
             ' '.join(['rez-env'] + list(args))
         )
     @classmethod
+    def _get_run_cmd_(cls, *args):
+        return ' '.join(['rez-env'] + list(args))
+    @classmethod
     def _set_run_with_result_(cls, *args):
         SubProcessRunner.set_run_with_result(
+            ' '.join(['rez-env'] + list(args))
+        )
+    @classmethod
+    def _set_run_with_result_use_thread_(cls, *args):
+        SubProcessRunner.set_run_with_result_use_thread(
             ' '.join(['rez-env'] + list(args))
         )
 
@@ -890,7 +916,7 @@ class AppLauncher(object):
         configure_file_path = self._get_application_configure_file_path_(**kwargs)
         if os.path.exists(configure_file_path):
             Log.set_module_result_trace(
-                'launcher-configure',
+                'launcher-configure search',
                 'project="{project}", application="{application}"'.format(
                     **kwargs
                 )
@@ -901,20 +927,41 @@ class AppLauncher(object):
                 i_run_args = configure.get(key)
                 lis.extend(i_run_args)
         else:
-            return AppLauncher(project='default', application=application).get_run_args()
+            Log.set_module_warning_trace(
+                'launcher-configure search',
+                'file="{}" is non-exists'.format(
+                    configure_file_path
+                )
+            )
+            return AppLauncher(
+                project='default',
+                application=application
+            ).get_run_args()
         return lis
 
     def set_cmd_run(self, command=None):
         run_args = self.get_run_args()
         #
         run_args.append(command)
-        self._set_run_(*run_args)
-    
+        self._set_cmd_run_(*run_args)
+
+    def get_run_cmd(self, *args):
+        run_args = self.get_run_args()
+        #
+        run_args.append(' '.join(args))
+        return self._get_run_cmd_(*run_args)
+
     def set_cmd_run_with_result(self, command=None):
         run_args = self.get_run_args()
         #
         run_args.append(command)
         self._set_run_with_result_(*run_args)
+
+    def set_cmd_run_with_result_use_thread(self, cmd):
+        run_args = self.get_run_args()
+        #
+        run_args.append(cmd)
+        self._set_run_with_result_use_thread_(*run_args)
 
     def get_configure_exists(self):
         pass
@@ -952,8 +999,31 @@ class MayaLauncher(object):
 
     def set_file_open(self, file_path):
         args = [
-            'pgtk',
-            'shotgun',
+            '-- maya',
+            '-file',
+            '"{}"'.format(file_path),
+        ]
+        cmd = ' '.join(args)
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+            cmd
+        )
+
+    def set_file_new(self, file_path):
+        args = [
+            '-- maya',
+            r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_path(\\\"{}\\\", with_create_directory=True)\")"'.format(
+                file_path
+            )
+        ]
+        cmd = ' '.join(args)
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+            cmd
+        )
+
+    def get_file_open_cmd(self, file_path):
+        args = [
+            # 'pgtk',
+            # 'shotgun',
             #
             '-- maya',
             '-file',
@@ -962,15 +1032,14 @@ class MayaLauncher(object):
             #     file_path
             # )
         ]
-        cmd = ' '.join(args)
-        AppLauncher(**self._kwargs).set_cmd_run(
-            cmd
+        return AppLauncher(**self._kwargs).get_run_cmd(
+            *args
         )
 
     def set_command_run(self, command):
         args = [
-            'pgtk',
-            'shotgun',
+            # 'pgtk',
+            # 'shotgun',
             #
             '-- maya -batch -command',
             command
@@ -981,17 +1050,13 @@ class MayaLauncher(object):
             cmd
         )
 
-    def set_command_run_with_result(self, command):
+    def set_run(self):
         args = [
-            'pgtk',
-            'shotgun',
-            #
-            '-- maya -batch -command',
-            command
+            '-- maya',
         ]
-        cmd = ' '.join(args)
+        cmd = r' '.join(args)
         #
-        AppLauncher(**self._kwargs).set_cmd_run_with_result(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
             cmd
         )
 
@@ -1212,8 +1277,8 @@ class HoudiniLauncher(object):
 
     def set_command_run(self, command):
         args = [
-            'pgtk',
-            'shotgun',
+            # 'pgtk',
+            # 'shotgun',
             #
             '-- hython',
             command
@@ -1222,9 +1287,6 @@ class HoudiniLauncher(object):
         AppLauncher(**self._kwargs).set_cmd_run(
             cmd
         )
-
-    def set_command_run_with_result(self, command):
-        pass
 
 
 class KatanaLauncher(object):
@@ -1343,11 +1405,42 @@ class KatanaLauncher(object):
 
     def set_file_open(self, file_path):
         args = [
-            'pgtk',
-            'shotgun',
-            #
             '-- katana',
             '"{}"'.format(file_path)
+        ]
+        cmd = ' '.join(args)
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+            cmd
+        )
+
+    def set_run(self):
+        args = [
+            '-- katana',
+        ]
+        cmd = r' '.join(args)
+        #
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+            cmd
+        )
+
+
+class UsdViewLauncher(object):
+    def __init__(self, **kwargs):
+        """
+        :param kwargs:
+            project: <project-name>
+        """
+        self._kwargs = kwargs
+        self._kwargs['application'] = 'usdview'
+
+    def set_file_open(self, file_path):
+        args = [
+            # 'pgtk',
+            # 'shotgun',
+            #
+            '-- usdview',
+            '--render "GL" --camera "/renderCamera/defaultCamera/defaultCameraLeft/defaultCameraLeftShape"',
+            '"{}"'.format(file_path),
         ]
         cmd = ' '.join(args)
         AppLauncher(**self._kwargs).set_cmd_run(
@@ -1392,8 +1485,139 @@ class RvLauncher(object):
             else:
                 return
         #
-        AppLauncher._set_run_(
+        AppLauncher._set_cmd_run_(
             *run_args
+        )
+
+
+class History(object):
+    if System.get_is_windows():
+        HISTORY_FILE_PATH = '{}/history.yml'.format(
+            bsc_configure.UserDirectory.WINDOWS
+        )
+    elif System.get_is_linux():
+        HISTORY_FILE_PATH = '{}/history.yml'.format(
+            bsc_configure.UserDirectory.LINUX
+        )
+    else:
+        raise SystemError()
+    @classmethod
+    def set_append(cls, key, value):
+        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        if f_o.get_is_exists() is False:
+            bsc_core.StorageFileOpt(cls.HISTORY_FILE_PATH).set_write(
+                {}
+            )
+        #
+        if f_o.get_is_exists() is True:
+            configure = bsc_objects.Configure(
+                value=f_o.path
+            )
+            values = configure.get(key) or []
+            if value in values:
+                values.remove(value)
+            #
+            values.append(value)
+            configure.set(key, values)
+            configure.set_save_to(cls.HISTORY_FILE_PATH)
+            return True
+        return False
+    @classmethod
+    def set_extend(cls, key, values):
+        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        if f_o.get_is_exists() is False:
+            bsc_core.StorageFileOpt(cls.HISTORY_FILE_PATH).set_write(
+                {}
+            )
+        #
+        if f_o.get_is_exists() is True:
+            configure = bsc_objects.Configure(
+                value=f_o.path
+            )
+            exists_values = configure.get(key) or []
+            #
+            for i_value in values:
+                if i_value not in exists_values:
+                    #
+                    exists_values.append(i_value)
+            #
+            configure.set(key, exists_values)
+            configure.set_save_to(cls.HISTORY_FILE_PATH)
+            return True
+        return False
+    @classmethod
+    def get(cls, key):
+        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        if f_o.get_is_exists() is True:
+            configure = bsc_objects.Configure(
+                value=f_o.path
+            )
+            return configure.get(key) or []
+        return []
+    @classmethod
+    def get_latest(cls, key):
+        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        if f_o.get_is_exists() is True:
+            configure = bsc_objects.Configure(
+                value=f_o.path
+            )
+            _ = configure.get(key) or []
+            if _:
+                return _[-1]
+
+
+class OslShaderMtd(object):
+    @classmethod
+    def set_katana_ui_template_create(cls, file_path, output_file_path):
+        output_file_opt = bsc_core.StorageFileOpt(output_file_path)
+        info = bsc_core.OslShaderMtd.get_info(file_path)
+        if info:
+            j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template.j2')
+            raw = j2_template.render(
+                **info
+            )
+            # print(raw)
+            output_file_opt.set_write(raw)
+    @classmethod
+    def set_maya_ui_template_create(cls, file_path, output_file_path):
+        output_file_opt = bsc_core.StorageFileOpt(output_file_path)
+        info = bsc_core.OslShaderMtd.get_info(file_path)
+        if info:
+            j2_template = utl_configure.Jinja.ARNOLD.get_template('maya-ui-template.j2')
+            raw = j2_template.render(
+                **info
+            )
+            # print(raw)
+            output_file_opt.set_write(raw)
+
+
+class HookMtd(object):
+    @classmethod
+    def set_cmd_run(cls, cmd):
+        import urllib
+        #
+        from lxbasic import bsc_core
+        #
+        unique_id = bsc_core.UuidMtd.get_new()
+        #
+        hook_yml_file_path = bsc_core.SystemMtd.get_user_session_file_path(unique_id=unique_id)
+        #
+        bsc_core.StorageFileOpt(hook_yml_file_path).set_write(
+            dict(
+                user=bsc_core.SystemMtd.get_user_name(),
+                tiame=bsc_core.SystemMtd.get_time(),
+                cmd=cmd,
+            )
+        )
+        #
+        urllib.urlopen(
+            'http://{host}:{port}/cmd-run?uuid={uuid}'.format(
+                **dict(
+                    host=utl_configure.Hook.HOST,
+                    port=utl_configure.Hook.PORT,
+                    uuid=unique_id
+                )
+            )
         )
 
 
@@ -1460,6 +1684,94 @@ def _print_time_(fnc):
     return fnc_
 
 
+def _run_ignore_(fnc):
+    def fnc_(*args, **kwargs):
+        if isinstance(fnc, types.FunctionType):
+            fnc_path = '{}'.format(
+                fnc.__name__
+            )
+        elif isinstance(fnc, types.MethodType):
+            fnc_path = '{}.{}'.format(
+                fnc.__class__.__name__, fnc.__name__
+            )
+        else:
+            raise TypeError()
+        # noinspection PyBroadException
+        try:
+            Log.set_module_result_trace(
+                'fnc run',
+                'fnc="{}" is started'.format(
+                    fnc_path
+                ),
+            )
+            #
+            _result = fnc(*args, **kwargs)
+            #
+            Log.set_module_result_trace(
+                'fnc run',
+                'fnc="{}" is completed'.format(
+                    fnc_path
+                )
+            )
+        except:
+            Log.set_module_error_trace(
+                'fnc run',
+                'fnc="{}" is error'.format(
+                    fnc_path
+                )
+            )
+            bsc_core.ExceptionMtd.set_print()
+    return fnc_
+
+
+def _print_fnc_completion_with_result_(fnc):
+    def fnc_(*args, **kwargs):
+        if isinstance(fnc, types.FunctionType):
+            fnc_path = '{}'.format(
+                fnc.__name__
+            )
+        elif isinstance(fnc, types.MethodType):
+            fnc_path = '{}.{}'.format(
+                fnc.__class__.__name__, fnc.__name__
+            )
+        else:
+            raise TypeError()
+        # noinspection PyBroadException
+        try:
+            Log.set_module_result_trace(
+                'fnc run',
+                'fnc="{}" is started'.format(
+                    fnc_path
+                ),
+            )
+            #
+            _result = fnc(*args, **kwargs)
+            #
+            if _result is True:
+                Log.set_module_result_trace(
+                    'fnc run',
+                    'fnc="{}" is completed'.format(
+                        fnc_path
+                    )
+                )
+            else:
+                Log.set_module_warning_trace(
+                    'fnc run',
+                    'fnc="{}" is failed'.format(
+                        fnc_path
+                    )
+                )
+        except:
+            Log.set_module_error_trace(
+                'fnc run',
+                'fnc="{}" is error'.format(
+                    fnc_path
+                )
+            )
+            bsc_core.ExceptionMtd.set_print()
+    return fnc_
+
+
 class Resources(object):
     ENVIRON_KEY = 'LYNXI_RESOURCES'
     @classmethod
@@ -1481,4 +1793,6 @@ class Resources(object):
 
 
 if __name__ == '__main__':
-    print(AppLauncher(project='lib', application='gui').get_run_args())
+    print(
+        AppLauncher(project='xkt', application='maya').get_run_args()
+    )

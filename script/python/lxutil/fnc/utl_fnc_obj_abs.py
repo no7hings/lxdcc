@@ -383,7 +383,7 @@ class AbsFncDccGeometryComparer(object):
         self._scene_file_path = file_path
         self._root = root
         #
-        self._cache_directory = bsc_core.EnvironMtd.get_temporary_path()
+        self._cache_directory = bsc_core.EnvironMtd.get_temporary_root()
         self._resolver = rsv_commands.get_resolver()
         #
         self._option = copy.deepcopy(self.OPTION)

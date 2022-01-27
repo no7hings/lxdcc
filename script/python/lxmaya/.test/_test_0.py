@@ -10,4 +10,6 @@ for i in a:
 
 print c
 
+print 'ae_osl_color_correct'[len('ae_'):]
+
 

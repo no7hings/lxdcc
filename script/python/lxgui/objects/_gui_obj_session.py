@@ -3,31 +3,36 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxgui import gui_configure
+from lxsession.objects import ssn_obj_abs
 
 from lxgui.objects import gui_obj_abs
 
-from lxresolver.objects import rsv_obj_session_abs
+from lxsession import ssn_configure
+
+import lxsession.objects as ssn_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxutil_gui.panel import utl_gui_pnl_abs_resolver
 
-from lxresolver.objects import _rsv_obj_session
+
+class ToolPanelSession(ssn_obj_abs.AbsToolPanelSession):
+    def __init__(self, *args, **kwargs):
+        super(ToolPanelSession, self).__init__(*args, **kwargs)
 
 
 class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
-    RSV_OBJ_ACTION_SESSION_CLASS = _rsv_obj_session.RsvObjActionSession
-    RSV_UNIT_ACTION_SESSION_CLASS = _rsv_obj_session.RsvUnitActionSession
+    RSV_OBJ_ACTION_SESSION_CLASS = ssn_objects.RsvObjActionSession
+    RSV_UNIT_ACTION_SESSION_CLASS = ssn_objects.RsvUnitActionSession
     def __init__(self, *args, **kwargs):
         self._configure = kwargs['configure']
         #
         self.WINDOW_NAME = self._configure.get('option.gui.name')
         self.WINDOW_SIZE = self._configure.get('option.gui.size')
         # filter
-        exact_filter = self._get_resolver_exact_filter_()
-        if exact_filter:
-            self.RESOLVER_FILTER = exact_filter
+        application_filter = self._get_resolver_application_filter_()
+        if application_filter:
+            self.RESOLVER_FILTER = application_filter
         else:
             self.RESOLVER_FILTER = self._configure.get('resolver.filter')
         #
@@ -37,10 +42,10 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
         #
         self._session_dict = {}
 
-    def _get_resolver_exact_filter_(self):
-        _ = self._configure.get('resolver.exact_filter') or {}
+    def _get_resolver_application_filter_(self):
+        _ = self._configure.get('resolver.application_filter') or {}
         for k, v in _.items():
-            if bsc_core.SystemMtd.get_is_matched([k]):
+            if bsc_core.SystemMtd.get_is_matched(['*-{}'.format(k)]):
                 return v
 
     def get_rsv_task_unit_show_raw(self, rsv_task):
@@ -182,8 +187,8 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
         if session_path in self._session_dict:
             return self._session_dict[session_path]
         else:
-            python_file_path = gui_configure.Hooks.get_python_file(key)
-            yaml_file_path = gui_configure.Hooks.get_yaml_file(key)
+            python_file_path = ssn_configure.Hooks.get_python_file(key)
+            yaml_file_path = ssn_configure.Hooks.get_yaml_file(key)
             if python_file_path and yaml_file_path:
                 python_file = utl_dcc_objects.OsPythonFile(python_file_path)
                 yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
@@ -195,27 +200,19 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
                         #
                         if type_name in ['asset', 'shot', 'step', 'task']:
                             session = self.RSV_OBJ_ACTION_SESSION_CLASS(
-                                *args, **kwargs
+                                *args,
+                                **kwargs
                             )
                         elif type_name in ['unit']:
                             session = self.RSV_UNIT_ACTION_SESSION_CLASS(
-                                *args, **kwargs
+                                *args,
+                                **kwargs
                             )
                         else:
                             raise TypeError()
                         #
                         self._session_dict[session_path] = session, execute_fnc
                         return session, execute_fnc
-
-
-class KitPanelSession(rsv_obj_session_abs.AbsKitPanelSession):
-    def __init__(self, *args, **kwargs):
-        super(KitPanelSession, self).__init__(*args, **kwargs)
-
-
-class ToolPanelSession(rsv_obj_session_abs.AbsToolPanelSession):
-    def __init__(self, *args, **kwargs):
-        super(ToolPanelSession, self).__init__(*args, **kwargs)
 
 
 class RsvLoaderSession(gui_obj_abs.AbsRsvPanelSession):

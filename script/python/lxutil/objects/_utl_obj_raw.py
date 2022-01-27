@@ -132,6 +132,7 @@ class DotAssReader(bsc_obj_abs.AbsFileReader):
 class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
     SEP = '\n\n'
     FILE_REFERENCE_DICT = {
+        'Palette': 'xgDataPath',
         'Description': 'xgDataPath'
     }
     def __init__(self, file_path):
@@ -165,7 +166,7 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
     def _get_file_paths_(self):
         lis = []
         obj_raws = self._get_obj_raws_()
-        print 'start file-path: "{}"'.format(self.file_path)
+        print 'start file: "{}"'.format(self.file_path)
         for obj_raw in obj_raws:
             line, variants = obj_raw
             obj_type = variants['obj_type']
@@ -181,14 +182,28 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
                             obj_name=obj_name,
                             port_name=port_name,
                             port_type=port_type,
-                            port_raw=port_raw
+                            port_raw=port_raw,
+                            line_index=self.lines.index(line),
                         )
                         lis.append(raw)
-        print 'end file-path: "{}"'.format(self.file_path)
+        print 'end file: "{}"'.format(self.file_path)
         return lis
 
     def get_file_paths(self):
         return self._get_file_paths_()
+
+    def set_xgen_paths(self, directory_path):
+        _ = self.get_file_paths()
+        for i in _:
+            print i
+            i_directory_path = i['port_raw']
+            i_directory_path = bsc_core.StoragePathOpt(
+                i_directory_path
+            ).get_path()
+            i_ss = i_directory_path.split('/xgen/collections/')
+            print i_ss
+            i_obj_type = i['obj_type']
+            print '{}/{}'.format(directory_path, i_ss[-1])
 
 
 class DotMaFileReader(bsc_obj_abs.AbsFileReader):
@@ -427,6 +442,36 @@ class DotMtlxFileReader(bsc_obj_abs.AbsFileReader):
         return lis
 
 
+class DotOslFileReader(bsc_obj_abs.AbsFileReader):
+    SEP = '\n'
+    LINE_MATCHER_CLS = _Pattern
+    PROPERTIES_CLASS = Properties
+    def __init__(self, file_path):
+        super(DotOslFileReader, self).__init__(file_path)
+
+    def _get_shader_start_line_(self):
+        _ = self._get_matches_(
+            pattern='shader {shader_name}({extra}',
+            lines=self.lines
+        )
+        print _
+
+    def _get_shader_lines_(self):
+        index = 0
+        p_index = index + 2
+        is_end = False
+        p_maximum = 10000
+        c = 0
+        while is_end is False:
+            pass
+
+    def get_port_args(self):
+        print self._get_matches_(
+            pattern='',
+            lines=self.lines
+        )
+
+
 class DotUsdaFile(object):
     OPTION = dict(
         root='master',
@@ -500,3 +545,9 @@ class DotUsdaFile(object):
                 uv_map_file=uv_map_file_path,
             )
         )
+
+
+if __name__ == '__main__':
+    DotOslFileReader(
+        file_path='/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_noise_fractal.osl'
+    )._get_shader_start_line_()

@@ -12,6 +12,9 @@ class Util(object):
     MATERIAL_TYPE = 'shadingEngine'
     #
     XGEN_DESCRIPTION = 'xgmDescription'
+    XGEN_SPLINE_GUIDE = 'xgmSplineGuide'
+    #
+    XGEN_PALETTE = 'xgmPalette'
 
 
 class XGen(object):

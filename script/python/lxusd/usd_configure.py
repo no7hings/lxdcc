@@ -20,6 +20,7 @@ class ObjCategory(object):
 class ObjType(object):
     TRANSFORM = 'Xform'
     MESH = 'Mesh'
+    CURVE = 'NurbsCurves'
 
 
 class Obj(object):

@@ -4,14 +4,16 @@ import maya.cmds as cmds
 
 import lxutil.commands as utl_cmds
 
+import lxutil.dcc.dcc_objects as utl_dcc_objects
+
 from .. import mya_dcc_obj_abs
 
-from ...dcc.dcc_objects import _ma_dcc_obj_os, _ma_dcc_obj_utility
+from ...dcc.dcc_objects import _mya_dcc_obj_utility
 
 
 class AndMaterialx(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
-    PORT_CLASS = _ma_dcc_obj_utility.Port
-    OS_FILE_CLASS = _ma_dcc_obj_os.OsFile
+    PORT_CLASS = _mya_dcc_obj_utility.Port
+    OS_FILE_CLASS = utl_dcc_objects.OsFile
     def __init__(self, path):
         super(AndMaterialx, self).__init__(path)
 
@@ -30,6 +32,6 @@ class AndMaterialx(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
 
 class AndStringReplace(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _ma_dcc_obj_utility.Port
+    PORT_CLASS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(AndStringReplace, self).__init__(path)

@@ -3177,24 +3177,15 @@ class AbsOsDirectory(
             )
 
     def get_all_file_paths(self):
-        def rcs_fnc_(path_):
-            _results = glob.glob(u'{}/*'.format(path_)) or []
-            _results.sort()
-            for _path in _results:
-                if os.path.isfile(_path):
-                    lis.append(_path)
-                elif os.path.isdir(_path):
-                    rcs_fnc_(_path)
-
-        lis = []
-        rcs_fnc_(self.path)
-        return lis
+        return bsc_core.DirectoryMtd.get_all_file_paths(
+            self.path
+        )
 
     def set_copy_to_directory(self, tgt_directory_path):
         def copy_fnc_(src_file_path_, tgt_file_path_):
             shutil.copy2(src_file_path_, tgt_file_path_)
             self.LOG.set_module_result_trace(
-                'file-copy',
+                'file copy',
                 u'file="{}" >> "{}"'.format(src_file_path_, tgt_file_path_)
             )
         #
@@ -3211,7 +3202,7 @@ class AbsOsDirectory(
                 if os.path.exists(i_tgt_dir_path) is False:
                     os.makedirs(i_tgt_dir_path)
                     self.LOG.set_module_result_trace(
-                        'directory-create',
+                        'directory create',
                         u'directory="{}"'.format(i_tgt_dir_path)
                     )
                 #
@@ -3385,15 +3376,19 @@ class AbsOsFile(
             if os.path.exists(target_directory) is False:
                 os.makedirs(target_directory)
                 self.LOG.set_module_result_trace(
-                    'directory-create',
+                    'directory create',
                     u'directory="{}"'.format(target_directory)
                 )
-            #
-            shutil.copy2(self.path, target_file_path)
-            self.LOG.set_module_result_trace(
-                'file-copy',
-                u'file="{}" >> "{}"'.format(self.path, target_file_path)
-            )
+            # noinspection PyBroadException
+            try:
+                shutil.copy2(self.path, target_file_path)
+                self.LOG.set_module_result_trace(
+                    'file-copy',
+                    u'file="{}" >> "{}"'.format(self.path, target_file_path)
+                )
+            except:
+                bsc_core.ExceptionMtd.set_print()
+                return self.path
 
     def get_orig_file(self, ext):
         if self.ext == ext:

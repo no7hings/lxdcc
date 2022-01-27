@@ -249,11 +249,15 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         cmds.delete(camera)
     @classmethod
     def _set_arnold_light_create_(cls):
-        light = mya_dcc_objects.Shape('arnold_light')
+        light = mya_dcc_objects.Shape('light')
         if light.get_is_exists() is False:
             light = light.set_create('aiStandIn')
         #
-        atr_raw = dict(dso='/l/resource/td/asset/ass/default-light.ass')
+        atr_raw = dict(
+            dso=utl_core.Path.set_map_to_platform(
+                '/l/resource/td/asset/ass/default-light.ass'
+            )
+        )
         [light.get_port(k).set(v) for k, v in atr_raw.items()]
         return light.transform.path
     @classmethod
@@ -312,7 +316,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         file_path_base = self._file_obj.path_base
         #
         jpg_file_path = '{}.snapshot/image{}'.format(file_path_base, '.jpg')
-        jpg_file_seq_path = '{}.snapshot/image.####{}'.format(file_path_base, '.jpg')
+        jpg_seq_file_path = '{}.snapshot/image.%04d{}'.format(file_path_base, '.jpg')
         mov_file_path = '{}{}'.format(file_path_base, '.mov')
         frame = self._option.get('frame')
         self._set_playblast_(
@@ -320,16 +324,24 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             self._root,
             frame=frame
         )
-        jpg_seq_file = utl_dcc_objects.OsFile(jpg_file_seq_path)
+        jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
         if self._option.get('convert_to_dot_mov') is True:
-            stg_operators.ImageOpt(
-                jpg_seq_file
-            ).set_convert_to(mov_file_path)
+            if jpg_seq_file.get_exists_files():
+                bsc_core.VedioOpt(
+                    mov_file_path
+                ).set_mov_create_from(
+                    jpg_seq_file_path, block=True
+                )
+                # stg_operators.ImageOpt(
+                #     jpg_seq_file
+                # ).set_convert_to(mov_file_path)
         else:
-            jpg_seq_file = utl_dcc_objects.OsFile(jpg_file_seq_path)
-            jpg_seq_file.get_exists_files()[0].set_copy_to_file(
-                self._file_path
-            )
+            jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
+            exist_files = jpg_seq_file.get_exists_files()
+            if exist_files:
+                jpg_seq_file.get_exists_files()[0].set_copy_to_file(
+                    self._file_path
+                )
         #
         self._results = [mov_file_path]
 
@@ -340,17 +352,24 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         file_path_base = self._file_obj.path_base
         #
         jpg_file_path = '{}.render/image{}'.format(file_path_base, '.exr')
-        jpg_file_seq_path = '{}.render/image.####{}'.format(file_path_base, '.exr')
+        jpg_seq_file_path = '{}.render/image.%04d{}'.format(file_path_base, '.exr')
         mov_file_path = '{}{}'.format(file_path_base, '.mov')
 
         self._set_render_(
             jpg_file_path,
             self._mya_root_dag_path.path
         )
+        jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
         if self._option.get('convert_to_dot_mov') is True:
-            stg_operators.ImageOpt(
-                utl_dcc_objects.OsFile(jpg_file_seq_path)
-            ).set_convert_to(mov_file_path)
+            if jpg_seq_file.get_exists_files():
+                bsc_core.VedioOpt(
+                    mov_file_path
+                ).set_mov_create_from(
+                    jpg_seq_file_path, block=True
+                )
+                # stg_operators.ImageOpt(
+                #     utl_dcc_objects.OsFile(jpg_seq_file_path)
+                # ).set_convert_to(mov_file_path)
 
         self._results = [mov_file_path]
 

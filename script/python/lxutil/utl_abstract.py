@@ -175,6 +175,9 @@ class AbsDccPort(AbsDccObjDef):
     def set_source(self, *args):
         pass
 
+    def set_source_disconnect(self):
+        pass
+
     def get_has_source(self):
         pass
 
@@ -187,6 +190,9 @@ class AbsDccPort(AbsDccObjDef):
             return _.obj
 
     def set_target(self, *args):
+        pass
+
+    def set_target_disconnect(self):
         pass
 
     def get_has_targets(self):
@@ -519,7 +525,7 @@ class AbsDccObj(
     def get_dcc_instance(self, obj_type, obj_path, *args, **kwargs):
         pass
 
-    def set_create(self, *args):
+    def set_create(self, *args, **kwargs):
         pass
 
     def set_delete(self, *args):
@@ -689,13 +695,13 @@ class AbsSetup(object):
             if value not in v:
                 os.environ[key] += os.pathsep + value
                 utl_core.Log.set_module_result_trace(
-                    'environ-add',
+                    'environ add',
                     u'key="{}", value="{}"'.format(key, value)
                 )
         else:
             os.environ[key] = value
             utl_core.Log.set_module_result_trace(
-                'environ-set',
+                'environ set',
                 u'key="{}", value="{}"'.format(key, value)
             )
     @classmethod
@@ -704,7 +710,7 @@ class AbsSetup(object):
         if path not in python_paths:
             sys.path.insert(0, path)
             utl_core.Log.set_module_result_trace(
-                'python-path-add',
+                'python-path add',
                 u'value="{}"'.format(path)
             )
     @classmethod

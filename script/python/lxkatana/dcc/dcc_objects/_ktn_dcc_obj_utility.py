@@ -34,27 +34,42 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def set_file_open(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
+        utl_core.Log.set_module_result_trace(
+            'katana-file open',
+            u'file="{}" is started'.format(file_path)
+        )
         KatanaFile.Load(file_obj.path)
         utl_core.Log.set_module_result_trace(
-            'scene-file-open',
-            u'file-path:"{}"'.format(file_path)
+            'katana-file open',
+            u'file="{}" is completed'.format(file_path)
         )
     @classmethod
     def set_file_save(cls):
-        src_file_path = cls.get_current_file_path()
-        if src_file_path:
-            KatanaFile.Save(src_file_path)
+        file_path = cls.get_current_file_path()
+        utl_core.Log.set_module_result_trace(
+            'katana-file save',
+            u'file="{}" is started'.format(file_path)
+        )
+        if file_path:
+            KatanaFile.Save(file_path)
+            utl_core.Log.set_module_result_trace(
+                'katana-file save',
+                u'file="{}" is completed'.format(file_path)
+            )
         else:
             pass
     @classmethod
     def set_file_save_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         file_obj.set_directory_create()
-        #
+        utl_core.Log.set_module_result_trace(
+            'katana-file save-to',
+            u'file="{}" is started'.format(file_path)
+        )
         KatanaFile.Save(file_obj.path)
         utl_core.Log.set_module_result_trace(
-            'scene-file-save',
-            u'file-path:"{}"'.format(file_path)
+            'katana-file save-to',
+            u'file="{}" is completed'.format(file_path)
         )
     @classmethod
     def set_file_export_to(cls, file_path):
@@ -72,10 +87,10 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         return KatanaFile.New()
     @classmethod
     def set_current_frame(cls, frame):
-        NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(frame, 0)
+        NodegraphAPI.GetRootNode().getParameter('currentTime').setValue(frame, 0)
     @classmethod
     def get_current_frame(cls):
-        return NodegraphAPI.GetRootNode().getParameter("currentTime").getValue(0)
+        return NodegraphAPI.GetRootNode().getParameter('currentTime').getValue(0)
     @classmethod
     def get_frame_range(cls, frame=None):
         if isinstance(frame, (tuple, list)):
@@ -85,6 +100,19 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         else:
             star_frame = end_frame = cls.get_current_frame()
         return star_frame, end_frame
+    @classmethod
+    def set_frame_range(cls, *args):
+        if len(args) == 2:
+            star_frame, end_frame = args
+        elif len(args) == 1:
+            star_frame = end_frame = args
+        else:
+            raise TypeError()
+        #
+        NodegraphAPI.GetRootNode().getParameter('inTime').setValue(star_frame, 0)
+        NodegraphAPI.GetRootNode().getParameter('workingInTime').setValue(star_frame, 0)
+        NodegraphAPI.GetRootNode().getParameter('outTime').setValue(end_frame, 0)
+        NodegraphAPI.GetRootNode().getParameter('workingOutTime').setValue(end_frame, 0)
     @classmethod
     def get_objs_by_type(cls, obj_type_name):
         if isinstance(obj_type_name, (str, unicode)):

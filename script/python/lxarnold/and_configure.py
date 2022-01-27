@@ -509,3 +509,20 @@ class HairProperty(object):
 
 class Utility(object):
     ROUND = 8
+
+
+class Aov(object):
+    TYPES = [
+        ("int", ai.ai_params.AI_TYPE_INT),
+        ("uint", ai.ai_params.AI_TYPE_UINT),
+        ("bool", ai.ai_params.AI_TYPE_BOOLEAN),
+        ("float", ai.ai_params.AI_TYPE_FLOAT),
+        ("rgb", ai.ai_params.AI_TYPE_RGB),
+        ("rgba", ai.ai_params.AI_TYPE_RGBA),
+        ("vector", ai.ai_params.AI_TYPE_VECTOR),
+        ("vector2", ai.ai_params.AI_TYPE_VECTOR2),
+        ("pointer", ai.ai_params.AI_TYPE_POINTER)
+    ]
+    @classmethod
+    def get_index(cls, type_name):
+        return dict(cls.TYPES)[type_name]

@@ -37,7 +37,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_window_clear()'
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_windows_clear()'
                 Namespace(s):
                     enable: True
                     check_enable: True
@@ -63,7 +63,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_name_clear()'
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_names_clear()'
                 Shader(s):
                     enable: True
                     check_enable: True
@@ -76,7 +76,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_shader_clear()'
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unused_shaders_clear()'
                 Display-layer(s):
                     enable: True
                     check_enable: True

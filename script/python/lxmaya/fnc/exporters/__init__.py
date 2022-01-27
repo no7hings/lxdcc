@@ -9,5 +9,8 @@ from ._mya_fnc_ept_texture import *
 
 from ._mya_fnc_ept_proxy import *
 
+from ._mya_fnc_ept_xgen import *
+
+
 
 

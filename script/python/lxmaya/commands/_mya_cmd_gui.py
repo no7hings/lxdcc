@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxmaya_gui.panel.pnl_widgets import _mya_pnl_wdt_checker
 
-from lxmaya.dcc.dcc_objects import _ma_dcc_obj_utility
+from lxmaya.dcc.dcc_objects import _mya_dcc_obj_utility
 
 from lxshotgun_gui.panel.pnl_widgets import _stg_pnl_wgt_validation
 
@@ -23,7 +23,7 @@ def get_validation_central_widget():
 
 
 def get_shotgun_validation_window():
-    file_path = _ma_dcc_obj_utility.SceneFile.get_current_file_path()
+    file_path = _mya_dcc_obj_utility.SceneFile.get_current_file_path()
     w = _stg_pnl_wgt_validation.SceneCheckerToolPanel(file_path)
     return w
 

@@ -1,5 +1,7 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
+import fnmatch
+# noinspection PyUnresolvedReferences
 from maya import cmds
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.api.OpenMaya as om2
@@ -80,6 +82,10 @@ def _ma_obj_name__get_with_namespace_clear_(obj_name):
 def _ma_obj_path__get_with_namespace_clear_(obj_path):
     obj_pathsep = ma_configure.Util.OBJ_PATHSEP
     return obj_pathsep.join([_ma_obj_name__get_with_namespace_clear_(i) for i in obj_path.split(obj_pathsep)])
+
+
+def _get_is_ui_mode_():
+    return not cmds.about(batch=1)
 
 
 class Om2Method(object):
@@ -319,9 +325,19 @@ class Om2Method(object):
         #
         value2 = (max2 - min2) * percent + min2
         return value2
+    @classmethod
+    def _set_om2_curve_create_(cls, points, knots, degree, form, parent):
+        om2_curve = om2.MFnNurbsCurve()
+        om2_curve.create(
+            points,
+            knots, degree, form,
+            False,
+            True,
+            parent=parent
+        )
 
 
-class CurveCreator(object):
+class Om2CurveCreator(object):
     def __init__(self, path):
         # if cmds.objExists(path) is False:
         #     cmds.createNode('transform', name=path)
@@ -391,7 +407,7 @@ class CurveCreator(object):
         )
 
 
-class CurveOpt(object):
+class Om2CurveOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_curve_fnc_(path)
     @property
@@ -420,6 +436,16 @@ class CurveOpt(object):
 
     def _test_(self):
         print self._om2_obj_fnc.cvs()
+    @classmethod
+    def set_create(cls, name, degree, form, points):
+        transform = cmds.createNode('transform', name=name)
+        count = len(points)
+        knots = Om2Method._get_curve_knots_(count, degree)
+        Om2Method._set_om2_curve_create_(
+            Om2Method._get_om2_point_array_(points),
+            knots, degree, form,
+            parent=Om2Method._get_om2_dag_obj_(transform)
+        )
 
 
 class Om2MeshOpt(object):
@@ -1057,7 +1083,7 @@ class SurfaceOpt(object):
         )
 
 
-class XgenGuideOpt(object):
+class CmdXgenSplineGuideOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_dag_(path)
         self._obj_path = self._om2_obj_fnc.fullPathName()
@@ -1288,7 +1314,20 @@ class ScriptJobMtd(object):
     # teTrackModified
     # cteEventClipEditModeChanged
     # teEditorPrefsChanged
-    pass
+    @classmethod
+    def get_all(cls):
+        return cmds.scriptJob(listJobs=1) or []
+    @classmethod
+    def set_delete(cls, pattern):
+        _ = fnmatch.filter(cls.get_all(), pattern)
+        if _:
+            for i in _:
+                index = i.split(': ')[0]
+                cmds.scriptJob(kill=int(index), force=1)
+                utl_core.Log.set_module_result_trace(
+                    'job-script kill',
+                    'job-script="{}"'.format(i.lstrip().rstrip())
+                )
 
 
 class CmdAtrQueryOpt(object):
@@ -1887,7 +1926,12 @@ class CmdObjOpt(object):
     @classmethod
     def _set_material_create_(cls, obj_name, type_name):
         if cls._get_is_exists_(obj_name) is False:
-            result = cmds.shadingNode(type_name, name=obj_name, asUtility=1, skipSelect=1)
+            result = cmds.shadingNode(
+                type_name,
+                name=obj_name,
+                asUtility=1,
+                skipSelect=1
+            )
             cls._set_material_light_link_create_(result)
     @classmethod
     def _set_material_light_link_create_(cls, shadingEngine):
@@ -2086,12 +2130,12 @@ class CmdObjOpt(object):
         for i_port_path, i_value in attributes.items():
             if isinstance(i_value, (str, unicode)):
                 type_name = 'string'
+            elif isinstance(i_value, bool):
+                type_name = 'bool'
             elif isinstance(i_value, int):
                 type_name = 'long'
             elif isinstance(i_value, float):
                 type_name = 'double'
-            elif isinstance(i_value, bool):
-                type_name = 'bool'
             else:
                 raise RuntimeError()
             #
@@ -2104,6 +2148,29 @@ class CmdObjOpt(object):
             port = CmdPortOpt(obj_path, i_port_path)
             if i_value is not None:
                 port.set(i_value)
+
+    def set_customize_attribute_create(self, port_path, value):
+        if value is not None:
+            obj_path = self.get_path()
+            if isinstance(value, (str, unicode)):
+                type_name = 'string'
+            elif isinstance(value, bool):
+                type_name = 'bool'
+            elif isinstance(value, int):
+                type_name = 'long'
+            elif isinstance(value, float):
+                type_name = 'double'
+            else:
+                raise RuntimeError()
+            #
+            CmdPortOpt._set_create_(
+                obj_path=obj_path,
+                port_path=port_path,
+                type_name=type_name
+            )
+            #
+            port = CmdPortOpt(obj_path, port_path)
+            port.set(value)
 
     def get_port(self, port_path):
         return CmdPortOpt(self._obj_path, port_path)
@@ -2161,7 +2228,6 @@ class CmdMeshesOpt(object):
         'center-y': 0.0,
         'center-z': 0.0,
     }
-
     def __init__(self, root):
         self._root = root
         self._mesh_paths = cmds.ls(
@@ -2285,3 +2351,22 @@ class CmdMeshesOpt(object):
         )
         cmds.polyTriangulate(mesh_path, constructionHistory=0)
         cmds.delete(mesh_path, constructionHistory=1)
+
+
+class CmdUndoStack(object):
+    def __init__(self, key=None):
+        if key is None:
+            key = bsc_core.UuidMtd.get_new()
+        #
+        self._key = key
+
+    def __enter__(self):
+        cmds.undoInfo(openChunk=1, undoName=self._key)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        cmds.undoInfo(closeChunk=1, undoName=self._key)
+
+
+def undo_stack(key=None):
+    return CmdUndoStack(key)

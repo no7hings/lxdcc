@@ -24,15 +24,3 @@ def get_task_properties_by_scene_src_file_path(file_path):
     task_properties = resolver.get_task_properties_by_scene_src_file_path(file_path)
     _rsv_obj_callback.__dict__['TASK_PROPERTIES'] = task_properties
     return task_properties
-
-
-def get_project(project):
-    pass
-
-
-def get_entity(**kwargs):
-    pass
-
-
-def get_exists_file(**kwargs):
-    pass

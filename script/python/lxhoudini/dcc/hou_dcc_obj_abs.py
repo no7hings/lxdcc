@@ -75,7 +75,7 @@ class AbsHouObj(utl_abstract.AbsDccObj):
         if hou_parent is not None:
             hou_obj = hou_parent.createNode(obj_type, self.name)
             utl_core.Log.set_module_result_trace(
-                'obj-create',
+                'obj create',
                 'obj="{}", type="{}"'.format(self.path, self.type)
             )
             hou_obj.moveToGoodPosition()

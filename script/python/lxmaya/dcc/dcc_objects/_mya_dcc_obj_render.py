@@ -4,7 +4,7 @@ import maya.cmds as cmds
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
-from lxmaya.dcc.dcc_objects import _ma_dcc_obj_obj
+from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj
 
 
 class RenderOption(object):
@@ -29,7 +29,7 @@ class RenderOption(object):
     }
     RENDER_GLOBALS = 'defaultRenderGlobals'
     def __init__(self):
-        self.render_globals = _ma_dcc_obj_obj.Node(self.RENDER_GLOBALS)
+        self.render_globals = _mya_dcc_obj_obj.Node(self.RENDER_GLOBALS)
     @classmethod
     def set_animation_enable(cls, boolean):
         cmds.setAttr('defaultRenderGlobals.animation', boolean)
@@ -89,7 +89,7 @@ class AndRenderOption(object):
         AND_AOV_DRIVER
     ]
     def __init__(self):
-        self._options_obj = _ma_dcc_obj_obj.Node(self.AND_OPTIONS)
+        self._options_obj = _mya_dcc_obj_obj.Node(self.AND_OPTIONS)
     @classmethod
     def set_image_format(cls, image_format):
         cmds.setAttr(cls.PORT_DICT['image_format'], image_format, type='string')
@@ -99,7 +99,7 @@ class AndRenderOption(object):
     @classmethod
     def get(cls):
         for i in [cls.AND_OPTIONS]:
-            obj = _ma_dcc_obj_obj.Node(i)
+            obj = _mya_dcc_obj_obj.Node(i)
             obj_ports_opt = mya_dcc_obj_abs.ObjPortsOpt(obj.path)
             port_names = obj_ports_opt.get_port_names()
             for port_name in port_names:

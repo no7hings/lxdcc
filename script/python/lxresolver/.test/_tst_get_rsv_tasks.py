@@ -12,7 +12,6 @@ if __name__ == '__main__':
         camera_abc_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-camera-abc-file')
         camera_abc_file_path = camera_abc_file_unit.get_result()
         if camera_abc_file_path is not None:
-            print i_rsv_task
             lis.append(i_rsv_task.properties.get('asset'))
 
     print lis

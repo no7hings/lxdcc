@@ -7,15 +7,13 @@ def set_lib_asset_push(option):
     import lxgui.fnc.methods as gui_fnc_methods
     #
     option_opt = bsc_core.KeywordArgumentsOpt(option)
-    project = option_opt.get('project')
-    assets = option_opt.get('assets', as_array=True)
     #
     user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
     time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
     #
     gui_fnc_methods.LibAssetPusher(
-        project=project,
-        assets=assets,
+        project=option_opt.get('project'),
+        assets=option_opt.get('assets', as_array=True),
         option=dict(
             with_system_create=option_opt.get('with_system_create') or False,
             with_system_permission_create=option_opt.get('with_system_permission_create') or False,

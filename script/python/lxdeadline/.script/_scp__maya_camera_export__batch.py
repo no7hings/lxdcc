@@ -32,18 +32,18 @@ for i_asset in assets:
     i_rsv_task = rsv_project.get_rsv_task(asset=i_asset, task='surfacing')
     i_katana_scene_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
     i_katana_scene_src_file_path = i_katana_scene_src_file_unit.get_result()
-    script_option = 'file={}&with_camera_abc=True&td_enable=True'.format(i_katana_scene_src_file_path)
+    script_option = 'file={}&with_camera_persp_abc=True&td_enable=True'.format(i_katana_scene_src_file_path)
     if i_katana_scene_src_file_path:
         i_rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=i_katana_scene_src_file_path)
         #
         i_maya_camera_export_query = ddl_objects.DdlRsvTaskQuery(
             'maya-camera-export', i_rsv_task_properties
         )
-        i_maya_camera_export = ddl_methods.DdlRsvTaskMethodRunner(
+        i_maya_camera_export = ddl_methods.RsvTaskHookExecutor(
             method_option=i_maya_camera_export_query.get_method_option(),
             script_option=i_maya_camera_export_query.get_script_option(
                 file=i_katana_scene_src_file_path,
-                with_camera_abc=True,
+                with_camera_persp_abc=True,
                 td_enable=True,
                 #
                 user=user, time_tag=time_tag,

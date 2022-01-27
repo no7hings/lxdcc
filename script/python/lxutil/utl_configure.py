@@ -172,12 +172,39 @@ class EnvironKey(object):
 
 
 class Jinja(object):
+    ROOT = MainData.get_directory('jinja')
+    #
+    MAIN = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(ROOT)
+    )
     USDA = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(MainData.get_directory('jinja/usda'))
+        loader=jinja2.FileSystemLoader('{}/usda'.format(ROOT))
     )
     XARC = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(MainData.get_directory('jinja/xarc'))
+        loader=jinja2.FileSystemLoader('{}/xarc'.format(ROOT))
     )
+    ARNOLD = jinja2.Environment(
+        loader=jinja2.FileSystemLoader('{}/arnold'.format(ROOT))
+    )
+    @classmethod
+    def get_template(cls, key):
+        return cls.MAIN.get_template(
+            '{}.j2'.format(key)
+        )
+    @classmethod
+    def get_configure(cls, key):
+        return bsc_objects.Configure(
+            value='{}/{}.yml'.format(cls.ROOT, key)
+        )
+
+
+class Hook(object):
+    HOST = 'localhost'
+    PORT = 9527
+
+
+class Session(object):
+    pass
 
 
 if __name__ == '__main__':

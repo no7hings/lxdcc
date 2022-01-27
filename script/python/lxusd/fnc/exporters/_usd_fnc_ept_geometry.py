@@ -224,7 +224,7 @@ class GeometryExporter(object):
         default_prim_path = self._output_stage.GetPrimAtPath(dag_path_comps[1])
         self._output_stage.SetDefaultPrim(default_prim_path)
 
-    def _set_transform_obj_opt_create_(self, obj_path, use_override=False):
+    def _set_transform_opt_create_(self, obj_path, use_override=False):
         if use_override is True:
             prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.TRANSFORM)
         else:
@@ -232,12 +232,22 @@ class GeometryExporter(object):
         obj_opt = usd_dcc_operators.TransformOpt(prim)
         return obj_opt
 
-    def _set_mesh_obj_opt_create_(self, obj_path, use_override=False):
+    def _set_mesh_opt_create_(self, obj_path, use_override=False):
         if use_override is True:
             prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.MESH)
         else:
             prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.MESH)
+        #
         obj_opt = usd_dcc_operators.MeshOpt(prim)
+        return obj_opt
+
+    def _set_curve_create_(self, obj_path, use_override=False):
+        if use_override is True:
+            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.CURVE)
+        else:
+            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.CURVE)
+        #
+        obj_opt = usd_dcc_operators.CurveOpt(prim)
         return obj_opt
 
     def _set_export_run_(self):

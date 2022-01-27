@@ -10,6 +10,6 @@ project-root-linux-dir: '/l/prod'
 # <asset-dcc>
 asset-maya-path: '|<asset-name>'
 #
-asset-geometry-dir: <asset-task-version-dir>/cache
+asset-geometry-dir: <asset-version-dir>/cache
 #
 asset-look-ass-dir: <asset-geometry-dir>/ass

@@ -8,9 +8,9 @@ from lxresolver.objects import _rsv_obj_stack
 from lxbasic.objects import _bsc_obj_raw
 
 
-class RsvVersion(rsv_abstract.AbsRsvVersion):
+class RsvVersionString(rsv_abstract.AbsRsvVersionString):
     def __init__(self, *args, **kwargs):
-        super(RsvVersion, self).__init__(*args, **kwargs)
+        super(RsvVersionString, self).__init__(*args, **kwargs)
 
 
 class RsvPattern(rsv_abstract.AbsRsvPattern):
@@ -23,15 +23,9 @@ class RsvMatcher(rsv_abstract.AbsRsvMatcher):
     #
     RSV_PATTERN_CLASS = RsvPattern
     #
-    RSV_VERSION_CLASS = RsvVersion
+    RSV_VERSION_CLASS = RsvVersionString
     def __init__(self, *args, **kwargs):
         super(RsvMatcher, self).__init__(*args, **kwargs)
-
-
-class RsvFile(rsv_abstract.AbsRsvFile):
-    PROPERTIES_CLASS = _bsc_obj_raw.Properties
-    def __init__(self, *args, **kwargs):
-        super(RsvFile, self).__init__(*args, **kwargs)
 
 
 class RsvUnit(rsv_abstract.AbsRsvUnit):
@@ -70,9 +64,16 @@ class RsvTask(rsv_abstract.AbsRsvTask):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
-    RSV_FILE_CLASS = RsvFile
     def __init__(self, *args, **kwargs):
         super(RsvTask, self).__init__(*args, **kwargs)
+
+
+class RsvVersion(rsv_abstract.AbsRsvVersion):
+    PATHSEP = '/'
+    #
+    PROPERTIES_CLASS = _bsc_obj_raw.Properties
+    def __init__(self, *args, **kwargs):
+        super(RsvVersion, self).__init__(*args, **kwargs)
 
 
 class RsvProject(rsv_abstract.AbsRsvProject):
@@ -89,8 +90,8 @@ class RsvProject(rsv_abstract.AbsRsvProject):
     RSV_ENTITY_CLASS = RsvEntity
     RSV_STEP_CLASS = RsvStep
     RSV_TASK_CLASS = RsvTask
+    RSV_VERSION_CLASS = RsvVersion
     #
-    RSV_FILE_CLASS = RsvUnit
     RSV_UNIT_CLASS = RsvUnit
     def __init__(self, *args, **kwargs):
         super(RsvProject, self).__init__(*args, **kwargs)

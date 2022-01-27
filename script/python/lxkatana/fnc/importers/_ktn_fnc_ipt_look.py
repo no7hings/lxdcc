@@ -31,7 +31,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         root_lstrip=None,
         material_root='/root/materials',
         frame=None,
-        auto_occlusion_assign=False
+        auto_occlusion_assign=False,
+        with_properties=True,
+        with_visibilities=True,
     )
     WORKSPACE = _ktn_fnc_bdr_utility.AssetWorkspaceBuilder()
     CONFIGURE = WORKSPACE.get_configure()
@@ -44,6 +46,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         self._dcc_importer_configure = bsc_objects.Configure(
             value=and_configure.Data.DCC_IMPORTER_CONFIGURE_PATH
         )
+        #
+        self._with_properties = self._option.get('with_properties') or False
+        self._with_visibilities = self._option.get('with_visibilities') or False
 
     def _set_obj_universe_create_(self):
         obj_scene = and_dcc_objects.Scene(
@@ -196,7 +201,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
                     self._set_tags_add_(shader_dcc_obj, i_and_shader.path)
                 else:
                     utl_core.Log.set_module_warning_trace(
-                        'material-shader-create',
+                        'shader create',
                         'obj="{}" is non-exists'.format(raw)
                     )
 
@@ -394,8 +399,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         #
         and_geometry_opt = and_dcc_operators.ShapeLookOpt(and_geometry)
         #
-        self._set_geometry_obj_property_ports_(and_geometry_opt, dcc_properties)
-        self._set_geometry_obj_visibility_ports_(and_geometry_opt, dcc_properties)
+        if self._with_properties is True:
+            self._set_geometry_obj_property_ports_(and_geometry_opt, dcc_properties)
+        if self._with_visibilities is True:
+            self._set_geometry_obj_visibility_ports_(and_geometry_opt, dcc_properties)
         #
         self._set_tags_add_(dcc_properties, and_geometry.path)
     @classmethod

@@ -66,3 +66,11 @@ class AbsMeshComparerDef(object):
         #
         content_0.set_element_add('points.uuid.{}'.format(points_uuid), dcc_obj_path)
         content_0.set('points.path.{}'.format(dcc_obj_path), points_uuid)
+
+
+class AbsCurveOptDef(object):
+    def _set_curve_opt_def_init_(self):
+        pass
+
+    def set_create(self, *args, **kwargs):
+        pass

@@ -8,7 +8,7 @@ method_query = ddl_objects.DdlMethodQuery(
     key='lib-assets-push', extend_option_kwargs=dict(configure='lib')
 )
 
-method = ddl_methods.DdlMethodRunner(
+method = ddl_methods.HookExecutor(
     method_option=method_query.get_method_option(),
     script_option=method_query.get_script_option(
         project='shl',

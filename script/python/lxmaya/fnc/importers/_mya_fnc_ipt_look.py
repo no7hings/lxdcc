@@ -118,7 +118,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
     OPTION = dict(
         look_pass='default',
         root_lstrip=None,
-        assign_selection=False
+        assign_selection=False,
+        #
+        with_material=True,
+        with_assign=True
     )
     def __init__(self, file_path, root=None, option=None):
         super(LookAssImporter, self).__init__(file_path, root, option)
@@ -167,15 +170,15 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         material_and_objs = material_and_type.get_objs()
         #
         method_args = [
-            (self._set_look_materials_create_, (material_and_objs, )),
-            (self._set_look_assigns_create_, (geometry_and_objs,))
+            (self._set_look_materials_create_, (material_and_objs, ), self._option['with_material']),
+            (self._set_look_assigns_create_, (geometry_and_objs,), self._option['with_assign'])
         ]
         if method_args:
             gp = utl_core.GuiProgressesRunner(maximum=len(method_args))
-            for method, args in method_args:
+            for i_method, i_args, i_enable in method_args:
                 gp.set_update()
-                #
-                method(*args)
+                if i_enable is True:
+                    i_method(*i_args)
             #
             gp.set_stop()
     @classmethod
@@ -345,14 +348,14 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
             #
             if source_dcc_obj.get_is_exists() is False:
                 utl_core.Log.set_module_warning_trace(
-                    'connection-create',
+                    'connection create',
                     'obj="{}" is non-exists'.format(source_and_obj.path)
                 )
                 continue
 
             if target_dcc_obj.get_is_exists() is False:
                 utl_core.Log.set_module_warning_trace(
-                    'connection-create',
+                    'connection create',
                     'obj="{}" is non-exists'.format(target_and_obj.path)
                 )
                 continue
@@ -365,21 +368,22 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
             )
             if source_dcc_port.get_is_exists() is False:
                 utl_core.Log.set_module_warning_trace(
-                    'connection-create', 'atr-src-path:"{}" is non-exists'.format(source_dcc_port.path)
+                    'connection create', 'atr-src-path:"{}" is non-exists'.format(source_dcc_port.path)
                 )
                 continue
 
             if target_dcc_port.get_is_exists() is False:
                 utl_core.Log.set_module_warning_trace(
-                    'connection-create', 'atr-tgt-path:"{}" is non-exists'.format(target_dcc_port.path)
+                    'connection create', 'atr-tgt-path:"{}" is non-exists'.format(target_dcc_port.path)
                 )
                 continue
 
             source_dcc_port.set_target(target_dcc_port, validation=True)
 
     def _set_shader_obj_create_(self, and_obj):
-        and_type = and_obj.type.name
-        dcc_type = self._dcc_importer_configure.get('shaders.to-maya.{}'.format(and_type))
+        and_obj_type_name = and_obj.type.name
+        all_and_obj_types = mya_dcc_objects.AndShader.CATEGORY_DICT.keys()
+        dcc_type = self._dcc_importer_configure.get('shaders.to-maya.{}'.format(and_obj_type_name))
         if dcc_type is not None:
             and_obj_name = and_obj.name
             dcc_obj_name = and_obj_name
@@ -388,16 +392,30 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
                 dcc_obj.set_create(dcc_type)
                 ma_core.CmdObjOpt(dcc_obj.path).set_customize_attributes_create(
                     dict(
-                        arnold_name=and_obj.name
+                        arnold_name=and_obj.get_port('name').get()
                     )
                 )
                 return dcc_obj, True
             return dcc_obj, False
         else:
-            utl_core.Log.set_module_warning_trace(
-                'shader-obj-create',
-                'obj-type="{}" is not available'.format(and_type)
-            )
+            if and_obj_type_name in all_and_obj_types:
+                and_obj_name = and_obj.name
+                dcc_obj_name = and_obj_name
+                dcc_obj = mya_dcc_objects.AndShader(dcc_obj_name)
+                if dcc_obj.get_is_exists() is False:
+                    dcc_obj.set_create(and_obj_type_name)
+                    ma_core.CmdObjOpt(dcc_obj.path).set_customize_attributes_create(
+                        dict(
+                            arnold_name=and_obj.get_port('name').get()
+                        )
+                    )
+                    return dcc_obj, True
+                return dcc_obj, False
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'shader create',
+                    'obj-type="{}" is not available'.format(and_obj_type_name)
+                )
     #
     def _set_shader_obj_ports_(self, and_obj, dcc_obj):
         and_obj_type_name = and_obj.type.name

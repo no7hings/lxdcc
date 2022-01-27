@@ -11,6 +11,8 @@ import getpass
 
 import time
 
+import datetime
+
 import platform
 
 import re
@@ -39,7 +41,11 @@ import glob
 
 import threading
 
+import socket
+
 from lxbasic import bsc_configure
+
+import shutil
 
 THREAD_MAXIMUM = threading.Semaphore(1024)
 
@@ -146,11 +152,20 @@ class ApplicationMtd(object):
             if i_fnc() is True:
                 return i_app
         return bsc_configure.Application.Python
+    @classmethod
+    def test(cls):
+        subprocess.check_output(
+            ['', '-v'], shell=True
+        ).strip()
 
 
 class SystemMtd(object):
     TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
-    TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S'
+    TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S_%f'
+    DATA_TAG_FORMAT = u'%Y_%m%d'
+    @classmethod
+    def get_host(cls):
+        return socket.gethostname()
     @classmethod
     def get_user_name(cls):
         return getpass.getuser()
@@ -177,10 +192,22 @@ class SystemMtd(object):
             time.localtime(timestamp)
         )
     @classmethod
+    def get_minute(cls):
+        return time.localtime().tm_min
+    @classmethod
+    def get_second(cls):
+        return time.localtime().tm_sec
+    @classmethod
     def get_time_tag(cls):
+        return datetime.datetime.now().strftime(cls.TIME_TAG_FORMAT)
+    @classmethod
+    def get_batch_tag(cls):
+        pass
+    @classmethod
+    def get_date_tag(cls):
         timestamp = time.time()
         return time.strftime(
-            cls.TIME_TAG_FORMAT,
+            cls.DATA_TAG_FORMAT,
             time.localtime(timestamp)
         )
     @classmethod
@@ -201,10 +228,16 @@ class SystemMtd(object):
             subprocess.Popen(cmd, shell=True)
     @classmethod
     def get_user_directory_path(cls):
-        return os.environ.get('HOME')
+        if cls.get_is_windows():
+            return os.environ.get('HOMEPATH')
+        elif cls.get_is_linux():
+            return os.environ.get('HOME')
+        else:
+            raise SystemError()
+    #
     @classmethod
     def get_temporary_directory_path(cls, create=False):
-        date_tag = time.strftime('%Y_%m%d', time.localtime(time.time()))
+        date_tag = cls.get_date_tag()
         if cls.get_is_windows():
             _ = '{}/temporary/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
         elif cls.get_is_linux():
@@ -215,9 +248,24 @@ class SystemMtd(object):
             StoragePathMtd.set_directory_create(_)
         return _
     @classmethod
+    def get_debug_directory_path(cls, tag=None, create=False):
+        date_tag = cls.get_date_tag()
+        if cls.get_is_windows():
+            _ = '{}/debug/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
+        elif cls.get_is_linux():
+            _ = '{}/debug/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)
+        else:
+            raise SystemError()
+        if tag is not None:
+            _ = '{}/{}'.format(_, tag)
+        if create:
+            StoragePathMtd.set_directory_create(_)
+        return _
+    @classmethod
     def get_temporary_file_path(cls, ext):
         directory_path = cls.get_temporary_directory_path()
         return '{}/{}{}'.format(directory_path, UuidMtd.get_new(), ext)
+    #
     @classmethod
     def get_system_includes(cls, system_keys):
         lis = []
@@ -238,6 +286,39 @@ class SystemMtd(object):
     @classmethod
     def get_is_matched(cls, system_keys):
         return cls.get_current() in cls.get_system_includes(system_keys)
+    #
+    @classmethod
+    def get_user_session_directory_path(cls, create=False):
+        date_tag = cls.get_date_tag()
+        if cls.get_is_windows():
+            _ = '{}/.session/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
+        elif cls.get_is_linux():
+            _ = '{}/.session/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)
+        else:
+            raise SystemError()
+        if create:
+            StoragePathMtd.set_directory_create(_)
+        return _
+    @classmethod
+    def get_user_session_file_path(cls, unique_id=None):
+        directory_path = cls.get_user_session_directory_path()
+        if unique_id is None:
+            unique_id = UuidMtd.get_new()
+        return '{}/{}.yml'.format(directory_path, unique_id)
+    #
+    GAIN_DICT = {
+        'user': get_user_name,
+        'time_tag': get_time_tag
+    }
+    #
+    @classmethod
+    def get(cls, key):
+        dic = {
+            'user': cls.get_user_name,
+            'time_tag': cls.get_time_tag
+        }
+        if key in dic:
+            return dic[key]()
 
 
 class StoragePathMtd(object):
@@ -325,6 +406,9 @@ class StoragePathMtd(object):
         #
         _ = path_.split(cls.PATHSEP)
         new_path = cls.PATHSEP.join([i for i in _ if i])
+        # etc: '/data/f/'
+        if path_.endswith(cls.PATHSEP):
+            new_path += '/'
         if path_.startswith(cls.PATHSEP):
             return cls.PATHSEP + new_path
         return new_path
@@ -373,6 +457,30 @@ class StoragePathMtd(object):
     @classmethod
     def get_relpath(cls, src_path, tgt_path):
         return os.path.relpath(src_path, tgt_path)
+    @classmethod
+    def get_path_is_exists(cls, path):
+        return os.path.exists(path)
+
+
+class StorageLinkMtd(object):
+    @classmethod
+    def set_link_to(cls, src_path, tgt_path):
+        if os.path.exists(tgt_path) is False:
+            tgt_dir_path = os.path.dirname(tgt_path)
+            src_rel_path = os.path.relpath(src_path, tgt_dir_path)
+            os.symlink(src_rel_path, tgt_path)
+    @classmethod
+    def get_is_link_source_to(cls, src_path, tgt_path):
+        tgt_dir_path = os.path.dirname(tgt_path)
+        src_rel_path = os.path.relpath(src_path, tgt_dir_path)
+        if os.path.islink(tgt_path):
+            orig_src_rel_path = os.readlink(tgt_path)
+            return src_rel_path == orig_src_rel_path
+        return False
+    @classmethod
+    def get_rel_path(cls, src_path, tgt_path):
+        tgt_dir_path = os.path.dirname(tgt_path)
+        return os.path.relpath(src_path, tgt_dir_path)
 
 
 class StoragePathOpt(object):
@@ -541,20 +649,56 @@ class MultiplyFileNameMtd(object):
 class DirectoryMtd(object):
     @classmethod
     def get_all_file_paths(cls, directory_path):
-        def rcs_fnc_(path_):
+        def rcs_glob_fnc_(path_):
             _results = glob.glob(u'{}/*'.format(path_)) or []
             _results.sort()
-            for _path in _results:
-                if os.path.isfile(_path):
-                    lis.append(_path)
-                elif os.path.isdir(_path):
-                    rcs_fnc_(_path)
+            for _i_path in _results:
+                if os.path.isfile(_i_path):
+                    lis.append(_i_path)
+                elif os.path.isdir(_i_path):
+                    rcs_glob_fnc_(_i_path)
+        #
+        def rcs_os_fnc_(path_):
+            _results = os.listdir(path_) or []
+            _results.sort()
+            for _i_name in _results:
+                _i_path = '{}/{}'.format(path_, _i_name)
+                if os.path.isfile(_i_path):
+                    lis.append(_i_path)
+                elif os.path.isdir(_i_path):
+                    rcs_os_fnc_(_i_path)
+
         lis = []
-        rcs_fnc_(directory_path)
+        rcs_os_fnc_(directory_path)
         return lis
     @classmethod
     def get_file_relative_path(cls, directory_path, file_path):
         return os.path.relpath(file_path, directory_path)
+    @classmethod
+    def set_copy_to(cls, src_directory_path, tgt_directory_path):
+        def copy_fnc_(src_file_path_, tgt_file_path_):
+            shutil.copy2(src_file_path_, tgt_file_path_)
+        #
+        src_directory_path = src_directory_path
+        file_paths = cls.get_all_file_paths(src_directory_path)
+        #
+        threads = []
+        for i_src_file_path in file_paths:
+            i_local_file_path = i_src_file_path[len(src_directory_path):]
+            #
+            i_tgt_file_path = tgt_directory_path + i_local_file_path
+            if os.path.exists(i_tgt_file_path) is False:
+                i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
+                if os.path.exists(i_tgt_dir_path) is False:
+                    os.makedirs(i_tgt_dir_path)
+                #
+                i_thread = PyThread(
+                    copy_fnc_, i_src_file_path, i_tgt_file_path
+                )
+                threads.append(i_thread)
+                i_thread.start()
+        #
+        [i.join() for i in threads]
 
 
 class MultiplyDirectoryMtd(object):
@@ -586,13 +730,15 @@ class EnvironMtd(object):
     TD_ENABLE_KEY = 'LYNXI_TD_ENABLE'
     DATA_PATH_KEY = 'LYNXI_DATA_PATH'
     #
-    TEMPORARY_PATH_KEY = 'LYNXI_CACHE_PATH'
+    TEMPORARY_ROOT_KEY = 'LYNXI_TEMPORARY_ROOT'
+    TEMPORARY_ROOT_DEFAULT = '/l/resource/temporary/.lynxi'
     #
-    ACTION_PATH_KEY = ''
-    #
-    TEMPORARY_PATH_VALUE = '/l/resource/temporary/.lynxi'
     DATABASE_PATH_KEY = 'LYNXI_DATABASE_PATH'
-    DATABASE_PATH_VALUE = '/l/resource/database/.lynxi'
+    DATABASE_PATH_DEFAULT = '/l/resource/database/.lynxi'
+    #
+    SESSION_ROOT_KEY = 'LYNXI_SESSION_ROOT'
+    SESSION_ROOT_DEFAULT = '/l/resource/temporary/.lynxi'
+    #
     TRUE = 'true'
     FALSE = 'false'
     @classmethod
@@ -608,20 +754,26 @@ class EnvironMtd(object):
         else:
             cls.set(cls.TD_ENABLE_KEY, cls.FALSE)
     @classmethod
-    def get_temporary_path(cls):
-        _ = cls.get(cls.TEMPORARY_PATH_KEY)
+    def get_temporary_root(cls):
+        _ = cls.get(cls.TEMPORARY_ROOT_KEY)
         if _ is not None:
             return StoragePathMtd.set_map_to_platform(_)
-        return StoragePathMtd.set_map_to_platform(cls.TEMPORARY_PATH_VALUE)
+        return StoragePathMtd.set_map_to_platform(cls.TEMPORARY_ROOT_DEFAULT)
     @classmethod
     def set_temporary_path(cls, path):
-        cls.set(cls.TEMPORARY_PATH_KEY, path)
+        cls.set(cls.TEMPORARY_ROOT_KEY, path)
+    @classmethod
+    def get_session_root(cls):
+        _ = cls.get(cls.SESSION_ROOT_KEY)
+        if _ is not None:
+            return StoragePathMtd.set_map_to_platform(_)
+        return StoragePathMtd.set_map_to_platform(cls.SESSION_ROOT_DEFAULT)
     @classmethod
     def get_database_path(cls):
         _ = cls.get(cls.DATABASE_PATH_KEY)
         if _ is not None:
             return StoragePathMtd.set_map_to_platform(_)
-        return StoragePathMtd.set_map_to_platform(cls.DATABASE_PATH_VALUE)
+        return StoragePathMtd.set_map_to_platform(cls.DATABASE_PATH_DEFAULT)
     @classmethod
     def get_data_paths(cls):
         pass
@@ -762,7 +914,7 @@ class TemporaryThumbnailMtd(object):
         return UuidMtd.get_by_file_path(file_path)
     @classmethod
     def get_file_path(cls, file_path, ext='.jpg'):
-        directory_path = EnvironMtd.get_temporary_path()
+        directory_path = EnvironMtd.get_temporary_root()
         key = cls.get_key(file_path)
         region = UuidMtd.get_save_region(key)
         return '{}/.thumbnail/{}/{}{}'.format(
@@ -776,11 +928,27 @@ class TemporaryYamlMtd(object):
         return UuidMtd.get_by_file_path(file_path)
     @classmethod
     def get_file_path(cls, file_path, tag):
-        directory_path = EnvironMtd.get_temporary_path()
+        directory_path = EnvironMtd.get_temporary_root()
         key = cls.get_key(file_path)
         region = UuidMtd.get_save_region(key)
         return '{}/.yml/{}/{}/{}{}'.format(
             directory_path, tag, region, key, '.yml'
+        )
+
+
+class SessionYamlMtd(object):
+    @classmethod
+    def get_key(cls, **kwargs):
+        return UuidMtd.get_by_string(
+            KeywordArgumentsMtd.to_string(**kwargs)
+        )
+    @classmethod
+    def get_file_path(cls, **kwargs):
+        directory_path = EnvironMtd.get_session_root()
+        key = cls.get_key(**kwargs)
+        region = UuidMtd.get_save_region(key)
+        return '{}/.session/option-hook/{}/{}{}'.format(
+            directory_path, region, key, '.yml'
         )
 
 
@@ -795,29 +963,74 @@ class SubProcessMtd(object):
     def __init__(self):
         pass
     @classmethod
-    def set_run_with_result(cls, cmd):
+    def set_run_with_result_in_windows(cls, cmd):
+        cmd = cmd.replace("&", "^&")
+        #
         sp = subprocess.Popen(
             cmd,
             shell=True,
+            # close_fds=True,
             universal_newlines=True,
             stdout=subprocess.PIPE,
-            # stderr=subprocess.STDOUT,
-            startupinfo=cls.NO_WINDOW,
+            stderr=subprocess.STDOUT,
+            startupinfo=cls.NO_WINDOW
         )
         while True:
             next_line = sp.stdout.readline()
-            return_line = next_line.decode("utf-8", "ignore")
+            #
+            return_line = next_line
             if return_line == '' and sp.poll() is not None:
                 break
             #
+            return_line = return_line.decode('gbk', 'ignore')
             print(return_line.rstrip())
         #
         return_code = sp.wait()
         if return_code:
-            raise subprocess.CalledProcessError(return_code, sp)
+            ExceptionMtd.set_stack_print()
+            #
+            raise subprocess.CalledProcessError(
+                return_code, sp
+            )
         #
-        # print(Log.get_trace(sp.stdout.read()))
         sp.stdout.close()
+    @classmethod
+    def set_run_with_result_in_linux(cls, cmd):
+        sp = subprocess.Popen(
+            cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=cls.NO_WINDOW
+        )
+        while True:
+            next_line = sp.stdout.readline()
+            #
+            return_line = next_line
+            if return_line == '' and sp.poll() is not None:
+                break
+            #
+            return_line = return_line.decode('utf-8', 'ignore')
+            return_line = return_line.replace(u'\u2018', "'").replace(u'\u2019', "'")
+            print(return_line.rstrip())
+        #
+        return_code = sp.wait()
+        if return_code:
+            ExceptionMtd.set_stack_print()
+            #
+            raise subprocess.CalledProcessError(
+                return_code, sp
+            )
+        #
+        sp.stdout.close()
+    @classmethod
+    def set_run_with_result(cls, cmd):
+        if SystemMtd.get_is_windows():
+            cls.set_run_with_result_in_windows(cmd)
+        elif SystemMtd.get_is_linux():
+            cls.set_run_with_result_in_linux(cmd)
     @classmethod
     def set_run(cls, cmd):
         _sp = subprocess.Popen(
@@ -825,7 +1038,7 @@ class SubProcessMtd(object):
             shell=True,
             universal_newlines=True,
             stdout=subprocess.PIPE,
-            # stderr=subprocess.STDOUT,
+            stderr=subprocess.STDOUT,
             startupinfo=cls.NO_WINDOW,
         )
         return _sp
@@ -834,6 +1047,22 @@ class SubProcessMtd(object):
 class MultiProcessMtd(object):
     def set_run(self, cmd):
         pass
+
+
+class KeywordArgumentsMtd(object):
+    ARGUMENT_SEP = '&'
+    @classmethod
+    def to_string(cls, **kwargs):
+        vars_ = []
+        keys = kwargs.keys()
+        keys.sort()
+        for k in keys:
+            v = kwargs[k]
+            if isinstance(v, (tuple, list)):
+                vars_.append('{}={}'.format(k, '+'.join(v)))
+            else:
+                vars_.append('{}={}'.format(k, v))
+        return cls.ARGUMENT_SEP.join(vars_)
 
 
 class KeywordArgumentsOpt(object):
@@ -851,7 +1080,12 @@ class KeywordArgumentsOpt(object):
             dic.update(option)
         else:
             raise TypeError()
+        #
         self._option_dict = dic
+        #
+        self._string_dict = {
+            'key': self.to_string()
+        }
     @classmethod
     def _set_update_by_string_(cls, dic, option_string):
         ks = [i.lstrip().rstrip() for i in option_string.split(cls.ARGUMENT_SEP)]
@@ -864,7 +1098,9 @@ class KeywordArgumentsOpt(object):
     @classmethod
     def _set_value_convert_by_string_(cls, value_string):
         if isinstance(value_string, (str, unicode)):
-            if value_string in ['True', 'False']:
+            if value_string in ['None']:
+                return None
+            elif value_string in ['True', 'False']:
                 return eval(value_string)
             elif value_string in ['()', '[]', '{}']:
                 return eval(value_string)
@@ -872,9 +1108,10 @@ class KeywordArgumentsOpt(object):
                 return value_string.split('+')
             else:
                 return value_string
-    @property
-    def value(self):
+
+    def get_value(self):
         return self._option_dict
+    value = property(get_value)
 
     def get(self, key, as_array=False):
         if key in self._option_dict:
@@ -885,29 +1122,47 @@ class KeywordArgumentsOpt(object):
                 return [_]
             return self._option_dict[key]
 
+    def pop(self, key):
+        if key in self._option_dict:
+            return self._option_dict.pop(
+                key
+            )
+
     def get_as(self, key, type_):
         pass
 
     def set(self, key, value):
         self._option_dict[key] = value
 
+    def set_update(self, dic, override=True):
+        if override is False:
+            [dic.pop(k) for k in dic if k in self._option_dict]
+        #
+        self._option_dict.update(dic)
+
+    def set_update_by_string(self, option):
+        self._option_dict.update(
+            self.__class__(option).get_value()
+        )
+
     def get_key_is_exists(self, key):
         return key in self._option_dict
 
     def to_option(self):
-        return self._to_string_(**self._option_dict)
-    @classmethod
-    def _to_string_(cls, **kwargs):
-        vars_ = []
-        for k, v in kwargs.items():
-            if isinstance(v, (tuple, list)):
-                vars_.append('{}={}'.format(k, '+'.join(v)))
-            else:
-                vars_.append('{}={}'.format(k, v))
-        return cls.ARGUMENT_SEP.join(vars_)
+        return self.to_string()
 
-    # def __str__(self):
-    #     return json.loads()
+    def to_string(self):
+        return KeywordArgumentsMtd.to_string(
+            **self._option_dict
+        )
+
+    def __str__(self):
+        return json.dumps(
+            self._option_dict,
+            indent=4,
+            skipkeys=True,
+            sort_keys=True
+        )
 
 
 class ScriptArgumentsOpt(object):
@@ -1016,6 +1271,11 @@ class StorageFileOpt(StoragePathOpt):
                 with open(self.path) as y:
                     raw = _OrderedYaml.set_load(y)
                     y.close()
+                    return raw
+            else:
+                with open(self.path) as f:
+                    raw = f.read()
+                    f.close()
                     return raw
 
     def get_modify_timestamp(self):
@@ -1506,6 +1766,37 @@ class AtrPathOpt(object):
         return self._obj_path, self._port_path
 
 
+class TextsMtd(object):
+    @classmethod
+    def set_sort_to(cls, texts):
+        _ = texts
+        _.sort(key=lambda x: TextMtd.to_number_embedded_args(x))
+        return _
+
+
+class ParsePatternMtd(object):
+    RE_PATTERN = r'[{](.*?)[}]'
+    @classmethod
+    def get_keys(cls, pattern):
+        lis_0 = re.findall(re.compile(cls.RE_PATTERN, re.S), pattern)
+        lis_1 = list(set(lis_0))
+        lis_1.sort(key=lis_0.index)
+        return lis_1
+    @classmethod
+    def set_update(cls, pattern, **kwargs):
+        if pattern is not None:
+            keys = cls.get_keys(pattern)
+            s = pattern
+            if keys:
+                for i_key in keys:
+                    if i_key in kwargs:
+                        v = kwargs[i_key]
+                        if v is not None and v != '*':
+                            s = s.replace('{{{}}}'.format(i_key), kwargs[i_key])
+            return s
+        return pattern
+
+
 class TextsOpt(object):
     def __init__(self, raw):
         self._raw = raw
@@ -1587,6 +1878,9 @@ class ColorMtd(object):
     @classmethod
     def get_complementary_rgb(cls, r, g, b):
         return (255-r) % 255, (255-g) % 255, (255-b) % 255
+    @classmethod
+    def set_rgb_offset(cls, rgb, hsv_offset):
+        r, g, b = rgb
 
 
 class ColorSpaceMtd(object):
@@ -1710,6 +2004,131 @@ class ValueMtd(object):
 
 
 class VedioOpt(object):
+    """
+ffmpeg version 3.4.7 Copyright (c) 2000-2019 the FFmpeg developers
+  built with gcc 4.8.5 (GCC) 20150623 (Red Hat 4.8.5-39)
+  configuration: --prefix=/usr --bindir=/usr/bin --datadir=/usr/share/ffmpeg --docdir=/usr/share/doc/ffmpeg --incdir=/usr/include/ffmpeg --libdir=/usr/lib64 --mandir=/usr/share/man --arch=x86_64 --optflags='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic' --extra-ldflags='-Wl,-z,relro ' --extra-cflags=' ' --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-version3 --enable-bzlib --disable-crystalhd --enable-fontconfig --enable-gcrypt --enable-gnutls --enable-ladspa --enable-libass --enable-libbluray --enable-libcdio --enable-libdrm --enable-indev=jack --enable-libfreetype --enable-libfribidi --enable-libgsm --enable-libmp3lame --enable-nvenc --enable-openal --enable-opencl --enable-opengl --enable-libopenjpeg --enable-libopus --disable-encoder=libopus --enable-libpulse --enable-librsvg --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libv4l2 --enable-libvidstab --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi --enable-avfilter --enable-avresample --enable-postproc --enable-pthreads --disable-static --enable-shared --enable-gpl --disable-debug --disable-stripping --shlibdir=/usr/lib64 --enable-libmfx --enable-runtime-cpudetect
+  libavutil      55. 78.100 / 55. 78.100
+  libavcodec     57.107.100 / 57.107.100
+  libavformat    57. 83.100 / 57. 83.100
+  libavdevice    57. 10.100 / 57. 10.100
+  libavfilter     6.107.100 /  6.107.100
+  libavresample   3.  7.  0 /  3.  7.  0
+  libswscale      4.  8.100 /  4.  8.100
+  libswresample   2.  9.100 /  2.  9.100
+  libpostproc    54.  7.100 / 54.  7.100
+Hyper fast Audio and Video encoder
+usage: ffmpeg [options] [[infile options] -i infile]... {[outfile options] outfile}...
+
+Getting help:
+    -h      -- print basic options
+    -h long -- print more options
+    -h full -- print all options (including all format and codec specific options, very long)
+    -h type=name -- print all options for the named decoder/encoder/demuxer/muxer/filter
+    See man ffmpeg for detailed description of the options.
+
+Print help / information / capabilities:
+-L                  show license
+-h topic            show help
+-? topic            show help
+-help topic         show help
+--help topic        show help
+-version            show version
+-buildconf          show build configuration
+-formats            show available formats
+-muxers             show available muxers
+-demuxers           show available demuxers
+-devices            show available devices
+-codecs             show available codecs
+-decoders           show available decoders
+-encoders           show available encoders
+-bsfs               show available bit stream filters
+-protocols          show available protocols
+-filters            show available filters
+-pix_fmts           show available pixel formats
+-layouts            show standard channel layouts
+-sample_fmts        show available audio sample formats
+-colors             show available color names
+-opencl_bench       run benchmark on all OpenCL devices and show results
+-sources device     list sources of the input device
+-sinks device       list sinks of the output device
+-hwaccels           show available HW acceleration methods
+
+Global options (affect whole program instead of just one file:
+-loglevel loglevel  set logging level
+-v loglevel         set logging level
+-report             generate a report
+-max_alloc bytes    set maximum size of a single allocated block
+-opencl_options     set OpenCL environment options
+-y                  overwrite output files
+-n                  never overwrite output files
+-ignore_unknown     Ignore unknown stream types
+-filter_threads     number of non-complex filter threads
+-filter_complex_threads  number of threads for -filter_complex
+-stats              print progress report during encoding
+-max_error_rate ratio of errors (0.0: no errors, 1.0: 100% error  maximum error rate
+-bits_per_raw_sample number  set the number of bits per raw sample
+-vol volume         change audio volume (256=normal)
+
+Per-file main options:
+-f fmt              force format
+-c codec            codec name
+-codec codec        codec name
+-pre preset         preset name
+-map_metadata outfile[,metadata]:infile[,metadata]  set metadata information of outfile from infile
+-t duration         record or transcode "duration" seconds of audio/video
+-to time_stop       record or transcode stop time
+-fs limit_size      set the limit file size in bytes
+-ss time_off        set the start time offset
+-sseof time_off     set the start time offset relative to EOF
+-seek_timestamp     enable/disable seeking by timestamp with -ss
+-timestamp time     set the recording timestamp ('now' to set the current time)
+-metadata string=string  add metadata
+-program title=string:st=number...  add program with specified streams
+-target type        specify target file type ("vcd", "svcd", "dvd", "dv" or "dv50" with optional prefixes "pal-", "ntsc-" or "film-")
+-apad               audio pad
+-frames number      set the number of frames to output
+-filter filter_graph  set stream filtergraph
+-filter_script filename  read stream filtergraph description from a file
+-reinit_filter      reinit filtergraph on input parameter changes
+-discard            discard
+-disposition        disposition
+
+Video options:
+-vframes number     set the number of video frames to output
+-r rate             set frame rate (Hz value, fraction or abbreviation)
+-s size             set frame size (WxH or abbreviation)
+-aspect aspect      set aspect ratio (4:3, 16:9 or 1.3333, 1.7777)
+-bits_per_raw_sample number  set the number of bits per raw sample
+-vn                 disable video
+-vcodec codec       force video codec ('copy' to copy stream)
+-timecode hh:mm:ss[:;.]ff  set initial TimeCode value.
+-pass n             select the pass number (1 to 3)
+-vf filter_graph    set video filters
+-ab bitrate         audio bitrate (please use -b:a)
+-b bitrate          video bitrate (please use -b:v)
+-dn                 disable data
+
+Audio options:
+-aframes number     set the number of audio frames to output
+-aq quality         set audio quality (codec-specific)
+-ar rate            set audio sampling rate (in Hz)
+-ac channels        set number of audio channels
+-an                 disable audio
+-acodec codec       force audio codec ('copy' to copy stream)
+-vol volume         change audio volume (256=normal)
+-af filter_graph    set audio filters
+
+Subtitle options:
+-s size             set frame size (WxH or abbreviation)
+-sn                 disable subtitle
+-scodec codec       force subtitle codec ('copy' to copy stream)
+-stag fourcc/tag    force subtitle tag/fourcc
+-fix_sub_duration   fix subtitles duration
+-canvas_size size   set canvas size (WxH or abbreviation)
+-spre preset        set the subtitle options to the indicated preset
+
+    """
     def __init__(self, file_path):
         self._file_path = file_path
     @property
@@ -1758,7 +2177,7 @@ class VedioOpt(object):
                     u'-i "{}"'.format(self.path),
                     '-vf scale={}:-1'.format(width),
                     '-vframes 1',
-                    '-y',
+                    '-n',
                     '"{}"'.format(thumbnail_file_path)
                 ]
                 return thumbnail_file_path, ' '.join(cmd_args)
@@ -1766,6 +2185,28 @@ class VedioOpt(object):
 
     def set_convert_to(self):
         pass
+
+    def set_mov_create_from(self, image_file_path, width=1024, fps=24, block=False):
+        if StoragePathOpt(self.path).get_is_exists() is False:
+            cmd_args = [
+                Bin.get_ffmpeg(),
+                '-i "{}"'.format(image_file_path),
+                '-r {}'.format(fps),
+                '-f mov',
+                '-vf scale={}:-1'.format(width),
+                '-vcodec h264',
+                '-n',
+                '"{}"'.format(self.path)
+            ]
+            cmd = ' '.join(cmd_args)
+            if block is True:
+                SubProcessMtd.set_run_with_result(
+                    cmd
+                )
+            else:
+                SubProcessMtd.set_run(
+                    cmd
+                )
 
 
 class Bin(object):
@@ -1775,6 +2216,18 @@ class Bin(object):
             return '{}/windows/oiiotool.exe'.format(bsc_configure.Root.BIN)
         elif SystemMtd.get_is_linux():
             return '{}/linux/oiiotool'.format(bsc_configure.Root.BIN)
+    @classmethod
+    def get_oslinfo(cls):
+        if SystemMtd.get_is_windows():
+            return '{}/windows/oslinfo.exe'.format(bsc_configure.Root.BIN)
+        elif SystemMtd.get_is_linux():
+            return '{}/linux/oslinfo'.format(bsc_configure.Root.BIN)
+    @classmethod
+    def get_oslc(cls):
+        if SystemMtd.get_is_windows():
+            return '{}/windows/oslc.exe'.format(bsc_configure.Root.BIN)
+        elif SystemMtd.get_is_linux():
+            return '{}/linux/oslc'.format(bsc_configure.Root.BIN)
     @classmethod
     def get_ffmpeg(cls):
         if SystemMtd.get_is_windows():
@@ -2116,6 +2569,83 @@ class OiioTextureOpt(OiioImageOpt):
             return bsc_configure.ColorSpace.LINEAR
 
 
+class OslShaderMtd(object):
+    OBJ_PATTERN = 'shader "{name}"\n'
+    PORT_PATTERN = '    "{name}" "{type}"\n'
+    DEFAULT_VALUE_PATTERN = '		Default value: {value}\n'
+    METADATA_PATTERN = '		metadata: {type} {name} = {value}\n'
+    @classmethod
+    def set_compile(cls, file_path):
+        file_opt = StorageFileOpt(file_path)
+        compile_file_path = '{}.oso'.format(file_opt.path_base)
+        #
+        cmd_args = [
+            Bin.get_oslc(),
+            '-o "{}" "{}"'.format(compile_file_path, file_opt.path),
+        ]
+        SubProcessMtd.set_run_with_result(' '.join(cmd_args))
+    @classmethod
+    def get_info(cls, file_path):
+        dic = collections.OrderedDict()
+        #
+        file_opt = StorageFileOpt(file_path)
+        compile_file_path = '{}.oso'.format(file_opt.path_base)
+        #
+        cmd_args = [
+            Bin.get_oslinfo(),
+            '-v "{}"'.format(compile_file_path),
+        ]
+        p = SubProcessMtd.set_run(' '.join(cmd_args))
+        _ = p.stdout.readlines()
+        if _:
+            p = parse.parse(cls.OBJ_PATTERN, _[0])
+            if p:
+                dic.update(p.named)
+            #
+            ports_dict = collections.OrderedDict()
+            dic['ports'] = ports_dict
+            #
+            i_port_dict = collections.OrderedDict()
+            for i in _[1:]:
+                i_p_0 = parse.parse(cls.PORT_PATTERN, i)
+                if i_p_0:
+                    i_port_dict = collections.OrderedDict()
+                    i_name_0 = i_p_0.named['name']
+                    i_type_0 = i_p_0.named['type']
+                    i_assign_0 = 'input'
+                    if i_type_0.startswith('output'):
+                        i_type_0 = i_type_0.split(' ')[-1]
+                        i_assign_0 = 'output'
+                    #
+                    i_port_dict['type'] = i_type_0
+                    i_port_dict['assign'] = i_assign_0
+                    i_port_dict['metadata'] = collections.OrderedDict()
+                    ports_dict[i_name_0] = i_port_dict
+                else:
+                    i_p_1 = parse.parse(cls.DEFAULT_VALUE_PATTERN, i)
+                    if i_p_1:
+                        i_type = i_port_dict['type']
+                        i_value_1 = i_p_1.named['value']
+                        if i_type in ['int', 'float', 'string']:
+                            i_value_1 = eval(i_value_1)
+                        #
+                        i_port_dict['value'] = i_value_1
+                    else:
+                        i_p_2 = parse.parse(cls.METADATA_PATTERN, i)
+                        i_name_2 = i_p_2.named['name']
+                        i_type_2 = i_p_2.named['type']
+                        i_value_2 = i_p_2.named['value']
+                        #
+                        i_metadata_dict = collections.OrderedDict()
+                        i_metadata_dict['type'] = i_type_2
+                        if i_type_2 in ['int', 'float', 'string']:
+                            i_value_2 = eval(i_value_2)
+                        #
+                        i_metadata_dict['value'] = i_value_2
+                        i_port_dict['metadata'][i_name_2] = i_metadata_dict
+        return dic
+
+
 class ImageOpt(object):
     def __init__(self, file_path):
         self._file_path = file_path
@@ -2358,10 +2888,23 @@ class ExceptionMtd(object):
     @classmethod
     def set_print(cls):
         import traceback
+        #
         traceback.print_exc()
     @classmethod
     def set_stack_print(cls):
-        pass
+        import sys
+        #
+        import traceback
+        #
+        exc_typ, exc_vlu, exc_stk = sys.exc_info()
+        exc_txts = []
+        # value = '{}: "{}"'.format(exc_typ.__name__, exc_vlu.message)
+        for seq, stk in enumerate(traceback.extract_tb(exc_stk)):
+            i_file_path, i_line, i_fnc, i_fnc_line = stk
+            exc_txts.append(
+                u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
+            )
+        print exc_txts
 
 
 class PointArrayOpt(object):
@@ -2396,7 +2939,41 @@ class GuiCacheMtd(object):
         cls.CACHE['button'] = gui_prx
 
 
+class SessionMtd(object):
+    @classmethod
+    def get_hook_abs_path(cls, src_key, tgt_key):
+        """
+        for i in ['../shotgun/shotgun-create', '../maya/geometry-export', '../maya/look-export']:
+            print SessionMtd.get_hook_abs_path(
+                'rsv-task-methods/asset/usd/usd-create', i
+            )
+
+        rsv-task-methods/asset/shotgun/shotgun-create
+        rsv-task-methods/asset/maya/geometry-export
+        rsv-task-methods/asset/maya/look-export
+
+        :param src_key: str(<hook-key>)
+        :param tgt_key: str(<hook-key>)
+        :return: str(<hook-key>)
+        """
+        if fnmatch.filter([tgt_key], '.*'):
+            s_0 = tgt_key.split('.')[-1].strip()
+            c_0 = tgt_key.count('.')
+            ss_1 = src_key.split('/')
+            c_1 = len(ss_1)
+            if c_0 < c_1:
+                return '{}{}'.format('/'.join(ss_1[:-c_0]), s_0)
+            elif c_0 == c_1:
+                return s_0
+            else:
+                raise ValueError(
+                    'count of sep "." out of range'
+                )
+        return tgt_key
+
+
 if __name__ == '__main__':
-    print IntegerArrayMtd.set_merge_to(
-        [1, 2, 3, 9, 10, 11, 100]
-    )
+    for _i in ['./shotgun-create', '../maya/scene-export', '../maya/geometry-export', '../usd/usd-create']:
+        print SessionMtd.get_hook_abs_path(
+            'rsv-task-methods/asset/shotgun/shotgun-export', _i
+        )

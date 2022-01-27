@@ -347,7 +347,7 @@ class AbsDdlRsvTaskOption(DdlMethodOption):
 class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
     TYPE = 'rsv-task-method'
     SCRIPT_OPTION_PATTERN_DICT = dict(
-        maya_camera_export='file={file}&with_camera_abc={with_camera_abc}',
+        maya_camera_export='file={file}&with_camera_persp_abc={with_camera_persp_abc}',
         katana_render_export='file={file}&create_scene={create_scene}'
     )
     # python
@@ -584,21 +584,6 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             configure=project,
             engine='katana-python',
             script='set_cfx_look_export_by_any_scene_file',
-            #
-            pool='subprogress',
-            group='subprogress',
-        )
-    @classmethod
-    def get_katana_render_scene_create(cls, rsv_task_properties):
-        project = rsv_task_properties.get('project')
-        name = cls._get_rsv_task_version_(rsv_task_properties)
-        return cls.get(
-            type=cls.TYPE,
-            name=name,
-            #
-            configure=project,
-            engine='katana-python',
-            script='set_render_scene_create_by_any_scene_file',
             #
             pool='subprogress',
             group='subprogress',

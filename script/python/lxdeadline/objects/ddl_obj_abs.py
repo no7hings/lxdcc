@@ -14,7 +14,7 @@ class AbsDdlQuery(object):
         )
     @classmethod
     def get_script_option(cls, **kwargs):
-        return bsc_core.KeywordArgumentsOpt._to_string_(
+        return bsc_core.KeywordArgumentsMtd.to_string(
             **kwargs
         )
     #
@@ -68,3 +68,85 @@ class AbsDdlRsvTaskQuery(AbsDdlQuery):
                 name=self._get_rsv_task_version_(rsv_task_properties)
             )
         )
+
+
+class AbsDdlSubmiter(object):
+    CON = None
+    CONFIGURE_FILE_PATH = None
+    def __init__(self):
+        self._configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        #
+        self._option = self._configure.get_content('option')
+        #
+        self._job_info = self._configure.get_content('output.info')
+        self._job_plug = self._configure.get_content('output.plug')
+        #
+        self._result = None
+
+    def get_option(self):
+        return self._option
+    option = property(get_option)
+
+    def set_option(self, **kwargs):
+        for k in self._configure.get('option'):
+            if k in kwargs:
+                self._configure.set(
+                    'option.{}'.format(k),
+                    kwargs[k]
+                )
+
+    def set_option_extra(self, **kwargs):
+        for k in self._configure.get('option.extra'):
+            if k in kwargs:
+                self._configure.set(
+                    'option.extra.{}'.format(k),
+                    kwargs[k]
+                )
+    #
+    def get_job_info(self):
+        return self._job_info
+    job_info = property(get_job_info)
+
+    def get_job_plug(self):
+        return self._job_plug
+    job_plug = property(get_job_plug)
+
+    def set_job_info_extra(self, raw):
+        if isinstance(raw, dict):
+            content = bsc_objects.Content(value=raw)
+            for seq, k in enumerate(content._get_last_keys_()):
+                self.job_info.set(
+                    'ExtraInfoKeyValue{}'.format(seq),
+                    '{}={}'.format(k, content.get(k))
+                )
+
+    def set_job_submit(self):
+        self._configure.set_flatten()
+        info = self.job_info.value
+        plug = self.job_plug.value
+        return self.__set_job_submit_(info, plug)
+
+    def __set_job_submit_(self, info, plug):
+        self._result = self.CON.Jobs.SubmitJob(info, plug)
+        return self._result
+
+    def get_job_is_submit(self):
+        return self.get_job_id() is not None
+
+    def get_job_group_name(self):
+        return self.job_info.get('BatchName')
+
+    def get_job_name(self):
+        return self.job_info.get('Name')
+
+    def get_job_result(self):
+        return self._result
+
+    def get_job_id(self):
+        _ = self.get_job_result()
+        if isinstance(_, dict):
+            if '_id' in _:
+                return _['_id']
+
+    def __str__(self):
+        return self._configure.get_str_as_yaml_style()

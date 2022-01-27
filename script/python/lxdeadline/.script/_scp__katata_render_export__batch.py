@@ -49,7 +49,7 @@ for i_rsv_entity in rsv_entities:
                 i_export_query = ddl_objects.DdlRsvTaskQuery(
                     'katana-render-export', i_rsv_task_properties
                 )
-                i_export = ddl_methods.DdlRsvTaskMethodRunner(
+                i_export = ddl_methods.RsvTaskHookExecutor(
                     method_option=i_export_query.get_method_option(),
                     script_option=i_export_query.get_script_option(
                         file=i_katana_scene_src_file_path,

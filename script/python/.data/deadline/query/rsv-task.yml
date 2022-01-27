@@ -65,6 +65,14 @@ maya-look-import:
     #
     pool: subprogress
     group: subprogress
+#
+maya-look-preview-export:
+    type: rsv-task-method
+    engine: maya
+    script: set_look_preview_export_by_any_scene_file
+    #
+    pool: emergency
+    group: 32cpus
 # houdini
 # houdini-export
 houdini-scene-export:

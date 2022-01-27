@@ -4,11 +4,9 @@ from pxr import Usd, Sdf, Vt, UsdGeom, Gf
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
-
 from lxutil.dcc import utl_dcc_opt_abs
 
-from lxutil import utl_core
+from lxusd import usd_core
 
 
 class UsdOptCore(object):
@@ -71,6 +69,13 @@ class TransformOpt(AbsUsdOptDef):
             usd_matrix = Gf.Matrix4d()
         return UsdOptCore._get_matrix_(usd_matrix)
 
+    def set_visible(self, boolean):
+        usd_core.UsdTransformOpt(
+            self.prim
+        ).set_visible(
+            boolean
+        )
+
 
 class MeshOpt(
     AbsUsdOptDef,
@@ -78,13 +83,20 @@ class MeshOpt(
 ):
     def __init__(self, *args, **kwargs):
         super(MeshOpt, self).__init__(*args, **kwargs)
+        self._set_mesh_opt_def_init_()
+
+    def get_usd_mesh(self):
+        return UsdGeom.Mesh(self.prim)
+    @property
+    def usd_mesh(self):
+        return self.get_usd_mesh()
     @property
     def mesh(self):
-        return UsdGeom.Mesh(self.prim)
+        return self.get_usd_mesh()
 
     def set_create(self, face_vertices, points, uv_maps=None, normal_maps=None, color_maps=None):
-        prim = self.prim
-        mesh = self.mesh
+        # prim = self.prim
+        # mesh = self.usd_mesh
         face_vertex_counts, face_vertex_indices = face_vertices
         self._set_face_vertex_counts_(face_vertex_counts)
         self._set_face_vertex_indices_(face_vertex_indices)
@@ -93,25 +105,25 @@ class MeshOpt(
 
     def _set_face_vertex_counts_(self, raw):
         if raw:
-            mesh = self.mesh
-            if mesh.GetPrim().HasAttribute('faceVertexCounts') is False:
-                face_vertex_counts_attr = mesh.CreateFaceVertexCountsAttr()
+            usd_mesh = self.usd_mesh
+            if usd_mesh.GetPrim().HasAttribute('faceVertexCounts') is False:
+                face_vertex_counts_attr = usd_mesh.CreateFaceVertexCountsAttr()
             else:
-                face_vertex_counts_attr = mesh.GetFaceVertexCountsAttr()
+                face_vertex_counts_attr = usd_mesh.GetFaceVertexCountsAttr()
             face_vertex_counts_attr.Set(raw)
 
     def _set_face_vertex_indices_(self, raw):
         if raw:
-            mesh = self.mesh
-            if mesh.GetPrim().HasAttribute("faceVertexIndices") is False:
-                face_vertex_counts_attr = mesh.CreateFaceVertexIndicesAttr()
+            usd_mesh = self.usd_mesh
+            if usd_mesh.GetPrim().HasAttribute("faceVertexIndices") is False:
+                face_vertex_counts_attr = usd_mesh.CreateFaceVertexIndicesAttr()
             else:
-                face_vertex_counts_attr = mesh.GetFaceVertexIndicesAttr()
+                face_vertex_counts_attr = usd_mesh.GetFaceVertexIndicesAttr()
             face_vertex_counts_attr.Set(raw)
 
     def get_face_vertex_counts(self):
-        mesh = self.mesh
-        a = mesh.GetFaceVertexCountsAttr()
+        usd_mesh = self.usd_mesh
+        a = usd_mesh.GetFaceVertexCountsAttr()
         if a.GetNumTimeSamples():
             v = a.Get(0)
         else:
@@ -121,8 +133,8 @@ class MeshOpt(
         return []
 
     def get_face_vertex_indices(self):
-        mesh = self.mesh
-        a = mesh.GetFaceVertexIndicesAttr()
+        usd_mesh = self.usd_mesh
+        a = usd_mesh.GetFaceVertexIndicesAttr()
         if a.GetNumTimeSamples():
             v = a.Get(0)
         else:
@@ -145,39 +157,39 @@ class MeshOpt(
         return self.get_face_vertex_counts(), self.get_face_vertex_indices()
 
     def get_points(self):
-        mesh = self.mesh
-        a = mesh.GetPointsAttr()
-        if a.GetNumTimeSamples():
-            v = a.Get(0)
+        usd_mesh = self.usd_mesh
+        p = usd_mesh.GetPointsAttr()
+        if p.GetNumTimeSamples():
+            v = p.Get(0)
         else:
-            v = a.Get()
+            v = p.Get()
         if v:
             return UsdOptCore._get_point_array_(v)
         return []
 
     def set_points(self, points):
-        mesh = self.mesh
-        return mesh.GetPointsAttr().Set(points)
+        usd_mesh = self.usd_mesh
+        return usd_mesh.GetPointsAttr().Set(points)
 
     def get_uv_map_names(self):
         lis = []
-        mesh = self.mesh
-        usd_primvars = mesh.GetAuthoredPrimvars()
-        for uv_primvar in usd_primvars:
-            name = uv_primvar.GetPrimvarName()
-            if uv_primvar.GetIndices():
-                lis.append(name)
+        usd_mesh = self.usd_mesh
+        usd_primvars = usd_mesh.GetAuthoredPrimvars()
+        for i_primvar in usd_primvars:
+            i_name = i_primvar.GetPrimvarName()
+            if i_primvar.GetIndices():
+                lis.append(i_name)
         return lis
 
     def get_uv_map_coords(self, uv_map_name):
-        mesh = self.mesh
-        uv_primvar = mesh.GetPrimvar(uv_map_name)
+        usd_mesh = self.usd_mesh
+        uv_primvar = usd_mesh.GetPrimvar(uv_map_name)
         uv_map_coords = uv_primvar.Get()
         return uv_map_coords
 
     def get_uv_map(self, uv_map_name):
-        mesh = self.mesh
-        a = mesh.GetPrimvar(uv_map_name)
+        usd_mesh = self.usd_mesh
+        a = usd_mesh.GetPrimvar(uv_map_name)
         uv_map_face_vertex_counts = self.get_face_vertex_counts()
         uv_map_face_vertex_indices = a.GetIndices()
         uv_map_coords = a.Get()
@@ -193,19 +205,19 @@ class MeshOpt(
 
     def set_uv_maps(self, raw):
         if raw:
-            mesh = self.mesh
+            usd_mesh = self.usd_mesh
             for uv_map_name, v in raw.items():
                 if uv_map_name == 'map1':
                     uv_map_name = 'st'
                 uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = v
-                if mesh.HasPrimvar(uv_map_name) is False:
-                    primvar = mesh.CreatePrimvar(
+                if usd_mesh.HasPrimvar(uv_map_name) is False:
+                    primvar = usd_mesh.CreatePrimvar(
                         uv_map_name,
                         Sdf.ValueTypeNames.TexCoord2fArray,
                         UsdGeom.Tokens.faceVarying
                     )
                 else:
-                    primvar = mesh.GetPrimvar(
+                    primvar = usd_mesh.GetPrimvar(
                         uv_map_name
                     )
                 primvar.Set(uv_map_coords)
@@ -237,5 +249,111 @@ class MeshOpt(
         return max(_) + 1
 
     def get_face_count(self):
-        mesh = self.mesh
-        return mesh.GetFaceCount()
+        usd_mesh = self.usd_mesh
+        return usd_mesh.GetFaceCount()
+
+    def set_visible(self, boolean):
+        usd_core.UsdGeometryOpt(
+            self.prim
+        ).set_visible(
+            boolean
+        )
+
+    def set_display_color(self, color):
+        usd_core.UsdGeometryMeshOpt(
+            self.prim
+        ).set_display_color(
+            color
+        )
+
+
+class CurveOpt(
+    AbsUsdOptDef,
+    utl_dcc_opt_abs.AbsCurveOptDef
+):
+    def __init__(self, *args, **kwargs):
+        super(CurveOpt, self).__init__(*args, **kwargs)
+        self._set_curve_opt_def_init_()
+
+    def get_usd_curve(self):
+        return UsdGeom.NurbsCurves(self.prim)
+    @property
+    def usd_curve(self):
+        return self.get_usd_curve()
+
+    def set_create(self, points, knots, ranges, widths, order):
+        self.set_points(points)
+        self.set_knots(knots)
+        self.set_ranges(ranges)
+        self.set_widths(widths)
+
+    def set_points(self, points):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetPointsAttr()
+        if p is None:
+            p = usd_curve.CreatePointsAttr()
+        p.Set(points)
+        p = usd_curve.GetCurveVertexCountsAttr()
+        if p is None:
+            p = usd_curve.CreateCurveVertexCountsAttr()
+        p.Set([len(points)])
+
+    def get_points(self):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetPointsAttr()
+        if p:
+            raw = p.Get()
+            return UsdOptCore._get_point_array_(raw)
+        return []
+
+    def get_point_count(self):
+        return len(self.get_points())
+
+    def set_knots(self, knots):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetKnotsAttr()
+        if p is None:
+            p = usd_curve.CreateKnotsAttr()
+        p.Set(knots)
+
+    def set_ranges(self, ranges):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetRangesAttr()
+        if p is None:
+            p = usd_curve.CreateRangesAttr()
+        p.Set(ranges)
+
+    def set_widths(self, widths):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetWidthsAttr()
+        if p is None:
+            p = usd_curve.CreateWidthsAttr()
+        p.Set(widths)
+
+    def set_extent(self, extent):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetPrim().HasAttribute('extent')
+        if p is None:
+            p = usd_curve.CreateExtentAttr()
+        p.Set(extent)
+
+    def set_order(self, order):
+        usd_curve = self.get_usd_curve()
+        p = usd_curve.GetOrderAttr()
+        if p is None:
+            p = usd_curve.CreateOrderAttr()
+        p.Set(order)
+
+    def set_display_color(self, color):
+        pass
+        # usd_curve = self.get_usd_curve()
+        # p = usd_curve.GetDisplayColorAttr()
+        # if p is None:
+        #     p = usd_curve.CreateDisplayColorAttr()
+        # r, g, b = color
+        # p.Set(
+        #     Vt.Vec3fArray([(r, g, b) for p in range(self.get_point_count())])
+        # )
+
+
+

@@ -3,8 +3,6 @@ from lxutil import utl_core
 
 from lxshotgun import stg_configure, stg_core
 
-import json
-
 
 class StgObjQuery(object):
     def __init__(self, stg_connector, stg_obj):
@@ -210,10 +208,41 @@ class StgConnector(object):
         )
         #
         utl_core.Log.set_module_result_trace(
-            'shotgun-create',
+            'shotgun create',
             u'stg-{}="{}"'.format(branch, entity_name)
         )
         return _
+
+    def get_stg_entities(self, **kwargs):
+        """
+        :param kwargs:
+            project=<project-name>
+            branch=<branch-name>
+        :return: list(
+        )
+        """
+        if 'branch' in kwargs:
+            branches = [kwargs['branch']]
+        else:
+            branches = ['asset', 'shot']
+        #
+        for i_branch in branches:
+            return self._shotgun.find(
+                entity_type=self._get_stg_entity_type_(i_branch),
+                filters=[
+                    ['project', 'is', self.get_stg_project(**kwargs)],
+                ]
+            )
+
+    def get_stg_entity_queries(self, **kwargs):
+        """
+        :param kwargs:
+            project=<project-name>
+            branch=<branch-name>
+        :return: list(
+        )
+        """
+        return [self.STG_OBJ_QUERY_CLS(self, i) for i in self.get_stg_entities(**kwargs)]
     # step
     def get_stg_steps(self, **kwargs):
         """
@@ -260,6 +289,9 @@ class StgConnector(object):
         stg_obj = self.get_stg_step(**kwargs)
         if stg_obj:
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
+
+    def set_stg_step_create(self, **kwargs):
+        pass
     # task
     def get_stg_tasks(self, **kwargs):
         """
@@ -327,7 +359,7 @@ class StgConnector(object):
             )
         )
         utl_core.Log.set_module_result_trace(
-            'shotgun-create',
+            'shotgun create',
             u'task="{}"'.format(task)
         )
         return _
@@ -386,6 +418,10 @@ class StgConnector(object):
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
 
     def set_stg_version_create(self, **kwargs):
+        exists_stg_version = self.get_stg_version(**kwargs)
+        if exists_stg_version:
+            return exists_stg_version
+        #
         if 'asset' in kwargs:
             branch = 'asset'
         elif 'shot' in kwargs:
@@ -405,13 +441,14 @@ class StgConnector(object):
                 project=self.get_stg_project(**kwargs),
                 entity=self.get_stg_entity(**kwargs),
                 sg_task=self.get_stg_task(**kwargs),
+                #
                 code=name,
                 #
                 user=self.get_stg_user(**kwargs),
             )
         )
         utl_core.Log.set_module_result_trace(
-            'shotgun-create',
+            'shotgun create',
             u'stg-version="{}"'.format(name)
         )
         return _
@@ -439,7 +476,7 @@ class StgConnector(object):
             )
         ]
         utl_core.Log.set_module_result_trace(
-            'shotgun-create',
+            'shotgun create',
             u'stg-tag="{}"'.format(tag_name)
         )
         return _
@@ -493,7 +530,7 @@ class StgConnector(object):
                 )
             ]
             utl_core.Log.set_module_result_trace(
-                'shotgun-create',
+                'shotgun create',
                 u'stg-look-pass="{}"'.format(look_pass_code)
             )
             return _

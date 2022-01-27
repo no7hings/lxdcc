@@ -195,6 +195,10 @@ class RsvAssetSceneQuery(AbsAssetQuery):
         sub_key = 'scene.maya-src-file'
         return self.get(sub_key, **kwargs)
 
+    def get_work_maya_src_file(self, **kwargs):
+        sub_key = 'scene.work-maya-src-file'
+        return self.get(sub_key, **kwargs)
+
     def get_houdini_file(self, **kwargs):
         sub_key = 'scene.houdini-file'
         return self.get(sub_key, **kwargs)

@@ -61,7 +61,9 @@ class DotMaExport(utl_fnc_obj_abs.AbsExporter):
             target_xgen_file_name = '{}__{}.xgen'.format(target_base, xgen_name)
             target_xgen_file_path = '{}/{}'.format(target_directory_path, target_xgen_file_name)
             utl_dcc_objects.OsFile(i_xgen_file_paths_src).set_copy_to_file(target_xgen_file_path)
-            replace_list.append((source_xgen_file_name, target_xgen_file_name))
+            replace_list.append(
+                (source_xgen_file_name, target_xgen_file_name)
+            )
         #
         if replace_list:
             if os.path.isfile(file_path_tgt):
@@ -70,8 +72,12 @@ class DotMaExport(utl_fnc_obj_abs.AbsExporter):
                     for i in replace_list:
                         s, t = i
                         d = d.replace(
-                            'setAttr ".xfn" -type "string" "{}";'.format(s),
-                            'setAttr ".xfn" -type "string" "{}";'.format(t)
+                            r'setAttr ".xfn" -type "string" "{}";'.format(s),
+                            r'setAttr ".xfn" -type "string" "{}";'.format(t)
+                        )
+                        d = d.replace(
+                            r'"xgFileName" " -type \"string\" \"{}\""'.format(s),
+                            r'"xgFileName" " -type \"string\" \"{}\""'.format(t)
                         )
                     with open(file_path_tgt, 'w') as fw:
                         fw.write(d)

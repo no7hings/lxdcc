@@ -1,0 +1,61 @@
+#usda 1.0
+(
+    defaultPrim = "{{ asset_root_name }}"
+    startTimeCode = {{ shot.start_frame }}
+    endTimeCode = {{ shot.end_frame }}
+    upAxis = "Y"
+)
+
+def Xform "{{ asset.root_name }}" (
+    kind = "component"
+    {# geometry_uv_map over shot_asset #}
+    variants = {
+        string geometry_uv_map = "{{ geometry_uv_maps.keys()[0] }}"
+        string shot_asset = "{{ shot_assets.keys()[0] }}"
+    }
+    prepend variantSets = [
+        "geometry_uv_map",
+        "shot_asset"
+    ]
+)
+{
+    string userProperties:set_option:shot:name = "{{ shot.name }}"
+    string userProperties:set_option:shot:start_frame = "{{ shot.start_frame }}"
+    string userProperties:set_option:shot:end_frame = "{{ shot.end_frame }}"
+    string userProperties:set_option:asset:role = "{{ asset.role }}"
+    string userProperties:set_option:asset:name = "{{ asset.name }}"
+    string userProperties:set_option:shot:sequence = "{{ shot.sequence }}"
+    variantSet "geometry_uv_map" = {
+        "None" {
+        }
+        {% for i_geometry_uv_map, i_geometry_uv_map_file in geometry_uv_maps.iteritems() -%}
+        "{{ i_geometry_uv_map }}" (
+            prepend references = {{ '@%s@' | format(i_geometry_uv_map_file) }}
+        ) {
+            string userProperties:set_option:asset:geometry_uv_map = "{{ i_geometry_uv_map }}"
+        }
+        {%- endfor %}
+        "latest" (
+            prepend references = @{{ asset.geometry_uv_map }}@
+        ) {
+            string userProperties:set_option:asset:geometry_uv_map = "latest"
+        }
+    }
+    variantSet "shot_asset" = {
+        "None" {
+        }
+        {% for i_shot_asset, i_location in shot_assets.iteritems() -%}
+        "{{ i_shot_asset }}" (
+            prepend references = {{ '@%s@<%s>' | format(shot.set_file, i_location) }}
+        ) {
+            string userProperties:set_option:asset:shot_asset = "{{ i_shot_asset }}"
+        }
+        {%- endfor %}
+    }
+}
+def Xform "{{ camera.root_name }}" (
+    kind = "component"
+    prepend references = {{ '@%s@<%s>' | format(shot.set_file, camera.path) }}
+)
+{
+}

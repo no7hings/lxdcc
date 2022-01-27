@@ -1,0 +1,42 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    rest:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_reset()'
+    #
+    options/asset:
+        value: ''
+    options/shot:
+        widget: enumerate
+        value:
+            - 'None'
+    #
+    guess:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_guess()'
+    #
+    usd/file:
+        widget: file
+        value: ''
+    usd/location:
+        widget: path
+        value: ''
+    #
+    create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_create()'
+    #
+    variants/shot_asset:
+        widget: enumerate
+        value:
+            - None
+    variants/geometry_uv_map:
+        widget: enumerate
+        value:
+            - None

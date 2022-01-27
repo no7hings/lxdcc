@@ -17,11 +17,11 @@ from lxmaya import ma_configure
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
-from lxmaya.dcc.dcc_objects import _ma_dcc_obj_obj, _ma_dcc_obj_dag, _ma_dcc_obj_xgen, _mya_dcc_obj_arnold
+from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag, _mya_dcc_obj_xgen, _mya_dcc_obj_arnold
 
 
 class Nodes(object):
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Node
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, type_names):
         self._type_names = type_names
 
@@ -35,7 +35,7 @@ class Nodes(object):
 class Cameras(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['camera']
     EXCLUDE_DCC_PATHS = ['|persp|perspShape', '|top|topShape', '|front|frontShape', '|side|sideShape']
-    DCC_OBJ_CLASS = _ma_dcc_obj_dag.Shape
+    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Shape
     def __init__(self, *args):
         super(Cameras, self).__init__(*args)
 
@@ -43,7 +43,7 @@ class Cameras(mya_dcc_obj_abs.AbsMyaObjs):
 class AnimationLayers(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['animLayer']
     EXCLUDE_DCC_PATHS = ['BaseAnimation']
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Node
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(AnimationLayers, self).__init__(*args)
 
@@ -51,7 +51,7 @@ class AnimationLayers(mya_dcc_obj_abs.AbsMyaObjs):
 class DisplayLayers(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['displayLayer']
     EXCLUDE_DCC_PATHS = ['defaultLayer']
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.DisplayLayer
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.DisplayLayer
     def __init__(self, *args):
         super(DisplayLayers, self).__init__(*args)
 
@@ -64,7 +64,7 @@ class Constrains(mya_dcc_obj_abs.AbsMyaObjs):
         'scaleConstraint'
     ]
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Node
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(Constrains, self).__init__(*args)
 
@@ -72,7 +72,7 @@ class Constrains(mya_dcc_obj_abs.AbsMyaObjs):
 class UnknownNodes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['unknown']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Node
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(UnknownNodes, self).__init__(*args)
 
@@ -80,7 +80,7 @@ class UnknownNodes(mya_dcc_obj_abs.AbsMyaObjs):
 class References(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['reference']
     EXCLUDE_DCC_PATHS = ['_UNKNOWN_REF_NODE_', 'sharedReferenceNode']
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Reference
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Reference
     def __init__(self, *args):
         super(References, self).__init__(*args)
 
@@ -101,7 +101,7 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
         'defaultLightSet',
         'defaultObjectSet'
     ]
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Material
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Material
     def __init__(self, *args):
         super(Materials, self).__init__(*args)
 
@@ -117,23 +117,25 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
 class TemporaryNodes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['mesh', 'nurbsCurve', 'nurbsSurface', 'brush', 'nParticle']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _ma_dcc_obj_obj.Node
+    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(TemporaryNodes, self).__init__(*args)
 
 
 class AbsFileReferences(object):
     DCC_NODE_CLASS_DICT = {
-        'custom': _ma_dcc_obj_obj.FileReference,
-        'file': _ma_dcc_obj_obj.TextureReference,
+        'custom': _mya_dcc_obj_obj.FileReference,
+        'file': _mya_dcc_obj_obj.TextureReference,
         # it's right name
-        'aiImage': _ma_dcc_obj_obj.TextureReference,
-        'reference': _ma_dcc_obj_obj.Reference,
+        'aiImage': _mya_dcc_obj_obj.TextureReference,
+        'reference': _mya_dcc_obj_obj.Reference,
         #
-        'xgmPalette': _ma_dcc_obj_xgen.XgnPalette,
-        'xgmDescription': _ma_dcc_obj_xgen.XgnDescription,
+        'xgmPalette': _mya_dcc_obj_xgen.XgnPalette,
+        'xgmDescription': _mya_dcc_obj_xgen.XgnDescription,
         #
-        'aiMaterialx': _mya_dcc_obj_arnold.AndMaterialx
+        'aiMaterialx': _mya_dcc_obj_arnold.AndMaterialx,
+        #
+        'osl_file_path': _mya_dcc_obj_obj.TextureReference,
     }
     #
     CUSTOM_SEARCH_KEYS = [
@@ -150,7 +152,9 @@ class AbsFileReferences(object):
         'AlembicNode': ['abc_File'],
         #
         'aiVolume': ['filename'],
-        'aiMaterialx': ['filename']
+        'aiMaterialx': ['filename'],
+        #
+        'osl_file_path': ['filename']
     }
     PORT_PATHSEP = ma_configure.Util.PORT_PATHSEP
     #
@@ -212,7 +216,7 @@ class AbsFileReferences(object):
         fs = cmds.ls(type='file')
         for i_f in fs:
             cls._set_file_value_repair_(
-                _ma_dcc_obj_obj.Node(i_f)
+                _mya_dcc_obj_obj.Node(i_f)
             )
     @classmethod
     def _get_obj_cls_(cls, obj_type_name):
@@ -232,13 +236,13 @@ class AbsFileReferences(object):
                 i_file_name = raw[i * 2]
                 i_atr_path = raw[i * 2 + 1]
                 search_key = cmds.filePathEditor(i_atr_path, query=1, attributeType=1)
-                if self._get_type_is_available_(search_key) is False:
-                    continue
-                #
-                i_file_path = u'{}/{}'.format(directory_path, i_file_name)
                 #
                 search_key_s = search_key.split(self.PORT_PATHSEP)
                 obj_type_name = search_key_s[0]
+                if self._get_type_is_available_(obj_type_name) is False:
+                    continue
+                #
+                i_file_path = u'{}/{}'.format(directory_path, i_file_name)
                 #
                 atr_path_s = i_atr_path.split(self.PORT_PATHSEP)
                 #
@@ -264,39 +268,41 @@ class AbsFileReferences(object):
     def __get_by_custom_(self, with_reference):
         all_obj_type_names = cmds.allNodeTypes()
         #
-        for search_key in self.CUSTOM_SEARCH_KEYS:
-            if self._get_type_is_available_(search_key) is False:
+        for i_obj_type_name, i_port_paths in self.PORT_QUERY_DICT.items():
+            if self._get_type_is_available_(i_obj_type_name) is False:
                 continue
             #
-            search_key_s = search_key.split(self.PORT_PATHSEP)
-            #
-            obj_type_name = search_key_s[0]
-            if obj_type_name not in all_obj_type_names:
+            if i_obj_type_name not in all_obj_type_names:
                 utl_core.Log.set_warning_trace(
-                    'obj-type="{}" is "unknown" / "unload"'.format(obj_type_name)
+                    'obj-type="{}" is "unknown" / "unload"'.format(i_obj_type_name)
                 )
                 continue
             #
-            port_path = self.PORT_PATHSEP.join(search_key_s[1:])
-            obj_paths = cmds.ls(type=obj_type_name, long=1) or []
-            for obj_path in obj_paths:
-                i_atr_path = self.PORT_PATHSEP.join([obj_path, port_path])
-                i_file_path = cmds.getAttr(i_atr_path)
-                if obj_path in self._raw:
-                    obj = self._raw[obj_path]
-                else:
-                    obj_cls = self._get_obj_cls_(obj_type_name)
-                    obj = obj_cls(obj_path)
-                    self._raw[obj_path] = obj
-                #
-                if with_reference is False:
-                    is_reference = obj.get_is_reference()
-                    if is_reference is True:
+            for j_port_path in i_port_paths:
+                obj_paths = cmds.ls(type=i_obj_type_name, long=1) or []
+                for j_obj_path in obj_paths:
+                    j_atr_path = self.PORT_PATHSEP.join([j_obj_path, j_port_path])
+                    j_file_path = cmds.getAttr(j_atr_path)
+                    if not j_file_path:
+                        utl_core.Log.set_warning_trace(
+                            'port="{}" is "empty"'.format(j_atr_path)
+                        )
                         continue
-                #
-                obj.set_file_port_raw_add(
-                    port_path, i_file_path
-                )
+                    if j_obj_path in self._raw:
+                        obj = self._raw[j_obj_path]
+                    else:
+                        obj_cls = self._get_obj_cls_(i_obj_type_name)
+                        obj = obj_cls(j_obj_path)
+                        self._raw[j_obj_path] = obj
+                    #
+                    if with_reference is False:
+                        is_reference = obj.get_is_reference()
+                        if is_reference is True:
+                            continue
+                    #
+                    obj.set_file_port_raw_add(
+                        j_port_path, j_file_path
+                    )
 
     def get_objs(self):
         with_reference = self._option['with_reference']
@@ -352,18 +358,23 @@ class TextureReferences(AbsFileReferences):
         'file',
         'aiImage.filename',
     ]
+    INCLUDE_TYPES = [
+        'file',
+        'aiImage',
+        'osl_file_path'
+    ]
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)
 
     def _get_type_is_available_(self, file_type):
-        return file_type in self.INCLUDE_DCC_FILE_TYPES
+        return file_type in self.INCLUDE_TYPES
     @classmethod
     def _get_objs_(cls, obj_paths):
         lis = []
         for obj_path in obj_paths:
-            obj_type_name = cmds.nodeType(obj_path)
-            if obj_type_name in cls.PORT_QUERY_DICT:
-                obj_cls = cls._get_obj_cls_(obj_type_name)
+            i_obj_type_name = cmds.nodeType(obj_path)
+            if i_obj_type_name in cls.PORT_QUERY_DICT:
+                obj_cls = cls._get_obj_cls_(i_obj_type_name)
                 obj = obj_cls(obj_path)
                 cls._set_obj_reference_update_(obj)
                 lis.append(obj)
@@ -386,7 +397,7 @@ class TextureReferences(AbsFileReferences):
 class XgenPalettes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['xgmPalette']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _ma_dcc_obj_xgen.XgnPalette
+    DCC_OBJ_CLASS = _mya_dcc_obj_xgen.XgnPalette
     def __init__(self):
         super(XgenPalettes, self).__init__(XgenPalettes)
 
@@ -394,6 +405,6 @@ class XgenPalettes(mya_dcc_obj_abs.AbsMyaObjs):
 class XgenDescriptions(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['xgmDescription']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _ma_dcc_obj_xgen.XgnDescription
+    DCC_OBJ_CLASS = _mya_dcc_obj_xgen.XgnDescription
     def __init__(self):
         super(XgenDescriptions, self).__init__(XgenPalettes)

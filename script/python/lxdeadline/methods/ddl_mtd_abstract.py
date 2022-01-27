@@ -194,11 +194,11 @@ class AbsJobSender2(object):
                 utl_core.SubProcessRunner.set_run(self._shell_command)
 
 
-class AbsDdlMethodRunner(AbsJobSender2):
+class AbsHookExecutor(AbsJobSender2):
     DEADLINE_COMMAND_PATTERN = r'rez-env lxdcc -c \"lxscript -p {configure} -a {engine} -s {script} -o \\\"{script_option}&start_index=\<STARTFRAME\>&end_index=\<ENDFRAME\>\\\"\"'
     SHELL_COMMAND_PATTERN = r'rez-env lxdcc -c "lxscript -p {configure} -a {engine} -s {script} -o \"{script_option}&start_index=\<STARTFRAME\>&end_index=\<ENDFRAME\>\\\"\"'
     def __init__(self, method_option, script_option, job_dependencies):
-        super(AbsDdlMethodRunner, self).__init__(method_option, script_option, job_dependencies)
+        super(AbsHookExecutor, self).__init__(method_option, script_option, job_dependencies)
 
     def set_run_with_deadline(self):
         script_option_opt = self.get_script_option_opt()
@@ -263,9 +263,9 @@ class AbsDdlMethodRunner(AbsJobSender2):
         return self._js_result
 
 
-class AbsDdlRsvTaskMethodRunner(AbsDdlMethodRunner):
+class AbsRsvTaskHookExecutor(AbsHookExecutor):
     def __init__(self, method_option, script_option, job_dependencies):
-        super(AbsDdlRsvTaskMethodRunner, self).__init__(method_option, script_option, job_dependencies)
+        super(AbsRsvTaskHookExecutor, self).__init__(method_option, script_option, job_dependencies)
 
     def set_run_with_deadline(self):
         script_option_opt = self.get_script_option_opt()
@@ -336,7 +336,7 @@ class AbsDdlRsvTaskMethodRunner(AbsDdlMethodRunner):
             return self._js_result
 
 
-class AbsDdlRsvTaskRender(AbsDdlMethodRunner):
+class AbsDdlRsvTaskRender(AbsHookExecutor):
     def __init__(self, method_option, script_option, job_dependencies):
         super(AbsDdlRsvTaskRender, self).__init__(method_option, script_option, job_dependencies)
 

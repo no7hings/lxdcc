@@ -22,7 +22,7 @@ class Root(object):
 
 class UserDirectory(object):
     user_name = getpass.getuser()
-    WINDOWS = '{}/.lynxi'.format(os.environ.get('HOME'))
+    WINDOWS = '{}/.lynxi'.format(os.environ.get('HOMEPATH'))
     LINUX = '{}/.lynxi'.format(os.environ.get('HOME'))
 
 
@@ -35,6 +35,11 @@ class LogDirectory(object):
 class CacheDirectory(object):
     WINDOWS = '{}/cache'.format(UserDirectory.WINDOWS)
     LINUX = '{}/cache'.format(UserDirectory.LINUX)
+
+
+class HookDirectory(object):
+    WINDOWS = '{}/hook'.format(UserDirectory.WINDOWS)
+    LINUX = '{}/hook'.format(UserDirectory.LINUX)
 
 
 class TemporaryDirectory(object):

@@ -28,12 +28,18 @@ class AbsContent(object):
     VARIANT_RE_PATTERN = r'[<](.*?)[>]'
     def __init__(self, key=None, value=None):
         self._key = key
+        self._file_path = None
         if isinstance(value, (str, unicode)):
-            _ = bsc_core.StorageFileOpt(value).set_read()
-            if isinstance(_, dict):
-                self._value = _
+            file_path_opt = bsc_core.StorageFileOpt(value)
+            if file_path_opt.get_is_exists():
+                self._file_path = value
+                _ = file_path_opt.set_read()
+                if isinstance(_, dict):
+                    self._value = _
+                else:
+                    raise TypeError()
             else:
-                raise TypeError()
+                raise OSError()
         elif isinstance(value, dict):
             self._value = value
         elif value is None:
@@ -64,7 +70,7 @@ class AbsContent(object):
         return '/' + key.replace('.', '/')
 
     def _get_all_keys_(self):
-        def _rcs_fnc(k_, v_):
+        def rcs_fnc_(k_, v_):
             for _k, _v in v_.items():
                 if k_ is not None:
                     _key = '{}.{}'.format(k_, _k)
@@ -72,13 +78,13 @@ class AbsContent(object):
                     _key = _k
                 lis.append(_key)
                 if isinstance(_v, dict):
-                    _rcs_fnc(_key, _v)
+                    rcs_fnc_(_key, _v)
         lis = []
-        _rcs_fnc(self._key, self._value)
+        rcs_fnc_(self._key, self._value)
         return lis
 
     def _get_last_keys_(self):
-        def _rcs_fnc(k_, v_):
+        def rcs_fnc_(k_, v_):
             for _k, _v in v_.items():
                 if k_ is not None:
                     _key = '{}.{}'.format(k_, _k)
@@ -86,12 +92,12 @@ class AbsContent(object):
                     _key = _k
                 #
                 if isinstance(_v, dict):
-                    _rcs_fnc(_key, _v)
+                    rcs_fnc_(_key, _v)
                 else:
                     lis.append(_key)
 
         lis = []
-        _rcs_fnc(self._key, self._value)
+        rcs_fnc_(self._key, self._value)
         return lis
 
     def get_leaf_key_as_paths(self):
@@ -178,7 +184,7 @@ class AbsContent(object):
             es.append(value)
 
     def _set_value_unfold_(self, key, keys):
-        def _rcs_fnc(key_, value_):
+        def rcs_fnc_(key_, value_):
             if isinstance(value_, (str, unicode)):
                 _value_unfold = value_
                 # etc: "\\<A\\>"
@@ -192,39 +198,47 @@ class AbsContent(object):
                     _var_keys = re.findall(re.compile(self.VARIANT_RE_PATTERN, re.S), _value_unfold)
                     if _var_keys:
                         for _i_var_key in set(_var_keys):
-                            # catch value
-                            if fnmatch.filter([_i_var_key], '*.key'):
-                                _ = _i_var_key.split('.')
-                                _c = len([i for i in _ if i == ''])
-                                _ks = key_.split('.')
-                                _v = _ks[-_c]
-                            elif fnmatch.filter([_i_var_key], '.*'):
-                                # etc: key=nodes.asset.name, _i_var_key=<.label>, result=nodes.asset.label
-                                _ = _i_var_key.split('.')
-                                _c = len([i for i in _ if i == ''])
-                                __k = '{}.{}'.format('.'.join(key_.split('.')[:-_c]), '.'.join(_[_c:]))
-                                #
-                                if __k in self._unfold_exludes:
-                                    continue
-                                if __k not in keys:
-                                    raise KeyError('key="{}" is Non-exists'.format(__k))
-                                _v = self.get(__k)
-                                #
-                                _v = _rcs_fnc(__k, _v)
+                            if '|' in _i_var_key:
+                                _j_var_keys = map(lambda x: x.lstrip().rstrip(), _i_var_key.split('|'))
+                                for _j_var_key in _j_var_keys:
+                                    _j_v = self.get(_j_var_key)
+                                    if _j_v is not None:
+                                        _value_unfold = _j_v
+                                        break
                             else:
+                                # catch value
+                                if fnmatch.filter([_i_var_key], '*.key'):
+                                    _ = _i_var_key.split('.')
+                                    _c = len([i for i in _ if i == ''])
+                                    _ks = key_.split('.')
+                                    _v = _ks[-_c]
+                                elif fnmatch.filter([_i_var_key], '.*'):
+                                    # etc: key=nodes.asset.name, _i_var_key=<.label>, result=nodes.asset.label
+                                    _ = _i_var_key.split('.')
+                                    _c = len([i for i in _ if i == ''])
+                                    __k = '{}.{}'.format('.'.join(key_.split('.')[:-_c]), '.'.join(_[_c:]))
+                                    #
+                                    if __k in self._unfold_exludes:
+                                        continue
+                                    if __k not in keys:
+                                        raise KeyError('key="{}" is Non-exists'.format(__k))
+                                    _v = self.get(__k)
+                                    #
+                                    _v = rcs_fnc_(__k, _v)
+                                else:
+                                    #
+                                    if _i_var_key in self._unfold_exludes:
+                                        continue
+                                    if _i_var_key not in keys:
+                                        raise KeyError('key="{}" is Non-exists'.format(_i_var_key))
+                                    _v = self.get(_i_var_key)
+                                    #
+                                    _v = rcs_fnc_(_i_var_key, _v)
                                 #
-                                if _i_var_key in self._unfold_exludes:
-                                    continue
-                                if _i_var_key not in keys:
-                                    raise KeyError('key="{}" is Non-exists'.format(_i_var_key))
-                                _v = self.get(_i_var_key)
-                                #
-                                _v = _rcs_fnc(_i_var_key, _v)
-                            #
-                            if isinstance(_v, (str, unicode)):
-                                _value_unfold = _value_unfold.replace('<{}>'.format(_i_var_key), _v)
-                            elif isinstance(_v, (int, float, bool)):
-                                _value_unfold = _value_unfold.replace('<{}>'.format(_i_var_key), str(_v))
+                                if isinstance(_v, (str, unicode)):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_var_key), _v)
+                                elif isinstance(_v, (int, float, bool)):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_var_key), str(_v))
                     else:
                         _v_ks = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
                 # etc: "=0+1"
@@ -233,11 +247,11 @@ class AbsContent(object):
                     _value_unfold = eval(cmd)
                 return _value_unfold
             elif isinstance(value_, (tuple, list)):
-                return [_rcs_fnc(key_, _i) for _i in value_]
+                return [rcs_fnc_(key_, _i) for _i in value_]
             return value_
         #
         value = self.get(key)
-        return _rcs_fnc(key, value)
+        return rcs_fnc_(key, value)
 
     def get_key_is_exists(self, key):
         return key in self._get_all_keys_()
@@ -280,6 +294,19 @@ class AbsContent(object):
 
     def get_is_empty(self):
         return not self._value
+
+    def get_file_path(self):
+        return self._file_path
+
+    def set_reload(self):
+        if self._file_path is not None:
+            file_path_opt = bsc_core.StorageFileOpt(self._file_path)
+            if file_path_opt.get_is_exists():
+                _ = file_path_opt.set_read()
+                if isinstance(_, dict):
+                    self._value = _
+                else:
+                    raise TypeError()
 
 
 class AbsConfigure(AbsContent):

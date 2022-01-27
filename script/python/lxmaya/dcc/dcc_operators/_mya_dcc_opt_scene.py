@@ -22,7 +22,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         return self._stage
 
     def get_mesh_data_content(self, directory_path, file_path):
-        from lxmaya.dcc.dcc_objects import _ma_dcc_obj_geometry
+        from lxmaya.dcc.dcc_objects import _mya_dcc_obj_geometry
         #
         from lxmaya.dcc.dcc_operators import _mya_dcc_opt_geometry
         #
@@ -49,7 +49,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                             dcc_path_dag_opt = core_objects.ObjDagPath(dcc_path)
                             mya_path_dag_opt = dcc_path_dag_opt.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
                             mya_obj_path = mya_path_dag_opt.path
-                            mya_mesh = _ma_dcc_obj_geometry.Mesh(mya_obj_path)
+                            mya_mesh = _mya_dcc_obj_geometry.Mesh(mya_obj_path)
                             mya_mesh_opt = _mya_dcc_opt_geometry.MeshOpt(mya_mesh)
                             #
                             content_0.set('name.{}'.format(dcc_obj_name), dcc_path)
@@ -79,7 +79,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
             return bsc_objects.Content(value={})
     @classmethod
     def _get_mesh_data_content_(cls, stage, yml_file_path):
-        from lxmaya.dcc.dcc_objects import _ma_dcc_obj_geometry
+        from lxmaya.dcc.dcc_objects import _mya_dcc_obj_geometry
         #
         from lxmaya.dcc.dcc_operators import _mya_dcc_opt_geometry
         #
@@ -100,7 +100,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                     dcc_path_dag_opt = bsc_core.DccPathDagOpt(dcc_path)
                     mya_path_dag_opt = dcc_path_dag_opt.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
                     mya_obj_path = mya_path_dag_opt.path
-                    mya_mesh = _ma_dcc_obj_geometry.Mesh(mya_obj_path)
+                    mya_mesh = _mya_dcc_obj_geometry.Mesh(mya_obj_path)
                     mya_mesh_opt = _mya_dcc_opt_geometry.MeshOpt(mya_mesh)
                     #
                     dcc_obj_name = dcc_obj.name

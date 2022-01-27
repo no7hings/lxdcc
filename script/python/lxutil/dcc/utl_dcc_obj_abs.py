@@ -61,7 +61,7 @@ class AbsOsDirectory(
         if self.get_is_exists() is False:
             os.makedirs(self.path)
             utl_core.Log.set_module_result_trace(
-                'directory-create',
+                'directory create',
                 u'directory-path="{}"'.format(self.path)
             )
 
@@ -70,7 +70,7 @@ class AbsOsDirectory(
         if tgt_directory.get_is_exists():
             if force is False:
                 utl_core.Log.set_module_result_trace(
-                    'path-link-create',
+                    'link create',
                     u'path="{}" is exists'.format(tgt_directory.path)
                 )
                 return
@@ -84,9 +84,10 @@ class AbsOsDirectory(
         #
         if tgt_directory.get_is_exists() is False:
             self._set_symlink_create_(self.path, tgt_directory.path)
+            #
             utl_core.Log.set_module_result_trace(
-                'path-link-create',
-                u'connection="{} >> {}"'.format(self.path, tgt_directory.path)
+                'link create',
+                u'connection="{}" >> "{}"'.format(self.path, tgt_directory.path)
             )
 
     def get_directory_paths(self):
@@ -364,7 +365,7 @@ class AbsOsFile(
             if target_tgt_file.get_is_exists() is True:
                 if force is False:
                     utl_core.Log.set_module_result_trace(
-                        'path-link-create',
+                        'link create',
                         u'file="{}" is exists'.format(target_tgt_file.path)
                     )
                     return
@@ -377,7 +378,7 @@ class AbsOsFile(
                 # link src to target
                 self._set_symlink_create_(target_src_file_path, target_tgt_file.path)
                 utl_core.Log.set_module_result_trace(
-                    'path-link-create',
+                    'link create',
                     u'connection="{} >> {}"'.format(target_src_file_path, target_tgt_file.path)
                 )
         else:
@@ -438,12 +439,15 @@ class AbsOsFile(
                     u'"{}"'.format(i)
                 )
 
+    def get_is_link_source_to(self, file_path):
+        pass
+
     def set_link_to(self, tgt_file_path, force=False):
         tgt_file = self.__class__(tgt_file_path)
         if tgt_file.get_is_exists():
             if force is False:
                 utl_core.Log.set_module_result_trace(
-                    'path-link-create',
+                    'link create',
                     u'path="{}" is exists'.format(tgt_file.path)
                 )
                 return
@@ -458,10 +462,13 @@ class AbsOsFile(
         if tgt_file.get_is_exists() is False:
             tgt_file.set_directory_create()
             #
-            self._set_symlink_create_(self.path, tgt_file.path)
+            bsc_core.StorageLinkMtd.set_link_to(
+                self.path, tgt_file.path
+            )
+            #
             utl_core.Log.set_module_result_trace(
-                'path-link-create',
-                u'connection="{} >> {}"'.format(self.path, tgt_file.path)
+                'link create',
+                u'link="{} >> {}"'.format(self.path, tgt_file.path)
             )
 
 
@@ -737,7 +744,7 @@ class AbsOsTexture(AbsOsFile):
         path_base, ext = os.path.splitext(file_path)
         if ext != cls.JPG_EXT:
             if cls._get_unit_tgt_ext_is_exists_(file_path, tgt_ext=cls.JPG_EXT) is False:
-                return bsc_core.ImageOpt(file_path).get_jpg()
+                return bsc_core.ImageOpt(file_path).get_jpg(width=2048)
         return True
 
     def get_thumbnail_file_path(self):

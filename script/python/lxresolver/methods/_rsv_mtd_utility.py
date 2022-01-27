@@ -110,7 +110,7 @@ class RsvPermissionMtd(object):
         for i_task_directory_path in task_directory_paths:
             bsc_core.StoragePathMtd.set_directory_create(i_task_directory_path)
             utl_core.Log.set_module_result_trace(
-                'directory-create',
+                'directory create',
                 'directory="{}"'.format(i_task_directory_path)
             )
         #

@@ -1,0 +1,29 @@
+asset: ''
+version: ''
+#
+dcc:
+    root: master
+#
+look:
+    passes:
+        - 'default'
+    #
+    properties:
+        - 'default'
+#
+option:
+    indent: 4
+    linesep: "\n"
+
+usd:
+    presets:
+        up_axis: Y
+        linear_unit: 0.01
+#
+usdas:
+    material: 'shading.usda'
+    #
+    proxy: 'proxy.usda'
+    payload: 'payload.usda'
+    registry: 'registry.usda'
+    asset: '<asset>.usda'

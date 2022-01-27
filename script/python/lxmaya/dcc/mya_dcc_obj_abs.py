@@ -118,7 +118,14 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         cmds.setAttr(self.path, value)
                 else:
                     if isinstance(value, (tuple, list)):
-                        cmds.setAttr(self.path, *value, clamp=1)
+                        if self.type == 'matrix':
+                            # ((1, 1, 1), ...)
+                            if isinstance(value[0], (tuple, list)):
+                                value = [j for i in value for j in i]
+                            #
+                            cmds.setAttr(self.path, value, type='matrix')
+                        else:
+                            cmds.setAttr(self.path, *value, clamp=1)
                     else:
                         # Debug ( Clamp Maximum or Minimum Value )
                         cmds.setAttr(self.path, value, clamp=1)
@@ -156,6 +163,13 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
 
     def set_source(self, output_port, validation=False):
         self._set_connect_(output_port, self, validation=validation)
+
+    def set_source_disconnect(self):
+        source = self.get_source()
+        if source:
+            cmds.disconnectAttr(
+                source.path, self.path
+            )
 
     def get_source(self):
         _ = cmds.connectionInfo(
@@ -464,6 +478,7 @@ class AbsMyaObj(
                 'obj-delete',
                 u'obj="{}"'.format(self.path)
             )
+
     def set_to_world(self):
         if self.get_is_exists() is True:
             cmds.parent(self.path, world=1)
@@ -642,7 +657,7 @@ class AbsMyaObj(
             parent_path = self.get_parent_path()
             name = self.name
             utl_core.Log.set_module_result_trace(
-                'obj-create',
+                'obj create',
                 'obj="{}", type="{}"'.format(self.path, self.type)
             )
             if parent_path is not None:

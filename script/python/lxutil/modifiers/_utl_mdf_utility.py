@@ -10,6 +10,7 @@ def set_method_exception_catch(method):
             return _method
         except:
             from lxutil import utl_core
+            #
             utl_core.ExceptionCatcher.set_create()
             raise
     return sub_method

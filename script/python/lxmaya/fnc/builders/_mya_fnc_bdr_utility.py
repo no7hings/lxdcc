@@ -184,14 +184,15 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                     usd_stage_opt.set_flatten()
                     usd_prim = usd_stage_opt.get_obj(root)
                     usd_prim_opt = usd_core.UsdPrimOpt(usd_prim)
-                    customize_attributes = usd_prim_opt.get_customize_attributes(includes=model_act_properties)
+                    customize_attributes = usd_prim_opt.get_customize_attributes(
+                        includes=model_act_properties
+                    )
                     #
                     ma_core.CmdObjOpt(
                         bsc_core.DccPathDagOpt(root).set_translate_to('|').to_string()
                     ).set_customize_attributes_create(customize_attributes)
     @classmethod
     def _set_model_act_geometry_dyn_connect_(cls, with_model_act_geometry_dyn_connect):
-        geometry_var_names = ['hi']
         GeometryAlembicBlender(
             '/dyn/master/hi', '/master/hi'
         ).set_run()
@@ -297,7 +298,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         if with_surface_look_preview is True:
             if rsv_task:
-                look_yml_file = rsv_task.get_rsv_unit(keyword='asset-look-preview-yml-file')
+                look_yml_file = rsv_task.get_rsv_unit(keyword='asset-look-yml-file')
                 look_yml_file_path = look_yml_file.get_result(version='latest')
                 if look_yml_file_path:
                     rsv_unit_properties = look_yml_file.get_properties(look_yml_file_path)

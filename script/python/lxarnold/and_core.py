@@ -285,6 +285,9 @@ class AndObjTypeMtd(object):
     @property
     def name(self):
         return ai.AiNodeEntryGetName(self.and_instance)
+    @property
+    def output_type(self):
+        return ai.AiNodeEntryGetOutputType(self._and_instance)
 
 
 class AndObjMtd(object):
@@ -293,8 +296,8 @@ class AndObjMtd(object):
     def __init__(self, universe, obj):
         self._universe = universe
         self._and_instance = obj
-        self._obj_type = ai.AiNodeGetNodeEntry(obj)
-        self._obj_category = ai.AiNodeEntryGetType(self._obj_type)
+        self._and_obj_type_instance = ai.AiNodeGetNodeEntry(obj)
+        self._obj_category = ai.AiNodeEntryGetType(self._and_obj_type_instance)
     @property
     def universe(self):
         return self._universe
@@ -315,7 +318,7 @@ class AndObjMtd(object):
         return ai.AiNodeEntryGetTypeName(self.type)
     @property
     def type(self):
-        return self._obj_type
+        return self._and_obj_type_instance
     @property
     def type_name(self):
         return AndObjTypeMtd(self.type).name
@@ -380,6 +383,22 @@ class AndObjMtd(object):
     def get_dcc_output_port_name(self):
         output_type = self.output_type
         return and_configure.Node.get_output_name(output_type)
+
+    def get_input_ports(self):
+        input_dict = {}
+
+        it = ai.AiNodeEntryGetParamIterator(ai.AiNodeGetNodeEntry(self._and_instance))
+        while not ai.AiParamIteratorFinished(it):
+            i_and_input_port = ai.AiParamIteratorGetNext(it)
+            # OSL parameters start with "param_"
+            if str(ai.AiParamGetName(i_and_input_port)).startswith("param_"):
+                paramName = ai.AiParamGetName(i_and_input_port)
+                i_and_input_port_opt = AndPortMtd(self._and_instance, i_and_input_port)
+                input_dict[paramName] = {}
+                input_dict[paramName]['paramName'] = i_and_input_port_opt.port_name
+                input_dict[paramName]['paramType'] = i_and_input_port_opt.type_name
+                input_dict[paramName]['paramDefaultValue'] = i_and_input_port_opt.get_default()
+        return input_dict
 
 
 class AndShapeObjMtd(AndObjMtd):
@@ -799,6 +818,7 @@ class AndTextureOpt_(AndImageOpt):
     def _set_unit_tx_create_(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space):
         cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
         if use_aces is True:
+            print color_space, aces_render_color_space
             if color_space in aces_color_spaces:
                 if color_space != aces_render_color_space:
                     cmd_args += [
@@ -816,6 +836,7 @@ class AndTextureOpt_(AndImageOpt):
                 '--compression dwaa'
             ]
         #
+        print cmd_args
         cmd_args += [self._file_path]
         #
         return bsc_core.SubProcessMtd.set_run(
@@ -834,7 +855,7 @@ class AndTextureOpt_(AndImageOpt):
                     ]
             else:
                 result = utl_core.Log.set_module_warning_trace(
-                    'texture-tx-create',
+                    'texture-tx create',
                     u'file="{}", color-space="{}" is Non-valid'.format(self._file_path, color_space)
                 )
                 raise TypeError(result)
@@ -858,6 +879,48 @@ class AndTextureOpt_(AndImageOpt):
             )
         #
         utl_core.Log.set_module_result_trace(
-            'texture-tx-create',
+            'texture-tx create',
             u'file="{}" >> "{}"'.format(self._file_path, self.get_tx_file_path())
         )
+
+
+class AndOslShaderMtd(object):
+    @classmethod
+    def get_data(cls, code):
+        input_dict = {}
+        errors = ''
+        isActive = ai.AiUniverseIsActive()
+        if not isActive:
+            ai.AiBegin()
+
+        # create a universe dedicated to OSL node compilation
+        # for parameter/output type introspection and error checking
+        compilation_universe = ai.AiUniverse()
+
+        and_obj = ai.AiNode(compilation_universe, "osl", "test_node")
+        and_obj_opt = AndObjMtd(compilation_universe, and_obj)
+
+        ai.AiNodeSetStr(and_obj, "code", code)
+
+        if ai.AiNodeLookUpUserParameter(and_obj, "compilation_errors"):
+            compilation_errors = ai.AiNodeGetArray(and_obj, "compilation_errors")
+        else:
+            compilation_errors = None
+
+        if compilation_errors is None or ai.AiArrayGetNumElements(compilation_errors) == 0:
+            compileState = True
+            input_dict = and_obj_opt.get_input_ports()
+        else:
+            compileState = False
+            for i in range(ai.AiArrayGetNumElements(compilation_errors)):
+                errors += ai.AiArrayGetStr(compilation_errors, i) + "\n"
+        # cleanup the node
+        ai.AiUniverseDestroy(compilation_universe)
+
+        if not isActive:
+            ai.AiEnd()
+        return input_dict
+
+
+class AndMayaAeTemplateMtd(object):
+    pass

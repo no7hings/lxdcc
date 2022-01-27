@@ -39,7 +39,7 @@ for i_asset in assets:
         )
         print i_shotgun_render_export_query.get_method_option()
         #
-        i_katana_look_checker_export_runner = ddl_methods.DdlRsvTaskMethodRunner(
+        i_katana_look_checker_export_runner = ddl_methods.RsvTaskHookExecutor(
             method_option=i_shotgun_render_export_query.get_method_option(),
             script_option=i_shotgun_render_export_query.get_script_option(
                 file=i_katana_scene_src_file_path,

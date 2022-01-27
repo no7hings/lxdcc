@@ -5,13 +5,14 @@ if __name__ == '__main__':
 
     r = rsv_commands.get_resolver()
 
-    rsv_project = r.get_rsv_project(project='cjd')
+    # rsv_project = r.get_rsv_project(project='cjd')
 
-    rsv_task = r.get_rsv_task(project='cjd', asset='td_test', task='surfacing')
-
+    rsv_task = r.get_rsv_task(project='cjd', asset='td_test', task='surfac*')
     print rsv_task
-    rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-usd-hi-file')
-    print rsv_unit.get_properties('/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v071/cache/usd/geo/hi.usd')
-    print rsv_unit.get_result()
-    print rsv_unit.get_latest_version()
-    print rsv_unit.get_new_version()
+
+    # print rsv_task
+    # rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-usd-hi-file')
+    # print rsv_unit.get_properties('/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v071/cache/usd/geo/hi.usd')
+    # print rsv_unit.get_result(version='latest')
+    # print rsv_unit.get_latest_version()
+    # print rsv_unit.get_new_version()

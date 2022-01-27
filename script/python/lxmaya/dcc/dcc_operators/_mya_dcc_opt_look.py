@@ -42,7 +42,7 @@ class AbsLookOpt(object):
         cmds.sets(shape_path, forceElement=value)
         utl_core.Log.set_module_result_trace(
             'material-assign',
-            u'material-obj="{}"'.format(value)
+            u'assign="{}" >> "{}"'.format(shape_path, value)
         )
 
     def set_material_assigns(self, material_assigns, force=False):
@@ -73,16 +73,13 @@ class AbsLookOpt(object):
                     cmds.sets(geometry_path, forceElement=material_path)
                     utl_core.Log.set_module_result_trace(
                         'material-assign',
-                        u'obj="{}"'.format(geometry_path)
-                    )
-                    utl_core.Log.set_result_trace(
-                        u'material-obj="{}"'.format(material_path)
+                        u'assign="{}" >> "{}"'.format(geometry_path, material_path)
                     )
                 except:
                     bsc_core.ExceptionMtd.set_print()
                     utl_core.Log.set_module_error_trace(
                         'material-assign',
-                        'obj="{}" >> obj="{}"'.format(geometry_path, material_path)
+                        u'assign="{}" >> "{}"'.format(geometry_path, material_path)
                     )
         else:
             utl_core.Log.set_module_warning_trace(

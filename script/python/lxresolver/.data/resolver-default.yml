@@ -13,13 +13,13 @@ project-root-effect-linux-dir: '/t/prod'
 # <asset-dcc>
 asset-maya-path: '|master'
 #
-asset-geometry-dir: <asset-task-version-dir>/cache
+asset-geometry-dir: <asset-version-dir>/cache
 #
 asset-look-ass-dir: <asset-geometry-dir>/ass
 #
-shot-maya-scene-dir: <shot-task-version-dir>/maya
+shot-maya-scene-dir: <shot-version-dir>/maya
 shot-maya-scene-file: <shot-maya-scene-dir>/<shot-name>.<step-name>.<task-name>.<version-name>.ma
-shot-houdini-scene-dir: <shot-task-version-dir>/houdini
+shot-houdini-scene-dir: <shot-version-dir>/houdini
 shot-houdini-scene-file: <shot-houdini-scene-dir>/<shot-name>.<step-name>.<task-name>.<version-name>.hip
-shot-katana-scene-dir: <shot-task-version-dir>/katana
+shot-katana-scene-dir: <shot-version-dir>/katana
 shot-katana-scene-file: <shot-katana-scene-dir>/<shot-name>.<step-name>.<task-name>.<version-name>.katana

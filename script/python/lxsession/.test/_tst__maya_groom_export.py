@@ -15,7 +15,7 @@ j_option_opt = bsc_core.KeywordArgumentsOpt(
     option=dict(
         option_hook_key='rsv-task-batchers/asset/maya/groom-export',
         #
-        file='/l/prod/cgm_dev/work/assets/chr/nn_14y_test/grm/groom/maya/scenes/nn_14y_test.grm.groom.v002.ma',
+        file='/l/prod/cgm_dev/work/assets/chr/nn_14y_light_test/grm/groom/maya/scenes/nn_14y_light_test.grm.groom.v002.ma',
         user=bsc_core.SystemMtd.get_user_name(),
         #
         td_enable=True,

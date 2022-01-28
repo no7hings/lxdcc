@@ -6,6 +6,16 @@
 )
 
 over "{{ dcc.root }}" (
+    assetInfo = {
+        asset identifier = @{{ asset }}.usda@
+        string project = "{{ project }}"
+        string role = "{{ role }}"
+        string asset = "{{ asset }}"
+        string step = "{{ step }}"
+        string task = "{{ task }}"
+        string version = "{{ version }}"
+    }
+    kind = "component"
     prepend references = [
         @{{ usdas.material }}@,
     ]

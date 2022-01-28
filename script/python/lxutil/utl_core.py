@@ -1004,8 +1004,9 @@ class MayaLauncher(object):
     def set_file_open(self, file_path):
         args = [
             '-- maya',
-            '-file',
-            '"{}"'.format(file_path),
+            r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open_as_project(\\\"{}\\\")\")"'.format(
+                file_path
+            )
         ]
         cmd = ' '.join(args)
         AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
@@ -1015,7 +1016,7 @@ class MayaLauncher(object):
     def set_file_new(self, file_path):
         args = [
             '-- maya',
-            r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_path(\\\"{}\\\", with_create_directory=True)\")"'.format(
+            r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_path_as_project(\\\"{}\\\", with_create_directory=True)\")"'.format(
                 file_path
             )
         ]

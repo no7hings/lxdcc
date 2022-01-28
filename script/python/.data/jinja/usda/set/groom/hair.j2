@@ -1,0 +1,19 @@
+#usda 1.0
+(
+    defaultPrim = "{{ dcc.root }}"
+    metersPerUnit = 0.01
+    upAxis = "Y"
+)
+
+def "{{ dcc.root }}" (
+    prepend references = [
+        @geo/hair.usd@
+    ]
+)
+{
+    over "hair" (
+        kind = "subcomponent"
+    )
+    {
+    }
+}

@@ -17,19 +17,8 @@ over "{{ dcc.root }}" (
     }
     kind = "component"
     prepend references = [
-        @{{ usdas.material }}@,
+        @{{ usdas.hair }}@,
     ]
-    variants = {
-        string uv = "{{ look.passes[0] }}"
-    }
-    prepend variantSets="uv"
-    payload = @{{ usdas.payload }}@
 )
 {
-    variantSet "uv" = {
-        "None" (){}
-        "default" (
-            payload = @uv_map.usd@
-        ){}
-       }
 }

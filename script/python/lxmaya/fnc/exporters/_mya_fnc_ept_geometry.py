@@ -76,7 +76,7 @@ class GeometryAbcExporter(object):
         self._star_frame, self._end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         self._step = step
         self._attribute = attribute
-        self._option = copy.deepcopy(self.OPTION)
+        self._option = copy.copy(self.OPTION)
         if isinstance(option, dict):
             for k, v in option.items():
                 if k in self.OPTION:
@@ -162,6 +162,7 @@ class GeometryAbcExporter(object):
         return cmds.AbcExport(j=j)
     #
     def set_run(self):
+        print self._option
         js = [
             self._get_frame_(self._star_frame, self._end_frame),
             self._get_step_(self._step),

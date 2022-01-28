@@ -260,6 +260,11 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         cmds.file(rename=file_path)
     @classmethod
+    def set_file_path_as_project(cls, file_path, with_create_directory=False):
+        cls.set_file_path(file_path, with_create_directory)
+        workspace_directory = utl_dcc_objects.OsFile(file_path).directory.get_parent()
+        cls.set_workspace_create(workspace_directory.path)
+    @classmethod
     def set_file_new_with_dialog(cls, file_path, post_method):
         def pos_method_run_fnc_():
             if isinstance(post_method, (types.FunctionType, types.MethodType)):
@@ -305,6 +310,10 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             no_fnc_()
     @classmethod
     def set_file_open(cls, file_path):
+        utl_core.Log.set_module_result_trace(
+            'scene-file open',
+            u'file="{}" is started'.format(file_path)
+        )
         cmds.file(
             file_path,
             open=1,
@@ -313,9 +322,14 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             type=cls._get_file_type_name_(file_path)
         )
         utl_core.Log.set_module_result_trace(
-            'scene-file-open',
-            u'file="{}"'.format(file_path)
+            'scene-file open',
+            u'file="{}" is completed'.format(file_path)
         )
+    @classmethod
+    def set_file_open_as_project(cls, file_path):
+        cls.set_file_open(file_path)
+        workspace_directory = utl_dcc_objects.OsFile(file_path).directory.get_parent()
+        cls.set_workspace_create(workspace_directory.path)
     @classmethod
     def set_file_save_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)

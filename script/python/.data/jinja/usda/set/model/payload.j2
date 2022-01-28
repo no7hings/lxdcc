@@ -7,9 +7,9 @@
 
 def "{{ dcc.root }}" (
     prepend references = [
-        @{{ usdas.material }}@,
         @geo/hi.usd@,
         @geo/shape.usd@,
+        @geo/hair.usd@,
         @{{ usdas.proxy }}@
     ]
 )
@@ -19,6 +19,12 @@ def "{{ dcc.root }}" (
     )
     {
         uniform token purpose = "render"
+    }
+
+    over "hair" (
+        kind = "subcomponent"
+    )
+    {
     }
 
     over "shape" (

@@ -777,9 +777,9 @@ class AbsRsvDef(object):
         return self.RSV_PATTERN_CLASS(self.get_pattern(keyword))
 
     def get_include(self, keyword):
-        if keyword not in self._includes_dict:
-            raise KeyError(u'keyword: "{}" is Non-registered'.format(keyword))
-        return self._includes_dict[keyword]
+        if keyword in self._includes_dict:
+            return self._includes_dict[keyword]
+        return []
 
     def get_value(self, keyword):
         if keyword not in self._raw:
@@ -2037,7 +2037,7 @@ class AbsRsvProject(
     def _project__set_rsv_obj_add_(self, rsv_obj):
         self._rsv_obj_stack.set_object_add(rsv_obj)
         utl_core.Log.set_module_result_trace(
-            u'resolver',
+            'resolver',
             u'{}="{}"'.format(rsv_obj.type, rsv_obj.path)
         )
 

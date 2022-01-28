@@ -8,7 +8,11 @@
 def Xform "{{ dcc.root }}" (
     assetInfo = {
         asset identifier = @{{ asset }}.usda@
-        string name = "{{ asset }}"
+        string project = "{{ project }}"
+        string role = "{{ role }}"
+        string asset = "{{ asset }}"
+        string step = "{{ step }}"
+        string task = "{{ task }}"
         string version = "{{ version }}"
     }
     kind = "component"

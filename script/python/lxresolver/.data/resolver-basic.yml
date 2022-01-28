@@ -505,3 +505,7 @@ include-asset-step:
     - efx
     # animation
     - ani
+    # light
+    - lgt
+    # set
+    - set

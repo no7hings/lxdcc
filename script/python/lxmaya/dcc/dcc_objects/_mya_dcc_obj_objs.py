@@ -182,6 +182,7 @@ class AbsFileReferences(object):
             results = re.findall(re_pattern, file_name)
             if results:
                 return file_path
+            #
             mode = obj.get_port('uvTilingMode').get()
             if mode == 3:
                 results = re.findall(r'[0-9][0-9][0-9][0-9]', file_name)
@@ -301,7 +302,7 @@ class AbsFileReferences(object):
                             continue
                     #
                     obj.set_file_port_raw_add(
-                        j_port_path, j_file_path
+                        j_port_path, self._set_file_gain_value_convert_(obj, j_file_path)
                     )
 
     def get_objs(self):

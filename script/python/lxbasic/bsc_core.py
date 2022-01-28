@@ -2973,7 +2973,4 @@ class SessionMtd(object):
 
 
 if __name__ == '__main__':
-    for _i in ['./shotgun-create', '../maya/scene-export', '../maya/geometry-export', '../usd/usd-create']:
-        print SessionMtd.get_hook_abs_path(
-            'rsv-task-methods/asset/shotgun/shotgun-export', _i
-        )
+    print StoragePathOpt('/data/b//').get_path()

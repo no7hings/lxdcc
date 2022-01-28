@@ -16,6 +16,6 @@ if __name__ == '__main__':
 
     print rsv_unit.get_latest_results()
 
-    rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-xgen-grow-file')
+    rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-xgen-grow-mesh-file')
 
     print rsv_unit.get_latest_results()

@@ -263,7 +263,9 @@ asset-geometry-ass-file: <asset-geometry-ass-dir>/<var-name>.ass
 asset-geometry-xgen-dir: <asset-version-dir>/maya
 asset-geometry-xgen-file: <asset-version-dir>/maya/<asset-name>__<xgen-name>.xgen
 asset-geometry-xgen-glow-dir: <asset-version-dir>/maya
-asset-geometry-xgen-grow-file: <asset-version-dir>/maya/<asset-name>__<xgen-name>.abc
+asset-geometry-xgen-grow-mesh-file: <asset-version-dir>/maya/<asset-name>__<xgen-name>.abc
+#
+asset-geometry-xgen-collection-dir: <asset-version-dir>/cache/xgen/collections
 #
 asset-metadata-dir: <asset-version-dir>/metadata
 asset-geometry-xml-topo-file: <asset-metadata-dir>/<var-name>.topo.xml

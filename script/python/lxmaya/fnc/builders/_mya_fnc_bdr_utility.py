@@ -261,7 +261,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             if rsv_groom_task:
                 geometry_xgen_file = rsv_groom_task.get_rsv_unit(keyword='asset-geometry-xgen-file')
                 geometry_xgen_file_paths = geometry_xgen_file.get_latest_results()
-                geometry_xgen_grow_file = rsv_groom_task.get_rsv_unit(keyword='asset-geometry-xgen-grow-file')
+                geometry_xgen_grow_file = rsv_groom_task.get_rsv_unit(keyword='asset-geometry-xgen-grow-mesh-file')
                 geometry_xgen_grow_file_paths = geometry_xgen_grow_file.get_latest_results()
                 if geometry_xgen_file_paths:
                     i = mya_fnc_importers.GeometryXgenImporter(

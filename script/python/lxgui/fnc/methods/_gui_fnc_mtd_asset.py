@@ -247,7 +247,7 @@ class AbsLibMethodFileDef(object):
     def _set_j_rsv_task_files_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
             'asset-geometry-xgen-file',
-            'asset-geometry-xgen-grow-file',
+            'asset-geometry-xgen-grow-mesh-file',
         ]:
             cls._set_k_rsv_unit_files_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
     @classmethod

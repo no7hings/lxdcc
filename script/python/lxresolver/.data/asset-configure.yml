@@ -218,7 +218,7 @@ geometries:
             task: <option.tasks.groom>
             version: latest
         grow-file:
-            keyword: asset-geometry-xgen-grow-file
+            keyword: asset-geometry-xgen-grow-mesh-file
             workspace: publish
             step: <option.steps.groom>
             task: <option.tasks.groom>

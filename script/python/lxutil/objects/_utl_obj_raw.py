@@ -132,8 +132,8 @@ class DotAssReader(bsc_obj_abs.AbsFileReader):
 class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
     SEP = '\n\n'
     FILE_REFERENCE_DICT = {
-        'Palette': 'xgDataPath',
-        'Description': 'xgDataPath'
+        'Palette': ['xgDataPath', 'xgProjectPath'],
+        'Description': ['xgDataPath', 'xgProjectPath']
     }
     def __init__(self, file_path):
         super(DotXgenFileReader, self).__init__(file_path)
@@ -158,7 +158,7 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
         sep = '\n'
         _ = cls._get_lines_(raw, sep)
         for i in _:
-            __ = i.lstrip().rstrip().split('\t')
+            __ = i.strip().split('\t')
             port_name, port_raw, port_type = __[0], __[-1], None
             dic[port_name] = port_type, port_raw
         return dic
@@ -171,39 +171,83 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
             line, variants = obj_raw
             obj_type = variants['obj_type']
             if obj_type in self.FILE_REFERENCE_DICT:
-                port_name = self.FILE_REFERENCE_DICT[obj_type]
-                if port_name is not None:
-                    port_raws = self._get_obj_port_raws_(variants['port_lines'])
-                    obj_name = port_raws['name'][-1]
-                    if port_name in port_raws:
-                        port_type, port_raw = port_raws[port_name]
-                        raw = dict(
-                            obj_type=obj_type,
-                            obj_name=obj_name,
-                            port_name=port_name,
-                            port_type=port_type,
-                            port_raw=port_raw,
-                            line_index=self.lines.index(line),
-                        )
-                        lis.append(raw)
+                port_names = self.FILE_REFERENCE_DICT[obj_type]
+                for i_port_name in port_names:
+                    if i_port_name is not None:
+                        port_raws = self._get_obj_port_raws_(variants['port_lines'])
+                        obj_name = port_raws['name'][-1]
+                        if i_port_name in port_raws:
+                            port_type, port_raw = port_raws[i_port_name]
+                            raw = dict(
+                                obj_type=obj_type,
+                                obj_name=obj_name,
+                                port_name=i_port_name,
+                                port_type=port_type,
+                                port_raw=port_raw,
+                                line_index=self.lines.index(line),
+                                line=line,
+                            )
+                            lis.append(raw)
         print 'end file: "{}"'.format(self.file_path)
         return lis
 
     def get_file_paths(self):
         return self._get_file_paths_()
 
-    def set_xgen_paths(self, directory_path):
+    def set_xgen_collection_path(self, directory_path):
         _ = self.get_file_paths()
+        lis = []
         for i in _:
-            print i
-            i_directory_path = i['port_raw']
-            i_directory_path = bsc_core.StoragePathOpt(
-                i_directory_path
-            ).get_path()
-            i_ss = i_directory_path.split('/xgen/collections/')
-            print i_ss
-            i_obj_type = i['obj_type']
-            print '{}/{}'.format(directory_path, i_ss[-1])
+            i_port_name = i['port_name']
+            if i_port_name == 'xgDataPath':
+                i_raw = i['port_raw']
+                i_raw = bsc_core.StoragePathOpt(
+                    i_raw
+                ).get_path()
+                i_ss = i_raw.split('/')
+                if i_ss[-1]:
+                    i_collection_name = i_ss[-1]
+                else:
+                    i_collection_name = i_ss[-2]
+                i_obj_type = i['obj_type']
+                if i_obj_type == 'Description':
+                    i_new_raw = '{}/{}/'.format(directory_path, i_collection_name)
+                else:
+                    i_new_raw = '{}/{}'.format(directory_path, i_collection_name)
+                #
+                i_line_index = i['line_index']
+                i_line = i['line']
+                i_new_line = i_line.replace(i_raw, i_new_raw)
+                lis.append((i_line_index, i_new_line))
+        #
+        for i_line_index, i_line in lis:
+            self.lines[i_line_index] = i_line
+
+    def set_project_path(self, directory_path):
+        _ = self.get_file_paths()
+        lis = []
+        for i in _:
+            i_port_name = i['port_name']
+            if i_port_name == 'xgProjectPath':
+                i_raw = i['port_raw']
+                i_raw = bsc_core.StoragePathOpt(
+                    i_raw
+                ).get_path()
+                #
+                i_new_raw = directory_path
+                #
+                i_line_index = i['line_index']
+                i_line = i['line']
+                i_new_line = i_line.replace(i_raw, i_new_raw)
+                lis.append((i_line_index, i_new_line))
+        #
+        for i_line_index, i_line in lis:
+            self.lines[i_line_index] = i_line
+
+    def set_save(self):
+        utl_core.File.set_write(
+            self.file_path, u''.join(self.lines)
+        )
 
 
 class DotMaFileReader(bsc_obj_abs.AbsFileReader):

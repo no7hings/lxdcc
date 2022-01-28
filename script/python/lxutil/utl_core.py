@@ -728,6 +728,10 @@ class Application(object):
 class File(object):
     @classmethod
     def set_write(cls, file_path, raw):
+        Log.set_module_result_trace(
+            'file write',
+            u'file="{}" is started'.format(file_path)
+        )
         directory = os.path.dirname(file_path)
         if os.path.isdir(directory) is False:
             os.makedirs(directory)
@@ -752,8 +756,8 @@ class File(object):
                 f.write(raw)
         #
         Log.set_module_result_trace(
-            'file-write',
-            u'file="{}"'.format(file_path)
+            'file write',
+            u'file="{}" is completed'.format(file_path)
         )
     @classmethod
     def set_read(cls, file_path):

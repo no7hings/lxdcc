@@ -961,6 +961,11 @@ class AbsRsvVersion(
             **kwargs
         )
 
+    def get_directory_path(self):
+        keyword = '{}-version-dir'.format(self.get('branch'))
+        rsv_unit = self.get_rsv_unit(keyword=keyword)
+        return rsv_unit.get_result()
+
 
 # <rsv-task>
 class AbsRsvTask(

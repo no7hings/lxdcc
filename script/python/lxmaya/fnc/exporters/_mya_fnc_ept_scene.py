@@ -28,7 +28,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 
 class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
-    WITH_XGEN = 'with_xgen'
+    WITH_XGEN = 'with_xgen_collection'
     OPTION = {
         WITH_XGEN: False
     }
@@ -72,7 +72,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
         pass
 
     def set_run(self):
-        with_xgen = self._option[self.WITH_XGEN]
+        with_xgen_collection = self._option[self.WITH_XGEN]
         #
         os_file = utl_dcc_objects.OsFile(self._file_path)
         os_file.set_directory_create()
@@ -99,7 +99,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
         if _:
             self._results = [self._file_path]
         #
-        if with_xgen is True:
+        if with_xgen_collection is True:
             self._set_dot_xgen_file_copy_()
             self._set_xgen_folder_copy_()
         #

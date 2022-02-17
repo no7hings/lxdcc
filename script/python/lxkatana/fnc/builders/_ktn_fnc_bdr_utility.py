@@ -1020,7 +1020,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
     @classmethod
     def _set_camera_build_by_abc_(cls, rsv_task, version):
         camera_abc_file_unit = rsv_task.get_rsv_unit(
-            keyword='asset-camera-abc-file'
+            keyword='asset-camera-persp-abc-file'
         )
         camera_abc_file_path = camera_abc_file_unit.get_result(version=version)
         if camera_abc_file_path is not None:

@@ -318,6 +318,7 @@ workspace:
             connections:
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
+    #
     references:
         label: references
         main:
@@ -332,6 +333,31 @@ workspace:
             connections:
                 - <...look_switch.main.path>.out
                 - <.path>.looks
+    #
+    cameras:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>
+            obj_type: lx_camera_loader
+            base_obj_type: Group
+            #
+            output: output
+            attributes:
+                x: =<option.x>+<option.w>/2
+                y: =<option.y>-<option.h>*4.75
+                ns_colorr: 0.75
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            parameters:
+                settings/resolution_enable: True
+                settings/frame_offset_enable: True
+                settings/frame_offset: 1000
+                settings/visible_enable: True
+                settings/visible: 0
+            connections:
+                - <.path>.output
+                - <...references.main.path>.cameras
+    #
     light_rigs:
         label: <..key>
         main:
@@ -376,6 +402,8 @@ workspace:
                 ns_colorr: 0.5
                 ns_colorg: 0.25
                 ns_colorb: 0.25
+            parameters:
+                lynxi_settings/render_output_enable: 1
             connections:
                 - <...light_rigs.main.path>.o0
                 - <.path>.<.input>
@@ -418,7 +446,7 @@ workspace:
                     input: input
                     output: output
                     obj_category: node
-                    obj_type: lx_render_outputs_modifier
+                    obj_type: lx_render_settings_modifier
                     base_obj_type: Group
                     attributes:
                         ns_colorr: 0.75

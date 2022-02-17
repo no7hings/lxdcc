@@ -1059,7 +1059,8 @@ class KeywordArgumentsMtd(object):
         for k in keys:
             v = kwargs[k]
             if isinstance(v, (tuple, list)):
-                vars_.append('{}={}'.format(k, '+'.join(v)))
+                # must convert to str
+                vars_.append('{}={}'.format(k, '+'.join(map(str, v))))
             else:
                 vars_.append('{}={}'.format(k, v))
         return cls.ARGUMENT_SEP.join(vars_)

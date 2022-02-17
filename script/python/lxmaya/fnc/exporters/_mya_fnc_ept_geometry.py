@@ -24,6 +24,8 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 import lxusd.fnc.exporters as usd_fnc_exporters
 
+from lxutil.fnc import utl_fnc_obj_abs
+
 
 class GeometryAbcExporter(object):
     FILE = 'file'
@@ -71,8 +73,7 @@ class GeometryAbcExporter(object):
     def __init__(self, file_path, root=None, frame=None, step=None, attribute=None, option=None, data_format=None):
         self._file_path = file_path
         #
-        dcc_root_dag_opt = bsc_core.DccPathDagOpt(root)
-        self._root = dcc_root_dag_opt.set_translate_to('|').to_string()
+        self._root = self._get_location_(root)
         self._star_frame, self._end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         self._step = step
         self._attribute = attribute
@@ -86,6 +87,17 @@ class GeometryAbcExporter(object):
         self._data_format = data_format
         #
         self._results = []
+    @classmethod
+    def _get_location_(cls, raw):
+        if raw is not None:
+            if isinstance(raw, (str, unicode)):
+                _ = [raw]
+            elif isinstance(raw, (tuple, list)):
+                _ = list(raw)
+            else:
+                raise TypeError()
+            return map(lambda x: bsc_core.DccPathDagOpt(x).set_translate_to('|').to_string(), _)
+        return []
     @classmethod
     def _get_file_(cls, file_path):
         return '-{0} {1}'.format(cls.FILE, file_path.replace('\\', '/'))
@@ -143,7 +155,7 @@ class GeometryAbcExporter(object):
         lis = cls._get_strs_(attr_name)
         #
         if lis:
-            _ = ' '.join(['{0} {1}'.format(cls.ATTR, i) for i in lis])
+            _ = ' '.join(['-{0} {1}'.format(cls.ATTR, i) for i in lis])
         else:
             _ = None
         return _
@@ -162,7 +174,6 @@ class GeometryAbcExporter(object):
         return cmds.AbcExport(j=j)
     #
     def set_run(self):
-        print self._option
         js = [
             self._get_frame_(self._star_frame, self._end_frame),
             self._get_step_(self._step),
@@ -510,3 +521,42 @@ class DatabaseGeometryExport(object):
 
     def set_run(self):
         self._set_uv_map_export_run_()
+
+
+class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+        file='',
+        location='',
+        frame=(1, 1),
+    )
+    def __init__(self, option):
+        super(CameraAbcExport, self).__init__(option)
+        option = self.get_option()
+        location = option.get('location')
+        g = mya_dcc_objects.Group(bsc_core.DccPathDagOpt(location).set_translate_to('|').to_string())
+        self._camera_shape_paths = g.get_all_shape_paths(include_obj_type='camera')
+        self._camera_transform_paths = map(lambda x: mya_dcc_objects.Shape(x).transform.path, self._camera_shape_paths)
+
+    def _set_pre_run_(self):
+        for i in self._camera_shape_paths:
+            i_camera_shape = mya_dcc_objects.Shape(i)
+            i_camera_shape.get_port('overscan').set(1)
+            #
+            i_camera_shape.get_port('lx_film_fit').set_create('long')
+            i_camera_shape.get_port('lx_film_fit').set(
+                i_camera_shape.get_port('filmFit').get()
+            )
+            i_camera_shape.get_port('lx_camera_tag').set_create('string')
+            i_camera_shape.get_port('lx_camera_tag').set(
+                'main'
+            )
+
+    def set_run(self):
+        self._set_pre_run_()
+        option = self.get_option()
+        GeometryAbcExporter(
+            file_path=option.get('file'),
+            root=self._camera_transform_paths,
+            frame=option.get('frame'),
+            attribute=['lx_film_fit', 'lx_camera_tag']
+        ).set_run()

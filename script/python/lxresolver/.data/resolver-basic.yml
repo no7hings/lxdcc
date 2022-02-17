@@ -276,8 +276,10 @@ asset-metadata-look-yml-file: <asset-metadata-dir>/<asset-name>.look.yml
 asset-scene-info-file: <asset-metadata-dir>/<asset-name>.info.yml
 #
 asset-camera-dir: <asset-version-dir>/camera
-asset-camera-yml-file: <asset-camera-dir>/yml/persp.yml
-asset-camera-abc-file: <asset-camera-dir>/abc/persp.abc
+asset-camera-main-abc-file: <asset-camera-dir>/abc/main.abc
+#
+asset-camera-persp-yml-file: <asset-camera-dir>/yml/persp.yml
+asset-camera-persp-abc-file: <asset-camera-dir>/abc/persp.abc
 # <asset-hair>
 asset-hair-dir: <asset-version-dir>/cache
 # <asset-hair-xgen>
@@ -491,6 +493,8 @@ include-role:
 include-asset-step:
     # art
     - art
+    # camera
+    - cam
     # model
     - mod
     # surface
@@ -509,3 +513,8 @@ include-asset-step:
     - lgt
     # set
     - set
+# ******************************************************************************************************************** #
+# dcc rule
+dcc:
+    root: /master
+    main_camera_location: /cameras/main

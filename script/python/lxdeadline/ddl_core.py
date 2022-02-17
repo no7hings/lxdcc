@@ -446,7 +446,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             #
             configure=project,
             engine='maya',
-            script='set_camera_export_by_any_scene_file',
+            script='set_camera_create_by_any_scene_file',
             #
             pool='subprogress',
             group='subprogress',

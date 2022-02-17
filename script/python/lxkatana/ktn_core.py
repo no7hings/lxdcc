@@ -447,6 +447,9 @@ class NGPortOpt(object):
     def set_connect_to(self, input_port):
         pass
 
+    def set_expression(self, raw):
+        self._ktn_port.setExpression(raw)
+
 
 class NGAndObjTypeOpt(object):
     def __init__(self, obj_type_name):
@@ -1061,6 +1064,10 @@ class NGMacro(object):
                     )
             elif isinstance(value, (int, float)):
                 ktn_port = ktn_group_port.createChildNumber(name, value)
+                if widget in ['boolean']:
+                    ktn_port.setHintString(
+                        str({'widget': 'boolean'})
+                    )
             elif isinstance(value, (list,)):
                 if widget in ['enumerate']:
                     ktn_port = ktn_group_port.createChildString(name, value[0])
@@ -1110,6 +1117,18 @@ class NGMacro(object):
         for k, v in parameters.items():
             k = k.replace('/', '.')
             self.set_parameter_create(k, v)
+    @classmethod
+    @ktn_modifiers.set_undo_mark_mdf
+    def set_create_to_op_script_by_configure_file(cls, file_path, op_script):
+        configure = bsc_objects.Configure(value=file_path)
+        parameters = configure.get('parameters') or {}
+        for k, v in parameters.items():
+            i_k_s = k.replace('/', '.')
+            i_k_t = k.replace('/', '__')
+            if v.get('widget') != 'button':
+                i_k_t = 'user.{}'.format(i_k_t)
+                NGMacro(op_script).set_parameter_create(i_k_t, v)
+                NGPortOpt(NGObjOpt(op_script).get_port(i_k_t)).set_expression('getParent().{}'.format(i_k_s))
 
 
 class LXRenderSettingsOpt(object):

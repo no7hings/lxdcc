@@ -107,10 +107,10 @@ main:
     #
     camera:
         yml-file:
-            keyword: asset-camera-yml-file
+            keyword: asset-camera-persp-yml-file
             workspace: publish
         abc-file:
-            keyword: asset-camera-abc-file
+            keyword: asset-camera-persp-abc-file
             workspace: publish
     #
     deadline:

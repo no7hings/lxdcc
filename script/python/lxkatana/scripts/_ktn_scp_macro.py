@@ -4,9 +4,70 @@ import collections
 from Katana import CacheManager
 
 
+class LxCameraAlembic(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def set_reset(self):
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        obj_opt.set_port_raw(
+            'alembic.file', ''
+        )
+        obj_opt.set_port_raw(
+            'alembic.location', ''
+        )
+        #
+        obj_opt.set_port_raw(
+            'option.resolution_enable', False
+        )
+        obj_opt.set_port_raw(
+            'option.resolution', '512x512'
+        )
+
+    def set_file_load(self):
+        # adjustScreenWindow=Adjust width to match resolution
+        import lxresolver.commands as rsv_commands
+        #
+        from lxkatana import ktn_core
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        f = ktn_dcc_objects.Scene.get_current_file_path()
+        if f:
+            resolver = rsv_commands.get_resolver()
+            rsv_task = resolver.get_rsv_task_by_any_file_path(f)
+            if rsv_task:
+                rsv_entity = rsv_task.get_rsv_entity()
+                rsv_camera_task = rsv_entity.get_rsv_task(
+                    step='cam',
+                    task='camera'
+                )
+                rsv_unit = rsv_camera_task.get_rsv_unit(
+                    keyword='asset-camera-main-abc-file'
+                )
+                file_path = rsv_unit.get_result(version='latest')
+                if file_path:
+                    obj_opt.set_port_raw(
+                        'alembic.file',
+                        file_path
+                    )
+                    obj_opt.set_port_raw(
+                        'alembic.location',
+                        '/root/world/cam/cameras'
+                    )
+
+
 class LxRenderSettings(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
+
+    def set_reset(self):
+        pass
 
     def set_stats_file(self):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -29,7 +90,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<look-pass>.stats.####.json'.format(render_output_directory_path)
+                v = '{}/main/<camera>/<look-pass>.stats.####.json'.format(render_output_directory_path)
                 utl_dcc_objects.OsFile(v).set_directory_create()
                 #
                 obj_opt.set_port_raw(
@@ -58,7 +119,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<look-pass>.profile.####.json'.format(render_output_directory_path)
+                v = '{}/main/<camera>/<look-pass>.profile.####.json'.format(render_output_directory_path)
                 utl_dcc_objects.OsFile(v).set_directory_create()
                 #
                 obj_opt.set_port_raw(
@@ -85,10 +146,10 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<look-pass>/<render-pass>.####.exr'.format(render_output_directory_path)
+                v = '{}/main/<camera>/<look-pass>/<render-pass>.####.exr'.format(render_output_directory_path)
                 #
                 obj_opt.set_port_raw(
-                    'lynxi_outputs.render_output', v
+                    'lynxi_settings.render_output', v
                 )
 
 
@@ -398,3 +459,54 @@ class LxShotAsset(object):
                 #
                 no_visible=False, cancel_visible=False
             )
+
+
+class LxCamera(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def set_reset(self):
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        obj_opt.set_port_raw(
+            'alembic.file', ''
+        )
+        obj_opt.set_port_raw(
+            'alembic.location', ''
+        )
+
+    def set_load(self):
+        # adjustScreenWindow=Adjust width to match resolution
+        import lxresolver.commands as rsv_commands
+        #
+        from lxkatana import ktn_core
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        f = ktn_dcc_objects.Scene.get_current_file_path()
+        if f:
+            resolver = rsv_commands.get_resolver()
+            rsv_task = resolver.get_rsv_task_by_any_file_path(f)
+            if rsv_task:
+                rsv_entity = rsv_task.get_rsv_entity()
+                rsv_camera_task = rsv_entity.get_rsv_task(
+                    step='cam',
+                    task='camera'
+                )
+                rsv_unit = rsv_camera_task.get_rsv_unit(
+                    keyword='asset-camera-main-abc-file'
+                )
+                file_path = rsv_unit.get_result(version='latest')
+                if file_path:
+                    obj_opt.set_port_raw(
+                        'alembic.file',
+                        file_path
+                    )
+                    obj_opt.set_port_raw(
+                        'alembic.location',
+                        '/root/world/cam/cameras'
+                    )

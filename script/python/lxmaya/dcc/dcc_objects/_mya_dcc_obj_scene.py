@@ -200,7 +200,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             star_frame = end_frame = frame
         else:
             star_frame = end_frame = cls.get_current_frame()
-        return star_frame, end_frame
+        return float(star_frame), float(end_frame)
     @classmethod
     def _get_file_type_name_(cls, file_path):
         ext = os.path.splitext(file_path)[-1]

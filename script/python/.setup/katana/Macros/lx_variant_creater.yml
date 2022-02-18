@@ -1,0 +1,19 @@
+#
+input_ports: []
+#
+output_ports: []
+
+parameters:
+    lynxi_variants/key:
+        widget: enumerate
+        value: ['layer', 'quality', 'camera', 'look_pass', 'light_pass']
+        tool_tip: '...'
+    lynxi_variants/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+    #
+    lynxi_variants/register:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxVariant(node).set_register()'
+        tool_tip: '...'

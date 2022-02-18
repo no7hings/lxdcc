@@ -309,15 +309,16 @@ workspace:
         label: <..key>
         main:
             path: <option.root>/<..label>
-            obj_type: VariableSwitch
+            obj_type: lx_variant_creater
+            base_obj_type: VariableSwitch
             attributes:
                 x: =<option.x>
                 y: =<option.y>-<option.h>*4.5
-                ns_colorr: 0.5
-                ns_colorg: 0.25
+                ns_colorr: 0.75
+                ns_colorg: 0.5
                 ns_colorb: 0.25
             parameters:
-                variableName: look_pass
+                lynxi_variants/key: look_pass
             connections:
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
@@ -348,8 +349,8 @@ workspace:
             attributes:
                 x: =<option.x>+<option.w>/2
                 y: =<option.y>-<option.h>*4.75
-                ns_colorr: 0.75
-                ns_colorg: 0.5
+                ns_colorr: 0.5
+                ns_colorg: 0.25
                 ns_colorb: 0.25
             parameters:
                 settings/resolution_enable: True
@@ -369,7 +370,7 @@ workspace:
             base_obj_type: Group
             attributes:
                 x: =<option.x>
-                y: =<option.y>-<option.h>*6
+                y: =<option.y>-<option.h>*5.5
                 ns_colorr: 0.5
                 ns_colorg: 0.25
                 ns_colorb: 0.25
@@ -382,7 +383,7 @@ workspace:
             attributes:
                 x: =<option.x>
                 y: =<option.y>-<option.h>*6
-                ns_text: <...label>
+                ns_text: 'light-pass(s)'
                 ns_fontScale: 3.0
                 ns_sizeX: =<option.w>*2-<option.margin>*2
                 ns_sizeY: =<option.h>*2-<option.margin>*2
@@ -394,15 +395,17 @@ workspace:
         label: <..key>
         main:
             path: <option.root>/<..label>
-            obj_type: VariableSwitch
+            obj_type: lx_variant_creater
+            base_obj_type: VariableSwitch
             attributes:
                 x: =<option.x>
-                y: =<option.y>-<option.h>*6.5
-                ns_colorr: 0.5
-                ns_colorg: 0.25
+                y: =<option.y>-<option.h>*6
+                
+                ns_colorr: 0.75
+                ns_colorg: 0.5
                 ns_colorb: 0.25
             parameters:
-                variableName: light_pass
+                lynxi_variants/key: light_pass
             connections:
                 - <...light_rigs.main.path>.o0
                 - <.path>.<option.light_pass>
@@ -418,7 +421,7 @@ workspace:
             output: output
             attributes:
                 x: =<option.x>
-                y: =<option.y>-<option.h>*7
+                y: =<option.y>-<option.h>*7.5
                 ns_colorr: 0.5
                 ns_colorg: 0.25
                 ns_colorb: 0.25
@@ -451,7 +454,7 @@ workspace:
             attributes:
                 x: =<option.x>+<option.offset_x>
                 y: =<option.y>-<option.h>*8
-                ns_text: <...label>
+                ns_text: 'renderer(s)'
                 ns_fontScale: 3.0
                 ns_sizeX: =<option.w>*2-<option.margin>*2
                 ns_sizeY: =<option.h>*2-<option.margin>*2
@@ -485,7 +488,7 @@ workspace:
             attributes:
                 x: =<option.x>-<option.w>*2
                 y: =<option.y>-<option.h>*6
-                ns_text: <...label>
+                ns_text: 'look-output(s)'
                 ns_fontScale: 3.0
                 ns_sizeX: =<option.w>*2-<option.margin>*2
                 ns_sizeY: =<option.h>*2-<option.margin>*2

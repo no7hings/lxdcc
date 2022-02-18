@@ -10,6 +10,11 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_reset()'
         tool_tip: 'press to rest all parameters'
     #
+    alembic/enable:
+      widget: boolean
+      value: False
+      tool_tip: '...'
+
     alembic/file:
       widget: file
       value: ''
@@ -54,3 +59,39 @@ parameters:
         widget: boolean
         value: 1
         tool_tip: '...'
+    #
+    cameras/location:
+        widget: path
+        value: '/root/world/cam/cameras'
+        tool_tip: '...'
+
+    cameras/close_up/name:
+        widget: string
+        value: '/cam_closeUp/cam_closeUpShape'
+        tool_tip: '...'
+
+    cameras/upper_body/name:
+        widget: string
+        value: '/cam_upperbody/cam_upperbodyShape'
+        tool_tip: '...'
+
+    cameras/upper_body_35/name:
+        widget: string
+        value: '/cam_upperbody35/cam_upperbody35Shape'
+        tool_tip: '...'
+
+    cameras/upper_body_50/name:
+        widget: string
+        value: '/cam_upperbody50/cam_upperbody50Shape'
+        tool_tip: '...'
+
+    cameras/full_body/name:
+        widget: string
+        value: '/cam_fullbody/cam_fullbodyShape'
+        tool_tip: '...'
+
+    cameras/free/name:
+        widget: string
+        value: '/cam_free/cam_freeShape'
+        tool_tip: '...'
+    #

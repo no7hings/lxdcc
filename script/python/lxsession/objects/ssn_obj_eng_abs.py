@@ -85,8 +85,10 @@ class AbsRsvApplication(object):
                     scene_src_file_path = scene_src_file_unit.get_result(
                         version=version
                     )
+                    work_scene_src_file = utl_dcc_objects.OsFile(work_scene_src_file_path)
                     scene_src_file = utl_dcc_objects.OsFile(scene_src_file_path)
                     if scene_src_file.get_is_exists() is False or force is True:
+                        work_scene_src_file.set_copy_to_file(scene_src_file_path)
                         if application == 'maya':
                             utl_fnc_exporters.DotMaExport(
                                 option=dict(
@@ -94,7 +96,7 @@ class AbsRsvApplication(object):
                                     file_path_tgt=scene_src_file_path
                                 )
                             ).set_run()
-                            return scene_src_file_path
+                        return scene_src_file_path
                     else:
                         return scene_src_file_path
                 else:

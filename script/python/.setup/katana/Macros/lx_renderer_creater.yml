@@ -10,14 +10,29 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_reset()'
         tool_tip: 'press to rest all parameters'
     #
+    lynxi_variants/layer_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
     lynxi_variants/layers:
         widget: string
         value: 'master'
         tool_tip: '...'
 
+    lynxi_variants/quality_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
     lynxi_variants/qualities:
         widget: string
-        value: 'low'
+        value: 'mid'
+        tool_tip: '...'
+
+    lynxi_variants/camera_enable:
+        widget: boolean
+        value: True
         tool_tip: '...'
 
     lynxi_variants/cameras:
@@ -25,14 +40,29 @@ parameters:
         value: 'full_body'
         tool_tip: '...'
 
+    lynxi_variants/look_pass_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
     lynxi_variants/look_passes:
         widget: string
         value: 'default'
         tool_tip: '...'
 
+    lynxi_variants/light_pass_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
     lynxi_variants/light_passes:
         widget: string
         value: 'all'
+        tool_tip: '...'
+    #
+    lynxi_variants/refresh:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_refresh()'
         tool_tip: '...'
     #
     create:

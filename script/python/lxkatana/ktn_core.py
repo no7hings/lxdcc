@@ -1,5 +1,7 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
+import collections
+
 from Katana import NodegraphAPI, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration
 # noinspection PyUnresolvedReferences
 from UI4 import App
@@ -385,6 +387,18 @@ class NGObjOpt(object):
         )
         self._ktn_obj.setAttributes(atr)
 
+    def set_color(self, color):
+        r, g, b = color
+        atr = self._ktn_obj.getAttributes()
+        atr.update(
+            dict(
+                ns_colorr=r,
+                ns_colorg=g,
+                ns_colorb=b
+            )
+        )
+        self._ktn_obj.setAttributes(atr)
+
     def set_ports_clear(self, prot_path=None):
         if prot_path is None:
             ktn_root_port = self._ktn_obj.getParameters()
@@ -393,8 +407,9 @@ class NGObjOpt(object):
         else:
             ktn_root_port = self._ktn_obj.getParameter(prot_path)
         #
-        for i in ktn_root_port.getChildren():
-            ktn_root_port.deleteChild(i)
+        if ktn_root_port is not None:
+            for i in ktn_root_port.getChildren():
+                ktn_root_port.deleteChild(i)
 
     def get_children(self):
         return self._ktn_obj.getChildren()
@@ -465,9 +480,10 @@ class NGPortOpt(object):
     @property
     def path(self):
         return self._atr_path
-    @property
-    def name(self):
-        return self.ktn_port.getName()
+
+    def get_name(self):
+        return self._ktn_port.getName()
+    name = property(get_name)
     @classmethod
     def _get_atr_path_(cls, ktn_port):
         def rcs_fnc_(ktn_port_):
@@ -544,6 +560,12 @@ class NGPortOpt(object):
 
     def set_expression(self, raw):
         self._ktn_port.setExpression(raw)
+
+    def get_children(self):
+        return [self._ktn_port.getChildren()]
+
+    def set_children_clear(self):
+        [self._ktn_port.deleteChild(i) for i in self.get_children()]
 
 
 class NGAndObjTypeOpt(object):
@@ -1201,8 +1223,8 @@ class NGMacro(object):
         NGObjOpt(self._ktn_obj).set_ports_clear(port_path)
 
     @ktn_modifiers.set_undo_mark_mdf
-    def set_create_by_configure_file(self, file_path):
-        NGObjOpt(self._ktn_obj).set_ports_clear()
+    def set_create_by_configure_file(self, file_path, clear_start=None):
+        NGObjOpt(self._ktn_obj).set_ports_clear(clear_start)
         #
         configure = bsc_objects.Configure(value=file_path)
         input_ports = configure.get('input_ports') or []
@@ -1236,3 +1258,53 @@ class NGMacro(object):
 class LXRenderSettingsOpt(object):
     def __init__(self, ktn_obj):
         pass
+
+
+class VariablesSetting(object):
+    def __init__(self):
+        self._ktn_obj = NodegraphAPI.GetNode('rootNode')
+
+    def set(self, key, value):
+        port_path = 'variables.{}.options'.format(key)
+        ktn_port = self._ktn_obj.getParameter(port_path)
+        if ktn_port is None:
+            pass
+        NGPortOpt(ktn_port).set(value)
+
+    def set_register(self, key, values):
+        ktn_port = self._ktn_obj.getParameter('variables')
+        group_ktn_port = ktn_port.getChild(key)
+        if group_ktn_port is not None:
+            ktn_port.deleteChild(group_ktn_port)
+            _ = NGObjOpt(self._ktn_obj).get_port_raw('variables.{}.value'.format(key))
+            if _ in values:
+                value = _
+            else:
+                value = values[0]
+        else:
+            value = values[0]
+        #
+        group_ktn_port = ktn_port.createChildGroup(key)
+        group_ktn_port.createChildNumber('enable', 1)
+        group_ktn_port.createChildString('value', value)
+        c = len(values)
+        #
+        options_port = group_ktn_port.createChildStringArray('options', c)
+        for i in range(c):
+            i_ktn_port = options_port.getChildByIndex(i)
+            i_ktn_port.setValue(values[i], 0)
+
+    def set_register_by_configure(self, dic):
+        for k, v in dic.items():
+            self.set_register(k, v)
+
+    def get_variants(self):
+        dic = collections.OrderedDict()
+        ktn_port = self._ktn_obj.getParameter('variables')
+        for i in ktn_port.getChildren():
+            i_key = NGPortOpt(i).name
+            i_values = NGPortOpt(
+                self._ktn_obj.getParameter('variables.{}.options'.format(i_key))
+            ).get()
+            dic[i_key] = i_values
+        return dic

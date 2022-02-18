@@ -90,7 +90,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<camera>/<look-pass>.stats.####.json'.format(render_output_directory_path)
+                v = '{}/main/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/stats.####.json'.format(render_output_directory_path)
                 utl_dcc_objects.OsFile(v).set_directory_create()
                 #
                 obj_opt.set_port_raw(
@@ -119,7 +119,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<camera>/<look-pass>.profile.####.json'.format(render_output_directory_path)
+                v = '{}/main/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/profile.####.json'.format(render_output_directory_path)
                 utl_dcc_objects.OsFile(v).set_directory_create()
                 #
                 obj_opt.set_port_raw(
@@ -146,7 +146,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<camera>/<look-pass>/<render-pass>.####.exr'.format(render_output_directory_path)
+                v = '{}/main/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/<render-pass>.####.exr'.format(render_output_directory_path)
                 #
                 obj_opt.set_port_raw(
                     'lynxi_settings.render_output', v
@@ -487,6 +487,11 @@ class LxCamera(object):
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         #
+        obj_opt.set_port_raw(
+            'alembic.enable',
+            0
+        )
+        #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
             resolver = rsv_commands.get_resolver()
@@ -503,6 +508,11 @@ class LxCamera(object):
                 file_path = rsv_unit.get_result(version='latest')
                 if file_path:
                     obj_opt.set_port_raw(
+                        'alembic.enable',
+                        1
+                    )
+                    #
+                    obj_opt.set_port_raw(
                         'alembic.file',
                         file_path
                     )
@@ -515,6 +525,16 @@ class LxCamera(object):
 class LxRenderer(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
+        #
+        self._search_dic = collections.OrderedDict(
+            [
+                ('layer', ['lynxi_variants.layer_enable', 'lynxi_variants.layers']),
+                ('quality', ['lynxi_variants.quality_enable', 'lynxi_variants.qualities']),
+                ('camera', ['lynxi_variants.camera_enable', 'lynxi_variants.cameras']),
+                ('look_pass', ['lynxi_variants.look_pass_enable', 'lynxi_variants.look_passes']),
+                ('light_pass', ['lynxi_variants.light_pass_enable', 'lynxi_variants.light_passes'])
+            ]
+        )
 
     def _get_variable_switches_(self):
         from lxkatana import ktn_core
@@ -524,25 +544,21 @@ class LxRenderer(object):
         pass
 
     def _set_create_(self):
+        import collections
+
         from lxbasic import bsc_core
 
         from lxkatana import ktn_core
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        search_dic = {
-            'layer': 'lynxi_variants.layers',
-            'quality': 'lynxi_variants.qualities',
-            'camera': 'lynxi_variants.cameras',
-            'look_pass': 'lynxi_variants.look_passes',
-            'light_pass': 'lynxi_variants.light_passes'
-        }
-        variants_dic = {}
-        for k, v in search_dic.items():
+        variants_dic = collections.OrderedDict()
+        for k, v in self._search_dic.items():
+            enable_port_path, values_port_path = v
             i_raw = obj_opt.get_port_raw(
-                v
+                values_port_path
             )
             if i_raw:
-                i_variants = map(lambda x: str(x).strip(), i_raw.split(','))
+                i_variants = map(lambda i: str(i).strip(), i_raw.split(','))
             else:
                 i_variants = []
             #
@@ -559,25 +575,30 @@ class LxRenderer(object):
             variants_dic
         )
         x, y = 0, 0
+
         for seq, i_variants in enumerate(combinations):
-            i_settings_name = 'settings__{}'.format(seq)
+            i_label = '__'.join(['{}'.format(v) for k, v in i_variants.items()])
+            #
+            i_settings_name = 'settings__{}'.format(i_label)
             i_settings_path = '{}/{}'.format(obj_opt.get_path(), i_settings_name)
             #
-            i_settings = ktn_core.NGObjOpt._set_create_(i_settings_path, 'lx_settings')
+            i_settings = ktn_core.NGObjOpt._set_create_(i_settings_path, 'lx_render_settings')
             i_settings_opt = ktn_core.NGObjOpt(i_settings)
             i_x, i_y = x, y-(seq+1)*240
             i_settings_opt.set_position(
                 i_x, i_y
             )
+            i_settings_opt.set_color((.75, .5, .25))
             obj_opt.get_send_port('input').connect(
                 i_settings_opt.get_input_port('input')
             )
+            i_settings_opt.set_port_raw('variables.over', 1)
             for j_k, j_v in i_variants.items():
                 i_settings_opt.set_port_raw(
                     variant_mapper[j_k], j_v
                 )
             #
-            i_renderer_name = 'renderer__{}'.format(seq)
+            i_renderer_name = 'renderer__{}'.format(i_label)
             i_renderer_path = '{}/{}'.format(obj_opt.get_path(), i_renderer_name)
             i_renderer = ktn_core.NGObjOpt._set_create_(i_renderer_path, 'Render')
             i_renderer_opt = ktn_core.NGObjOpt(i_renderer)
@@ -587,6 +608,7 @@ class LxRenderer(object):
             i_renderer_opt.set_position(
                 i_x, i_y-120
             )
+            i_renderer_opt.set_color((.5, .25, .25))
             i_settings_opt.get_output_port('output').connect(
                 i_renderer_opt.get_input_port('input')
             )
@@ -605,3 +627,37 @@ class LxRenderer(object):
         finally:
             Utils.UndoStack.CloseGroup()
 
+    def set_refresh(self):
+        from lxkatana import ktn_core
+
+        variants = ktn_core.VariablesSetting().get_variants()
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        for k, v in variants.items():
+            if k in self._search_dic:
+                enable_port_path, values_port_path = self._search_dic[k]
+                if obj_opt.get_port_raw(enable_port_path) == 1:
+                    obj_opt.set_port_raw(
+                        values_port_path, ', '.join(v)
+                    )
+
+
+class LxVariant(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def _get_key_(self):
+        from lxkatana import ktn_core
+        return ktn_core.NGObjOpt(self._ktn_obj).get_port_raw('variableName')
+
+    def _get_values_(self):
+        from lxkatana import ktn_core
+        ktn_port = ktn_core.NGObjOpt(self._ktn_obj).get_port('patterns')
+        return [ktn_core.NGPortOpt(i).get() for i in ktn_core.NGObjOpt(ktn_port).get_children()]
+
+    def set_register(self):
+        from lxkatana import ktn_core
+        key = self._get_key_()
+        values = self._get_values_()
+        ktn_core.VariablesSetting().set_register(
+            key, values
+        )

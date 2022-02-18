@@ -2980,7 +2980,7 @@ class VariablesMtd(object):
     def get_all_combinations(cls, variables):
         lis = []
         for i in itertools.product(*[[{k: i} for i in v] for k, v in variables.items()]):
-            i_dic = {}
+            i_dic = collections.OrderedDict()
             for j_dic in i:
                 i_dic.update(j_dic)
             lis.append(i_dic)

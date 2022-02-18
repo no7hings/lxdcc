@@ -81,6 +81,11 @@ parameters:
         value: ''
         tool_tip: '...'
     #
+    variables/over:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+    #
     lynxi_settings/render_output_enable:
         widget: boolean
         value: False
@@ -113,7 +118,7 @@ parameters:
 
     lynxi_variants/quality:
         widget: string
-        value: 'low'
+        value: 'mid'
         tool_tip: '...'
 
     lynxi_variants/camera:

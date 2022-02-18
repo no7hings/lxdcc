@@ -7,7 +7,7 @@ output_ports:
 parameters:
     reset:
         widget: button
-        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_reset()'
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCameraAlembic(node).set_reset()'
         tool_tip: 'press to rest all parameters'
     #
     alembic/file:
@@ -20,37 +20,37 @@ parameters:
         value: ''
         tool_tip: 'alembic location'
 
-    alembic/load:
+    alembic/load_file:
         widget: button
-        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_load()'
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCameraAlembic(node).set_file_load()'
         tool_tip: '...'
     #
-    settings/resolution_enable:
+    option/resolution_enable:
         widget: boolean
         value: False
         tool_tip: '...'
 
-    settings/resolution:
+    option/resolution:
         widget: resolution
         value: '512x512'
         tool_tip: '...'
 
-    settings/frame_offset_enable:
+    option/frame_offset_enable:
         widget: boolean
         value: False
         tool_tip: '...'
 
-    settings/frame_offset:
+    option/frame_offset:
         widget: integer
         value: 0
         tool_tip: '...'
 
-    settings/visible_enable:
+    option/visible_enable:
         widget: boolean
         value: False
         tool_tip: '...'
 
-    settings/visible:
+    option/visible:
         widget: boolean
         value: 1
         tool_tip: '...'

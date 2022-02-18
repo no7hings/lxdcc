@@ -4,6 +4,9 @@ option:
         r: 0.102
         g: 0.6824
         b: 0.6235
+    #
+    light_pass: all
+    #
     root: /rootNode
     #
     geometry_root: /root/world/geo
@@ -303,7 +306,7 @@ workspace:
                         - <.path>.input
                         - <.path>.out
     look_switch:
-        label: look_switch
+        label: <..key>
         main:
             path: <option.root>/<..label>
             obj_type: VariableSwitch
@@ -386,12 +389,29 @@ workspace:
                 ns_colorr: 0.25
                 ns_colorg: 0.25
                 ns_colorb: 0.5
+    #
+    light_switch:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>
+            obj_type: VariableSwitch
+            attributes:
+                x: =<option.x>
+                y: =<option.y>-<option.h>*6.5
+                ns_colorr: 0.5
+                ns_colorg: 0.25
+                ns_colorb: 0.25
+            parameters:
+                variableName: light_pass
+            connections:
+                - <...light_rigs.main.path>.o0
+                - <.path>.<option.light_pass>
     # render
     render_settings:
         label: <..key>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_render_settings_modifier
+            obj_type: lx_render_settings
             base_obj_type: Group
             #
             input: input
@@ -405,13 +425,13 @@ workspace:
             parameters:
                 lynxi_settings/render_output_enable: 1
             connections:
-                - <...light_rigs.main.path>.o0
+                - <...light_switch.main.path>.out
                 - <.path>.<.input>
     renderer:
         label: <..key>
         main:
-            path: <option.root>/<option.look_pass>__<..label>
-            obj_type: Render
+            path: <option.root>/<..label>
+            obj_type: lx_renderer_creater
             input: input
             output: ''
             attributes:
@@ -438,27 +458,6 @@ workspace:
                 ns_colorr: 0.7412
                 ns_colorg: 0.2039
                 ns_colorb: 0.8196
-        #
-        node_graph:
-            nodes:
-                render_outputs:
-                    path: <option.root>/<option.look_pass>__<..key>
-                    input: input
-                    output: output
-                    obj_category: node
-                    obj_type: lx_render_settings_modifier
-                    base_obj_type: Group
-                    attributes:
-                        ns_colorr: 0.75
-                        ns_colorg: 0.5
-                        ns_colorb: 0.25
-                    parameters:
-                        lynxi_variants/look_pass: <option.look_pass>
-                    split_connections:
-                        - <.....render_settings.main.path>.<.....render_settings.main.output>
-                        - <....main.path>.<....main.input>
-                        - <.path>.<.input>
-                        - <.path>.<.output>
     # outputs
     look_outputs:
         label: <..key>

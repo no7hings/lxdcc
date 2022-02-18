@@ -1,0 +1,50 @@
+#
+input_ports: []
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_reset()'
+        tool_tip: 'press to rest all parameters'
+    #
+    options/asset:
+        value: ''
+        tool_tip: 'enter a rsv-asset path or press "guess" auto find'
+    options/shot:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: 'rsv-shot path for choose'
+    #
+    guess:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_guess()'
+        tool_tip: 'press to find rsv-asset by current scene file-path'
+    #
+    usd/file:
+        widget: file
+        value: ''
+        tool_tip: 'usd set file-path'
+    usd/location:
+        widget: path
+        value: ''
+        tool_tip: 'usd location path'
+    #
+    create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_create()'
+        tool_tip: 'press to create usd set file'
+    #
+    variants/shot_asset:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: 'choose a shot-asset for show in viewer'
+    variants/geometry_uv_map:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: 'choose a using uv-map'

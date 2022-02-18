@@ -43,6 +43,8 @@ import threading
 
 import socket
 
+import itertools
+
 from lxbasic import bsc_configure
 
 import shutil
@@ -2973,5 +2975,19 @@ class SessionMtd(object):
         return tgt_key
 
 
+class VariablesMtd(object):
+    @classmethod
+    def get_all_combinations(cls, variables):
+        lis = []
+        for i in itertools.product(*[[{k: i} for i in v] for k, v in variables.items()]):
+            i_dic = {}
+            for j_dic in i:
+                i_dic.update(j_dic)
+            lis.append(i_dic)
+        return lis
+
+
 if __name__ == '__main__':
-    print StoragePathOpt('/data/b//').get_path()
+    print VariablesMtd.get_all_combinations(
+        {'camera': ['full_body', 'upper_body'], 'look_pass': ['default'], 'light_pass': ['all', 'test']}
+    )

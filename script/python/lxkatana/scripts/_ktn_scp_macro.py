@@ -1,7 +1,7 @@
 # coding:utf-8
 import collections
 # noinspection PyUnresolvedReferences
-from Katana import CacheManager
+from Katana import Utils, CacheManager
 
 
 class LxCameraAlembic(object):
@@ -510,3 +510,98 @@ class LxCamera(object):
                         'alembic.location',
                         '/root/world/cam/cameras'
                     )
+
+
+class LxRenderer(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def _get_variable_switches_(self):
+        from lxkatana import ktn_core
+        print ktn_core.NGObjOpt(self._ktn_obj).get_source_objs()
+
+    def set_reset(self):
+        pass
+
+    def _set_create_(self):
+        from lxbasic import bsc_core
+
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        search_dic = {
+            'layer': 'lynxi_variants.layers',
+            'quality': 'lynxi_variants.qualities',
+            'camera': 'lynxi_variants.cameras',
+            'look_pass': 'lynxi_variants.look_passes',
+            'light_pass': 'lynxi_variants.light_passes'
+        }
+        variants_dic = {}
+        for k, v in search_dic.items():
+            i_raw = obj_opt.get_port_raw(
+                v
+            )
+            if i_raw:
+                i_variants = map(lambda x: str(x).strip(), i_raw.split(','))
+            else:
+                i_variants = []
+            #
+            variants_dic[k] = i_variants
+        #
+        variant_mapper = {
+            'layer': 'lynxi_variants.layer',
+            'quality': 'lynxi_variants.quality',
+            'camera': 'lynxi_variants.camera',
+            'look_pass': 'lynxi_variants.look_pass',
+            'light_pass': 'lynxi_variants.light_pass'
+        }
+        combinations = bsc_core.VariablesMtd.get_all_combinations(
+            variants_dic
+        )
+        x, y = 0, 0
+        for seq, i_variants in enumerate(combinations):
+            i_settings_name = 'settings__{}'.format(seq)
+            i_settings_path = '{}/{}'.format(obj_opt.get_path(), i_settings_name)
+            #
+            i_settings = ktn_core.NGObjOpt._set_create_(i_settings_path, 'lx_settings')
+            i_settings_opt = ktn_core.NGObjOpt(i_settings)
+            i_x, i_y = x, y-(seq+1)*240
+            i_settings_opt.set_position(
+                i_x, i_y
+            )
+            obj_opt.get_send_port('input').connect(
+                i_settings_opt.get_input_port('input')
+            )
+            for j_k, j_v in i_variants.items():
+                i_settings_opt.set_port_raw(
+                    variant_mapper[j_k], j_v
+                )
+            #
+            i_renderer_name = 'renderer__{}'.format(seq)
+            i_renderer_path = '{}/{}'.format(obj_opt.get_path(), i_renderer_name)
+            i_renderer = ktn_core.NGObjOpt._set_create_(i_renderer_path, 'Render')
+            i_renderer_opt = ktn_core.NGObjOpt(i_renderer)
+            i_renderer_opt.set_port_raw(
+                'passName', i_renderer_name
+            )
+            i_renderer_opt.set_position(
+                i_x, i_y-120
+            )
+            i_settings_opt.get_output_port('output').connect(
+                i_renderer_opt.get_input_port('input')
+            )
+
+    def _set_clear_(self):
+        from lxkatana import ktn_core
+        [ktn_core.NGObjOpt(i).set_delete() for i in ktn_core.NGObjOpt(self._ktn_obj).get_children()]
+
+    def set_create(self):
+        Utils.UndoStack.OpenGroup(self._ktn_obj.getName())
+        try:
+            self._set_clear_()
+            self._set_create_()
+        except Exception:
+            raise
+        finally:
+            Utils.UndoStack.CloseGroup()
+

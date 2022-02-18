@@ -1,0 +1,22 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: ''
+        tool_tip: 'press to rest all parameters'
+    #
+    settings/image:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    settings/location:
+        widget: path
+        value: ''
+        tool_tip: '...'

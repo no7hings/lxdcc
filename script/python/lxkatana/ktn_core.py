@@ -163,20 +163,69 @@ class NGObjsOpt(object):
 class NGObjOpt(object):
     PATHSEP = '/'
     PORT_PATHSEP = '.'
+    @classmethod
+    def _get_path_(cls, name):
+        def _rcs_fnc(name_):
+            _ktn_obj = NodegraphAPI.GetNode(name_)
+            if _ktn_obj is not None:
+                _parent = _ktn_obj.getParent()
+                if _parent is None:
+                    lis.append('')
+                else:
+                    _parent_name = _parent.getName()
+                    lis.append(_parent_name)
+                    _rcs_fnc(_parent_name)
+        #
+        lis = [name]
+        _rcs_fnc(name)
+        lis.reverse()
+        return cls.PATHSEP.join(lis)
+    @classmethod
+    def _set_create_(cls, path, type_name):
+        path_opt = bsc_core.DccPathDagOpt(path)
+        name = path_opt.name
+        parent_opt = path_opt.get_parent()
+        parent_name = parent_opt.get_name()
+        ktn_obj = NodegraphAPI.GetNode(name)
+        if ktn_obj is None:
+            parent = cls(parent_name)
+            parent_ktn_obj = parent.ktn_obj
+            if parent_ktn_obj is not None:
+                ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
+                if ktn_obj is None:
+                    raise RuntimeError('type="{}" is known'.format(type_name))
+                #
+                name_ktn_port = ktn_obj.getParameter('name')
+                if name_ktn_port is not None:
+                    name_ktn_port.setValue(name, 0)
+                #
+                ktn_obj.setName(name)
+                return ktn_obj
+            else:
+                raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
+        return ktn_obj
+
     def __init__(self, ktn_obj):
         if isinstance(ktn_obj, (str, unicode)):
             self._ktn_obj = NodegraphAPI.GetNode(ktn_obj)
         else:
             self._ktn_obj = ktn_obj
-    @property
-    def ktn_obj(self):
+
+    def get_ktn_obj(self):
         return self._ktn_obj
-    @property
-    def type(self):
+    ktn_obj = property(get_ktn_obj)
+
+    def get_type(self):
         return self.ktn_obj.getType()
-    @property
-    def name(self):
+    type = property(get_type)
+
+    def get_path(self):
+        return self._get_path_(self.get_name())
+    path = property(get_path)
+
+    def get_name(self):
         return self.ktn_obj.getName()
+    name = property(get_name)
 
     def set_gui_expanded(self):
         attributes = self.ktn_obj.getAttributes()
@@ -290,6 +339,18 @@ class NGObjOpt(object):
     def get_port(self, port_path):
         return self.ktn_obj.getParameter(port_path)
 
+    def get_input_port(self, port_path):
+        return self._ktn_obj.getInputPort(port_path)
+
+    def get_output_port(self, port_path):
+        return self._ktn_obj.getOutputPort(port_path)
+
+    def get_send_port(self, port_path):
+        return self._ktn_obj.getSendPort(port_path)
+
+    def get_return_port(self, port_path):
+        return self._ktn_obj.getReturnPort(port_path)
+
     def set_port_create(self, port_path, type_, value):
         _ = self.get_port(port_path)
         port_parent = obj_core.PortPathMethod.get_dag_parent(
@@ -311,6 +372,33 @@ class NGObjOpt(object):
     def set_delete(self):
         self.ktn_obj.delete()
 
+    def get_position(self):
+        return NodegraphAPI.GetNodePosition(self.ktn_obj)
+
+    def set_position(self, x, y):
+        atr = self._ktn_obj.getAttributes()
+        atr.update(
+            dict(
+                x=x,
+                y=y
+            )
+        )
+        self._ktn_obj.setAttributes(atr)
+
+    def set_ports_clear(self, prot_path=None):
+        if prot_path is None:
+            ktn_root_port = self._ktn_obj.getParameters()
+            for i in ktn_root_port.getChildren():
+                ktn_root_port.deleteChild(i)
+        else:
+            ktn_root_port = self._ktn_obj.getParameter(prot_path)
+        #
+        for i in ktn_root_port.getChildren():
+            ktn_root_port.deleteChild(i)
+
+    def get_children(self):
+        return self._ktn_obj.getChildren()
+
 
 class NGGroupStackOpt(NGObjOpt):
     def __init__(self, ktn_obj):
@@ -325,14 +413,14 @@ class NGGroupStackOpt(NGObjOpt):
 
     def set_child_create(self, name):
         src_ktn_obj = self._ktn_obj
-        obj_type_name = src_ktn_obj.getChildNodeType()
+        type_name = src_ktn_obj.getChildNodeType()
         tgt_ktn_obj = NodegraphAPI.GetNode(name)
         if tgt_ktn_obj is not None:
             return tgt_ktn_obj, False
         #
-        tgt_ktn_obj = NodegraphAPI.CreateNode(obj_type_name, src_ktn_obj)
+        tgt_ktn_obj = NodegraphAPI.CreateNode(type_name, src_ktn_obj)
         if tgt_ktn_obj is None:
-            raise TypeError('unknown-obj-type: "{}"'.format(obj_type_name))
+            raise TypeError('unknown-obj-type: "{}"'.format(type_name))
         name_ktn_port = tgt_ktn_obj.getParameter('name')
         if name_ktn_port is not None:
             name_ktn_port.setValue(name, 0)
@@ -445,15 +533,22 @@ class NGPortOpt(object):
         )
 
     def set_connect_to(self, input_port):
-        pass
+        self._ktn_port.connect(
+            input_port
+        )
+
+    def set_target(self, input_port):
+        self._ktn_port.connect(
+            input_port
+        )
 
     def set_expression(self, raw):
         self._ktn_port.setExpression(raw)
 
 
 class NGAndObjTypeOpt(object):
-    def __init__(self, obj_type_name):
-        self._obj_type_name = obj_type_name
+    def __init__(self, type_name):
+        self._obj_type_name = type_name
 
     def get_ktn_objs(self):
         lis = []
@@ -1101,8 +1196,14 @@ class NGMacro(object):
             ktn_port.setHintString(
                 str(hint_dict)
             )
+
+    def set_ports_clear(self, port_path=None):
+        NGObjOpt(self._ktn_obj).set_ports_clear(port_path)
+
     @ktn_modifiers.set_undo_mark_mdf
     def set_create_by_configure_file(self, file_path):
+        NGObjOpt(self._ktn_obj).set_ports_clear()
+        #
         configure = bsc_objects.Configure(value=file_path)
         input_ports = configure.get('input_ports') or []
         #
@@ -1119,16 +1220,17 @@ class NGMacro(object):
             self.set_parameter_create(k, v)
     @classmethod
     @ktn_modifiers.set_undo_mark_mdf
-    def set_create_to_op_script_by_configure_file(cls, file_path, op_script):
+    def set_create_to_op_script_by_configure_file(cls, file_path, ktn_op_script):
         configure = bsc_objects.Configure(value=file_path)
         parameters = configure.get('parameters') or {}
+        NGObjOpt(ktn_op_script).set_ports_clear('user')
         for k, v in parameters.items():
             i_k_s = k.replace('/', '.')
             i_k_t = k.replace('/', '__')
             if v.get('widget') != 'button':
                 i_k_t = 'user.{}'.format(i_k_t)
-                NGMacro(op_script).set_parameter_create(i_k_t, v)
-                NGPortOpt(NGObjOpt(op_script).get_port(i_k_t)).set_expression('getParent().{}'.format(i_k_s))
+                NGMacro(ktn_op_script).set_parameter_create(i_k_t, v)
+                NGPortOpt(NGObjOpt(ktn_op_script).get_port(i_k_t)).set_expression('getParent().{}'.format(i_k_s))
 
 
 class LXRenderSettingsOpt(object):

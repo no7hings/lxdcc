@@ -399,13 +399,13 @@ class NGObjOpt(object):
         )
         self._ktn_obj.setAttributes(atr)
 
-    def set_ports_clear(self, prot_path=None):
-        if prot_path is None:
+    def set_ports_clear(self, port_path=None):
+        if port_path is None:
             ktn_root_port = self._ktn_obj.getParameters()
             for i in ktn_root_port.getChildren():
                 ktn_root_port.deleteChild(i)
         else:
-            ktn_root_port = self._ktn_obj.getParameter(prot_path)
+            ktn_root_port = self._ktn_obj.getParameter(port_path)
         #
         if ktn_root_port is not None:
             for i in ktn_root_port.getChildren():
@@ -413,6 +413,17 @@ class NGObjOpt(object):
 
     def get_children(self):
         return self._ktn_obj.getChildren()
+
+    def set_port_execute(self, port_path):
+        ktn_port = self._ktn_obj.getParameter(port_path)
+        if ktn_port:
+            hint_string = ktn_port.getHintString()
+            if hint_string:
+                hint_dict = eval(hint_string)
+                if hint_dict['widget'] in ['scriptButton']:
+                    script = hint_dict['scriptText']
+                    node = self._ktn_obj
+                    exec script
 
 
 class NGGroupStackOpt(NGObjOpt):

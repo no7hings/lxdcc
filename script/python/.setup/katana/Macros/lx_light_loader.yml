@@ -11,12 +11,22 @@ parameters:
         value: ''
         tool_tip: 'press to rest all parameters'
     #
-    settings/image:
-        widget: file
-        value: ''
+    light/scheme:
+        widget: enumerate
+        value: ['custom']
+        tool_tip: '...'
+    #
+    animations/start_frame:
+        widget: float
+        value: 1.0
         tool_tip: '...'
 
-    settings/location:
-        widget: path
-        value: ''
+    animations/end_frame:
+        widget: float
+        value: 120.0
+        tool_tip: '...'
+
+    animations/frame_offset:
+        widget: float
+        value: 0.0
         tool_tip: '...'

@@ -167,6 +167,10 @@ class AssetWorkspaceBuilder(object):
                         i_parameter_port_path = i_parameter_port_path.replace('/', '.')
                         dcc_node.get_port(i_parameter_port_path).set(parameter_value)
                 #
+                node_executes = configure.get('workspace.{}.{}.executes'.format(key, sub_key))
+                if node_executes:
+                    cls._set_node_executes_(ktn_node, node_executes)
+                #
                 child_dcc_type = configure.get('workspace.{}.{}.child_obj_type'.format(key, sub_key))
                 if child_dcc_type is not None:
                     ktn_node.setChildNodeType(child_dcc_type)
@@ -188,8 +192,9 @@ class AssetWorkspaceBuilder(object):
                 node_obj_path = v['path']
                 node_obj_category = v['obj_category']
                 node_obj_type = v['obj_type']
+                node_base_obj_type = v.get('base_obj_type')
                 dcc_node = ktn_dcc_objects.Node(node_obj_path)
-                ktn_node, is_create = dcc_node.get_dcc_instance(node_obj_type)
+                ktn_node, is_create = dcc_node.get_dcc_instance(node_obj_type, node_base_obj_type)
                 if is_create is True:
                     if node_obj_category == 'group':
                         child_dcc_type = v['child_obj_type']
@@ -200,14 +205,22 @@ class AssetWorkspaceBuilder(object):
                     if node_attributes:
                         ktn_node.setAttributes(node_attributes)
                     #
-                    node_insert_connections = v.get('insert_connections')
-                    if node_insert_connections:
+                    i_insert_connections = v.get('insert_connections')
+                    if i_insert_connections:
                         insert_scheme = v.get('insert_scheme')
-                        cls._set_node_insert_connections_create_(node_insert_connections, insert_scheme)
+                        cls._set_node_insert_connections_create_(i_insert_connections, insert_scheme)
                     #
                     i_split_connections = v.get('split_connections')
                     if i_split_connections:
                         cls._set_node_spit_connections_create_(i_split_connections)
+
+                    i_connections = v.get('connections')
+                    if i_connections:
+                        cls._set_node_connections_create_(i_connections)
+
+                    i_executes = v.get('executes')
+                    if i_executes:
+                        cls._set_node_executes_(ktn_node, i_executes)
                     #
                     parameters = v.get('parameters')
                     if parameters:
@@ -236,6 +249,10 @@ class AssetWorkspaceBuilder(object):
                 target_ktn_port, _ = target_dcc_port.get_dcc_instance()
                 #
                 source_ktn_port.connect(target_ktn_port)
+    @classmethod
+    def _set_node_executes_(cls, ktn_obj, executes):
+        for i_port_path in executes:
+            ktn_core.NGObjOpt(ktn_obj).set_port_execute(i_port_path)
     @classmethod
     def _set_node_insert_connections_create_(cls, node_insert_connections, insert_scheme):
         if node_insert_connections:

@@ -30,6 +30,9 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         elif self.port_assign == obj_configure.PortAssign.OUTPUTS:
             return NodegraphAPI.GetNode(self.obj.name).getOutputPort(self.port_path)
         raise TypeError()
+
+    def get_ktn_obj(self):
+        return self.obj.ktn_obj
     @property
     def ktn_obj(self):
         return self.obj.ktn_obj
@@ -153,6 +156,11 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                     source.path, target.path
                 )
             )
+
+    def set_execute(self):
+        NodegraphAPI.UserParameters.ExecuteButton(
+            self.get_ktn_obj(), self.port_path
+        )
 
     def get_source(self):
         ktn_output_ports = self.ktn_port.getConnectedPorts()

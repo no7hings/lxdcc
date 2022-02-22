@@ -159,6 +159,8 @@ asset-work-set-usd-hair-file: <asset-work-set-dir>/hair.usda
 asset-work-set-usd-effect-file: <asset-work-set-dir>/effect.usda
 asset-work-set-usd-surface-file: <asset-work-set-dir>/surface.usda
 #
+asset-work-set-usd-file: <asset-work-set-dir>/<asset-name>.usda
+#
 asset-work-shot-asset-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
 #
 asset-work-render-dir: <asset-task-dir>/render/<user-name>
@@ -173,6 +175,8 @@ asset-review-file: <asset-review-dir>/<asset-version-name>.mov
 asset-review-mov-file: <asset-review-dir>/<asset-version-name>.mov
 # <asset-render>
 asset-render-dir: <asset-version-dir>/render
+asset-render-set-usd-file: <asset-version-dir>/render/set/<asset-name>.usda
+#
 asset-render-output-dir: <asset-version-dir>/render/output
 asset-render-output-sub-dir: <asset-version-dir>/render/output/<look-pass-name>
 asset-render-maya-output-dir: <asset-render-dir>/maya/output

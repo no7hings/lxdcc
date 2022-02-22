@@ -27,7 +27,7 @@ parameters:
 
     lynxi_variants/qualities:
         widget: string
-        value: 'mid'
+        value: 'med'
         tool_tip: '...'
 
     lynxi_variants/camera_enable:

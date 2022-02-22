@@ -1,0 +1,23 @@
+properties:
+    project: ''
+    role: ''
+    asset: ''
+    step: ''
+    task: ''
+    version: ''
+#
+file: ''
+#
+dcc:
+    root: master
+#
+option:
+    indent: 4
+    linesep: "\n"
+
+usd:
+    presets:
+        up_axis: Y
+        linear_unit: 0.01
+
+layers: []

@@ -6,6 +6,8 @@ option:
         b: 0.6235
     #
     light_pass: all
+    quality: low
+    layer: master
     #
     root: /rootNode
     #
@@ -52,6 +54,24 @@ workspace:
                 ns_colorr: 0.1725
                 ns_colorg: 0.5333
                 ns_colorb: 0.851
+        node_graph:
+            nodes:
+                definition:
+                    path: <option.root>/<....label>
+                    obj_category: node
+                    obj_type: lx_asset_loader
+                    base_obj_type: Group
+                    attributes:
+                        x: =<option.x>-<option.w>*1.5
+                        y: =<option.y>+<option.h>*1.5
+                        ns_colorr: 0.75
+                        ns_colorg: 0.5
+                        ns_colorb: 0.25
+                    connections:
+                        - <.path>.output
+                        - <....main.path>.geometries
+                    executes:
+                        - 'usd.create'
     # materials
     materials:
         label: materials
@@ -337,6 +357,19 @@ workspace:
             connections:
                 - <...look_switch.main.path>.out
                 - <.path>.looks
+        backdrop:
+            path: <option.root>/<..label>_backgrop
+            obj_type: Backdrop
+            attributes:
+                x: =<option.x>
+                y: =<option.y>-<option.h>*6
+                ns_text: 'variable(s)'
+                ns_fontScale: 3.0
+                ns_sizeX: =<option.w>*2-<option.margin>*2
+                ns_sizeY: =<option.h>*2-<option.margin>*2
+                ns_colorr: 0.25
+                ns_colorg: 0.25
+                ns_colorb: 0.5
     #
     cameras:
         label: <..key>
@@ -361,35 +394,8 @@ workspace:
             connections:
                 - <.path>.output
                 - <...references.main.path>.cameras
-    #
-    light_rigs:
-        label: <..key>
-        main:
-            path: <option.root>/<..label>
-            obj_type: Lookdev_LightRig
-            base_obj_type: Group
-            attributes:
-                x: =<option.x>
-                y: =<option.y>-<option.h>*5.5
-                ns_colorr: 0.5
-                ns_colorg: 0.25
-                ns_colorb: 0.25
-            connections:
-                - <...references.main.path>.out
-                - <.path>.i0
-        backdrop:
-            path: <option.root>/<..label>_backgrop
-            obj_type: Backdrop
-            attributes:
-                x: =<option.x>
-                y: =<option.y>-<option.h>*6
-                ns_text: 'light-pass(s)'
-                ns_fontScale: 3.0
-                ns_sizeX: =<option.w>*2-<option.margin>*2
-                ns_sizeY: =<option.h>*2-<option.margin>*2
-                ns_colorr: 0.25
-                ns_colorg: 0.25
-                ns_colorb: 0.5
+            executes:
+                - 'alembic.load'
     #
     light_switch:
         label: <..key>
@@ -397,18 +403,129 @@ workspace:
             path: <option.root>/<..label>
             obj_type: lx_variant_creater
             base_obj_type: VariableSwitch
+            output: <.path>.out
             attributes:
                 x: =<option.x>
-                y: =<option.y>-<option.h>*6
-                
+                y: =<option.y>-<option.h>*5.75
                 ns_colorr: 0.75
                 ns_colorg: 0.5
                 ns_colorb: 0.25
             parameters:
                 lynxi_variants/key: light_pass
             connections:
-                - <...light_rigs.main.path>.o0
+                - <...references.main.path>.out
                 - <.path>.<option.light_pass>
+        node_graph:
+            nodes:
+                definition:
+                    path: <option.root>/<option.light_pass>__light
+                    obj_category: node
+                    obj_type: lx_light_loader
+                    base_obj_type: Group
+                    attributes:
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    insert_scheme: TB
+                    insert_connections:
+                        - <.....references.main.path>.out
+                        - <....main.path>.<option.light_pass>
+                        - <.path>.input
+                        - <.path>.output
+    #
+    quality_switch:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>
+            obj_type: lx_variant_creater
+            base_obj_type: VariableSwitch
+            output: <.path>.out
+            attributes:
+                x: =<option.x>
+                y: =<option.y>-<option.h>*6.25
+                ns_colorr: 0.75
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            parameters:
+                lynxi_variants/key: quality
+            connections:
+                - <...light_switch.main.output>
+                - <.path>.<option.quality>
+        node_graph:
+            nodes:
+                low:
+                    path: <option.root>/<..key>__quality
+                    obj_category: node
+                    obj_type: lx_quality_loader
+                    base_obj_type: Group
+                    attributes:
+                        x: =<option.x>-<option.w>/2
+                        y: =<option.y>-<option.h>*6
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        quality/scheme: low
+                    connections:
+                        - <.....light_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                med:
+                    path: <option.root>/<..key>__quality
+                    obj_category: node
+                    obj_type: lx_quality_loader
+                    base_obj_type: Group
+                    attributes:
+                        x: =<option.x>
+                        y: =<option.y>-<option.h>*6
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        quality/scheme: med
+                    connections:
+                        - <.....light_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                hi:
+                    path: <option.root>/<..key>__quality
+                    obj_category: node
+                    obj_type: lx_quality_loader
+                    base_obj_type: Group
+                    attributes:
+                        x: =<option.x>+<option.w>/2
+                        y: =<option.y>-<option.h>*6
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        quality/scheme: hi
+                    connections:
+                        - <.....light_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+    # layer
+    layer_switch:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>
+            obj_type: lx_variant_creater
+            base_obj_type: VariableSwitch
+            output: <.path>.out
+            attributes:
+                x: =<option.x>
+                y: =<option.y>-<option.h>*6.75
+                ns_colorr: 0.75
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            parameters:
+                lynxi_variants/key: layer
+            connections:
+                - <...quality_switch.main.output>
+                - <.path>.<option.layer>
     # render
     render_settings:
         label: <..key>
@@ -416,9 +533,8 @@ workspace:
             path: <option.root>/<..label>
             obj_type: lx_render_settings
             base_obj_type: Group
-            #
-            input: input
-            output: output
+            input: <.path>.input
+            output: <.path>.output
             attributes:
                 x: =<option.x>
                 y: =<option.y>-<option.h>*7.5
@@ -428,14 +544,14 @@ workspace:
             parameters:
                 lynxi_settings/render_output_enable: 1
             connections:
-                - <...light_switch.main.path>.out
-                - <.path>.<.input>
+                - <...layer_switch.main.output>
+                - <.input>
     renderer:
         label: <..key>
         main:
             path: <option.root>/<..label>
             obj_type: lx_renderer_creater
-            input: input
+            input: <.path>.input
             output: ''
             attributes:
                 x: =<option.x>+<option.offset_x>
@@ -444,10 +560,10 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.25
             parameters:
-                passName: <option.look_pass>__<...label>
+                lynxi_variants/quality_enable: 0
             connections:
-                - <...render_settings.main.path>.<...render_settings.main.output>
-                - <.path>.<.input>
+                - <...render_settings.main.output>
+                - <.input>
         backdrop:
             path: <option.root>/<option.look_pass>__<..label>_backgrop
             obj_type: Backdrop
@@ -519,7 +635,7 @@ node:
         main:
             name: 'geometry_xgen__{xgen}'
             path: <option.root>/<.name>
-            output: out
+            output: <.path>.out
             obj_type: ArnoldXGen
             attributes:
                 ns_colorr: 0.75
@@ -530,7 +646,7 @@ node:
                 name_scheme: '\<description\>'
             file_parameter: xgen_file
             connections:
-                - <.path>.<.output>
+                - <.output>
                 - '<workspace.geometries.main.path>.<.name>'
     geometry_usd:
         keyword: geometries
@@ -678,7 +794,7 @@ node:
             base_obj_type: Group
             #
             input: input
-            output: output
+            output: <.path>.output
             attributes:
                 ns_colorr: 0.75
                 ns_colorg: 0.5
@@ -687,5 +803,5 @@ node:
                 camera/location: <option.camera_root>
             file_parameter: camera.file
             connections:
-                - <.path>.<.output>
+                - <.output>
                 - <workspace.references.main.path>.camera_abc

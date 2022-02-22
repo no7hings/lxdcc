@@ -13,7 +13,7 @@ parameters:
         value: True
         tool_tip: '...'
     #
-    lynxi_variants/register:
+    lynxi_variants/register_variable:
         widget: button
-        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxVariant(node).set_register()'
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxVariant(node).set_variable_register()'
         tool_tip: '...'

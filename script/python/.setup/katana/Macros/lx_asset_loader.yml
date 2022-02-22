@@ -1,0 +1,31 @@
+#
+input_ports: []
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_reset()'
+        tool_tip: '...'
+    #
+    usd/file:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    usd/location:
+        widget: path
+        value: '/root/world/geo'
+        tool_tip: '...'
+
+    usd/scheme:
+        widget: enumerate
+        value: ['work', 'render']
+        tool_tip: '...'
+
+    usd/create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_create()'
+        tool_tip: '...'

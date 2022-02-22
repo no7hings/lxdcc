@@ -27,11 +27,11 @@ class LookWorkspaceCreator(object):
         ktn_core.VariablesSetting().set_register_by_configure(
             {
                 'layer': ['master'],
-                'quality': ['low', 'mid', 'hi'],
-                'camera': ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up', 'free'],
+                'quality': ['low', 'med', 'hi', 'custom'],
+                'camera': ['full', 'half', 'add_0', 'add_1', 'free', 'shot'],
                 'light_pass': ['all'],
                 'look_pass': ['default'],
-                'variables_enable': ['off', 'on'],
+                'variables_enable': ['on', 'off'],
             }
         )
 

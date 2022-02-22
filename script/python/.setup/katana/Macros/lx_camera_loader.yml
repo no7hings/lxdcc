@@ -22,7 +22,7 @@ parameters:
 
     alembic/location:
         widget: path
-        value: ''
+        value: '/root/world/cam/cameras/main'
         tool_tip: 'alembic location'
 
     alembic/load:
@@ -59,39 +59,68 @@ parameters:
         widget: boolean
         value: 1
         tool_tip: '...'
-    #
-    cameras/location:
+
+    cameras/close_up/location:
         widget: path
-        value: '/root/world/cam/cameras'
+        value: '/root/world/cam/cameras/main/cam_closeUp/cam_closeUpShape'
         tool_tip: '...'
 
-    cameras/close_up/name:
-        widget: string
-        value: '/cam_closeUp/cam_closeUpShape'
+    cameras/upper_body/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_upperbody/cam_upperbodyShape'
         tool_tip: '...'
 
-    cameras/upper_body/name:
-        widget: string
-        value: '/cam_upperbody/cam_upperbodyShape'
+    cameras/upper_body_35/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_upperbody35/cam_upperbody35Shape'
         tool_tip: '...'
 
-    cameras/upper_body_35/name:
-        widget: string
-        value: '/cam_upperbody35/cam_upperbody35Shape'
+    cameras/upper_body_50/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_upperbody50/cam_upperbody50Shape'
         tool_tip: '...'
 
-    cameras/upper_body_50/name:
-        widget: string
-        value: '/cam_upperbody50/cam_upperbody50Shape'
+    cameras/full_body/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_fullbody/cam_fullbodyShape'
+        tool_tip: '...'
+    # prop
+    cameras/full/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_full/cam_fullShape'
         tool_tip: '...'
 
-    cameras/full_body/name:
-        widget: string
-        value: '/cam_fullbody/cam_fullbodyShape'
+    cameras/half/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_half/cam_halfShape'
         tool_tip: '...'
 
-    cameras/free/name:
-        widget: string
-        value: '/cam_free/cam_freeShape'
+    cameras/add_0/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_add_0/cam_add_0Shape'
+        tool_tip: '...'
+
+    cameras/add_1/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_add_1/cam_add_1Shape'
         tool_tip: '...'
     #
+    cameras/free/location:
+        widget: path
+        value: '/root/world/cam/cameras/cam_free/cam_freeShape'
+        tool_tip: '...'
+    # shot
+    cameras/shot/location:
+        widget: path
+        value: '/root/world/cam/renderCamera/defaultCamera/defaultCameraCenterShape'
+        tool_tip: '...'
+
+    lynxi_variants/camera_scheme:
+        widget: enumerate
+        value: ['character', 'prop']
+        tool_tip: '...'
+
+    lynxi_variants/register_variable:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_variable_register()'
+        tool_tip: '...'

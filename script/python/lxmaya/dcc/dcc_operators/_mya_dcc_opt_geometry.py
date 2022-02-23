@@ -374,8 +374,10 @@ class MeshOpt(
             uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = uv_map
             if uv_map_face_vertex_counts:
                 u_coords, v_coords = zip(*uv_map_coords)
+                #
                 om2_obj.setUVs(u_coords, v_coords, uv_map_name)
                 om2_obj.assignUVs(uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_name)
+                #
                 utl_core.Log.set_module_result_trace(
                     'mesh-uv-map-assign',
                     u'obj="{}"; uv-map-name="{}"'.format(self.obj.path, uv_map_name)

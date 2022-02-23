@@ -47,19 +47,20 @@ class LxCameraAlembic(object):
                     step='cam',
                     task='camera'
                 )
-                rsv_unit = rsv_camera_task.get_rsv_unit(
-                    keyword='asset-camera-main-abc-file'
-                )
-                file_path = rsv_unit.get_result(version='latest')
-                if file_path:
-                    obj_opt.set_port_raw(
-                        'alembic.file',
-                        file_path
+                if rsv_camera_task is not None:
+                    rsv_unit = rsv_camera_task.get_rsv_unit(
+                        keyword='asset-camera-main-abc-file'
                     )
-                    obj_opt.set_port_raw(
-                        'alembic.location',
-                        '/root/world/cam/cameras'
-                    )
+                    file_path = rsv_unit.get_result(version='latest')
+                    if file_path:
+                        obj_opt.set_port_raw(
+                            'alembic.file',
+                            file_path
+                        )
+                        obj_opt.set_port_raw(
+                            'alembic.location',
+                            '/root/world/cam/cameras'
+                        )
 
 
 class LxRenderSettings(object):
@@ -498,30 +499,31 @@ class LxCamera(object):
         if f:
             resolver = rsv_commands.get_resolver()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
-            if rsv_task:
+            if rsv_task is not None:
                 rsv_entity = rsv_task.get_rsv_entity()
                 rsv_camera_task = rsv_entity.get_rsv_task(
                     step='cam',
                     task='camera'
                 )
-                rsv_unit = rsv_camera_task.get_rsv_unit(
-                    keyword='asset-camera-main-abc-file'
-                )
-                file_path = rsv_unit.get_result(version='latest')
-                if file_path:
-                    obj_opt.set_port_raw(
-                        'alembic.enable',
-                        1
+                if rsv_camera_task is not None:
+                    rsv_unit = rsv_camera_task.get_rsv_unit(
+                        keyword='asset-camera-main-abc-file'
                     )
-                    #
-                    obj_opt.set_port_raw(
-                        'alembic.file',
-                        file_path
-                    )
-                    obj_opt.set_port_raw(
-                        'alembic.location',
-                        '/root/world/cam/cameras/main'
-                    )
+                    file_path = rsv_unit.get_result(version='latest')
+                    if file_path:
+                        obj_opt.set_port_raw(
+                            'alembic.enable',
+                            1
+                        )
+                        #
+                        obj_opt.set_port_raw(
+                            'alembic.file',
+                            file_path
+                        )
+                        obj_opt.set_port_raw(
+                            'alembic.location',
+                            '/root/world/cam/cameras/main'
+                        )
 
     def set_variable_register(self):
         from lxkatana import ktn_core
@@ -637,16 +639,6 @@ class LxRenderer(object):
         from lxkatana import ktn_core
         [ktn_core.NGObjOpt(i).set_delete() for i in ktn_core.NGObjOpt(self._ktn_obj).get_children()]
 
-    def set_create(self):
-        Utils.UndoStack.OpenGroup(self._ktn_obj.getName())
-        try:
-            self._set_clear_()
-            self._set_create_()
-        except Exception:
-            raise
-        finally:
-            Utils.UndoStack.CloseGroup()
-
     def set_refresh(self):
         from lxkatana import ktn_core
 
@@ -659,6 +651,19 @@ class LxRenderer(object):
                     obj_opt.set_port_raw(
                         values_port_path, ', '.join(v)
                     )
+
+    def set_create(self):
+        Utils.UndoStack.OpenGroup(self._ktn_obj.getName())
+        try:
+            self._set_clear_()
+            self._set_create_()
+        except Exception:
+            raise
+        finally:
+            Utils.UndoStack.CloseGroup()
+
+    def set_submit_to_deadline(self):
+        pass
 
 
 class LxVariant(object):
@@ -807,9 +812,8 @@ class LxAsset(object):
         if file_path:
             resolver = rsv_commands.get_resolver()
             rsv_task = resolver.get_rsv_task_by_file_path(file_path)
-            if rsv_task:
+            if rsv_task is not None:
                 rsv_entity = rsv_task.get_rsv_entity()
-
                 scheme = obj_opt.get_port_raw('usd.scheme')
                 if scheme in ['work']:
                     work_katana_scene_src_file_unit = rsv_task.get_rsv_unit(
@@ -847,3 +851,8 @@ class LxAsset(object):
                         obj_opt.set_port_raw(
                             'usd.file', render_set_usd_file_path
                         )
+
+
+class LxLook(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj

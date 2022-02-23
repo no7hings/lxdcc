@@ -22,7 +22,7 @@ parameters:
 
     usd/scheme:
         widget: enumerate
-        value: ['work', 'render']
+        value: ['work', 'render', 'shot']
         tool_tip: '...'
 
     usd/create:

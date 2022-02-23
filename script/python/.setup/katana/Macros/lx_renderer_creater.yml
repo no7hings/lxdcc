@@ -37,7 +37,7 @@ parameters:
 
     lynxi_variants/cameras:
         widget: string
-        value: 'full_body'
+        value: 'full_body, upper_body, upper_body_35, upper_body_50, close_up, shot'
         tool_tip: '...'
 
     lynxi_variants/look_pass_enable:
@@ -68,4 +68,9 @@ parameters:
     create:
         widget: button
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_create()'
+        tool_tip: '...'
+    #
+    submit_to_deadline:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_submit_to_deadline()'
         tool_tip: '...'

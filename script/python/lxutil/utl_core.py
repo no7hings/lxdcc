@@ -1795,9 +1795,3 @@ class Resources(object):
                 )
                 if i_results:
                     return i_results[0]
-
-
-if __name__ == '__main__':
-    print(
-        AppLauncher(project='xkt', application='maya').get_run_args()
-    )

@@ -29,14 +29,14 @@ option:
     offset_y: 0
 #
 workspace:
-    # geometries
-    geometries:
-        label: geometries
+    # asset geometries
+    asset_geometries:
+        label: <..key>
         main:
             path: <option.root>/<..label>_merge
             obj_type: Merge
             attributes:
-                x: =<option.x>-<option.w>
+                x: =<option.x>-<option.w>*1.5
                 y: =<option.y>+<option.h>
                 ns_colorr: 0.5
                 ns_colorg: 0.25
@@ -56,22 +56,73 @@ workspace:
                 ns_colorb: 0.851
         node_graph:
             nodes:
-                definition:
-                    path: <option.root>/<....label>
+                asset:
+                    name: <..key>__geometries
+                    path: <option.root>/<.name>
                     obj_category: node
                     obj_type: lx_asset_loader
                     base_obj_type: Group
                     attributes:
                         x: =<option.x>-<option.w>*1.5
                         y: =<option.y>+<option.h>*1.5
-                        ns_colorr: 0.75
+                        ns_colorr: 0.25
                         ns_colorg: 0.5
-                        ns_colorb: 0.25
+                        ns_colorb: 0.75
                     connections:
                         - <.path>.output
-                        - <....main.path>.geometries
+                        - <....main.path>.<.name>
                     executes:
                         - 'usd.create'
+    # asset geometries
+    shot_geometries:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>_merge
+            obj_type: Merge
+            attributes:
+                x: =<option.x>-<option.w>*0.5
+                y: =<option.y>+<option.h>
+                ns_colorr: 0.5
+                ns_colorg: 0.25
+                ns_colorb: 0.25
+        node_graph:
+            nodes:
+                shot:
+                    name: <..key>__geometries
+                    path: <option.root>/<.name>
+                    obj_category: node
+                    obj_type: lx_shot_asset_loader
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....main.attributes.x>
+                        y: =<.....main.attributes.y>+<option.h>*.5
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    connections:
+                        - <.path>.output
+                        - <....main.path>.<..key>
+    #
+    geometry_switch:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>
+            obj_type: lx_variant_creater
+            base_obj_type: Group
+            output: <.path>.out
+            attributes:
+                x: =<option.x>-<option.w>
+                y: =<option.y>+<option.h>/2
+                ns_colorr: 0.75
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            parameters:
+                lynxi_variants/key: geometry
+            connections:
+                - <...asset_geometries.main.path>.out
+                - <.path>.asset
+                - <...shot_geometries.main.path>.out
+                - <.path>.shot
     # materials
     materials:
         label: materials
@@ -79,6 +130,7 @@ workspace:
             path: <option.root>/<..label>_merge
             obj_type: Mtl_Merge_Srf
             base_obj_type: Merge
+            output: <.path>.out
             attributes:
                 x: =<option.x>+<option.w>
                 y: =<option.y>+<option.h>
@@ -112,9 +164,9 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.25
             connections:
-                - <...geometries.main.path>.out
+                - <...geometry_switch.main.output>
                 - <.path>.geometries
-                - <...materials.main.path>.out
+                - <...materials.main.output>
                 - <.path>.materials
     # material-assigns
     material_assigns:
@@ -325,12 +377,14 @@ workspace:
                         - <....main.path>.<option.look_pass>
                         - <.path>.input
                         - <.path>.out
-    look_switch:
+    #
+    look_pass_switch:
         label: <..key>
         main:
             path: <option.root>/<..label>
             obj_type: lx_variant_creater
             base_obj_type: VariableSwitch
+            output: <.path>.out
             attributes:
                 x: =<option.x>
                 y: =<option.y>-<option.h>*4.5
@@ -342,6 +396,94 @@ workspace:
             connections:
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
+        node_graph:
+            nodes:
+                plastic:
+                    path: <option.root>/<..key>__look
+                    obj_category: node
+                    obj_type: lx_look_loader
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
+                    attributes:
+                        x: =<option.x>-<option.w>
+                        y: =<.....main.attributes.y>+<option.h>*.125
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        look/scheme: plastic
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <.....look_pass_switch.main.path>.<..key>
+                ambocc:
+                    path: <option.root>/<..key>__look
+                    obj_category: node
+                    obj_type: lx_look_loader
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
+                    attributes:
+                        x: =<option.x>-<option.w>
+                        y: =<.....main.attributes.y>+<option.h>*.25
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        look/scheme: ambocc
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <.....look_pass_switch.main.path>.<..key>
+                wire:
+                    path: <option.root>/<..key>__look
+                    obj_category: node
+                    obj_type: lx_look_loader
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
+                    attributes:
+                        x: =<option.x>-<option.w>
+                        y: =<.....main.attributes.y>+<option.h>*.375
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        look/scheme: wire
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <.....look_pass_switch.main.path>.<..key>
+    #
+    cameras:
+        label: <..key>
+        main:
+            path: <option.root>/<..label>
+            obj_type: lx_camera_loader
+            base_obj_type: Group
+            #
+            output: <.path>.output
+            attributes:
+                x: =<option.x>
+                y: =<option.y>-<option.h>*4.75
+                ns_colorr: 0.5
+                ns_colorg: 0.25
+                ns_colorb: 0.25
+            parameters:
+                settings/resolution_enable: True
+                settings/frame_offset_enable: True
+                settings/frame_offset: 1000
+                settings/visible_enable: True
+                settings/visible: 0
+            connections:
+                - <...look_pass_switch.main.output>
+                - <.path>.input
+            executes:
+                - 'alembic.load'
     #
     references:
         label: references
@@ -355,8 +497,8 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.25
             connections:
-                - <...look_switch.main.path>.out
-                - <.path>.looks
+                - <...cameras.main.output>
+                - <.path>.cameras
         backdrop:
             path: <option.root>/<..label>_backgrop
             obj_type: Backdrop
@@ -371,33 +513,7 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.5
     #
-    cameras:
-        label: <..key>
-        main:
-            path: <option.root>/<..label>
-            obj_type: lx_camera_loader
-            base_obj_type: Group
-            #
-            output: output
-            attributes:
-                x: =<option.x>+<option.w>/2
-                y: =<option.y>-<option.h>*4.75
-                ns_colorr: 0.5
-                ns_colorg: 0.25
-                ns_colorb: 0.25
-            parameters:
-                settings/resolution_enable: True
-                settings/frame_offset_enable: True
-                settings/frame_offset: 1000
-                settings/visible_enable: True
-                settings/visible: 0
-            connections:
-                - <.path>.output
-                - <...references.main.path>.cameras
-            executes:
-                - 'alembic.load'
-    #
-    light_switch:
+    light_pass_switch:
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -417,8 +533,8 @@ workspace:
                 - <.path>.<option.light_pass>
         node_graph:
             nodes:
-                definition:
-                    path: <option.root>/<option.light_pass>__light
+                all:
+                    path: <option.root>/<..key>__light
                     obj_category: node
                     obj_type: lx_light_loader
                     base_obj_type: Group
@@ -426,6 +542,12 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.75
+                    parameters:
+                        rotations/enable: 1
+                        rotations/value_offset: 0.0
+                        rotations/start_frame: 1.0
+                        rotations/end_frame: 120.0
+                        rotations/frame_offset: 1124.0
                     insert_scheme: TB
                     insert_connections:
                         - <.....references.main.path>.out
@@ -449,7 +571,7 @@ workspace:
             parameters:
                 lynxi_variants/key: quality
             connections:
-                - <...light_switch.main.output>
+                - <...light_pass_switch.main.output>
                 - <.path>.<option.quality>
         node_graph:
             nodes:
@@ -467,7 +589,7 @@ workspace:
                     parameters:
                         quality/scheme: low
                     connections:
-                        - <.....light_switch.main.output>
+                        - <.....light_pass_switch.main.output>
                         - <.path>.input
                         - <.path>.output
                         - <....main.path>.<..key>
@@ -485,7 +607,7 @@ workspace:
                     parameters:
                         quality/scheme: med
                     connections:
-                        - <.....light_switch.main.output>
+                        - <.....light_pass_switch.main.output>
                         - <.path>.input
                         - <.path>.output
                         - <....main.path>.<..key>
@@ -503,7 +625,25 @@ workspace:
                     parameters:
                         quality/scheme: hi
                     connections:
-                        - <.....light_switch.main.output>
+                        - <.....light_pass_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                custom:
+                    path: <option.root>/<..key>__quality
+                    obj_category: node
+                    obj_type: lx_quality_loader
+                    base_obj_type: Group
+                    attributes:
+                        x: =<option.x>+<option.w>
+                        y: =<option.y>-<option.h>*6
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        quality/scheme: hi
+                    connections:
+                        - <.....light_pass_switch.main.output>
                         - <.path>.input
                         - <.path>.output
                         - <....main.path>.<..key>
@@ -594,7 +734,7 @@ workspace:
                     - <option.asset_root>
             file_parameter: saveTo
             connections:
-                - <...geometries.main.path>.out
+                - <...asset_geometries.main.path>.out
                 - <.path>.orig
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
@@ -614,7 +754,7 @@ workspace:
 #
 node:
     geometry_abc:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -628,9 +768,9 @@ node:
             file_parameter: abcAsset
             connections:
                 - <.path>.out
-                - <workspace.geometries.main.path>.<..label>
+                - <workspace.asset_geometries.main.path>.<..label>
     geometry_xgen:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             name: 'geometry_xgen__{xgen}'
@@ -647,9 +787,9 @@ node:
             file_parameter: xgen_file
             connections:
                 - <.output>
-                - '<workspace.geometries.main.path>.<.name>'
+                - '<workspace.asset_geometries.main.path>.<.name>'
     geometry_usd:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -663,10 +803,10 @@ node:
             file_parameter: usd.fileName
             connections:
                 - <.path>.o0
-                - <workspace.geometries.main.path>.<..label>
+                - <workspace.asset_geometries.main.path>.<..label>
     #
     model_usd:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -680,10 +820,10 @@ node:
             file_parameter: usd.fileName
             connections:
                 - <.path>.o0
-                - <workspace.geometries.main.path>.<..label>
+                - <workspace.asset_geometries.main.path>.<..label>
     #
     groom_geometry_usd:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -697,10 +837,10 @@ node:
             file_parameter: usd.fileName
             connections:
                 - <.path>.o0
-                - <workspace.geometries.main.path>.<..label>
+                - <workspace.asset_geometries.main.path>.<..label>
     #
     effect_usd:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -714,9 +854,9 @@ node:
             file_parameter: usd.fileName
             connections:
                 - <.path>.o0
-                - <workspace.geometries.main.path>.<..label>
+                - <workspace.asset_geometries.main.path>.<..label>
     set_usd:
-        keyword: geometries
+        keyword: asset_geometries
         label: <..key>
         main:
             path: <option.root>/<..label>
@@ -730,7 +870,7 @@ node:
             file_parameter: usd.fileName
             connections:
                 - <.path>.o0
-                - <workspace.geometries.main.path>.<..label>
+                - <workspace.asset_geometries.main.path>.<..label>
     #
     material_group:
         keyword: materials

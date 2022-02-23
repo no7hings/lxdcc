@@ -30,7 +30,7 @@ class LookWorkspaceCreator(object):
                 'quality': ['low', 'med', 'hi', 'custom'],
                 'camera': ['full', 'half', 'add_0', 'add_1', 'free', 'shot'],
                 'light_pass': ['all'],
-                'look_pass': ['default'],
+                'look_pass': ['default', 'plastic', 'ambocc', 'wire'],
                 'variables_enable': ['on', 'off'],
             }
         )

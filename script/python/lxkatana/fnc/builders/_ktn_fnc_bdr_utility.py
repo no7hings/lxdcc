@@ -194,16 +194,16 @@ class AssetWorkspaceBuilder(object):
                 node_obj_type = v['obj_type']
                 node_base_obj_type = v.get('base_obj_type')
                 dcc_node = ktn_dcc_objects.Node(node_obj_path)
-                ktn_node, is_create = dcc_node.get_dcc_instance(node_obj_type, node_base_obj_type)
+                i_ktn_obj, is_create = dcc_node.get_dcc_instance(node_obj_type, node_base_obj_type)
                 if is_create is True:
                     if node_obj_category == 'group':
                         child_dcc_type = v['child_obj_type']
                         if child_dcc_type is not None:
-                            ktn_node.setChildNodeType(child_dcc_type)
+                            i_ktn_obj.setChildNodeType(child_dcc_type)
                     #
-                    node_attributes = v.get('attributes')
-                    if node_attributes:
-                        ktn_node.setAttributes(node_attributes)
+                    i_node_attributes = v.get('attributes')
+                    if i_node_attributes:
+                        i_ktn_obj.setAttributes(i_node_attributes)
                     #
                     i_insert_connections = v.get('insert_connections')
                     if i_insert_connections:
@@ -220,7 +220,7 @@ class AssetWorkspaceBuilder(object):
 
                     i_executes = v.get('executes')
                     if i_executes:
-                        cls._set_node_executes_(ktn_node, i_executes)
+                        cls._set_node_executes_(i_ktn_obj, i_executes)
                     #
                     parameters = v.get('parameters')
                     if parameters:

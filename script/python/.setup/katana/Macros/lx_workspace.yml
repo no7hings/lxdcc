@@ -6,7 +6,7 @@ output_ports: []
 parameters:
     lynxi_variants/scheme:
         widget: enumerate
-        value: ['character', 'prop']
+        value: ['character', 'prop', 'shot']
         tool_tip: '...'
     #
     lynxi_variants/initialization_variables:

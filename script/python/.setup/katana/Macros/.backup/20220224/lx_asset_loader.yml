@@ -1,0 +1,71 @@
+#
+input_ports: []
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_reset()'
+        tool_tip: '...'
+
+    usd/file:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    usd/location:
+        widget: path
+        value: '/root/world/geo'
+        tool_tip: '...'
+
+    usd/scheme:
+        widget: enumerate
+        value: ['work', 'render', 'shot']
+        tool_tip: '...'
+
+    usd/create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_create()'
+        tool_tip: '...'
+    #
+    lynxi_info/type:
+        widget: string
+        value: 'lx_asset_loader'
+        tool_tip: '...'
+    #
+    lynxi_variants/geometry:
+        widget: enumerate
+        value: ['asset', 'asset-work', 'shot']
+        tool_tip: '...'
+
+    lynxi_variants/look:
+        widget: enumerate
+        value: ['asset', 'asset-work']
+        tool_tip: '...'
+    #
+    lynxi_properties/project:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/role:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/asset:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/step:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/task:
+        widget: string
+        value: ''
+        tool_tip: '...'

@@ -507,7 +507,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
         for obj in source_objs:
             obj.set_colour_by_type_name()
 
-    def get_pos(self):
+    def get_position(self):
         ktn_obj = self._get_ktn_obj_()
         return NodegraphAPI.GetNodePosition(ktn_obj)
 

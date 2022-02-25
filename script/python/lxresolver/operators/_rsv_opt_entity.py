@@ -29,6 +29,8 @@ class AbsAssetQuery(object):
         _kwargs = copy.copy(
             task_properties.value
         )
+        if definition_kwargs is None:
+            return None
         #
         for k, v in definition_kwargs.items():
             _kwargs[k] = v

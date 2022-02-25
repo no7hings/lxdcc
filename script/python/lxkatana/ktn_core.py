@@ -333,6 +333,9 @@ class NGObjOpt(object):
         if port:
             NGPortOpt(port).set(raw)
 
+    def set(self, key, value):
+        self.set_port_raw(key, value)
+
     def set_port_enumerate_raw(self, port_path, raw):
         port = self.ktn_obj.getParameter(port_path)
         if port:

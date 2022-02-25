@@ -5,21 +5,21 @@ from lxkatana import ktn_core
 
 from lxkatana.fnc.builders import _ktn_fnc_bdr_utility
 
+from lxutil.fnc import utl_fnc_obj_abs
 
-class LookWorkspaceCreator(object):
+
+class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
     OPTION = dict(
+        localtion='',
         look_path='default'
     )
-    def __init__(self, file_path=None, root=None, option=None):
-        self._file_path = file_path
-        self._root = root
-        self._option = copy.copy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                if k in self.OPTION:
-                    self._option[k] = v
+    def __init__(self, option=None):
+        super(LookWorkspaceCreator, self).__init__(option)
         #
-        self._ktn_workspace = _ktn_fnc_bdr_utility.AssetWorkspaceBuilder()
+        print self.get('location')
+        self._ktn_workspace = _ktn_fnc_bdr_utility.AssetWorkspaceBuilder(
+            self.get('location')
+        )
 
     def set_run(self):
         self._ktn_workspace.set_workspace_create()
@@ -28,10 +28,9 @@ class LookWorkspaceCreator(object):
             {
                 'layer': ['master'],
                 'quality': ['low', 'med', 'hi', 'custom'],
-                'camera': ['full', 'half', 'add_0', 'add_1', 'free', 'shot'],
+                'camera': ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
                 'light_pass': ['all'],
                 'look_pass': ['default', 'plastic', 'ambocc', 'wire'],
-                'variables_enable': ['on', 'off'],
             }
         )
 

@@ -206,23 +206,16 @@ class LxShotAsset(object):
         #
         if file_path:
             resolver = rsv_commands.get_resolver()
-            rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(
-                file_path
-            )
-            if rsv_task_properties:
-                project = rsv_task_properties.get('project')
-                asset = rsv_task_properties.get('asset')
+            rsv_task = resolver.get_rsv_task_by_file_path(file_path)
+            if rsv_task:
+                self.__set_variants_update_(rsv_task)
                 #
-                rsv_asset = resolver.get_rsv_entity(
-                    project=project, asset=asset
-                )
-                obj_opt.set_port_raw(
+                rsv_asset = rsv_task.get_rsv_entity()
+                #
+                obj_opt.set(
                     'options.asset', rsv_asset.path
                 )
-                #
-                rsv_shots = resolver.get_rsv_entities(
-                    project=project, branch='shot'
-                )
+                rsv_shots = self._get_shots_(rsv_asset)
                 obj_opt.set_port_enumerate_raw(
                     'options.shot', [i.path for i in rsv_shots]
                 )
@@ -241,8 +234,37 @@ class LxShotAsset(object):
                 #
                 no_visible=False, cancel_visible=False
             )
-
-    def __get_shot_assets(self, project, role, asset, shot_set_usd_file_path):
+    @classmethod
+    def _get_shots_(cls, rsv_asset):
+        import lxresolver.commands as rsv_commands
+        #
+        lis = []
+        #
+        resolver = rsv_commands.get_resolver()
+        #
+        rsv_shots = resolver.get_rsv_entities(
+            project=rsv_asset.get('project'), branch='shot'
+        )
+        for i_rsv_shot in rsv_shots:
+            i_rsv_shot_set_task = i_rsv_shot.get_rsv_task(
+                workspace='publish', step='set', task='registry'
+            )
+            if i_rsv_shot_set_task is not None:
+                i_rsv_shot_set_usd_file = i_rsv_shot_set_task.get_rsv_unit(
+                    keyword='shot-set-usd-file'
+                )
+                i_shot_set_usd_file_path = i_rsv_shot_set_usd_file.get_result(
+                    version='latest'
+                )
+                if i_shot_set_usd_file_path is not None:
+                    shot_assets_dict = cls._get_shot_assets_(
+                        rsv_asset, i_shot_set_usd_file_path
+                    )
+                    if shot_assets_dict:
+                        lis.append(i_rsv_shot)
+        return lis
+    @classmethod
+    def _get_shot_assets_(cls, rsv_asset, shot_set_usd_file_path):
         from lxbasic import bsc_core
         #
         from lxusd import usd_core
@@ -253,7 +275,7 @@ class LxShotAsset(object):
             shot_set_usd_file_path
         ).set_obj_paths_find(
             '/assets/*/{}*'.format(
-                asset
+                rsv_asset.get('asset')
             )
         )
         if paths:
@@ -263,20 +285,20 @@ class LxShotAsset(object):
             i_shot_asset = i_location.split('/')[-1]
             dic[i_shot_asset] = i_location
         return dic
-
-    def __get_geometry_uv_map(self, project, role, asset):
+    @classmethod
+    def _get_asset_geometry_uv_map_(cls, rsv_asset):
         import lxresolver.commands as rsv_commands
         #
         dic = collections.OrderedDict()
         #
         resolver = rsv_commands.get_resolver()
-        rsv_task = resolver.get_rsv_task(
-            project=project,
-            asset=asset,
+        rsv_surface_task = resolver.get_rsv_task(
+            project=rsv_asset.get('project'),
+            asset=rsv_asset.get('asset'),
             step='srf',
             task='surfacing'
         )
-        work_geometry_uv_map_usd_file_unit = rsv_task.get_rsv_unit(
+        work_geometry_uv_map_usd_file_unit = rsv_surface_task.get_rsv_unit(
             keyword='asset-work-geometry-uv_map-usd-var-file'
         )
         work_geometry_uv_map_usd_file_path = work_geometry_uv_map_usd_file_unit.get_result(
@@ -285,7 +307,7 @@ class LxShotAsset(object):
         if work_geometry_uv_map_usd_file_path:
             dic['surface_work_latest'] = work_geometry_uv_map_usd_file_path
         #
-        geometry_uv_map_usd_file_unit = rsv_task.get_rsv_unit(
+        geometry_uv_map_usd_file_unit = rsv_surface_task.get_rsv_unit(
             keyword='asset-geometry-usd-uv_map-file'
         )
         geometry_uv_map_usd_file_path = geometry_uv_map_usd_file_unit.get_result(
@@ -294,13 +316,13 @@ class LxShotAsset(object):
         if geometry_uv_map_usd_file_path:
             dic['surface_publish_latest'] = work_geometry_uv_map_usd_file_path
         return dic
-
-    def __get_frame_range(self, shot_set_usd_file_path):
+    @classmethod
+    def _get_shot_frame_range_(cls, shot_set_usd_file_path):
         from lxusd import usd_core
         #
         return usd_core.UsdStageOpt(shot_set_usd_file_path).get_frame_range()
-
-    def _set_file_create_(self, project, role, asset, sequence, shot, start_frame, end_frame, shot_assets_dict, geometry_uv_maps_dict, shot_set_usd_file_path, asset_set_usd_file_path):
+    @classmethod
+    def _set_shot_usd_file_create_(cls, rsv_asset, rsv_shot, start_frame, end_frame, shot_assets_dict, geometry_uv_maps_dict, shot_set_usd_file_path, asset_set_usd_file_path):
         from lxbasic import bsc_core
         #
         from lxutil import utl_configure
@@ -315,11 +337,11 @@ class LxShotAsset(object):
             key
         )
 
-        c.set('asset.role', role)
-        c.set('asset.name', asset)
+        c.set('asset.role', rsv_asset.get('role'))
+        c.set('asset.name', rsv_asset.get('asset'))
 
-        c.set('shot.sequence', sequence)
-        c.set('shot.name', shot)
+        c.set('shot.sequence', rsv_shot.get('sequence'))
+        c.set('shot.name', rsv_shot.get('shot'))
         c.set('shot.start_frame', start_frame)
         c.set('shot.end_frame', end_frame)
         c.set('shot.set_file', shot_set_usd_file_path)
@@ -338,7 +360,7 @@ class LxShotAsset(object):
             raw
         )
 
-    def _set_result_create_(self, project, role, asset, sequence, shot, shot_assets_dict, geometry_uv_maps_dict, shot_set_usd_file_path):
+    def __set_result_create_(self, rsv_asset, rsv_shot, shot_assets_dict, geometry_uv_maps_dict, shot_set_usd_file_path):
         import lxresolver.commands as rsv_commands
         #
         from lxkatana import ktn_core
@@ -366,17 +388,19 @@ class LxShotAsset(object):
                 asset_set_usd_file_path = shot_asset_set_usd_file.get_result(
                     version=rsv_task_properties.get('version'),
                     extend_variants=dict(
-                        asset_shot=shot
+                        asset_shot=rsv_shot.get('shot')
                     )
                 )
                 #
-                start_frame, end_frame = self.__get_frame_range(shot_set_usd_file_path)
+                start_frame, end_frame = self._get_shot_frame_range_(shot_set_usd_file_path)
+                obj_opt.set('lynxi_settings.render_start_frame', start_frame)
+                obj_opt.set('lynxi_settings.render_end_frame', end_frame)
                 ktn_dcc_objects.Scene.set_frame_range(start_frame, end_frame)
                 #
-                self._set_file_create_(
-                    project,
-                    role, asset,
-                    sequence, shot, start_frame, end_frame,
+                self._set_shot_usd_file_create_(
+                    rsv_asset,
+                    rsv_shot,
+                    start_frame, end_frame,
                     shot_assets_dict, geometry_uv_maps_dict,
                     shot_set_usd_file_path,
                     asset_set_usd_file_path
@@ -389,6 +413,14 @@ class LxShotAsset(object):
                 )
         #
         CacheManager.flush()
+
+    def __set_variants_update_(self, rsv_task):
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        for k, v in rsv_task.properties.value.items():
+            obj_opt.set('lynxi_properties.{}'.format(k), v)
 
     def set_create(self):
         from lxutil import utl_core
@@ -408,6 +440,7 @@ class LxShotAsset(object):
             project, sequence, shot = _shot[1:]
             _asset = asset_path.split('/')
             project, role, asset = _asset[1:]
+            rsv_asset = resolver.get_rsv_entity(project=project, asset=asset)
             rsv_shot = resolver.get_rsv_entity(project=project, shot=shot)
             rsv_task = rsv_shot.get_rsv_task(
                 workspace='publish', step='set', task='registry'
@@ -420,23 +453,22 @@ class LxShotAsset(object):
                     version='latest'
                 )
                 if shot_set_usd_file_path:
-                    shot_assets_dict = self.__get_shot_assets(
-                        project, role, asset, shot_set_usd_file_path
-                    )
-                    geometry_uv_maps_dict = self.__get_geometry_uv_map(
-                        project, role, asset
+                    shot_assets_dict = self._get_shot_assets_(
+                        rsv_asset, shot_set_usd_file_path
                     )
                     if shot_assets_dict:
-                        obj_opt.set_port_enumerate_raw(
-                            'variants.shot_asset', shot_assets_dict.keys()
+                        geometry_uv_maps_dict = self._get_asset_geometry_uv_map_(
+                            rsv_asset
                         )
                         obj_opt.set_port_enumerate_raw(
-                            'variants.geometry_uv_map', geometry_uv_maps_dict.keys()
+                            'usd.variants.shot_asset', shot_assets_dict.keys()
                         )
-                        self._set_result_create_(
-                            project,
-                            role, asset,
-                            sequence, shot,
+                        obj_opt.set_port_enumerate_raw(
+                            'usd.variants.geometry_uv_map', geometry_uv_maps_dict.keys()
+                        )
+                        self.__set_result_create_(
+                            rsv_asset,
+                            rsv_shot,
                             shot_assets_dict, geometry_uv_maps_dict,
                             shot_set_usd_file_path
                         )
@@ -533,7 +565,7 @@ class LxCamera(object):
         )
         key = 'camera'
         if camera_scheme in ['character']:
-            values = ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up', 'add_0', 'add_1', 'free', 'shot']
+            values = ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free']
             ktn_core.VariablesSetting().set_register(
                 key, values
             )
@@ -696,12 +728,64 @@ class LxAsset(object):
         from lxkatana import ktn_core
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        obj_opt.set_port_raw(
+            'option.asset', ''
+        )
+        obj_opt.set_port_raw(
+            'option.scheme', 'asset'
+        )
         obj_opt.set_port_raw(
             'usd.file', ''
         )
         obj_opt.set_port_raw(
             'usd.location', '/root/world/geo'
         )
+
+    def set_guess(self):
+        from lxutil import utl_core
+        #
+        import lxresolver.commands as rsv_commands
+        #
+        from lxkatana import ktn_core
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        content = None
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        asset_path = obj_opt.get_port_raw('options.asset')
+        if asset_path:
+            pass
+        else:
+            pass
+        #
+        file_path = ktn_dcc_objects.Scene.get_current_file_path()
+        #
+        if file_path:
+            resolver = rsv_commands.get_resolver()
+            rsv_task = resolver.get_rsv_task_by_file_path(file_path)
+            if rsv_task:
+                rsv_asset = rsv_task.get_rsv_entity()
+                obj_opt.set(
+                    'options.asset', rsv_asset.path
+                )
+            else:
+                content = 'file="{}" is not available'.format(file_path)
+        else:
+            content = 'file="{}" is not available'.format(file_path)
+
+        if content is not None:
+            utl_core.DialogWindow.set_create(
+                'Shot Asset Loader',
+                content=content,
+                status=utl_core.DialogWindow.GuiStatus.Error,
+                #
+                yes_label='Close',
+                #
+                no_visible=False, cancel_visible=False
+            )
 
     def _set_work_file_create_(self, rsv_entity, rsv_task, file_path, file_properties):
         from lxbasic import bsc_core
@@ -799,6 +883,14 @@ class LxAsset(object):
             raw
         )
 
+    def __set_variants_update_(self, rsv_task):
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        for k, v in rsv_task.properties.value.items():
+            obj_opt.set('lynxi_properties.{}'.format(k), v)
+
     def set_create(self):
         import lxresolver.commands as rsv_commands
         #
@@ -813,9 +905,11 @@ class LxAsset(object):
             resolver = rsv_commands.get_resolver()
             rsv_task = resolver.get_rsv_task_by_file_path(file_path)
             if rsv_task is not None:
+                self.__set_variants_update_(rsv_task)
+                #
                 rsv_entity = rsv_task.get_rsv_entity()
-                scheme = obj_opt.get_port_raw('usd.scheme')
-                if scheme in ['work']:
+                scheme = obj_opt.get_port_raw('options.scheme')
+                if scheme in ['asset-work']:
                     work_katana_scene_src_file_unit = rsv_task.get_rsv_unit(
                         keyword='asset-work-katana-scene-src-file'
                     )
@@ -834,7 +928,7 @@ class LxAsset(object):
                         obj_opt.set_port_raw(
                             'usd.file', work_set_usd_file_path
                         )
-                if scheme in ['render']:
+                if scheme in ['asset']:
                     render_katana_scene_file_unit = rsv_task.get_rsv_unit(
                         keyword='asset-render-katana-scene-file'
                     )
@@ -856,3 +950,23 @@ class LxAsset(object):
 class LxLook(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
+
+
+class LxWorkspace(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def set_workspace_create(self):
+        from lxkatana import ktn_core
+        import lxkatana.fnc.creators as ktn_fnc_creators
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        ktn_fnc_creators.LookWorkspaceCreator(
+            option=dict(
+                location=obj_opt.get_path()
+            )
+        ).set_run()
+
+    def set_look_pass_add(self):
+        pass

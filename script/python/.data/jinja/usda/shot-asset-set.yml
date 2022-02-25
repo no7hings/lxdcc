@@ -4,7 +4,7 @@ asset:
     #
     root_name: master
     # surface usd file
-    geometry_uv_map: '/l/prod/cjd/work/assets/chr/qunzhongnan_c/srf/surfacing/geometry/scene/v007/uv_map.hi.usd'
+    geometry_uv_map: ''
 #
 shot:
     sequence: ''

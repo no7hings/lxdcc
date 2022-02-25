@@ -29,9 +29,15 @@ from lxutil.fnc import utl_fnc_obj_abs
 class AssetWorkspaceBuilder(object):
     CONFIGURE_FILE_PATH = ktn_configure.Data.LOOK_KATANA_WORKSPACE_CONFIGURE_PATH
 
-    def __init__(self):
+    def __init__(self, location=None):
         self._look_configure_dict = {}
         self._default_configure = self.set_configure_create()
+        if location is not None:
+            w, h = self._default_configure.get('option.w'), self._default_configure.get('option.h')
+            x, y = ktn_dcc_objects.Node(location).get_position()
+            self._default_configure.set('option.x', x)
+            self._default_configure.set('option.y', y+h/2)
+        #
         self._default_configure.set_flatten()
 
     def get_configure(self, pass_name='default'):
@@ -49,8 +55,8 @@ class AssetWorkspaceBuilder(object):
     def set_workspace_create(self):
         self._set_workspace_create_by_configure_(self._default_configure)
 
-    def get_pass_names(self):
-        return self._get_pass_names_()
+    def get_look_pass_names(self):
+        return self._get_look_pass_names_()
 
     def get_pass_source_obj(self, pass_name):
         node_key = 'look_outputs'
@@ -60,26 +66,26 @@ class AssetWorkspaceBuilder(object):
             if input_port.get_is_exists() is True:
                 return input_port.get_source_obj()
 
-    def get_pass_color(self, pass_name):
-        pass_index = self.get_pass_index(pass_name)
-        return self._get_pass_rgb_(
+    def get_look_pass_color(self, pass_name):
+        pass_index = self.get_look_pass_index(pass_name)
+        return self._get_look_pass_rgb_(
             pass_index
         )
     @classmethod
-    def _get_pass_rgb_(cls, pass_index):
+    def _get_look_pass_rgb_(cls, pass_index):
         h, s, v = 63 + pass_index * 15, .5, .5
         return bsc_core.ColorMtd.hsv2rgb(
                 h, s, v, maximum=1
             )
 
-    def get_pass_index(self, pass_name):
-        look_passes = self.get_pass_names()
+    def get_look_pass_index(self, pass_name):
+        look_passes = self.get_look_pass_names()
         if pass_name in look_passes:
             return look_passes.index(pass_name)
         else:
             raise TypeError()
 
-    def _get_pass_names_(self):
+    def _get_look_pass_names_(self):
         lis = []
         node_key = 'look_outputs'
         dcc_main_obj, ktn_main_obj, (x, y) = self.get_main_args(node_key)
@@ -91,15 +97,15 @@ class AssetWorkspaceBuilder(object):
                     lis.append(i_port_path)
         return lis
     @_ktn_mdf_utility.set_undo_mark_mdf
-    def set_pass_add(self, pass_name=None):
-        pass_names = self.get_pass_names()
+    def set_look_pass_add(self, pass_name=None):
+        pass_names = self.get_look_pass_names()
         pass_count = len(pass_names)
         if pass_name is None:
             pass_name = 'pass_{}'.format(pass_count)
         #
         if pass_name not in pass_names:
             configure = self.set_configure_create(pass_name)
-            r, g, b = self._get_pass_rgb_(pass_count+1)
+            r, g, b = self._get_look_pass_rgb_(pass_count+1)
             configure.set('option.look_pass_color', dict(r=r, g=g, b=b))
             w = configure.get('option.w')
             offset_x = w * pass_count * 2
@@ -107,8 +113,8 @@ class AssetWorkspaceBuilder(object):
             configure.set_flatten()
             self._set_workspace_create_by_configure_(configure)
             utl_core.Log.set_module_result_trace(
-                'pass-add',
-                'pass-name="{}"'.format(pass_name)
+                'look-pass add',
+                'look-pass name="{}"'.format(pass_name)
             )
         else:
             utl_core.Log.set_module_warning_trace(
@@ -882,7 +888,7 @@ class AssetWorkspaceBuilder(object):
         if is_create is True:
             _x = index % d
             _y = int(index / d)
-            r, g, b = self.get_pass_color(pass_name)
+            r, g, b = self.get_look_pass_color(pass_name)
             x, y = x + _x * w / 2, y + h + _y * h / 2
             node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
             if node_attributes:
@@ -965,7 +971,7 @@ class AssetWorkspaceBuilder(object):
             node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
             if node_attributes:
                 node_attributes.set_update(ktn_obj.getAttributes())
-                r, g, b = self.get_pass_color(pass_name)
+                r, g, b = self.get_look_pass_color(pass_name)
                 node_attributes.set('ns_colorr', r)
                 node_attributes.set('ns_colorg', g)
                 node_attributes.set('ns_colorb', b)
@@ -1006,7 +1012,7 @@ class AssetWorkspaceBuilder(object):
             node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
             if node_attributes:
                 node_attributes.set_update(ktn_properties.getAttributes())
-                r, g, b = self.get_pass_color(pass_name)
+                r, g, b = self.get_look_pass_color(pass_name)
                 node_attributes.set('ns_colorr', r)
                 node_attributes.set('ns_colorg', g)
                 node_attributes.set('ns_colorb', b)

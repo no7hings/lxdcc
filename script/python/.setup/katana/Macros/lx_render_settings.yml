@@ -121,6 +121,11 @@ parameters:
         value: 'med'
         tool_tip: '...'
 
+    lynxi_variants/percent:
+        widget: enumerate
+        value: ['100%', '25%', '50%', '75%', '125%', '150%', '175%', '200%']
+        tool_tip: '...'
+
     lynxi_variants/camera:
         widget: string
         value: 'full_body'

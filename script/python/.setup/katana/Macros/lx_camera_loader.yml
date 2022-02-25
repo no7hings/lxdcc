@@ -33,7 +33,7 @@ parameters:
     #
     settings/resolution_enable:
         widget: boolean
-        value: False
+        value: True
         tool_tip: '...'
 
     settings/resolution:
@@ -43,12 +43,12 @@ parameters:
 
     settings/frame_offset_enable:
         widget: boolean
-        value: False
+        value: True
         tool_tip: '...'
 
     settings/frame_offset:
         widget: integer
-        value: 0
+        value: 1000.0
         tool_tip: '...'
 
     settings/visible_enable:
@@ -160,6 +160,16 @@ parameters:
         widget: resolution
         value: '2048x2048'
         tool_tip: '...'
+    #
+    cameras/asset_free/location:
+        widget: path
+        value: '/root/world/cam/cameras/cam_asset_free/cam_asset_freeShape'
+        tool_tip: '...'
+
+    cameras/asset_free/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
     # shot
     cameras/shot/location:
         widget: path
@@ -169,6 +179,16 @@ parameters:
     cameras/shot/resolution:
         widget: resolution
         value: '2048x858'
+        tool_tip: '...'
+
+    cameras/shot_free/location:
+        widget: path
+        value: '/root/world/cam/cameras/cam_shot_free/cam_shot_freeShape'
+        tool_tip: '...'
+
+    cameras/shot_free/resolution:
+        widget: resolution
+        value: '2048x2048'
         tool_tip: '...'
 
     lynxi_info/type:

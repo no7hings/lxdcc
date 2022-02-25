@@ -592,7 +592,7 @@ class AbsFncDccGeometryComparer(object):
 
 class AbsFncOptionMethod(object):
     OPTION = dict()
-    def __init__(self, option):
+    def __init__(self, option=None):
         self._option = copy.copy(self.OPTION)
         if isinstance(option, dict):
             for k, v in option.items():
@@ -601,3 +601,6 @@ class AbsFncOptionMethod(object):
     def get_option(self):
         return self._option
     option = property(get_option)
+
+    def get(self, key):
+        return self._option.get(key)

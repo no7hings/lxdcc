@@ -24,7 +24,7 @@ class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             value=self._option['file']
         )
 
-    def get_pass_names(self):
+    def get_look_pass_names(self):
         _ = self._raw.get_keys(
             'root.*.properties.customize-attributes.pg_lookpass.enumerate-strings'
         )
@@ -40,4 +40,4 @@ if __name__ == '__main__':
             file='/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v051/look/yml/td_test.yml',
             root='/master'
         )
-    ).get_pass_names()
+    ).get_look_pass_names()

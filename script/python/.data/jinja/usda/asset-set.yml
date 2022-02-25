@@ -1,0 +1,16 @@
+asset:
+    role: ''
+    name: ''
+    #
+    root_name: master
+    # surface usd file
+    geometry_uv_map: ''
+#
+camera:
+    root_name: cameras
+    #
+    path: /renderCamera
+#
+shot_assets: {}
+#
+geometry_uv_maps: {}

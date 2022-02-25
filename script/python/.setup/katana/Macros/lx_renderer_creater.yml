@@ -12,7 +12,7 @@ parameters:
     #
     lynxi_variants/layer_enable:
         widget: boolean
-        value: True
+        value: False
         tool_tip: '...'
 
     lynxi_variants/layers:
@@ -22,7 +22,7 @@ parameters:
 
     lynxi_variants/quality_enable:
         widget: boolean
-        value: True
+        value: False
         tool_tip: '...'
 
     lynxi_variants/qualities:
@@ -32,7 +32,7 @@ parameters:
 
     lynxi_variants/camera_enable:
         widget: boolean
-        value: True
+        value: False
         tool_tip: '...'
 
     lynxi_variants/cameras:
@@ -42,7 +42,7 @@ parameters:
 
     lynxi_variants/look_pass_enable:
         widget: boolean
-        value: True
+        value: False
         tool_tip: '...'
 
     lynxi_variants/look_passes:
@@ -52,7 +52,7 @@ parameters:
 
     lynxi_variants/light_pass_enable:
         widget: boolean
-        value: True
+        value: False
         tool_tip: '...'
 
     lynxi_variants/light_passes:
@@ -70,7 +70,7 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_create()'
         tool_tip: '...'
     #
-    submit_to_deadline:
+    create_and_submit_to_deadline:
         widget: button
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_submit_to_deadline()'
         tool_tip: '...'

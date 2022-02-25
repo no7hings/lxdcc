@@ -9,9 +9,14 @@ parameters:
     reset:
         widget: button
         value: ''
-        tool_tip: 'press to rest all parameters'
+        tool_tip: '...'
 
     quality/scheme:
-      widget: enumerate
-      value: ['low', 'med', 'hi']
-      tool_tip: 'press to rest all parameters'
+        widget: enumerate
+        value: ['low', 'med', 'hi']
+        tool_tip: '...'
+
+    lynxi_variants/percent:
+        widget: enumerate
+        value: ['25%', '50%', '75%', '100%', '125%', '150%', '175%', '200%']
+        tool_tip: '...'

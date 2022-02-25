@@ -1,0 +1,42 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    lynxi_info/type:
+        widget: string
+        value: 'lx_variant_processer'
+        tool_tip: '...'
+
+    camera_rotate/enable:
+        widget: enumerate
+        value: ['off', 'on']
+        tool_tip: '...'
+
+    camera_rotate/main_path:
+        widget: path
+        value: '/root/world/cam/cameras/main'
+        tool_tip: '...'
+
+    camera_rotate/sub_path:
+        widget: path
+        value: '/root/world/cam/cameras/sub'
+        tool_tip: '...'
+    #
+    light_rotate/enable:
+        widget: enumerate
+        value: ['off', 'on']
+        tool_tip: '...'
+
+    light_rotate/main_path:
+        widget: path
+        value: '/root/world/lgt/lights/main'
+        tool_tip: '...'
+
+    light_rotate/sub_path:
+        widget: path
+        value: '/root/world/lgt/lights/sub'
+        tool_tip: '...'

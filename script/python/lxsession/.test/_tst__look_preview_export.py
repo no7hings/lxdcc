@@ -19,7 +19,7 @@ time_tag = bsc_core.SystemMtd.get_time_tag()
 
 for i_f in [
     # '/l/prod/xkt/publish/assets/chr/jiguang/srf/srf_anishading/jiguang.srf.srf_anishading.v005/scene/jiguang.ma',
-    '/l/prod/xkt/publish/assets/chr/heidong/srf/srf_anishading/heidong.srf.srf_anishading.v011/scene/heidong.ma'
+    '/l/prod/xkt/publish/assets/chr/heidong/srf/srf_anishading/heidong.srf.srf_anishading.v015/scene/heidong.ma'
 ]:
     for j_seq, (j_option_hook_key, j_script_option) in enumerate(
         [

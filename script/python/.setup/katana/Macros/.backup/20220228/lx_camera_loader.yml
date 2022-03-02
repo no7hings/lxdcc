@@ -1,0 +1,207 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_reset()'
+        tool_tip: '...'
+    #
+    alembic/enable:
+      widget: boolean
+      value: False
+      tool_tip: '...'
+
+    alembic/file:
+      widget: file
+      value: ''
+      tool_tip: 'alembic file'
+
+    alembic/location:
+        widget: path
+        value: '/root/world/cam/cameras/main'
+        tool_tip: 'alembic location'
+
+    alembic/load:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_load()'
+        tool_tip: '...'
+    #
+    settings/resolution_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    settings/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    settings/frame_offset_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    settings/frame_offset:
+        widget: integer
+        value: 1000.0
+        tool_tip: '...'
+
+    settings/visible_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    settings/visible:
+        widget: boolean
+        value: 1
+        tool_tip: '...'
+
+    cameras/close_up/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_closeUp/cam_closeUpShape'
+        tool_tip: '...'
+
+    cameras/close_up/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/upper_body/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_upperbody/cam_upperbodyShape'
+        tool_tip: '...'
+
+    cameras/upper_body/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/upper_body_35/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_upperbody35/cam_upperbody35Shape'
+        tool_tip: '...'
+
+    cameras/upper_body_35/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/upper_body_50/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_upperbody50/cam_upperbody50Shape'
+        tool_tip: '...'
+
+    cameras/upper_body_50/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/full_body/location:
+        widget: path
+        value: '/root/world/cam/cameras/main/cam_fullbody/cam_fullbodyShape'
+        tool_tip: '...'
+
+    cameras/full_body/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+    # prop
+    cameras/full/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_full/cam_fullShape'
+        tool_tip: '...'
+
+    cameras/full/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/half/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_half/cam_halfShape'
+        tool_tip: '...'
+
+    cameras/half/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/add_0/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_add_0/cam_add_0Shape'
+        tool_tip: '...'
+
+    cameras/add_0/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    cameras/add_1/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_add_1/cam_add_1Shape'
+        tool_tip: '...'
+
+    cameras/add_1/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+    #
+    cameras/free/location:
+        widget: path
+        value: '/root/world/cam/cameras/cam_free/cam_freeShape'
+        tool_tip: '...'
+
+    cameras/free/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+    #
+    cameras/asset_free/location:
+        widget: path
+        value: '/root/world/cam/cameras/cam_asset_free/cam_asset_freeShape'
+        tool_tip: '...'
+
+    cameras/asset_free/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+    # shot
+    cameras/shot/location:
+        widget: path
+        value: '/root/world/geo/cameras/defaultCamera/defaultCameraCenterShape'
+        tool_tip: '...'
+
+    cameras/shot/resolution:
+        widget: resolution
+        value: '2048x858'
+        tool_tip: '...'
+
+    cameras/shot_free/location:
+        widget: path
+        value: '/root/world/cam/cameras/cam_shot_free/cam_shot_freeShape'
+        tool_tip: '...'
+
+    cameras/shot_free/resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
+    lynxi_info/type:
+        widget: string
+        value: 'lx_camera_loader'
+        tool_tip: '...'
+
+    lynxi_variants/camera_scheme:
+        widget: enumerate
+        value: ['character', 'prop']
+        tool_tip: '...'
+
+    lynxi_variants/register_variable:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_variable_register()'
+        tool_tip: '...'

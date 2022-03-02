@@ -2109,17 +2109,22 @@ class AbsRsvProject(
     # scene
     def _project__get_rsv_task_by_file_path_(self, file_path, variants_override):
         if file_path is not None:
-            for branch in rsv_configure.Branch.ALL:
-                i_rsv_task_pattern = self.get_pattern(keyword='{}-task-dir'.format(branch))
+            for i_branch in rsv_configure.Branch.ALL:
+                i_rsv_task_pattern = self.get_pattern(keyword='{}-task-dir'.format(i_branch))
                 i_rsv_task_pattern_ = '{}/{{extra}}'.format(i_rsv_task_pattern)
                 i_rsv_matcher = self.RSV_MATCHER_CLASS(
                     self, i_rsv_task_pattern_, format_dict=variants_override
                 )
                 i_properties = i_rsv_matcher.get_properties(result=file_path)
                 if i_properties:
-                    i_properties.set('branch', branch)
+                    i_properties.set('branch', i_branch)
                     i_rsv_task = self.get_rsv_task(**i_properties.value)
                     return i_rsv_task
+
+    def _project__get_rsv_version_by_file_path_(self, file_path, variants_override):
+        rsv_task = self._project__get_rsv_task_by_file_path_(file_path, variants_override)
+        if rsv_task is not None:
+            pass
     # work
     def get_rsv_task_by_work_file_path(self, file_path):
         return self._project__get_rsv_task_by_file_path_(
@@ -2141,6 +2146,16 @@ class AbsRsvProject(
             )
             if rsv_task is not None:
                 return rsv_task
+        return None
+
+    def get_rsv_version_by_any_file_path(self, file_path):
+        for i_workspace in ['work', 'publish']:
+            rsv_version = self._project__get_rsv_version_by_file_path_(
+                file_path,
+                variants_override=dict(workspace=i_workspace)
+            )
+            if rsv_version is not None:
+                return rsv_version
         return None
 
     def get_folders(self):

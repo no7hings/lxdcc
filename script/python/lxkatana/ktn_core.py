@@ -1,7 +1,7 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
 import collections
-
+# noinspection PyUnresolvedReferences
 from Katana import NodegraphAPI, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration
 # noinspection PyUnresolvedReferences
 from UI4 import App
@@ -206,6 +206,9 @@ class NGObjOpt(object):
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj
+    @classmethod
+    def _get_is_exists_(cls, name):
+        return NodegraphAPI.GetNode(name) is not None
 
     def __init__(self, ktn_obj):
         if isinstance(ktn_obj, (str, unicode)):
@@ -336,10 +339,16 @@ class NGObjOpt(object):
     def set(self, key, value):
         self.set_port_raw(key, value)
 
+    def get(self, key):
+        return self.get_port_raw(key)
+
     def set_port_enumerate_raw(self, port_path, raw):
         port = self.ktn_obj.getParameter(port_path)
         if port:
             NGPortOpt(port).set_enumerate_strings(raw)
+
+    def set_as_enumerate(self, key, value):
+        self.set_port_enumerate_raw(key, value)
 
     def get_port(self, port_path):
         return self.ktn_obj.getParameter(port_path)
@@ -1235,7 +1244,6 @@ class NGMacro(object):
 
     def set_ports_clear(self, port_path=None):
         NGObjOpt(self._ktn_obj).set_ports_clear(port_path)
-
     @ktn_modifiers.set_undo_mark_mdf
     def set_create_by_configure_file(self, file_path, clear_start=None):
         NGObjOpt(self._ktn_obj).set_ports_clear(clear_start)

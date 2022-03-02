@@ -68,7 +68,7 @@ workspace:
                     name: <..key>__geometries
                     path: <option.root>/<.name>
                     obj_category: node
-                    obj_type: lx_asset_loader
+                    obj_type: lx_asset
                     base_obj_type: Group
                     attributes:
                         x: =<.....geometry.x>
@@ -77,7 +77,11 @@ workspace:
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
+                        options/scheme: 'asset'
                         lynxi_variants/look: 'asset'
+                        lynxi_settings/render_start_frame: 1001.0
+                        lynxi_settings/render_end_frame: 1244.0
+                        lynxi_settings/resolution: '2048x2048'
                     connections:
                         - <.path>.output
                         - <....main.path>.<.name>
@@ -120,7 +124,7 @@ workspace:
                     name: <..key>__geometries
                     path: <option.root>/<.name>
                     obj_category: node
-                    obj_type: lx_shot_asset_loader
+                    obj_type: lx_asset
                     base_obj_type: Group
                     attributes:
                         x: =<.....geometry.x>
@@ -129,10 +133,14 @@ workspace:
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
+                        options/scheme: 'shot_asset'
                         lynxi_variants/look: 'asset'
+                        lynxi_settings/resolution: '2048x858'
                     connections:
                         - <.path>.output
                         - <....main.path>.<..key>
+                    executes:
+                        - 'usd.create'
     # geometry switch
     # materials
     # y=1.0
@@ -180,8 +188,8 @@ workspace:
             y: =<option.y>+<option.h>*<..offset.y>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_variant_creater
-            base_obj_type: Group
+            obj_type: lx_variant
+            base_obj_type: VariableSwitch
             output: <.path>.out
             attributes:
                 x: =<...geometry.x>
@@ -454,7 +462,7 @@ workspace:
             y: =<option.y>+<option.h>*<..offset.y>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_variant_creater
+            obj_type: lx_variant
             base_obj_type: VariableSwitch
             output: <.path>.out
             attributes:
@@ -486,7 +494,7 @@ workspace:
                 plastic:
                     path: <option.root>/<..key>__look
                     obj_category: node
-                    obj_type: lx_look_loader
+                    obj_type: lx_look_pass
                     base_obj_type: Group
                     input: <.path>.input
                     output: <.path>.output
@@ -506,7 +514,7 @@ workspace:
                 ambocc:
                     path: <option.root>/<..key>__look
                     obj_category: node
-                    obj_type: lx_look_loader
+                    obj_type: lx_look_pass
                     base_obj_type: Group
                     input: <.path>.input
                     output: <.path>.output
@@ -526,7 +534,7 @@ workspace:
                 wire:
                     path: <option.root>/<..key>__look
                     obj_category: node
-                    obj_type: lx_look_loader
+                    obj_type: lx_look_pass
                     base_obj_type: Group
                     input: <.path>.input
                     output: <.path>.output
@@ -584,7 +592,7 @@ workspace:
                 cameras:
                     path: <option.root>/<..key>
                     obj_category: node
-                    obj_type: lx_camera_loader
+                    obj_type: lx_cameras
                     base_obj_type: Group
                     #
                     input: <.path>.input
@@ -621,7 +629,7 @@ workspace:
             y: =<option.y>+<option.h>*<..offset.y>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_variant_creater
+            obj_type: lx_variant
             base_obj_type: VariableSwitch
             output: <.path>.out
             attributes:
@@ -653,7 +661,7 @@ workspace:
                 all:
                     path: <option.root>/<..key>__light
                     obj_category: node
-                    obj_type: lx_light_loader
+                    obj_type: lx_light_pass
                     base_obj_type: Group
                     attributes:
                         ns_colorr: 0.25
@@ -683,7 +691,7 @@ workspace:
             y: =<option.y>+<option.h>*<..offset.y>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_variant_creater
+            obj_type: lx_variant
             base_obj_type: VariableSwitch
             output: <.path>.out
             attributes:
@@ -715,7 +723,7 @@ workspace:
                 low:
                     path: <option.root>/<..key>__quality
                     obj_category: node
-                    obj_type: lx_quality_loader
+                    obj_type: lx_quality
                     base_obj_type: Group
                     attributes:
                         x: =<.....geometry.x>-<option.w>/2*0
@@ -734,7 +742,7 @@ workspace:
                 med:
                     path: <option.root>/<..key>__quality
                     obj_category: node
-                    obj_type: lx_quality_loader
+                    obj_type: lx_quality
                     base_obj_type: Group
                     attributes:
                         x: =<.....geometry.x>-<option.w>/2*1
@@ -753,7 +761,7 @@ workspace:
                 hi:
                     path: <option.root>/<..key>__quality
                     obj_category: node
-                    obj_type: lx_quality_loader
+                    obj_type: lx_quality
                     base_obj_type: Group
                     attributes:
                         x: =<.....geometry.x>-<option.w>/2*2
@@ -772,7 +780,7 @@ workspace:
                 custom:
                     path: <option.root>/<..key>__quality
                     obj_category: node
-                    obj_type: lx_quality_loader
+                    obj_type: lx_quality
                     base_obj_type: Group
                     attributes:
                         x: =<.....geometry.x>-<option.w>/2*3
@@ -800,7 +808,7 @@ workspace:
             y: =<option.y>+<option.h>*<..offset.y>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_variant_creater
+            obj_type: lx_variant
             base_obj_type: VariableSwitch
             output: <.path>.out
             attributes:
@@ -866,7 +874,7 @@ workspace:
             y: =<option.y>+<option.h>*<..offset.y>
         main:
             path: <option.root>/<..label>
-            obj_type: lx_renderer_creater
+            obj_type: lx_render_outputs
             input: <.path>.input
             output: ''
             attributes:
@@ -881,7 +889,7 @@ workspace:
                 - <...render_settings.main.output>
                 - <.input>
         backdrop:
-            path: <option.root>/<option.look_pass>__<..label>_backgrop
+            path: <option.root>/<..label>_backgrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>

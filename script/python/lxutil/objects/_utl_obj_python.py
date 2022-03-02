@@ -99,7 +99,7 @@ class PyModule(object):
             if _:
                 module = importlib.import_module(self.name)
                 imp.reload(module)
-                print '<python-module-reload> module-path="{}"; file="{}"'.format(self.name, self.file_path)
+                print '<python-module reload> module-path="{}"; file="{}"'.format(self.name, self.file_path)
 
     def set_help_print(self):
         # noinspection PyUnresolvedReferences

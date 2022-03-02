@@ -47,9 +47,9 @@ class PortQueryStack(obj_abstract.AbsObjStack):
 
 
 # port
-class PortStack(obj_abstract.AbsObjStack):
+class PrxPortStack(obj_abstract.AbsObjStack):
     def __init__(self):
-        super(PortStack, self).__init__()
+        super(PrxPortStack, self).__init__()
 
     def get_key(self, obj):
         return obj._get_stack_key_()

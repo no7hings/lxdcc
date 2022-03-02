@@ -1,0 +1,76 @@
+#
+input_ports:
+    - input
+#
+output_ports: []
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_reset()'
+        tool_tip: 'press to rest all parameters'
+    #
+    lynxi_variants/layer_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    lynxi_variants/layers:
+        widget: string
+        value: 'master'
+        tool_tip: '...'
+
+    lynxi_variants/quality_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    lynxi_variants/qualities:
+        widget: string
+        value: 'med'
+        tool_tip: '...'
+
+    lynxi_variants/camera_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    lynxi_variants/cameras:
+        widget: string
+        value: 'full_body, upper_body, upper_body_35, upper_body_50, close_up, shot'
+        tool_tip: '...'
+
+    lynxi_variants/look_pass_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    lynxi_variants/look_passes:
+        widget: string
+        value: 'default'
+        tool_tip: '...'
+
+    lynxi_variants/light_pass_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    lynxi_variants/light_passes:
+        widget: string
+        value: 'all'
+        tool_tip: '...'
+    #
+    lynxi_variants/refresh:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_refresh()'
+        tool_tip: '...'
+    #
+    create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_create()'
+        tool_tip: '...'
+    #
+    create_and_submit_to_deadline:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_submit_to_deadline()'
+        tool_tip: '...'

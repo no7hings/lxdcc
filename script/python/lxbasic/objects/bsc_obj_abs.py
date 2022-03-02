@@ -448,7 +448,7 @@ class AbsProcess(object):
             self._status = status
             if self.LOGGER is not None:
                 self.LOGGER.set_module_result_trace(
-                    'process-status-changed',
+                    'process-status changed',
                     '"{}" status is change to "{}"'.format(
                         self._name,
                         str(self._status)

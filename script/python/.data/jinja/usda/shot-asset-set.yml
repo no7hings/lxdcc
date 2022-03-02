@@ -1,10 +1,16 @@
 asset:
+    project: ''
     role: ''
     name: ''
     #
     root_name: master
-    # surface usd file
-    geometry_uv_map: ''
+    #
+    overrides:
+        model: {}
+        groom: {}
+        rig: {}
+        effect: {}
+        surface: {}
 #
 shot:
     sequence: ''
@@ -16,6 +22,9 @@ shot:
     end_frame: 1024
     #
     set_file: ''
+    #
+    overrides:
+        animation: {}
 #
 camera:
     root_name: cameras
@@ -23,5 +32,3 @@ camera:
     path: /renderCamera
 #
 shot_assets: {}
-#
-geometry_uv_maps: {}

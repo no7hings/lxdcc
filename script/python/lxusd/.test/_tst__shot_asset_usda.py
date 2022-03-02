@@ -31,7 +31,7 @@ c.set(
     'geometry_uv_maps',
     {
         'surface_work_latest': '/l/prod/cjd/work/assets/chr/qunzhongnan_c/srf/surfacing/geometry/scene/v007/uv_map.hi.usd',
-        'surface_publish_latest': '/l/prod/cjd/publish/assets/chr/qunzhongnan_c/srf/surfacing/qunzhongnan_c.srf.surfacing.v022/cache/usd/uv_map.usd'
+        'surface_latest': '/l/prod/cjd/publish/assets/chr/qunzhongnan_c/srf/surfacing/qunzhongnan_c.srf.surfacing.v022/cache/usd/uv_map.usd'
     }
 )
 

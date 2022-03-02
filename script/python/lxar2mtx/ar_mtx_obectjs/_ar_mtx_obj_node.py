@@ -23,7 +23,7 @@ class Node(ar_mtx_abstract.AbsDccObj):
     CLS_grh__node__typepath = _datObjPath.Typepath
     CLS_grh__node__datatype = _datObjRaw.Datatype
 
-    CLS_grh__node__port_stack = _grhObjStack.PortStack
+    CLS_grh__node__port_stack = _grhObjStack.PrxPortStack
 
     CLS_grh__node__connector = _ar_mtx_obj_port.Connector
 

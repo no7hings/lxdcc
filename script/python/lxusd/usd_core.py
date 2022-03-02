@@ -1,5 +1,7 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
+import collections
+# noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, Vt, UsdGeom, Gf
 
 import fnmatch
@@ -256,8 +258,8 @@ class UsdStageDataOpt(object):
 
 
 class UsdPrimOpt(object):
-    def __init__(self, prim):
-        self._usd_prim = prim
+    def __init__(self, usd_prim):
+        self._usd_prim = usd_prim
 
     def get_type_name(self):
         return self._usd_prim.GetTypeName()
@@ -286,11 +288,51 @@ class UsdPrimOpt(object):
     def get_child_paths(self):
         return [self.__class__(i).get_path() for i in self._usd_prim.GetChildren()]
 
+    def get_variant_set(self, variant_set_name):
+        return self._usd_prim.GetVariantSet(variant_set_name)
+
+    def get_variant_sets(self):
+        lis = []
+        usd_variant_sets = self._usd_prim.GetVariantSets()
+        for i in usd_variant_sets.GetNames():
+            i_variant_set = self._usd_prim.GetVariantSet(i)
+            lis.append(
+                i_variant_set
+            )
+        return lis
+
+    def get_variant_names(self, variant_set_name):
+        return UsdVariantSetOpt(self.get_variant_set(variant_set_name)).get_variant_names()
+
+    def get_variant_dict(self):
+        dic = collections.OrderedDict()
+        for i in self.get_variant_sets():
+            i_variant_set_opt = UsdVariantSetOpt(i)
+            dic[i_variant_set_opt.get_name()] = i_variant_set_opt.get_current_variant_name(), i_variant_set_opt.get_variant_names()
+        return dic
+
     def __str__(self):
         return '{}(path={})'.format(
             self.get_type_name(),
             self.get_path()
         )
+
+
+class UsdVariantSetOpt(object):
+    def __init__(self, usd_usd_variant):
+        self._usd_usd_variant = usd_usd_variant
+    @property
+    def usd_instance(self):
+        return self._usd_usd_variant
+
+    def get_name(self):
+        return self._usd_usd_variant.GetName()
+
+    def get_variant_names(self):
+        return self._usd_usd_variant.GetVariantNames()
+
+    def get_current_variant_name(self):
+        return self._usd_usd_variant.GetVariantSelection()
 
 
 class UsdDataMapper(object):
@@ -314,8 +356,8 @@ class UsdDataMapper(object):
 
 
 class UsdTransformOpt(object):
-    def __init__(self, prim):
-        self._usd_prim = prim
+    def __init__(self, usd_prim):
+        self._usd_prim = usd_prim
         self._usd_transform = UsdGeom.Imageable(self._usd_prim)
 
     def set_visible(self, boolean):
@@ -334,8 +376,8 @@ class UsdTransformOpt(object):
 
 
 class UsdGeometryOpt(object):
-    def __init__(self, prim):
-        self._usd_prim = prim
+    def __init__(self, usd_prim):
+        self._usd_prim = usd_prim
         self._usd_geometry = UsdGeom.Imageable(self._usd_prim)
 
     def set_customize_port_create(self, port_path, dcc_type, dcc_value):
@@ -365,8 +407,8 @@ class UsdGeometryOpt(object):
 
 
 class UsdGeometryMeshOpt(UsdGeometryOpt):
-    def __init__(self, prim):
-        super(UsdGeometryMeshOpt, self).__init__(prim)
+    def __init__(self, usd_prim):
+        super(UsdGeometryMeshOpt, self).__init__(usd_prim)
         self._usd_mesh = UsdGeom.Mesh(self._usd_prim)
 
     def get_points(self):

@@ -31,6 +31,7 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
                 'camera': ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
                 'light_pass': ['all'],
                 'look_pass': ['default', 'plastic', 'ambocc', 'wire'],
+                'variables_enable': ['on', 'off']
             }
         )
 

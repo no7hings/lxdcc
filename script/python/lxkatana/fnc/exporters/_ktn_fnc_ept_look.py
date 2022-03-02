@@ -130,13 +130,16 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
                     settings=render_set
                 )
                 #
-                fr = utl_scripts.DotAssFileReader(output_file_path)
-                fr._set_file_paths_convert_()
-                #
-                utl_core.Log.set_module_result_trace(
-                    'katana-ass-export',
-                    u'file="{}"'.format(file_path)
-                )
+                output_file = utl_dcc_objects.OsFile(output_file_path)
+                if output_file.get_is_exists() is True:
+                    #
+                    fr = utl_scripts.DotAssFileReader(output_file_path)
+                    fr._set_file_paths_convert_()
+                    #
+                    utl_core.Log.set_module_result_trace(
+                        'katana-ass-export',
+                        u'file="{}"'.format(file_path)
+                    )
             #
             merge_obj.set_delete()
             camera_obj.set_delete()

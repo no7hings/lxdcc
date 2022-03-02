@@ -36,7 +36,7 @@ class AssetWorkspaceBuilder(object):
             w, h = self._default_configure.get('option.w'), self._default_configure.get('option.h')
             x, y = ktn_dcc_objects.Node(location).get_position()
             self._default_configure.set('option.x', x)
-            self._default_configure.set('option.y', y+h/2)
+            self._default_configure.set('option.y', y-h/2)
         #
         self._default_configure.set_flatten()
 
@@ -223,14 +223,14 @@ class AssetWorkspaceBuilder(object):
                     i_connections = v.get('connections')
                     if i_connections:
                         cls._set_node_connections_create_(i_connections)
-
-                    i_executes = v.get('executes')
-                    if i_executes:
-                        cls._set_node_executes_(i_ktn_obj, i_executes)
                     #
                     parameters = v.get('parameters')
                     if parameters:
                         cls._set_node_parameters_(dcc_node, parameters)
+                    #
+                    i_executes = v.get('executes')
+                    if i_executes:
+                        cls._set_node_executes_(i_ktn_obj, i_executes)
     @classmethod
     def _set_node_connections_create_(cls, node_connections, extend_variants=None):
         if extend_variants is None:
@@ -687,7 +687,13 @@ class AssetWorkspaceBuilder(object):
     def get_geometry_usd_surface_hi_file_path(self):
         configure = self.get_configure()
         asset_root = configure.get('option.asset_root')
+        #
         atr_path = '{}.userProperties.geometry__surface__hi'.format(asset_root)
+        _ = self._get_stage_port_raw_(atr_path)
+        if _:
+            return _[0]
+        #
+        atr_path = '{}.userProperties.usd.variants.asset.surface.override.file'.format(asset_root)
         _ = self._get_stage_port_raw_(atr_path)
         if _:
             return _[0]
@@ -703,6 +709,13 @@ class AssetWorkspaceBuilder(object):
             if _:
                 dic[element_label] = _[0]
         return dic
+
+    def get_asset_usd_check_raw(self):
+        obj = ktn_dcc_objects.Node('asset_geometries')
+        if obj.get_is_exists() is True:
+            pass
+        else:
+            pass
 
     def _get_stage_port_raw_(self, atr_path):
         configure = self.get_configure()

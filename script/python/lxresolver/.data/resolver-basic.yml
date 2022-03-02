@@ -159,8 +159,8 @@ asset-work-set-usd-hair-file: <asset-work-set-dir>/hair.usda
 asset-work-set-usd-effect-file: <asset-work-set-dir>/effect.usda
 asset-work-set-usd-surface-file: <asset-work-set-dir>/surface.usda
 #
-asset-work-set-usd-file: <asset-work-set-dir>/<asset-name>.usda
-#
+asset-work-asset-set-usd-override-file: <asset-work-set-dir>/<asset-name>.override.usda
+asset-work-asset-set-usd-file: <asset-work-set-dir>/<asset-name>.usda
 asset-work-shot-asset-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
 #
 asset-work-render-dir: <asset-task-dir>/render/<user-name>

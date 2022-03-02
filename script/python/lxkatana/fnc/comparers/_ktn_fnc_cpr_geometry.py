@@ -24,9 +24,9 @@ class GeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
         #
         import lxkatana.fnc.builders as ktn_fnc_builders
         #
-        surface_workspace = ktn_fnc_builders.AssetWorkspaceBuilder()
+        katana_workspace = ktn_fnc_builders.AssetWorkspaceBuilder()
         #
-        usd_file_path = surface_workspace.get_geometry_usd_surface_hi_file_path()
+        usd_file_path = katana_workspace.get_geometry_usd_surface_hi_file_path()
         if usd_file_path is not None:
             root = self._root
             #

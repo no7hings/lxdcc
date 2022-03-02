@@ -1,0 +1,113 @@
+#
+input_ports: []
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_reset()'
+        tool_tip: 'press to rest all parameters'
+    #
+    options/asset:
+        value: ''
+        tool_tip: 'enter a rsv-asset path or press "guess" auto find'
+
+    options/shot:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: 'rsv-shot path for choose'
+
+    options/scheme:
+        widget: enumerate
+        value: ['shot']
+        tool_tip: '...'
+    #
+    options/guess:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_guess()'
+        tool_tip: 'press to find rsv-asset by current scene file-path'
+    #
+    usd/file:
+        widget: file
+        value: ''
+        tool_tip: 'usd set file-path'
+
+    usd/location:
+        widget: path
+        value: ''
+        tool_tip: 'usd location path'
+
+    usd/create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxShotAsset(node).set_create()'
+        tool_tip: 'press to create usd set file'
+    #
+    lynxi_info/type:
+        widget: string
+        value: 'lx_shot_asset_loader'
+        tool_tip: '...'
+    #
+    usd/variants/shot_asset:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: 'choose a shot-asset for show in viewer'
+
+    usd/variants/geometry_uv_map:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: 'choose a using uv-map'
+
+    lynxi_variants/geometry:
+        widget: enumerate
+        value: ['shot']
+        tool_tip: '...'
+
+    lynxi_variants/look:
+        widget: enumerate
+        value: ['asset-work', 'asset']
+        tool_tip: '...'
+
+    lynxi_settings/render_resolution:
+        widget: resolution
+        value: '2048x858'
+        tool_tip: '...'
+
+    lynxi_settings/render_start_frame:
+        widget: float
+        value: 1001.0
+        tool_tip: '...'
+
+    lynxi_settings/render_end_frame:
+        widget: float
+        value: 1120.0
+        tool_tip: '...'
+
+    lynxi_properties/project:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/role:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/asset:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/step:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    lynxi_properties/task:
+        widget: string
+        value: ''
+        tool_tip: '...'

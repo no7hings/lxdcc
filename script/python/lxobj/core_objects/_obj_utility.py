@@ -103,7 +103,7 @@ class Obj(obj_abstract.AbsObj):
     PATHSEP = obj_configure.Obj.PATHSEP
     # port/def
     PORT_CLASS = Port
-    PORT_STACK_CLASS = _obj_stack.PortStack
+    PORT_STACK_CLASS = _obj_stack.PrxPortStack
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
     ATTRIBUTES_CLASS = Attributes

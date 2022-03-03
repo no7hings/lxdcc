@@ -259,10 +259,10 @@ class MeshOpt(
             boolean
         )
 
-    def set_display_color(self, color):
+    def set_display_color_fill(self, color):
         usd_core.UsdGeometryMeshOpt(
             self.prim
-        ).set_display_color(
+        ).set_display_color_fill(
             color
         )
 
@@ -344,7 +344,7 @@ class CurveOpt(
             p = usd_curve.CreateOrderAttr()
         p.Set(order)
 
-    def set_display_color(self, color):
+    def set_display_color_fill(self, color):
         pass
         # usd_curve = self.get_usd_curve()
         # p = usd_curve.GetDisplayColorAttr()

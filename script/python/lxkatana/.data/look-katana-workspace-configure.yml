@@ -363,21 +363,6 @@ workspace:
                         - <....main.path>.<option.look_pass>
                         - <.path>.in
                         - <.path>.out
-                # nodes
-                no_subdiv_assign:
-                    path: <option.root>/<option.look_pass>__<..key>
-                    obj_category: node
-                    obj_type: ArnoldObjectSettings
-                    attributes:
-                        ns_colorr: 0.25
-                        ns_colorg: 0.5
-                        ns_colorb: 0.25
-                    insert_scheme: TB
-                    insert_connections:
-                        - <.....material_assigns.main.path>.out
-                        - <....main.path>.<option.look_pass>
-                        - <.path>.input
-                        - <.path>.out
                 subdiv_assign:
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
@@ -391,6 +376,20 @@ workspace:
                         subdiv_type: catclark
                         subdiv_iterations: 2
                         subdiv_smooth_derivs: True
+                    insert_scheme: TB
+                    insert_connections:
+                        - <.....material_assigns.main.path>.out
+                        - <....main.path>.<option.look_pass>
+                        - <.path>.input
+                        - <.path>.out
+                no_subdiv_assign:
+                    path: <option.root>/<option.look_pass>__<..key>
+                    obj_category: node
+                    obj_type: ArnoldObjectSettings
+                    attributes:
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.25
                     insert_scheme: TB
                     insert_connections:
                         - <.....material_assigns.main.path>.out
@@ -418,7 +417,7 @@ workspace:
                         - <....main.path>.<option.look_pass>
                         - <.path>.input
                         - <.path>.out
-                opacty_assign:
+                opacity_assign:
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
                     obj_type: ArnoldObjectSettings

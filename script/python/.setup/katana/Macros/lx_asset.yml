@@ -16,7 +16,7 @@ parameters:
         tool_tip: '...'
 
     options/asset:
-        widget: ''
+        widget: string
         value: ''
         tool_tip: '...'
 
@@ -161,12 +161,12 @@ parameters:
     #
     lynxi_variants/geometry:
         widget: enumerate
-        value: ['asset-work', 'asset']
+        value: ['asset-work', 'asset', 'shot-work', 'shot']
         tool_tip: '...'
 
     lynxi_variants/look:
         widget: enumerate
-        value: ['asset-work', 'asset']
+        value: ['asset-work', 'asset', 'shot-work', 'shot']
         tool_tip: '...'
 
     lynxi_settings/render_resolution:

@@ -15,7 +15,7 @@ j_option_opt = bsc_core.KeywordArgumentsOpt(
     option=dict(
         option_hook_key='rsv-task-batchers/asset/maya/camera-export',
         #
-        file='/l/prod/cgm_dev/work/assets/chr/nn_14y_test/cam/camera/maya/scenes/nn_14y_test.cam.camera.v001.ma',
+        file='/l/prod/cgm/work/assets/chr/nn_4y_test/cam/camera/maya/scenes/nn_4y_test.cam.camera.v003.ma',
         user=bsc_core.SystemMtd.get_user_name(),
         #
         td_enable=True,

@@ -696,6 +696,12 @@ class AssetWorkspaceBuilder(object):
         atr_path = '{}.userProperties.usd.variants.asset.surface.override.file'.format(asset_root)
         _ = self._get_stage_port_raw_(atr_path)
         if _:
+            f = utl_dcc_objects.OsFile(_[0])
+            # TODO fix this bug
+            if f.get_is_naming_match('hi.uv_map.usd'):
+                return '{}/hi.usd'.format(
+                    f.directory.path
+                )
             return _[0]
 
     def get_geometry_usd_check_raw(self):

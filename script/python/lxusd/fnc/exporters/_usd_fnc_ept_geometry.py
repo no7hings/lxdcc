@@ -86,12 +86,12 @@ class GeometryUvMapExporter(object):
                     surface_geometry_prim = _
                     input_usd_mesh = UsdGeom.Mesh(surface_geometry_prim)
                     output_prim.CreateAttribute(
-                        'userProperties:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
+                        'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
                     ).Set(self._file_path_1)
                 else:
                     input_usd_mesh = UsdGeom.Mesh(usd_prim)
                     output_prim.CreateAttribute(
-                        'userProperties:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
+                        'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
                     ).Set(self._file_path_0)
                 #
                 input_usd_mesh_opt = usd_core.UsdMeshOpt(input_usd_mesh)
@@ -100,6 +100,14 @@ class GeometryUvMapExporter(object):
                     for uv_map_name in uv_map_names:
                         uv_map = input_usd_mesh_opt.get_uv_map(uv_map_name)
                         output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
+                #
+                input_usd_mesh_opt.set_display_color_fill(
+                    (0.25, 0.75, 0.5)
+                )
+                output_usd_mesh_opt.set_usd_display_colors(
+                    input_usd_mesh_opt.get_usd_display_colors()
+                )
+
         #
         utl_core.Progress.set_stop(ps)
         #
@@ -113,6 +121,14 @@ class GeometryUvMapExporter(object):
 
     def set_run(self):
         self.set_uv_map_export()
+
+
+class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+
+    )
+    def __init__(self, option):
+        super(GeometryDisplayColorExporter, self).__init__(option)
 
 
 class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):

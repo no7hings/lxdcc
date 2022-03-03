@@ -440,7 +440,7 @@ class GeometryUsdExporter_(object):
                                     color = bsc_core.TextOpt(i_mya_mesh.name).to_rgb(
                                         maximum=1
                                     )
-                                    i_usd_mesh_opt.set_display_color(
+                                    i_usd_mesh_opt.set_display_color_fill(
                                         color
                                     )
                             else:
@@ -463,7 +463,7 @@ class GeometryUsdExporter_(object):
                                 color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb(
                                     maximum=1
                                 )
-                                i_usd_curve_opt.set_display_color(
+                                i_usd_curve_opt.set_display_color_fill(
                                     color
                                 )
                 #

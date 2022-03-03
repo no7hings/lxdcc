@@ -1,0 +1,12 @@
+window:
+    name: Asset Render Manager
+    size:
+        - 960
+        - 720
+
+configure:
+    scheme:
+        widget: enumerate
+        value: default
+        tool_tip: '...'
+

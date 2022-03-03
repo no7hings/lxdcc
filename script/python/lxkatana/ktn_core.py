@@ -437,6 +437,16 @@ class NGObjOpt(object):
                     node = self._ktn_obj
                     exec script
 
+    def set_input_port_create(self, port_path):
+        _ = self._ktn_obj.getInputPort(port_path)
+        if _ is None:
+            self._ktn_obj.addInputPort(port_path)
+
+    def set_output_port_create(self, port_path):
+        _ = self._ktn_obj.getOutputPort(port_path)
+        if _ is None:
+            self._ktn_obj.addOutputPort(port_path)
+
 
 class NGGroupStackOpt(NGObjOpt):
     def __init__(self, ktn_obj):

@@ -70,7 +70,7 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_create()'
         tool_tip: '...'
     #
-    create_and_submit_to_deadline:
+    submit_to_deadline:
         widget: button
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxRenderer(node).set_submit_to_deadline()'
         tool_tip: '...'

@@ -315,15 +315,13 @@ class LxAsset(object):
                     if shot_assets_dict:
                         lis.append(i_rsv_shot)
         return lis
-
-    def _get_rsv_asset_auto_(self):
+    @classmethod
+    def _get_rsv_asset_auto_(cls):
         import lxresolver.commands as rsv_commands
         #
         from lxkatana import ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-        #
-        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         #
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
         #
@@ -332,9 +330,6 @@ class LxAsset(object):
             rsv_task = resolver.get_rsv_task_by_file_path(file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_entity()
-                obj_opt.set(
-                    'options.asset', rsv_asset.path
-                )
                 return rsv_asset
 
     def _get_rsv_shot_auto_(self, rsv_asset):
@@ -410,14 +405,17 @@ class LxAsset(object):
     @classmethod
     def _get_overrides_(cls, rsv_task):
         dic = collections.OrderedDict()
-        work_asset_geometry_hi_file_unit = rsv_task.get_rsv_unit(
-            keyword='asset-work-geometry-usd-hi-file'
-        )
-        work_asset_geometry_hi_file_paths = work_asset_geometry_hi_file_unit.get_result(version='all')
-        for i_file_path in work_asset_geometry_hi_file_paths:
-            i_properties = work_asset_geometry_hi_file_unit.get_properties(i_file_path)
-            i_version = i_properties.get('version')
-            dic[i_version] = i_file_path
+        if rsv_task is not None:
+            work_asset_geometry_uv_map_var_file_unit = rsv_task.get_rsv_unit(
+                keyword='asset-work-geometry-uv_map-usd-var-file'
+            )
+            work_asset_geometry_uv_map_var_file_paths = work_asset_geometry_uv_map_var_file_unit.get_result(
+                version='all', extend_variants=dict(var='hi')
+            )
+            for i_file_path in work_asset_geometry_uv_map_var_file_paths:
+                i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties(i_file_path)
+                i_version = i_properties.get('version')
+                dic[i_version] = i_file_path
         return dic
     @classmethod
     def _set_work_shot_asset_usd_file_create_(cls, rsv_asset, rsv_shot, start_frame, end_frame, shot_assets_dict, shot_set_usd_file_path, work_asset_set_usd_file_path):
@@ -447,12 +445,12 @@ class LxAsset(object):
 
         c.set('shot_assets', shot_assets_dict)
 
-        # for i_key, i_step, i_task in cls.ASSET_OVERRIDE_VARIANTS:
-        #     i_rsv_task = rsv_asset.get_rsv_task(
-        #         step=i_step, task=i_task
-        #     )
-        #     i_overrides = cls._get_overrides_(i_rsv_task)
-        #     c.set('asset.overrides.{}'.format(i_key), i_overrides)
+        for i_key, i_step, i_task in cls.ASSET_OVERRIDE_VARIANTS:
+            i_rsv_task = rsv_asset.get_rsv_task(
+                step=i_step, task=i_task
+            )
+            i_overrides = cls._get_overrides_(i_rsv_task)
+            c.set('asset.overrides.{}'.format(i_key), i_overrides)
 
         raw = t.render(
             c.value
@@ -670,6 +668,8 @@ class LxAsset(object):
             rsv_asset = self._get_rsv_asset_auto_()
         #
         if rsv_asset is not None:
+            self.__set_rsv_asset_(rsv_asset)
+            #
             rsv_asset_set_task = rsv_asset.get_rsv_task(
                 workspace='publish', step='set', task='registry'
             )
@@ -708,6 +708,8 @@ class LxAsset(object):
             rsv_asset = self._get_rsv_asset_auto_()
 
         if rsv_asset:
+            self.__set_rsv_asset_(rsv_asset)
+            #
             rsv_shot_path = obj_opt.get_port_raw('options.shot')
             if rsv_shot_path != 'None':
                 rsv_shot = self._get_rsv_shot_(rsv_shot_path)
@@ -958,7 +960,9 @@ class LxRenderer(object):
             Utils.UndoStack.CloseGroup()
 
     def set_submit_to_deadline(self):
-        pass
+        import lxutil_gui.panel.utl_pnl_widgets as utl_pnl_widgets
+        w = utl_pnl_widgets.AssetRenderManager()
+        w.set_window_show()
 
 
 class LxVariant(object):
@@ -1006,3 +1010,83 @@ class LxWorkspace(object):
 
     def set_look_pass_add(self):
         pass
+
+
+class LxLight(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def set_guess(self):
+        from lxutil import utl_core
+        #
+        import lxresolver.commands as rsv_commands
+        #
+        from lxkatana import ktn_core
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        content = None
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        scheme = obj_opt.get('options.scheme')
+        #
+        rsv_asset = None
+        resolver = rsv_commands.get_resolver()
+        #
+        rsv_asset_path = obj_opt.get_port_raw('options.asset')
+        if rsv_asset_path:
+            rsv_asset = LxAsset._get_rsv_asset_(rsv_asset_path)
+            if rsv_asset is not None:
+                pass
+            else:
+                content = 'asset="{}" is not available'.format(rsv_asset_path)
+        else:
+            file_path = ktn_dcc_objects.Scene.get_current_file_path()
+            rsv_task = resolver.get_rsv_task_by_file_path(file_path)
+            if rsv_task:
+                rsv_asset = rsv_task.get_rsv_entity()
+            else:
+                content = 'file="{}" is not available'.format(file_path)
+
+        if rsv_asset is not None:
+            self.__set_rsv_asset_(rsv_asset)
+
+    def __set_rsv_asset_(self, rsv_asset):
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        obj_opt.set(
+            'options.asset', rsv_asset.path
+        )
+
+    def set_create(self):
+        from lxutil import utl_core
+        #
+        from lxkatana import ktn_core
+        #
+        content = None
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        rsv_asset_path = obj_opt.get_port_raw('options.asset')
+        if rsv_asset_path:
+            rsv_asset = LxAsset._get_rsv_asset_(rsv_asset_path)
+        else:
+            rsv_asset = LxAsset._get_rsv_asset_auto_()
+        #
+        if rsv_asset is not None:
+            self.__set_rsv_asset_(rsv_asset)
+            #
+            rsv_asset_light_task = rsv_asset.get_rsv_task(
+                workspace='publish', step='lgt', task='lighting'
+            )
+            asset_light_live_group_unit = rsv_asset_light_task.get_rsv_unit(
+                keyword='asset-light-live_group-file'
+            )
+            asset_light_live_group_file_path = asset_light_live_group_unit.get_result(
+                version='latest'
+            )
+            if asset_light_live_group_file_path is not None:
+                obj_opt.set('live_group.file', asset_light_live_group_file_path)

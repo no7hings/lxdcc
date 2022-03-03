@@ -135,12 +135,17 @@ asset-work-geometry-usd-hi-file: <asset-work-geometry-dir>/hi.usd
 asset-work-geometry-usd-lo-file: <asset-work-geometry-dir>/lo.usd
 asset-work-geometry-usd-shape-file: <asset-work-geometry-dir>/shape.usd
 asset-work-geometry-usd-temp-file: <asset-work-geometry-dir>/temp.usd
-#
+# <asset-work-geometry-uv_map>
 asset-work-geometry-uv_map-usd-file: <asset-work-geometry-dir>/uv_map.usd
-asset-work-geometry-uv_map-usd-var-file: <asset-work-geometry-dir>/uv_map.<var-name>.usd
+asset-work-geometry-uv_map-usd-var-file: <asset-work-geometry-dir>/<var-name>.uv_map.usd
+
+asset-work-geometry-display_color-usd-file: <asset-work-geometry-dir>/display_color.usd
+asset-work-geometry-display_color-usd-var-file: <asset-work-geometry-dir>/<var-name>.display_color.usd
 #
 asset-work-geometry-info-xml-file: <asset-work-geometry-dir>/<var-name>.info.xml
 asset-work-geometry-info-xml-hi-file: <asset-work-geometry-dir>/hi.info.xml
+
+asset-work-geometry-ovrride-usd-file: <asset-work-geometry-dir>/override.usda
 #
 asset-work-look-dir: <asset-task-dir>/look/scene/<version-name>
 asset-work-look-assign-yml-file: <asset-work-look-dir>/all.assign.yml
@@ -215,6 +220,9 @@ asset-houdini-scene-src-file: <asset-houdini-scene-src-dir>/<asset-name>.hip
 #
 asset-katana-scene-src-dir: <asset-version-dir>/scene
 asset-katana-scene-src-file: <asset-katana-scene-src-dir>/<asset-name>.katana
+
+asset-light-dir: <asset-version-dir>/light
+asset-light-live_group-file: <asset-light-dir>/<asset-name>.livegroup
 #
 asset-nuke-scene-src-dir: <asset-version-dir>/scene
 asset-nuke-scene-src-file: <asset-nuke-scene-src-dir>/<asset-name>.nk

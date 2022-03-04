@@ -47,7 +47,7 @@ parameters:
 
     lynxi_variants/look_passes:
         widget: string
-        value: 'default'
+        value: 'plastic, ambocc, wire, default'
         tool_tip: '...'
 
     lynxi_variants/light_pass_enable:

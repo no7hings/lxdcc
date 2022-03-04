@@ -91,7 +91,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/stats.####.json'.format(
+                v = '{}/main/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/stats.####.json'.format(
                     render_output_directory_path)
                 utl_dcc_objects.OsFile(v).set_directory_create()
                 #
@@ -121,7 +121,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/profile.####.json'.format(
+                v = '{}/main/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/profile.####.json'.format(
                     render_output_directory_path)
                 utl_dcc_objects.OsFile(v).set_directory_create()
                 #
@@ -149,7 +149,7 @@ class LxRenderSettings(object):
             if rsv_task_properties:
                 rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
-                v = '{}/main/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/<render-pass>.####.exr'.format(
+                v = '{}/main/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/<render-pass>.####.exr'.format(
                     render_output_directory_path)
                 #
                 obj_opt.set_port_raw(

@@ -48,7 +48,7 @@ parameters:
 
     arnold_render_settings/stats_file:
         widget: file
-        value: '/temp/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/stats.####.json'
+        value: '/temp/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/stats.####.json'
         tool_tip: '...'
 
     arnold_render_settings/set_stats_file:
@@ -63,7 +63,7 @@ parameters:
 
     arnold_render_settings/profile_file:
         widget: file
-        value: '/temp/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/profile.####.json'
+        value: '/temp/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/profile.####.json'
         tool_tip: '...'
 
     arnold_render_settings/set_profile_file:
@@ -93,7 +93,7 @@ parameters:
 
     lynxi_settings/render_output:
         widget: file
-        value: '/temp/<layer>/<quality>/<look-pass>/<light-pass>/<camera>/<render-pass>.####.exr'
+        value: '/temp/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/<render-pass>.####.exr'
         tool_tip: '...'
 
     lynxi_settings/set_render_output:

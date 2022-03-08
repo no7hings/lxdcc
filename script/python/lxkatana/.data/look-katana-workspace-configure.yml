@@ -81,7 +81,7 @@ workspace:
                         lynxi_variants/geometry: 'asset'
                         lynxi_variants/look: 'asset'
                         lynxi_settings/render_start_frame: 1001.0
-                        lynxi_settings/render_end_frame: 1244.0
+                        lynxi_settings/render_end_frame: 1240.0
                         lynxi_settings/resolution: '2048x2048'
                     connections:
                         - <.path>.output
@@ -607,7 +607,7 @@ workspace:
                     parameters:
                         settings/resolution_enable: True
                         settings/frame_offset_enable: True
-                        settings/frame_offset: 1000
+                        settings/frame_offset: 997.0
                         settings/visible_enable: True
                         settings/visible: 0
                     #
@@ -673,7 +673,7 @@ workspace:
                         rotations/value_offset: 0.0
                         rotations/start_frame: 121.0
                         rotations/end_frame: 240.0
-                        rotations/frame_offset: 1003.0
+                        rotations/frame_offset: 1000.0
                     insert_scheme: TB
                     insert_connections:
                         - <.....cameras.main.path>.out

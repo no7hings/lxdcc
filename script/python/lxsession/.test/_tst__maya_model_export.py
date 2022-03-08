@@ -15,7 +15,7 @@ j_option_opt = bsc_core.KeywordArgumentsOpt(
     option=dict(
         option_hook_key='rsv-task-batchers/asset/maya/model-export',
         #
-        file='/l/prod/cgm_dev/work/assets/chr/nn_14y_test/mod/modeling/maya/scenes/nn_14y_test.mod.modeling.v002.ma',
+        file='/l/prod/cgm/work/assets/chr/ast_cg7_mom/mod/modeling/maya/scenes/ast_cg7_mom.mod.modeling.v001.ma',
         user=bsc_core.SystemMtd.get_user_name(),
         #
         td_enable=True,

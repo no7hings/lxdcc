@@ -140,3 +140,8 @@ parameters:
         widget: button
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_variable_register()'
         tool_tip: '...'
+
+    camera_manager:
+        widget: button
+        value: ''
+        tool_tip: '...'

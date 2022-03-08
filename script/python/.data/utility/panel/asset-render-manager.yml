@@ -2,7 +2,7 @@ window:
     name: Asset Render Manager
     size:
         - 960
-        - 720
+        - 960
 
 configure:
     scheme:
@@ -10,3 +10,82 @@ configure:
         value: default
         tool_tip: '...'
 
+node:
+    varianbles/layers/master:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+
+    varianbles/cameras/full_body:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+
+    varianbles/cameras/upper_body:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+        joint_to_next: True
+
+    varianbles/cameras/upper_body_35:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+        joint_to_next: True
+
+    varianbles/cameras/upper_body_50:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+
+    varianbles/cameras/close_up:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+
+    varianbles/look_passes/default:
+        widget: boolean
+        value: True
+        enable: null
+        tool_tip: '...'
+    #
+    usd_variants/asset/model:
+        widget: enumerate
+        value: ['None']
+        enable: False
+        tool_tip: '...'
+
+    usd_variants/asset/groom:
+        widget: enumerate
+        value: [ 'None' ]
+        enable: False
+        tool_tip: '...'
+
+    usd_variants/asset/rig:
+        widget: enumerate
+        value: [ 'None' ]
+        enable: False
+        tool_tip: '...'
+
+    usd_variants/asset/effect:
+        widget: enumerate
+        value: [ 'None' ]
+        enable: False
+        tool_tip: '...'
+
+    usd_variants/asset/surface:
+        widget: enumerate
+        value: [ 'None' ]
+        enable: False
+        tool_tip: '...'
+
+    create:
+        widget: button
+        value: ''
+        tool_tip: '...'

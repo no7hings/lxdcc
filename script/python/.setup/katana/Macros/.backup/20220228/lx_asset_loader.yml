@@ -67,7 +67,7 @@ parameters:
 
     lynxi_settings/render_end_frame:
         widget: float
-        value: 1244.0
+        value: 1240.0
         tool_tip: '...'
     #
     lynxi_properties/project:

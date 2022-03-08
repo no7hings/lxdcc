@@ -36,6 +36,16 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxLight(node).set_create()'
         tool_tip: '...'
     #
+    settings/background_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    settings/background_color:
+        widget: color3
+        value: [0.18, 0.18, 0.18]
+        tool_tip: '...'
+    #
     rotations/enable:
         widget: boolean
         value: True
@@ -63,7 +73,7 @@ parameters:
 
     rotations/frame_offset:
         widget: float
-        value: 1003.0
+        value: 1000.0
         tool_tip: '...'
 
     lynxi_info/type:

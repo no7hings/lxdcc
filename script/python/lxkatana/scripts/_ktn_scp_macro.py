@@ -404,6 +404,12 @@ class LxAsset(object):
         )
     @classmethod
     def _get_overrides_(cls, rsv_task):
+        import lxusd.rsv.objects as usd_rsv_objects
+
+        usd_rsv_objects.RsvTaskOverrideUsdCreator(
+            rsv_task
+        )._set_geometry_uv_map_create_()
+
         dic = collections.OrderedDict()
         if rsv_task is not None:
             work_asset_geometry_uv_map_var_file_unit = rsv_task.get_rsv_unit(
@@ -512,7 +518,7 @@ class LxAsset(object):
 
         if work_asset_set_usd_file_path is not None:
             obj_opt.set('lynxi_settings.render_start_frame', 1001.0)
-            obj_opt.set('lynxi_settings.render_end_frame', 1244.0)
+            obj_opt.set('lynxi_settings.render_end_frame', 1240.0)
             obj_opt.set('lynxi_settings.render_resolution', '2048x2048')
             #
             self._set_work_asset_usd_file_create_(

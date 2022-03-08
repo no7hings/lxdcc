@@ -1224,6 +1224,16 @@ class NGMacro(object):
                     ktn_port.setHintString(
                         str(dict(widget='popup', options=list(value)))
                     )
+                elif widget in ['color3']:
+                    c = 3
+                    ktn_port = ktn_group_port.createChildNumberArray(name, c)
+                    for i in range(c):
+                        i_ktn_port = ktn_port.getChildByIndex(i)
+                        i_ktn_port.setValue(value[i], 0)
+                    #
+                    ktn_port.setHintString(
+                        str(dict(widget='color'))
+                    )
                 else:
                     c = len(value)
                     if isinstance(value[0], (str, unicode)):

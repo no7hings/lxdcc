@@ -83,5 +83,5 @@ parameters:
 
     lynxi_variants/rotations/light_frame_offset:
         widget: float
-        value: 1003.0
+        value: 1000.0
         tool_tip: '...'

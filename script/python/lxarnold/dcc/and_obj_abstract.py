@@ -485,18 +485,20 @@ class AbsObjScene(
         if and_surface_shader_objs:
             and_surface_shader_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_surface_shader_objs[0])
             orig_and_surface_shader_obj_name = and_surface_shader_obj_mtd.name
-            if orig_and_surface_shader_obj_name != 'ai_default_reflection_shader':
-                surface_index = self._index_dict[orig_and_surface_shader_obj_name]
-                and_surface_shader_obj_name = and_surface_shader_obj_mtd.set_name_prettify(surface_index, self._look_pass_name)
+            if orig_and_surface_shader_obj_name is not None:
+                if orig_and_surface_shader_obj_name != 'ai_default_reflection_shader':
+                    surface_index = self._index_dict[orig_and_surface_shader_obj_name]
+                    and_surface_shader_obj_name = and_surface_shader_obj_mtd.set_name_prettify(surface_index, self._look_pass_name)
         #
         and_displacement_shader_obj_name = None
         and_displacement_shader_objs = shape_and_obj_mtd.get_displacement_shader_objs()
         if and_displacement_shader_objs:
             and_displacement_shader_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_displacement_shader_objs[0])
             orig_and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.name
-            if orig_and_displacement_shader_obj_name != 'ai_default_reflection_shader':
-                displacement_index = self._index_dict[orig_and_displacement_shader_obj_name]
-                and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.set_name_prettify(displacement_index, self._look_pass_name)
+            if orig_and_displacement_shader_obj_name is not None:
+                if orig_and_displacement_shader_obj_name != 'ai_default_reflection_shader':
+                    displacement_index = self._index_dict[orig_and_displacement_shader_obj_name]
+                    and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.set_name_prettify(displacement_index, self._look_pass_name)
         # volume
         and_volume_shader_obj_name = None
         #

@@ -1072,6 +1072,14 @@ class AbsRsvTask(
             override_variants=dict(workspace='publish'),
             file_path_keys=['any_scene_file', 'scene_file']
         )
+
+    def get_properties_by_output_scene_file_path(self, file_path):
+        return self._get_properties_by_scene_file_path_(
+            file_path,
+            key_format='{branch}-output-{application}-scene-file',
+            override_variants=dict(workspace='output'),
+            file_path_keys=['any_scene_file', 'output_scene_file']
+        )
     #
     def _get_properties_by_scene_file_path_(self, file_path, key_format, override_variants, file_path_keys):
         if file_path is not None:
@@ -1093,8 +1101,8 @@ class AbsRsvTask(
                     task_unit_properties.set('user', utl_core.System.get_user_name())
                     task_unit_properties.set('time', utl_core.System.get_time())
                     task_unit_properties.set('time_tag', utl_core.System.get_time_tag())
-                    for file_path_key in file_path_keys:
-                        task_unit_properties.set(file_path_key, file_path)
+                    for i_file_path_key in file_path_keys:
+                        task_unit_properties.set(i_file_path_key, file_path)
                     #
                     task_unit_properties.set('option.scheme', 'publish')
                     task_unit_properties.set('option.version', task_unit_properties.get('version'))
@@ -1121,6 +1129,7 @@ class AbsRsvTask(
                     '{branch}-{application}-scene-src-file',
                     '{branch}-{application}-scene-file',
                     '{branch}-work-{application}-scene-src-file',
+                    '{branch}-output-{application}-scene-file',
                 ]:
                     j_keyword = j_keyword_format.format(
                         **dict(branch=branch, application=i_application)
@@ -2119,6 +2128,7 @@ class AbsRsvProject(
                 if i_properties:
                     i_properties.set('branch', i_branch)
                     i_rsv_task = self.get_rsv_task(**i_properties.value)
+                    i_rsv_task.set('workspace', variants_override['workspace'])
                     return i_rsv_task
 
     def _project__get_rsv_version_by_file_path_(self, file_path, variants_override):
@@ -2137,9 +2147,15 @@ class AbsRsvProject(
             file_path,
             variants_override=dict(workspace='publish')
         )
+    # output
+    def get_rsv_task_by_output_file_path(self, file_path):
+        return self._project__get_rsv_task_by_file_path_(
+            file_path,
+            variants_override=dict(workspace='output')
+        )
 
     def get_rsv_task_by_any_file_path(self, file_path):
-        for i_workspace in ['work', 'publish']:
+        for i_workspace in ['work', 'publish', 'output']:
             rsv_task = self._project__get_rsv_task_by_file_path_(
                 file_path,
                 variants_override=dict(workspace=i_workspace)
@@ -2160,6 +2176,11 @@ class AbsRsvProject(
 
     def get_folders(self):
         pass
+
+    def get_rsv_obj_by_path(self, rsv_obj_type_name, rsv_obj_path):
+        keyword_dict = {
+            'project': 'project-dir'
+        }
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
@@ -2398,6 +2419,13 @@ class AbsResolver(
             if rsv_project:
                 return rsv_project.get_rsv_task(**kwargs_)
 
+    def get_rsv_tasks(self, **kwargs):
+        kwargs_ = self._get_rsv_kwargs_(**kwargs)
+        if kwargs_:
+            rsv_project = self.get_rsv_project(**kwargs_)
+            if rsv_project:
+                return rsv_project.get_rsv_tasks(**kwargs_)
+
     def get_rsv_task_by_file_path(self, file_path):
         rsv_project = self.get_rsv_project_by_file_path(file_path)
         if rsv_project is not None:
@@ -2524,7 +2552,7 @@ class AbsResolver(
         return None
 
     def get_task_properties_by_work_scene_src_file_path(self, file_path):
-        _ = self._get_task_properties_by_work_scene_src_file_path_(file_path)
+        _ = self._get_rsv_task_properties_by_work_scene_src_file_path_(file_path)
         if _ is not None:
             return _
         else:
@@ -2534,13 +2562,13 @@ class AbsResolver(
             )
         return None
     #
-    def _get_task_properties_by_work_scene_src_file_path_(self, file_path):
-        rsv_task = self.get_rsv_task_by_work_scene_src_file_path(file_path)
+    def _get_rsv_task_properties_by_work_scene_src_file_path_(self, file_path):
+        rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
             return rsv_task.get_properties_by_work_scene_src_file_path(file_path)
 
     def get_task_properties_by_scene_src_file_path(self, file_path):
-        _ = self._get_task_properties_by_scene_src_file_path_(file_path)
+        _ = self._get_rsv_task_properties_by_scene_src_file_path_(file_path)
         if _ is not None:
             return _
         else:
@@ -2550,8 +2578,8 @@ class AbsResolver(
             )
         return None
     #
-    def _get_task_properties_by_scene_src_file_path_(self, file_path):
-        rsv_task = self.get_rsv_task_by_scene_src_file_path(file_path)
+    def _get_rsv_task_properties_by_scene_src_file_path_(self, file_path):
+        rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
             return rsv_task.get_properties_by_scene_src_file_path(file_path)
     #
@@ -2570,7 +2598,7 @@ class AbsResolver(
         return None
     #
     def get_task_properties_by_scene_file_path(self, file_path):
-        _ = self._get_task_properties_by_scene_file_path_(file_path)
+        _ = self._get_rsv_task_properties_by_scene_file_path_(file_path)
         if _ is not None:
             return _
         else:
@@ -2580,10 +2608,15 @@ class AbsResolver(
             )
         return None
     #
-    def _get_task_properties_by_scene_file_path_(self, file_path):
-        rsv_task = self.get_rsv_task_by_scene_file_path(file_path)
+    def _get_rsv_task_properties_by_scene_file_path_(self, file_path):
+        rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
             return rsv_task.get_properties_by_scene_file_path(file_path)
+
+    def _get_rsv_task_properties_by_output_scene_file_path_(self, file_path):
+        rsv_task = self.get_rsv_task_by_any_file_path(file_path)
+        if rsv_task is not None:
+            return rsv_task.get_properties_by_output_scene_file_path(file_path)
     #
     def _get_task_properties_by_work_user_scene_src_file_path_(self, file_path):
         rsv_task = self.get_rsv_task_by_work_scene_src_file_path(file_path)
@@ -2592,9 +2625,10 @@ class AbsResolver(
     #
     def get_task_properties_by_any_scene_file_path(self, file_path):
         methods = [
-            self._get_task_properties_by_work_scene_src_file_path_,
-            self._get_task_properties_by_scene_src_file_path_,
-            self._get_task_properties_by_scene_file_path_
+            self._get_rsv_task_properties_by_work_scene_src_file_path_,
+            self._get_rsv_task_properties_by_scene_src_file_path_,
+            self._get_rsv_task_properties_by_scene_file_path_,
+            self._get_rsv_task_properties_by_output_scene_file_path_,
         ]
         for method in methods:
             # noinspection PyArgumentList

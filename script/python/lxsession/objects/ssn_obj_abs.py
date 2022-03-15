@@ -445,6 +445,7 @@ class AbsOptionMethodSession(
     def __set_script_option_completion_(self):
         option_opt = self.get_option_opt()
         #
+        inherit_keys = option_opt.get('inherit_keys')
         script_option = self._configure.get('hook_option.script') or {}
         for k, v in script_option.items():
             if option_opt.get_key_is_exists(k) is False:

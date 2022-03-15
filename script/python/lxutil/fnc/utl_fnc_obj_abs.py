@@ -187,6 +187,7 @@ class AbsFncDccMeshMatcher(object):
             tgt_paths_in_points = self._tgt_data.get(
                 'points.uuid.{}'.format(tgt_points_uuid)
             ) or []
+            #
             uuid_matched_tgt_paths = bsc_core.ListMtd.get_addition(
                 bsc_core.ListMtd.get_intersection(tgt_paths_in_face_vertices, tgt_paths_in_points) or [],
                 self._src_paths

@@ -1497,20 +1497,20 @@ class RvLauncher(object):
 
 class History(object):
     if System.get_is_windows():
-        HISTORY_FILE_PATH = '{}/history.yml'.format(
+        FILE_PATH = '{}/history.yml'.format(
             bsc_configure.UserDirectory.WINDOWS
         )
     elif System.get_is_linux():
-        HISTORY_FILE_PATH = '{}/history.yml'.format(
+        FILE_PATH = '{}/history.yml'.format(
             bsc_configure.UserDirectory.LINUX
         )
     else:
         raise SystemError()
     @classmethod
     def set_append(cls, key, value):
-        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is False:
-            bsc_core.StorageFileOpt(cls.HISTORY_FILE_PATH).set_write(
+            bsc_core.StorageFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
         #
@@ -1524,14 +1524,14 @@ class History(object):
             #
             values.append(value)
             configure.set(key, values)
-            configure.set_save_to(cls.HISTORY_FILE_PATH)
+            configure.set_save_to(cls.FILE_PATH)
             return True
         return False
     @classmethod
     def set_extend(cls, key, values):
-        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is False:
-            bsc_core.StorageFileOpt(cls.HISTORY_FILE_PATH).set_write(
+            bsc_core.StorageFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
         #
@@ -1547,12 +1547,12 @@ class History(object):
                     exists_values.append(i_value)
             #
             configure.set(key, exists_values)
-            configure.set_save_to(cls.HISTORY_FILE_PATH)
+            configure.set_save_to(cls.FILE_PATH)
             return True
         return False
     @classmethod
     def get(cls, key):
-        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is True:
             configure = bsc_objects.Configure(
                 value=f_o.path
@@ -1561,7 +1561,7 @@ class History(object):
         return []
     @classmethod
     def get_latest(cls, key):
-        f_o = bsc_core.StoragePathOpt(cls.HISTORY_FILE_PATH)
+        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is True:
             configure = bsc_objects.Configure(
                 value=f_o.path
@@ -1569,6 +1569,32 @@ class History(object):
             _ = configure.get(key) or []
             if _:
                 return _[-1]
+
+
+class SchemeHistories(object):
+    def __init__(self, scheme_key):
+        if System.get_is_windows():
+            self._file_path = '{}/scheme/{}.yml'.format(
+                bsc_configure.UserDirectory.WINDOWS,
+                scheme_key
+            )
+        elif System.get_is_linux():
+            self._file_path = '{}/scheme/{}.yml'.format(
+                bsc_configure.UserDirectory.LINUX,
+                scheme_key
+            )
+        else:
+            raise SystemError()
+        #
+        f_o = bsc_core.StoragePathOpt(self._file_path)
+        if f_o.get_is_exists() is False:
+            bsc_core.StorageFileOpt(self._file_path).set_write(
+                {}
+            )
+
+        self._configure = bsc_objects.Configure(
+            value=f_o.path
+        )
 
 
 class OslShaderMtd(object):

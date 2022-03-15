@@ -82,7 +82,7 @@ main:
             workspace: publish
         #
         output-render-dir:
-            keyword: asset-output-render-dir
+            keyword: asset-output-katana-render-output-dir
             workspace: publish
         #
         katana-scene-file:

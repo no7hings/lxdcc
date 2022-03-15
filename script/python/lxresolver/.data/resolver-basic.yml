@@ -77,7 +77,15 @@ asset-task-dir: <asset-step-dir>/<task-name>
 asset-work-task-dir: <asset-work-step-dir>/<task-name>
 asset-work-task-user-dir: <asset-work-step-dir>/<task-name>/<user-name>
 asset-output-task-dir: <asset-output-step-dir>/<task-name>
-asset-output-render-dir: <asset-output-task-dir>/katana/images/<asset-version-name>
+#
+asset-output-maya-render-output-dir: <asset-output-task-dir>/maya/images/<asset-version-name>
+asset-output-maya-scene-file: <asset-output-task-dir>/maya/scenes/<asset-version-name>.ma
+#
+asset-output-houdini-render-output-dir: <asset-output-task-dir>/houdini/images/<asset-version-name>
+asset-output-houdini-scene-file: <asset-output-task-dir>/houdini/scenes/<asset-version-name>.hip
+#
+asset-output-katana-render-output-dir: <asset-output-task-dir>/katana/images/<asset-version-name>
+asset-output-katana-scene-file: <asset-output-task-dir>/katana/scenes/<asset-version-name>.katana
 # <asset-dcc>
 asset-maya-path: None
 # <asset-version>

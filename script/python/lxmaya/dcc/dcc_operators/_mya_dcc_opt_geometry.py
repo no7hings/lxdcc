@@ -608,6 +608,15 @@ class CurveOpt(
     def get_om2_obj(self):
         return ma_core.Om2Method._get_om2_curve_fnc_(self.obj.path)
 
+    def get_knots(self):
+        return ma_core.Om2CurveOpt(
+            self.obj.path
+        ).get_knots()
+
+    def get_knots_as_uuid(self):
+        raw = self.get_knots()
+        return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
+
 
 class SurfaceOpt(
     utl_dcc_opt_abs.AbsObjOpt,

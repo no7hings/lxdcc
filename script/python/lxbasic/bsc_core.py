@@ -2211,6 +2211,16 @@ Subtitle options:
                     cmd
                 )
 
+    def get_size(self):
+        cmd_args = [
+            Bin.get_ffmpeg(),
+            u'-i "{}"'.format(self.path),
+        ]
+        cmd = ' '.join(cmd_args)
+        SubProcessMtd.set_run_with_result(
+            cmd
+        )
+
 
 class Bin(object):
     @classmethod
@@ -2987,7 +2997,38 @@ class VariablesMtd(object):
         return lis
 
 
+class FrameMtd(object):
+    @classmethod
+    def get(cls, frame_range, frame_step):
+        start_frame, end_frame = frame_range
+        start_frame, end_frame = int(start_frame), int(end_frame)
+        frame_step = int(frame_step)
+        # (1001, 1001), 1
+        if start_frame == end_frame:
+            return [start_frame]
+        # (1001, 1002), 1
+        elif start_frame < end_frame:
+            frames = range(start_frame, end_frame+1)
+            count = len(frames)
+            # (1001, 1002), 2
+            if count == frame_step:
+                return [start_frame, end_frame]
+            # (1001, 1010), 4
+            elif count > frame_step:
+                _ = [i for i in frames if not (i-1) % frame_step]
+                if start_frame not in _:
+                    _.insert(0, start_frame)
+                if end_frame not in _:
+                    _.append(end_frame)
+                return _
+            # (1001, 1002), 3
+            else:
+                return [start_frame]
+        else:
+            raise ValueError()
+
+
 if __name__ == '__main__':
-    print VariablesMtd.get_all_combinations(
-        {'camera': ['full_body', 'upper_body'], 'look_pass': ['default'], 'light_pass': ['all', 'test']}
+    print FrameMtd.get(
+        (1001, 1240), 5
     )

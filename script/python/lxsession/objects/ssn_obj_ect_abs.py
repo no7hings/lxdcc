@@ -107,6 +107,12 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                         'Frames', ','.join(render_frames)
                     )
             #
+            renderer = hook_option_opt.get('renderer')
+            if renderer:
+                job_name = self._ddl_submiter.option.get('deadline.job_name')
+                job_name_ = '{}[{}]'.format(job_name, renderer)
+                self._ddl_submiter.option.set('deadline.job_name', job_name_)
+            #
             self._ddl_submiter.job_info.set(
                 'Comment', hook_option
             )

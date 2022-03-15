@@ -85,7 +85,12 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                 **rsv_task_properties.value
             )
             #
-            self._ddl_submiter.option.set('deadline.output_file', scene_file_path)
+            render_file_path = hook_option_opt.get('render_file')
+            if render_file_path:
+                self._ddl_submiter.option.set('deadline.output_file', render_file_path)
+            else:
+                self._ddl_submiter.option.set('deadline.output_file', scene_file_path)
+            #
             self._ddl_submiter.option.set('deadline.group', ddl_configure.get('group'))
             self._ddl_submiter.option.set('deadline.pool', ddl_configure.get('pool'))
             #
@@ -95,6 +100,12 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                 self._ddl_submiter.job_info.set(
                     'Frames', ','.join(map(str, range(len(batch_list))))
                 )
+            else:
+                render_frames = hook_option_opt.get('render_frames', as_array=True)
+                if render_frames:
+                    self._ddl_submiter.job_info.set(
+                        'Frames', ','.join(render_frames)
+                    )
             #
             self._ddl_submiter.job_info.set(
                 'Comment', hook_option

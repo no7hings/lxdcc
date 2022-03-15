@@ -473,7 +473,7 @@ class LxAsset(object):
         #
         return usd_core.UsdStageOpt(shot_set_usd_file_path).get_frame_range()
 
-    def __get_work_asset_usd_file_path_(self, rsv_asset):
+    def __get_temp_asset_usd_file_path_(self, rsv_asset):
         from lxbasic import bsc_core
 
         import lxresolver.commands as rsv_commands
@@ -487,21 +487,35 @@ class LxAsset(object):
         if file_path:
             resolver = rsv_commands.get_resolver()
             rsv_asset_task = resolver.get_rsv_task_by_file_path(file_path)
-            if rsv_asset_task is not None:
-                self.__set_asset_info_update_(rsv_asset_task)
-                #
-                work_katana_scene_src_file_unit = rsv_asset_task.get_rsv_unit(
-                    keyword='asset-work-katana-scene-src-file'
-                )
-                rsv_unit_properties = work_katana_scene_src_file_unit.get_properties(
-                    file_path
-                )
-                if rsv_unit_properties:
-                    version = rsv_unit_properties.get('version')
-                    work_asset_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
-                        keyword='asset-work-asset-set-usd-file'
+            rsv_task_properties = resolver.get_rsv_task_properties_by_any_file_path(file_path)
+            if rsv_task_properties:
+                workspace = rsv_task_properties.get('workspace')
+                if workspace in ['work']:
+                    work_katana_scene_src_file_unit = rsv_asset_task.get_rsv_unit(
+                        keyword='asset-work-katana-scene-src-file'
                     )
-                    work_asset_set_usd_file_path = work_asset_set_usd_file_unit.get_result(version=version)
+                    rsv_properties = work_katana_scene_src_file_unit.get_properties(
+                        file_path
+                    )
+                    if rsv_properties:
+                        version = rsv_properties.get('version')
+                        work_asset_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
+                            keyword='asset-work-asset-set-usd-file'
+                        )
+                        work_asset_set_usd_file_path = work_asset_set_usd_file_unit.get_result(version=version)
+                elif workspace in ['output']:
+                    output_katana_scene_file_unit = rsv_asset_task.get_rsv_unit(
+                        keyword='asset-output-katana-scene-file'
+                    )
+                    rsv_properties = output_katana_scene_file_unit.get_properties(
+                        file_path
+                    )
+                    if rsv_properties:
+                        version = rsv_properties.get('version')
+                        work_asset_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
+                            keyword='asset-work-asset-set-usd-file'
+                        )
+                        work_asset_set_usd_file_path = work_asset_set_usd_file_unit.get_result(version=version)
         else:
             work_asset_set_usd_file_path = '{}{}.usda'.format(
                 bsc_core.SystemMtd.get_temporary_directory_path(),
@@ -514,7 +528,7 @@ class LxAsset(object):
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
-        work_asset_set_usd_file_path = self.__get_work_asset_usd_file_path_(rsv_asset)
+        work_asset_set_usd_file_path = self.__get_temp_asset_usd_file_path_(rsv_asset)
 
         if work_asset_set_usd_file_path is not None:
             obj_opt.set('lynxi_settings.render_start_frame', 1001.0)

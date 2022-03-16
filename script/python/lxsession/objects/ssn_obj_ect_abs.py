@@ -48,9 +48,9 @@ class AbsHookExecutor(object):
         )
 
 
-class AbsRsvTaskHookExecutor(AbsHookExecutor):
+class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvTaskHookExecutor, self).__init__(*args, **kwargs)
+        super(AbsRsvTaskMethodHookExecutor, self).__init__(*args, **kwargs)
 
     def set_run_with_deadline(self):
         session = self.get_session()
@@ -59,7 +59,6 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
         hook_option = session.get_option()
         #
         scene_file_path = hook_option_opt.get('file')
-        engine = hook_option_opt.get('engine')
         resolver = rsv_commands.get_resolver()
         #
         ddl_configure = session.get_ddl_configure()
@@ -85,12 +84,6 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                 **rsv_task_properties.value
             )
             #
-            render_file_path = hook_option_opt.get('render_file')
-            if render_file_path:
-                self._ddl_submiter.option.set('deadline.output_file', render_file_path)
-            else:
-                self._ddl_submiter.option.set('deadline.output_file', scene_file_path)
-            #
             self._ddl_submiter.option.set('deadline.group', ddl_configure.get('group'))
             self._ddl_submiter.option.set('deadline.pool', ddl_configure.get('pool'))
             #
@@ -100,18 +93,29 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                 self._ddl_submiter.job_info.set(
                     'Frames', ','.join(map(str, range(len(batch_list))))
                 )
-            else:
+            #
+            renderer = hook_option_opt.get('renderer')
+            if renderer:
+                render_output_directory_path = hook_option_opt.get('render_output_directory')
+                if render_output_directory_path:
+                    self._ddl_submiter.option.set('deadline.output_file', render_output_directory_path)
+                #
                 render_frames = hook_option_opt.get('render_frames', as_array=True)
                 if render_frames:
                     self._ddl_submiter.job_info.set(
                         'Frames', ','.join(render_frames)
                     )
+            else:
+                self._ddl_submiter.option.set('deadline.output_file', scene_file_path)
             #
-            renderer = hook_option_opt.get('renderer')
-            if renderer:
-                job_name = self._ddl_submiter.option.get('deadline.job_name')
-                job_name_ = '{}[{}]'.format(job_name, renderer)
-                self._ddl_submiter.option.set('deadline.job_name', job_name_)
+            job_name_extend = hook_option_opt.get('job_name_extend', as_array=True)
+            if job_name_extend:
+                job_name_old = self._ddl_submiter.option.get('deadline.job_name')
+                new_job_name = '{}{}'.format(
+                    job_name_old,
+                    ''.join(['[{}]'.format(i) for i in job_name_extend])
+                )
+                self._ddl_submiter.option.set('deadline.job_name', new_job_name)
             #
             self._ddl_submiter.job_info.set(
                 'Comment', hook_option
@@ -122,10 +126,22 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                 'deadline.command',
                 ddl_command
             )
-            dependent_ddl_job_ids = session.get_ddl_dependencies(hook_option)
-            if isinstance(dependent_ddl_job_ids, (tuple, list)):
-                self._ddl_submiter.job_info.set('JobDependencies', ','.join(dependent_ddl_job_ids))
+            #
+            hook_dependent_ddl_job_ids = session.get_ddl_dependencies(hook_option)
+            if isinstance(hook_dependent_ddl_job_ids, (tuple, list)):
+                self._ddl_submiter.job_info.set('JobDependencies', ','.join(hook_dependent_ddl_job_ids))
                 self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
+            #
+            dependent_ddl_job_id_extend = hook_option_opt.get('dependent_ddl_job_id_extend', as_array=True)
+            if dependent_ddl_job_id_extend:
+                dependent_ddl_job_ids_string_old = self._ddl_submiter.job_info.get('JobDependencies')
+                dependent_ddl_job_id_extend_string = ','.join(dependent_ddl_job_id_extend)
+                if dependent_ddl_job_ids_string_old:
+                    self._ddl_submiter.job_info.set('JobDependencies', dependent_ddl_job_id_extend_string)
+                    self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
+                else:
+                    dependent_ddl_job_ids_string_new = '{},{}'.format(dependent_ddl_job_ids_string_old, dependent_ddl_job_id_extend_string)
+                    self._ddl_submiter.job_info.set('JobDependencies', dependent_ddl_job_ids_string_new)
             #
             td_enable = hook_option_opt.get('td_enable') or False
             if td_enable is True:
@@ -143,6 +159,7 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
             #
             ddl_job_id = self._ddl_submiter.get_job_id()
             if ddl_job_id is not None:
+                session._ddl_job_id = ddl_job_id
                 #
                 session.set_ddl_result_update(
                     hook_option, ddl_job_id
@@ -165,4 +182,3 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
 
     def set_run(self):
         return self.set_run_with_deadline()
-

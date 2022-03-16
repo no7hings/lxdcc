@@ -17,3 +17,7 @@ command:
     usd: '<command.maya-python>'
     #
     shotgun: '<command.maya-python>'
+
+    rv: '-c "/opt/rv/bin/rvio \"{image_file}\" -overlay frameburn .4 1.0 30.0 -dlut \"{lut_directory}\" -o \"{movie_file}\" -comment \"{user}\" -outparams timecode={start_frame}"'
+
+    rv-movie-convert: '-c "/opt/rv/bin/rvio \"{image_file}\" -overlay frameburn .4 1.0 30.0 -dlut \"{lut_directory}\" -o \"{movie_file}\" -comment \"{user}\" -outparams timecode={start_frame}"'

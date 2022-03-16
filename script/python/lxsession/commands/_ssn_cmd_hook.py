@@ -74,22 +74,6 @@ def set_hook_execute_by_shell(key):
         # session.set_execute_by_shell()
 
 
-def get_option_hook_script_inherit_keys(key):
-    import lxbasic.objects as bsc_objects
-
-    from lxsession import ssn_configure
-
-    import lxutil.dcc.dcc_objects as utl_dcc_objects
-
-    yaml_file_path = ssn_configure.Hooks.get_yaml_file(key)
-    if yaml_file_path:
-        yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
-        if yaml_file.get_is_exists() is True:
-            configure = bsc_objects.Configure(value=yaml_file.path)
-            return configure.get('hook_option.script.inherit_keys') or []
-    return []
-
-
 def get_option_hook_args(option):
     def execute_fnc():
         session._set_file_execute_(python_file_path, dict(session=session))
@@ -182,6 +166,7 @@ def set_option_hook_execute_by_deadline(option):
         session, execute_fnc = hook_args
         #
         session.set_execute_by_deadline()
+        return session
 
 
 if __name__ == '__main__':

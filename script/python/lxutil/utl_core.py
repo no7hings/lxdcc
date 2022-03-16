@@ -916,6 +916,10 @@ class AppLauncher(object):
             kwargs['application'] = 'maya'
         elif application == 'gui':
             kwargs['application'] = 'maya'
+        elif application == 'rv':
+            kwargs['application'] = 'maya'
+        elif application == 'rv-movie-convert':
+            kwargs['application'] = 'maya'
         #
         configure_file_path = self._get_application_configure_file_path_(**kwargs)
         if os.path.exists(configure_file_path):
@@ -1454,6 +1458,7 @@ class UsdViewLauncher(object):
 
 
 class RvLauncher(object):
+    PACKAGE_PATH = '/l/packages/pg/prod/pgrv'
     def __init__(self, **kwargs):
         """
         :param kwargs:
@@ -1462,6 +1467,21 @@ class RvLauncher(object):
         self._args = [
             'pgrv',
         ]
+
+    def get_local_bin(self):
+        run_args = copy.copy(self._args)
+        if bsc_core.SystemMtd.get_is_windows():
+            bins = Path._get_stg_paths_by_parse_pattern_(
+                'C:/Program Files/Shotgun/*/bin/rvio_hw.exe'
+            )
+            if bins:
+                return bins[0]
+        elif bsc_core.SystemMtd.get_is_linux():
+            bins = Path._get_stg_paths_by_parse_pattern_(
+                '/opt/rv/bin/rv'
+            )
+            if bins:
+                return bins[0]
 
     def set_file_open(self, file_path):
         run_args = copy.copy(self._args)
@@ -1493,6 +1513,11 @@ class RvLauncher(object):
         AppLauncher._set_cmd_run_(
             *run_args
         )
+
+    def set_image_convert_to_mov(self, image_file_path, mov_file_path):
+        local_bin = self.get_local_bin()
+        if local_bin is not None:
+            pass
 
 
 class History(object):

@@ -191,6 +191,12 @@ node:
             enable: False
             tool_tip: '...'
 
+        render/scene_file:
+            widget: file
+            value: ''
+            enable: False
+            tool_tip: '...'
+
         render/output_directory:
             widget: directory
             value: '/tmp/<layer>.<quality>.<look-pass>.<light-pass>.<camera>/<render-pass>.####.exr'

@@ -75,6 +75,24 @@ class ImageOpt(object):
                 )
 
 
+class StgImageOpt(object):
+    COLOR_SPACE_OPTION = {
+        'ACEScg_sRGB': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/sRGB_for_ACEScg_Maya.csp',
+        'ACEScg_Rec709': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/Rec.709_for_ACEScg_Maya.csp'
+    }
+    def __init__(self, obj):
+        self._obj = obj
+        #
+        if utl_core.System.get_is_windows():
+            self._rv_io_path = 'C:/Program Files/Shotgun/*/bin/rvio_hw.exe'
+            self._rv_ls_path = 'C:/Program Files/Shotgun/*/bin/rvls.exe'
+        elif utl_core.System.get_is_linux():
+            self._rv_io_path = '/opt/rv/bin/rvio'
+            self._rv_ls_path = '/opt/rv/bin/rvls'
+        else:
+            raise SystemError()
+
+
 class AbsStgObjOpt(object):
     def __init__(self, stg_obj_query):
         self._stg_obj_query = stg_obj_query

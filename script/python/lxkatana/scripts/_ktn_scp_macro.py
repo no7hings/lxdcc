@@ -513,7 +513,7 @@ class LxAsset(object):
                     if rsv_properties:
                         version = rsv_properties.get('version')
                         work_asset_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
-                            keyword='asset-work-asset-set-usd-file'
+                            keyword='asset-output-asset-set-usd-file'
                         )
                         work_asset_set_usd_file_path = work_asset_set_usd_file_unit.get_result(version=version)
         else:
@@ -547,7 +547,7 @@ class LxAsset(object):
 
         CacheManager.flush()
 
-    def __get_temp_shot_asset_usd_file_path_(self, rsv_asset, rsv_shot):
+    def __get_temp_asset_shot_usd_file_path_(self, rsv_asset, rsv_shot):
         from lxbasic import bsc_core
 
         import lxresolver.commands as rsv_commands
@@ -574,7 +574,7 @@ class LxAsset(object):
                     if rsv_properties:
                         version = rsv_properties.get('version')
                         asset_work_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
-                            keyword='asset-work-shot-asset-set-usd-file'
+                            keyword='asset-work-asset-shot-set-usd-file'
                         )
                         temp_shot_asset_set_usd_file_path = asset_work_set_usd_file_unit.get_result(
                             version=version,
@@ -592,7 +592,7 @@ class LxAsset(object):
                     if rsv_properties:
                         version = rsv_properties.get('version')
                         asset_work_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
-                            keyword='asset-work-shot-asset-set-usd-file'
+                            keyword='asset-output-asset-shot-set-usd-file'
                         )
                         temp_shot_asset_set_usd_file_path = asset_work_set_usd_file_unit.get_result(
                             version=version,
@@ -614,7 +614,7 @@ class LxAsset(object):
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         #
-        temp_shot_asset_set_usd_file_path = self.__get_temp_shot_asset_usd_file_path_(rsv_asset, rsv_shot)
+        temp_shot_asset_set_usd_file_path = self.__get_temp_asset_shot_usd_file_path_(rsv_asset, rsv_shot)
         #
         if temp_shot_asset_set_usd_file_path is not None:
             start_frame, end_frame = self._get_shot_frame_range_(shot_set_usd_file_path)

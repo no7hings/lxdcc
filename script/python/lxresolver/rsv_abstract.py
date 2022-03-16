@@ -811,6 +811,7 @@ class AbsRsvUnit(
         #
         if version == rsv_configure.Version.LATEST:
             kwargs['version'] = '*'
+            # print(self._pattern)
             rsv_matcher = self.rsv_project.RSV_MATCHER_CLASS(
                 self.rsv_project,
                 self._pattern,

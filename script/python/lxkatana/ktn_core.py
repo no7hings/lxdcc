@@ -342,6 +342,12 @@ class NGObjOpt(object):
     def get(self, key):
         return self.get_port_raw(key)
 
+    def get_as_enumerate(self, key):
+        port = self.ktn_obj.getParameter(key)
+        if port:
+            return NGPortOpt(port).get_enumerate_strings()
+        return []
+
     def set_port_enumerate_raw(self, port_path, raw):
         port = self.ktn_obj.getParameter(port_path)
         if port:
@@ -580,6 +586,13 @@ class NGPortOpt(object):
         self.ktn_port.setValue(
             str(value[0]), frame
         )
+
+    def get_enumerate_strings(self):
+        hint_string = self.ktn_port.getHintString()
+        if hint_string:
+            hint_dict = eval(hint_string)
+            return hint_dict.get('options', [])
+        return []
 
     def set_connect_to(self, input_port):
         self._ktn_port.connect(

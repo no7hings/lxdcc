@@ -7,6 +7,6 @@ class HookExecutor(ssn_obj_ect_abs.AbsHookExecutor):
         super(HookExecutor, self).__init__(*args, **kwargs)
 
 
-class RsvTaskHookExecutor(ssn_obj_ect_abs.AbsRsvTaskHookExecutor):
+class RsvTaskHookExecutor(ssn_obj_ect_abs.AbsRsvTaskMethodHookExecutor):
     def __init__(self, *args, **kwargs):
         super(RsvTaskHookExecutor, self).__init__(*args, **kwargs)

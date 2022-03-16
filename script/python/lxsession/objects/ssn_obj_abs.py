@@ -334,6 +334,7 @@ class AbsExecuteDef(object):
     #
     def _set_hook_execute_def_init_(self, ddl_configure):
         self._ddl_configure = ddl_configure
+        self._ddl_job_id = None
 
     def get_ddl_configure(self):
         return self._ddl_configure
@@ -351,7 +352,13 @@ class AbsExecuteDef(object):
 
     def set_execute_by_deadline(self):
         executor = self.get_executor()
-        executor.set_run()
+        executor.set_run_with_deadline()
+
+    def set_ddl_job_id(self, ddl_job_id):
+        self._ddl_job_id = ddl_job_id
+
+    def get_ddl_job_id(self):
+        return self._ddl_job_id
 
     def set_execute_by_shell(self):
         executor = self.get_executor()

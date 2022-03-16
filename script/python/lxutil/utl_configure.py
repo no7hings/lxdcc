@@ -207,5 +207,9 @@ class Session(object):
     pass
 
 
+class Aces(object):
+    LUT = '/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp'
+
+
 if __name__ == '__main__':
     print UtilityProductData.get_as_configure('texture-tx-convert')

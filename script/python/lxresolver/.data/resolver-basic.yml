@@ -92,7 +92,7 @@ asset-output-scene-dir: <asset-output-version-dir>/scene
 asset-output-set-dir: <asset-output-version-dir>/set
 asset-output-metadata-dir: <asset-output-version-dir>/metadata
 #
-asset-output-metadata-yaml-file: <asset-output-metadata-dir>/<asset-name>.yml
+asset-output-render-info-yaml-file: <asset-output-metadata-dir>/render-info.yml
 #
 asset-output-maya-render-output-dir: <asset-output-render-dir>/maya-images
 asset-output-maya-scene-file: <asset-output-scene-dir>/<asset-name>.ma

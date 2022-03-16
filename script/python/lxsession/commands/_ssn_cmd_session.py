@@ -37,12 +37,13 @@ def set_session_option_hooks_execute_by_deadline(session):
         _dependencies.append(main_key_)
         _option_opt.set('dependencies', _dependencies)
         #
-        _inherit_keys = _option_opt.get('inherit_keys')
-        _option_opt.set('inherit_keys', _inherit_keys)
-        for _i in _inherit_keys:
-            _option_opt.set(
-                _i, _batch_option_opt.get(_i)
-            )
+        _inherit_keys = _option_opt.get('inherit_keys', as_array=True)
+        if _inherit_keys:
+            _option_opt.set('inherit_keys', _inherit_keys)
+            for _i in _inherit_keys:
+                _option_opt.set(
+                    _i, _batch_option_opt.get(_i)
+                )
         #
         _ssn_cmd_hook.set_option_hook_execute_by_deadline(
             option=_option_opt.to_string()

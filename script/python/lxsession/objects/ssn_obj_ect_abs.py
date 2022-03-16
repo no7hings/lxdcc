@@ -58,6 +58,8 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
         hook_option_opt = session.get_option_opt()
         hook_option = session.get_option()
         #
+        option_hook_key = hook_option_opt.get('option_hook_key')
+        #
         scene_file_path = hook_option_opt.get('file')
         resolver = rsv_commands.get_resolver()
         #
@@ -68,7 +70,6 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
         )
         if rsv_task_properties:
             name = session._get_rsv_task_version_(rsv_task_properties)
-            option_hook_key = hook_option_opt.get('option_hook_key')
             #
             self._ddl_submiter = ddl_objects.DdlSubmiter()
             self._ddl_submiter.set_option(
@@ -137,11 +138,12 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
                 dependent_ddl_job_ids_string_old = self._ddl_submiter.job_info.get('JobDependencies')
                 dependent_ddl_job_id_extend_string = ','.join(dependent_ddl_job_id_extend)
                 if dependent_ddl_job_ids_string_old:
-                    self._ddl_submiter.job_info.set('JobDependencies', dependent_ddl_job_id_extend_string)
+                    self._ddl_submiter.job_info.set('JobDependencies', ','.join([dependent_ddl_job_ids_string_old, dependent_ddl_job_id_extend_string]))
                     self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
                 else:
                     dependent_ddl_job_ids_string_new = '{},{}'.format(dependent_ddl_job_ids_string_old, dependent_ddl_job_id_extend_string)
                     self._ddl_submiter.job_info.set('JobDependencies', dependent_ddl_job_ids_string_new)
+                    self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
             #
             td_enable = hook_option_opt.get('td_enable') or False
             if td_enable is True:

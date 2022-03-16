@@ -485,6 +485,7 @@ class AbsOptionRsvTaskMethodSession(
         self.__set_system_option_completion_()
         #
         self._rsv_task_properties = None
+        self._rsv_task = None
         #
         option_opt = self.get_option_opt()
         #
@@ -494,9 +495,15 @@ class AbsOptionRsvTaskMethodSession(
             self._rsv_task_properties = self.resolver.get_task_properties_by_any_scene_file_path(
                 self._batch_file_path
             )
+            self._rsv_task = self.resolver.get_rsv_task_by_any_file_path(
+                self._batch_file_path
+            )
         else:
             if self._file_path:
                 self._rsv_task_properties = self.resolver.get_task_properties_by_any_scene_file_path(
+                    self._file_path
+                )
+                self._rsv_task = self.resolver.get_rsv_task_by_any_file_path(
                     self._file_path
                 )
         #
@@ -514,24 +521,26 @@ class AbsOptionRsvTaskMethodSession(
     def __set_rsv_task_option_completion_(self):
         option_opt = self.get_option_opt()
         for i_key in ['project']:
-            option_opt.set(i_key, self._rsv_task_properties.get(i_key))
+            option_opt.set(
+                i_key, self._rsv_task_properties.get(i_key)
+            )
 
     def get_batch_key(self):
         option_opt = self.get_option_opt()
         return bsc_core.SessionYamlMtd.get_key(
-            version=self.get_rsv_version(),
+            version=self.get_rsv_version_name(),
             time_tag=option_opt.get('time_tag'),
         )
 
     def get_batch_file_path(self):
         option_opt = self.get_option_opt()
         file_path = bsc_core.SessionYamlMtd.get_file_path(
-            version=self.get_rsv_version(),
+            version=self.get_rsv_version_name(),
             time_tag=option_opt.get('time_tag'),
         )
         if bsc_core.StoragePathMtd.get_path_is_exists(file_path) is False:
             raw = dict(
-                version=self.get_rsv_version(),
+                version=self.get_rsv_version_name(),
                 time_tag=option_opt.get('time_tag'),
             )
             utl_core.File.set_write(file_path, raw)
@@ -625,7 +634,10 @@ class AbsOptionRsvTaskMethodSession(
     def get_rsv_task_properties(self):
         return self._rsv_task_properties
 
-    def get_rsv_version(self):
+    def get_rsv_task(self):
+        return self._rsv_task
+
+    def get_rsv_version_name(self):
         return self._get_rsv_task_version_(
             self.get_rsv_task_properties()
         )
@@ -633,13 +645,13 @@ class AbsOptionRsvTaskMethodSession(
     def get_ddl_dependent_unique_id(self):
         option_opt = self.get_option_opt()
         return bsc_core.SessionYamlMtd.get_key(
-            version=self.get_rsv_version(),
+            version=self.get_rsv_version_name(),
             # user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
 
     def get_group(self):
-        return self.get_rsv_version()
+        return self.get_rsv_version_name()
 
     def get_ddl_name(self):
         return self.get_name()

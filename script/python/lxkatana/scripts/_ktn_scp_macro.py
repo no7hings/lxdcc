@@ -487,7 +487,7 @@ class LxAsset(object):
         if file_path:
             resolver = rsv_commands.get_resolver()
             rsv_asset_task = resolver.get_rsv_task_by_file_path(file_path)
-            rsv_task_properties = resolver.get_rsv_task_properties_by_any_file_path(file_path)
+            rsv_task_properties = resolver.get_rsv_task_properties_by_any_scene_file_path(file_path)
             if rsv_task_properties:
                 workspace = rsv_task_properties.get('workspace')
                 if workspace in ['work']:
@@ -561,7 +561,7 @@ class LxAsset(object):
         if file_path:
             resolver = rsv_commands.get_resolver()
             rsv_asset_task = resolver.get_rsv_task_by_file_path(file_path)
-            rsv_task_properties = resolver.get_rsv_task_properties_by_any_file_path(file_path)
+            rsv_task_properties = resolver.get_rsv_task_properties_by_any_scene_file_path(file_path)
             if rsv_task_properties:
                 workspace = rsv_task_properties.get('workspace')
                 if workspace in ['work']:

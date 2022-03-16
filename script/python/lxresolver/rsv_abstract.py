@@ -1122,7 +1122,7 @@ class AbsRsvTask(
         file_properties = rsv_matcher.get_properties(result=file_path)
         return file_properties
     #
-    def get_rsv_properties_by_any_file_path(self, file_path):
+    def get_rsv_properties_by_any_scene_file_path(self, file_path):
         if file_path is not None:
             branch = self.properties.get('branch')
             for i_application in rsv_configure.Application.ALL:
@@ -2708,10 +2708,10 @@ class AbsResolver(
             lis.append(result)
         return lis
 
-    def get_rsv_task_properties_by_any_file_path(self, file_path):
+    def get_rsv_task_properties_by_any_scene_file_path(self, file_path):
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
-            return rsv_task.get_rsv_properties_by_any_file_path(file_path)
+            return rsv_task.get_rsv_properties_by_any_scene_file_path(file_path)
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(

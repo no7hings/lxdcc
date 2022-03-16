@@ -64,7 +64,7 @@ class AbsRsvApplication(object):
         rsv_task = self.get_rsv_task()
         if rsv_task is not None:
             scene_file_path = self._get_scene_file_path_()
-            rsv_task_properties = rsv_task.get_rsv_properties_by_any_file_path(
+            rsv_task_properties = rsv_task.get_rsv_properties_by_any_scene_file_path(
                 scene_file_path
             )
             # print rsv_task_properties

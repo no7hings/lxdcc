@@ -1151,6 +1151,9 @@ class KeywordArgumentsOpt(object):
     def get_key_is_exists(self, key):
         return key in self._option_dict
 
+    def get_raw(self):
+        return self._option_dict
+
     def to_option(self):
         return self.to_string()
 

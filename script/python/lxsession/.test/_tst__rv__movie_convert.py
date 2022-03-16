@@ -31,7 +31,7 @@ for i_f in [
                 image_file='/l/prod/cgm/output/assets/chr/nn_14y_test/mod/modeling/nn_14y_test.mod.modeling.v002/render/katana-images/main/full_body.master.all.plastic.custom/beauty.####.exr',
                 movie_file='/l/prod/cgm/output/assets/chr/nn_14y_test/mod/modeling/nn_14y_test.mod.modeling.v002/render/katana-images/main/full_body.master.all.plastic.custom.mov',
                 #
-                job_name_extend=['full_body.master.all.plastic.custom'],
+                option_hook_key_extend=['full_body.master.all.plastic.custom'],
                 #
                 start_frame=1001,
                 end_frame=1240,

@@ -339,7 +339,7 @@ class AbsExecuteDef(object):
     def get_ddl_configure(self):
         return self._ddl_configure
 
-    def get_ddl_dependencies(self, *args, **kwargs):
+    def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
         pass
 
     def get_ddl_dependent_unique_id(self):
@@ -469,7 +469,7 @@ class AbsOptionMethodSession(
         return self._option_opt.to_string()
     option = property(get_option)
 
-    def get_ddl_dependencies(self, *args, **kwargs):
+    def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
         return
 
 
@@ -545,17 +545,61 @@ class AbsOptionRsvTaskMethodSession(
         f = self.get_batch_file_path()
         c = bsc_objects.Configure(value=f)
         #
-        c.set_element_add(
-            'deadline.{}.job_ids'.format(option_hook_key), ddl_job_id
+        keys = [option_hook_key]
+        option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
+        if option_hook_key_extend:
+            keys.extend(option_hook_key_extend)
+        #
+        hook_dependencies = hook_option_opt.get('dependencies')
+        #
+        key = '/'.join(keys)
+        c.set(
+            'deadline.{}.job_id'.format(key), ddl_job_id
         )
         c.set(
-            'option', hook_option
+            'deadline.{}.option'.format(key), hook_option
         )
         c.set_save_to(
             f
         )
 
-    def get_ddl_dependencies(self, hook_option):
+    def set_ddl_job_id_find(self, hook_option):
+        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+            hook_option
+        )
+        option_hook_key = hook_option_opt.get('option_hook_key')
+        f = self.get_batch_file_path()
+        c = bsc_objects.Configure(value=f)
+        #
+        keys = [option_hook_key]
+        option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
+        if option_hook_key_extend:
+            keys.extend(option_hook_key_extend)
+        #
+        key = '/'.join(keys)
+        #
+        return c.get(
+            'deadline.{}.job_id'.format(key)
+        )
+    @classmethod
+    def get_dependencies(cls, hook_option):
+        lis = []
+        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+            hook_option
+        )
+        main_key = hook_option_opt.get('option_hook_key')
+        #
+        dependent_option_hook_keys = hook_option_opt.get(
+            'dependencies', as_array=True
+        ) or []
+        for i_key in dependent_option_hook_keys:
+            i_option_hook_key = bsc_core.SessionMtd.get_hook_abs_path(
+                main_key, i_key
+            )
+            lis.append(i_option_hook_key)
+        return lis
+
+    def set_ddl_dependent_job_ids_find(self, hook_option):
         lis = []
         hook_option_opt = bsc_core.KeywordArgumentsOpt(
             hook_option
@@ -564,18 +608,18 @@ class AbsOptionRsvTaskMethodSession(
         f = self.get_batch_file_path()
         c = bsc_objects.Configure(value=f)
         #
-        option_hook_keys = hook_option_opt.get(
+        dependent_option_hook_keys = hook_option_opt.get(
             'dependencies', as_array=True
         ) or []
-        for i_sub_key in option_hook_keys:
-            i_sub_key = bsc_core.SessionMtd.get_hook_abs_path(
-                main_key, i_sub_key
+        for i_key in dependent_option_hook_keys:
+            i_option_hook_key = bsc_core.SessionMtd.get_hook_abs_path(
+                main_key, i_key
             )
-            i_ddl_job_ids = c.get(
-                'deadline.{}.job_ids'.format(i_sub_key)
+            i_ddl_job_id = c.get(
+                'deadline.{}.job_id'.format(i_option_hook_key)
             ) or []
-            if i_ddl_job_ids:
-                lis.extend(i_ddl_job_ids)
+            if i_ddl_job_id:
+                lis.append(i_ddl_job_id)
         return lis
 
     def get_rsv_task_properties(self):

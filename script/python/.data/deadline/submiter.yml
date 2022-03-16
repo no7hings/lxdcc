@@ -83,7 +83,7 @@ output:
         ResumeOnFailedDependencies: False
         #
         OverrideTaskFailureDetection: True
-        FailureDetectionTaskErrors: 2
+        FailureDetectionTaskErrors: 1
         #
         ExtraInfo0: <option.extra.platform>
         ExtraInfo1: <option.extra.project>

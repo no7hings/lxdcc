@@ -487,9 +487,9 @@ class LxAsset(object):
         if file_path:
             resolver = rsv_commands.get_resolver()
             rsv_asset_task = resolver.get_rsv_task_by_file_path(file_path)
-            rsv_task_properties = resolver.get_rsv_task_properties_by_any_scene_file_path(file_path)
-            if rsv_task_properties:
-                workspace = rsv_task_properties.get('workspace')
+            rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(file_path)
+            if rsv_scene_properties:
+                workspace = rsv_scene_properties.get('workspace')
                 if workspace in ['work']:
                     work_katana_scene_src_file_unit = rsv_asset_task.get_rsv_unit(
                         keyword='asset-work-katana-scene-src-file'
@@ -561,9 +561,9 @@ class LxAsset(object):
         if file_path:
             resolver = rsv_commands.get_resolver()
             rsv_asset_task = resolver.get_rsv_task_by_file_path(file_path)
-            rsv_task_properties = resolver.get_rsv_task_properties_by_any_scene_file_path(file_path)
-            if rsv_task_properties:
-                workspace = rsv_task_properties.get('workspace')
+            rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(file_path)
+            if rsv_scene_properties:
+                workspace = rsv_scene_properties.get('workspace')
                 if workspace in ['work']:
                     work_katana_scene_src_file_unit = rsv_asset_task.get_rsv_unit(
                         keyword='asset-work-katana-scene-src-file'
@@ -607,7 +607,7 @@ class LxAsset(object):
             )
         return temp_shot_asset_set_usd_file_path
 
-    def __set_shot_asset_usd_create_(self, rsv_asset, rsv_shot, shot_set_usd_file_path):
+    def __set_asset_shot_usd_create_(self, rsv_asset, rsv_shot, shot_set_usd_file_path):
         from lxkatana import ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -769,7 +769,7 @@ class LxAsset(object):
                         version='latest'
                     )
                     if shot_set_usd_file_path:
-                        self.__set_shot_asset_usd_create_(
+                        self.__set_asset_shot_usd_create_(
                             rsv_asset,
                             rsv_shot,
                             shot_set_usd_file_path

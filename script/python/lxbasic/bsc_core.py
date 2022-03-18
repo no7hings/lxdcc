@@ -45,6 +45,8 @@ import socket
 
 import itertools
 
+import functools
+
 from lxbasic import bsc_configure
 
 import shutil
@@ -216,18 +218,33 @@ class SystemMtd(object):
     def set_directory_open(cls, path):
         if cls.get_is_windows():
             cmd = u'explorer "{}"'.format(path.replace('/', '\\'))
-            subprocess.Popen(cmd, shell=True)
+            # subprocess.Popen(cmd, shell=True)
         elif cls.get_is_linux():
             cmd = u'nautilus "{}"'.format(path)
-            subprocess.Popen(cmd, shell=True)
+            # subprocess.Popen(cmd, shell=True)
+        else:
+            raise SystemError()
+
+        t = threading.Thread(
+            target=functools.partial(SubProcessMtd.set_run_with_result, cmd)
+        )
+        t.start()
     @classmethod
     def set_file_open(cls, path):
         if cls.get_is_windows():
             cmd = u'explorer /select,"{}"'.format(path.replace('/', '\\'))
-            subprocess.Popen(cmd, shell=True)
+            # subprocess.Popen(cmd, shell=True)
+
         elif cls.get_is_linux():
             cmd = u'nautilus "{}" --select'.format(path)
-            subprocess.Popen(cmd, shell=True)
+            # subprocess.Popen(cmd, shell=True)
+        else:
+            raise SystemError()
+
+        t = threading.Thread(
+            target=functools.partial(SubProcessMtd.set_run_with_result, cmd)
+        )
+        t.start()
     @classmethod
     def get_user_directory_path(cls):
         if cls.get_is_windows():
@@ -2172,8 +2189,8 @@ Subtitle options:
 
     def get_thumbnail_create_args(self, width=128, ext='.jpg'):
         thumbnail_file_path = self.get_thumbnail_file_path(ext=ext)
-        if os.path.exists(self._file_path):
-            if os.path.exists(thumbnail_file_path) is False:
+        if os.path.exists(thumbnail_file_path) is False:
+            if os.path.exists(self._file_path):
                 directory_path = os.path.dirname(thumbnail_file_path)
                 if os.path.exists(directory_path) is False:
                     os.makedirs(directory_path)

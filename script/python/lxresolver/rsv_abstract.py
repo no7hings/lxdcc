@@ -257,7 +257,7 @@ class _Thread(threading.Thread):
 
 
 # <rev-version>
-class AbsRsvVersionString(object):
+class AbsRsvVersionKey(object):
     VERSION_ZFILL_COUNT = 3
     VERSION_FNMATCH_PATTERN = 'v{}'.format('[0-9]'*VERSION_ZFILL_COUNT)
     def __init__(self, text):
@@ -542,9 +542,9 @@ class AbsRsvMatcher(
             format_dict.update(parameters)
             if 'version' in format_dict:
                 version = format_dict['version']
-                rsv_version = self.RSV_VERSION_CLASS(version)
-                rsv_version += 1
-                format_dict['version'] = str(rsv_version)
+                rsv_version_key = self.RSV_VERSION_CLASS(version)
+                rsv_version_key += 1
+                format_dict['version'] = str(rsv_version_key)
                 return self.__get_path_by_local_variants_(format_dict)
         else:
             format_dict['version'] = 'v001'
@@ -554,7 +554,7 @@ class AbsRsvMatcher(
         format_dict = copy.copy(self._format_dict)
         return self.__get_path_by_local_variants_(format_dict)
     @classmethod
-    def _set_rsv_version_create_(cls, version):
+    def _set_rsv_version_key_create_(cls, version):
         return cls.RSV_VERSION_CLASS(version)
 
     def __str__(self):
@@ -941,9 +941,9 @@ class AbsRsvUnit(
     def get_new_version(self):
         version = self.get_latest_version()
         if version is not None:
-            rsv_version = self._rsv_matcher._set_rsv_version_create_(version)
-            rsv_version += 1
-            return str(rsv_version)
+            rsv_version_key = self._rsv_matcher._set_rsv_version_key_create_(version)
+            rsv_version_key += 1
+            return str(rsv_version_key)
         return 'v001'
 
 
@@ -1045,9 +1045,9 @@ class AbsRsvTask(
     def _get_new_version_(self, keyword, **kwargs):
         version = self._get_latest_version_(keyword, **kwargs)
         if version is not None:
-            rsv_version = self._rsv_matcher._set_rsv_version_create_(version)
-            rsv_version += 1
-            return str(rsv_version)
+            rsv_version_key = self._rsv_matcher._set_rsv_version_key_create_(version)
+            rsv_version_key += 1
+            return str(rsv_version_key)
         return 'v001'
 
     def get_properties_by_work_scene_src_file_path(self, file_path):
@@ -1072,6 +1072,14 @@ class AbsRsvTask(
             key_format='{branch}-{application}-scene-file',
             override_variants=dict(workspace='publish'),
             file_path_keys=['any_scene_file', 'scene_file']
+        )
+
+    def get_properties_by_output_scene_src_file_path(self, file_path):
+        return self._get_properties_by_scene_file_path_(
+            file_path,
+            key_format='{branch}-output-{application}-scene-src-file',
+            override_variants=dict(workspace='output'),
+            file_path_keys=['any_scene_file', 'output_scene_src_file']
         )
 
     def get_properties_by_output_scene_file_path(self, file_path):
@@ -1122,15 +1130,18 @@ class AbsRsvTask(
         file_properties = rsv_matcher.get_properties(result=file_path)
         return file_properties
     #
-    def get_rsv_properties_by_any_scene_file_path(self, file_path):
+    def get_rsv_scene_properties_by_any_scene_file_path(self, file_path):
         if file_path is not None:
             branch = self.properties.get('branch')
             for i_application in rsv_configure.Application.ALL:
-                for j_keyword_format in [
-                    '{branch}-{application}-scene-src-file',
-                    '{branch}-{application}-scene-file',
-                    '{branch}-work-{application}-scene-src-file',
-                    '{branch}-output-{application}-scene-file',
+                for j_keyword_format, scene_type in [
+                    ('{branch}-work-{application}-scene-src-file', 'work-scene-src'),
+                    #
+                    ('{branch}-{application}-scene-src-file', 'scene-src'),
+                    ('{branch}-{application}-scene-file', 'scene-src'),
+                    #
+                    ('{branch}-output-{application}-scene-src-file', 'output-scene-src'),
+                    ('{branch}-output-{application}-scene-file', 'output-scene'),
                 ]:
                     j_keyword = j_keyword_format.format(
                         **dict(branch=branch, application=i_application)
@@ -1141,6 +1152,9 @@ class AbsRsvTask(
                     )
                     j_rsv_properties = j_rsv_unit.get_properties(file_path)
                     if j_rsv_properties:
+                        j_rsv_properties.set('keyword', j_keyword)
+                        j_rsv_properties.set('scene_type', scene_type)
+
                         j_rsv_properties.set('branch', branch)
                         j_rsv_properties.set('application', i_application)
                         #
@@ -2614,6 +2628,11 @@ class AbsResolver(
         if rsv_task is not None:
             return rsv_task.get_properties_by_scene_file_path(file_path)
 
+    def _get_rsv_task_properties_by_output_scene_src_file_path_(self, file_path):
+        rsv_task = self.get_rsv_task_by_any_file_path(file_path)
+        if rsv_task is not None:
+            return rsv_task.get_properties_by_output_scene_src_file_path(file_path)
+
     def _get_rsv_task_properties_by_output_scene_file_path_(self, file_path):
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
@@ -2629,6 +2648,7 @@ class AbsResolver(
             self._get_rsv_task_properties_by_work_scene_src_file_path_,
             self._get_rsv_task_properties_by_scene_src_file_path_,
             self._get_rsv_task_properties_by_scene_file_path_,
+            self._get_rsv_task_properties_by_output_scene_src_file_path_,
             self._get_rsv_task_properties_by_output_scene_file_path_,
         ]
         for method in methods:
@@ -2708,10 +2728,10 @@ class AbsResolver(
             lis.append(result)
         return lis
 
-    def get_rsv_task_properties_by_any_scene_file_path(self, file_path):
+    def get_rsv_scene_properties_by_any_scene_file_path(self, file_path):
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
-            return rsv_task.get_rsv_properties_by_any_scene_file_path(file_path)
+            return rsv_task.get_rsv_scene_properties_by_any_scene_file_path(file_path)
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(

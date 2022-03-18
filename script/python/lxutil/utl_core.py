@@ -1510,7 +1510,7 @@ class RvLauncher(object):
             else:
                 return
         #
-        AppLauncher._set_cmd_run_(
+        AppLauncher._set_run_with_result_use_thread_(
             *run_args
         )
 

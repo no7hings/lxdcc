@@ -10,5 +10,3 @@ bsc_core.EnvironMtd.set(
 
 
 rsv_application = utl_ssn_objects.RsvApplication()
-
-rsv_application.set_file_send_to_publish(application='maya')

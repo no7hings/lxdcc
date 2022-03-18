@@ -10,6 +10,11 @@ class GuiSession(ssn_obj_abs.AbsGuiSession):
         super(GuiSession, self).__init__(*args, **kwargs)
 
 
+class OptionActionSession(ssn_obj_abs.AbsSsnOptionAction):
+    def __init__(self, *args, **kwargs):
+        super(OptionActionSession, self).__init__(*args, **kwargs)
+
+
 class OptionMethodSession(ssn_obj_abs.AbsOptionMethodSession):
     EXECUTOR = _ssn_obj_executor.HookExecutor
     def __init__(self, *args, **kwargs):
@@ -22,12 +27,12 @@ class RsvOptionHookMethodSession(ssn_obj_abs.AbsOptionRsvTaskMethodSession):
         super(RsvOptionHookMethodSession, self).__init__(*args, **kwargs)
 
 
-class RsvObjActionSession(ssn_obj_abs.AbsRsvObjActionSession):
+class RsvObjActionSession(ssn_obj_abs.AbsSsnRsvObjAction):
     def __init__(self, *args, **kwargs):
         super(RsvObjActionSession, self).__init__(*args, **kwargs)
 
 
-class RsvUnitActionSession(ssn_obj_abs.AbsRsvUnitActionSession):
+class RsvUnitActionSession(ssn_obj_abs.AbsSsnRsvUnitAction):
     def __init__(self, *args, **kwargs):
         super(RsvUnitActionSession, self).__init__(*args, **kwargs)
 

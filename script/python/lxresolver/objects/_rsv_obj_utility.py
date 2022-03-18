@@ -8,9 +8,9 @@ from lxresolver.objects import _rsv_obj_stack
 from lxbasic.objects import _bsc_obj_raw
 
 
-class RsvVersionString(rsv_abstract.AbsRsvVersionString):
+class RsvVersionKey(rsv_abstract.AbsRsvVersionKey):
     def __init__(self, *args, **kwargs):
-        super(RsvVersionString, self).__init__(*args, **kwargs)
+        super(RsvVersionKey, self).__init__(*args, **kwargs)
 
 
 class RsvPattern(rsv_abstract.AbsRsvPattern):
@@ -23,7 +23,7 @@ class RsvMatcher(rsv_abstract.AbsRsvMatcher):
     #
     RSV_PATTERN_CLASS = RsvPattern
     #
-    RSV_VERSION_CLASS = RsvVersionString
+    RSV_VERSION_CLASS = RsvVersionKey
     def __init__(self, *args, **kwargs):
         super(RsvMatcher, self).__init__(*args, **kwargs)
 

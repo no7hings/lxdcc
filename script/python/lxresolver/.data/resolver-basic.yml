@@ -88,25 +88,42 @@ asset-output-task-dir: <asset-output-step-dir>/<task-name>
 asset-output-version-dir: <asset-output-task-dir>/<asset-version-name>
 #
 asset-output-render-dir: <asset-output-version-dir>/render
-asset-output-scene-dir: <asset-output-version-dir>/scene
 asset-output-set-dir: <asset-output-version-dir>/set
 asset-output-metadata-dir: <asset-output-version-dir>/metadata
 #
+asset-output-scene-src-dir: <asset-output-version-dir>/scene
+#
 asset-output-render-info-yaml-file: <asset-output-metadata-dir>/render-info.yml
 #
+asset-output-maya-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-maya-scene-src-file: <asset-output-maya-scene-src-dir>/<asset-name>.ma
+asset-output-maya-scene-dir: <asset-output-version-dir>/maya
+asset-output-maya-scene-file: <asset-output-maya-scene-dir>/<asset-name>.ma
 asset-output-maya-render-output-dir: <asset-output-render-dir>/maya-images
-asset-output-maya-scene-file: <asset-output-scene-dir>/<asset-name>.ma
 #
+asset-output-houdini-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-houdini-scene-src-file: <asset-output-houdini-scene-src-dir>/<asset-name>.hip
+asset-output-houdini-scene-dir: <asset-output-version-dir>/houdini
+asset-output-houdini-scene-file: <asset-output-houdini-scene-dir>/<asset-name>.hip
 asset-output-houdini-render-output-dir: <asset-output-render-dir>/houdini-images
-asset-output-houdini-scene-file: <asset-output-scene-dir>/<asset-name>.hip
 #
+asset-output-katana-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-katana-scene-src-file: <asset-output-katana-scene-src-dir>/<asset-name>.katana
+asset-output-katana-scene-dir: <asset-output-version-dir>/katana
+asset-output-katana-scene-file: <asset-output-katana-scene-dir>/<asset-name>.katana
 asset-output-katana-render-output-dir: <asset-output-render-dir>/katana-images
 asset-output-katana-render-image-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr
 asset-output-katana-render-movie-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
-asset-output-katana-scene-file: <asset-output-scene-dir>/<asset-name>.katana
 #
 asset-output-asset-set-usd-file: <asset-output-set-dir>/usd/<asset-name>.usda
 asset-output-asset-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usda
+#
+asset-output-geometry-dir: <asset-output-version-dir>/cache
+asset-output-geometry-usd-dir: <asset-output-geometry-dir>/usd
+asset-output-geometry-usd-var-dir: <asset-output-geometry-dir>/usd/geo
+asset-output-geometry-usd-var-file: <asset-output-geometry-usd-var-dir>/<var-name>.usd
+#
+asset-output-comp-usd-dir: <asset-output-version-dir>/cache/usd
 #
 # <asset-dcc>
 asset-maya-path: None
@@ -197,6 +214,8 @@ asset-work-set-usd-surface-file: <asset-work-set-dir>/surface.usda
 asset-work-asset-set-usd-override-file: <asset-work-set-dir>/<asset-name>.override.usda
 asset-work-asset-set-usd-file: <asset-work-set-dir>/<asset-name>.usda
 asset-work-asset-shot-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
+#
+asset-work-comp-usd-dir: <asset-task-dir>/cache/usd/<version-name>
 #
 asset-work-render-dir: <asset-task-dir>/render/<user-name>
 #
@@ -359,15 +378,15 @@ asset-look-yml-file: <asset-look-yml-dir>/<asset-name>.yml
 asset-texture-src-dir: <asset-task-dir>/texture
 asset-texture-tgt-dir: <asset-version-dir>/texture
 # <asset-usd>
-asset-usd-dir: <asset-version-dir>/cache/usd
-asset-usd-payload-file: <asset-usd-dir>/payload.usda
-asset-usd-registry-file: <asset-usd-dir>/registry.usda
+asset-comp-usd-dir: <asset-version-dir>/cache/usd
+asset-usd-payload-file: <asset-comp-usd-dir>/payload.usda
+asset-usd-registry-file: <asset-comp-usd-dir>/registry.usda
 #
-asset-component-usd-file: <asset-usd-dir>/<asset-name>.usda
+asset-component-usd-file: <asset-comp-usd-dir>/<asset-name>.usda
 #
-asset-usd-look-file: <asset-usd-dir>/shading.usda
-asset-usd-look-properties-usd-file: <asset-usd-dir>/look/<look-pass>.properties.usda
-asset-usd-geometry-uv_map-file: <asset-usd-dir>/uv_map.usd
+asset-usd-look-file: <asset-comp-usd-dir>/shading.usda
+asset-usd-look-properties-usd-file: <asset-comp-usd-dir>/look/<look-pass>.properties.usda
+asset-usd-geometry-uv_map-file: <asset-comp-usd-dir>/uv_map.usd
 # <asset-usd-model>
 asset-usd-model-dir: <asset-version-dir>/cache/usd
 asset-usd-model-registry-file: <asset-usd-model-dir>/registry.usda

@@ -2,7 +2,7 @@
 from lxsession.objects import ssn_obj_abs
 
 
-class AbsRsvPanelSession(ssn_obj_abs.AbsSession):
+class AbsRsvPanelSession(ssn_obj_abs.AbsSsnObj):
     RSV_PANEL_CLASS = None
     def __init__(self, *args, **kwargs):
         super(AbsRsvPanelSession, self).__init__(*args, **kwargs)

@@ -3,6 +3,8 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
+from lxutil import utl_core
+
 
 class AbsDdlQuery(object):
     CONFIGURE_FILE_PATH = None
@@ -82,6 +84,7 @@ class AbsDdlSubmiter(object):
         self._job_plug = self._configure.get_content('output.plug')
         #
         self._result = None
+        self._job_id = None
 
     def get_option(self):
         return self._option
@@ -127,8 +130,22 @@ class AbsDdlSubmiter(object):
         return self.__set_job_submit_(info, plug)
 
     def __set_job_submit_(self, info, plug):
+        utl_core.Log.set_module_result_trace(
+            'deadline-job submit', 'is started'
+        )
         self._result = self.CON.Jobs.SubmitJob(info, plug)
-        return self._result
+        if isinstance(self._result, dict):
+            if '_id' in self._result:
+                utl_core.Log.set_module_result_trace(
+                    'deadline-job submit', 'is completed'
+                )
+                self._job_id = self._result['_id']
+                return self._job_id
+        #
+        utl_core.Log.set_module_error_trace(
+            'deadline-job submit', 'is failed, {}'.format(self._result)
+        )
+        return None
 
     def get_job_is_submit(self):
         return self.get_job_id() is not None

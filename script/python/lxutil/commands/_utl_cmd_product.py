@@ -107,7 +107,7 @@ class MtdBasic(object):
         return _rcs_fnc(variant)
 
 
-class RsvVersionString(object):
+class RsvVersionKey(object):
     ZFILL_COUNT = 3
     FNMATCH_PATTERN = 'v{}'.format('[0-9]'*ZFILL_COUNT)
     def __init__(self, text):
@@ -145,7 +145,7 @@ class RsvVersionString(object):
 
 
 class RsvMatcher(MtdBasic):
-    RSV_VERSION_CLASS = RsvVersionString
+    RSV_VERSION_CLASS = RsvVersionKey
     def __init__(self, pattern, format_variant=None):
         self._orig_parameter = format_variant
         self._rsv_pattern = self._current_pattern = pattern

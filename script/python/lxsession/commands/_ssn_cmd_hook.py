@@ -104,7 +104,14 @@ def get_option_hook_args(option):
             type_name = configure.get('option.type')
             #
             session = None
-            if type_name == 'method':
+            if type_name == 'action':
+                session = ssn_objects.OptionActionSession(
+                    type=type_name,
+                    hook=hook_key,
+                    configure=configure,
+                    option=option_opt.to_string()
+                )
+            elif type_name == 'method':
                 session = ssn_objects.OptionMethodSession(
                     type=type_name,
                     hook=hook_key,

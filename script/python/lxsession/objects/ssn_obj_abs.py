@@ -12,7 +12,7 @@ from lxutil import utl_core
 import lxshotgun.objects as stg_objects
 
 
-class AbsSession(object):
+class AbsSsnObj(object):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
     def __init__(self, *args, **kwargs):
@@ -97,7 +97,6 @@ class AbsSession(object):
 
     def get_user(self):
         return self._user
-
     @property
     def system(self):
         return self._system
@@ -210,13 +209,13 @@ class AbsSession(object):
         return self._configure.get_str_as_yaml_style()
 
 
-class AbsRsvObjSession(AbsSession):
+class AbsSsnRsvObj(AbsSsnObj):
     def __init__(self, *args, **kwargs):
         self._rsv_obj = args[0]
         self._rsv_properties = self._rsv_obj.properties
         #
         kwargs['variants'] = self._rsv_properties.value
-        super(AbsRsvObjSession, self).__init__(
+        super(AbsSsnRsvObj, self).__init__(
             *args, **kwargs
         )
     @property
@@ -230,8 +229,8 @@ class AbsRsvObjSession(AbsSession):
         return self._rsv_obj.get_gui_attribute('gui_obj')
 
 
-class AbsShotgunDef(object):
-    def _set_shotgun_def_(self):
+class AbsSsnShotgunDef(object):
+    def _set_shotgun_def_init_(self):
         pass
 
     def get_shotgun_connector(self):
@@ -239,16 +238,7 @@ class AbsShotgunDef(object):
     shotgun_connector = property(get_shotgun_connector)
 
 
-class AbsRsvDef(object):
-    def _set_rsv_def_init_(self):
-        self._resolver = rsv_commands.get_resolver()
-
-    def get_resolver(self):
-        return self._resolver
-    resolver = property(get_resolver)
-
-
-class AbsRsvUnitDef(object):
+class AbsSsnRsvUnitDef(object):
     def _set_rsv_unit_def_init_(self, rsv_obj, configure):
         keyword = configure.get('resolver.rsv_unit.keyword')
         self._rsv_unit_version = configure.get('resolver.rsv_unit.version')
@@ -271,8 +261,8 @@ class AbsRsvUnitDef(object):
         return self._rsv_unit_extend_variants
 
 
-class AbsRsvObjActionDef(object):
-    def _set_rsv_obj_action_def_init_(self, configure):
+class AbsSsnGuiDef(object):
+    def _set_gui_def_init_(self, configure):
         self._gui_group_name = configure.get(
             'option.gui.group_name'
         )
@@ -281,33 +271,33 @@ class AbsRsvObjActionDef(object):
         return self._gui_group_name
 
 
-class AbsRsvObjActionSession(
-    AbsRsvObjSession,
-    AbsRsvObjActionDef,
-    AbsShotgunDef
+class AbsSsnRsvObjAction(
+    AbsSsnRsvObj,
+    AbsSsnGuiDef,
+    AbsSsnShotgunDef
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvObjActionSession, self).__init__(*args, **kwargs)
+        super(AbsSsnRsvObjAction, self).__init__(*args, **kwargs)
         #
         if self.get_is_loadable():
-            self._set_rsv_obj_action_def_init_(self._configure)
-            self._set_shotgun_def_()
+            self._set_gui_def_init_(self._configure)
+            self._set_shotgun_def_init_()
 
 
-class AbsRsvUnitActionSession(
-    AbsRsvObjSession,
-    AbsRsvUnitDef,
-    AbsRsvObjActionDef,
-    AbsShotgunDef
+class AbsSsnRsvUnitAction(
+    AbsSsnRsvObj,
+    AbsSsnRsvUnitDef,
+    AbsSsnGuiDef,
+    AbsSsnShotgunDef
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvUnitActionSession, self).__init__(*args, **kwargs)
+        super(AbsSsnRsvUnitAction, self).__init__(*args, **kwargs)
         #
         rsv_obj = args[0]
         if self.get_is_loadable():
             self._set_rsv_unit_def_init_(rsv_obj, self._configure)
-            self._set_rsv_obj_action_def_init_(self._configure)
-            self._set_shotgun_def_()
+            self._set_gui_def_init_(self._configure)
+            self._set_shotgun_def_init_()
 
     def get_is_executable(self):
         if self.rsv_unit is not None:
@@ -365,13 +355,13 @@ class AbsExecuteDef(object):
         executor.set_run_with_shell()
 
 
-class AbsToolPanelSession(AbsSession):
+class AbsToolPanelSession(AbsSsnObj):
     def __init__(self, *args, **kwargs):
         super(AbsToolPanelSession, self).__init__(*args, **kwargs)
 
 
 class AbsGuiSession(
-    AbsSession,
+    AbsSsnObj,
     AbsExecuteDef
 ):
     def __init__(self, *args, **kwargs):
@@ -406,8 +396,8 @@ class AbsGuiSession(
     option = property(get_option)
 
 
-class AbsSessionOptionDef(object):
-    def _set_session_option_def_init_(self, option):
+class AbsSsnOptionDef(object):
+    def _set_option_def_init_(self, option):
         self._option_opt = bsc_core.KeywordArgumentsOpt(
             option
         )
@@ -421,14 +411,26 @@ class AbsSessionOptionDef(object):
     option = property(get_option)
 
 
+class AbsSsnOptionAction(
+    AbsSsnObj,
+    AbsSsnGuiDef,
+    AbsSsnOptionDef
+):
+    def __init__(self, *args, **kwargs):
+        self._set_option_def_init_(kwargs.pop('option'))
+        super(AbsSsnOptionAction, self).__init__(*args, **kwargs)
+        #
+        self._set_gui_def_init_(self._configure)
+
+
 # session for deadline job
 class AbsOptionMethodSession(
-    AbsSession,
-    AbsSessionOptionDef,
+    AbsSsnObj,
+    AbsSsnOptionDef,
     AbsExecuteDef
 ):
     def __init__(self, *args, **kwargs):
-        self._set_session_option_def_init_(kwargs.pop('option'))
+        self._set_option_def_init_(kwargs.pop('option'))
         #
         super(AbsOptionMethodSession, self).__init__(*args, **kwargs)
         #
@@ -471,6 +473,15 @@ class AbsOptionMethodSession(
 
     def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
         return
+
+
+class AbsRsvDef(object):
+    def _set_rsv_def_init_(self):
+        self._resolver = rsv_commands.get_resolver()
+
+    def get_resolver(self):
+        return self._resolver
+    resolver = property(get_resolver)
 
 
 # session for rsv task deadline job
@@ -669,6 +680,6 @@ class AbsOptionRsvTaskBatcherSession(
         super(AbsOptionRsvTaskBatcherSession, self).__init__(*args, **kwargs)
 
 
-class AbsApplicationSession(AbsSession):
+class AbsApplicationSession(AbsSsnObj):
     def __init__(self, *args, **kwargs):
         super(AbsApplicationSession, self).__init__(*args, **kwargs)

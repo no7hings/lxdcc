@@ -160,34 +160,37 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
             exists_result = session.set_ddl_job_id_find(hook_option)
             if exists_result:
                 utl_core.Log.set_module_warning_trace(
-                    'deadline-job submit', 'option-hook="{}" is exists, job-id="{}"'.format(
+                    'deadline-job', 'option-hook="{}" is exists, job-id="{}"'.format(
                         option_hook_key, exists_result
                     )
                 )
             else:
-                self._js_result = self._ddl_submiter.set_job_submit()
-                #
-                ddl_job_id = self._ddl_submiter.get_job_id()
+                ddl_job_id = self._ddl_submiter.set_job_submit()
                 if ddl_job_id is not None:
+                    utl_core.Log.set_module_result_trace(
+                        'deadline-job', 'option-hook="{}", job-id="{}"'.format(
+                            option_hook_key, ddl_job_id
+                        )
+                    )
                     session._ddl_job_id = ddl_job_id
                     #
                     session.set_ddl_result_update(
                         hook_option, ddl_job_id
                     )
                     #
-                    utl_core.Log.set_module_result_trace(
-                        'deadline-job submit',
-                        u'batch-name="{}";job-name="{}";job-id="{}"option="{}"'.format(
-                            self._ddl_submiter.option.get('deadline.batch_name'),
-                            self._ddl_submiter.option.get('deadline.job_name'),
-                            ddl_job_id,
-                            hook_option
-                        )
-                    )
-                    utl_core.Log.set_module_result_trace(
-                        'deadline-job submit',
-                        u'command=`{}`'.format(ddl_command)
-                    )
+                    # utl_core.Log.set_module_result_trace(
+                    #     'deadline-job result',
+                    #     u'batch-name="{}";job-name="{}";job-id="{}"option="{}"'.format(
+                    #         self._ddl_submiter.option.get('deadline.batch_name'),
+                    #         self._ddl_submiter.option.get('deadline.job_name'),
+                    #         ddl_job_id,
+                    #         hook_option
+                    #     )
+                    # )
+                    # utl_core.Log.set_module_result_trace(
+                    #     'deadline-job submit',
+                    #     u'command=`{}`'.format(ddl_command)
+                    # )
             return self._ddl_submiter.get_job_result()
 
     def set_run(self):

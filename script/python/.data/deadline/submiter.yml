@@ -27,8 +27,8 @@ option:
         version: ''
     #
     deadline:
-        batch_name: '[<option.group>][<option.type>][<option.time_tag>]'
-        job_name: '[<option.name>][<option.engine>][<option.hook>]'
+        batch_name: '[<option.group>][<option.extra.workspace>][<option.type>][<option.time_tag>]'
+        job_name: '[<option.name>][<option.extra.workspace>][<option.engine>][<option.hook>]'
         #
         output_directory: ''
         output_file: ''
@@ -83,7 +83,7 @@ output:
         ResumeOnFailedDependencies: False
         #
         OverrideTaskFailureDetection: True
-        FailureDetectionTaskErrors: 1
+        FailureDetectionTaskErrors: 2
         #
         ExtraInfo0: <option.extra.platform>
         ExtraInfo1: <option.extra.project>

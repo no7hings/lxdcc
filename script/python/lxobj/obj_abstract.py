@@ -3122,6 +3122,7 @@ class AbsOsDirectory(
         glob_pattern = '{}{}*'.format(path, self.PATHSEP)
         _ = glob.glob(glob_pattern)
         if _:
+            _.sort()
             for i in _:
                 if os.path.isdir(i):
                     lis.append(i)

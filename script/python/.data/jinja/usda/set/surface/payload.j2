@@ -7,9 +7,9 @@
 
 def "{{ dcc.root }}" (
     prepend references = [
-        @geo/hi.usd@,
-        @geo/shape.usd@,
-        @geo/hair.usd@
+        @{{ geometries.hi }}@,
+        @{{ geometries.shape }}@,
+        @{{ geometries.hair }}@
     ]
 )
 {

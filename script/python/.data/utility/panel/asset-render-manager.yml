@@ -135,6 +135,12 @@ node:
             enable: False
             tool_tip: '...'
 
+        variants/asset_version_enble:
+            widget: boolean
+            value: True
+            enable: False
+            tool_tip: '...'
+
         variants/asset_version/model:
             widget: enumerate
             value: ['None']
@@ -165,7 +171,61 @@ node:
             enable: False
             tool_tip: '...'
 
+        variants/asset_version_override_enable:
+            widget: boolean
+            value: True
+            enable: False
+            tool_tip: '...'
+
+        variants/asset_version_override/model:
+            widget: enumerate
+            value: ['None']
+            enable: False
+            tool_tip: '...'
+
+        variants/asset_version_override/groom:
+            widget: enumerate
+            value: [ 'None' ]
+            enable: False
+            tool_tip: '...'
+
+        variants/asset_version_override/rig:
+            widget: enumerate
+            value: [ 'None' ]
+            enable: False
+            tool_tip: '...'
+
+        variants/asset_version_override/effect:
+            widget: enumerate
+            value: [ 'None' ]
+            enable: False
+            tool_tip: '...'
+
+        variants/asset_version_override/surface:
+            widget: enumerate
+            value: [ 'None' ]
+            enable: False
+            tool_tip: '...'
+
+        variants/shot_version_enable:
+            widget: boolean
+            value: True
+            enable: False
+            tool_tip: '...'
+
         variants/shot_version/animation:
+            widget: enumerate
+            value: [ 'None' ]
+            enable: False
+            tool_tip: '...'
+
+        variants/shot_version_override_enable:
+            widget: boolean
+            value: True
+            enable: False
+            tool_tip: '...'
+
+        variants/shot_version_override/animation:
             widget: enumerate
             value: [ 'None' ]
             enable: False

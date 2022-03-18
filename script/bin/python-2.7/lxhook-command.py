@@ -54,10 +54,11 @@ def __set_run_by_option(option):
     else:
         hook_key = option_opt.get('hook_key')
         if hook_key:
-            t = threading.Thread(
-                target=functools.partial(__set_hook_run, option=option)
-            )
-            t.start()
+            # t = threading.Thread(
+            #     target=functools.partial(__set_hook_run, option=option)
+            # )
+            # t.start()
+            __set_hook_run(option)
 
 
 # hook

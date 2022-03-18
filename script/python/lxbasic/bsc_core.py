@@ -225,10 +225,10 @@ class SystemMtd(object):
         else:
             raise SystemError()
 
-        t = threading.Thread(
+        t_0 = threading.Thread(
             target=functools.partial(SubProcessMtd.set_run_with_result, cmd)
         )
-        t.start()
+        t_0.start()
     @classmethod
     def set_file_open(cls, path):
         if cls.get_is_windows():
@@ -241,10 +241,10 @@ class SystemMtd(object):
         else:
             raise SystemError()
 
-        t = threading.Thread(
+        t_0 = threading.Thread(
             target=functools.partial(SubProcessMtd.set_run_with_result, cmd)
         )
-        t.start()
+        t_0.start()
     @classmethod
     def get_user_directory_path(cls):
         if cls.get_is_windows():

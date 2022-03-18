@@ -449,13 +449,13 @@ class SubProcessRunner(object):
         w.set_process_start()
     @classmethod
     def set_run_with_result_use_thread(cls, cmd):
-        t = threading.Thread(
+        t_0 = threading.Thread(
             target=functools.partial(
                 cls.set_run_with_result,
                 cmd=cmd
             )
         )
-        t.start()
+        t_0.start()
 
 
 class Icons(object):

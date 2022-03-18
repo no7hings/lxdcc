@@ -239,15 +239,16 @@ class LxAsset(object):
                 self.__set_rsv_asset_shots_(rsv_asset)
 
         if content is not None:
-            utl_core.DialogWindow.set_create(
-                'Shot Asset Loader',
-                content=content,
-                status=utl_core.DialogWindow.GuiStatus.Error,
-                #
-                yes_label='Close',
-                #
-                no_visible=False, cancel_visible=False
-            )
+            if ktn_core._get_is_ui_mode_():
+                utl_core.DialogWindow.set_create(
+                    'Shot Asset Loader',
+                    content=content,
+                    status=utl_core.DialogWindow.GuiStatus.Error,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
     @classmethod
     def _get_rsv_asset_(cls, rsv_asset_path):
         import lxresolver.commands as rsv_commands
@@ -480,7 +481,7 @@ class LxAsset(object):
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        work_asset_set_usd_file_path = None
+        usd_file_path = None
         #
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
         #
@@ -490,38 +491,28 @@ class LxAsset(object):
             rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(file_path)
             if rsv_scene_properties:
                 workspace = rsv_scene_properties.get('workspace')
+                version = rsv_scene_properties.get('version')
                 if workspace in ['work']:
-                    work_katana_scene_src_file_unit = rsv_asset_task.get_rsv_unit(
-                        keyword='asset-work-katana-scene-src-file'
+                    rsv_usd_file_unit = rsv_asset_task.get_rsv_unit(
+                        keyword='asset-work-asset-set-usd-file'
                     )
-                    rsv_properties = work_katana_scene_src_file_unit.get_properties(
-                        file_path
+                    usd_file_path = rsv_usd_file_unit.get_result(version=version)
+                elif workspace in ['publish']:
+                    rsv_usd_file_unit = rsv_asset_task.get_rsv_unit(
+                        keyword='asset-asset-set-usd-file'
                     )
-                    if rsv_properties:
-                        version = rsv_properties.get('version')
-                        work_asset_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
-                            keyword='asset-work-asset-set-usd-file'
-                        )
-                        work_asset_set_usd_file_path = work_asset_set_usd_file_unit.get_result(version=version)
+                    usd_file_path = rsv_usd_file_unit.get_result(version=version)
                 elif workspace in ['output']:
-                    output_katana_scene_file_unit = rsv_asset_task.get_rsv_unit(
-                        keyword='asset-output-katana-scene-file'
+                    rsv_usd_file_unit = rsv_asset_task.get_rsv_unit(
+                        keyword='asset-output-asset-set-usd-file'
                     )
-                    rsv_properties = output_katana_scene_file_unit.get_properties(
-                        file_path
-                    )
-                    if rsv_properties:
-                        version = rsv_properties.get('version')
-                        work_asset_set_usd_file_unit = rsv_asset_task.get_rsv_unit(
-                            keyword='asset-output-asset-set-usd-file'
-                        )
-                        work_asset_set_usd_file_path = work_asset_set_usd_file_unit.get_result(version=version)
+                    usd_file_path = rsv_usd_file_unit.get_result(version=version)
         else:
-            work_asset_set_usd_file_path = '{}{}.usda'.format(
+            usd_file_path = '{}{}.usda'.format(
                 bsc_core.SystemMtd.get_temporary_directory_path(),
                 rsv_asset.path
             )
-        return work_asset_set_usd_file_path
+        return usd_file_path
 
     def __set_asset_usd_create_(self, rsv_asset, asset_set_usd_file_path):
         from lxkatana import ktn_core
@@ -724,15 +715,16 @@ class LxAsset(object):
                     self.__set_asset_usd_create_(rsv_asset, asset_set_usd_file_path)
         #
         if content is not None:
-            utl_core.DialogWindow.set_create(
-                'Shot Asset Loader',
-                content=content,
-                status=utl_core.DialogWindow.GuiStatus.Error,
-                #
-                yes_label='Close',
-                #
-                no_visible=False, cancel_visible=False
-            )
+            if ktn_core._get_is_ui_mode_():
+                utl_core.DialogWindow.set_create(
+                    'Shot Asset Loader',
+                    content=content,
+                    status=utl_core.DialogWindow.GuiStatus.Error,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
 
     def __set_shot_asset_create_(self):
         from lxutil import utl_core
@@ -780,15 +772,16 @@ class LxAsset(object):
                 content = u'shot="{}" is not available'.format(rsv_shot_path)
             #
             if content is not None:
-                utl_core.DialogWindow.set_create(
-                    'Shot Asset Loader',
-                    content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Error,
-                    #
-                    yes_label='Close',
-                    #
-                    no_visible=False, cancel_visible=False
-                )
+                if ktn_core._get_is_ui_mode_():
+                    utl_core.DialogWindow.set_create(
+                        'Shot Asset Loader',
+                        content=content,
+                        status=utl_core.DialogWindow.GuiStatus.Error,
+                        #
+                        yes_label='Close',
+                        #
+                        no_visible=False, cancel_visible=False
+                    )
 
 
 class LxCamera(object):

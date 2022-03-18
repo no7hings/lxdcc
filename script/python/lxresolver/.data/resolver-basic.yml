@@ -409,6 +409,9 @@ asset-usd-groom-file: <asset-usd-groom-dir>/<asset-name>.usda
 asset-set-dir: <asset-no-version-dir>/cache
 asset-set-usd-dir: <asset-set-dir>/usd
 asset-set-usd-file: <asset-set-usd-dir>/<asset-name>.usda
+
+asset-asset-set-usd-file: <asset-version-dir>/set/usd/<asset-name>.usda
+asset-asset-shot-set-usd-file: <asset-version-dir>/set/usd/<asset-shot-name>.usda
 # effect ============================================================================================================= #
 project-root-effect-dir: '{root_effect}'
 project-root-effect-windows-dir: None

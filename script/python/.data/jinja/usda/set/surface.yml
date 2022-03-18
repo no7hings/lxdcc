@@ -24,6 +24,13 @@ usd:
         up_axis: Y
         linear_unit: 0.01
 #
+geometries:
+    hi: 'geo/hi.usd'
+    shape: 'geo/shape.usd'
+    hair: 'geo/hair.usd'
+    #
+    uv_map: 'uv_map.usd'
+#
 usdas:
     material: 'shading.usda'
     #

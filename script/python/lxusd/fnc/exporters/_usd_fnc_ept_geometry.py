@@ -20,22 +20,19 @@ import lxusd.dcc.dcc_operators as usd_dcc_operators
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class GeometryUvMapExporter(object):
+class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     ROOT_LSTRIP = 'root_lstrip'
     OPTION = dict(
         root_lstrip=False,
         file_0=None,
-        file_1=None
+        file_1=None,
+        display_color=(0.25, 0.75, 0.5)
     )
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
         self._root = root
         #
-        self._option = copy.deepcopy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                if k in self.OPTION:
-                    self._option[k] = v
+        super(GeometryUvMapExporter, self).__init__(option)
         #
         self._geometry_stage_0 = Usd.Stage.CreateInMemory()
         self._geometry_stage_opt_0 = usd_core.UsdStageOpt(self._geometry_stage_0)
@@ -45,12 +42,12 @@ class GeometryUvMapExporter(object):
         self._output_stage = Usd.Stage.CreateInMemory()
         self._output_stage_opt = usd_core.UsdStageOpt(self._output_stage)
         #
-        self._file_path_0 = self._option.get('file_0')
+        self._file_path_0 = self.get('file_0')
         if self._file_path_0 is not None:
             self._geometry_stage_opt_0.set_sublayer_append(self._file_path_0)
             self._geometry_stage_0.Flatten()
         #
-        self._file_path_1 = self._option.get('file_1')
+        self._file_path_1 = self.get('file_1')
         if self._file_path_1 is not None:
             self._geometry_stage_opt_1.set_sublayer_append(self._file_path_1)
             self._geometry_stage_1.Flatten()
@@ -71,14 +68,15 @@ class GeometryUvMapExporter(object):
         return uv_map_face_vertex_indices, uv_map_coords
 
     def set_uv_map_export(self):
+        display_color = self.get('display_color')
         ps = utl_core.Progress.set_create(len([i for i in self._geometry_stage_0.TraverseAll()]))
         #
-        for usd_prim in self._geometry_stage_0.TraverseAll():
+        for i_usd_prim in self._geometry_stage_0.TraverseAll():
             utl_core.Progress.set_update(ps)
-            obj_type_name = usd_prim.GetTypeName()
-            obj_path = usd_prim.GetPath().pathString
+            i_obj_type_name = i_usd_prim.GetTypeName()
+            obj_path = i_usd_prim.GetPath().pathString
             output_prim = self._output_stage_opt.set_obj_create_as_override(obj_path)
-            if obj_type_name == 'Mesh':
+            if i_obj_type_name == 'Mesh':
                 _ = self._geometry_stage_1.GetPrimAtPath(obj_path)
                 output_usd_mesh = UsdGeom.Mesh(output_prim)
                 output_usd_mesh_opt = usd_core.UsdMeshOpt(output_usd_mesh)
@@ -89,7 +87,7 @@ class GeometryUvMapExporter(object):
                         'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
                     ).Set(self._file_path_1)
                 else:
-                    input_usd_mesh = UsdGeom.Mesh(usd_prim)
+                    input_usd_mesh = UsdGeom.Mesh(i_usd_prim)
                     output_prim.CreateAttribute(
                         'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
                     ).Set(self._file_path_0)
@@ -102,12 +100,11 @@ class GeometryUvMapExporter(object):
                         output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
                 #
                 input_usd_mesh_opt.set_display_color_fill(
-                    (0.25, 0.75, 0.5)
+                    display_color
                 )
                 output_usd_mesh_opt.set_usd_display_colors(
                     input_usd_mesh_opt.get_usd_display_colors()
                 )
-
         #
         utl_core.Progress.set_stop(ps)
         #
@@ -153,14 +150,14 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
     def _get_info_raw(cls, stage, root=None, lstrip=None):
         info_configure = bsc_objects.Content(value=collections.OrderedDict())
         for prim in stage.TraverseAll():
-            obj_type_name = prim.GetTypeName()
+            i_obj_type_name = prim.GetTypeName()
             obj_path = prim.GetPath().pathString
             #
             obj_path_ = obj_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, lstrip)
             if obj_path_:
                 obj_properties = bsc_objects.Content(value=collections.OrderedDict())
                 #
-                if obj_type_name == 'Mesh':
+                if i_obj_type_name == 'Mesh':
                     obj_type_name_ = 'mesh'
                     obj_attributes = collections.OrderedDict()
                     mesh_obj_opt = usd_dcc_operators.MeshOpt(prim)

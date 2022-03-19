@@ -841,6 +841,15 @@ class AbsRsvUnit(
         )
         return rsv_matcher.get_current()
 
+    def get_exists_result(self, *args, **kwargs):
+        result = self.get_result(*args, **kwargs)
+        if result:
+            if isinstance(result, (str, unicode)):
+                if bsc_core.StoragePathMtd.get_path_is_exists(result):
+                    return result
+            elif isinstance(result, (tuple, list)):
+                return result
+
     def get_results(self, version=None, check_exists=False, trim=None):
         kwargs = copy.copy(self.properties.value)
         if version is None:

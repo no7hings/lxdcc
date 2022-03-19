@@ -123,7 +123,10 @@ asset-output-geometry-usd-dir: <asset-output-geometry-dir>/usd
 asset-output-geometry-usd-var-dir: <asset-output-geometry-dir>/usd/geo
 asset-output-geometry-usd-var-file: <asset-output-geometry-usd-var-dir>/<var-name>.usd
 #
+asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
+#
 asset-output-comp-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-comp-registry-usd-file: <asset-output-comp-usd-dir>/registry.usda
 #
 # <asset-dcc>
 asset-maya-path: None
@@ -315,8 +318,8 @@ asset-geometry-usd-lo-file: <asset-geometry-usd-var-dir>/lo.usd
 asset-geometry-usd-shape-file: <asset-geometry-usd-var-dir>/shape.usd
 asset-geometry-usd-temp-file: <asset-geometry-usd-var-dir>/temp.usd
 #
-asset-geometry-usd-uv_map-file: <asset-geometry-usd-dir>/uv_map.usd
-asset-geometry-usd-uv_map-var-file: <asset-geometry-usd-dir>/uv_map.<var-name>.usd
+asset-geometry-uv_map-usd-file: <asset-geometry-usd-dir>/uv_map.usd
+asset-geometry-uv_map-usd-var-file: <asset-geometry-usd-dir>/uv_map.<var-name>.usd
 # <asset-geometry-ass>
 asset-geometry-ass-dir: <asset-geometry-dir>/ass
 asset-geometry-ass-file: <asset-geometry-ass-dir>/<var-name>.ass
@@ -408,7 +411,7 @@ asset-usd-groom-file: <asset-usd-groom-dir>/<asset-name>.usda
 # <asset-set-usd>
 asset-set-dir: <asset-no-version-dir>/cache
 asset-set-usd-dir: <asset-set-dir>/usd
-asset-set-usd-file: <asset-set-usd-dir>/<asset-name>.usda
+asset-set-dress-usd-file: <asset-set-usd-dir>/<asset-name>.usda
 
 asset-asset-set-usd-file: <asset-version-dir>/set/usd/<asset-name>.usda
 asset-asset-shot-set-usd-file: <asset-version-dir>/set/usd/<asset-shot-name>.usda
@@ -517,7 +520,7 @@ shot-manifest-scenegraph-usd-file: <shot-manifest-usd-dir>/scenegraph.usda
 #
 shot-set-dir: <shot-no-version-dir>/manifest
 shot-set-usd-dir: <shot-set-dir>/usd
-shot-set-usd-file: <shot-set-usd-dir>/<shot-name>.usda
+shot-set-dress-usd-file: <shot-set-usd-dir>/<shot-name>.usda
 # ******************************************************************************************************************** #
 # include-rule:
 #     key: list(str(variant), ...)

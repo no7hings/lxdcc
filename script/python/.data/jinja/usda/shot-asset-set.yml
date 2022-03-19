@@ -5,7 +5,14 @@ asset:
     #
     root_name: master
     #
-    overrides:
+    version:
+        model: {}
+        groom: {}
+        rig: {}
+        effect: {}
+        surface: {}
+    #
+    version_override:
         model: {}
         groom: {}
         rig: {}
@@ -23,7 +30,7 @@ shot:
     #
     set_file: ''
     #
-    overrides:
+    version_override:
         animation: {}
 #
 camera:

@@ -200,7 +200,7 @@ geometries:
             version: latest
         #
         uv_map-file:
-            keyword: asset-geometry-usd-uv_map-file
+            keyword: asset-geometry-uv_map-usd-file
             workspace: publish
             version: latest
         #

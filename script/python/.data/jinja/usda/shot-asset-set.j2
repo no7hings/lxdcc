@@ -49,7 +49,7 @@ def Xform "{{ asset.root_name }}" (
     variantSet "model_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.model.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.model.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -61,7 +61,7 @@ def Xform "{{ asset.root_name }}" (
     variantSet "groom_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.groom.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.groom.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -73,7 +73,7 @@ def Xform "{{ asset.root_name }}" (
     variantSet "rig_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.rig.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.rig.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -85,7 +85,7 @@ def Xform "{{ asset.root_name }}" (
     variantSet "effect_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.effect.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.effect.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -97,7 +97,7 @@ def Xform "{{ asset.root_name }}" (
     variantSet "surface_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.surface.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.surface.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -109,7 +109,7 @@ def Xform "{{ asset.root_name }}" (
     variantSet "animation_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in shot.overrides.animation.iteritems() -%}
+        {% for i_variant_key, i_variant_file in shot.version_override.animation.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {

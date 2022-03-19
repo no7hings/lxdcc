@@ -1,4 +1,6 @@
 # coding:utf-8
+import sys
+
 import os
 
 import collections
@@ -810,6 +812,11 @@ class EnvironMtd(object):
                 os.environ[key] += os.pathsep + value
         else:
             os.environ[key] = value
+    @classmethod
+    def set_python_add(cls, path):
+        python_paths = sys.path
+        if path not in python_paths:
+            sys.path.insert(0, path)
 
 
 class HashMtd(object):
@@ -1122,6 +1129,8 @@ class KeywordArgumentsOpt(object):
                 return None
             elif value_string in ['True', 'False']:
                 return eval(value_string)
+            elif value_string in ['true', 'false']:
+                return [True, False][['true', 'false'].index(value_string)]
             elif value_string in ['()', '[]', '{}']:
                 return eval(value_string)
             elif '+' in value_string:
@@ -3049,6 +3058,4 @@ class FrameMtd(object):
 
 
 if __name__ == '__main__':
-    print FrameMtd.get(
-        (1001, 1240), 5
-    )
+    print KeywordArgumentsOpt._set_value_convert_by_string_('false')

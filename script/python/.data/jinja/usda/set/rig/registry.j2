@@ -1,11 +1,11 @@
 #usda 1.0
 (
-    defaultPrim = "{{ dcc.root }}"
+    defaultPrim = "{{ dcc.root_name }}"
     metersPerUnit = 0.01
     upAxis = "Y"
 )
 
-def Xform "{{ dcc.root }}" (
+def Xform "{{ dcc.root_name }}" (
     assetInfo = {
         asset identifier = @{{ asset }}.usda@
         string project = "{{ project }}"

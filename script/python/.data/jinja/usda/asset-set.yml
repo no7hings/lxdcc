@@ -12,7 +12,14 @@ asset:
     #
     path: '/master'
     #
-    overrides:
+    version:
+        model: {}
+        groom: {}
+        rig: {}
+        effect: {}
+        surface: {}
+    #
+    version_override:
         model: {}
         groom: {}
         rig: {}

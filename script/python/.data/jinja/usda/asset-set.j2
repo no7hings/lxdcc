@@ -33,10 +33,11 @@ def Xform "{{ asset.root_name }}" (
     variantSet "model_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.model.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.model.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
+            string userProperties:usd:variants:asset:override:step = "model"
             string userProperties:usd:variants:asset:model:override:version = "{{ i_variant_key }}"
             string userProperties:usd:variants:asset:model:override:file = "{{ i_variant_file }}"
         }
@@ -45,10 +46,11 @@ def Xform "{{ asset.root_name }}" (
     variantSet "groom_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.groom.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.groom.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
+            string userProperties:usd:variants:asset:override:step = "groom"
             string userProperties:usd:variants:asset:groom:override:version = "{{ i_variant_key }}"
             string userProperties:usd:variants:asset:groom:override:file = "{{ i_variant_file }}"
         }
@@ -57,10 +59,11 @@ def Xform "{{ asset.root_name }}" (
     variantSet "rig_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.rig.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.rig.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
+            string userProperties:usd:variants:asset:override:step = "rig"
             string userProperties:usd:variants:asset:rig:override:version = "{{ i_variant_key }}"
             string userProperties:usd:variants:asset:rig:override:file = "{{ i_variant_file }}"
         }
@@ -69,10 +72,11 @@ def Xform "{{ asset.root_name }}" (
     variantSet "effect_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.effect.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.effect.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
+            string userProperties:usd:variants:asset:override:step = "effect"
             string userProperties:usd:variants:asset:effect:override:version = "{{ i_variant_key }}"
             string userProperties:usd:variants:asset:effect:override:file = "{{ i_variant_file }}"
         }
@@ -81,10 +85,11 @@ def Xform "{{ asset.root_name }}" (
     variantSet "surface_override" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.overrides.surface.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_override.surface.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
+            string userProperties:usd:variants:asset:override:step = "surface"
             string userProperties:usd:variants:asset:surface:override:version = "{{ i_variant_key }}"
             string userProperties:usd:variants:asset:surface:override:file = "{{ i_variant_file }}"
         }

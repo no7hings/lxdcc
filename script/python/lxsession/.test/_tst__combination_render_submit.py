@@ -15,7 +15,8 @@ j_option_opt = bsc_core.KeywordArgumentsOpt(
     option=dict(
         option_hook_key='rsv-task-batchers/asset/combination-render-submit',
         #
-        file='/l/prod/cgm/work/assets/chr/nn_14y_test/mod/modeling/maya/scenes/nn_14y_test.mod.modeling.v006.ma',
+        # file='/l/prod/cgm/work/assets/chr/nn_14y_test/mod/modeling/maya/scenes/nn_14y_test.mod.modeling.v006.ma',
+        file='/l/prod/cgm/work/assets/chr/nn_14y_test/srf/surfacing/maya/scenes/nn_14y_test.srf.surfacing.v004.ma',
         user=bsc_core.SystemMtd.get_user_name(),
         #
         td_enable=True,

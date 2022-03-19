@@ -1126,6 +1126,7 @@ class AbsRsvTask(
                     task_unit_properties.set('option.version', task_unit_properties.get('version'))
                     #
                     task_unit_properties.set('dcc.root', '/master')
+                    task_unit_properties.set('dcc.root_name', 'master')
                     task_unit_properties.set('dcc.sub_root', '/master/hi')
                     #
                     task_unit_properties.set('dcc.pathsep', rsv_configure.Application.get_pathsep(application))
@@ -1172,6 +1173,7 @@ class AbsRsvTask(
                         j_rsv_properties.set('extra.time_tag', utl_core.System.get_time_tag())
                         #
                         j_rsv_properties.set('dcc.root', '/master')
+                        j_rsv_properties.set('dcc.root_name', 'master')
                         j_rsv_properties.set('dcc.sub_root', '/master/hi')
                         #
                         j_rsv_properties.set('dcc.pathsep', rsv_configure.Application.get_pathsep(i_application))

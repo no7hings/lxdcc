@@ -6,7 +6,7 @@ task: ''
 version: ''
 #
 dcc:
-    root: master
+    root: /master
     root_name: master
 #
 look:

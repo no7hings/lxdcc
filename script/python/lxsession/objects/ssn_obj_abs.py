@@ -423,6 +423,53 @@ class AbsSsnOptionAction(
         self._set_gui_def_init_(self._configure)
 
 
+class AbsSsnShellExecuteDef(object):
+    EXECUTOR = None
+    @property
+    def configure(self):
+        raise NotImplementedError()
+    @property
+    def option_opt(self):
+        raise NotImplementedError()
+
+    def _set_shell_execute_def_init_(self, configure):
+        self.__set_execute_option_completion_()
+
+    def get_executor(self):
+        return self.EXECUTOR(
+            self
+        )
+
+    def set_execute_by_shell(self):
+        executor = self.get_executor()
+        executor.set_run_with_shell()
+
+    def __set_execute_option_completion_(self):
+        hook_engine = self.configure.get('hook_option.engine')
+        self.option_opt.set('hook_engine', hook_engine)
+        #
+        rez_extend_packages = self.configure.get('hook_option.rez.extend_packages') or []
+        if rez_extend_packages:
+            self.option_opt.set('rez_extend_packages', rez_extend_packages)
+        #
+        rez_add_environs = self.configure.get('hook_option.rez.add_environ') or []
+
+
+class AbsSsnOptionToolPanel(
+    AbsSsnObj,
+    AbsSsnGuiDef,
+    AbsSsnOptionDef,
+    AbsSsnShellExecuteDef
+):
+    def __init__(self, *args, **kwargs):
+        self._set_option_def_init_(kwargs.pop('option'))
+        super(AbsSsnOptionToolPanel, self).__init__(*args, **kwargs)
+        #
+        self._set_gui_def_init_(self._configure)
+        #
+        self._set_shell_execute_def_init_(self._configure)
+
+
 # session for deadline job
 class AbsOptionMethodSession(
     AbsSsnObj,

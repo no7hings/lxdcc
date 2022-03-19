@@ -11,42 +11,55 @@ def set_session_option_hooks_execute_by_deadline(session):
     from lxsession.commands import _ssn_cmd_hook
     #
     from lxbasic import bsc_core
+
+    from lxutil import utl_core
     #
-    def run_fnc_(main_key_, method_option_hook_key_, option_, script_option_):
-        _batch_option_opt = bsc_core.KeywordArgumentsOpt(option_)
-        _option_opt = bsc_core.KeywordArgumentsOpt(
+    def run_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
+        _batch_hook_option_opt = bsc_core.KeywordArgumentsOpt(batch_hook_option_)
+        _batch_choice_scheme = _batch_hook_option_opt.get('choice_scheme')
+        _hook_option_opt = bsc_core.KeywordArgumentsOpt(
             dict(
-                option_hook_key=method_option_hook_key_,
+                option_hook_key=option_hook_key_,
                 #
-                batch_file=_batch_option_opt.get('batch_file'),
+                batch_file=_batch_hook_option_opt.get('batch_file'),
                 # python option
-                file=_batch_option_opt.get('file'),
+                file=_batch_hook_option_opt.get('file'),
                 #
-                user=_batch_option_opt.get('user'), time_tag=_batch_option_opt.get('time_tag'),
+                user=_batch_hook_option_opt.get('user'), time_tag=_batch_hook_option_opt.get('time_tag'),
                 #
-                td_enable=_batch_option_opt.get('td_enable') or False,
-                rez_beta=_batch_option_opt.get('rez_beta') or False,
+                choice_scheme=_batch_hook_option_opt.get('choice_scheme'),
+                #
+                td_enable=_batch_hook_option_opt.get('td_enable') or False,
+                rez_beta=_batch_hook_option_opt.get('rez_beta') or False,
             )
         )
         #
-        _option_opt.set_update(
-            script_option_
+        _hook_option_opt.set_update(
+            hook_option_override_
         )
         # add main-key to dependencies
-        _dependencies = _option_opt.get('dependencies') or []
-        _dependencies.append(main_key_)
-        _option_opt.set('dependencies', _dependencies)
+        _dependencies = _hook_option_opt.get('dependencies') or []
+        _dependencies.append(batch_option_hook_key_)
+        _hook_option_opt.set('dependencies', _dependencies)
         #
-        _inherit_keys = _option_opt.get('inherit_keys', as_array=True)
+        _choice_scheme_includes = _hook_option_opt.get('choice_scheme_includes', as_array=True)
+        if _choice_scheme_includes:
+            if _batch_choice_scheme not in _choice_scheme_includes:
+                utl_core.Log.set_module_warning_trace(
+                    'scheme choice', 'option-hook="{}" is ignore'.format(option_hook_key_)
+                )
+                return
+        #
+        _inherit_keys = _hook_option_opt.get('inherit_keys', as_array=True)
         if _inherit_keys:
-            _option_opt.set('inherit_keys', _inherit_keys)
-            for _i in _inherit_keys:
-                _option_opt.set(
-                    _i, _batch_option_opt.get(_i)
+            _hook_option_opt.set('inherit_keys', _inherit_keys)
+            for _i_key in _inherit_keys:
+                _hook_option_opt.set(
+                    _i_key, _batch_hook_option_opt.get(_i_key)
                 )
         #
         _ssn_cmd_hook.set_option_hook_execute_by_deadline(
-            option=_option_opt.to_string()
+            option=_hook_option_opt.to_string()
         )
     #
     c = session.configure

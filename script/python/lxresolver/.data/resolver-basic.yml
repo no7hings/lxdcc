@@ -128,6 +128,15 @@ asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.us
 asset-output-comp-usd-dir: <asset-output-version-dir>/cache/usd
 asset-output-comp-registry-usd-file: <asset-output-comp-usd-dir>/registry.usda
 #
+asset-output-texture-src-dir: <asset-output-task-dir>/texture
+asset-output-texture-tgt-dir: <asset-output-version-dir>/texture
+#
+asset-output-look-dir: <asset-output-version-dir>/look
+asset-output-look-klf-file: <asset-output-look-dir>/klf/<asset-name>.klf
+#
+asset-output-look-ass-file: <asset-output-look-dir>/ass/<asset-name>.ass
+asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-pass>.ass
+#
 # <asset-dcc>
 asset-maya-path: None
 # <asset-version>

@@ -12,6 +12,7 @@ over "{{ dcc.root_name }}" (
     prepend variantSets = "pass"
 )
 {
+    asset userProperties:usd:variants:asset:look:file = @../../look/klf/{{ asset }}.klf@
     def Xform "look" ()
     {
         uniform token purpose = "render"

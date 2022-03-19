@@ -731,9 +731,12 @@ class LxRenderer(object):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxutil_gui.panel.utl_pnl_widgets as utl_pnl_widgets
+
+        file_path = ktn_dcc_objects.Scene.get_current_file_path()
+
         w = utl_pnl_widgets.AssetRenderSubmitter(
             option='file={}'.format(
-                ktn_dcc_objects.Scene.get_current_file_path()
+                file_path
             )
         )
         w.set_window_show()

@@ -1,4 +1,6 @@
 command:
+    lynxi: '-- lxdcc-python {lxdcc_root}/script/bin/python-2.7/lxhook-engine-script.py "{hook_option}"'
+    #
     python: '<command.maya-python>'
     #
     maya: '-- maya -batch -command "python(\"import lxsession.commands as ssn_commands; ssn_commands.set_option_hook_execute(option=\\\"{hook_option}\\\")\")"'

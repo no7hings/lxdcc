@@ -15,6 +15,12 @@ class OptionActionSession(ssn_obj_abs.AbsSsnOptionAction):
         super(OptionActionSession, self).__init__(*args, **kwargs)
 
 
+class OptionToolPanelSession(ssn_obj_abs.AbsSsnOptionToolPanel):
+    EXECUTOR = _ssn_obj_executor.HookExecutor
+    def __init__(self, *args, **kwargs):
+        super(OptionToolPanelSession, self).__init__(*args, **kwargs)
+
+
 class OptionMethodSession(ssn_obj_abs.AbsOptionMethodSession):
     EXECUTOR = _ssn_obj_executor.HookExecutor
     def __init__(self, *args, **kwargs):

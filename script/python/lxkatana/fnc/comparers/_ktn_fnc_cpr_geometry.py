@@ -26,7 +26,7 @@ class GeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
         #
         katana_workspace = ktn_fnc_builders.AssetWorkspaceBuilder()
         #
-        usd_file_path = katana_workspace.get_geometry_usd_surface_hi_file_path()
+        usd_file_path = katana_workspace.get_geometry_uv_map_usd_source_file()
         if usd_file_path is not None:
             root = self._root
             #

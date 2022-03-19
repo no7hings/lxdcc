@@ -623,12 +623,12 @@ class AssetWorkspaceBuilder(object):
             ktn_obj.WriteToLookFile(None, file_path)
 
             utl_core.Log.set_module_result_trace(
-                'look-klf-export',
+                'look-klf export',
                 '"{}"'.format(file_path)
             )
         else:
             utl_core.Log.set_module_warning_trace(
-                'look-klf-export',
+                'look-klf export',
                 'obj="{}" is non-exists'.format(dcc_obj.path)
             )
     @_ktn_mdf_utility.set_undo_mark_mdf
@@ -684,7 +684,7 @@ class AssetWorkspaceBuilder(object):
         if _:
             return _[0]
 
-    def get_geometry_usd_surface_hi_file_path(self):
+    def get_geometry_uv_map_usd_source_file(self):
         configure = self.get_configure()
         asset_root = configure.get('option.asset_root')
         #

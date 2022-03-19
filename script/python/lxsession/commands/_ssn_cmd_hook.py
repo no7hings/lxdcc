@@ -111,6 +111,13 @@ def get_option_hook_args(option):
                     configure=configure,
                     option=option_opt.to_string()
                 )
+            elif type_name == 'tool-panel':
+                session = ssn_objects.OptionToolPanelSession(
+                    type=type_name,
+                    hook=hook_key,
+                    configure=configure,
+                    option=option_opt.to_string()
+                )
             elif type_name == 'method':
                 session = ssn_objects.OptionMethodSession(
                     type=type_name,

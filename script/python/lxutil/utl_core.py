@@ -904,7 +904,7 @@ class AppLauncher(object):
             ' '.join(['rez-env'] + list(args))
         )
 
-    def get_run_args(self):
+    def get_rez_packages(self):
         lis = []
         kwargs = copy.copy(self._kwargs)
         application = self._kwargs['application']
@@ -920,6 +920,8 @@ class AppLauncher(object):
             kwargs['application'] = 'maya'
         elif application == 'rv-movie-convert':
             kwargs['application'] = 'maya'
+        elif application == 'lynxi':
+            return ['lxdcc']
         #
         configure_file_path = self._get_application_configure_file_path_(**kwargs)
         if os.path.exists(configure_file_path):
@@ -944,29 +946,29 @@ class AppLauncher(object):
             return AppLauncher(
                 project='default',
                 application=application
-            ).get_run_args()
+            ).get_rez_packages()
         return lis
 
     def set_cmd_run(self, command=None):
-        run_args = self.get_run_args()
+        run_args = self.get_rez_packages()
         #
         run_args.append(command)
         self._set_cmd_run_(*run_args)
 
     def get_run_cmd(self, *args):
-        run_args = self.get_run_args()
+        run_args = self.get_rez_packages()
         #
         run_args.append(' '.join(args))
         return self._get_run_cmd_(*run_args)
 
     def set_cmd_run_with_result(self, command=None):
-        run_args = self.get_run_args()
+        run_args = self.get_rez_packages()
         #
         run_args.append(command)
         self._set_run_with_result_(*run_args)
 
     def set_cmd_run_with_result_use_thread(self, cmd):
-        run_args = self.get_run_args()
+        run_args = self.get_rez_packages()
         #
         run_args.append(cmd)
         self._set_run_with_result_use_thread_(*run_args)

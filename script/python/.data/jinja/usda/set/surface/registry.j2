@@ -17,7 +17,7 @@ over "{{ dcc.root_name }}" (
     }
     kind = "component"
     prepend references = [
-        @{{ usdas.material }}@,
+        @{{ usdas.material }}@
     ]
     variants = {
         string uv = "{{ look.passes[0] }}"
@@ -28,7 +28,10 @@ over "{{ dcc.root_name }}" (
     variantSet "uv" = {
         "None" (){}
         "default" (
-            payload = @uv_map.usd@
-        ){}
-       }
+            payload = @{{ geometries.uv_map }}@
+        ){
+            asset userProperties:usd:variants:asset:geometry_uv_map:file = @{{ geometries.uv_map }}@
+            asset userProperties:usd:variants:asset:geometry_uv_map:source_file = @{{ geometries.hi }}@
+        }
+   }
 }

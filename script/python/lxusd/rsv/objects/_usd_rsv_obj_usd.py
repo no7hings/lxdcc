@@ -3,6 +3,8 @@ import collections
 
 from lxbasic import bsc_core
 
+import lxbasic.objects as bsc_objects
+
 from lxutil import utl_configure
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -18,10 +20,33 @@ from lxusd import usd_core
 
 class RsvAssetSetUsdCreator(object):
     ASSET_OVERRIDE_VARIANTS = {
-        ('model', 'mod', 'modeling'),
-        ('groom', 'grm', 'groom'),
-        ('rig', 'rig', 'rigging'),
-        ('surface', 'srf', 'surfacing'),
+        ('mod', 'modeling', 'model'),
+        ('grm', 'groom', 'groom'),
+        ('rig', 'rigging', 'rig'),
+        ('srf', 'surfacing', 'surface'),
+    }
+    STEP_MAPPER = {
+        'mod': 'model',
+        'grm': 'groom',
+        'rig': 'rig',
+        'srf': 'surface',
+    }
+    VARIANTS = {
+        'modeling': 'variants.asset_version.model',
+        'groom': 'variants.asset_version.groom',
+        'rigging': 'variants.asset_version.rig',
+        'effects': 'variants.asset_version.effect',
+        'surfacing': 'variants.asset_version.surface',
+        #
+        'model_override': 'variants.asset_version_override.model',
+        'groom_override': 'variants.asset_version_override.groom',
+        'rig_override': 'variants.asset_version_override.rig',
+        'effect_override': 'variants.asset_version_override.effect',
+        'surface_override': 'variants.asset_version_override.surface',
+        #
+        'animation': 'variants.shot_version.animation',
+        #
+        'animation_override': 'variants.shot_version_override.animation',
     }
     def __init__(self, rsv_asset):
         self._rsv_asset = rsv_asset
@@ -179,7 +204,7 @@ class RsvAssetSetUsdCreator(object):
             )
         return usd_file_path
     @classmethod
-    def _get_asset_version_override_(cls, rsv_scene_properties, per_rsv_task):
+    def _get_asset_set_registry_override_(cls, rsv_scene_properties, per_rsv_task):
         workspace = rsv_scene_properties.get('workspace')
         per_step = per_rsv_task.get('step')
         dic = collections.OrderedDict()
@@ -200,9 +225,9 @@ class RsvAssetSetUsdCreator(object):
                         i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties(i_file_path)
                         i_version = i_properties.get('version')
                         dic[i_version] = i_file_path
-            if workspace == 'work':
+            elif workspace == 'publish':
                 pass
-            if workspace == 'output':
+            elif workspace == 'output':
                 register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
                     keyword='asset-output-comp-registry-usd-file'
                 )
@@ -215,13 +240,53 @@ class RsvAssetSetUsdCreator(object):
                     dic[i_version] = i_file_path
         return dic
     @classmethod
-    def _set_asset_all_version_update_(cls, configure, rsv_asset, rsv_scene_properties):
-        for i_key, i_step, i_task in cls.ASSET_OVERRIDE_VARIANTS:
+    def _get_usd_variant_dict_(cls, rsv_scene_properties, asset_usd_file_path):
+        c = bsc_objects.Configure(value=collections.OrderedDict())
+        step = rsv_scene_properties.get('step')
+        usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
+        usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
+        usd_variant_dict = usd_prim_opt.get_variant_dict()
+        for i_variant_set_name, i_port_path in cls.VARIANTS.items():
+            c.set(
+                '{}.port_path'.format(i_variant_set_name),
+                i_port_path
+            )
+            if i_variant_set_name in usd_variant_dict:
+                i_current_variant_name, i_variant_names = usd_variant_dict[i_variant_set_name]
+                if i_variant_names:
+                    c.set(
+                        '{}.variant_names'.format(i_variant_set_name),
+                        i_variant_names
+                    )
+                    if i_variant_set_name.endswith('override'):
+                        if step in cls.STEP_MAPPER:
+                            step_ = cls.STEP_MAPPER[step]
+                            if i_variant_set_name == '{}_override'.format(step_):
+                                i_current_variant_name = i_variant_names[-1]
+                    #
+                    c.set(
+                        '{}.variant_name'.format(i_variant_set_name),
+                        i_current_variant_name
+                    )
+            else:
+                c.set(
+                    '{}.variant_names'.format(
+                        i_variant_set_name),
+                    ['None']
+                )
+                c.set(
+                    '{}.variant_name'.format(i_variant_set_name),
+                    'None'
+                )
+        return c.value
+    @classmethod
+    def _set_asset_all_set_registry_update_(cls, configure, rsv_asset, rsv_scene_properties):
+        for i_step, i_task, i_key in cls.ASSET_OVERRIDE_VARIANTS:
             i_per_rsv_task = rsv_asset.get_rsv_task(
                 step=i_step, task=i_task
             )
-            i_overrides = cls._get_asset_version_override_(rsv_scene_properties, i_per_rsv_task)
-            configure.set('asset.version_override.{}'.format(i_key), i_overrides)
+            i_set_registry_override = cls._get_asset_set_registry_override_(rsv_scene_properties, i_per_rsv_task)
+            configure.set('asset.version_override.{}'.format(i_key), i_set_registry_override)
     @classmethod
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
@@ -247,7 +312,7 @@ class RsvAssetSetUsdCreator(object):
             #
             c.set('asset.set_file', asset_set_dress_usd_file_path)
 
-            cls._set_asset_all_version_update_(
+            cls._set_asset_all_set_registry_update_(
                 c, rsv_asset, rsv_scene_properties
             )
 
@@ -295,7 +360,7 @@ class RsvAssetSetUsdCreator(object):
 
             c.set('shot_assets', shot_assets_dict)
 
-            cls._set_asset_all_version_update_(
+            cls._set_asset_all_set_registry_update_(
                 c, rsv_asset, rsv_scene_properties
             )
 

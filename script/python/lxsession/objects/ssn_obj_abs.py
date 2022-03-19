@@ -637,7 +637,7 @@ class AbsOptionRsvTaskMethodSession(
             )
             i_ddl_job_id = c.get(
                 'deadline.{}.job_id'.format(i_option_hook_key)
-            ) or []
+            )
             if i_ddl_job_id:
                 lis.append(i_ddl_job_id)
         return lis

@@ -343,7 +343,11 @@ class LxAsset(object):
                 obj_opt.set('lynxi_settings.render_start_frame', 1001.0)
                 obj_opt.set('lynxi_settings.render_end_frame', 1240.0)
                 obj_opt.set('lynxi_settings.render_resolution', '2048x2048')
-                self.__set_usd_variants_update_(asset_set_usd_file_path)
+                usd_variant_dict = usd_rsv_objects.RsvAssetSetUsdCreator._get_usd_variant_dict_(
+                    rsv_scene_properties,
+                    asset_set_usd_file_path
+                )
+                self.__set_usd_variant_by_dict_(usd_variant_dict)
 
         CacheManager.flush()
 
@@ -385,7 +389,11 @@ class LxAsset(object):
                 obj_opt.set_port_enumerate_raw(
                     'usd.variants.shot_asset', shot_assets_dict.keys()
                 )
-                self.__set_usd_variants_update_(asset_shot_set_usd_file_path)
+                usd_variant_dict = usd_rsv_objects.RsvAssetSetUsdCreator._get_usd_variant_dict_(
+                    rsv_scene_properties,
+                    asset_shot_set_usd_file_path
+                )
+                self.__set_usd_variant_by_dict_(usd_variant_dict)
         #
         CacheManager.flush()
 
@@ -397,31 +405,22 @@ class LxAsset(object):
         for k, v in rsv_task.properties.value.items():
             obj_opt.set('lynxi_properties.{}'.format(k), v)
 
-    def __set_usd_variants_update_(self, asset_usd_file_path):
-        from lxusd import usd_core
-        #
+    def __set_usd_variant_by_dict_(self, dict_):
         from lxkatana import ktn_core
-        #
+
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
-        usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
-        usd_variant_dict = usd_prim_opt.get_variant_dict()
-        for i_variant_set_name, i_port_path in self.VARIANTS.items():
-            if i_variant_set_name in usd_variant_dict:
-                i_current_variant_name, i_variant_names = usd_variant_dict[i_variant_set_name]
-                if i_variant_names:
-                    obj_opt.set_as_enumerate(
-                        i_port_path, i_variant_names
-                    )
-                    #
-                    if i_variant_set_name.endswith('override'):
-                        i_current_variant_name = i_variant_names[-1]
-                    #
-                    obj_opt.set(i_port_path, i_current_variant_name)
-            else:
-                obj_opt.set_as_enumerate(
-                    i_port_path, ['None']
-                )
+
+        for k, v in dict_.items():
+            i_port_path = 'usd.{}'.format(v['port_path'])
+            i_variant_names = v['variant_names']
+            i_current_variant_name = v['variant_name']
+            obj_opt.set_as_enumerate(
+                i_port_path, i_variant_names
+            )
+            obj_opt.set(
+                i_port_path,
+                i_current_variant_name
+            )
 
     def set_create(self):
         from lxkatana import ktn_core
@@ -729,8 +728,14 @@ class LxRenderer(object):
             Utils.UndoStack.CloseGroup()
 
     def set_submit_to_deadline(self):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
         import lxutil_gui.panel.utl_pnl_widgets as utl_pnl_widgets
-        w = utl_pnl_widgets.AssetRenderSubmitter()
+        w = utl_pnl_widgets.AssetRenderSubmitter(
+            option='file={}'.format(
+                ktn_dcc_objects.Scene.get_current_file_path()
+            )
+        )
         w.set_window_show()
 
 

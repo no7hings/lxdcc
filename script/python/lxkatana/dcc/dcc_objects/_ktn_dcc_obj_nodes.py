@@ -227,11 +227,11 @@ class AbsTextureReferences(object):
                 if not e == new_expression:
                     ktn_port.setExpression(new_expression)
                     utl_core.Log.set_module_result_trace(
-                        'texture-repath',
+                        'texture repath',
                         'port="{}"'.format(port.path)
                     )
                     utl_core.Log.set_module_result_trace(
-                        'texture-repath',
+                        'texture repath',
                         'expression="{}"'.format(new_expression)
                     )
         else:
@@ -240,11 +240,11 @@ class AbsTextureReferences(object):
                 ktn_port.setValue(file_path, 0)
                 #
                 utl_core.Log.set_module_result_trace(
-                    'texture-repath',
+                    'texture repath',
                     'port="{}"'.format(port.path)
                 )
                 utl_core.Log.set_module_result_trace(
-                    'texture-repath',
+                    'texture repath',
                     'file="{}"'.format(file_path)
                 )
     @classmethod

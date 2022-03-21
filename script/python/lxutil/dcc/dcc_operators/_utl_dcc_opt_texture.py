@@ -234,7 +234,7 @@ class DccTexturesOpt(object):
 
     def _set_repath_queue_run_(self, queue, force=False):
         utl_core.Log.set_module_result_trace(
-            'texture-repath',
+            'texture repath',
             'start'
         )
         if queue:
@@ -256,7 +256,7 @@ class DccTexturesOpt(object):
                         port.obj.set_color_space(color_space)
                 else:
                     utl_core.Log.set_module_warning_trace(
-                        'texture-repath',
+                        'texture repath',
                         u'file="{}" is non-exists'.format(tgt_stg_file.path)
                     )
             #
@@ -265,7 +265,7 @@ class DccTexturesOpt(object):
             self._set_repath_post_run_()
         #
         utl_core.Log.set_module_result_trace(
-            'texture-repath',
+            'texture repath',
             'complete'
         )
     @utl_core._debug_
@@ -281,7 +281,7 @@ class DccTexturesOpt(object):
             stg_texture.path
         )
         utl_core.Log.set_module_result_trace(
-            'texture-repath',
+            'texture repath',
             u'port="{}", file="{}"'.format(port.path, stg_texture.path)
         )
 

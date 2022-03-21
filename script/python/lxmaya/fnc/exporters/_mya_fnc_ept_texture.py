@@ -91,7 +91,7 @@ class TextureExporter(object):
                             if port.get() != i_tgt_texture_file_path:
                                 port.set(i_tgt_texture_file_path)
                                 utl_core.Log.set_module_result_trace(
-                                    'texture-repath',
+                                    'texture repath',
                                     u'"{}" >> "{}"'.format(i_src_texture_file_path, i_tgt_texture_file_path)
                                 )
                         else:

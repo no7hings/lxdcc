@@ -1068,6 +1068,15 @@ class SubProcessMtd(object):
             startupinfo=cls.NO_WINDOW,
         )
         return _sp
+    @classmethod
+    def set_run_with_result_use_thread(cls, cmd):
+        t_0 = threading.Thread(
+            target=functools.partial(
+                cls.set_run_with_result,
+                cmd=cmd
+            )
+        )
+        t_0.start()
 
 
 class MultiProcessMtd(object):

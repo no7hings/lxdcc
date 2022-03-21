@@ -21,10 +21,10 @@ scheme:
             /camera/add_1: false
             /camera/close_up: true
             /camera/full_body: true
-            /camera/shot: true
+            /camera/shot: false
             /camera/upper_body: true
-            /camera/upper_body_35: true
-            /camera/upper_body_50: true
+            /camera/upper_body_35: false
+            /camera/upper_body_50: false
             /layer: true
             /layer/master: true
             /light_pass: true

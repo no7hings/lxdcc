@@ -1,5 +1,5 @@
 command:
-    lynxi: '-- lxdcc-python {lxdcc_root}/script/bin/python-2.7/lxhook-engine-script.py "{hook_option}"'
+    lynxi: '-c "lxdcc-python {lxdcc_root}/script/bin/python-2.7/lxhook-engine-script.py \"{hook_option}\""'
     #
     python: '<command.maya-python>'
     #

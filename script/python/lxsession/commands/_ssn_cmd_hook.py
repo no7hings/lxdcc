@@ -66,14 +66,6 @@ def set_hook_execute(key):
         execute_fnc()
 
 
-def set_hook_execute_by_shell(key):
-    hook_args = get_hook_args(key)
-    if hook_args is not None:
-        session, execute_fnc = hook_args
-        #
-        # session.set_execute_by_shell()
-
-
 def get_option_hook_args(option):
     def execute_fnc():
         session._set_file_execute_(python_file_path, dict(session=session))
@@ -153,9 +145,11 @@ def get_option_hook_args(option):
             session.set_hook_yaml_file(yaml_file_path)
             return session, execute_fnc
     else:
-        utl_core.Log.set_module_error_trace(
-            'option-hook gain',
-            'key="{}" configue (.yml) is not found'.format(hook_key)
+        raise RuntimeError(
+            utl_core.Log.set_module_error_trace(
+                'option-hook gain',
+                'option-hook key="{}" configue (.yml) is not found'.format(hook_key)
+            )
         )
 
 

@@ -104,12 +104,22 @@ def __set_option_hook_run(hook_option):
         #
         application = hook_engine.split('-')[0]
         #
-        utl_core.AppLauncher(
-            project=project,
-            application=application
-        ).set_cmd_run_with_result(
-            ' '.join(cmd_args)
-        )
+        use_thread = option_opt.get('use_thread') or False
+        #
+        if use_thread is True:
+            utl_core.AppLauncher(
+                project=project,
+                application=application
+            ).set_cmd_run_with_result_use_thread(
+                ' '.join(cmd_args)
+            )
+        else:
+            utl_core.AppLauncher(
+                project=project,
+                application=application
+            ).set_cmd_run_with_result(
+                ' '.join(cmd_args)
+            )
     else:
         raise TypeError(
             utl_core.Log.set_module_error_trace(

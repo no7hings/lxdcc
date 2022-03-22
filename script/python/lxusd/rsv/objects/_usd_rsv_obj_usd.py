@@ -240,6 +240,46 @@ class RsvAssetSetUsdCreator(object):
                     dic[i_version] = i_file_path
         return dic
     @classmethod
+    def _get_asset_usd_set_dress_variant_dict_(cls, rsv_asst):
+        usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asst)
+        return cls._get_usd_file_variant_dict_(usd_file_path)
+    @classmethod
+    def _get_shot_usd_set_dress_variant_dict_(cls, rsv_shot):
+        usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
+        return cls._get_usd_file_variant_dict_(usd_file_path)
+    @classmethod
+    def _get_usd_file_variant_dict_(cls, usd_file_path):
+        c = bsc_objects.Configure(value=collections.OrderedDict())
+        usd_stage_opt = usd_core.UsdStageOpt(usd_file_path)
+        usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
+        if usd_file_path:
+            usd_variant_dict = usd_prim_opt.get_variant_dict()
+            for i_variant_set_name, i_port_path in cls.VARIANTS.items():
+                c.set(
+                    '{}.port_path'.format(i_variant_set_name),
+                    i_port_path
+                )
+                if i_variant_set_name in usd_variant_dict:
+                    i_current_variant_name, i_variant_names = usd_variant_dict[i_variant_set_name]
+                    c.set(
+                        '{}.variant_names'.format(i_variant_set_name),
+                        i_variant_names
+                    )
+                    c.set(
+                        '{}.variant_name'.format(i_variant_set_name),
+                        i_current_variant_name
+                    )
+                else:
+                    c.set(
+                        '{}.variant_names'.format(i_variant_set_name),
+                        ['None']
+                    )
+                    c.set(
+                        '{}.variant_name'.format(i_variant_set_name),
+                        'None'
+                    )
+        return c.value
+    @classmethod
     def _get_usd_variant_dict_(cls, rsv_scene_properties, asset_usd_file_path):
         c = bsc_objects.Configure(value=collections.OrderedDict())
         step = rsv_scene_properties.get('step')

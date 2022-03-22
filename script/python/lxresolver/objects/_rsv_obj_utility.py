@@ -23,7 +23,7 @@ class RsvMatcher(rsv_abstract.AbsRsvMatcher):
     #
     RSV_PATTERN_CLASS = RsvPattern
     #
-    RSV_VERSION_CLASS = RsvVersionKey
+    RSV_VERSION_KEY_CLASS = RsvVersionKey
     def __init__(self, *args, **kwargs):
         super(RsvMatcher, self).__init__(*args, **kwargs)
 
@@ -68,12 +68,20 @@ class RsvTask(rsv_abstract.AbsRsvTask):
         super(RsvTask, self).__init__(*args, **kwargs)
 
 
-class RsvVersion(rsv_abstract.AbsRsvVersion):
+class RsvTaskVersion(rsv_abstract.AbsRsvTaskVersion):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
     def __init__(self, *args, **kwargs):
-        super(RsvVersion, self).__init__(*args, **kwargs)
+        super(RsvTaskVersion, self).__init__(*args, **kwargs)
+
+
+class RsvUnitVersion(rsv_abstract.AbsRsvUnitVersion):
+    PATHSEP = '/'
+    #
+    PROPERTIES_CLASS = _bsc_obj_raw.Properties
+    def __init__(self, *args, **kwargs):
+        super(RsvUnitVersion, self).__init__(*args, **kwargs)
 
 
 class RsvProject(rsv_abstract.AbsRsvProject):
@@ -90,9 +98,10 @@ class RsvProject(rsv_abstract.AbsRsvProject):
     RSV_ENTITY_CLASS = RsvEntity
     RSV_STEP_CLASS = RsvStep
     RSV_TASK_CLASS = RsvTask
-    RSV_VERSION_CLASS = RsvVersion
+    RSV_TASK_VERSION_CLASS = RsvTaskVersion
     #
     RSV_UNIT_CLASS = RsvUnit
+    RSV_UNIT_VERSION_CLASS = RsvUnitVersion
     def __init__(self, *args, **kwargs):
         super(RsvProject, self).__init__(*args, **kwargs)
 

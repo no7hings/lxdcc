@@ -54,7 +54,8 @@ extent-var-keys:
     - asset_shot
 #
 workspace-src: work
-workspace-prd: publish
+workspace-release: publish
+workspace-pre-release: output
 #
 stack-key-project: /<project-name>
 stack-key-asset: /<project-name>/<asset-name>

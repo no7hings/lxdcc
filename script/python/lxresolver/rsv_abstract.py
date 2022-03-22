@@ -126,7 +126,7 @@ class MtdBasic(object):
             'step',
             'task',
             #
-            'version'
+            # 'version'
         ]
         p_values = ['', ]
         #
@@ -340,7 +340,7 @@ class AbsRsvMatcher(
     #
     RSV_PATTERN_CLASS = None
     #
-    RSV_VERSION_CLASS = None
+    RSV_VERSION_KEY_CLASS = None
     def __init__(self, rsv_obj, pattern, format_dict=None):
         self._set_rsv_properties_def_init_()
         #
@@ -542,7 +542,7 @@ class AbsRsvMatcher(
             format_dict.update(parameters)
             if 'version' in format_dict:
                 version = format_dict['version']
-                rsv_version_key = self.RSV_VERSION_CLASS(version)
+                rsv_version_key = self.RSV_VERSION_KEY_CLASS(version)
                 rsv_version_key += 1
                 format_dict['version'] = str(rsv_version_key)
                 return self.__get_path_by_local_variants_(format_dict)
@@ -555,7 +555,7 @@ class AbsRsvMatcher(
         return self.__get_path_by_local_variants_(format_dict)
     @classmethod
     def _set_rsv_version_key_create_(cls, version):
-        return cls.RSV_VERSION_CLASS(version)
+        return cls.RSV_VERSION_KEY_CLASS(version)
 
     def __str__(self):
         return '{}(pattern="{}")'.format(
@@ -665,6 +665,7 @@ class AbsRsvObj(
                 ('{}-directory'.format(self.type_name), ),
                 ('Open Work Directory', 'file/folder', (self._get_work_directory_is_enable_, self._set_work_directory_open_, False)),
                 ('Open Publish Directory', 'file/folder', (self._get_publish_directory_is_enable_, self._set_publish_directory_open_, False)),
+                ('Open Output Directory', 'file/folder', (self._get_output_directory_is_enable_, self._set_output_directory_open_, False)),
             ]
         )
 
@@ -683,7 +684,12 @@ class AbsRsvObj(
 
     def _get_publish_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
-        kwargs['workspace'] = self.rsv_project.get_workspace_prd()
+        kwargs['workspace'] = self.rsv_project.get_workspace_release()
+        return self._pattern.format(**kwargs)
+
+    def _get_output_directory_path_(self):
+        kwargs = copy.copy(self.properties.value)
+        kwargs['workspace'] = self.rsv_project.get_workspace_pre_release()
         return self._pattern.format(**kwargs)
 
     def _get_publish_directory_is_enable_(self):
@@ -692,6 +698,14 @@ class AbsRsvObj(
 
     def _set_publish_directory_open_(self):
         directory_path = self._get_publish_directory_path_()
+        bsc_core.DirectoryOpt(directory_path).set_open()
+
+    def _get_output_directory_is_enable_(self):
+        directory_path = self._get_output_directory_path_()
+        return bsc_core.DirectoryOpt(directory_path).get_is_exists()
+
+    def _set_output_directory_open_(self):
+        directory_path = self._get_output_directory_path_()
         bsc_core.DirectoryOpt(directory_path).set_open()
     @property
     def rsv_project(self):
@@ -955,12 +969,52 @@ class AbsRsvUnit(
             return str(rsv_version_key)
         return 'v001'
 
+    def get_rsv_version(self, **kwargs):
+        rsv_version = self.rsv_project._project__get_rsv_unit_version_(
+            rsv_obj=self,
+            **kwargs
+        )
+        rsv_version._set_result_(self.get_result(version=kwargs['version']))
+        return rsv_version
 
-class AbsRsvVersion(
+    def get_rsv_versions(self):
+        lis = []
+        results = self.get_result(version='all')
+        for i_result in results:
+            i_properties = self.get_properties(i_result)
+            i_properties.set('keyword', self.get('keyword'))
+            i_rsv_version = self.get_rsv_version(**i_properties.value)
+            lis.append(i_rsv_version)
+        return lis
+
+
+class AbsRsvUnitVersion(
     AbsRsvObj
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvVersion, self).__init__(*args, **kwargs)
+        super(AbsRsvUnitVersion, self).__init__(*args, **kwargs)
+        self.set_gui_menu_raw(
+            [
+                ('{}-directory'.format(self.type_name), ),
+                ('Open Directory', 'file/folder', (True, self._set_work_directory_open_, False)),
+            ]
+        )
+
+        self._result = None
+
+    def _set_result_(self, raw):
+        self._result = raw
+
+    def _set_directory_open_(self):
+        if self._result:
+            bsc_core.StoragePathOpt(self._result).set_open_in_system()
+
+
+class AbsRsvTaskVersion(
+    AbsRsvObj
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsRsvTaskVersion, self).__init__(*args, **kwargs)
 
     def get_rsv_task(self):
         return self.get_parent()
@@ -1192,15 +1246,18 @@ class AbsRsvTask(
         return self.get_parent()
     # version
     def get_rsv_version(self, **kwargs):
-        return self.rsv_project._project__get_rsv_version_(
-            rsv_obj=self,
+        branch = self.get('branch')
+        keyword = '{}-version-dir'.format(branch)
+        rsv_unit = self.get_rsv_unit(keyword=keyword)
+        return rsv_unit.get_rsv_version(
             **kwargs
         )
 
     def get_rsv_versions(self):
-        return self._rsv_project._project__get_rsv_versions_(
-            **self.properties.value
-        )
+        branch = self.get('branch')
+        keyword = '{}-version-dir'.format(branch)
+        rsv_unit = self.get_rsv_unit(keyword=keyword)
+        return rsv_unit.get_rsv_versions()
     # unit
     def get_rsv_unit(self, **kwargs):
         return self.rsv_project._project__get_rsv_unit_(
@@ -1364,9 +1421,10 @@ class AbsRsvProject(
     RSV_ENTITY_CLASS = None
     RSV_STEP_CLASS = None
     RSV_TASK_CLASS = None
-    RSV_VERSION_CLASS = None
+    RSV_TASK_VERSION_CLASS = None
     #
     RSV_UNIT_CLASS = None
+    RSV_UNIT_VERSION_CLASS = None
     def __init__(self, *args, **parameters):
         self._set_obj_def_init_()
         self._set_rsv_def_init_()
@@ -1438,8 +1496,11 @@ class AbsRsvProject(
         else:
             kwargs['workspace'] = self.get_workspace_src()
 
-    def get_workspace_prd(self):
-        return self.get_value('workspace-prd')
+    def get_workspace_release(self):
+        return self.get_value('workspace-release')
+
+    def get_workspace_pre_release(self):
+        return self.get_value('workspace-pre-release')
 
     def _set_dag_create_(self, path):
         if path == self._obj_path:
@@ -1806,13 +1867,13 @@ class AbsRsvProject(
         )
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._set_rsv_step_create_(
+        return self._project__set_rsv_step_create_(
             obj_path,
             pattern,
             **variants
         )
     #
-    def _set_rsv_step_create_(self, *args, **kwargs):
+    def _project__set_rsv_step_create_(self, *args, **kwargs):
         self.__set_workspace_kwargs_(kwargs)
         #
         matches = self.RSV_MATCHER_CLASS(
@@ -1937,26 +1998,26 @@ class AbsRsvProject(
             rsv_obj = self.RSV_TASK_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
-    # version
-    def get_rsv_version(self, **kwargs):
+    # task version
+    def get_rsv_task_version(self, **kwargs):
         if 'version' in kwargs:
             return self._task__get_rsv_version_(**kwargs)
         #
-        _ = self.get_rsv_versions(**kwargs)
+        _ = self.get_rsv_task_versions(**kwargs)
         if _:
             return _[-1]
     #
-    def get_rsv_versions(self, **kwargs):
+    def get_rsv_task_versions(self, **kwargs):
         branch = self._get_rsv_branch_0_(**kwargs)
         if branch is not None:
             kwargs['branch'] = branch
-            return self._project__get_rsv_versions_(**kwargs)
+            return self._project__get_rsv_task_versions_(**kwargs)
         else:
             lis = []
             for branch in rsv_configure.Branch.ALL:
                 kwargs['branch'] = branch
                 lis.extend(
-                    self._project__get_rsv_versions_(**kwargs)
+                    self._project__get_rsv_task_versions_(**kwargs)
                 )
             return lis
 
@@ -1965,7 +2026,7 @@ class AbsRsvProject(
         if rsv_task is not None:
             return rsv_task.get_rsv_version(**kwargs)
 
-    def _project__get_rsv_versions_(self, **kwargs):
+    def _project__get_rsv_task_versions_(self, **kwargs):
         lis = []
         #
         branch = kwargs['branch']
@@ -1986,50 +2047,6 @@ class AbsRsvProject(
                 if rsv_version not in lis:
                     lis.append(rsv_version)
         return lis
-
-    def _project__get_rsv_version_(self, rsv_obj, **kwargs):
-        kwargs_ = collections.OrderedDict()
-        for k, v in rsv_obj.properties.value.items():
-            kwargs_[k] = v
-        #
-        kwargs_.update(kwargs)
-        #
-        type_ = 'version'
-        branch = self._get_rsv_branch_(**kwargs_)
-        keyword = '{}-{}-dir'.format(branch, type_)
-        #
-        if type_ in kwargs_:
-            name = kwargs_[type_]
-        else:
-            raise KeyError()
-        #
-        if MtdBasic._set_name_check_(name) is False:
-            return None
-        #
-        kwargs_['type'] = type_
-        kwargs_['keyword'] = keyword
-        kwargs_[type_] = name
-        #
-        obj_path, pattern, variants = self._get_obj_args_(
-            kwargs_,
-            extend_keys=['type', 'branch']
-        )
-        if self._rsv_obj_stack.get_object_exists(obj_path) is True:
-            return self._rsv_obj_stack.get_object(obj_path)
-        return self._set_rsv_version_create_(obj_path, pattern, **variants)
-
-    def _set_rsv_version_create_(self, *args, **kwargs):
-        self.__set_workspace_kwargs_(kwargs)
-        #
-        matches = self.RSV_MATCHER_CLASS(
-            self, args[1], kwargs
-        ).get_matches()
-        if matches:
-            _, variants = matches[-1]
-            kwargs.update(variants)
-            rsv_obj = self.RSV_VERSION_CLASS(self, *args, **kwargs)
-            self._project__set_rsv_obj_add_(rsv_obj)
-            return rsv_obj
     # unit
     def get_rsv_unit(self, **kwargs):
         rsv_task = self.get_rsv_task(**kwargs)
@@ -2059,12 +2076,62 @@ class AbsRsvProject(
         obj_path = '{}/{}'.format(obj_path, keyword)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._set_rsv_unit_create_(obj_path, pattern, **variants)
+        return self._project__set_rsv_unit_create_(obj_path, pattern, **variants)
 
-    def _set_rsv_unit_create_(self, *args, **kwargs):
+    def _project__set_rsv_unit_create_(self, *args, **kwargs):
         rsv_obj = self.RSV_UNIT_CLASS(self, *args, **kwargs)
         self._project__set_rsv_obj_add_(rsv_obj)
         return rsv_obj
+
+    def _project__get_rsv_unit_version_(self, rsv_obj, **kwargs):
+        kwargs_ = collections.OrderedDict()
+        for k, v in rsv_obj.properties.value.items():
+            kwargs_[k] = v
+        #
+        kwargs_.update(kwargs)
+        #
+        type_ = 'version'
+        keyword = rsv_obj.get('keyword')
+        #
+        if type_ in kwargs_:
+            name = kwargs_[type_]
+        else:
+            raise KeyError()
+        #
+        if MtdBasic._set_name_check_(name) is False:
+            return None
+        #
+        kwargs_['type'] = type_
+        kwargs_['keyword'] = keyword
+        kwargs_[type_] = name
+        #
+        obj_path, pattern, variants = self._get_obj_args_(
+            kwargs_,
+            extend_keys=['type', 'branch']
+        )
+        version = kwargs_['version']
+        obj_path = '{}/{}/{}'.format(obj_path, keyword, version)
+        if self._rsv_obj_stack.get_object_exists(obj_path) is True:
+            return self._rsv_obj_stack.get_object(obj_path)
+        return self._project__set_rsv_unit_version_create_(obj_path, pattern, **variants)
+
+    def _project__set_rsv_unit_version_create_(self, *args, **kwargs):
+        self.__set_workspace_kwargs_(kwargs)
+        #
+        matches = self.RSV_MATCHER_CLASS(
+            self, args[1], kwargs
+        ).get_matches()
+        if matches:
+            _, variants = matches[-1]
+            kwargs.update(variants)
+            rsv_obj = self.RSV_UNIT_VERSION_CLASS(self, *args, **kwargs)
+            self._project__set_rsv_obj_add_(rsv_obj)
+            return rsv_obj
+
+    def _unit__get_rsv_version_(self, **kwargs):
+        rsv_task = self.get_rsv_task(**kwargs)
+        if rsv_task is not None:
+            return rsv_task.get_rsv_version(**kwargs)
 
     def _get_rsv_obj_exists_(self, rsv_obj_path):
         return self._rsv_obj_stack.get_object_exists(rsv_obj_path)
@@ -2491,13 +2558,12 @@ class AbsResolver(
             )
         return None
 
-    def get_rsv_version(self, **kwargs):
+    def get_rsv_task_version(self, **kwargs):
         kwargs_ = self._get_rsv_kwargs_(**kwargs)
         if kwargs_:
             rsv_project = self.get_rsv_project(**kwargs_)
             if rsv_project:
-                return rsv_project.get_rsv_version(**kwargs_)
-
+                return rsv_project.get_rsv_task_version(**kwargs_)
     # = rsv_project.get_rsv_unit
     def get_rsv_unit(self, **kwargs):
         kwargs_ = self._get_rsv_kwargs_(**kwargs)

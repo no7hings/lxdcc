@@ -6,7 +6,7 @@ if __name__ == '__main__':
 
     rsv_project = r.get_rsv_project(project='lib')
 
-    rsv_version = rsv_project.get_rsv_versions(
+    rsv_version = rsv_project.get_rsv_task_versions(
         asset='ast_cjd_didi',
         workspace='publish',
         # step='srf',

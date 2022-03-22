@@ -750,7 +750,7 @@ class LxVariant(object):
         from lxkatana import ktn_core
         return ktn_core.NGObjOpt(self._ktn_obj).get_port_raw('variableName')
 
-    def _get_values_(self):
+    def _get_item_values_(self):
         from lxkatana import ktn_core
         ktn_port = ktn_core.NGObjOpt(self._ktn_obj).get_port('patterns')
         return [ktn_core.NGPortOpt(i).get() for i in ktn_core.NGObjOpt(ktn_port).get_children()]
@@ -758,7 +758,7 @@ class LxVariant(object):
     def set_variable_register(self):
         from lxkatana import ktn_core
         key = self._get_key_()
-        values = self._get_values_()
+        values = self._get_item_values_()
         ktn_core.VariablesSetting().set_register(
             key, values
         )

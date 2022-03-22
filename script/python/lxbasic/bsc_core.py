@@ -142,7 +142,7 @@ class ApplicationMtd(object):
             cls.get_is_maya,
             cls.get_is_houdini,
             cls.get_is_katana,
-            # cls.get_is_lynxi
+            cls.get_is_lynxi
         ]:
             if i_fnc() is True:
                 return True
@@ -153,7 +153,7 @@ class ApplicationMtd(object):
             (cls.get_is_maya, bsc_configure.Application.Maya),
             (cls.get_is_houdini, bsc_configure.Application.Houdini),
             (cls.get_is_katana, bsc_configure.Application.Katana),
-            # (cls.get_is_lynxi, bsc_configure.Application.Lynxi)
+            (cls.get_is_lynxi, bsc_configure.Application.Lynxi)
         ]:
             if i_fnc() is True:
                 return i_app
@@ -272,7 +272,11 @@ class SystemMtd(object):
     def get_debug_directory_path(cls, tag=None, create=False):
         date_tag = cls.get_date_tag()
         if cls.get_is_windows():
-            _ = '{}/debug/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
+            root = bsc_configure.UserDirectory.WINDOWS
+            if not root:
+                root = 'c:/temp/.lynxi'
+            #
+            _ = '{}/debug/{}'.format(root, date_tag)
         elif cls.get_is_linux():
             _ = '{}/debug/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)
         else:

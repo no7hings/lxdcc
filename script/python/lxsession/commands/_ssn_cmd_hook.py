@@ -153,6 +153,26 @@ def get_option_hook_args(option):
         )
 
 
+def get_option_hook_configure(option):
+    from lxbasic import bsc_core
+    #
+    import lxbasic.objects as bsc_objects
+    #
+    import lxutil.dcc.dcc_objects as utl_dcc_objects
+    #
+    from lxsession import ssn_configure
+    #
+    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    #
+    option_hook_key = option_opt.get('option_hook_key')
+    #
+    yaml_file_path = ssn_configure.OptionHooks.get_yaml_file(option_hook_key)
+    if yaml_file_path:
+        yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
+        if yaml_file.get_is_exists() is True:
+            return bsc_objects.Configure(value=yaml_file.path)
+
+
 def set_option_hook_execute(option):
     hook_args = get_option_hook_args(option)
     if hook_args is not None:

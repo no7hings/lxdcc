@@ -22,9 +22,13 @@ class UsdSetup(utl_abstract.AbsSetup):
         )
     @classmethod
     def set_environs_setup(cls):
-        bsc_core.EnvironMtd.set_add(
+        cls._set_environ_add_(
             'PXR_AR_DEFAULT_SEARCH_PATH',
             bsc_core.StoragePathMtd.set_map_to_platform('/l/prod')
+        )
+        cls._set_environ_add_(
+            'PXR_AR_DEFAULT_SEARCH_PATH',
+            bsc_core.StoragePathMtd.set_map_to_platform('/t/prod')
         )
 
 

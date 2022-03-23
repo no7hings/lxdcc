@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 from lxshotgun import stg_configure, stg_core
@@ -380,7 +382,6 @@ class StgConnector(object):
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
 
     def get_stg_version(self, **kwargs):
-        project = kwargs['project']
         if 'asset' in kwargs:
             branch = 'asset'
         elif 'shot' in kwargs:
@@ -452,6 +453,74 @@ class StgConnector(object):
             u'stg-version="{}"'.format(name)
         )
         return _
+
+    def get_stg_published_file_type(self, **kwargs):
+        file_type = kwargs['file_type']
+        _ = self._shotgun.find_one(
+            "PublishedFileType",
+            [
+                ['code', 'is', file_type]
+            ]
+        )
+        if _:
+            return _
+
+    def set_stg_published_file_create(self, **kwargs):
+        stg_project = self.get_stg_project(**kwargs)
+        stg_entity = self.get_stg_entity(**kwargs)
+        stg_task = self.get_stg_task(**kwargs)
+        stg_version = self.get_stg_version(**kwargs)
+        #
+        version = kwargs['version']
+        version_number = int(version[1:])
+        #
+        file_path = kwargs['file']
+        file_opt = bsc_core.StorageFileOpt(file_path)
+        file_name = file_opt.get_name()
+        file_ext = file_opt.get_ext()
+        if 'file_type' in kwargs:
+            file_type = kwargs['file_type']
+            stg_file_type = self.get_stg_published_file_type(
+                file_type=file_type
+            )
+        else:
+            if file_ext in ['.ma']:
+                stg_file_type = self.get_stg_published_file_type(
+                    file_type='Maya Ma'
+                )
+            else:
+                raise RuntimeError()
+        #
+        if file_opt.get_is_file() is True:
+            if stg_version:
+                _ = self._shotgun.create(
+                    'PublishedFile',
+                    {
+                        "path": {
+                            'local_path': file_path,
+                            'link_type': 'local',
+                            'name': file_name
+                        },
+                        "name": file_name,
+                        "code": file_name,
+                        "published_file_type": stg_file_type,
+                        "sg_status_list": "pub",
+                        "version": stg_version,
+                        "task": stg_task,
+                        "project": stg_project,
+                        "entity": stg_entity,
+                        "path_cache": bsc_core.StoragePathMtd.set_map_to_platform(file_path),
+                        "version_number": version_number,
+                     }
+                )
+                utl_core.Log.set_module_result_trace(
+                    'shotgun create',
+                    u'stg-published-file="{}"'.format(file_path)
+                )
+                return _
+
+    def get_stg_published_file(self, **kwargs):
+        pass
 
     def get_sgt_tag(self, tag_name):
         _ = self._shotgun.find_one(

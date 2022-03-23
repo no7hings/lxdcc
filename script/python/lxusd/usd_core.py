@@ -282,7 +282,7 @@ class UsdPrimOpt(object):
         return dic
 
     def get_parent_path(self):
-        print self._usd_prim.GetParent()
+        # print self._usd_prim.GetParent()
         return self.__class__(self._usd_prim.GetParent()).get_path()
 
     def get_child_paths(self):
@@ -389,7 +389,8 @@ class UsdGeometryOpt(object):
             )
             p.Set(dcc_value)
         else:
-            print dcc_type
+            pass
+            # print dcc_type
 
     def set_visible(self, boolean):
         p = self._usd_geometry.GetVisibilityAttr()

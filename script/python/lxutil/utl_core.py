@@ -456,6 +456,9 @@ class SubProcessRunner(object):
             )
         )
         t_0.start()
+    @classmethod
+    def set_run_with_result_use_log(cls):
+        pass
 
 
 class Icons(object):

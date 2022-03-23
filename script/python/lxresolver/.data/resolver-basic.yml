@@ -531,6 +531,8 @@ shot-manifest-scenegraph-usd-file: <shot-manifest-usd-dir>/scenegraph.usda
 shot-set-dir: <shot-no-version-dir>/manifest
 shot-set-usd-dir: <shot-set-dir>/usd
 shot-set-dress-usd-file: <shot-set-usd-dir>/<shot-name>.usda
+#
+shot-output-katana-render-movie-file: <shot-output-task-dir>/render_images/<shot-version-name>.mov
 # ******************************************************************************************************************** #
 # include-rule:
 #     key: list(str(variant), ...)

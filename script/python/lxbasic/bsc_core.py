@@ -1598,6 +1598,24 @@ class TextMtd(object):
         return re.sub(r'(\d)', '[0-9]', string)
 
 
+class DictMtd(object):
+    @classmethod
+    def get_as_json_style(cls, dict_):
+        return json.dumps(
+            dict_,
+            indent=4,
+            skipkeys=True,
+            sort_keys=True
+        )
+    @classmethod
+    def get_as_yaml_style(cls, dict_):
+        return OrderedYamlMtd.set_dump(
+            dict_,
+            indent=4,
+            default_flow_style=False
+        )
+
+
 class StrUnderlineOpt(object):
     def __init__(self, string):
         self._string = string

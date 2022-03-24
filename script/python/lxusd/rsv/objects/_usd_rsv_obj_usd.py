@@ -325,8 +325,9 @@ class RsvAssetSetUsdCreator(object):
             i_per_rsv_task = rsv_asset.get_rsv_task(
                 step=i_step, task=i_task
             )
-            i_set_registry_override = cls._get_asset_set_registry_override_(rsv_scene_properties, i_per_rsv_task)
-            configure.set('asset.version_override.{}'.format(i_key), i_set_registry_override)
+            if i_per_rsv_task is not None:
+                i_set_registry_override = cls._get_asset_set_registry_override_(rsv_scene_properties, i_per_rsv_task)
+                configure.set('asset.version_override.{}'.format(i_key), i_set_registry_override)
     @classmethod
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)

@@ -27,7 +27,17 @@ class UsdStageOpt(object):
             elif isinstance(args[0], (str, unicode)):
                 file_path = args[0]
                 if os.path.isfile(file_path) is True:
-                    stage = Usd.Stage.Open(args[0])
+                    utl_core.Log.set_module_result_trace(
+                        'usd-file open is started', 'file="{}"'.format(
+                            file_path
+                        )
+                    )
+                    stage = Usd.Stage.Open(file_path)
+                    utl_core.Log.set_module_result_trace(
+                        'usd-file open is completed', 'file="{}"'.format(
+                            file_path
+                        )
+                    )
                 else:
                     raise OSError()
             else:
@@ -244,6 +254,21 @@ class UsdStageOpt(object):
 
         get_fnc_('/', 0)
         return lis
+
+
+class UsdFileOpt(object):
+    def __init__(self, file_path, location=None):
+        usd_stage_mask = Usd.StagePopulationMask()
+        usd_stage_mask.Add(
+            Sdf.Path(location)
+        )
+        self._usd_stage = Usd.Stage.OpenMasked(
+            file_path, usd_stage_mask
+        )
+
+    def get_usd_instance(self):
+        return self._usd_stage
+    usd_instance = property(get_usd_instance)
 
 
 class UsdStageDataOpt(object):

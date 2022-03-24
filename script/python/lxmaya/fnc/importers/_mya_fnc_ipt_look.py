@@ -656,7 +656,7 @@ class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
 
     def _set_obj_connections_create_(self):
         for atr_path_src, atr_path_tgt in self._connections:
-            obj_path_src, port_path_src = bsc_core.AtrPathOpt(atr_path_src).to_args()
+            obj_path_src, port_path_src = bsc_core.DccAttrPathOpt(atr_path_src).to_args()
             if obj_path_src in self._name_dict:
                 obj_path_src = self._name_dict[obj_path_src]
             atr_path_src = bsc_core.AtrPathMtd.get_atr_path(obj_path_src, port_path_src)

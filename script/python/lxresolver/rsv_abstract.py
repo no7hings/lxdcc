@@ -782,6 +782,9 @@ class AbsRsvDef(object):
             return fnmatch.filter(_, regex)
         return _
 
+    def get_has_pattern(self, keyword):
+        return keyword in self._patterns_dict
+
     def get_pattern(self, keyword):
         if keyword not in self._patterns_dict:
             raise KeyError(u'keyword: "{}" is Non-registered'.format(keyword))
@@ -1213,28 +1216,29 @@ class AbsRsvTask(
                     j_keyword = j_keyword_format.format(
                         **dict(branch=branch, application=i_application)
                     )
-                    j_rsv_unit = self.get_rsv_unit(
-                        keyword=j_keyword,
-                        application=i_application
-                    )
-                    j_rsv_properties = j_rsv_unit.get_properties(file_path)
-                    if j_rsv_properties:
-                        j_rsv_properties.set('keyword', j_keyword)
-                        j_rsv_properties.set('scene_type', scene_type)
+                    if self.get_rsv_project().get_has_pattern(j_keyword):
+                        j_rsv_unit = self.get_rsv_unit(
+                            keyword=j_keyword,
+                            application=i_application
+                        )
+                        j_rsv_properties = j_rsv_unit.get_properties(file_path)
+                        if j_rsv_properties:
+                            j_rsv_properties.set('keyword', j_keyword)
+                            j_rsv_properties.set('scene_type', scene_type)
 
-                        j_rsv_properties.set('branch', branch)
-                        j_rsv_properties.set('application', i_application)
-                        #
-                        j_rsv_properties.set('extra.file', file_path)
-                        j_rsv_properties.set('extra.user', utl_core.System.get_user_name())
-                        j_rsv_properties.set('extra.time_tag', utl_core.System.get_time_tag())
-                        #
-                        j_rsv_properties.set('dcc.root', '/master')
-                        j_rsv_properties.set('dcc.root_name', 'master')
-                        j_rsv_properties.set('dcc.sub_root', '/master/hi')
-                        #
-                        j_rsv_properties.set('dcc.pathsep', rsv_configure.Application.get_pathsep(i_application))
-                        return j_rsv_properties
+                            j_rsv_properties.set('branch', branch)
+                            j_rsv_properties.set('application', i_application)
+                            #
+                            j_rsv_properties.set('extra.file', file_path)
+                            j_rsv_properties.set('extra.user', utl_core.System.get_user_name())
+                            j_rsv_properties.set('extra.time_tag', utl_core.System.get_time_tag())
+                            #
+                            j_rsv_properties.set('dcc.root', '/master')
+                            j_rsv_properties.set('dcc.root_name', 'master')
+                            j_rsv_properties.set('dcc.sub_root', '/master/hi')
+                            #
+                            j_rsv_properties.set('dcc.pathsep', rsv_configure.Application.get_pathsep(i_application))
+                            return j_rsv_properties
     # ================================================================================================================ #
     def get_rsv_project(self):
         return self._rsv_project

@@ -1841,7 +1841,7 @@ class CmdPortOpt(object):
             sourceFromDestination=1
         )
         if _:
-            a = bsc_core.AtrPathOpt(_)
+            a = bsc_core.DccAttrPathOpt(_)
             obj_path = a.obj_path
             port_path = a.port_path
             return self.PATHSEP.join(

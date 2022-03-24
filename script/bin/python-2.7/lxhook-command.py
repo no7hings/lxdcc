@@ -78,7 +78,10 @@ def __set_hook_run(option):
         #
         packages = session.get_rez_extend_packages()
         #
-        cmd = 'rez-env lxdcc {} -- lxhook-python -o "{}"'.format('' .join(packages), option)
+        if packages:
+            cmd = 'rez-env lxdcc {} -- lxhook-python -o "{}"'.format('' .join(packages), option)
+        else:
+            cmd = 'rez-env lxdcc -- lxhook-python -o "{}"'.format(option)
         # run cmd by subprocess
         utl_core.SubProcessRunner.set_run_with_result_use_thread(
             cmd

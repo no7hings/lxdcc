@@ -4,7 +4,13 @@ from lxsession.objects import ssn_obj_abs
 from lxsession.objects import _ssn_obj_executor
 
 
-class GuiSession(ssn_obj_abs.AbsGuiSession):
+class OptionGuiSession(ssn_obj_abs.AbsSsnOptionGui):
+    EXECUTOR = _ssn_obj_executor.HookExecutor
+    def __init__(self, *args, **kwargs):
+        super(OptionGuiSession, self).__init__(*args, **kwargs)
+
+
+class GuiSession(ssn_obj_abs.AbsSsnGui):
     EXECUTOR = _ssn_obj_executor.HookExecutor
     def __init__(self, *args, **kwargs):
         super(GuiSession, self).__init__(*args, **kwargs)

@@ -990,21 +990,36 @@ class SubProcessMtd(object):
     else:
         NO_WINDOW = None
     #
+    ENVIRON_MARK = os.environ
+    #
     def __init__(self):
         pass
     @classmethod
-    def set_run_with_result_in_windows(cls, cmd):
+    def set_run_with_result_in_windows(cls, cmd, clear_environ=False):
         cmd = cmd.replace("&", "^&")
         #
-        sp = subprocess.Popen(
-            cmd,
-            shell=True,
-            # close_fds=True,
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            startupinfo=cls.NO_WINDOW
-        )
+        if clear_environ is True:
+            sp = subprocess.Popen(
+                cmd,
+                shell=True,
+                # close_fds=True,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                startupinfo=cls.NO_WINDOW,
+                # env=cls.ENVIRON_MARK
+            )
+        else:
+            sp = subprocess.Popen(
+                cmd,
+                shell=True,
+                # close_fds=True,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                startupinfo=cls.NO_WINDOW,
+            )
+        #
         while True:
             next_line = sp.stdout.readline()
             #
@@ -1025,16 +1040,29 @@ class SubProcessMtd(object):
         #
         sp.stdout.close()
     @classmethod
-    def set_run_with_result_in_linux(cls, cmd):
-        sp = subprocess.Popen(
-            cmd,
-            shell=True,
-            # close_fds=True,
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            startupinfo=cls.NO_WINDOW
-        )
+    def set_run_with_result_in_linux(cls, cmd, clear_environ=False):
+        if clear_environ is True:
+            sp = subprocess.Popen(
+                cmd,
+                shell=True,
+                # close_fds=True,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                startupinfo=cls.NO_WINDOW,
+                # env=cls.ENVIRON_MARK
+            )
+        else:
+            sp = subprocess.Popen(
+                cmd,
+                shell=True,
+                # close_fds=True,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                startupinfo=cls.NO_WINDOW
+            )
+        #
         while True:
             next_line = sp.stdout.readline()
             #
@@ -1056,11 +1084,11 @@ class SubProcessMtd(object):
         #
         sp.stdout.close()
     @classmethod
-    def set_run_with_result(cls, cmd):
+    def set_run_with_result(cls, cmd, clear_environ=False):
         if SystemMtd.get_is_windows():
-            cls.set_run_with_result_in_windows(cmd)
+            cls.set_run_with_result_in_windows(cmd, clear_environ)
         elif SystemMtd.get_is_linux():
-            cls.set_run_with_result_in_linux(cmd)
+            cls.set_run_with_result_in_linux(cmd, clear_environ)
     @classmethod
     def set_run(cls, cmd):
         _sp = subprocess.Popen(
@@ -1790,7 +1818,7 @@ class AtrPathMtd(object):
         return port_pathsep.join([obj_path, port_path])
 
 
-class AtrPathOpt(object):
+class DccAttrPathOpt(object):
     def __init__(self, atr_path, port_pathsep='.'):
         self._path = atr_path
         self._port_pathsep = port_pathsep

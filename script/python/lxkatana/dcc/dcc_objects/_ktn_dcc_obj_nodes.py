@@ -201,7 +201,7 @@ class AbsTextureReferences(object):
             return e
     @classmethod
     def _set_real_file_path_by_atr_path_(cls, atr_path, file_path):
-        atr_path_opt = bsc_core.AtrPathOpt(atr_path)
+        atr_path_opt = bsc_core.DccAttrPathOpt(atr_path)
         obj_path, port_path = atr_path_opt.obj_path, atr_path_opt.port_path
         obj_path_opt = bsc_core.DccPathDagOpt(obj_path)
         obj_name = obj_path_opt.name

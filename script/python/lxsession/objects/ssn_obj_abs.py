@@ -12,7 +12,39 @@ from lxutil import utl_core
 import lxshotgun.objects as stg_objects
 
 
-class AbsSsnObj(object):
+class AbsSsnGuiDef(object):
+    @property
+    def configure(self):
+        raise NotImplementedError()
+
+    def _set_gui_def_init_(self):
+        self._gui_configure = self.configure.get_content(
+            'option.gui'
+        )
+
+    def get_gui_configure(self):
+        return self._gui_configure
+    gui_configure = property(get_gui_configure)
+    @property
+    def gui_group_name(self):
+        return self._gui_configure.get(
+            'group_name'
+        )
+    @property
+    def gui_name(self):
+        return self._gui_configure.get(
+            'name'
+        )
+    @property
+    def gui_icon_name(self):
+        return self._gui_configure.get(
+            'icon_name'
+        )
+
+
+class AbsSsnObj(
+    AbsSsnGuiDef
+):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
     def __init__(self, *args, **kwargs):
@@ -46,13 +78,6 @@ class AbsSsnObj(object):
         #
         self._configure.set_flatten()
         #
-        self._gui_name = self._configure.get(
-            'option.gui.name'
-        )
-        self._gui_icon_name = self._configure.get(
-            'option.gui.icon_name'
-        )
-        #
         self._user = bsc_core.SystemMtd.get_user_name()
         self._platform = bsc_core.SystemMtd.get_platform()
         self._application = bsc_core.SystemMtd.get_application()
@@ -68,6 +93,8 @@ class AbsSsnObj(object):
         #
         self._hook_python_file = None
         self._hook_yaml_file = None
+
+        self._set_gui_def_init_()
 
     def get_type(self):
         return self._type
@@ -103,13 +130,6 @@ class AbsSsnObj(object):
     @property
     def system_includes(self):
         return self._system_includes
-    # gui
-    @property
-    def gui_name(self):
-        return self._gui_name
-    @property
-    def gui_icon_name(self):
-        return self._gui_icon_name
     @property
     def variants(self):
         return self._variants
@@ -261,33 +281,20 @@ class AbsSsnRsvUnitDef(object):
         return self._rsv_unit_extend_variants
 
 
-class AbsSsnGuiDef(object):
-    def _set_gui_def_init_(self, configure):
-        self._gui_group_name = configure.get(
-            'option.gui.group_name'
-        )
-    @property
-    def gui_group_name(self):
-        return self._gui_group_name
-
-
 class AbsSsnRsvObjAction(
     AbsSsnRsvObj,
-    AbsSsnGuiDef,
     AbsSsnShotgunDef
 ):
     def __init__(self, *args, **kwargs):
         super(AbsSsnRsvObjAction, self).__init__(*args, **kwargs)
         #
         if self.get_is_loadable():
-            self._set_gui_def_init_(self._configure)
             self._set_shotgun_def_init_()
 
 
 class AbsSsnRsvUnitAction(
     AbsSsnRsvObj,
     AbsSsnRsvUnitDef,
-    AbsSsnGuiDef,
     AbsSsnShotgunDef
 ):
     def __init__(self, *args, **kwargs):
@@ -296,7 +303,6 @@ class AbsSsnRsvUnitAction(
         rsv_obj = args[0]
         if self.get_is_loadable():
             self._set_rsv_unit_def_init_(rsv_obj, self._configure)
-            self._set_gui_def_init_(self._configure)
             self._set_shotgun_def_init_()
 
     def get_is_executable(self):
@@ -311,7 +317,7 @@ class AbsSsnRsvUnitAction(
         return False
 
 
-class AbsExecuteDef(object):
+class AbsSsnRsvOptionExecuteDef(object):
     EXECUTOR = None
     @classmethod
     def _get_rsv_task_version_(cls, rsv_task_properties):
@@ -360,9 +366,9 @@ class AbsToolPanelSession(AbsSsnObj):
         super(AbsToolPanelSession, self).__init__(*args, **kwargs)
 
 
-class AbsGuiSession(
+class AbsSsnOptionGui(
     AbsSsnObj,
-    AbsExecuteDef
+    AbsSsnRsvOptionExecuteDef
 ):
     def __init__(self, *args, **kwargs):
         if 'option' in kwargs:
@@ -372,7 +378,7 @@ class AbsGuiSession(
         else:
             self._option_opt = None
         #
-        super(AbsGuiSession, self).__init__(*args, **kwargs)
+        super(AbsSsnOptionGui, self).__init__(*args, **kwargs)
         #
         if self._option_opt is not None:
             self.__set_option_completion_()
@@ -396,6 +402,13 @@ class AbsGuiSession(
     option = property(get_option)
 
 
+class AbsSsnGui(
+    AbsSsnObj
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnGui, self).__init__(*args, **kwargs)
+
+
 class AbsSsnOptionDef(object):
     def _set_option_def_init_(self, option):
         self._option_opt = bsc_core.KeywordArgumentsOpt(
@@ -413,14 +426,11 @@ class AbsSsnOptionDef(object):
 
 class AbsSsnOptionAction(
     AbsSsnObj,
-    AbsSsnGuiDef,
     AbsSsnOptionDef
 ):
     def __init__(self, *args, **kwargs):
         self._set_option_def_init_(kwargs.pop('option'))
         super(AbsSsnOptionAction, self).__init__(*args, **kwargs)
-        #
-        self._set_gui_def_init_(self._configure)
 
 
 class AbsSsnShellExecuteDef(object):
@@ -457,15 +467,12 @@ class AbsSsnShellExecuteDef(object):
 
 class AbsSsnOptionToolPanel(
     AbsSsnObj,
-    AbsSsnGuiDef,
     AbsSsnOptionDef,
     AbsSsnShellExecuteDef
 ):
     def __init__(self, *args, **kwargs):
         self._set_option_def_init_(kwargs.pop('option'))
         super(AbsSsnOptionToolPanel, self).__init__(*args, **kwargs)
-        #
-        self._set_gui_def_init_(self._configure)
         #
         self._set_shell_execute_def_init_(self._configure)
 
@@ -474,7 +481,7 @@ class AbsSsnOptionToolPanel(
 class AbsOptionMethodSession(
     AbsSsnObj,
     AbsSsnOptionDef,
-    AbsExecuteDef
+    AbsSsnRsvOptionExecuteDef
 ):
     def __init__(self, *args, **kwargs):
         self._set_option_def_init_(kwargs.pop('option'))

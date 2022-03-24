@@ -416,13 +416,13 @@ class SubProcessRunner(object):
     def __init__(self):
         pass
     @classmethod
-    def set_run_with_result(cls, cmd):
+    def set_run_with_result(cls, cmd, clear_environ=False):
         Log.set_module_result_trace(
             'sub-progress run with result',
             u'command=`{}` is started'.format(cmd)
         )
         bsc_core.SubProcessMtd.set_run_with_result(
-            cmd
+            cmd, clear_environ
         )
         # Log.set_module_result_trace(
         #     'sub-progress run with result',
@@ -448,11 +448,12 @@ class SubProcessRunner(object):
         w.set_process_cmd(cmd)
         w.set_process_start()
     @classmethod
-    def set_run_with_result_use_thread(cls, cmd):
+    def set_run_with_result_use_thread(cls, cmd, clear_environ=False):
         t_0 = threading.Thread(
             target=functools.partial(
                 cls.set_run_with_result,
-                cmd=cmd
+                cmd=cmd,
+                clear_environ=clear_environ
             )
         )
         t_0.start()
@@ -858,6 +859,7 @@ class Path(object):
 
 
 class AppLauncher(object):
+    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_user_directory_path())
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
     #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
@@ -872,9 +874,13 @@ class AppLauncher(object):
             project: <project-name>
             application: <application-name>
         """
-        self._root = Path.set_map_to_platform(self.SERVER_ROOT)
+        if bsc_core.StoragePathOpt(self.LOCAL_ROOT).get_is_exists():
+            self._root = Path.set_map_to_platform(self.LOCAL_ROOT)
+        else:
+            self._root = Path.set_map_to_platform(self.SERVER_ROOT)
+        #
         self._kwargs = dict(
-            root=Path.set_map_to_platform(self.SERVER_ROOT),
+            root=self._root,
             project=kwargs['project'],
             application=kwargs['application']
         )
@@ -904,7 +910,7 @@ class AppLauncher(object):
     @classmethod
     def _set_run_with_result_use_thread_(cls, *args):
         SubProcessRunner.set_run_with_result_use_thread(
-            ' '.join(['rez-env'] + list(args))
+            ' '.join(['rez-env'] + list(args)), clear_environ=True
         )
 
     def get_rez_packages(self):

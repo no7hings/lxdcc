@@ -24,9 +24,14 @@ class MayaMenuSetup(utl_gui_qt_core.AsbQtMenuSetup):
                 'menu-add',
                 u'menu="{}"'.format(name)
             )
+            qt_menu.setTearOffEnabled(True)
             return qt_menu
 
     def set_setup(self):
         self.set_menu_build_by_configure(
             utl_configure.MayaMenuData.get_as_configure('main')
         )
+
+        import lxsession.commands as ssn_commands
+
+        ssn_commands.set_hook_execute('dcc-menus/gen-maya')

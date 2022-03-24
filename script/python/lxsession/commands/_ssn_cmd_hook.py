@@ -39,13 +39,26 @@ def get_hook_args(key):
                     configure=configure
                 )
             elif type_name == 'kit-panel':
-                session = ssn_objects.GuiSession(
+                session = ssn_objects.OptionGuiSession(
                     type=type_name,
                     hook=key,
                     configure=configure
                 )
             elif type_name == 'rsv-loader':
                 session = gui_objects.RsvLoaderSession(
+                    type=type_name,
+                    hook=key,
+                    configure=configure
+                )
+            #
+            elif type_name == 'dcc-menu':
+                session = ssn_objects.GuiSession(
+                    type=type_name,
+                    hook=key,
+                    configure=configure
+                )
+            elif type_name == 'dcc-tool-panel':
+                session = ssn_objects.GuiSession(
                     type=type_name,
                     hook=key,
                     configure=configure
@@ -132,7 +145,7 @@ def get_option_hook_args(option):
                     option=option_opt.to_string()
                 )
             elif type_name == 'kit-panel':
-                session = ssn_objects.GuiSession(
+                session = ssn_objects.OptionGuiSession(
                     type=type_name,
                     hook=hook_key,
                     configure=configure,

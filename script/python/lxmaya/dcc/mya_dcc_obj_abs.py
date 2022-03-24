@@ -177,7 +177,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
             sourceFromDestination=1
         )
         if _:
-            a = bsc_core.AtrPathOpt(_)
+            a = bsc_core.DccAttrPathOpt(_)
             obj_path = a.obj_path
             port_path = a.port_path
             return self.obj.__class__(obj_path).get_port(port_path)
@@ -203,7 +203,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
             destinationFromSource=1
         ) or []
         for i in _:
-            a = bsc_core.AtrPathOpt(i)
+            a = bsc_core.DccAttrPathOpt(i)
             i_obj_path = a.obj_path
             i_port_path = a.port_path
             lis.append(

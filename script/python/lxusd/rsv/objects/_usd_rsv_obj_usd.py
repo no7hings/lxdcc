@@ -5,7 +5,7 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxutil import utl_configure
+from lxutil import utl_configure, utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -30,6 +30,12 @@ class RsvAssetSetUsdCreator(object):
         'grm': 'groom',
         'rig': 'rig',
         'srf': 'surface',
+    }
+    VARIANT_MAPPER = {
+        'modeling': 'mod',
+        'groom': 'groom',
+        'rigging': 'rig',
+        'surfacing': 'surface'
     }
     VARIANTS = {
         'modeling': 'variants.asset_version.model',
@@ -303,6 +309,11 @@ class RsvAssetSetUsdCreator(object):
                             step_ = cls.STEP_MAPPER[step]
                             if i_variant_set_name == '{}_override'.format(step_):
                                 i_current_variant_name = i_variant_names[-1]
+                    else:
+                        if step in cls.STEP_MAPPER:
+                            step_ = cls.VARIANT_MAPPER[i_variant_set_name]
+                            if step == step_:
+                                i_current_variant_name = 'None'
                     #
                     c.set(
                         '{}.variant_name'.format(i_variant_set_name),
@@ -327,7 +338,9 @@ class RsvAssetSetUsdCreator(object):
             )
             if i_per_rsv_task is not None:
                 i_set_registry_override = cls._get_asset_set_registry_override_(rsv_scene_properties, i_per_rsv_task)
-                configure.set('asset.version_override.{}'.format(i_key), i_set_registry_override)
+                configure.set(
+                    'asset.version_override.{}'.format(i_key), i_set_registry_override
+                )
     @classmethod
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)

@@ -41,6 +41,9 @@ class AbsSsnGuiDef(object):
             'icon_name'
         )
 
+    def get_is_visible(self):
+        return True
+
 
 class AbsSsnObj(
     AbsSsnGuiDef
@@ -151,7 +154,9 @@ class AbsSsnObj(
         pass
 
     def set_execute(self):
-        pass
+        self._set_file_execute_(
+            self._hook_python_file, dict(session=self)
+        )
 
     def _set_post_run_(self):
         pass
@@ -271,6 +276,9 @@ class AbsSsnRsvUnitDef(object):
                 keyword=keyword
             )
     @property
+    def rsv_task(self):
+        return self._rsv_unit.get_rsv_task()
+    @property
     def rsv_unit(self):
         return self._rsv_unit
     @property
@@ -305,8 +313,27 @@ class AbsSsnRsvUnitAction(
             self._set_rsv_unit_def_init_(rsv_obj, self._configure)
             self._set_shotgun_def_init_()
 
+    def get_is_visible(self):
+        if self.rsv_unit is not None:
+            step_includes = self.configure.get(
+                'resolver.step_includes'
+            )
+            if step_includes:
+                step = self.rsv_unit.get('step')
+                if step not in step_includes:
+                    return False
+        return True
+
     def get_is_executable(self):
         if self.rsv_unit is not None:
+            step_includes = self.configure.get(
+                'resolver.step_includes'
+            )
+            if step_includes:
+                step = self.rsv_unit.get('step')
+                if step not in step_includes:
+                    return False
+            #
             result = self.rsv_unit.get_result(
                 version=self.rsv_unit_version,
                 extend_variants=self.rsv_unit_extend_variants

@@ -149,7 +149,7 @@ class RsvEntitiesPanel(utl_gui_pnl_abs_resolver.AbsEntitiesLoaderPanel):
             )
             if i_args:
                 i_session, i_execute_fnc = i_args
-                if i_session.get_is_loadable() is True:
+                if i_session.get_is_loadable() is True and i_session.get_is_visible() is True:
                     i_group_name = i_session.gui_group_name
                     if i_group_name:
                         content.set(

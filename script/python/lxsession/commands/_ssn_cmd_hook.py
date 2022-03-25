@@ -67,8 +67,8 @@ def get_hook_args(key):
                 raise TypeError()
             #
             if session is not None:
-                session.set_hook_python_file(python_file_path)
-                session.set_hook_yaml_file(yaml_file_path)
+                session.set_hook_yaml_file(yaml_file.path)
+                session.set_hook_python_file(python_file.path)
                 return session, execute_fnc
 
 

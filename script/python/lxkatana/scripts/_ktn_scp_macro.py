@@ -817,14 +817,14 @@ class LxLight(object):
             if rsv_asset is not None:
                 pass
             else:
-                content = 'asset="{}" is not available'.format(rsv_asset_path)
+                content = u'asset="{}" is not available'.format(rsv_asset_path)
         else:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
             rsv_task = resolver.get_rsv_task_by_file_path(file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_entity()
             else:
-                content = 'file="{}" is not available'.format(file_path)
+                content = u'file="{}" is not available'.format(file_path)
 
         if rsv_asset is not None:
             self.__set_rsv_asset_(rsv_asset)

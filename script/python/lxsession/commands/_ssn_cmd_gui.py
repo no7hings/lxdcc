@@ -113,8 +113,13 @@ def get_menu_content_by_hooks(hooks):
                     '{}.properties.name'.format(i_gui_path), i_gui_configure.get('name')
                 )
                 content.set(
-                    '{}.properties.icon_name'.format(i_gui_path), i_session.gui_icon_name
+                    '{}.properties.icon_name'.format(i_gui_path), i_gui_configure.get('icon_name')
                 )
+                if 'gui_icon_name' in i_hook_option:
+                    content.set(
+                        '{}.properties.icon_name'.format(i_gui_path), i_hook_option.get('gui_icon_name')
+                    )
+                #
                 content.set(
                     '{}.properties.executable_fnc'.format(i_gui_path), i_session.get_is_executable
                 )

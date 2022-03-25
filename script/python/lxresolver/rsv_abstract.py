@@ -195,15 +195,15 @@ class MtdBasic(object):
                 return [glob_pattern]
         return []
     @classmethod
-    def _set_name_check_(cls, name):
+    def _set_name_check_(cls, type_, name):
         _ = re.findall(
             r'[^a-zA-Z0-9_]',
             name
         )
         if _:
             utl_core.Log.set_module_warning_trace(
-                'name-check',
-                u'name="{}" is not available'.format(name)
+                'name check',
+                u'{}-name="{}" is not available'.format(type_, name)
             )
             return False
         return True
@@ -1669,7 +1669,7 @@ class AbsRsvProject(
             name = '*'
             # raise KeyError()
         #
-        if MtdBasic._set_name_check_(name) is False:
+        if MtdBasic._set_name_check_(type_, name) is False:
             return None
         # type
         kwargs_['type'] = type_
@@ -1761,7 +1761,7 @@ class AbsRsvProject(
         else:
             raise KeyError()
         #
-        if MtdBasic._set_name_check_(name) is False:
+        if MtdBasic._set_name_check_(type_, name) is False:
             return None
         # type
         kwargs_['type'] = type_
@@ -1953,7 +1953,7 @@ class AbsRsvProject(
         else:
             raise KeyError()
         #
-        if MtdBasic._set_name_check_(name) is False:
+        if MtdBasic._set_name_check_(type_, name) is False:
             return None
         #
         kwargs_['type'] = type_
@@ -2068,7 +2068,7 @@ class AbsRsvProject(
         else:
             raise KeyError()
         #
-        if MtdBasic._set_name_check_(name) is False:
+        if MtdBasic._set_name_check_(type_, name) is False:
             return None
         #
         kwargs_['type'] = type_
@@ -2148,7 +2148,7 @@ class AbsRsvProject(
         else:
             raise KeyError()
         #
-        if MtdBasic._set_name_check_(name) is False:
+        if MtdBasic._set_name_check_(type_, name) is False:
             return None
         #
         kwargs_['type'] = type_

@@ -31,7 +31,6 @@ class MayaMenuSetup(utl_gui_qt_core.AsbQtMenuSetup):
         self.set_menu_build_by_configure(
             utl_configure.MayaMenuData.get_as_configure('main')
         )
-
+        #
         import lxsession.commands as ssn_commands
-
-        ssn_commands.set_hook_execute('dcc-menus/gen-maya')
+        ssn_commands.set_hook_execute('dcc-menus/gen-menu')

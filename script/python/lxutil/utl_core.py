@@ -1857,3 +1857,13 @@ class Resources(object):
                 )
                 if i_results:
                     return i_results[0]
+    @classmethod
+    def get_all(cls, sub_key):
+        for i_path in cls.get_search_paths():
+            i_path_opt = bsc_core.StoragePathOpt(i_path)
+            if i_path_opt.get_is_exists() is True:
+                i_glob_pattern = '{}/{}'.format(i_path_opt.path, sub_key)
+                i_results = Path._get_stg_paths_by_parse_pattern_(
+                    i_glob_pattern
+                )
+                return i_results

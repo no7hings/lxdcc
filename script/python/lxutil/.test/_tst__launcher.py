@@ -2,7 +2,12 @@
 from lxutil import utl_core
 
 print utl_core.AppLauncher(
-    project='default',
+    project='xkt',
+    application='maya'
+).get_run_cmd('')
+
+print utl_core.AppLauncher(
+    project='cgm',
     application='maya'
 ).get_run_cmd('')
 

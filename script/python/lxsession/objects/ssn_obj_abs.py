@@ -45,8 +45,17 @@ class AbsSsnGuiDef(object):
         return True
 
 
+class AbsSsnRezDef(object):
+    def _set_rez_def_init_(self):
+        self._rez_beta = bsc_core.EnvironMtd.get('REZ_BETA')
+
+    def get_rez_beta(self):
+        return self._rez_beta
+
+
 class AbsSsnObj(
-    AbsSsnGuiDef
+    AbsSsnRezDef,
+    AbsSsnGuiDef,
 ):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
@@ -97,6 +106,7 @@ class AbsSsnObj(
         self._hook_python_file = None
         self._hook_yaml_file = None
 
+        self._set_rez_def_init_()
         self._set_gui_def_init_()
 
     def get_type(self):

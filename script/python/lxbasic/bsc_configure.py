@@ -23,8 +23,8 @@ class Root(object):
 class UserDirectory(object):
     user_name = getpass.getuser()
     WINDOWS = '{}/{}/.lynxi'.format(
-        os.environ.get('HOMEDRIVE'),
-        os.environ.get('HOMEPATH')
+        os.environ.get('HOMEDRIVE', 'c:'),
+        os.environ.get('HOMEPATH', '/temp')
     ).replace('\\', '/')
     LINUX = '{}/.lynxi'.format(
         os.environ.get('HOME')

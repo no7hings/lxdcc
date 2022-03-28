@@ -552,6 +552,26 @@ workspace:
                         - <.input>
                         - <.output>
                         - <.....look_pass_switch.main.path>.<..key>
+                white:
+                    path: <option.root>/<..key>__look
+                    obj_category: node
+                    obj_type: lx_look_pass
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*2
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        look/scheme: white
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <.....look_pass_switch.main.path>.<..key>
     # camera
     # y=-6.0
     cameras:

@@ -652,3 +652,22 @@ class AbsKtnFileReferenceObj(
 
     def get_is_multiply_reference(self):
         return False
+
+
+class AbsSGKtnObj(utl_abstract.AbsDccObj):
+    def __init__(self, path):
+        pass
+
+    @property
+    def type(self):
+        return ''
+
+    @property
+    def icon(self):
+        pass
+
+    def get_is_file_reference(self):
+        pass
+
+    def get_is_exists(self):
+        pass

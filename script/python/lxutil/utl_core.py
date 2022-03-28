@@ -1503,7 +1503,7 @@ class RvLauncher(object):
             if bins:
                 run_args += [
                     '--',
-                    '"{}"'.format(bins[0]),
+                    '"{}"'.format('pgrv'),
                     '"{}"'.format(file_path)
                 ]
             else:

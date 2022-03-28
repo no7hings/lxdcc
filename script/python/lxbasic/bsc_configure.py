@@ -27,7 +27,7 @@ class UserDirectory(object):
         os.environ.get('HOMEPATH', '/temp')
     ).replace('\\', '/')
     LINUX = '{}/.lynxi'.format(
-        os.environ.get('HOME')
+        os.environ.get('HOME', '/temp')
     )
 
 

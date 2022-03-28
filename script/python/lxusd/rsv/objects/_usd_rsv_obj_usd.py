@@ -311,9 +311,10 @@ class RsvAssetSetUsdCreator(object):
                                 i_current_variant_name = i_variant_names[-1]
                     else:
                         if step in cls.STEP_MAPPER:
-                            step_ = cls.VARIANT_MAPPER[i_variant_set_name]
-                            if step == step_:
-                                i_current_variant_name = 'None'
+                            if i_variant_set_name in cls.VARIANT_MAPPER:
+                                step_ = cls.VARIANT_MAPPER[i_variant_set_name]
+                                if step == step_:
+                                    i_current_variant_name = 'None'
                     #
                     c.set(
                         '{}.variant_name'.format(i_variant_set_name),

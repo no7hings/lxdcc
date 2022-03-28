@@ -273,9 +273,6 @@ class SystemMtd(object):
         date_tag = cls.get_date_tag()
         if cls.get_is_windows():
             root = bsc_configure.UserDirectory.WINDOWS
-            if not root:
-                root = 'c:/temp/.lynxi'
-            #
             _ = '{}/debug/{}'.format(root, date_tag)
         elif cls.get_is_linux():
             _ = '{}/debug/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)

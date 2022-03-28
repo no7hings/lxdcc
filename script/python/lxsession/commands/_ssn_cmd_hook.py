@@ -15,8 +15,6 @@ def get_hook_args(key):
     #
     import lxsession.objects as ssn_objects
     #
-    import lxgui.objects as gui_objects
-    #
     yaml_file_path = ssn_configure.Hooks.get_yaml_file(key)
     if yaml_file_path:
         python_file_path = ssn_configure.Hooks.get_python_file(key)
@@ -33,7 +31,7 @@ def get_hook_args(key):
                     configure=configure
                 )
             elif type_name == 'tool-panel':
-                session = gui_objects.ToolPanelSession(
+                session = ssn_objects.GuiSession(
                     type=type_name,
                     hook=key,
                     configure=configure
@@ -45,7 +43,13 @@ def get_hook_args(key):
                     configure=configure
                 )
             elif type_name == 'rsv-loader':
-                session = gui_objects.RsvLoaderSession(
+                session = ssn_objects.GuiSession(
+                    type=type_name,
+                    hook=key,
+                    configure=configure
+                )
+            elif type_name == 'rsv-loader-test':
+                session = ssn_objects.GuiSession(
                     type=type_name,
                     hook=key,
                     configure=configure

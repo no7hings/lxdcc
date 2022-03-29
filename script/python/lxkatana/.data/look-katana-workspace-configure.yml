@@ -373,7 +373,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    parameters:
+                    arnold_parameters:
                         smoothing: True
                         subdiv_type: catclark
                         subdiv_iterations: 2
@@ -406,7 +406,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    parameters:
+                    arnold_parameters:
                         smoothing: True
                         subdiv_type: catclark
                         subdiv_iterations: 3
@@ -427,7 +427,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    parameters:
+                    arnold_parameters:
                         opaque: False
                     insert_scheme: TB
                     insert_connections:
@@ -443,7 +443,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    parameters:
+                    arnold_parameters:
                         sss_setname: sss
                     insert_scheme: TB
                     insert_connections:

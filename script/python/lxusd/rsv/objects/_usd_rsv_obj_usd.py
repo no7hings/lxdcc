@@ -22,6 +22,7 @@ class RsvAssetSetUsdCreator(object):
     ASSET_OVERRIDE_VARIANTS = {
         ('mod', 'modeling', 'model'),
         ('grm', 'groom', 'groom'),
+        ('efx', 'effects', 'effect'),
         ('rig', 'rigging', 'rig'),
         ('srf', 'surfacing', 'surface'),
     }
@@ -29,13 +30,15 @@ class RsvAssetSetUsdCreator(object):
         'mod': 'model',
         'grm': 'groom',
         'rig': 'rig',
+        'effect': 'efx',
         'srf': 'surface',
     }
     VARIANT_MAPPER = {
         'modeling': 'mod',
         'groom': 'groom',
         'rigging': 'rig',
-        'surfacing': 'surface'
+        'effects': 'efx',
+        'surfacing': 'surface',
     }
     VARIANTS = {
         'modeling': 'variants.asset_version.model',
@@ -210,7 +213,22 @@ class RsvAssetSetUsdCreator(object):
             )
         return usd_file_path
     @classmethod
-    def _get_asset_set_registry_override_(cls, rsv_scene_properties, per_rsv_task):
+    def _get_asset_comp_registry_(cls, rsv_scene_properties, per_rsv_task):
+        dic = collections.OrderedDict()
+        if per_rsv_task is not None:
+            comp_register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
+                keyword='asset-comp-registry-usd-file'
+            )
+            register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
+                version='all'
+            )
+            for i_file_path in register_usd_file_paths:
+                i_properties = comp_register_usd_file_rsv_unit.get_properties(i_file_path)
+                i_version = i_properties.get('version')
+                dic[i_version] = i_file_path
+        return dic
+    @classmethod
+    def _get_asset_comp_registry_override_(cls, rsv_scene_properties, per_rsv_task):
         workspace = rsv_scene_properties.get('workspace')
         per_step = per_rsv_task.get('step')
         dic = collections.OrderedDict()
@@ -234,14 +252,14 @@ class RsvAssetSetUsdCreator(object):
             elif workspace == 'publish':
                 pass
             elif workspace == 'output':
-                register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
+                comp_register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
                     keyword='asset-output-comp-registry-usd-file'
                 )
-                register_usd_file_paths = register_usd_file_rsv_unit.get_result(
+                register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
                     version='all'
                 )
                 for i_file_path in register_usd_file_paths:
-                    i_properties = register_usd_file_rsv_unit.get_properties(i_file_path)
+                    i_properties = comp_register_usd_file_rsv_unit.get_properties(i_file_path)
                     i_version = i_properties.get('version')
                     dic[i_version] = i_file_path
         return dic
@@ -332,15 +350,23 @@ class RsvAssetSetUsdCreator(object):
                 )
         return c.value
     @classmethod
-    def _set_asset_all_set_registry_update_(cls, configure, rsv_asset, rsv_scene_properties):
+    def _set_asset_all_comp_registry_update_(cls, configure, rsv_asset, rsv_scene_properties):
         for i_step, i_task, i_key in cls.ASSET_OVERRIDE_VARIANTS:
             i_per_rsv_task = rsv_asset.get_rsv_task(
                 step=i_step, task=i_task
             )
             if i_per_rsv_task is not None:
-                i_set_registry_override = cls._get_asset_set_registry_override_(rsv_scene_properties, i_per_rsv_task)
+                i_comp_registry = cls._get_asset_comp_registry_(
+                    rsv_scene_properties, i_per_rsv_task
+                )
                 configure.set(
-                    'asset.version_override.{}'.format(i_key), i_set_registry_override
+                    'asset.version.{}'.format(i_key), i_comp_registry
+                )
+                i_comp_registry_override = cls._get_asset_comp_registry_override_(
+                    rsv_scene_properties, i_per_rsv_task
+                )
+                configure.set(
+                    'asset.version_override.{}'.format(i_key), i_comp_registry_override
                 )
     @classmethod
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
@@ -367,7 +393,7 @@ class RsvAssetSetUsdCreator(object):
             #
             c.set('asset.set_file', asset_set_dress_usd_file_path)
 
-            cls._set_asset_all_set_registry_update_(
+            cls._set_asset_all_comp_registry_update_(
                 c, rsv_asset, rsv_scene_properties
             )
 
@@ -415,7 +441,7 @@ class RsvAssetSetUsdCreator(object):
 
             c.set('shot_assets', shot_assets_dict)
 
-            cls._set_asset_all_set_registry_update_(
+            cls._set_asset_all_comp_registry_update_(
                 c, rsv_asset, rsv_scene_properties
             )
 

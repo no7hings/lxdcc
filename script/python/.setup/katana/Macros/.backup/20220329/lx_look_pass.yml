@@ -1,0 +1,12 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    look/scheme:
+        widget: enumerate
+        value: ['passthrough', 'lambert', 'plastic', 'metal', 'ambocc', 'wire', 'white']
+        tool_tip: '...'

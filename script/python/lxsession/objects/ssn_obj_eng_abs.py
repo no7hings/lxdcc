@@ -24,6 +24,10 @@ class AbsRsvApplication(object):
         return self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
             self._any_scene_file_path
         )
+    @classmethod
+    def get_stg_connector(cls):
+        import lxshotgun.objects as stg_objects
+        return stg_objects.StgConnector()
 
     def set_file_send_to_publish(self, application):
         rsv_task = self.get_rsv_task()

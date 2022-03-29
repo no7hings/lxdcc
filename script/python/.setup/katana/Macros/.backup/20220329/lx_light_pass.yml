@@ -1,0 +1,88 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: ''
+        tool_tip: 'press to rest all parameters'
+    #
+    options/scheme:
+        widget: enumerate
+        value: ['default', 'custom']
+        tool_tip: '...'
+
+    options/asset:
+        widget: string
+        value: ''
+        tool_tip: '...'
+
+    options/guess:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxLight(node).set_guess()'
+        tool_tip: '...'
+    #
+    live_group/file:
+        widget: file
+        value: '/l/resource/td/asset/live-group/default.livegroup'
+        tool_tip: '...'
+
+    live_group/create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxLight(node).set_create()'
+        tool_tip: '...'
+    #
+    settings/background_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    settings/background_color:
+        widget: color3
+        value: [0.18, 0.18, 0.18]
+        tool_tip: '...'
+    #
+    rotations/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    rotations/location:
+        widget: path
+        value: '/root/world/lgt/gaffer'
+        tool_tip: '...'
+
+    rotations/value_offset:
+        widget: float
+        value: 0.0
+        tool_tip: '...'
+
+    rotations/start_frame:
+        widget: float
+        value: 121.0
+        tool_tip: '...'
+
+    rotations/end_frame:
+        widget: float
+        value: 240.0
+        tool_tip: '...'
+
+    rotations/frame_offset:
+        widget: float
+        value: 1000.0
+        tool_tip: '...'
+
+    lynxi_info/type:
+        widget: string
+        value: 'lx_light_loader'
+        tool_tip: '...'
+
+    lynxi_variants/rotations/light_value:
+        widget: float
+        value: 0.0
+        tool_tip: '...'
+

@@ -126,28 +126,34 @@ class AssetWorkspaceBuilder(object):
         workspace_keys = configure.get('workspace').keys()
         #
         method_args = [
-
+            cls._set_workspace_nodes_create_mtd_,
+            cls._set_workspace_connections_create_mtd_,
+            cls._set_workspace_node_graphs_create_mtd_
         ]
-        # node
-        ps = utl_core.Progress.set_create(len(workspace_keys))
-        for key in workspace_keys:
-            utl_core.Progress.set_update(ps)
-            for sub_key in ['main', 'backdrop']:
-                cls._set_workspace_node_create_(configure, key, sub_key)
-        utl_core.Progress.set_stop(ps)
-        # connection
-        ps = utl_core.Progress.set_create(len(workspace_keys))
-        for key in workspace_keys:
-            utl_core.Progress.set_update(ps)
-            for sub_key in ['main', 'node_graph']:
-                cls._set_workspace_connections_create_(configure, key, sub_key)
-        utl_core.Progress.set_stop(ps)
-        # node-graph
-        ps = utl_core.Progress.set_create(len(workspace_keys))
-        for key in workspace_keys:
-            utl_core.Progress.set_update(ps)
-            cls._set_workspace_node_graph_create_(configure, key)
-        utl_core.Progress.set_stop(ps)
+        with utl_core.gui_progress(maximum=len(method_args)) as g_p:
+            for i_method in method_args:
+                g_p.set_update()
+                i_method(configure, workspace_keys)
+    @classmethod
+    def _set_workspace_nodes_create_mtd_(cls, configure, workspace_keys):
+        with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
+            for key in workspace_keys:
+                g_p.set_update()
+                for sub_key in ['main', 'backdrop']:
+                    cls._set_workspace_node_create_(configure, key, sub_key)
+    @classmethod
+    def _set_workspace_connections_create_mtd_(cls, configure, workspace_keys):
+        with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
+            for key in workspace_keys:
+                g_p.set_update()
+                for sub_key in ['main', 'node_graph']:
+                    cls._set_workspace_connections_create_(configure, key, sub_key)
+    @classmethod
+    def _set_workspace_node_graphs_create_mtd_(cls, configure, workspace_keys):
+        with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
+            for key in workspace_keys:
+                g_p.set_update()
+                cls._set_workspace_node_graph_create_(configure, key)
     @classmethod
     def _set_workspace_node_create_(cls, configure, key, sub_key):
         variable = configure.get('workspace.{}.variable'.format(key))
@@ -227,6 +233,10 @@ class AssetWorkspaceBuilder(object):
                     parameters = v.get('parameters')
                     if parameters:
                         cls._set_node_parameters_(dcc_node, parameters)
+
+                    arnold_parameters = v.get('arnold_parameters')
+                    if arnold_parameters:
+                        cls._set_node_arnold_parameters_(dcc_node, arnold_parameters)
                     #
                     i_executes = v.get('executes')
                     if i_executes:
@@ -325,6 +335,11 @@ class AssetWorkspaceBuilder(object):
         for i_port_path, i_value in parameters.items():
             i_port_path = i_port_path.replace('/', '.')
             dcc_node.get_port(i_port_path).set(i_value)
+    @classmethod
+    def _set_node_arnold_parameters_(cls, dcc_node, parameters):
+        for i_port_path, i_value in parameters.items():
+            i_port_path = i_port_path.replace('/', '.')
+            cls._set_arnold_property_(dcc_node, i_port_path, i_value)
     @classmethod
     def _get_node_connect_args_(cls, source_attr_path, target_attr_path):
         def rcs_fnc_(o_ktn_port_):

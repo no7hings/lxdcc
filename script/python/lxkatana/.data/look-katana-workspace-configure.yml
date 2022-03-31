@@ -694,6 +694,8 @@ workspace:
                         rotations/start_frame: 121.0
                         rotations/end_frame: 240.0
                         rotations/frame_offset: 1000.0
+                        #
+                        settings/background_enable: 1
                     insert_scheme: TB
                     insert_connections:
                         - <.....cameras.main.path>.out

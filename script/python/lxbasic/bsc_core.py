@@ -482,6 +482,10 @@ class StoragePathMtd(object):
     @classmethod
     def get_path_is_exists(cls, path):
         return os.path.exists(path)
+    @classmethod
+    def get_file_realpath(cls, file_path_src, file_path_tgt):
+        directory_path_src = os.path.dirname(file_path_src)
+        return os.path.relpath(file_path_tgt, directory_path_src)
 
 
 class StorageLinkMtd(object):
@@ -2042,6 +2046,9 @@ class TextOpt(object):
             ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', self._raw
         )
 
+    def get_filter_by_pattern(self, pattern):
+        return fnmatch.filter([self._raw], pattern)
+
 
 class ValueMtd(object):
     @classmethod
@@ -3111,6 +3118,30 @@ class FrameMtd(object):
                 return [start_frame]
         else:
             raise ValueError()
+
+
+class ParsePatternOpt(object):
+    def __init__(self, pattern):
+        self._pattern = pattern
+        self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
+    @classmethod
+    def _get_fnmatch_pattern_(cls, variant):
+        if variant is not None:
+            re_pattern = re.compile(r'[{](.*?)[}]', re.S)
+            #
+            keys = re.findall(re_pattern, variant)
+            s = variant
+            if keys:
+                for key in keys:
+                    s = s.replace('{{{}}}'.format(key), '*')
+            return s
+        return variant
+    @property
+    def pattern(self):
+        return self._pattern
+    @property
+    def fnmatch_pattern(self):
+        return self._fnmatch_pattern
 
 
 if __name__ == '__main__':

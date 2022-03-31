@@ -84,60 +84,6 @@ asset-output-step-dir: <asset-dir>/<step-name>
 asset-task-dir: <asset-step-dir>/<task-name>
 asset-work-task-dir: <asset-work-step-dir>/<task-name>
 asset-work-task-user-dir: <asset-work-step-dir>/<task-name>/<user-name>
-#
-asset-output-task-dir: <asset-output-step-dir>/<task-name>
-asset-output-version-dir: <asset-output-task-dir>/<asset-version-name>
-#
-asset-output-render-dir: <asset-output-version-dir>/render
-asset-output-set-dir: <asset-output-version-dir>/set
-asset-output-metadata-dir: <asset-output-version-dir>/metadata
-#
-asset-output-scene-src-dir: <asset-output-version-dir>/scene
-#
-asset-output-render-info-yaml-file: <asset-output-metadata-dir>/render-info.yml
-#
-asset-output-maya-scene-src-dir: <asset-output-version-dir>/scene
-asset-output-maya-scene-src-file: <asset-output-maya-scene-src-dir>/<asset-name>.ma
-asset-output-maya-scene-dir: <asset-output-version-dir>/maya
-asset-output-maya-scene-file: <asset-output-maya-scene-dir>/<asset-name>.ma
-asset-output-maya-render-output-dir: <asset-output-render-dir>/maya-images
-#
-asset-output-houdini-scene-src-dir: <asset-output-version-dir>/scene
-asset-output-houdini-scene-src-file: <asset-output-houdini-scene-src-dir>/<asset-name>.hip
-asset-output-houdini-scene-dir: <asset-output-version-dir>/houdini
-asset-output-houdini-scene-file: <asset-output-houdini-scene-dir>/<asset-name>.hip
-asset-output-houdini-render-output-dir: <asset-output-render-dir>/houdini-images
-#
-asset-output-katana-scene-src-dir: <asset-output-version-dir>/scene
-asset-output-katana-scene-src-file: <asset-output-katana-scene-src-dir>/<asset-name>.katana
-asset-output-katana-scene-dir: <asset-output-version-dir>/katana
-asset-output-katana-scene-file: <asset-output-katana-scene-dir>/<asset-name>.katana
-asset-output-katana-render-output-dir: <asset-output-render-dir>/katana-images
-asset-output-katana-render-image-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr
-asset-output-katana-render-movie-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
-#
-asset-output-asset-set-usd-file: <asset-output-set-dir>/usd/<asset-name>.usda
-asset-output-asset-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usda
-#
-asset-output-geometry-dir: <asset-output-version-dir>/cache
-asset-output-geometry-usd-dir: <asset-output-geometry-dir>/usd
-asset-output-geometry-usd-var-dir: <asset-output-geometry-dir>/usd/geo
-asset-output-geometry-usd-var-file: <asset-output-geometry-usd-var-dir>/<var-name>.usd
-#
-asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
-#
-asset-output-comp-usd-dir: <asset-output-version-dir>/cache/usd
-asset-output-comp-registry-usd-file: <asset-output-comp-usd-dir>/registry.usda
-#
-asset-output-texture-src-dir: <asset-output-task-dir>/texture
-asset-output-texture-tgt-dir: <asset-output-version-dir>/texture
-#
-asset-output-look-dir: <asset-output-version-dir>/look
-asset-output-look-klf-file: <asset-output-look-dir>/klf/<asset-name>.klf
-#
-asset-output-look-ass-file: <asset-output-look-dir>/ass/<asset-name>.ass
-asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-pass>.ass
-#
 # <asset-dcc>
 asset-maya-path: None
 # <asset-version>
@@ -341,6 +287,9 @@ asset-geometry-xgen-grow-mesh-file: <asset-version-dir>/maya/<asset-name>__<xgen
 #
 asset-geometry-xgen-collection-dir: <asset-version-dir>/cache/xgen/collections
 #
+asset-xgen-usd-dir: <asset-version-dir>/cache/usd
+asset-xgen-usd-file: <asset-xgen-usd-dir>/xgen.usda
+#
 asset-metadata-dir: <asset-version-dir>/metadata
 asset-geometry-xml-topo-file: <asset-metadata-dir>/<var-name>.topo.xml
 asset-geometry-xml-topo-hi-file: <asset-metadata-dir>/hi.topo.xml
@@ -425,6 +374,65 @@ asset-set-dress-usd-file: <asset-set-usd-dir>/<asset-name>.usda
 
 asset-asset-set-usd-file: <asset-version-dir>/set/usd/<asset-name>.usda
 asset-asset-shot-set-usd-file: <asset-version-dir>/set/usd/<asset-shot-name>.usda
+# asset output ======================================================================================================= #
+asset-output-task-dir: <asset-output-step-dir>/<task-name>
+asset-output-version-dir: <asset-output-task-dir>/<asset-version-name>
+#
+asset-output-render-dir: <asset-output-version-dir>/render
+asset-output-set-dir: <asset-output-version-dir>/set
+asset-output-metadata-dir: <asset-output-version-dir>/metadata
+#
+asset-output-scene-src-dir: <asset-output-version-dir>/scene
+#
+asset-output-render-info-yaml-file: <asset-output-metadata-dir>/render-info.yml
+#
+asset-output-maya-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-maya-scene-src-file: <asset-output-maya-scene-src-dir>/<asset-name>.ma
+asset-output-maya-scene-dir: <asset-output-version-dir>/maya
+asset-output-maya-scene-file: <asset-output-maya-scene-dir>/<asset-name>.ma
+asset-output-maya-render-output-dir: <asset-output-render-dir>/maya-images
+#
+asset-output-houdini-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-houdini-scene-src-file: <asset-output-houdini-scene-src-dir>/<asset-name>.hip
+asset-output-houdini-scene-dir: <asset-output-version-dir>/houdini
+asset-output-houdini-scene-file: <asset-output-houdini-scene-dir>/<asset-name>.hip
+asset-output-houdini-render-output-dir: <asset-output-render-dir>/houdini-images
+#
+asset-output-katana-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-katana-scene-src-file: <asset-output-katana-scene-src-dir>/<asset-name>.katana
+asset-output-katana-scene-dir: <asset-output-version-dir>/katana
+asset-output-katana-scene-file: <asset-output-katana-scene-dir>/<asset-name>.katana
+asset-output-katana-render-output-dir: <asset-output-render-dir>/katana-images
+asset-output-katana-render-image-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr
+asset-output-katana-render-movie-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
+#
+asset-output-asset-set-usd-file: <asset-output-set-dir>/usd/<asset-name>.usda
+asset-output-asset-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usda
+#
+asset-output-geometry-dir: <asset-output-version-dir>/cache
+asset-output-geometry-usd-dir: <asset-output-geometry-dir>/usd
+asset-output-geometry-usd-var-dir: <asset-output-geometry-dir>/usd/geo
+asset-output-geometry-usd-var-file: <asset-output-geometry-usd-var-dir>/<var-name>.usd
+#
+asset-output-xgen-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-xgen-usd-file: <asset-output-xgen-usd-dir>/xgen.usda
+#
+asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
+#
+asset-output-comp-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-comp-registry-usd-file: <asset-output-comp-usd-dir>/registry.usda
+#
+asset-output-texture-src-dir: <asset-output-task-dir>/texture
+asset-output-texture-tgt-dir: <asset-output-version-dir>/texture
+#
+asset-output-look-dir: <asset-output-version-dir>/look
+asset-output-look-klf-file: <asset-output-look-dir>/klf/<asset-name>.klf
+#
+asset-output-look-ass-file: <asset-output-look-dir>/ass/<asset-name>.ass
+asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-pass>.ass
+#
+asset-output-geometry-xgen-glow-dir: <asset-output-version-dir>/maya
+asset-output-geometry-xgen-collection-dir: <asset-output-version-dir>/cache/xgen/collections
 # effect ============================================================================================================= #
 project-root-effect-dir: '{root_effect}'
 project-root-effect-windows-dir: None

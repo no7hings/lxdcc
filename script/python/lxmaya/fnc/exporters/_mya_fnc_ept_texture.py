@@ -81,7 +81,7 @@ class TextureExporter(object):
                                 i_tgt_texture_file_path = tgt_texture_tx_file_path
                             else:
                                 utl_core.Log.set_module_warning_trace(
-                                    'texture-tx-search',
+                                    'texture-tx search',
                                     u'file="{}" is Non-exists'.format(tgt_texture_tx_file_path)
                                 )
                         #

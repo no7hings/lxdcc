@@ -836,7 +836,7 @@ class AndTextureOpt_(AndImageOpt):
                 '--compression dwaa'
             ]
         #
-        print cmd_args
+        # print cmd_args
         cmd_args += [self._file_path]
         #
         return bsc_core.SubProcessMtd.set_run(

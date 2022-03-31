@@ -1,5 +1,6 @@
 # coding:utf-8
 import collections
+import fnmatch
 
 from lxbasic import bsc_configure, bsc_core
 
@@ -190,6 +191,14 @@ class AbsSsnObj(
 
     def get_is_system_matched(self, system_key):
         return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
+    @classmethod
+    def _get_choice_scheme_matched_(cls, choice_scheme, choice_scheme_includes):
+        for i_choice_scheme in choice_scheme_includes:
+            if fnmatch.filter(
+                [choice_scheme], i_choice_scheme
+            ):
+                return True
+        return False
 
     def set_execute_fnc(self, fnc):
         pass
@@ -357,11 +366,11 @@ class AbsSsnRsvUnitAction(
 class AbsSsnRsvOptionExecuteDef(object):
     EXECUTOR = None
     @classmethod
-    def _get_rsv_task_version_(cls, rsv_task_properties):
-        if rsv_task_properties.get('shot'):
-            return '{project}.{shot}.{step}.{task}.{version}'.format(**rsv_task_properties.value)
-        elif rsv_task_properties.get('asset'):
-            return '{project}.{asset}.{step}.{task}.{version}'.format(**rsv_task_properties.value)
+    def _get_rsv_task_version_(cls, rsv_scene_properties):
+        if rsv_scene_properties.get('shot'):
+            return '{project}.{shot}.{step}.{task}.{version}'.format(**rsv_scene_properties.value)
+        elif rsv_scene_properties.get('asset'):
+            return '{project}.{asset}.{step}.{task}.{version}'.format(**rsv_scene_properties.value)
         else:
             raise TypeError()
     #
@@ -526,7 +535,7 @@ class AbsOptionMethodSession(
         super(AbsOptionMethodSession, self).__init__(*args, **kwargs)
         #
         self.__set_option_completion_()
-        self.__set_script_option_completion_()
+        self.__set_option_completion_by_script_()
         #
         self._set_hook_execute_def_init_(
             self._configure.get_content('hook_option.deadline')
@@ -542,17 +551,20 @@ class AbsOptionMethodSession(
         if rez_extend_packages:
             option_opt.set('rez_extend_packages', rez_extend_packages)
 
-    def __set_script_option_completion_(self):
+    def __set_option_completion_by_script_(self):
         option_opt = self.get_option_opt()
         #
-        inherit_keys = option_opt.get('inherit_keys')
-        script_option = self._configure.get('hook_option.script') or {}
-        for k, v in script_option.items():
+        # inherit_keys = option_opt.get('inherit_keys')
+        script_kwargs = self._configure.get('hook_option.script') or {}
+        for k, v in script_kwargs.items():
             if option_opt.get_key_is_exists(k) is False:
                 if isinstance(v, dict):
                     pass
                 else:
-                    option_opt.set(k, v)
+                    option_opt.set(
+                        # etc: asset-{application}-publish
+                        k, v
+                    )
 
     def get_option_opt(self):
         return self._option_opt
@@ -566,7 +578,7 @@ class AbsOptionMethodSession(
         return
 
 
-class AbsRsvDef(object):
+class AbsSsnResolverDef(object):
     def _set_rsv_def_init_(self):
         self._resolver = rsv_commands.get_resolver()
 
@@ -578,7 +590,7 @@ class AbsRsvDef(object):
 # session for rsv task deadline job
 class AbsOptionRsvTaskMethodSession(
     AbsOptionMethodSession,
-    AbsRsvDef
+    AbsSsnResolverDef
 ):
     def __init__(self, *args, **kwargs):
         super(AbsOptionRsvTaskMethodSession, self).__init__(*args, **kwargs)
@@ -586,7 +598,7 @@ class AbsOptionRsvTaskMethodSession(
         #
         self.__set_system_option_completion_()
         #
-        self._rsv_task_properties = None
+        self._rsv_scene_properties = None
         self._rsv_task = None
         #
         option_opt = self.get_option_opt()
@@ -594,7 +606,7 @@ class AbsOptionRsvTaskMethodSession(
         self._batch_file_path = option_opt.pop('batch_file')
         self._file_path = option_opt.get('file')
         if self._batch_file_path:
-            self._rsv_task_properties = self.resolver.get_task_properties_by_any_scene_file_path(
+            self._rsv_scene_properties = self.resolver.get_rsv_scene_properties_by_any_scene_file_path(
                 self._batch_file_path
             )
             self._rsv_task = self.resolver.get_rsv_task_by_any_file_path(
@@ -602,14 +614,14 @@ class AbsOptionRsvTaskMethodSession(
             )
         else:
             if self._file_path:
-                self._rsv_task_properties = self.resolver.get_task_properties_by_any_scene_file_path(
+                self._rsv_scene_properties = self.resolver.get_rsv_scene_properties_by_any_scene_file_path(
                     self._file_path
                 )
                 self._rsv_task = self.resolver.get_rsv_task_by_any_file_path(
                     self._file_path
                 )
         #
-        self.__set_rsv_task_option_completion_()
+        self.__set_option_completion_by_rsv_scene_properties_()
         #
         # print self.get_option_opt()
         # print self.get_option()
@@ -620,12 +632,13 @@ class AbsOptionRsvTaskMethodSession(
             if option_opt.get(i_key) is None:
                 option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
 
-    def __set_rsv_task_option_completion_(self):
+    def __set_option_completion_by_rsv_scene_properties_(self):
         option_opt = self.get_option_opt()
-        for i_key in ['project']:
-            option_opt.set(
-                i_key, self._rsv_task_properties.get(i_key)
-            )
+        for i_key in ['project', 'workspace', 'asset', 'shot', 'step', 'task', 'version', 'application']:
+            if self._rsv_scene_properties.get_key_is_exists(i_key):
+                option_opt.set(
+                    i_key, self._rsv_scene_properties.get(i_key)
+                )
 
     def get_batch_key(self):
         option_opt = self.get_option_opt()
@@ -733,15 +746,15 @@ class AbsOptionRsvTaskMethodSession(
                 lis.append(i_ddl_job_id)
         return lis
 
-    def get_rsv_task_properties(self):
-        return self._rsv_task_properties
+    def get_rsv_scene_properties(self):
+        return self._rsv_scene_properties
 
     def get_rsv_task(self):
         return self._rsv_task
 
     def get_rsv_version_name(self):
         return self._get_rsv_task_version_(
-            self.get_rsv_task_properties()
+            self.get_rsv_scene_properties()
         )
 
     def get_ddl_dependent_unique_id(self):
@@ -774,3 +787,9 @@ class AbsOptionRsvTaskBatcherSession(
 class AbsApplicationSession(AbsSsnObj):
     def __init__(self, *args, **kwargs):
         super(AbsApplicationSession, self).__init__(*args, **kwargs)
+
+
+if __name__ == '__main__':
+    print AbsSsnObj._get_choice_scheme_matched_(
+        'asset-model-maya', ['asset-*-katana']
+    )

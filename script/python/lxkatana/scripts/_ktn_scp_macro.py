@@ -409,7 +409,6 @@ class LxAsset(object):
         from lxkatana import ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-
         for k, v in dict_.items():
             i_port_path = 'usd.{}'.format(v['port_path'])
             i_variant_names = v['variant_names']

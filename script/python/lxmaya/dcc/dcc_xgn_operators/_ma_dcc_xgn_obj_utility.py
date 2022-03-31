@@ -246,7 +246,7 @@ class Palette(XGenObj):
     def get_project_path(self):
         return self.get_port('xgProjectPath').get()
 
-    def set_project_path(self, dir_path):
+    def set_project_directory_repath(self, dir_path):
         self.get_port('xgProjectPath').set(dir_path)
     # compose
     def get_description(self, name):

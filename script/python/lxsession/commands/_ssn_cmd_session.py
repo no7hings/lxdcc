@@ -1,6 +1,5 @@
 # coding:utf-8
 
-
 def set_session_option_hooks_execute_by_deadline(session):
     """
     execute contain option-hooks by deadline
@@ -8,6 +7,8 @@ def set_session_option_hooks_execute_by_deadline(session):
     :param session: <instance of session>
     :return: None
     """
+    import fnmatch
+
     from lxsession.commands import _ssn_cmd_hook
     #
     from lxbasic import bsc_core
@@ -44,7 +45,10 @@ def set_session_option_hooks_execute_by_deadline(session):
         #
         _choice_scheme_includes = _hook_option_opt.get('choice_scheme_includes', as_array=True)
         if _choice_scheme_includes:
-            if _batch_choice_scheme not in _choice_scheme_includes:
+            if session._get_choice_scheme_matched_(
+                    _batch_choice_scheme,
+                    _choice_scheme_includes
+            ) is False:
                 utl_core.Log.set_module_warning_trace(
                     'scheme choice', 'option-hook="{}" is ignore'.format(option_hook_key_)
                 )

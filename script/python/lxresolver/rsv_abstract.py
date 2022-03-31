@@ -737,7 +737,7 @@ class AbsRsvObj(
         return self.__str__()
 
 
-class AbsRsvDef(object):
+class AbsSsnResolverDef(object):
     RSV_PATTERN_CLASS = None
     def _set_rsv_def_init_(self):
         self._raw = collections.OrderedDict()
@@ -1269,7 +1269,7 @@ class AbsRsvTask(
             **kwargs
         )
 
-    def get_rsv_task_properties(self):
+    def get_rsv_scene_properties(self):
         properties = self.PROPERTIES_CLASS(
             self, self.properties.get_copy_value()
         )
@@ -1413,7 +1413,7 @@ class AbsRsvTag(
 # <rsv-project>
 class AbsRsvProject(
     AbsRsvObjDef,
-    AbsRsvDef,
+    AbsSsnResolverDef,
     obj_abstract.AbsObjGuiDef,
     obj_abstract.AbsObjDagDef,
 ):
@@ -2338,7 +2338,7 @@ class AbsRsvProject(
 
 # <resolver>
 class AbsResolver(
-    AbsRsvDef,
+    AbsSsnResolverDef,
     obj_abstract.AbsObjGuiDef,
     obj_abstract.AbsObjDagDef,
 ):

@@ -3328,18 +3328,19 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             if isinstance(target_dir_path, (str, unicode)):
                 target_dir_path = [target_dir_path]
-            for target_dir_path_ in target_dir_path:
-                target_file_path = self.get_target_file_path(target_dir_path_, ignore_structure)
+            #
+            for i_directory_path_tgt in target_dir_path:
+                target_file_path = self.get_target_file_path(i_directory_path_tgt, ignore_structure=ignore_structure)
                 if os.path.exists(target_file_path) is False:
                     target_directory = os.path.dirname(target_file_path)
                     if os.path.exists(target_directory) is False:
                         os.makedirs(target_directory)
                         self.LOG.set_result_trace(
-                            'directory-create: "{}"'.format(target_directory)
+                            'directory create: "{}"'.format(target_directory)
                         )
                     shutil.copy2(self.path, target_file_path)
                     self.LOG.set_result_trace(
-                        'file-copy: "{}" >> "{}"'.format(self.path, target_file_path))
+                        'file copy: "{}" >> "{}"'.format(self.path, target_file_path))
                 else:
                     self.LOG.set_warning_trace('file-copy: target "{}" is exist.'.format(target_file_path))
         else:

@@ -387,6 +387,7 @@ class GeometryUsdExporter_(object):
                 #
                 for i_mya_obj in mya_objs:
                     l_p.set_update()
+                    #
                     i_mya_obj_type = i_mya_obj.type
                     i_mya_obj_path = i_mya_obj.path
                     #
@@ -416,7 +417,6 @@ class GeometryUsdExporter_(object):
                             transform_usd_obj_opt.set_visible(
                                 transform_mya_obj.get_visible()
                             )
-                    #
                     elif i_mya_obj_type == ma_configure.Util.MESH_TYPE:
                         i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
                         if i_mya_mesh.get_port('intermediateObject').get() is False:

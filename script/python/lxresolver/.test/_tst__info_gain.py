@@ -1,21 +1,22 @@
 # coding:utf-8
-import lxmaya.ssn.objects as ssn_objects
+import lxmaya.ssn.objects as mya_ssn_objects
 
-app = ssn_objects.RsvApplication()
+app = mya_ssn_objects.RsvApplication()
 
-rsv_scene_properties = app.get_rsv_scene_properties()
+rsp = app.get_rsv_scene_properties()
 
-print rsv_scene_properties
+print rsp
 
-print rsv_scene_properties.get('project')
-print rsv_scene_properties.get('step')
-print rsv_scene_properties.get(rsv_scene_properties.get('branch'))
-print rsv_scene_properties.get('task')
+print rsp.get('project')
+print rsp.get('step')
+print rsp.get(rsp.get('branch'))
+print rsp.get('task')
+#
+sc = app.get_stg_connector()
 
-stg_connector = app.get_stg_connector()
+si = sc.shotgun
 
-print stg_connector.get_stg_project(**rsv_scene_properties.value)
-print stg_connector.get_stg_entity(**rsv_scene_properties.value)
-print stg_connector.get_stg_step(**rsv_scene_properties.value)
-print stg_connector.get_stg_task(**rsv_scene_properties.value)
-
+print sc.get_stg_project(**rsp.value)
+print sc.get_stg_entity(**rsp.value)
+print sc.get_stg_step(**rsp.value)
+print sc.get_stg_task(**rsp.value)

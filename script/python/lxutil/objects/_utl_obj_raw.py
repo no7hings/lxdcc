@@ -11,6 +11,8 @@ from lxbasic import bsc_core
 
 from lxbasic.objects import bsc_obj_abs
 
+import lxbasic.objects as bsc_objects
+
 import copy
 
 import os
@@ -140,6 +142,11 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
 
     def _get_obj_raws_(self):
         lis = []
+        utl_core.Log.set_module_result_trace(
+            'file parse is started', 'file="{}"'.format(
+                self._file_path
+            )
+        )
         pattern_0 = _Pattern(u'{obj_type}\n{port_lines}\n')
         lines = fnmatch.filter(
             self.lines, pattern_0.pattern
@@ -151,6 +158,11 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
             if p:
                 variant = p.named
                 lis.append((line, variant))
+        utl_core.Log.set_module_result_trace(
+            'file parse is completed', 'file="{}"'.format(
+                self._file_path
+            )
+        )
         return lis
     @classmethod
     def _get_obj_port_raws_(cls, raw):
@@ -166,37 +178,82 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
     def _get_file_paths_(self):
         lis = []
         obj_raws = self._get_obj_raws_()
-        print 'start file: "{}"'.format(self.file_path)
-        for obj_raw in obj_raws:
-            line, variants = obj_raw
-            obj_type = variants['obj_type']
-            if obj_type in self.FILE_REFERENCE_DICT:
-                port_names = self.FILE_REFERENCE_DICT[obj_type]
-                for i_port_name in port_names:
-                    if i_port_name is not None:
-                        port_raws = self._get_obj_port_raws_(variants['port_lines'])
-                        obj_name = port_raws['name'][-1]
-                        if i_port_name in port_raws:
-                            port_type, port_raw = port_raws[i_port_name]
-                            raw = dict(
-                                obj_type=obj_type,
-                                obj_name=obj_name,
-                                port_name=i_port_name,
-                                port_type=port_type,
-                                port_raw=port_raw,
-                                line_index=self.lines.index(line),
-                                line=line,
-                            )
-                            lis.append(raw)
-        print 'end file: "{}"'.format(self.file_path)
+        for i_obj_raw in obj_raws:
+            i_line, i_variants = i_obj_raw
+            i_obj_type = i_variants['obj_type']
+            if i_obj_type in self.FILE_REFERENCE_DICT:
+                i_port_dict = self._get_obj_port_raws_(i_variants['port_lines'])
+                i_obj_name = i_port_dict['name'][-1]
+                #
+                i_port_names = self.FILE_REFERENCE_DICT[i_obj_type]
+                for j_port_name in i_port_names:
+                    if j_port_name in i_port_dict:
+                        j_port_type, j_port_raw = i_port_dict[j_port_name]
+                        raw = dict(
+                            obj_type=i_obj_type,
+                            obj_name=i_obj_name,
+                            port_name=j_port_name,
+                            port_type=j_port_type,
+                            port_raw=j_port_raw,
+                            line_index=self.lines.index(i_line),
+                            line=i_line,
+                        )
+                        lis.append(raw)
         return lis
 
     def get_file_paths(self):
         return self._get_file_paths_()
 
-    def set_xgen_collection_path(self, directory_path):
+    def set_repair(self):
+        lis = []
+        project_directory_path = self.get_project_directory_path()
+        project_directory_path = bsc_core.StoragePathOpt(
+            project_directory_path
+        ).get_path()
+        _ = self.get_file_paths()
+        for i in _:
+            i_port_name = i['port_name']
+            if i_port_name == 'xgDataPath':
+                i_raw = i['port_raw']
+                if i_raw.startswith('${PROJECT}'):
+                    i_new_raw = i_raw.replace('${PROJECT}', project_directory_path)
+                    #
+                    if i_raw != i_new_raw:
+                        i_line_index = i['line_index']
+                        i_line = i['line']
+                        i_new_line = i_line.replace(i_raw, i_new_raw)
+                        lis.append(
+                            (i_line_index, i_new_line)
+                        )
+                        utl_core.Log.set_module_result_trace(
+                            u'xgen collection directory repair',
+                            u'directory="{}" >> "{}"'.format(
+                                i_raw, i_new_raw
+                            )
+                        )
+
+        for i_line_index, i_line in lis:
+            self.lines[i_line_index] = i_line
+
+    def get_project_directory_path(self):
+        obj_raws = self._get_obj_raws_()
+        for i_obj_raw in obj_raws:
+            i_line, i_variants = i_obj_raw
+            i_obj_type = i_variants['obj_type']
+            if i_obj_type == 'Palette':
+                i_port_dict = self._get_obj_port_raws_(i_variants['port_lines'])
+                j_port_type, j_port_raw = i_port_dict['xgProjectPath']
+                return j_port_raw
+
+    def set_collection_directory_repath(self, xgen_collection_directory_path, xgen_collection_name):
         _ = self.get_file_paths()
         lis = []
+        utl_core.Log.set_module_result_trace(
+            u'xgen collection directory repath is started',
+            u'directory="{}"'.format(
+                xgen_collection_directory_path
+            )
+        )
         for i in _:
             i_port_name = i['port_name']
             if i_port_name == 'xgDataPath':
@@ -204,28 +261,54 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
                 i_raw = bsc_core.StoragePathOpt(
                     i_raw
                 ).get_path()
-                i_ss = i_raw.split('/')
-                if i_ss[-1]:
-                    i_collection_name = i_ss[-1]
-                else:
-                    i_collection_name = i_ss[-2]
-                i_obj_type = i['obj_type']
-                if i_obj_type == 'Description':
-                    i_new_raw = '{}/{}/'.format(directory_path, i_collection_name)
-                else:
-                    i_new_raw = '{}/{}'.format(directory_path, i_collection_name)
                 #
-                i_line_index = i['line_index']
-                i_line = i['line']
-                i_new_line = i_line.replace(i_raw, i_new_raw)
-                lis.append((i_line_index, i_new_line))
+                i_obj_type = i['obj_type']
+                i_obj_name = i['obj_name']
+                if i_obj_type == 'Description':
+                    i_new_raw = u'{}/{}/'.format(xgen_collection_directory_path, xgen_collection_name)
+                else:
+                    i_new_raw = u'{}/{}'.format(xgen_collection_directory_path, xgen_collection_name)
+                #
+                if i_raw != i_new_raw:
+                    i_line_index = i['line_index']
+                    i_line = i['line']
+                    i_new_line = i_line.replace(i_raw, i_new_raw)
+                    #
+                    lis.append(
+                        (i_line_index, i_new_line)
+                    )
+                    utl_core.Log.set_module_result_trace(
+                        u'xgen collection directory repath',
+                        u'obj="{}"'.format(
+                            i_obj_name
+                        )
+                    )
+                    utl_core.Log.set_module_result_trace(
+                        u'xgen collection directory repath',
+                        u'directory="{}" >> "{}"'.format(
+                            i_raw, i_new_raw
+                        )
+                    )
         #
         for i_line_index, i_line in lis:
             self.lines[i_line_index] = i_line
+        #
+        utl_core.Log.set_module_result_trace(
+            u'xgen collection directory repath is completed',
+            u'directory="{}"'.format(
+                xgen_collection_directory_path
+            )
+        )
 
-    def set_project_path(self, directory_path):
+    def set_project_directory_repath(self, xgen_project_directory_path):
         _ = self.get_file_paths()
         lis = []
+        utl_core.Log.set_module_result_trace(
+            u'xgen project directory repath is started',
+            u'directory="{}"'.format(
+                xgen_project_directory_path
+            )
+        )
         for i in _:
             i_port_name = i['port_name']
             if i_port_name == 'xgProjectPath':
@@ -234,15 +317,83 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
                     i_raw
                 ).get_path()
                 #
-                i_new_raw = directory_path
+                i_obj_name = i['obj_name']
                 #
-                i_line_index = i['line_index']
-                i_line = i['line']
-                i_new_line = i_line.replace(i_raw, i_new_raw)
-                lis.append((i_line_index, i_new_line))
+                i_new_raw = xgen_project_directory_path
+                #
+                if i_raw != i_new_raw:
+                    i_line_index = i['line_index']
+                    i_line = i['line']
+                    i_new_line = i_line.replace(i_raw, i_new_raw)
+                    lis.append(
+                        (i_line_index, i_new_line)
+                    )
+                    utl_core.Log.set_module_result_trace(
+                        u'xgen project directory repath',
+                        u'obj="{}"'.format(
+                            i_obj_name
+                        )
+                    )
+                    utl_core.Log.set_module_result_trace(
+                        u'xgen project directory repath',
+                        u'directory="{}" >> "{}"'.format(
+                            i_raw, i_new_raw
+                        )
+                    )
         #
         for i_line_index, i_line in lis:
             self.lines[i_line_index] = i_line
+        #
+        utl_core.Log.set_module_result_trace(
+            u'xgen project directory repath is completed',
+            u'directory="{}"'.format(
+                xgen_project_directory_path
+            )
+        )
+
+    def get_description_properties(self):
+        d = bsc_objects.Dict()
+        utl_core.Log.set_module_result_trace(
+            'file parse is started', 'file="{}"'.format(
+                self._file_path
+            )
+        )
+        obj_raws = self._get_obj_raws_()
+        enable = False
+        cur_description_name = None
+        for i_obj_raw in obj_raws:
+            i_line, i_variants = i_obj_raw
+            i_obj_type = i_variants['obj_type']
+            i_port_dict = self._get_obj_port_raws_(i_variants['port_lines'])
+            #
+            if i_obj_type == 'Description':
+                enable = True
+                cur_description_name = i_port_dict['name'][-1]
+            elif i_obj_type.startswith('Patches'):
+                enable = False
+            #
+            i_key = cur_description_name
+            if i_obj_type != 'Description':
+                if cur_description_name is not None:
+                    i_key = '{}.{}'.format(cur_description_name, i_obj_type)
+                else:
+                    i_key = i_obj_type
+            #
+            if enable is True:
+                if '\t' not in i_obj_type:
+                    for j_port_name, (j_port_type, j_port_raw) in i_port_dict.items():
+                        j_key = '{}.{}'.format(i_key, j_port_name)
+                        # print j_key, j_port_raw
+                        d.set(j_key, j_port_raw)
+                else:
+                    pass
+                    j_key = '{}.extra'.format(cur_description_name)
+                    d.set_element_add(j_key, i_obj_type)
+                    # print i_obj_type
+        return d
+
+    def get_collection_data_directory_path(self):
+        pass
 
     def set_save(self):
         utl_core.File.set_write(
@@ -274,9 +425,9 @@ class DotMaFileReader(bsc_obj_abs.AbsFileReader):
         lines = fnmatch.filter(
             self.lines, pattern.pattern
         )
-        for line in lines:
+        for i_line in lines:
             p = parse.parse(
-                pattern.format, line
+                pattern.format, i_line
             )
             if p:
                 file_path = p.named['file']
@@ -289,13 +440,13 @@ class DotMaFileReader(bsc_obj_abs.AbsFileReader):
         lines = fnmatch.filter(
             self.lines, pattern_0.pattern
         )
-        for line in lines:
+        for i_line in lines:
             p = parse.parse(
-                pattern_0.format, line
+                pattern_0.format, i_line
             )
             if p:
                 variants = p.named
-                lis.append((line, variants))
+                lis.append((i_line, variants))
         #
         return lis
 
@@ -592,6 +743,8 @@ class DotUsdaFile(object):
 
 
 if __name__ == '__main__':
-    DotOslFileReader(
-        file_path='/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_noise_fractal.osl'
-    )._get_shader_start_line_()
+    d = DotXgenFileReader(
+        file_path='/l/prod/cgm/output/assets/chr/nn_4y_test/grm/groom/nn_4y_test.grm.groom.v002/scene/nn_4y_test__nn_4y_test_hair_collection.xgen'
+    )
+    d.set_repair()
+    d.set_save()

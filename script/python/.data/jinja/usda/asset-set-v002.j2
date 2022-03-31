@@ -12,33 +12,38 @@ def Xform "{{ asset.root_name }}" (
         {{ '@%s@<%s>' | format(asset.set_file, asset.path) }}
     ]
     variants = {
+        string model_main = "None"
         string model_override = "None"
+        string groom_main = "None"
         string groom_override = "None"
+        string rig_main = "None"
         string rig_override = "None"
+        string effect_main = "None"
         string effect_override = "None"
+        string surface_main = "None"
         string surface_override = "None"
     }
     prepend variantSets = [
         "surface_override",
-        "surface",
+        "surface_main",
         "effect_override",
-        "effect",
+        "effect_main",
         "rig_override",
-        "rig",
+        "rig_main",
         "groom_override",
-        "groom",
+        "groom_main",
         "model_override",
-        "model",
+        "model_main",
     ]
 )
 {
     string userProperties:usd:variants:asset:project = "{{ asset.project }}"
     string userProperties:usd:variants:asset:role = "{{ asset.role }}"
     string userProperties:usd:variants:asset:name = "{{ asset.name }}"
-    variantSet "model" = {
+    variantSet "model_main" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.version.model.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_main.model.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -61,10 +66,10 @@ def Xform "{{ asset.root_name }}" (
         }
         {%- endfor %}
     }
-    variantSet "groom" = {
+    variantSet "groom_main" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.version.groom.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_main.groom.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -87,10 +92,10 @@ def Xform "{{ asset.root_name }}" (
         }
         {%- endfor %}
     }
-    variantSet "rig" = {
+    variantSet "rig_main" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.version.rig.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_main.rig.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -113,10 +118,10 @@ def Xform "{{ asset.root_name }}" (
         }
         {%- endfor %}
     }
-    variantSet "effect" = {
+    variantSet "effect_main" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.version.effect.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_main.effect.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {
@@ -139,10 +144,10 @@ def Xform "{{ asset.root_name }}" (
         }
         {%- endfor %}
     }
-    variantSet "surface" = {
+    variantSet "surface_main" = {
         "None" {
         }
-        {% for i_variant_key, i_variant_file in asset.version.surface.iteritems() -%}
+        {% for i_variant_key, i_variant_file in asset.version_main.surface.iteritems() -%}
         "{{ i_variant_key }}" (
             prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
         ) {

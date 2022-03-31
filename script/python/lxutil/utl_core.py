@@ -1515,7 +1515,7 @@ class RvLauncher(object):
             if bins:
                 run_args += [
                     '--',
-                    '"{}"'.format(bins[0]),
+                    bins[0],
                     '"{}"'.format(file_path)
                 ]
             else:

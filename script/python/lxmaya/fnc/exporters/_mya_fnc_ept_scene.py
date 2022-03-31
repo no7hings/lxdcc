@@ -26,6 +26,8 @@ import lxmaya.modifiers as mya_modifiers
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
+import lxutil.fnc.exporters as utl_fnc_exporters
+
 
 class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
     WITH_XGEN = 'with_xgen_collection'
@@ -34,42 +36,6 @@ class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
     }
     def __init__(self, file_path, root=None, option=None):
         super(SceneExporter, self).__init__(file_path, root, option)
-    @classmethod
-    def _get_xgen_file_path_(cls):
-        current_file_path = mya_dcc_objects.Scene.get_current_file_path()
-        d = os.path.splitext(current_file_path)[0]
-        p = '{}__*.xgen'.format(d)
-        return glob.glob(p) or []
-
-    def _set_dot_xgen_file_copy_(self):
-        source_xgen_file_paths = self._get_xgen_file_path_()
-        target_file_path = self._file_path
-        target_base = os.path.splitext(os.path.basename(target_file_path))[0]
-        target_directory_path = os.path.dirname(target_file_path)
-        replace_list = []
-        for source_xgen_file_path in source_xgen_file_paths:
-            source_xgen_file_name = os.path.basename(source_xgen_file_path)
-            source_base = os.path.splitext(source_xgen_file_name)[0]
-            xgen_name = source_base.split('__')[-1]
-            target_xgen_file_name = '{}__{}.xgen'.format(target_base, xgen_name)
-            target_xgen_file_path = '{}/{}'.format(target_directory_path, target_xgen_file_name)
-            utl_dcc_objects.OsFile(source_xgen_file_path).set_copy_to_file(target_xgen_file_path)
-            replace_list.append((source_xgen_file_name, target_xgen_file_name))
-        #
-        if os.path.isfile(self._file_path):
-            with open(self._file_path) as fr:
-                d = fr.read()
-                for i in replace_list:
-                    s, t = i
-                    d = d.replace(
-                        'setAttr ".xfn" -type "string" "{}";'.format(s),
-                        'setAttr ".xfn" -type "string" "{}";'.format(t)
-                    )
-                with open(self._file_path, 'w') as fw:
-                    fw.write(d)
-
-    def _set_xgen_folder_copy_(self):
-        pass
 
     def set_run(self):
         with_xgen_collection = self._option[self.WITH_XGEN]
@@ -100,8 +66,10 @@ class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
             self._results = [self._file_path]
         #
         if with_xgen_collection is True:
-            self._set_dot_xgen_file_copy_()
-            self._set_xgen_folder_copy_()
+            utl_fnc_exporters.DotMaExporter._set_xgen_collection_files_copy_(
+                file_path_src=mya_dcc_objects.Scene.get_current_file_path(),
+                file_path_tgt=self._file_path
+            )
         #
         if self._results:
             for i in self._results:

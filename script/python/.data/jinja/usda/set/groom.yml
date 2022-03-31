@@ -34,6 +34,7 @@ geometries:
 #
 usdas:
     material: 'shading.usda'
+    xgen: 'xgen.usda'
     #
     payload: 'payload.usda'
     registry: 'registry.usda'

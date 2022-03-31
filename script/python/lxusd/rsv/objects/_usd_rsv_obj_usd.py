@@ -33,11 +33,11 @@ class RsvAssetSetUsdCreator(object):
         'effect': 'efx',
         'srf': 'surface',
     }
-    VARIANT_MAPPER = {
-        'modeling': 'mod',
+    TASK_MAPPER = {
+        'modeling': 'model',
         'groom': 'groom',
         'rigging': 'rig',
-        'effects': 'efx',
+        'effects': 'effect',
         'surfacing': 'surface',
     }
     VARIANTS = {
@@ -306,7 +306,8 @@ class RsvAssetSetUsdCreator(object):
     @classmethod
     def _get_usd_variant_dict_(cls, rsv_scene_properties, asset_usd_file_path):
         c = bsc_objects.Configure(value=collections.OrderedDict())
-        step = rsv_scene_properties.get('step')
+        cur_step = rsv_scene_properties.get('step')
+        cur_key = cls.STEP_MAPPER[cur_step]
         usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
         usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
         usd_variant_dict = usd_prim_opt.get_variant_dict()
@@ -323,15 +324,15 @@ class RsvAssetSetUsdCreator(object):
                         i_variant_names
                     )
                     if i_variant_set_name.endswith('override'):
-                        if step in cls.STEP_MAPPER:
-                            step_ = cls.STEP_MAPPER[step]
-                            if i_variant_set_name == '{}_override'.format(step_):
+                        if cur_step in cls.STEP_MAPPER:
+                            per_key = cls.STEP_MAPPER[cur_step]
+                            if i_variant_set_name == '{}_override'.format(per_key):
                                 i_current_variant_name = i_variant_names[-1]
                     else:
-                        if step in cls.STEP_MAPPER:
-                            if i_variant_set_name in cls.VARIANT_MAPPER:
-                                step_ = cls.VARIANT_MAPPER[i_variant_set_name]
-                                if step == step_:
+                        if cur_step in cls.STEP_MAPPER:
+                            if i_variant_set_name in cls.TASK_MAPPER:
+                                per_key = cls.TASK_MAPPER[i_variant_set_name]
+                                if cur_key == per_key:
                                     i_current_variant_name = 'None'
                     #
                     c.set(
@@ -360,7 +361,7 @@ class RsvAssetSetUsdCreator(object):
                     rsv_scene_properties, i_per_rsv_task
                 )
                 configure.set(
-                    'asset.version.{}'.format(i_key), i_comp_registry
+                    'asset.version_main.{}'.format(i_key), i_comp_registry
                 )
                 i_comp_registry_override = cls._get_asset_comp_registry_override_(
                     rsv_scene_properties, i_per_rsv_task
@@ -376,7 +377,7 @@ class RsvAssetSetUsdCreator(object):
                 rsv_asset,
                 rsv_scene_properties
             )
-            key = 'usda/asset-set'
+            key = 'usda/asset-set-v002'
 
             t = utl_configure.Jinja.get_template(
                 key

@@ -223,7 +223,7 @@ class AbsLibMethodFileDef(object):
         if file_path_src:
             file_src = utl_dcc_objects.OsFile(file_path_src)
             if file_src.ext in ['.ma']:
-                utl_fnc_exporters.DotMaExport(
+                utl_fnc_exporters.DotMaExporter(
                     option=dict(
                         file_path_src=file_path_src,
                         file_path_tgt=file_path_tgt

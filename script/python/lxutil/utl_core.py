@@ -462,14 +462,6 @@ class SubProcessRunner(object):
         pass
 
 
-class Icons(object):
-    def __init__(self):
-        pass
-
-    def get_icon_file_paths(self, key, ext='.svg'):
-        pass
-
-
 class Icon(object):
     ROOT_PATH = utl_configure.Root.icon
     ICON_KEY_PATTERN = r'[@](.*?)[@]'

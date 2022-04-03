@@ -636,6 +636,7 @@ class AbsRsvObj(
     AbsRsvObjDef,
     AbsRsvPropertiesDef,
     obj_abstract.AbsObjDagDef,
+    # gui
     obj_abstract.AbsObjGuiDef
 ):
     def __init__(self, *args, **kwargs):
@@ -667,6 +668,10 @@ class AbsRsvObj(
                 ('Open Publish Directory', 'file/folder', (self._get_publish_directory_is_enable_, self._set_publish_directory_open_, False)),
                 ('Open Output Directory', 'file/folder', (self._get_output_directory_is_enable_, self._set_output_directory_open_, False)),
             ]
+        )
+
+        self.set_description(
+            '\n'.join(['{} : {}'.format(k, v) for k, v in bsc_core.DictMtd.set_key_sort_to(kwargs).items()])
         )
 
     def __get_src_directory_path_(self):
@@ -960,7 +965,7 @@ class AbsRsvUnit(
         )
         matches = rsv_matcher.get_matches(trim=(-1, None))
         if matches:
-            _, variants = matches[-1]
+            result, variants = matches[-1]
             version = variants['version']
             return version
 
@@ -977,7 +982,6 @@ class AbsRsvUnit(
             rsv_obj=self,
             **kwargs
         )
-        rsv_version._set_result_(self.get_result(version=kwargs['version']))
         return rsv_version
 
     def get_rsv_versions(self):
@@ -1007,9 +1011,6 @@ class AbsRsvUnitVersion(
 
     def get_rsv_unit(self):
         return self.get_parent()
-
-    def _set_result_(self, raw):
-        self._result = raw
 
     def _set_directory_open_(self):
         if self._result:
@@ -1107,7 +1108,7 @@ class AbsRsvTask(
         )
         matches = rsv_matcher.get_matches(trim=(-1, None))
         if matches:
-            _, variants = matches[-1]
+            result, variants = matches[-1]
             version = variants['version']
             return version
 
@@ -1696,7 +1697,7 @@ class AbsRsvProject(
         ).get_matches()
         if matches:
             result, variants = matches[-1]
-            kwargs.update(variants)
+            self._set_kwargs_update_(result, variants, kwargs)
             rsv_obj = self.RSV_TAG_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
@@ -1788,7 +1789,7 @@ class AbsRsvProject(
         ).get_matches()
         if matches:
             result, variants = matches[-1]
-            kwargs.update(variants)
+            self._set_kwargs_update_(result, variants, kwargs)
             rsv_obj = self.RSV_ENTITY_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
@@ -1884,8 +1885,8 @@ class AbsRsvProject(
             self, args[1], kwargs
         ).get_matches()
         if matches:
-            _, variants = matches[-1]
-            kwargs.update(variants)
+            result, variants = matches[-1]
+            self._set_kwargs_update_(result, variants, kwargs)
             rsv_obj = self.RSV_STEP_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
@@ -1997,8 +1998,8 @@ class AbsRsvProject(
             self, args[1], kwargs
         ).get_matches()
         if matches:
-            _, variants = matches[-1]
-            kwargs.update(variants)
+            result, variants = matches[-1]
+            self._set_kwargs_update_(result, variants, kwargs)
             rsv_obj = self.RSV_TASK_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
@@ -2092,8 +2093,8 @@ class AbsRsvProject(
             self, args[1], kwargs
         ).get_matches()
         if matches:
-            _, variants = matches[-1]
-            kwargs.update(variants)
+            result, variants = matches[-1]
+            self._set_kwargs_update_(result, variants, kwargs)
             rsv_obj = self.RSV_TASK_VERSION_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
@@ -2172,11 +2173,22 @@ class AbsRsvProject(
             self, args[1], kwargs
         ).get_matches()
         if matches:
-            _, variants = matches[-1]
-            kwargs.update(variants)
+            result, variants = matches[-1]
+            self._set_kwargs_update_(result, variants, kwargs)
             rsv_obj = self.RSV_UNIT_VERSION_CLASS(self, *args, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
+    @classmethod
+    def _set_kwargs_update_(cls, result, variants, kwargs):
+        update = bsc_core.TimeMtd.to_prettify_by_timestamp(
+            bsc_core.StorageFileOpt(
+                result
+            ).get_modify_timestamp(),
+            language=1
+        )
+        kwargs['result'] = result
+        kwargs['update'] = update
+        kwargs.update(variants)
 
     def _unit__get_rsv_version_(self, **kwargs):
         rsv_task = self.get_rsv_task(**kwargs)
@@ -2337,7 +2349,7 @@ class AbsRsvProject(
 
 
 # <resolver>
-class AbsResolver(
+class AbsRsvRoot(
     AbsSsnResolverDef,
     obj_abstract.AbsObjGuiDef,
     obj_abstract.AbsObjDagDef,

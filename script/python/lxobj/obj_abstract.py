@@ -1092,6 +1092,9 @@ class AbsObjGuiDef(object):
     @property
     def description(self):
         return self.get_gui_attribute('description')
+
+    def set_description(self, text):
+        self.set_gui_attribute('description', text)
     @property
     def icon(self):
         return self.get_gui_attribute('icon')

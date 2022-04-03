@@ -1615,6 +1615,14 @@ class DictMtd(object):
             indent=4,
             default_flow_style=False
         )
+    @classmethod
+    def set_key_sort_to(cls, dict_):
+        dic = collections.OrderedDict()
+        keys = dict_.keys()
+        keys.sort()
+        for i_key in keys:
+            dic[i_key] = dict_[i_key]
+        return dic
 
 
 class StrUnderlineOpt(object):
@@ -1968,8 +1976,8 @@ class ColorMtd(object):
         v_ = v
         return h_, s_, v_
     @classmethod
-    def get_complementary_rgb(cls, r, g, b):
-        return (255-r) % 255, (255-g) % 255, (255-b) % 255
+    def get_complementary_rgb(cls, r, g, b, maximum=255):
+        return abs(255-r), abs(255-g), abs(255-b)
     @classmethod
     def set_rgb_offset(cls, rgb, hsv_offset):
         r, g, b = rgb
@@ -3144,5 +3152,73 @@ class ParsePatternOpt(object):
         return self._fnmatch_pattern
 
 
+class TimeMtd(object):
+    MONTH = [
+        (u'01月', 'January'),
+        (u'02月', 'February'),
+        (u'03月', 'March'),
+        (u'04月', 'April'),
+        (u'05月', 'May'),
+        (u'06月', 'June'),
+        (u'07月', 'July'),
+        (u'08月', 'August'),
+        (u'09月', 'September'),
+        (u'10月', 'October'),
+        (u'11月', 'November'),
+        (u'12月', 'December')
+    ]
+    WEEK = [
+        (u'周一', 'Monday'),
+        (u'周二', 'Tuesday'),
+        (u'周三', 'Wednesday'),
+        (u'周四', 'Thursday'),
+        (u'周五', 'Friday'),
+        (u'周六', 'Saturday'),
+        (u'周天', 'Sunday'),
+    ]
+    @classmethod
+    def to_prettify_by_timestamp(cls, timestamp, language=0):
+        if isinstance(timestamp, float):
+            return cls.to_prettify_by_timetuple(
+                time.localtime(timestamp),
+                language=language,
+                )
+    @classmethod
+    def to_prettify_by_timetuple(cls, timetuple, language=0):
+        year, month, day, hour, minute, second, week, dayCount, isDst = timetuple
+        cur_timetuple = time.localtime(time.time())
+        year_, month_, day_, hour_, minute_, second_, week_, dayCount_, isDst_ = cur_timetuple
+        #
+        monday = day - week
+        monday_ = day_ - week_
+        year_str = [u'{}年'.format(str(year).zfill(4)), str(year).zfill(4)][language]
+        month_str = cls.MONTH[int(month) - 1][language]
+        day_str = [u'{}日'.format(str(day).zfill(2)), str(day).zfill(2)][language]
+        if cur_timetuple[:1] == timetuple[:1]:
+            if cur_timetuple[:2] == timetuple[:2]:
+                if monday_ == monday:
+                    week_str = u'{0}'.format(cls.WEEK[int(week)][language])
+                    if day_ == day:
+                        time_str = [
+                            u'{}点{}分{}秒'.format(str(hour).zfill(2), str(minute).zfill(2), str(second).zfill(2)),
+                            '{}:{}:{}'.format(str(hour).zfill(2), str(minute).zfill(2), str(second).zfill(2))
+                        ][language]
+                        return time_str
+                    elif day_ == day + 1:
+                        sub_str = [u'昨天', 'Yesterday'][language]
+                        return sub_str
+                    return week_str
+            #
+            if language == 0:
+                return u'{}{}'.format(month_str, day_str)
+            return '{} {}'.format(day_str, month_str)
+        #
+        if language == 0:
+            return u'{}{}'.format(year_str, month_str)
+        return '{} {}'.format(month_str, year_str)
+
+
 if __name__ == '__main__':
-    print KeywordArgumentsOpt._set_value_convert_by_string_('false')
+    print ColorMtd.get_complementary_rgb(
+        255, 0, 0
+    )

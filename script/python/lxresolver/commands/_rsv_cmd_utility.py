@@ -7,7 +7,7 @@ from lxresolver.objects import _rsv_obj_utility
 def get_resolver():
     _ = _rsv_obj_callback.__dict__['RESOLVER']
     if _ is None:
-        _ = _rsv_obj_utility.Resolver()
+        _ = _rsv_obj_utility.RsvRoot()
         _rsv_obj_callback.__dict__['RESOLVER'] = _
     return _
 

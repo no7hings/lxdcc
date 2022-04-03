@@ -106,7 +106,7 @@ class RsvProject(rsv_abstract.AbsRsvProject):
         super(RsvProject, self).__init__(*args, **kwargs)
 
 
-class Resolver(rsv_abstract.AbsResolver):
+class RsvRoot(rsv_abstract.AbsRsvRoot):
     PATHSEP = '/'
     #
     FILE_PATH = rsv_configure.Data.RESOLVER_BASIC_CONFIGURE_PATH
@@ -116,7 +116,7 @@ class Resolver(rsv_abstract.AbsResolver):
     RSV_PROJECT_STACK_CLASS = _rsv_obj_stack.ProjectStack
     RSV_PROJECT_CLASS = RsvProject
     def __init__(self):
-        super(Resolver, self).__init__()
+        super(RsvRoot, self).__init__()
 
 
 if __name__ == '__main__':

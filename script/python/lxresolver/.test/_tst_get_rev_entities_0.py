@@ -7,8 +7,6 @@ if __name__ == '__main__':
     src_rsv_project = r.get_rsv_project(project='shl')
     tgt_rsv_project = r.get_rsv_project(project='cjd')
 
-    print src_rsv_project
-
     assets = [
         'cao_a',
         'cao_b',

@@ -420,7 +420,7 @@ class RsvAssetSetUsdCreator(object):
             start_frame, end_frame = usd_core.UsdStageOpt(shot_set_dress_usd_file_path).get_frame_range()
             shot_assets_dict = cls._get_shot_asset_dict_(rsv_asset, rsv_shot)
 
-            key = 'usda/shot-asset-set'
+            key = 'usda/shot-asset-set-v002'
 
             t = utl_configure.Jinja.get_template(
                 key

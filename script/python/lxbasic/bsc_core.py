@@ -198,6 +198,9 @@ class SystemMtd(object):
             time.localtime(timestamp)
         )
     @classmethod
+    def get_timestamp(cls):
+        return time.time()
+    @classmethod
     def get_minute(cls):
         return time.localtime().tm_min
     @classmethod
@@ -1007,6 +1010,7 @@ class SubProcessMtd(object):
     @classmethod
     def set_run_with_result_in_windows(cls, cmd, clear_environ=False):
         # must reload, output error
+        import sys
         reload(sys)
         if hasattr(sys, 'setdefaultencoding'):
             sys.setdefaultencoding('utf-8')
@@ -1057,6 +1061,7 @@ class SubProcessMtd(object):
     @classmethod
     def set_run_with_result_in_linux(cls, cmd, clear_environ=False):
         # must reload, output error
+        import sys
         reload(sys)
         if hasattr(sys, 'setdefaultencoding'):
             sys.setdefaultencoding('utf-8')

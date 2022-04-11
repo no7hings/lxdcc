@@ -249,8 +249,7 @@ class LogProgressRunner(object):
         self._label = label
         self._use_as_progress_bar = use_as_progress_bar
         #
-        self._pre_timestamp = 0.0
-        #
+        self._pre_timestamp = bsc_core.SystemMtd.get_timestamp()
         #
         Log.set_module_result_trace(
             self._label,
@@ -259,23 +258,28 @@ class LogProgressRunner(object):
 
     def set_update(self, sub_label=None):
         self._value += 1
+        cur_timestamp = bsc_core.SystemMtd.get_timestamp()
+        cost_timestamp = cur_timestamp - self._pre_timestamp
+        self._pre_timestamp = cur_timestamp
         #
         percent = float(self._value) / float(self._maximum)
         #
         if self._use_as_progress_bar is True:
             Log.set_module_result_trace(
                 u'{}'.format(self._label),
-                u'is running {} {}%'.format(
+                u'is running {} {}%, cost time {}'.format(
                     self._get_progress_bar_string_(percent),
                     '%3d' % (percent * 100),
+                    bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
 
                 )
             )
         else:
             Log.set_module_result_trace(
                 u'{}'.format(self._label),
-                u'is running {}%'.format(
+                u'is running {}%, cost time {}'.format(
                     '%3d' % (percent*100),
+                    bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
                 )
             )
     @classmethod
@@ -284,7 +288,7 @@ class LogProgressRunner(object):
         p = int(percent*c)
         p = max(p, 1)
         return u'{}{}'.format(
-            p*u'█', (c-p)*' '
+            p*u'■', (c-p)*'□'
         )
 
     def set_stop(self):

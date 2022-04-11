@@ -79,7 +79,6 @@ asset-role-dir: <asset-tag-dir>
 # <asset-step>
 asset-step-dir: <asset-dir>/<step-name>
 asset-work-step-dir: <asset-dir>/<step-name>
-asset-output-step-dir: <asset-dir>/<step-name>
 # <asset-task>
 asset-task-dir: <asset-step-dir>/<task-name>
 asset-work-task-dir: <asset-work-step-dir>/<task-name>
@@ -340,15 +339,15 @@ asset-look-yml-file: <asset-look-yml-dir>/<asset-name>.yml
 asset-texture-src-dir: <asset-task-dir>/texture
 asset-texture-tgt-dir: <asset-version-dir>/texture
 # <asset-usd>
-asset-comp-usd-dir: <asset-version-dir>/cache/usd
-asset-usd-payload-file: <asset-comp-usd-dir>/payload.usda
-asset-comp-registry-usd-file: <asset-comp-usd-dir>/registry.usda
+asset-component-usd-dir: <asset-version-dir>/cache/usd
+asset-usd-payload-file: <asset-component-usd-dir>/payload.usda
+asset-comp-registry-usd-file: <asset-component-usd-dir>/registry.usda
 #
-asset-component-usd-file: <asset-comp-usd-dir>/<asset-name>.usda
+asset-component-usd-file: <asset-component-usd-dir>/<asset-name>.usda
 #
-asset-usd-look-file: <asset-comp-usd-dir>/shading.usda
-asset-usd-look-properties-usd-file: <asset-comp-usd-dir>/look/<look-pass>.properties.usda
-asset-usd-geometry-uv_map-file: <asset-comp-usd-dir>/uv_map.usd
+asset-usd-look-file: <asset-component-usd-dir>/shading.usda
+asset-usd-look-properties-usd-file: <asset-component-usd-dir>/look/<look-pass>.properties.usda
+asset-usd-geometry-uv_map-file: <asset-component-usd-dir>/uv_map.usd
 # <asset-usd-model>
 asset-usd-model-dir: <asset-version-dir>/cache/usd
 asset-usd-model-registry-file: <asset-usd-model-dir>/registry.usda
@@ -375,6 +374,7 @@ asset-set-dress-usd-file: <asset-set-usd-dir>/<asset-name>.usda
 asset-asset-set-usd-file: <asset-version-dir>/set/usd/<asset-name>.usda
 asset-asset-shot-set-usd-file: <asset-version-dir>/set/usd/<asset-shot-name>.usda
 # asset output ======================================================================================================= #
+asset-output-step-dir: <asset-dir>/<step-name>
 asset-output-task-dir: <asset-output-step-dir>/<task-name>
 asset-output-version-dir: <asset-output-task-dir>/<asset-version-name>
 #
@@ -419,8 +419,8 @@ asset-output-xgen-usd-file: <asset-output-xgen-usd-dir>/xgen.usda
 #
 asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
 #
-asset-output-comp-usd-dir: <asset-output-version-dir>/cache/usd
-asset-output-comp-registry-usd-file: <asset-output-comp-usd-dir>/registry.usda
+asset-output-component-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-component-registry-usd-file: <asset-output-component-usd-dir>/registry.usda
 #
 asset-output-texture-src-dir: <asset-output-task-dir>/texture
 asset-output-texture-tgt-dir: <asset-output-version-dir>/texture
@@ -462,11 +462,9 @@ shot-sequence-dir: <shot-tag-dir>
 # <shot-step>
 shot-step-dir: <shot-dir>/<step-name>
 shot-work-step-dir: <shot-dir>/<step-name>
-shot-output-step-dir: <shot-dir>/<step-name>
 # <shot-task>
 shot-task-dir: <shot-step-dir>/<task-name>
 shot-work-task-dir: <shot-work-step-dir>/<task-name>
-shot-output-task-dir: <shot-output-step-dir>/<task-name>
 # <shot-version>
 shot-version-name: <shot-name>.<step-name>.<task-name>.<version-name>
 shot-no-version-name: <shot-name>.<step-name>.<task-name>
@@ -539,8 +537,38 @@ shot-manifest-scenegraph-usd-file: <shot-manifest-usd-dir>/scenegraph.usda
 shot-set-dir: <shot-no-version-dir>/manifest
 shot-set-usd-dir: <shot-set-dir>/usd
 shot-set-dress-usd-file: <shot-set-usd-dir>/<shot-name>.usda
+# <shot-usd>
+shot-component-usd-dir: <shot-version-dir>/manifest/usd
+shot-component-usd-file: <shot-component-usd-dir>/<shot-name>.usda
+# shot output ===================================================================================+==================== #
+shot-output-step-dir: <shot-dir>/<step-name>
+shot-output-task-dir: <shot-output-step-dir>/<task-name>
+shot-output-version-dir: <shot-output-task-dir>/<shot-version-name>
+#
+shot-output-render-dir: <shot-output-version-dir>/render
+#
+shot-output-maya-scene-src-dir: <shot-output-version-dir>/scene
+shot-output-maya-scene-src-file: <shot-output-maya-scene-src-dir>/<shot-name>.ma
+shot-output-maya-scene-dir: <shot-output-version-dir>/maya
+shot-output-maya-scene-file: <shot-output-maya-scene-dir>/<shot-name>.ma
+shot-output-maya-render-output-dir: <shot-output-render-dir>/maya-images
+#
+shot-output-houdini-scene-src-dir: <shot-output-version-dir>/scene
+shot-output-houdini-scene-src-file: <shot-output-houdini-scene-src-dir>/<shot-name>.hip
+shot-output-houdini-scene-dir: <shot-output-version-dir>/houdini
+shot-output-houdini-scene-file: <shot-output-houdini-scene-dir>/<shot-name>.hip
+shot-output-houdini-render-output-dir: <shot-output-render-dir>/houdini-images
+#
+shot-output-katana-scene-src-dir: <shot-output-version-dir>/scene
+shot-output-katana-scene-src-file: <shot-output-katana-scene-src-dir>/<shot-name>.katana
+shot-output-katana-scene-dir: <shot-output-version-dir>/katana
+shot-output-katana-scene-file: <shot-output-katana-scene-dir>/<shot-name>.katana
+shot-output-katana-render-output-dir: <shot-output-render-dir>/katana-images
 #
 shot-output-katana-render-movie-file: <shot-output-task-dir>/render_images/<shot-version-name>.mov
+# <shot-usd>
+shot-output-component-usd-dir: <shot-output-version-dir>/manifest/usd
+shot-output-component-usd-file: <shot-output-component-usd-dir>/<shot-name>.usda
 # ******************************************************************************************************************** #
 # include-rule:
 #     key: list(str(variant), ...)

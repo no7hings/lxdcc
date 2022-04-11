@@ -6,6 +6,7 @@ import platform
 import os
 
 import glob
+
 import threading
 
 import time
@@ -72,6 +73,11 @@ class _Pattern(object):
 
 
 class Log(object):
+    import sys
+    reload(sys)
+    if hasattr(sys, 'setdefaultencoding'):
+        sys.setdefaultencoding('utf-8')
+    #
     PRINT_ENABLE = True
     def __init__(self, file_path):
         self._file_path = file_path
@@ -237,24 +243,48 @@ def gui_progress(maximum, label=None):
 
 
 class LogProgressRunner(object):
-    def __init__(self, maximum, label):
+    def __init__(self, maximum, label, use_as_progress_bar=False):
         self._maximum = maximum
         self._value = 0
         self._label = label
+        self._use_as_progress_bar = use_as_progress_bar
+        #
+        self._pre_timestamp = 0.0
+        #
         #
         Log.set_module_result_trace(
             self._label,
-            'start'
+            'is started'
         )
 
     def set_update(self, sub_label=None):
         self._value += 1
         #
-        Log.set_module_result_trace(
-            self._label,
-            u'progress running {}%'.format(
-                (round(float(self._value) / float(self._maximum), 4)) * 100
+        percent = float(self._value) / float(self._maximum)
+        #
+        if self._use_as_progress_bar is True:
+            Log.set_module_result_trace(
+                u'{}'.format(self._label),
+                u'is running {} {}%'.format(
+                    self._get_progress_bar_string_(percent),
+                    '%3d' % (percent * 100),
+
+                )
             )
+        else:
+            Log.set_module_result_trace(
+                u'{}'.format(self._label),
+                u'is running {}%'.format(
+                    '%3d' % (percent*100),
+                )
+            )
+    @classmethod
+    def _get_progress_bar_string_(cls, percent):
+        c = 20
+        p = int(percent*c)
+        p = max(p, 1)
+        return u'{}{}'.format(
+            p*u'█', (c-p)*' '
         )
 
     def set_stop(self):
@@ -263,7 +293,7 @@ class LogProgressRunner(object):
         #
         Log.set_module_result_trace(
             self._label,
-            'complete'
+            'is completed'
         )
 
     def __enter__(self):
@@ -273,8 +303,8 @@ class LogProgressRunner(object):
         self.set_stop()
 
 
-def log_progress(maximum, label):
-    return LogProgressRunner(maximum, label)
+def log_progress(maximum, label, use_as_progress_bar=False):
+    return LogProgressRunner(maximum, label, use_as_progress_bar)
 
 
 class DialogWindow(object):

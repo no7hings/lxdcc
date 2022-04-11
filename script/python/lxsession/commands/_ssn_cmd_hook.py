@@ -11,13 +11,13 @@ def get_hook_args(key):
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects
     #
-    from lxsession import ssn_configure
+    from lxsession import ssn_core
     #
     import lxsession.objects as ssn_objects
     #
-    yaml_file_path = ssn_configure.Hooks.get_yaml_file(key)
+    yaml_file_path = ssn_core.RscHookFile.get_yaml(key)
     if yaml_file_path:
-        python_file_path = ssn_configure.Hooks.get_python_file(key)
+        python_file_path = ssn_core.RscHookFile.get_python(key)
         python_file = utl_dcc_objects.OsPythonFile(python_file_path)
         yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
         if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
@@ -85,7 +85,19 @@ def set_hook_execute(key):
 
 def get_option_hook_args(option):
     def execute_fnc():
-        session._set_file_execute_(python_file_path, dict(session=session))
+        utl_core.Log.set_module_result_trace(
+            'option-hook execute is started', 'file="{}"'.format(
+                python_file_path
+            )
+        )
+        session._set_file_execute_(
+            python_file_path, dict(session=session)
+        )
+        utl_core.Log.set_module_result_trace(
+            'option-hook execute is completed', 'file="{}"'.format(
+                python_file_path
+            )
+        )
     #
     from lxbasic import bsc_core
     #
@@ -95,7 +107,7 @@ def get_option_hook_args(option):
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects
     #
-    from lxsession import ssn_configure
+    from lxsession import ssn_core
     #
     import lxsession.objects as ssn_objects
     #
@@ -103,9 +115,9 @@ def get_option_hook_args(option):
     #
     hook_key = option_opt.get('option_hook_key')
     #
-    yaml_file_path = ssn_configure.OptionHooks.get_yaml_file(hook_key)
+    yaml_file_path = ssn_core.RscOptionHookFile.get_yaml(hook_key)
     if yaml_file_path:
-        python_file_path = ssn_configure.OptionHooks.get_python_file(hook_key)
+        python_file_path = ssn_core.RscOptionHookFile.get_python(hook_key)
         python_file = utl_dcc_objects.OsPythonFile(python_file_path)
         yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
         if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
@@ -177,13 +189,13 @@ def get_option_hook_configure(option):
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects
     #
-    from lxsession import ssn_configure
+    from lxsession import ssn_core
     #
     option_opt = bsc_core.KeywordArgumentsOpt(option)
     #
     option_hook_key = option_opt.get('option_hook_key')
     #
-    yaml_file_path = ssn_configure.OptionHooks.get_yaml_file(option_hook_key)
+    yaml_file_path = ssn_core.RscOptionHookFile.get_yaml(option_hook_key)
     if yaml_file_path:
         yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
         if yaml_file.get_is_exists() is True:

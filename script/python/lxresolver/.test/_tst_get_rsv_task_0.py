@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     print rsv_task
 
-    rsv_unit = rsv_task.get_rsv_unit(keyword='asset-render-katana-output-sub-dir')
+    rsv_unit = rsv_task.get_rsv_unit(keyword='{branch}-render-katana-output-sub-dir')
 
     for i in rsv_unit.get_results(
         version='v014', check_exists=False

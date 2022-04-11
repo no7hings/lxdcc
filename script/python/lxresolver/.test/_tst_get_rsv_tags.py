@@ -10,10 +10,12 @@ if __name__ == '__main__':
 
     rsv_tags = rsv_project.get_rsv_tags(workspace='work', role=['gmt', 'sdr'])
 
-    def test():
-        for rsv_tag in rsv_tags:
-            print rsv_tag.get_rsv_tasks()
+    print rsv_project.get_rsv_tags(role='ch*')
 
-    import cProfile
-
-    cProfile.run("test()")
+    # def test():
+    #     for rsv_tag in rsv_tags:
+    #         print rsv_tag.get_rsv_tasks()
+    #
+    # import cProfile
+    #
+    # cProfile.run("test()")

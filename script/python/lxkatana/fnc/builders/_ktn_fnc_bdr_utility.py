@@ -28,7 +28,6 @@ from lxutil.fnc import utl_fnc_obj_abs
 
 class AssetWorkspaceBuilder(object):
     CONFIGURE_FILE_PATH = ktn_configure.Data.LOOK_KATANA_WORKSPACE_CONFIGURE_PATH
-
     def __init__(self, location=None):
         self._look_configure_dict = {}
         self._default_configure = self.set_configure_create()
@@ -365,30 +364,6 @@ class AssetWorkspaceBuilder(object):
         #
         return s_ktn_port, t_ktn_port
     @classmethod
-    def _get_node_connect_args__(cls, source_attr_path, target_attr_path):
-        def rcs_fnc_(i_ktn_port_):
-            _source_ktn_ports = i_ktn_port_.getConnectedPorts()
-            if _source_ktn_ports:
-                _source_ktn_port = _source_ktn_ports[0]
-                if _source_ktn_port == o_ktn_port:
-                    return i_ktn_port_
-                else:
-                    _source_node = _source_ktn_port.getNode()
-                    _i_ktn_ports = _source_node.getInputPorts()
-                    if _i_ktn_ports:
-                        _i_ktn_port = _i_ktn_ports[0]
-                        return rcs_fnc_(_i_ktn_port)
-        #
-        source_obj_path, source_port_name = source_attr_path.split('.')
-        o_ktn_port = ktn_dcc_objects.Node(source_obj_path).ktn_obj.getOutputPort(source_port_name)
-        target_obj_path, target_port_name = target_attr_path.split('.')
-        i_ktn_port = ktn_dcc_objects.Node(target_obj_path).ktn_obj.getInputPort(target_port_name)
-        #
-        s_ktn_port = o_ktn_port
-        t_ktn_port = rcs_fnc_(i_ktn_port)
-        #
-        return s_ktn_port, t_ktn_port
-    @classmethod
     def _set_workspace_connections_create_(cls, configure, key, sub_key):
         node_connections = configure.get('workspace.{}.{}.connections'.format(key, sub_key))
         if node_connections:
@@ -418,7 +393,7 @@ class AssetWorkspaceBuilder(object):
             enable_dcc_port.set(True)
         else:
             utl_core.Log.set_warning_trace(
-                'unknown-port-name="{}"'.format(parameter_port_name)
+                'port-name="{}" is unknown'.format(parameter_port_name)
             )
         #
         value_ktn_port_name = 'args.arnoldStatements.{}.value'.format(parameter_port_name)
@@ -765,6 +740,7 @@ class AssetWorkspaceBuilder(object):
             if obj_type is not None:
                 lis.extend(obj_type.get_objs())
         return lis
+    # to occ
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_auto_occlusion_assign(self, pass_name='default'):
         configure = self.get_configure(pass_name)
@@ -772,12 +748,12 @@ class AssetWorkspaceBuilder(object):
         material_root = configure.get('option.material_root')
         geometries = self.get_sg_geometries(pass_name)
         for i_geometry in geometries:
-            dcc_material_assign, ktn_material_assign = self.get_ng_material_assign(
+            i_dcc_material_assign, i_ktn_material_assign = self.get_ng_material_assign(
                 name=i_geometry.name,
                 pass_name=pass_name
             )
-            if ktn_material_assign is None:
-                dcc_material, ktn_material = self.set_ng_material_create(
+            if i_ktn_material_assign is None:
+                i_dcc_material, i_ktn_material = self.set_ng_material_create(
                     name=i_geometry.name,
                     pass_name=pass_name
                 )
@@ -785,36 +761,35 @@ class AssetWorkspaceBuilder(object):
                     name=i_geometry.name,
                     assign=(
                         i_geometry.path,
-                        '{}/{}'.format(material_root, dcc_material.name)
+                        '{}/{}'.format(material_root, i_dcc_material.name)
                     ),
                     pass_name=pass_name
                 )
-                dcc_shader_name = self.get_ng_shader_name(
+                i_dcc_shader_name = self.get_ng_shader_name(
                     name=i_geometry.name,
                     pass_name=pass_name
                 )
                 if i_geometry.type_name in ['renderer procedural']:
-                    color = (0.37, 0.08, 0.37)
-                    # r, g, b = 0.37, 0.08, 0.37
+                    i_color = (0.37, 0.08, 0.37)
                     # h, s, v = bsc_core.ColorMtd.hsv2rgb(r, g, b, maximum=1)
                     self._set_occlusion_shader_create_(
-                        dcc_material,
-                        '{}/{}'.format(dcc_material.get_parent().path, dcc_shader_name),
-                        color
+                        i_dcc_material,
+                        '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name),
+                        i_color
                     )
                 elif i_geometry.type_name in ['subdmesh']:
                     self._set_opacity_lambert_create_(
-                        dcc_material,
-                        '{}/{}'.format(dcc_material.get_parent().path, dcc_shader_name),
+                        i_dcc_material,
+                        '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name),
                     )
             else:
-                sg_material_path = dcc_material_assign.get_port(
+                i_sg_material_path = i_dcc_material_assign.get_port(
                     'args.materialAssign.value'
                 ).get()
-                if sg_material_path:
-                    ng_material_name = bsc_core.DccPathDagOpt(sg_material_path).name
-                    ng_dcc_material = ktn_dcc_objects.Node(ng_material_name)
-                    self._set_occlusion_convert_(ng_dcc_material)
+                if i_sg_material_path:
+                    i_ng_material_name = bsc_core.DccPathDagOpt(i_sg_material_path).name
+                    i_ng_dcc_material = ktn_dcc_objects.Node(i_ng_material_name)
+                    self._set_occlusion_convert_(i_ng_dcc_material)
     @classmethod
     def _set_occlusion_convert_(cls, dcc_material):
         dcc_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
@@ -863,6 +838,9 @@ class AssetWorkspaceBuilder(object):
                 if dcc_targets:
                     for i_dcc_target in dcc_targets:
                         dcc_occ_opt.set_port_target('out', i_dcc_target, validation=True)
+    #
+    def set_auto_white_assign(self, pass_name='default'):
+        pass
     @classmethod
     def _set_occlusion_shader_create_(cls, dcc_material, dcc_path, color):
         dcc_shader_opt = ktn_dcc_operators.AndShaderOpt(

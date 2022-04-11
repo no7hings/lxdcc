@@ -82,8 +82,8 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
         self._usd_stage.Flatten()
         # base, ext = os.path.splitext(file_path)
         # self._usd_stage.Export('{}.usda'.format(base))
-        for usd_prim in self._usd_stage.TraverseAll():
-            self._set_obj_create_(usd_prim)
+        for i_usd_prim in self._usd_stage.TraverseAll():
+            self._set_obj_create_(i_usd_prim)
 
     def _set_obj_create_(self, usd_prim):
         obj_category_name = obj_configure.ObjCategory.USD

@@ -7,8 +7,6 @@ def set_session_option_hooks_execute_by_deadline(session):
     :param session: <instance of session>
     :return: None
     """
-    import fnmatch
-
     from lxsession.commands import _ssn_cmd_hook
     #
     from lxbasic import bsc_core
@@ -69,22 +67,28 @@ def set_session_option_hooks_execute_by_deadline(session):
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
-    for i in option_hook_keys:
-        if isinstance(i, (str, unicode)):
-            i_sub_key = i
-            run_fnc_(
-                main_key,
-                i_sub_key,
-                session.option,
-                {}
-            )
-        elif isinstance(i, dict):
-            for i_k, i_v in i.items():
-                i_sub_key = i_k
-                i_script_option = i_v
+    with utl_core.log_progress(
+            maximum=len(option_hook_keys),
+            label='option hooks execute by deadline',
+            use_as_progress_bar=True
+    ) as g_p:
+        for i in option_hook_keys:
+            g_p.set_update()
+            if isinstance(i, (str, unicode)):
+                i_sub_key = i
                 run_fnc_(
                     main_key,
                     i_sub_key,
                     session.option,
-                    i_script_option
+                    {}
                 )
+            elif isinstance(i, dict):
+                for i_k, i_v in i.items():
+                    i_sub_key = i_k
+                    i_script_option = i_v
+                    run_fnc_(
+                        main_key,
+                        i_sub_key,
+                        session.option,
+                        i_script_option
+                    )

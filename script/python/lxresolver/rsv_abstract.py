@@ -671,7 +671,7 @@ class AbsRsvObj(
         )
 
         self.set_description(
-            '\n'.join(['{} : {}'.format(k, v) for k, v in bsc_core.DictMtd.set_key_sort_to(kwargs).items()])
+            u'\n'.join([u'{} : {}'.format(k, v) for k, v in bsc_core.DictMtd.set_key_sort_to(kwargs).items()])
         )
 
     def __get_src_directory_path_(self):
@@ -742,7 +742,7 @@ class AbsRsvObj(
         return self.__str__()
 
 
-class AbsSsnResolverDef(object):
+class AbsRsvDef(object):
     RSV_PATTERN_CLASS = None
     def _set_rsv_def_init_(self):
         self._raw = collections.OrderedDict()
@@ -1414,7 +1414,7 @@ class AbsRsvTag(
 # <rsv-project>
 class AbsRsvProject(
     AbsRsvObjDef,
-    AbsSsnResolverDef,
+    AbsRsvDef,
     obj_abstract.AbsObjGuiDef,
     obj_abstract.AbsObjDagDef,
 ):
@@ -2114,6 +2114,7 @@ class AbsRsvProject(
         type_ = 'unit'
         kwargs_['type'] = type_
         keyword = kwargs_['keyword']
+        keyword = self._set_keyword_update_(kwargs_)
         if 'platform' not in kwargs_:
             kwargs_['platform'] = bsc_core.SystemMtd.get_platform()
         #
@@ -2128,6 +2129,18 @@ class AbsRsvProject(
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
         return self._project__set_rsv_unit_create_(obj_path, pattern, **variants)
+    @classmethod
+    def _set_keyword_update_(cls, kwargs):
+        """
+        etc: keyword = '{branch}-component-usd-file'
+        :param kwargs:
+        :return:
+        """
+        keyword = kwargs.pop('keyword')
+        # noinspection PyStatementEffect
+        keyword = keyword.format(**kwargs)
+        kwargs['keyword'] = keyword
+        return keyword
 
     def _project__set_rsv_unit_create_(self, *args, **kwargs):
         rsv_obj = self.RSV_UNIT_CLASS(self, *args, **kwargs)
@@ -2350,7 +2363,7 @@ class AbsRsvProject(
 
 # <resolver>
 class AbsRsvRoot(
-    AbsSsnResolverDef,
+    AbsRsvDef,
     obj_abstract.AbsObjGuiDef,
     obj_abstract.AbsObjDagDef,
 ):
@@ -2544,7 +2557,7 @@ class AbsRsvRoot(
                         rsv_project.properties.set('root', root)
                         return rsv_project
         #
-        return self._get_rsv_project_by_default_(file_path)
+        return self._resolver__get_rsv_project_use_default_(file_path)
     # = rsv_project.get_rsv_entities
     def get_rsv_entities(self, **kwargs):
         kwargs_ = self._get_rsv_kwargs_(**kwargs)
@@ -2634,7 +2647,7 @@ class AbsRsvRoot(
             if rsv_project:
                 return rsv_project.get_rsv_unit(**kwargs_)
     #
-    def _get_rsv_project_by_default_(self, file_path):
+    def _resolver__get_rsv_project_use_default_(self, file_path):
         rsv_project = self.get_rsv_project(project='default')
         for platform_ in rsv_configure.Platform.ALL:
             root = rsv_project.get_pattern('project-root-{}-dir'.format(platform_))
@@ -2650,8 +2663,8 @@ class AbsRsvRoot(
                 project_properties = rsv_matcher._get_project_properties_by_default_(file_path)
                 project = project_properties.get('project')
                 utl_core.Log.set_module_result_trace(
-                    'resolver-project-create-from-default',
-                    'project-name="{}"'.format(project)
+                    'resolver project create',
+                    'project-name="{}", create use "default"'.format(project)
                 )
                 return self.get_rsv_project(project=project)
     # rsv-project

@@ -560,6 +560,15 @@ class StoragePathOpt(object):
             elif self.get_is_file():
                 SystemMtd.set_file_open(self.path)
 
+    def get_modify_timestamp(self):
+        return os.stat(self._path).st_mtime
+
+    def get_access_timestamp(self):
+        return os.stat(self._path).st_atime
+
+    def get_is_same_timestamp_to(self, file_path):
+        return str(self.get_modify_timestamp()) == str(self.__class__(file_path).get_modify_timestamp())
+
     def __str__(self):
         return self._path
 
@@ -997,10 +1006,15 @@ class SubProcessMtd(object):
         pass
     @classmethod
     def set_run_with_result_in_windows(cls, cmd, clear_environ=False):
+        # must reload, output error
+        reload(sys)
+        if hasattr(sys, 'setdefaultencoding'):
+            sys.setdefaultencoding('utf-8')
+        #
         cmd = cmd.replace("&", "^&")
         #
         if clear_environ is True:
-            sp = subprocess.Popen(
+            s_p = subprocess.Popen(
                 cmd,
                 shell=True,
                 # close_fds=True,
@@ -1011,7 +1025,7 @@ class SubProcessMtd(object):
                 # env=cls.ENVIRON_MARK
             )
         else:
-            sp = subprocess.Popen(
+            s_p = subprocess.Popen(
                 cmd,
                 shell=True,
                 # close_fds=True,
@@ -1022,28 +1036,33 @@ class SubProcessMtd(object):
             )
         #
         while True:
-            next_line = sp.stdout.readline()
+            next_line = s_p.stdout.readline()
             #
             return_line = next_line
-            if return_line == '' and sp.poll() is not None:
+            if return_line == '' and s_p.poll() is not None:
                 break
             #
             return_line = return_line.decode('gbk', 'ignore')
             print(return_line.rstrip())
         #
-        return_code = sp.wait()
+        return_code = s_p.wait()
         if return_code:
             ExceptionMtd.set_stack_print()
             #
             raise subprocess.CalledProcessError(
-                return_code, sp
+                return_code, s_p
             )
         #
-        sp.stdout.close()
+        s_p.stdout.close()
     @classmethod
     def set_run_with_result_in_linux(cls, cmd, clear_environ=False):
+        # must reload, output error
+        reload(sys)
+        if hasattr(sys, 'setdefaultencoding'):
+            sys.setdefaultencoding('utf-8')
+        #
         if clear_environ is True:
-            sp = subprocess.Popen(
+            s_p = subprocess.Popen(
                 cmd,
                 shell=True,
                 # close_fds=True,
@@ -1054,7 +1073,7 @@ class SubProcessMtd(object):
                 # env=cls.ENVIRON_MARK
             )
         else:
-            sp = subprocess.Popen(
+            s_p = subprocess.Popen(
                 cmd,
                 shell=True,
                 # close_fds=True,
@@ -1065,25 +1084,25 @@ class SubProcessMtd(object):
             )
         #
         while True:
-            next_line = sp.stdout.readline()
+            next_line = s_p.stdout.readline()
             #
             return_line = next_line
-            if return_line == '' and sp.poll() is not None:
+            if return_line == '' and s_p.poll() is not None:
                 break
             #
             return_line = return_line.decode('utf-8', 'ignore')
             return_line = return_line.replace(u'\u2018', "'").replace(u'\u2019', "'")
             print(return_line.rstrip())
         #
-        return_code = sp.wait()
+        return_code = s_p.wait()
         if return_code:
             ExceptionMtd.set_stack_print()
             #
             raise subprocess.CalledProcessError(
-                return_code, sp
+                return_code, s_p
             )
         #
-        sp.stdout.close()
+        s_p.stdout.close()
     @classmethod
     def set_run_with_result(cls, cmd, clear_environ=False):
         if SystemMtd.get_is_windows():
@@ -1352,12 +1371,6 @@ class StorageFileOpt(StoragePathOpt):
                     f.close()
                     return raw
 
-    def get_modify_timestamp(self):
-        return os.stat(self._path).st_mtime
-
-    def get_access_timestamp(self):
-        return os.stat(self._path).st_atime
-
 
 class GzipStorageFileOpt(StorageFileOpt):
     def __init__(self, *args, **kwargs):
@@ -1459,7 +1472,6 @@ class TimestampOpt(object):
     TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S'
     def __init__(self, timestamp):
         self._timestamp = timestamp
-
     @property
     def timestamp(self):
         return self._timestamp
@@ -1826,7 +1838,7 @@ class DccPathDagOpt(object):
     def get_name_namespace(self, namespacesep=':'):
         name = self.get_name()
         _ = name.split(namespacesep)
-        print _
+        # print _
         return namespacesep.join(_[:-1])
 
     def __str__(self):
@@ -2056,6 +2068,26 @@ class TextOpt(object):
 
     def get_filter_by_pattern(self, pattern):
         return fnmatch.filter([self._raw], pattern)
+
+    def to_frames(self):
+        lis = []
+        s = self._raw
+        texts = [i.strip() for i in s.split(',')]
+        for i in texts:
+            if '-' in i:
+                i_start_frame, i_end_frame = [j.strip() for j in i.split('-')]
+                lis.extend(list(range(int(i_start_frame), int(i_end_frame)+1)))
+            else:
+                lis.append(int(i))
+        if lis:
+            lis_ = list(set(lis))
+            lis_.sort()
+            return lis_
+        return lis
+
+    def to_frame_range(self):
+        frames = self.to_frames()
+        return min(frames), max(frames)
 
 
 class ValueMtd(object):
@@ -2810,10 +2842,10 @@ class ImageOpt(object):
                 '--threads 1',
                 u'-o "{}"'.format(jpg_file_path),
             ]
-            sp = SubProcessMtd.set_run(
+            s_p = SubProcessMtd.set_run(
                 ' '.join(cmd_args)
             )
-            return sp
+            return s_p
 
 
 class ListMtd(object):
@@ -3097,7 +3129,7 @@ class VariablesMtd(object):
         return lis
 
 
-class FrameMtd(object):
+class FrameRangeMtd(object):
     @classmethod
     def get(cls, frame_range, frame_step):
         start_frame, end_frame = frame_range
@@ -3219,6 +3251,4 @@ class TimeMtd(object):
 
 
 if __name__ == '__main__':
-    print ColorMtd.get_complementary_rgb(
-        255, 0, 0
-    )
+    print TextOpt('1001-1005, 2000,500, 500').to_frames()

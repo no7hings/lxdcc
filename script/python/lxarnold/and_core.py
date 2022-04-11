@@ -818,7 +818,7 @@ class AndTextureOpt_(AndImageOpt):
     def _set_unit_tx_create_(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space):
         cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
         if use_aces is True:
-            print color_space, aces_render_color_space
+            # print color_space, aces_render_color_space
             if color_space in aces_color_spaces:
                 if color_space != aces_render_color_space:
                     cmd_args += [

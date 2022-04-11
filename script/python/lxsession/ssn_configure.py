@@ -11,26 +11,3 @@ class Root(object):
     RESOURCES = '{}/.resources'.format(MAIN)
     #
     HOOKS = '{}/hooks'.format(RESOURCES)
-
-
-class Hooks(object):
-    BRANCH = 'hooks'
-    @classmethod
-    def get_python_file(cls, key):
-        return utl_core.Resources.get(
-            '{}/{}.py'.format(cls.BRANCH, key)
-        )
-    @classmethod
-    def get_yaml_file(cls, key):
-        return utl_core.Resources.get(
-            '{}/{}.yml'.format(cls.BRANCH, key)
-        )
-    @classmethod
-    def get_command_file(cls, key):
-        return utl_core.Resources.get(
-            '{}/{}.yml'.format(cls.BRANCH, key)
-        )
-
-
-class OptionHooks(Hooks):
-    BRANCH = 'option-hooks'

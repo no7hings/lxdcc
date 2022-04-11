@@ -7,7 +7,7 @@ import lxresolver.commands as rsv_commands
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 
-class AbsRsvApplication(object):
+class AbsSsnRsvApplication(object):
     def __init__(self):
         self._resolver = rsv_commands.get_resolver()
         self._any_scene_file_path = self._get_any_scene_file_path_()

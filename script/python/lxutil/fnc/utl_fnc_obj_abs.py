@@ -40,9 +40,9 @@ class AbsDccExporter(object):
         #
         self._root = root
         if root is not None:
-            self._root_dag_path = core_objects.ObjDagPath(root)
+            self._root_dat_opt = core_objects.ObjDagPath(root)
         else:
-            self._root_dag_path = None
+            self._root_dat_opt = None
         #
         self._option = copy.copy(self.OPTION)
         if isinstance(option, dict):

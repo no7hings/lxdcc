@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxmaya.ssn.objects as mya_ssn_objects
 
-app = mya_ssn_objects.RsvApplication()
+app = mya_ssn_objects.SsnRsvApplication()
 
 rsp = app.get_rsv_scene_properties()
 

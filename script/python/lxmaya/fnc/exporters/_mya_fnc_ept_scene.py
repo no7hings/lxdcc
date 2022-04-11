@@ -52,7 +52,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
         )
         _selected_paths = []
         if self._root is not None:
-            root_mya_dag_path = self._root_dag_path.set_translate_to(
+            root_mya_dag_path = self._root_dat_opt.set_translate_to(
                 ma_configure.Util.OBJ_PATHSEP
             )
             _selected_paths = cmds.ls(selection=1, long=1) or []
@@ -253,7 +253,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
 
     def set_run(self):
         use_render = self._option.get('use_render')
-        self._mya_root_dag_path = self._root_dag_path.set_translate_to(
+        self._mya_root_dag_path = self._root_dat_opt.set_translate_to(
             ma_configure.Util.OBJ_PATHSEP
         )
         root_mya_obj = mya_dcc_objects.Group(self._mya_root_dag_path.path)

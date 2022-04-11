@@ -90,6 +90,12 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
             self._ddl_submiter.option.set('deadline.group', ddl_configure.get('group'))
             self._ddl_submiter.option.set('deadline.pool', ddl_configure.get('pool'))
             #
+            error_limit = ddl_configure.get('error_limit')
+            if error_limit is not None:
+                self._ddl_submiter.job_info.set(
+                    'FailureDetectionTaskErrors', error_limit
+                )
+            #
             batch_key = hook_option_opt.get('batch_key')
             if batch_key:
                 batch_list = hook_option_opt.get(batch_key, as_array=True) or []
@@ -160,7 +166,7 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
             exists_result = session.set_ddl_job_id_find(hook_option)
             if exists_result:
                 utl_core.Log.set_module_warning_trace(
-                    'option-hook deadline execute', 'option-hook="{}" is exists, job-id="{}"'.format(
+                    'option-hook execute by deadline', 'option-hook="{}" is exists, job-id="{}"'.format(
                         option_hook_key, exists_result
                     )
                 )
@@ -168,7 +174,7 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
                 ddl_job_id = self._ddl_submiter.set_job_submit()
                 if ddl_job_id is not None:
                     utl_core.Log.set_module_result_trace(
-                        'option-hook deadline execute', 'option-hook="{}", job-id="{}"'.format(
+                        'option-hook execute by deadline', 'option-hook="{}", job-id="{}"'.format(
                             option_hook_key, ddl_job_id
                         )
                     )

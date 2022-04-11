@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxutil import utl_configure
+from lxutil import utl_configure, utl_core
 
 
 class HookEngineMtd(object):
@@ -14,6 +14,29 @@ class HookEngineMtd(object):
             'command.{}'.format(hook_engine)
         )
         return _.format(**kwargs)
+
+
+class RscHookFile(object):
+    BRANCH = 'hooks'
+    @classmethod
+    def get_python(cls, key):
+        return utl_core.Resources.get(
+            '{}/{}.py'.format(cls.BRANCH, key)
+        )
+    @classmethod
+    def get_yaml(cls, key):
+        return utl_core.Resources.get(
+            '{}/{}.yml'.format(cls.BRANCH, key)
+        )
+    @classmethod
+    def get_command(cls, key):
+        return utl_core.Resources.get(
+            '{}/{}.yml'.format(cls.BRANCH, key)
+        )
+
+
+class RscOptionHookFile(RscHookFile):
+    BRANCH = 'option-hooks'
 
 
 if __name__ == '__main__':

@@ -253,7 +253,7 @@ class RsvAssetSetUsdCreator(object):
                 pass
             elif workspace == 'output':
                 comp_register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
-                    keyword='asset-output-comp-registry-usd-file'
+                    keyword='asset-output-component-registry-usd-file'
                 )
                 register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
                     version='all'

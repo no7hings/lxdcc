@@ -36,12 +36,13 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: set_katana_scene_src_create
+        #
         Geometry(s):
             name: <..key>
             type: PrxExpandedGroup
             path: /<...key>
             items:
-                Export Work Geometry UV-map ():
+                Export Work Geometry UV-map (usd):
                     enable: True
                     name: <..key>
                     icon: python
@@ -87,6 +88,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: set_groom_geometry_xgen_import
+        #
         Texture(s):
             name: <..key>
             type: PrxExpandedGroup
@@ -113,6 +115,7 @@ central:
                     path: <...path>/<..key>
                     click_method: ''
                     click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+        #
         Look(s):
             name: <..key>
             type: PrxExpandedGroup
@@ -157,6 +160,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: set_work_look_yml_export
+        #
         Light(s):
             name: <..key>
             type: PrxExpandedGroup
@@ -171,6 +175,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_command: 'import lxmaya.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_reference("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma")'
+        #
         TD(s):
             name: <..key>
             type: PrxExpandedGroup

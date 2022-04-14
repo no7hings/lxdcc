@@ -18,9 +18,10 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
         self._obj.ktn_obj.checkDynamicParameters()
 
     def set_create(self, obj_type_name):
-        self._obj.get_dcc_instance('ArnoldShadingNode')
+        ktn_obj, is_create = self._obj.get_dcc_instance('ArnoldShadingNode')
         self._obj.get_port('nodeType').set(obj_type_name)
         self._obj.ktn_obj.checkDynamicParameters()
+        return is_create
 
     def get_enable_port(self, and_port_path):
         return self._obj.get_port(
@@ -40,6 +41,9 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
     def set_port_value(self, and_port_path, value):
         self.get_enable_port(and_port_path).set(True)
         self.get_value_port(and_port_path).set(value)
+
+    def set(self, key, value):
+        self.set_port_value(key, value)
 
     def set_colour_by_type_name(self):
         type_name = self.get_type_name()

@@ -1,9 +1,7 @@
 # coding:utf-8
-import copy
-
 from lxkatana import ktn_core
 
-from lxkatana.fnc.builders import _ktn_fnc_bdr_utility
+import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -17,15 +15,13 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         super(LookWorkspaceCreator, self).__init__(option)
         #
         print self.get('location')
-        self._ktn_workspace = _ktn_fnc_bdr_utility.AssetWorkspaceBuilder(
+        self._ktn_workspace = ktn_dcc_objects.AssetWorkspace(
             self.get('location')
         )
 
     @classmethod
     def _get_rsv_asset_auto_(cls):
         import lxresolver.commands as rsv_commands
-        #
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
         #

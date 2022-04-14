@@ -352,6 +352,11 @@ properties:
             # trace_sets: aiTraceSets
             mode: aiMode
             min_pixel_width: aiMinPixelWidth
+    #
+    to-katana:
+        mesh:
+            subdiv_iterations: iterations
+            disp_zero_value: zero_value
 #
 visibilities:
     to-maya:

@@ -3,7 +3,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 import lxresolver.commands as rsv_commands
 
-import lxkatana.fnc.builders as ktn_fnc_builders
+import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
 def set_surface_light_rig_update_(task_properties):
@@ -13,7 +13,7 @@ def set_surface_light_rig_update_(task_properties):
     branch = task_properties.get('branch')
     step = task_properties.get('step')
     if branch == 'asset' and step == 'srf':
-        node_dcc_obj = ktn_fnc_builders.AssetWorkspaceBuilder().set_light_rig_update()
+        node_dcc_obj = ktn_dcc_objects.AssetWorkspace().set_light_rig_update()
 
         _kwargs = copy.copy(task_properties)
 

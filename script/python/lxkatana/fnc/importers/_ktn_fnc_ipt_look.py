@@ -20,7 +20,7 @@ from lxkatana.modifiers import _ktn_mdf_utility
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-from lxkatana.fnc.builders import _ktn_fnc_bdr_utility
+import lxkatana.dcc.dcc_operators as ktn_dcc_operators
 
 
 class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
@@ -32,7 +32,8 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         root_lstrip=None,
         material_root='/root/materials',
         frame=None,
-        auto_occlusion_assign=False,
+        auto_ambocc_assign=False,
+        auto_white_disp_assign=False,
         with_properties=True,
         with_visibilities=True,
         # if set shader is not in includes create is ignore
@@ -60,7 +61,8 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     @classmethod
     def _set_geometry_property_ports_(cls, and_geometry_opt, dcc_geometry):
         convert_dict = dict(
-            subdiv_iterations='iterations'
+            subdiv_iterations='iterations',
+            disp_zero_value='zero_value'
         )
         #
         and_geometry = and_geometry_opt.obj
@@ -71,26 +73,29 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             i_dcc_port_name = i_and_port_name
             if i_and_port_name in convert_dict:
                 i_dcc_port_name = convert_dict[i_and_port_name]
-            if i_and_port.get_is_value_changed() is True:
-                i_enable_ktn_port_name = 'args.arnoldStatements.{}.enable'.format(i_dcc_port_name)
-                i_enable_dcc_port = dcc_geometry.get_port(i_enable_ktn_port_name)
-                if i_enable_dcc_port.get_is_exists() is True:
-                    i_enable_dcc_port.set(True)
-                else:
-                    utl_core.Log.set_warning_trace(
-                        'port-name="{}" is unknown'.format(i_dcc_port_name)
-                    )
+            #
+            if i_and_port.get_is_value_changed() is False:
+                pass
+            #
+            i_enable_ktn_port_name = 'args.arnoldStatements.{}.enable'.format(i_dcc_port_name)
+            i_enable_dcc_port = dcc_geometry.get_port(i_enable_ktn_port_name)
+            if i_enable_dcc_port.get_is_exists() is True:
+                i_enable_dcc_port.set(True)
+            else:
+                utl_core.Log.set_warning_trace(
+                    'port-name="{}" is unknown'.format(i_dcc_port_name)
+                )
+            #
+            i_value_ktn_port_name = 'args.arnoldStatements.{}.value'.format(i_dcc_port_name)
+            i_value_dcc_port = dcc_geometry.get_port(i_value_ktn_port_name)
+            if i_value_dcc_port.get_is_exists() is True:
+                i_raw = i_and_port.get()
+                if i_value_dcc_port.type == 'number':
+                    if i_and_port.get_is_enumerate():
+                        i_raw = i_and_port.get_as_index()
                 #
-                i_value_ktn_port_name = 'args.arnoldStatements.{}.value'.format(i_dcc_port_name)
-                i_value_dcc_port = dcc_geometry.get_port(i_value_ktn_port_name)
-                if i_value_dcc_port.get_is_exists() is True:
-                    i_raw = i_and_port.get()
-                    if i_value_dcc_port.type == 'number':
-                        if i_and_port.get_is_enumerate():
-                            i_raw = i_and_port.get_as_index()
-                    #
-                    if i_raw is not None:
-                        i_value_dcc_port.set(i_raw)
+                if i_raw is not None:
+                    i_value_dcc_port.set(i_raw)
     @classmethod
     def _set_geometry_visibility_ports_(cls, and_geometry_opt, dcc_geometry):
         # convert_dict = dict()
@@ -100,7 +105,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             i_and_port = and_geometry.get_input_port(i_and_port_name)
             #
             i_dcc_port_name = 'AI_RAY_{}'.format(i_and_port_name.upper())
-            # if i_and_port.get_is_value_changed() is True:
+            #
+            if i_and_port.get_is_value_changed() is False:
+                pass
+            #
             i_enable_ktn_port_name = 'args.arnoldStatements.visibility.{}.enable'.format(i_dcc_port_name)
             i_enable_dcc_port = dcc_geometry.get_port(i_enable_ktn_port_name)
             if i_enable_dcc_port.get_is_exists() is True:
@@ -137,7 +145,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
         self._shader_includes = self.get('shader_includes')
 
-        self._workspace = _ktn_fnc_bdr_utility.AssetWorkspaceBuilder()
+        self._workspace = ktn_dcc_objects.AssetWorkspace()
         self._configure = self._workspace.get_configure()
 
     def __set_obj_universe_create_(self):
@@ -155,6 +163,8 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._and_obj_universe = obj_scene.universe
 
     def __set_look_create_(self, pass_name):
+        self._workspace.get_look_pass_index(pass_name)
+        #
         self._ramp_dcc_objs = []
         #
         self._configure = self._workspace.set_configure_create(pass_name=pass_name)
@@ -213,7 +223,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         dcc_material_group = dcc_material.get_parent()
         dcc_material_group_path = dcc_material_group.path
         #
-        self.__set_material_shaders_create_(and_material, ktn_material, dcc_material_group_path)
+        self.__set_material_shaders_create_(and_material, dcc_material, ktn_material, dcc_material_group_path)
         #
         dcc_material.set_source_objs_layout()
         #
@@ -238,7 +248,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 port_path = k
             dcc_obj.get_port(port_path).set_create('string', v)
 
-    def __set_material_shaders_create_(self, and_material, ktn_material, dcc_material_group_path):
+    def __set_material_shaders_create_(self, and_material, dcc_material, ktn_material, dcc_material_group_path):
         convert_dict = {
             'surface': 'arnoldSurface',
             'displacement': 'arnoldDisplacement',
@@ -280,10 +290,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     # )
                     # i_ktn_source_port.connect(i_ktn_target_port)
                     #
-                    and_material.get_input_port(
+                    dcc_material.get_input_port(
                         convert_dict.get(i_and_bind_name)
                     ).set_source(
-                        i_dcc_shader.get_port(
+                        i_dcc_shader.get_output_port(
                             'out'
                         )
                     )
@@ -460,7 +470,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             if geometry_seq is not None:
                 assign_name = '{}__{}'.format(and_geometry.name, geometry_seq)
             #
-            dcc_material_assign, ktn_material_assign = self._workspace.set_ng_material_assign_create(
+            dcc_material_assign, ktn_material_assign = self._workspace.set_ng_geometry_material_assign_create(
                 name=assign_name,
                 assign=(
                     '{}{}'.format(geometry_root, and_geometry.path),
@@ -478,7 +488,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         if geometry_seq is not None:
             assign_name = '{}__{}'.format(and_geometry.name, geometry_seq)
         #
-        dcc_properties, ktn_properties = self._workspace.set_ng_properties_create(
+        dcc_properties, ktn_properties = self._workspace.set_ng_geometry_properties_create(
             name=assign_name,
             pass_name=pass_name
         )
@@ -490,6 +500,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         if self._with_properties is True:
             self._set_geometry_property_ports_(and_geometry_opt, dcc_properties)
+        #
         if self._with_visibilities is True:
             self._set_geometry_visibility_ports_(and_geometry_opt, dcc_properties)
         #
@@ -498,13 +509,25 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def set_run(self):
         self.__set_obj_universe_create_()
         #
+        self._workspace.set_look_pass_add(self._pass_name)
+        #
         self.__set_look_create_(self._pass_name)
         #
-        auto_occlusion_assign = self._option['auto_occlusion_assign']
-        if auto_occlusion_assign is True:
-            self._workspace.set_auto_occlusion_assign(
-                pass_name=self._pass_name
-            )
+        auto_ambocc_assign = self._option['auto_ambocc_assign']
+        if auto_ambocc_assign is True:
+            ktn_dcc_operators.AssetWorkspaceOpt(
+                self._workspace
+            ).set_auto_ambocc_assign(pass_name=self._pass_name)
+        #
+        auto_white_disp_assign = self._option['auto_white_disp_assign']
+        if auto_white_disp_assign is True:
+            ktn_dcc_operators.AssetWorkspaceOpt(
+                self._workspace
+            ).set_auto_white_disp_assign(pass_name=self._pass_name)
+            #
+            ktn_dcc_operators.AssetWorkspaceOpt(
+                self._workspace
+            ).set_auto_geometry_properties_assign(pass_name=self._pass_name)
 
 
 class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):

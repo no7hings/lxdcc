@@ -21,10 +21,10 @@ class GeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        import lxkatana.fnc.builders as ktn_fnc_builders
-        #
-        katana_workspace = ktn_fnc_builders.AssetWorkspaceBuilder()
+        katana_workspace = ktn_dcc_objects.AssetWorkspace()
         #
         usd_file_path = katana_workspace.get_geometry_uv_map_usd_source_file()
         if usd_file_path is not None:

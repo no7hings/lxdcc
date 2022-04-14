@@ -1010,10 +1010,10 @@ class SubProcessMtd(object):
     @classmethod
     def set_run_with_result_in_windows(cls, cmd, clear_environ=False):
         # must reload, output error
-        import sys
-        reload(sys)
-        if hasattr(sys, 'setdefaultencoding'):
-            sys.setdefaultencoding('utf-8')
+        # import sys
+        # reload(sys)
+        # if hasattr(sys, 'setdefaultencoding'):
+        #     sys.setdefaultencoding('utf-8')
         #
         cmd = cmd.replace("&", "^&")
         #
@@ -1047,7 +1047,11 @@ class SubProcessMtd(object):
                 break
             #
             return_line = return_line.decode('gbk', 'ignore')
-            print(return_line.rstrip())
+            # noinspection PyBroadException
+            try:
+                print(return_line.encode('gbk').rstrip())
+            except:
+                pass
         #
         return_code = s_p.wait()
         if return_code:
@@ -1061,10 +1065,10 @@ class SubProcessMtd(object):
     @classmethod
     def set_run_with_result_in_linux(cls, cmd, clear_environ=False):
         # must reload, output error
-        import sys
-        reload(sys)
-        if hasattr(sys, 'setdefaultencoding'):
-            sys.setdefaultencoding('utf-8')
+        # import sys
+        # reload(sys)
+        # if hasattr(sys, 'setdefaultencoding'):
+        #     sys.setdefaultencoding('utf-8')
         #
         if clear_environ is True:
             s_p = subprocess.Popen(
@@ -1097,7 +1101,11 @@ class SubProcessMtd(object):
             #
             return_line = return_line.decode('utf-8', 'ignore')
             return_line = return_line.replace(u'\u2018', "'").replace(u'\u2019', "'")
-            print(return_line.rstrip())
+            # noinspection PyBroadException
+            try:
+                print(return_line.encode('utf-8').rstrip())
+            except:
+                pass
         #
         return_code = s_p.wait()
         if return_code:

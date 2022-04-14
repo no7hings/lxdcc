@@ -429,8 +429,12 @@ class NGObjOpt(object):
             for i in ktn_root_port.getChildren():
                 ktn_root_port.deleteChild(i)
 
-    def get_children(self):
-        return self._ktn_obj.getChildren()
+    def get_children(self, include_type_names=None):
+        _ = self._ktn_obj.getChildren()
+        if include_type_names is not None:
+            if isinstance(include_type_names, (tuple, list)):
+                return [i for i in _ if self.__class__(i).get_type() in include_type_names]
+        return _
 
     def set_port_execute(self, port_path):
         ktn_port = self._ktn_obj.getParameter(port_path)
@@ -1153,8 +1157,8 @@ class NGObjCustomizePortOpt(object):
 
 
 class NGMacro(object):
-    def __init__(self, ktn_port):
-        self._ktn_obj = ktn_port
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
 
     def set_input_port_create(self, port_path):
         _ = self._ktn_obj.getInputPort(port_path)
@@ -1295,19 +1299,20 @@ class NGMacro(object):
         for k, v in parameters.items():
             k = k.replace('/', '.')
             self.set_parameter_create(k, v)
-    @classmethod
     @ktn_modifiers.set_undo_mark_mdf
-    def set_create_to_op_script_by_configure_file(cls, file_path, ktn_op_script):
-        configure = bsc_objects.Configure(value=file_path)
-        parameters = configure.get('parameters') or {}
-        NGObjOpt(ktn_op_script).set_ports_clear('user')
-        for k, v in parameters.items():
-            i_k_s = k.replace('/', '.')
-            i_k_t = k.replace('/', '__')
-            if v.get('widget') != 'button':
-                i_k_t = 'user.{}'.format(i_k_t)
-                NGMacro(ktn_op_script).set_parameter_create(i_k_t, v)
-                NGPortOpt(NGObjOpt(ktn_op_script).get_port(i_k_t)).set_expression('getParent().{}'.format(i_k_s))
+    def set_create_to_op_script_by_configure_file(self, file_path):
+        ktn_op_scripts = NGObjOpt(self._ktn_obj).get_children(include_type_names=['OpScript'])
+        for i_ktn_op_script in ktn_op_scripts:
+            configure = bsc_objects.Configure(value=file_path)
+            parameters = configure.get('parameters') or {}
+            NGObjOpt(i_ktn_op_script).set_ports_clear('user')
+            for k, v in parameters.items():
+                i_k_s = k.replace('/', '.')
+                i_k_t = k.replace('/', '__')
+                if v.get('widget') != 'button':
+                    i_k_t = 'user.{}'.format(i_k_t)
+                    NGMacro(i_ktn_op_script).set_parameter_create(i_k_t, v)
+                    NGPortOpt(NGObjOpt(i_ktn_op_script).get_port(i_k_t)).set_expression('getParent().{}'.format(i_k_s))
 
 
 class LXRenderSettingsOpt(object):

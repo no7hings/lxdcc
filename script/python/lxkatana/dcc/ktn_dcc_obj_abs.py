@@ -133,7 +133,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             if ktn_source is not None and ktn_target is not None:
                 ktn_source.connect(ktn_target)
                 utl_core.Log.set_module_result_trace(
-                    'port-connect',
+                    'port connect',
                     'connection="{} >> {}"'.format(
                         source.path, target.path
                     )
@@ -141,7 +141,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         else:
             source.ktn_port.connect(target.ktn_port)
             utl_core.Log.set_module_result_trace(
-                'port-connect',
+                'port connect',
                 'connection="{} >> {}"'.format(
                     source.path, target.path
                 )

@@ -474,6 +474,12 @@ class AbsDccObj(
                 port_assign
             )
 
+    def set(self, key, value):
+        self.get_port(key).set(value)
+
+    def get(self, key):
+        return self.get_port(key).get()
+
     def get_input_port(self, port_path):
         return self.get_port(
             port_path,

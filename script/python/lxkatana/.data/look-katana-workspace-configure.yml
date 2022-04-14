@@ -55,7 +55,7 @@ workspace:
             attributes:
                 x: =<...geometry.x>
                 y: =<...geometry.y>+<option.h>
-                ns_text: <...label>
+                ns_text: 'asset-geometry(s)'
                 ns_fontScale: 3.0
                 ns_sizeX: =<option.w>-<option.margin>*2
                 ns_sizeY: =<option.h>*2-<option.margin>*2
@@ -106,13 +106,15 @@ workspace:
                 ns_colorr: 0.5
                 ns_colorg: 0.25
                 ns_colorb: 0.25
+            parameters:
+                lynxi_variants/look: asset-work
         backdrop:
             path: <option.root>/<..label>_backgrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
                 y: =<...geometry.y>+<option.h>
-                ns_text: <...label>
+                ns_text: 'shot-geometry(s)'
                 ns_fontScale: 3.0
                 ns_sizeX: =<option.w>-<option.margin>*2
                 ns_sizeY: =<option.h>*2-<option.margin>*2
@@ -217,6 +219,7 @@ workspace:
             x: =<option.x>+<option.w>*<..offset.x>+<option.offset_x>
             y: =<option.y>+<option.h>*<..offset.y>
         main:
+            variable: True
             path: <option.root>/<option.look_pass>__<..label>_merge
             obj_type: Merge
             attributes:
@@ -239,8 +242,9 @@ workspace:
         geometry:
             x: =<option.x>+<option.w>*<..offset.x>+<option.offset_x>
             y: =<option.y>+<option.h>*<..offset.y>
-        variable: True
+        #
         main:
+            variable: True
             path: <option.root>/<option.look_pass>__<..label>_merge
             obj_type: Merge
             attributes:
@@ -253,6 +257,7 @@ workspace:
                 - <...look_pass.main.path>.out
                 - <.path>.<option.look_pass>
         backdrop:
+            variable: True
             path: <option.root>/<option.look_pass>__<..label>_backgrop
             obj_type: Backdrop
             attributes:
@@ -268,6 +273,7 @@ workspace:
         node_graph:
             nodes:
                 definition:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<....label>_group
                     obj_category: group
                     obj_type: GroupStack
@@ -283,6 +289,7 @@ workspace:
                         - <.path>.in
                         - <.path>.out
                 customize:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>__<....label>_group
                     obj_category: group
                     obj_type: GroupStack
@@ -306,10 +313,12 @@ workspace:
         geometry:
             x: =<option.x>+<option.w>*<..offset.x>+<option.offset_x>
             y: =<option.y>+<option.h>*<..offset.y>
-        variable: True
+        #
         main:
+            variable: True
             path: <option.root>/<option.look_pass>__<..label>_merge
             obj_type: Merge
+            output: <.path>.out
             attributes:
                 x: =<...geometry.x>
                 y: =<...geometry.y>
@@ -320,6 +329,7 @@ workspace:
                 - <...material_assigns.main.path>.out
                 - <.path>.<option.look_pass>
         backdrop:
+            variable: True
             path: <option.root>/<option.look_pass>__<..label>_backgrop
             obj_type: Backdrop
             attributes:
@@ -336,6 +346,7 @@ workspace:
             nodes:
                 # groups
                 definition:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<....label>_group
                     obj_category: group
                     obj_type: GroupStack
@@ -351,6 +362,7 @@ workspace:
                         - <.path>.in
                         - <.path>.out
                 customize:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>__<....label>_group
                     obj_category: group
                     obj_type: GroupStack
@@ -366,6 +378,7 @@ workspace:
                         - <.path>.in
                         - <.path>.out
                 subdiv_assign:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
                     obj_type: ArnoldObjectSettings
@@ -373,7 +386,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    arnold_parameters:
+                    arnold_geometry_properties:
                         smoothing: True
                         subdiv_type: catclark
                         subdiv_iterations: 2
@@ -385,6 +398,7 @@ workspace:
                         - <.path>.input
                         - <.path>.out
                 no_subdiv_assign:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
                     obj_type: ArnoldObjectSettings
@@ -399,6 +413,7 @@ workspace:
                         - <.path>.input
                         - <.path>.out
                 displacemenet_assign:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
                     obj_type: ArnoldObjectSettings
@@ -406,7 +421,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    arnold_parameters:
+                    arnold_geometry_properties:
                         smoothing: True
                         subdiv_type: catclark
                         subdiv_iterations: 3
@@ -420,6 +435,7 @@ workspace:
                         - <.path>.input
                         - <.path>.out
                 opacity_assign:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
                     obj_type: ArnoldObjectSettings
@@ -427,7 +443,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    arnold_parameters:
+                    arnold_geometry_properties:
                         opaque: False
                     insert_scheme: TB
                     insert_connections:
@@ -436,6 +452,7 @@ workspace:
                         - <.path>.input
                         - <.path>.out
                 sss_assign:
+                    variable: True
                     path: <option.root>/<option.look_pass>__<..key>
                     obj_category: node
                     obj_type: ArnoldObjectSettings
@@ -443,7 +460,7 @@ workspace:
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.25
-                    arnold_parameters:
+                    arnold_geometry_properties:
                         sss_setname: sss
                     insert_scheme: TB
                     insert_connections:
@@ -462,6 +479,7 @@ workspace:
             x: =<option.x>+<option.w>*<..offset.x>
             y: =<option.y>+<option.h>*<..offset.y>
         main:
+            variable: True
             path: <option.root>/<..label>
             obj_type: lx_variant
             base_obj_type: VariableSwitch
@@ -492,27 +510,30 @@ workspace:
                 ns_fontScale: 6.0
         node_graph:
             nodes:
-                plastic:
-                    path: <option.root>/<..key>__look
+                look_pass:
+                    variable: True
+                    path: <option.root>/<option.look_pass>__look
                     obj_category: node
                     obj_type: lx_look_pass
                     base_obj_type: Group
                     input: <.path>.input
                     output: <.path>.output
                     attributes:
-                        x: =<.....geometry.x>-<option.w>/2*0
+                        x: =<.....geometry.x>+<option.offset_x>
                         y: =<.....geometry.y>+<option.h>/4
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
-                        look/scheme: plastic
+                        look_pass/scheme: passthrough
+                        lynxi_scheme/override/look_pass: <option.look_pass>
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....property_assigns.main.output>
                         - <.input>
                         - <.output>
-                        - <.....look_pass_switch.main.path>.<..key>
-                ambocc:
+                        - <.....look_pass_switch.main.path>.<option.look_pass>
+                #
+                plastic:
                     path: <option.root>/<..key>__look
                     obj_category: node
                     obj_type: lx_look_pass
@@ -526,7 +547,27 @@ workspace:
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
-                        look/scheme: ambocc
+                        look_pass/scheme: plastic
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <.....look_pass_switch.main.path>.<..key>
+                ambocc:
+                    path: <option.root>/<..key>__look
+                    obj_category: node
+                    obj_type: lx_look_pass
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*2
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        look_pass/scheme: ambocc
                     connections:
                         - <.....geometry_switch.main.output>
                         - <.input>
@@ -540,13 +581,13 @@ workspace:
                     input: <.path>.input
                     output: <.path>.output
                     attributes:
-                        x: =<.....geometry.x>-<option.w>/2*2
+                        x: =<.....geometry.x>-<option.w>/2*3
                         y: =<.....geometry.y>+<option.h>/4
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
-                        look/scheme: wire
+                        look_pass/scheme: wire
                     connections:
                         - <.....geometry_switch.main.output>
                         - <.input>
@@ -560,13 +601,13 @@ workspace:
                     input: <.path>.input
                     output: <.path>.output
                     attributes:
-                        x: =<.....geometry.x>-<option.w>/2*2
+                        x: =<.....geometry.x>-<option.w>/2*4
                         y: =<.....geometry.y>+<option.h>/4
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
-                        look/scheme: white
+                        look_pass/scheme: white
                     connections:
                         - <.....geometry_switch.main.output>
                         - <.input>
@@ -877,8 +918,8 @@ workspace:
             attributes:
                 x: =<...geometry.x>
                 y: =<...geometry.y>
-                ns_colorr: 0.5
-                ns_colorg: 0.25
+                ns_colorr: 0.125
+                ns_colorg: 0.5
                 ns_colorb: 0.25
             parameters:
                 arnold_render_settings/override_enable: 1
@@ -939,6 +980,7 @@ workspace:
             x: =<option.x>+<option.w>*<..offset.x>
             y: =<option.y>+<option.h>*<..offset.y>
         main:
+            variable: True
             path: <option.root>/<..label>
             obj_type: LookFileBake
             attributes:

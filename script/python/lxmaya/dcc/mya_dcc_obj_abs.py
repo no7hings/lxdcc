@@ -295,7 +295,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         if cmds.isConnected(source_path, target_path) is False:
                             cmds.connectAttr(source_path, target_path, force=1)
                             utl_core.Log.set_module_result_trace(
-                                'port-connect',
+                                'port connect',
                                 u'connection="{} >> {}"'.format(
                                     source_path,
                                     target_path
@@ -316,7 +316,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                             if cmds.isConnected(source_path, target_path) is False:
                                 cmds.connectAttr(source_path, target_path, force=1)
                                 utl_core.Log.set_module_result_trace(
-                                    'port-connect',
+                                    'port connect',
                                     u'connection="{} >> {}"'.format(
                                         source_path, target_path
                                     )
@@ -333,7 +333,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                                 if cmds.isConnected(source_path, target_path) is False:
                                     cmds.connectAttr(source_path, target_path, force=1)
                                     utl_core.Log.set_module_result_trace(
-                                        'port-connect',
+                                        'port connect',
                                         u'connection="{} >> {}"'.format(
                                             source_path, target_path
                                         )
@@ -361,14 +361,14 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         if cmds.isConnected(source_path, target_path) is False:
                             cmds.connectAttr(source_path, target_path, force=1)
                             utl_core.Log.set_module_result_trace(
-                                'port-connect',
+                                'port connect',
                                 u'connection="{} >> {}"'.format(
                                     source_path, target_path
                                 )
                             )
                     else:
                         utl_core.Log.set_warning_trace(
-                            'port-connect',
+                            'port connect',
                             u'connection="{} >> {}" is not available'.format(
                                 source_path, target_path
                             )

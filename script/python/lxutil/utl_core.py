@@ -1,6 +1,8 @@
 # coding:utf-8
 from __future__ import print_function
 
+import sys
+
 import platform
 
 import os
@@ -73,10 +75,13 @@ class _Pattern(object):
 
 
 class Log(object):
-    import sys
-    reload(sys)
-    if hasattr(sys, 'setdefaultencoding'):
-        sys.setdefaultencoding('utf-8')
+    DEFAULT_CODING = sys.getdefaultencoding()
+    print(
+        'lynxi logger is initialization, default coding is "{}"'.format(DEFAULT_CODING)
+    )
+    # reload(sys)
+    # if hasattr(sys, 'setdefaultencoding'):
+    #     sys.setdefaultencoding('utf-8')
     #
     PRINT_ENABLE = True
     def __init__(self, file_path):
@@ -95,7 +100,11 @@ class Log(object):
                 print_method(text)
             # else:
             if cls.PRINT_ENABLE is True:
-                print(text)
+                # noinspection PyBroadException
+                try:
+                    print(text.encode('utf-8'))
+                except:
+                    pass
             #
             if isinstance(LOG_WRITE_METHOD, (types.FunctionType, types.MethodType)):
                 # noinspection PyCallingNonCallable
@@ -269,7 +278,7 @@ class LogProgressRunner(object):
                 u'{}'.format(self._label),
                 u'is running {} {}%, cost time {}'.format(
                     self._get_progress_bar_string_(percent),
-                    '%3d' % (percent * 100),
+                    '%3d' % (percent*100),
                     bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
 
                 )
@@ -288,7 +297,7 @@ class LogProgressRunner(object):
         p = int(percent*c)
         p = max(p, 1)
         return u'{}{}'.format(
-            p*u'■', (c-p)*'□'
+            p*u'■', (c-p)*u'□'
         )
 
     def set_stop(self):
@@ -427,7 +436,7 @@ class ExceptionCatcher(object):
             Log.set_error_trace(value)
             return w
         else:
-            print('\n'.join(exc_txts))
+            print(u'\n'.join(exc_txts))
             print(value)
     @classmethod
     def set_create_for_execute(cls, use_window=True):
@@ -1680,7 +1689,6 @@ class OslShaderMtd(object):
             raw = j2_template.render(
                 **info
             )
-            # print(raw)
             output_file_opt.set_write(raw)
 
 

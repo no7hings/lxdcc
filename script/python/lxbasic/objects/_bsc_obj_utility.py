@@ -46,15 +46,17 @@ class SignalInstance(object):
 
     def set_emit_send(self, *args, **kwargs):
         if self._methods:
-            THREAD_MAXIMUM.acquire()
-            #
-            ts = [threading.Thread(target=i_method, args=args, kwargs=kwargs) for i_method in self._methods]
-            for t in ts:
-                t.start()
-            for t in ts:
-                t.join()
-            #
-            THREAD_MAXIMUM.release()
+            for i in self._methods:
+                i(*args, **kwargs)
+            # THREAD_MAXIMUM.acquire()
+            # #
+            # ts = [threading.Thread(target=i_method, args=args, kwargs=kwargs) for i_method in self._methods]
+            # for t in ts:
+            #     t.start()
+            # for t in ts:
+            #     t.join()
+            # #
+            # THREAD_MAXIMUM.release()
 
     def get_methods(self):
         return self._methods

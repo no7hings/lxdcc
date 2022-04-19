@@ -25,7 +25,7 @@ for i_rsv_shot in rsv_shots:
         j_rsv_task = i_rsv_shot.get_rsv_task(step=j_step, task=j_task)
         if j_rsv_task is not None:
             j_rsv_unit = j_rsv_task.get_rsv_unit(
-                keyword='shot-manifest-usd-file'
+                keyword='shot-component-usd-file'
             )
             j_file_path = j_rsv_unit.get_result()
             if j_file_path is not None:

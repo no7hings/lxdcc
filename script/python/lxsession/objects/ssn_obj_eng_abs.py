@@ -94,7 +94,10 @@ class AbsSsnRsvApplication(object):
                         version=version
                     )
                 elif version_scheme == 'new':
-                    version = rsv_task.get_new_version(workspace=cur_workspace)
+                    version_rsv_unit = rsv_task.get_rsv_unit(
+                        keyword='{branch}-version-dir'
+                    )
+                    version = version_rsv_unit.get_new_version()
                     scene_src_file_path_tgt = scene_src_file_unit.get_result(
                         version=version
                     )
@@ -141,7 +144,10 @@ class AbsSsnRsvApplication(object):
                         version=version
                     )
                 elif version_scheme == 'new':
-                    version = rsv_task.get_new_version(workspace=cur_workspace)
+                    version_rsv_unit = rsv_task.get_rsv_unit(
+                        keyword='{branch}-output-version-dir'
+                    )
+                    version = version_rsv_unit.get_new_version()
                     scene_src_file_path_tgt = output_scene_src_file_unit.get_result(
                         version=version
                     )
@@ -164,3 +170,22 @@ class AbsSsnRsvApplication(object):
                     return scene_src_file_path_tgt
             else:
                 raise ValueError()
+
+    def get_virtual_publish_scene_src_file(self, keyword):
+        cur_workspace = 'publish'
+        rsv_scene_properties = self.get_rsv_scene_properties()
+        if rsv_scene_properties is not None:
+            workspace = rsv_scene_properties.get('workspace')
+            if workspace == cur_workspace:
+                return self._any_scene_file_path
+            elif workspace == 'work':
+                rsv_task = self.get_rsv_task()
+                branch = rsv_scene_properties.get('branch')
+                application = rsv_scene_properties.get('application')
+                rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
+                rsv_unit_result = rsv_unit.get_result(version='latest')
+                rsv_unit_properties = rsv_unit.get_properties_by_result(rsv_unit_result)
+                print rsv_unit_properties
+
+    def get_virtual_output_scene_src_file_(self, keyword):
+        pass

@@ -52,7 +52,7 @@ for i_asset in assets:
     i_katana_scene_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
     i_katana_scene_src_file_path = i_katana_scene_src_file_unit.get_result()
     if i_katana_scene_src_file_path:
-        i_properties = i_katana_scene_src_file_unit.get_properties(i_katana_scene_src_file_path)
+        i_properties = i_katana_scene_src_file_unit.get_properties_by_result(i_katana_scene_src_file_path)
         i_version = i_properties.get('version')
         i_maya_scene_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-maya-scene-src-file')
         i_maya_scene_src_file_path = i_maya_scene_src_file_unit.get_result(version=i_version)

@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 import fnmatch
 # noinspection PyUnresolvedReferences
-from maya import cmds
+from maya import cmds, OpenMayaUI
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.api.OpenMaya as om2
 
@@ -11,6 +11,8 @@ from lxbasic import bsc_core
 from lxutil import utl_core
 
 from . import ma_configure
+
+from PySide2 import QtWidgets
 
 
 def _ma__get_group_paths_():
@@ -2366,6 +2368,75 @@ class CmdUndoStack(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         cmds.undoInfo(closeChunk=1, undoName=self._key)
+
+
+class QtControlOpt(object):
+    def __init__(self, name):
+        self._name = name
+
+    def get_is_exists(self):
+        return cmds.workspaceControl(self._name, exists=True)
+
+    def set_visible(self, boolean):
+        if self.get_is_exists():
+            cmds.workspaceControl(
+                self._name,
+                edit=True,
+                visible=boolean,
+            )
+
+    def set_restore(self):
+        cmds.workspaceControl(
+            self._name,
+            edit=True,
+            restore=True,
+        )
+
+    def set_delete(self):
+        if cmds.workspaceControl(self._name, exists=True):
+            cmds.workspaceControl(
+                self._name,
+                edit=True,
+                close=True
+            )
+            #
+            cmds.deleteUI(self._name)
+
+    def set_script(self, script):
+        cmds.workspaceControl(
+            self._name,
+            edit=True,
+            uiScript=script
+        )
+
+    def set_create(self, width, height):
+        if self.get_is_exists():
+            self.set_restore()
+            # self.set_visible(True)
+        else:
+            cmds.workspaceControl(
+                self._name,
+                label=bsc_core.StrUnderlineOpt(self._name).to_prettify(capitalize=False),
+                dockToMainWindow=['right', False],
+                initialWidth=width, initialHeight=height,
+                widthProperty='free', heightProperty='free'
+            )
+    @classmethod
+    def _to_qt_instance_(cls, ptr, base):
+        from shiboken2 import wrapInstance
+        return wrapInstance(long(ptr), base)
+
+    def to_qt_widget(self):
+        ptr = OpenMayaUI.MQtUtil.findControl(self._name)
+        if ptr is not None:
+            return self._to_qt_instance_(
+                ptr, base=QtWidgets.QWidget
+            )
+
+    def get_qt_layout(self):
+        widget = self.to_qt_widget()
+        if widget is not None:
+            return widget.layout()
 
 
 def undo_stack(key=None):

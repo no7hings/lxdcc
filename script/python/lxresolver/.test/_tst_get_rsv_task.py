@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     # print rsv_task
     # rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-usd-hi-file')
-    # print rsv_unit.get_properties('/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v071/cache/usd/geo/hi.usd')
+    # print rsv_unit.get_properties_by_result('/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v071/cache/usd/geo/hi.usd')
     # print rsv_unit.get_result(version='latest')
     # print rsv_unit.get_latest_version()
     # print rsv_unit.get_new_version()

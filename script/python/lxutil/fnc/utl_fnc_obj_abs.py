@@ -398,7 +398,7 @@ class AbsFncDccGeometryComparer(object):
         )
         if self._task_properties is not None:
             step = self._task_properties.get('step')
-            if step in ['mod', 'srf', 'rig']:
+            if step in ['mod', 'srf', 'rig', 'grm']:
                 self._set_model_geometry_usd_hi_file_path_(
                     rsv_operators.RsvAssetGeometryQuery(
                         self._task_properties

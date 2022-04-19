@@ -4,6 +4,10 @@
 #     keyword: str(pattern)
 #     if <keyword> in value auto resolve to final value
 # ******************************************************************************************************************** #
+#
+root-choices:
+    - root_primary
+    - root_secondary
 # <key>
 project-name: '{project}'
 workspace-name: '{workspace}'
@@ -66,6 +70,14 @@ stack-key-shot-task: /<project-name>/<shot-name>/<step-name>/<task-name>
 project-root-dir: '{root}'
 project-root-windows-dir: None
 project-root-linux-dir: None
+#
+project-root_primary-dir: '{root_primary}'
+project-root_primary-windows-dir: None
+project-root_primary-linux-dir: None
+# effect ============================================================================================================= #
+project-root_secondary-dir: '{root_secondary}'
+project-root_secondary-windows-dir: None
+project-root_secondary-linux-dir: None
 #
 project-dir: <project-root-dir>/<project-name>
 project-workspace-dir: <project-dir>/<workspace-name>
@@ -420,6 +432,7 @@ asset-output-xgen-usd-file: <asset-output-xgen-usd-dir>/xgen.usda
 asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
 #
 asset-output-component-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-component-usd-file: <asset-output-component-usd-dir>/<asset-name>.usda
 asset-output-component-registry-usd-file: <asset-output-component-usd-dir>/registry.usda
 #
 asset-output-texture-src-dir: <asset-output-task-dir>/texture
@@ -433,12 +446,8 @@ asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-p
 #
 asset-output-geometry-xgen-glow-dir: <asset-output-version-dir>/maya
 asset-output-geometry-xgen-collection-dir: <asset-output-version-dir>/cache/xgen/collections
-# effect ============================================================================================================= #
-project-root-effect-dir: '{root_effect}'
-project-root-effect-windows-dir: None
-project-root-effect-linux-dir: None
 #
-project-effect-dir: <project-root-effect-dir>/<project-name>
+project-effect-dir: <project-root-dir>/<project-name>
 project-effect-workspace-dir: <project-effect-dir>/<workspace-name>
 #
 asset-effect-dir: <project-effect-workspace-dir>/assets/<role-name>/<asset-name>
@@ -531,7 +540,6 @@ shot-camera-usd-file: <shot-camera-dir>/cache/usd/<shot-name>_cam.usda
 shot-manifest-dir: <shot-version-dir>/manifest
 #
 shot-manifest-usd-dir: <shot-manifest-dir>/usd
-shot-manifest-usd-file: <shot-manifest-usd-dir>/<shot-name>.usda
 shot-manifest-scenegraph-usd-file: <shot-manifest-usd-dir>/scenegraph.usda
 #
 shot-set-dir: <shot-no-version-dir>/manifest
@@ -628,6 +636,12 @@ include-asset-step:
     - lgt
     # set
     - set
+#
+root-step-choice:
+    work: {}
+    publish: {efx: 'root_secondary'}
+    output: {efx: 'root_secondary'}
+
 # ******************************************************************************************************************** #
 # dcc rule
 dcc:

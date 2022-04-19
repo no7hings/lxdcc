@@ -30,7 +30,7 @@ class Uuid(object):
     def get_by_string(cls, string):
         return str(uuid.uuid3(uuid.UUID(Uuid.BASIC), str(string))).upper()
     @classmethod
-    def get_by_file_path(cls, file_path):
+    def get_by_file(cls, file_path):
         if os.path.isfile(file_path):
             timestamp = os.stat(file_path).st_mtime
             return str(uuid.uuid3(uuid.UUID(Uuid.BASIC), 'file="{}"; timestamp={}; version=2.0'.format(file_path, timestamp))).upper()

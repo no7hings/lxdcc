@@ -32,7 +32,7 @@ for i_file_path in file_paths:
         keyword='asset-maya-scene-file'
     )
     i_file_path_ = i_rsv_unit.get_result(version=i_rsv_scene_properties.get('version'))
-    i_rsv_properties = i_rsv_unit.get_properties(i_file_path_)
+    i_rsv_properties = i_rsv_unit.get_properties_by_result(i_file_path_)
 
     print c.set_stg_published_file_create(
         file=i_file_path_, **i_rsv_properties.value

@@ -39,7 +39,7 @@ if __name__ == '__main__':
                     scene_file_paths = rsv_scene_file_unit.get_result(version='all')
                     if scene_file_paths:
                         for scene_file_path in scene_file_paths:
-                            rsv_scene_file_unit_properties = rsv_scene_file_unit.get_properties(scene_file_path)
+                            rsv_scene_file_unit_properties = rsv_scene_file_unit.get_properties_by_result(scene_file_path)
                             #
                             scene_info_file_path = rsv_task.get_rsv_unit(
                                 keyword='asset-scene-info-file'
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                         )
                         scene_src_file_paths = rsv_scene_src_file_unit.get_result(version='all')
                         for scene_src_file_path in scene_src_file_paths:
-                            rsv_scene_src_file_unit_properties = rsv_scene_src_file_unit.get_properties(scene_src_file_path)
+                            rsv_scene_src_file_unit_properties = rsv_scene_src_file_unit.get_properties_by_result(scene_src_file_path)
                             #
                             scene_info_file_path = rsv_task.get_rsv_unit(
                                 keyword='asset-scene-info-file'

@@ -44,7 +44,7 @@ if __name__ == '__main__':
                     )
                     scene_info_file_paths = rsv_scene_info_file_unit.get_result(version='all', trim=[-5, None])
                     for scene_info_file_path in scene_info_file_paths:
-                        rsv_scene_info_file_unit_properties = rsv_scene_info_file_unit.get_properties(
+                        rsv_scene_info_file_unit_properties = rsv_scene_info_file_unit.get_properties_by_result(
                             scene_info_file_path
                         )
                         #

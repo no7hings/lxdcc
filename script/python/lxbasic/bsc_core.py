@@ -169,6 +169,8 @@ class SystemMtd(object):
     TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
     TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S_%f'
     DATA_TAG_FORMAT = u'%Y_%m%d'
+    #
+    Platform = bsc_configure.Platform
     @classmethod
     def get_host(cls):
         return socket.gethostname()
@@ -885,7 +887,7 @@ class UuidMtd(object):
     def get_by_hash_value(cls, hash_value):
         return cls.get_by_string(hash_value)
     @classmethod
-    def get_by_file_path(cls, file_path):
+    def get_by_file(cls, file_path):
         check_file_path = StoragePathMtd.set_map_to_linux(file_path)
         if os.path.isfile(file_path):
             timestamp = os.stat(file_path).st_mtime
@@ -954,7 +956,7 @@ class DatabaseGeometryUvMapMtd(object):
 class TemporaryThumbnailMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.get_by_file_path(file_path)
+        return UuidMtd.get_by_file(file_path)
     @classmethod
     def get_file_path(cls, file_path, ext='.jpg'):
         directory_path = EnvironMtd.get_temporary_root()
@@ -968,7 +970,7 @@ class TemporaryThumbnailMtd(object):
 class TemporaryYamlMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.get_by_file_path(file_path)
+        return UuidMtd.get_by_file(file_path)
     @classmethod
     def get_file_path(cls, file_path, tag):
         directory_path = EnvironMtd.get_temporary_root()
@@ -1167,6 +1169,25 @@ class KeywordArgumentsMtd(object):
 
 
 class KeywordArgumentsOpt(object):
+    #  =%20
+    # "=%22
+    # #=%23
+    # %=%25
+    # &=%26
+    # (=%28
+    # )=%29
+    # +=%2B
+    # ,=%2C
+    # /=%2F
+    # :=%3A
+    # ;=%3B
+    # <=%3C
+    # ==%3D
+    # >=%3E
+    # ?=%3F
+    # @=%40
+    # \=%5C
+    # |=%7C
     ARGUMENT_SEP = '&'
     def __init__(self, option, default_option=None):
         dic = collections.OrderedDict()
@@ -2885,6 +2906,18 @@ class ListMtd(object):
     @classmethod
     def get_deletion(cls, a, b):
         pass
+
+
+class RangeMtd(object):
+    @classmethod
+    def set_map_to(cls, range_0, range_1, value_0):
+        value_min_0, value_max_0 = range_0
+        value_min_1, value_max_1 = range_1
+        #
+        percent = float(value_0 - value_min_0) / (value_max_0 - value_min_0)
+        #
+        value_1 = (value_max_1 - value_min_1) * percent + value_min_1
+        return value_1
 
 
 class CoordMtd(object):

@@ -73,7 +73,7 @@ class AbsObjScene(
         shader_rename=False,
         root_lstrip=None,
         #
-        look_pass='default'
+        look_pass='default',
     )
     MAPPER_DICT = {
         '[PG_PROJ_ROOT]': {
@@ -109,9 +109,9 @@ class AbsObjScene(
             if file_ext in ['.ass']:
                 self._set_load_by_dot_ass_(file_obj, root_lstrip)
 
-    def set_load_from_dot_ass(self, file_path, root=None, root_lstrip=None):
+    def set_load_from_dot_ass(self, file_path, root=None, root_lstrip=None, time_tag=None):
         file_obj = self.FILE_CLASS(file_path)
-        self._set_load_by_dot_ass_(file_obj, root_lstrip)
+        self._set_load_by_dot_ass_(file_obj, root_lstrip=root_lstrip, time_tag=time_tag)
 
     def set_load_from_dot_mtlx(self, file_path, root=None, root_lstrip=None):
         file_obj = self.FILE_CLASS(file_path)
@@ -298,7 +298,7 @@ class AbsObjScene(
         target_and_obj_name = and_obj_mtd.name
         target_and_clear_obj_name = and_obj_mtd.set_name_clear(target_and_obj_name)
         target_index = self._index_dict[target_and_obj_name]
-        target_and_prettify_obj_name = and_obj_mtd.set_name_prettify(target_index, self._look_pass_name)
+        target_and_prettify_obj_name = and_obj_mtd.set_name_prettify(target_index, self._look_pass_name, self._time_tag)
         if and_obj_mtd.get_port_has_source(and_port_name) is True:
             source_args = and_obj_mtd.get_dcc_port_source_args(and_port_name)
             if source_args is not None:
@@ -308,7 +308,7 @@ class AbsObjScene(
                 source_and_obj = and_core.AndUniverseMtd(and_universe).get_obj(source_and_obj_name)
                 source_and_obj_mtd = and_core.AndObjMtd(and_universe, source_and_obj)
                 source_index = self._index_dict[source_and_obj_name]
-                source_and_prettify_obj_name = source_and_obj_mtd.set_name_prettify(source_index, self._look_pass_name)
+                source_and_prettify_obj_name = source_and_obj_mtd.set_name_prettify(source_index, self._look_pass_name, self._time_tag)
                 dcc_source_obj_args = ('', source_and_prettify_obj_name)
                 self.universe.set_connection_create(
                     dcc_source_obj_args, dcc_source_port_args,
@@ -319,7 +319,7 @@ class AbsObjScene(
         and_orig_obj_name = shader_and_obj_mtd.get_orig_name()
         and_clear_obj_name = shader_and_obj_mtd.set_name_clear(and_orig_obj_name)
         index = self._index_dict[and_orig_obj_name]
-        and_prettify_obj_name = shader_and_obj_mtd.set_name_prettify(index, self._look_pass_name)
+        and_prettify_obj_name = shader_and_obj_mtd.set_name_prettify(index, self._look_pass_name, self._time_tag)
         #
         and_obj_type_name = shader_and_obj_mtd.type_name
         and_obj_category_name = shader_and_obj_mtd.category_name
@@ -488,7 +488,7 @@ class AbsObjScene(
             if orig_and_surface_shader_obj_name is not None:
                 if orig_and_surface_shader_obj_name != 'ai_default_reflection_shader':
                     surface_index = self._index_dict[orig_and_surface_shader_obj_name]
-                    and_surface_shader_obj_name = and_surface_shader_obj_mtd.set_name_prettify(surface_index, self._look_pass_name)
+                    and_surface_shader_obj_name = and_surface_shader_obj_mtd.set_name_prettify(surface_index, self._look_pass_name, self._time_tag)
         #
         and_displacement_shader_obj_name = None
         and_displacement_shader_objs = shape_and_obj_mtd.get_displacement_shader_objs()
@@ -498,7 +498,7 @@ class AbsObjScene(
             if orig_and_displacement_shader_obj_name is not None:
                 if orig_and_displacement_shader_obj_name != 'ai_default_reflection_shader':
                     displacement_index = self._index_dict[orig_and_displacement_shader_obj_name]
-                    and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.set_name_prettify(displacement_index, self._look_pass_name)
+                    and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.set_name_prettify(displacement_index, self._look_pass_name, self._time_tag)
         # volume
         and_volume_shader_obj_name = None
         #
@@ -507,7 +507,11 @@ class AbsObjScene(
         )
         if material_key != ';'.join([str(None)]*3):
             if material_key not in self._material_name_dict:
-                dcc_material_name = '{}__material__{}'.format(self._look_pass_name, len(self._material_name_dict))
+                if self._time_tag is not None:
+                    dcc_material_name = '{}__material__{}__{}'.format(self._look_pass_name, len(self._material_name_dict), self._time_tag)
+                else:
+                    dcc_material_name = '{}__material__{}'.format(self._look_pass_name, len(self._material_name_dict))
+                #
                 dcc_obj = self._set_dcc_material_build_(
                     dcc_material_name,
                     (
@@ -560,7 +564,7 @@ class AbsObjScene(
     def _set_ar_universe_load_(self):
         pass
     # main method
-    def _set_load_by_dot_ass_(self, file_obj, root_lstrip=None):
+    def _set_load_by_dot_ass_(self, file_obj, root_lstrip=None, time_tag=None):
         self.set_restore()
         #
         file_path = file_obj.path
@@ -572,6 +576,7 @@ class AbsObjScene(
         #
         self._and_universe = ai.AiUniverse()
         self._path_lstrip = root_lstrip
+        self._time_tag = time_tag
         ai.AiASSLoad(self._and_universe, file_path, ai.AI_NODE_ALL)
         # node iterator start
         and_obj_iterator = ai.AiUniverseGetNodeIterator(self._and_universe, sum(self.AR_OBJ_CATEGORY_MASK))

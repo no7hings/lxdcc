@@ -286,10 +286,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 look_ass_file_path = look_ass_file.get_result(version='latest')
                 if look_ass_file_path:
                     mya_fnc_importers.LookAssImporter(
-                        file_path=look_ass_file_path,
-                        root='/master',
                         option=dict(
-                            look_pass='default'
+                            file=look_ass_file_path,
+                            location='/master',
+                            look_pass='default',
+                            name_join_time_tag=True,
                         )
                     ).set_run()
     @classmethod
@@ -298,10 +299,10 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         if with_surface_look_preview is True:
             if rsv_task:
-                look_yml_file = rsv_task.get_rsv_unit(keyword='asset-look-yml-file')
-                look_yml_file_path = look_yml_file.get_result(version='latest')
+                look_yml_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-look-yml-file')
+                look_yml_file_path = look_yml_file_rsv_unit.get_result(version='latest')
                 if look_yml_file_path:
-                    rsv_unit_properties = look_yml_file.get_properties(look_yml_file_path)
+                    rsv_unit_properties = look_yml_file_rsv_unit.get_properties_by_result(look_yml_file_path)
                     version = rsv_unit_properties.get('version')
                     mya_fnc_importers.LookYamlImporter(
                         option=dict(

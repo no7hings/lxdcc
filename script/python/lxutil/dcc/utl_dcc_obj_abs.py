@@ -110,8 +110,10 @@ class AbsOsFile(
     obj_abstract.AbsOsFilePackageDef
 ):
     ICON_DICT = {
-        '.ma': 'maya',
-        '.mb': 'maya',
+        '.ma': 'ma',
+        '.mb': 'ma',
+        '.hip': 'hip',
+        '.katana': 'katana',
         '.exr': 'image',
         '.py': 'python'
     }
@@ -156,9 +158,7 @@ class AbsOsFile(
     @property
     def icon(self):
         if self.ext:
-            if self.ext in self.ICON_DICT:
-                return utl_core.FileIcon.get(self.ICON_DICT[self.ext])
-            return utl_core.FileIcon.get_default()
+            return utl_core.FileIcon.get_by_file_ext(self.ext)
         return utl_core.FileIcon.get_default()
     @property
     def file_path(self):

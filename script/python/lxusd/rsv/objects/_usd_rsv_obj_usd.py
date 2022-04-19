@@ -223,7 +223,7 @@ class RsvAssetSetUsdCreator(object):
                 version='all'
             )
             for i_file_path in register_usd_file_paths:
-                i_properties = comp_register_usd_file_rsv_unit.get_properties(i_file_path)
+                i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
                 i_version = i_properties.get('version')
                 dic[i_version] = i_file_path
         return dic
@@ -246,7 +246,7 @@ class RsvAssetSetUsdCreator(object):
                         version='all', extend_variants=dict(var='hi')
                     )
                     for i_file_path in work_asset_geometry_uv_map_var_file_paths:
-                        i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties(i_file_path)
+                        i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties_by_result(i_file_path)
                         i_version = i_properties.get('version')
                         dic[i_version] = i_file_path
             elif workspace == 'publish':
@@ -259,7 +259,7 @@ class RsvAssetSetUsdCreator(object):
                     version='all'
                 )
                 for i_file_path in register_usd_file_paths:
-                    i_properties = comp_register_usd_file_rsv_unit.get_properties(i_file_path)
+                    i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
                     i_version = i_properties.get('version')
                     dic[i_version] = i_file_path
         return dic
@@ -492,7 +492,7 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
             version='all', extend_variants=dict(var=var_name)
         )
         for i_work_asset_geometry_var_file_path in work_asset_geometry_hi_file_paths:
-            i_properties = work_asset_geometry_var_file_unit.get_properties(i_work_asset_geometry_var_file_path)
+            i_properties = work_asset_geometry_var_file_unit.get_properties_by_result(i_work_asset_geometry_var_file_path)
             i_version = i_properties.get('version')
             i_work_asset_geometry_uv_map_var_file_path = work_asset_geometry_uv_map_var_file_unit.get_result(
                 version=i_version, extend_variants=dict(var=var_name)

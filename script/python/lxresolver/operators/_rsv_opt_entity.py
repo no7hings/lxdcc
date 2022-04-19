@@ -504,7 +504,7 @@ class RsvAssetUsdQuery(AbsAssetQuery):
             version=kwargs['version']
         )
         for i_file_path in results:
-            i_properties = rsv_unit.get_properties(i_file_path)
+            i_properties = rsv_unit.get_properties_by_result(i_file_path)
             i_look_passe_name = i_properties['look_pass']
             dic[i_look_passe_name] = i_file_path
         return dic

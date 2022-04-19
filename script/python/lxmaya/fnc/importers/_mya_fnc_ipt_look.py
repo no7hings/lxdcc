@@ -2,8 +2,6 @@
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
-import copy
-
 from lxutil import utl_core
 
 from lxmaya_fnc import ma_fnc_configure, ma_fnc_core
@@ -23,6 +21,8 @@ import lxbasic.objects as bsc_objects
 from lxutil.fnc import utl_fnc_obj_abs
 
 from lxutil.fnc.importers import utl_fnc_ipt_abs
+
+import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxarnold import and_configure
 
@@ -113,7 +113,7 @@ class LookAssignImporter(object):
                     look_opt.set_visibilities(visibilities)
 
 
-class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
+class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     PLUG_NAME = 'mtoa'
     OPTION = dict(
         look_pass='default',
@@ -121,12 +121,19 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         assign_selection=False,
         #
         with_material=True,
-        with_assign=True
+        with_assign=True,
+        #
+        name_join_time_tag=False
     )
-    def __init__(self, file_path, root=None, option=None):
-        super(LookAssImporter, self).__init__(file_path, root, option)
-        self._look_pass_name = self._option.get('look_pass')
-        self._assign_selection_enable = self._option.get('assign_selection')
+    def __init__(self, option=None):
+        super(LookAssImporter, self).__init__(option)
+
+        self._file_path = self.get('file')
+        self._location = self.get('location')
+        #
+        self._look_pass_name = self.get('look_pass')
+        self._assign_selection_enable = self.get('assign_selection')
+        self._name_join_time_tag = self.get('name_join_time_tag')
         #
         self._dcc_importer_configure = bsc_objects.Configure(
             value=and_configure.Data.DCC_IMPORTER_CONFIGURE_PATH
@@ -145,10 +152,22 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
                 look_pass=self._look_pass_name
             )
         )
-        obj_scene.set_load_from_dot_ass(
-            self._file_path,
-            root_lstrip='/root/world/geo',
-        )
+        file_ = utl_dcc_objects.OsFile(self._file_path)
+        if file_.get_is_exists() is True:
+            if self._name_join_time_tag is True:
+                time_tag = bsc_core.IntegerOpt(
+                    int(file_.get_modify_timestamp())
+                ).set_encode_to_36()
+            else:
+                time_tag = None
+            #
+            obj_scene.set_load_from_dot_ass(
+                self._file_path,
+                root_lstrip='/root/world/geo',
+                time_tag=time_tag
+            )
+        else:
+            raise RuntimeError()
         #
         self._and_obj_universe = obj_scene.universe
     @mya_modifiers.set_undo_mark_mdf
@@ -170,17 +189,15 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
         material_and_objs = material_and_type.get_objs()
         #
         method_args = [
-            (self.__set_look_materials_create_, (material_and_objs, ), self._option['with_material']),
-            (self.__set_look_assigns_create_, (geometry_and_objs,), self._option['with_assign'])
+            (self.__set_look_materials_create_, (material_and_objs, ), self.get('with_material')),
+            (self.__set_look_assigns_create_, (geometry_and_objs,), self.get('with_assign'))
         ]
         if method_args:
-            gp = utl_core.GuiProgressesRunner(maximum=len(method_args))
-            for i_method, i_args, i_enable in method_args:
-                gp.set_update()
-                if i_enable is True:
-                    i_method(*i_args)
-            #
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(method_args)) as g_p:
+                for i_method, i_args, i_enable in method_args:
+                    g_p.set_update()
+                    if i_enable is True:
+                        i_method(*i_args)
     @classmethod
     def _set_look_create_by_geometry_obj_path_(cls, geometry_and_obj):
         obj_universe = geometry_and_obj.universe
@@ -235,7 +252,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
             raw = material_and_obj.get_input_port(i_shader_and_bind_port_name).get()
             if raw is not None:
                 shader_and_obj = self._and_obj_universe.get_obj(raw)
-                shader_dcc_obj, is_create = self._set_material_shader_obj_create_(shader_and_obj)
+                shader_dcc_obj, is_create = self.__set_material_shader_create_(shader_and_obj)
                 if shader_dcc_obj is not None:
                     # debug
                     # do not check create, material can use same shader
@@ -246,8 +263,8 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
                     #
                     # self._set_material_shader_node_graph_rename_(material_seq, i_shader_and_bind_port_name, shader_and_obj)
 
-    def _set_material_shader_obj_create_(self, shader_and_obj):
-        create_args = self._set_shader_obj_create_(shader_and_obj)
+    def __set_material_shader_create_(self, shader_and_obj):
+        create_args = self.__set_shader_create_(shader_and_obj)
         if create_args is not None:
             shader_dcc_obj, is_create = create_args
             if is_create is True:
@@ -279,7 +296,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
     def __set_shader_node_graph_create_(self, and_obj):
         source_and_objs = and_obj.get_all_source_objs()
         for seq, source_and_obj in enumerate(source_and_objs):
-            _ = self._set_shader_obj_create_(source_and_obj)
+            _ = self.__set_shader_create_(source_and_obj)
             if _ is not None:
                 source_dcc_obj, is_create = _
                 self.__set_shader_ports_(source_and_obj, source_dcc_obj)
@@ -380,7 +397,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
 
             source_dcc_port.set_target(target_dcc_port, validation=True)
 
-    def _set_shader_obj_create_(self, and_obj):
+    def __set_shader_create_(self, and_obj):
         and_obj_type_name = and_obj.type.name
         all_and_obj_types = mya_dcc_objects.AndShader.CATEGORY_DICT.keys()
         dcc_type = self._dcc_importer_configure.get('shaders.to-maya.{}'.format(and_obj_type_name))
@@ -390,6 +407,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
             dcc_obj = mya_dcc_objects.AndShader(dcc_obj_name)
             if dcc_obj.get_is_exists() is False:
                 dcc_obj.set_create(dcc_type)
+                #
                 ma_core.CmdObjOpt(dcc_obj.path).set_customize_attributes_create(
                     dict(
                         arnold_name=and_obj.get_port('name').get()
@@ -486,27 +504,27 @@ class LookAssImporter(utl_fnc_obj_abs.AbsDccExporter):
 
     def _set_look_assign_selection_(self, geometry_and_objs):
         selection_paths = mya_dcc_objects.Selection.get_selected_paths(include=['mesh'])
-        for obj_path in selection_paths:
-            geometry_and_obj = geometry_and_objs[0]
-            geometry_dcc_obj = mya_dcc_objects.Mesh(obj_path)
-            self._set_geometry_assign_create_(geometry_and_obj, geometry_dcc_obj)
+        for i_geometry_path in selection_paths:
+            i_and_geometry = geometry_and_objs[0]
+            i_dcc_geometry = mya_dcc_objects.Mesh(i_geometry_path)
+            self._set_geometry_assign_create_(i_and_geometry, i_dcc_geometry)
 
     def __set_look_geometry_material_assign_create_(self, geometry_and_obj_opt, geometry_dcc_obj_opt):
         material_assigns = geometry_and_obj_opt.get_material_assigns()
         for k, v in material_assigns.items():
             for i in v:
-                material_and_obj = self._and_obj_universe.get_obj(i)
-                material_and_obj_name = material_and_obj.name
-                material_dcc_obj_name = material_and_obj_name
-                geometry_dcc_obj_opt.set_material(material_dcc_obj_name)
+                i_and_material = self._and_obj_universe.get_obj(i)
+                i_and_material_name = i_and_material.name
+                i_dcc_material = i_and_material_name
+                geometry_dcc_obj_opt.set_material(i_dcc_material)
     @classmethod
     def __set_look_geometry_properties_create_(cls, geometry_and_obj_opt, geometry_dcc_obj_opt):
-        maya_properties = geometry_and_obj_opt.set_properties_convert_to(application='maya')
-        geometry_dcc_obj_opt.set_properties(maya_properties)
+        mya_properties = geometry_and_obj_opt.set_properties_convert_to(application='maya')
+        geometry_dcc_obj_opt.set_properties(mya_properties)
     @classmethod
     def _set_look_geometry_visibilities_create_(cls, geometry_and_obj_opt, geometry_dcc_obj_opt):
-        maya_visibilities = geometry_and_obj_opt.set_visibilities_convert_to(application='maya')
-        geometry_dcc_obj_opt.set_visibilities(maya_visibilities)
+        mya_visibilities = geometry_and_obj_opt.set_visibilities_convert_to(application='maya')
+        geometry_dcc_obj_opt.set_visibilities(mya_visibilities)
 
 
 class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):

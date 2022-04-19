@@ -30,7 +30,7 @@ if __name__ == '__main__':
     scene_info_file_paths = rsv_scene_info_file_unit.get_result(version='all')
 
     for scene_info_file_path in scene_info_file_paths:
-        rsv_scene_info_file_unit_properties = rsv_scene_info_file_unit.get_properties(scene_info_file_path)
+        rsv_scene_info_file_unit_properties = rsv_scene_info_file_unit.get_properties_by_result(scene_info_file_path)
         sub_key_path = '{asset}.{step}-{task}-{version}'.format(**rsv_scene_info_file_unit_properties.value)
         scene_info = bsc_objects.Configure(value=scene_info_file_path)
         face_vertices_uuid_key_paths = scene_info.get_keys(regex='mesh.*.face-vertices-uuid')

@@ -85,7 +85,7 @@ class AssetBatcher(object):
             i_katana_scene_src_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
             i_katana_scene_src_src_file_path = i_katana_scene_src_src_file_unit.get_result(version='latest')
             if i_katana_scene_src_src_file_path:
-                i_katana_scene_src_src_file_properties = i_katana_scene_src_src_file_unit.get_properties(
+                i_katana_scene_src_src_file_properties = i_katana_scene_src_src_file_unit.get_properties_by_result(
                     i_katana_scene_src_src_file_path
                 )
                 version = i_katana_scene_src_src_file_properties.get('version')

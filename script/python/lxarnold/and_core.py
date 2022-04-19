@@ -337,8 +337,10 @@ class AndObjMtd(object):
             ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', name
         )
 
-    def set_name_prettify(self, index, look_pass_name):
+    def set_name_prettify(self, index, look_pass_name, time_tag=None):
         and_type_name = self.type_name
+        if time_tag is not None:
+            return '{}__{}__{}__{}'.format(look_pass_name, and_type_name, index, time_tag)
         return '{}__{}__{}'.format(look_pass_name, and_type_name, index)
 
     def get_parent(self):

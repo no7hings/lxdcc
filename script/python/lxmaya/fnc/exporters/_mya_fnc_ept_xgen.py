@@ -61,13 +61,6 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         mya_location = bsc_core.DccPathDagOpt(location).set_translate_to('|').to_string()
         group = mya_dcc_objects.Group(mya_location)
         xgen_collection_obj_paths = group.get_all_shape_paths(include_obj_type=[ma_configure.Util.XGEN_PALETTE])
-        # maya_scene_file_path = mya_dcc_objects.Scene.get_current_file_path()
-        # dot_xgen_exporter = utl_fcn_exporters.DotXgenExporter
-        # xgen_collection_file_paths = dot_xgen_exporter._get_xgen_collection_file_paths_(
-        #     maya_scene_file_path
-        # )
-        # for i_xgen_collection_file_path_src in xgen_collection_file_paths:
-        #     i_xgen_collection_name = dot_xgen_exporter._get_xgen_collection_name_(i_xgen_collection_file_path_src)
         for i_xgen_collection_obj_path in xgen_collection_obj_paths:
             i_xgen_palette = mya_dcc_objects.XgenPalette(
                 i_xgen_collection_obj_path

@@ -8,8 +8,11 @@
 project-root-windows-dir: 'l:/prod'
 project-root-linux-dir: '/l/prod'
 #
-project-root-effect-windows-dir: 't:/prod'
-project-root-effect-linux-dir: '/t/prod'
+project-root_primary-windows-dir: 'l:/prod'
+project-root_primary-linux-dir: '/l/prod'
+#
+project-root_secondary-windows-dir: 't:/prod'
+project-root_secondary-linux-dir: '/t/prod'
 # <asset-dcc>
 asset-maya-path: '|master'
 #

@@ -569,7 +569,7 @@ class FileIcon(object):
     def get_maya(cls):
         return Icon.get('file/ma')
     @classmethod
-    def get_by_ext(cls, ext):
+    def get_by_file_ext(cls, ext):
         return Icon.get('file/{}'.format(ext[1:]))
 
 
@@ -1515,14 +1515,18 @@ class RvLauncher(object):
         ]
 
     def get_local_bin(self):
-        run_args = copy.copy(self._args)
-        if bsc_core.SystemMtd.get_is_windows():
+        # run_args = copy.copy(self._args)
+        platform_ = bsc_core.SystemMtd.get_platform()
+        return self._get_local_bin_(platform_)
+    @classmethod
+    def _get_local_bin_(cls, platform_):
+        if platform_ == bsc_core.SystemMtd.Platform.Windows:
             bins = Path._get_stg_paths_by_parse_pattern_(
                 'C:/Program Files/Shotgun/*/bin/rvio_hw.exe'
             )
             if bins:
                 return bins[0]
-        elif bsc_core.SystemMtd.get_is_linux():
+        elif platform_ == bsc_core.SystemMtd.Platform.Linux:
             bins = Path._get_stg_paths_by_parse_pattern_(
                 '/opt/rv/bin/rv'
             )

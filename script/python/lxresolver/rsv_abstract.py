@@ -1449,7 +1449,11 @@ class AbsRsvProject(
         # workspace
         if 'workspace' in kwargs:
             workspace = kwargs['workspace']
-            if workspace not in ['work', 'publish', 'output']:
+            if workspace not in [
+                'work',
+                'publish',
+                # 'output'
+            ]:
                 kwargs['workspace'] = self.get_workspace_src()
         else:
             kwargs['workspace'] = self.get_workspace_src()

@@ -2190,8 +2190,12 @@ class AbsRsvProject(
             ).get_modify_timestamp(),
             language=1
         )
+        user = bsc_core.StoragePathOpt(
+            result
+        ).get_user()
         kwargs['result'] = result
         kwargs['update'] = update
+        kwargs['user'] = user
         kwargs.update(variants)
 
     def _unit__get_rsv_version_(self, **kwargs):

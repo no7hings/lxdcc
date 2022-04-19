@@ -30,6 +30,7 @@ from lxutil.fnc import utl_fnc_obj_abs
 class GeometryAbcExporter(object):
     FILE = 'file'
     FRAME_RANGE = 'frameRange'
+    FRAME_RELATIVE_SAMPLE = 'frameRelativeSample'
     STEP = 'step'
     ROOT = 'root'
     ATTR = 'attr'
@@ -47,6 +48,8 @@ class GeometryAbcExporter(object):
     EULER_FILTER = 'eulerFilter'
     WRITE_CREASES = 'writeCreases'
     WRITE_UV_SETS = 'writeUVSets'
+    #
+    ATTR_PREFIX = 'attrPrefix'
     #
     OPTION = {
         NO_NORMAL: False,
@@ -70,13 +73,14 @@ class GeometryAbcExporter(object):
         HDF
     ]
     PLUG_NAME = 'AbcExport'
-    def __init__(self, file_path, root=None, frame=None, step=None, attribute=None, option=None, data_format=None):
+    def __init__(self, file_path, root=None, frame=None, step=None, attribute=None, attribute_prefix=None, option=None, data_format=None):
         self._file_path = file_path
         #
         self._root = self._get_location_(root)
         self._star_frame, self._end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         self._step = step
         self._attribute = attribute
+        self._attribute_prefix = attribute_prefix
         self._option = copy.copy(self.OPTION)
         if isinstance(option, dict):
             for k, v in option.items():
@@ -159,6 +163,15 @@ class GeometryAbcExporter(object):
         else:
             _ = None
         return _
+    @classmethod
+    def _get_attribute_prefix_(cls, attr_name):
+        lis = cls._get_strs_(attr_name)
+        #
+        if lis:
+            _ = ' '.join(['-{0} {1}'.format(cls.ATTR_PREFIX, i) for i in lis])
+        else:
+            _ = None
+        return _
     @staticmethod
     def _get_j_(js):
         _ = [i for i in js if i is not None]
@@ -178,6 +191,7 @@ class GeometryAbcExporter(object):
             self._get_frame_(self._star_frame, self._end_frame),
             self._get_step_(self._step),
             self._get_attribute_(self._attribute),
+            self._get_attribute_prefix_(self._attribute_prefix),
             self._get_option_(self._option),
             self._get_data_format_(self._data_format),
             self._get_root_(self._root),

@@ -54,7 +54,8 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 _mya_fnc_ept_geometry.GeometryAbcExporter(
                     file_path=i_abc_file_path,
                     root=[i.transform.path for i in i_grow_meshes],
-                    attribute=['xgen_palette']
+                    attribute_prefix=['xgen'],
+                    option={}
                 ).set_run()
     @classmethod
     def _set_xgen_collection_export_(cls, xgen_project_directory_path, xgen_collection_directory_path, location):

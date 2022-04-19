@@ -463,9 +463,12 @@ class StoragePathMtd(object):
             uid = s.st_uid
             if SystemMtd.get_is_linux():
                 import pwd
-                user = pwd.getpwuid(uid)[0]
-                return user
-        return None
+                try:
+                    user = pwd.getpwuid(uid)[0]
+                    return user
+                except KeyError:
+                    return 'unknown'
+        return 'unknown'
     @classmethod
     def get_group(cls, path):
         # noinspection PyBroadException
@@ -544,29 +547,32 @@ class StoragePathOpt(object):
         return os.path.normcase(self._path)
 
     def get_is_windows(self):
-        return StoragePathMtd.get_path_is_windows(self.path)
+        return StoragePathMtd.get_path_is_windows(self.get_path())
 
     def get_is_linux(self):
-        return StoragePathMtd.get_path_is_linux(self.path)
+        return StoragePathMtd.get_path_is_linux(self.get_path())
 
     def get_is_exists(self):
-        return os.path.exists(self.path)
+        return os.path.exists(self.get_path())
 
     def get_is_directory(self):
-        return os.path.isdir(self.path)
+        return os.path.isdir(self.get_path())
 
     def get_is_file(self):
-        return os.path.isfile(self.path)
+        return os.path.isfile(self.get_path())
 
     def set_open_in_system(self):
         if self.get_is_exists():
             if self.get_is_directory():
-                SystemMtd.set_directory_open(self.path)
+                SystemMtd.set_directory_open(self.get_path())
             elif self.get_is_file():
-                SystemMtd.set_file_open(self.path)
+                SystemMtd.set_file_open(self.get_path())
 
     def get_modify_timestamp(self):
         return os.stat(self._path).st_mtime
+
+    def get_user(self):
+        return StoragePathMtd.get_user(self.get_path())
 
     def get_access_timestamp(self):
         return os.stat(self._path).st_atime

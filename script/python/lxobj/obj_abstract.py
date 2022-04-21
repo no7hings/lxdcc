@@ -1483,6 +1483,9 @@ class AbsPortSourceDef(object):
             target_obj_args, target_port_args
         )
 
+    def set_source(self, output_port):
+        self.set_connect_from(output_port)
+
     def _format_dict_(self):
         raise NotImplementedError()
 
@@ -1542,6 +1545,9 @@ class AbsPortTargetDef(object):
             source_obj_args, source_port_args,
             target_obj_args, target_port_args
         )
+
+    def set_target(self, input_port):
+        self.set_connect_to(input_port)
 
     def _format_dict_(self):
         raise NotImplementedError()
@@ -2027,6 +2033,12 @@ class AbsObjPortDef(object):
             )
             self._port_stack.set_object_add(port)
         return port
+
+    def set_input_port_create(self, type_args, port_path):
+        self.set_port_create(type_args, port_path, obj_configure.PortAssign.INPUTS)
+
+    def set_output_port_create(self, type_args, port_path):
+        self.set_port_create(type_args, port_path, obj_configure.PortAssign.OUTPUTS)
 
     def _set_port_create_(self, type_args, port_path, port_assign):
         port = self.PORT_CLASS(
@@ -2814,6 +2826,11 @@ class AbsObjUniverseDef(object):
     #
     OBJ_BIND_STACK_CLASS = None
     OBJ_BIND_CLASS = None
+    #
+    Category = obj_configure.Category
+    Type = obj_configure.Type
+    PortAssign = obj_configure.PortAssign
+    #
     def _set_obj_universe_def_init_(self):
         # <type>
         self._category_stack = self.CATEGORY_STACK_CLASS()

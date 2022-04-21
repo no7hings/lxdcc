@@ -19,6 +19,13 @@ def get_menu_content_by_hook_options(hook_options):
                 i_gui_parent_path = '/'
                 #
                 i_gui_name = i_gui_configure.get('name')
+                if i_hook_option_opt.get_key_is_exists('gui_name'):
+                    i_gui_name = i_hook_option_opt.get('gui_name')
+                #
+                i_gui_group_name = i_gui_configure.get('group_name')
+                if i_hook_option_opt.get_key_is_exists('gui_group_name'):
+                    i_gui_group_name = i_hook_option_opt.get('gui_group_name')
+                #
                 if i_hook_option_opt.get_value():
                     if i_hook_option_opt.get_key_is_exists('gui_parent'):
                         i_gui_parent_path = i_hook_option_opt.get('gui_parent')
@@ -30,12 +37,11 @@ def get_menu_content_by_hook_options(hook_options):
                 else:
                     i_gui_path = '{}/{}'.format(i_gui_parent_path, i_gui_name)
                 #
-                i_gui_separator_name = i_gui_configure.get('group_name')
-                if i_gui_separator_name:
+                if i_gui_group_name:
                     if i_gui_parent_path_opt.get_is_root():
-                        i_gui_separator_path = '/{}'.format(i_gui_separator_name)
+                        i_gui_separator_path = '/{}'.format(i_gui_group_name)
                     else:
-                        i_gui_separator_path = '{}/{}'.format(i_gui_parent_path, i_gui_separator_name)
+                        i_gui_separator_path = '{}/{}'.format(i_gui_parent_path, i_gui_group_name)
                     #
                     content.set(
                         '{}.properties.type'.format(i_gui_separator_path), 'separator'
@@ -48,10 +54,10 @@ def get_menu_content_by_hook_options(hook_options):
                     '{}.properties.type'.format(i_gui_path), 'action'
                 )
                 content.set(
-                    '{}.properties.group_name'.format(i_gui_path), i_gui_configure.get('group_name')
+                    '{}.properties.group_name'.format(i_gui_path), i_gui_group_name
                 )
                 content.set(
-                    '{}.properties.name'.format(i_gui_path), i_gui_configure.get('name')
+                    '{}.properties.name'.format(i_gui_path), i_gui_name
                 )
                 content.set(
                     '{}.properties.icon_name'.format(i_gui_path), i_gui_configure.get('icon_name')

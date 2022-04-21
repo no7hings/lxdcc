@@ -467,6 +467,21 @@ class RsvAssetSetUsdCreator(object):
         pass
 
 
+class RsvShotSetUsdCreator(object):
+    def __init__(self, rsv_shot):
+        self._rsv_shot = rsv_shot
+    @classmethod
+    def get_effect_component_paths(cls, usd_file_path):
+        paths = usd_core.UsdStageOpt(
+            usd_file_path
+        ).set_obj_paths_find(
+            '/assets/efx/effects/*'
+        )
+        if paths:
+            paths = bsc_core.TextsOpt(paths).set_sort_to()
+        return paths
+
+
 class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
     OPTION = dict(
         var_names=['hi'],

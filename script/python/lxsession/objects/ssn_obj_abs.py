@@ -633,12 +633,15 @@ class AbsOptionRsvTaskMethodSession(
                 option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
 
     def __set_option_completion_by_rsv_scene_properties_(self):
-        option_opt = self.get_option_opt()
-        for i_key in ['project', 'workspace', 'asset', 'shot', 'step', 'task', 'version', 'application']:
-            if self._rsv_scene_properties.get_key_is_exists(i_key):
-                option_opt.set(
-                    i_key, self._rsv_scene_properties.get(i_key)
-                )
+        if self._rsv_scene_properties is not None:
+            option_opt = self.get_option_opt()
+            for i_key in ['project', 'workspace', 'asset', 'shot', 'step', 'task', 'version', 'application']:
+                if self._rsv_scene_properties.get_key_is_exists(i_key):
+                    option_opt.set(
+                        i_key, self._rsv_scene_properties.get(i_key)
+                    )
+        else:
+            raise RuntimeError()
 
     def get_batch_key(self):
         option_opt = self.get_option_opt()

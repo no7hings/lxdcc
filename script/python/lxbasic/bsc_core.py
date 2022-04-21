@@ -1541,35 +1541,32 @@ class TimestampMtd(object):
 class IntegerMtd(object):
     @classmethod
     def get_file_size_prettify(cls, value):
-        string = value
+        if value < 1.0:
+            return str(round(float(value), 2))
         #
         dv = 1024
-        lis = [(dv ** 4, 'T'), (dv ** 3, 'G'), (dv ** 2, 'M'), (dv ** 1, 'K')]
-        #
-        for i in lis:
-            s = abs(value) / i[0]
-            if s:
-                string = str(round(float(value) / float(i[0]), 2)) + i[1]
-                break
-        #
-        return str(string)
-    @classmethod
-    def get_prettify(cls, value):
-        string = value
-        #
-        dv = 1000
-        lis = [(dv ** 4, 'T'), (dv ** 3, 'B'), (dv ** 2, 'M'), (dv ** 1, 'K')]
-        #
-        if value >= dv:
+        if int(value) >= dv:
+            lis = [(dv**4, 'T'), (dv**3, 'G'), (dv**2, 'M'), (dv**1, 'K')]
             for i in lis:
                 s = int(abs(value)) / i[0]
                 if s:
-                    string = str(round(float(value) / float(i[0]), 2)) + i[1]
-                    break
-        else:
-            string = value
+                    return str(round(float(value) / float(i[0]), 2)) + i[1]
         #
-        return str(string)
+        return str(round(float(value), 2))
+    @classmethod
+    def get_prettify(cls, value):
+        if value < 1.0:
+            return str(round(float(value), 2))
+        #
+        dv = 1000
+        if int(value) >= dv:
+            lis = [(dv**4, 'T'), (dv**3, 'B'), (dv**2, 'M'), (dv**1, 'K')]
+            for i in lis:
+                s = int(abs(value)) / i[0]
+                if s:
+                    return str(round(float(value) / float(i[0]), 2)) + i[1]
+        #
+        return str(round(float(value), 2))
     @classmethod
     def get_prettify_(cls, value, mode):
         if mode == 0:
@@ -1579,7 +1576,7 @@ class IntegerMtd(object):
     @classmethod
     def byte_to_gb(cls, value):
         dv = 1024.0
-        return float(value)/dv ** 3
+        return float(value)/dv**3
     @classmethod
     def frame_to_time(cls, frame, fps=24):
         second = int(frame) / fps
@@ -1604,15 +1601,15 @@ class IntegerMtd(object):
     @classmethod
     def second_to_minute(cls, second):
         dv = 60.0
-        return float(second)/dv ** 1
+        return float(second)/dv**1
     @classmethod
     def second_to_hours(cls, second):
         dv = 60.0
-        return float(second)/dv ** 2
+        return float(second)/dv**2
     @classmethod
     def microsecond_to_second(cls, microsecond):
         dv = 1000.0
-        return float(microsecond) / dv ** 2
+        return float(microsecond) / dv**2
     @classmethod
     def microsecond_to_hours(cls, microsecond):
         return cls.second_to_hours(
@@ -2132,8 +2129,8 @@ class TextOpt(object):
 
 class ValueMtd(object):
     @classmethod
-    def step_to(cls, value, delta, step, valueRange):
-        min0, max0 = valueRange
+    def step_to(cls, value, delta, step, value_range, direction):
+        min0, max0 = value_range
         min1, max1 = min0 + step, max0 - step
         if value < min1:
             if 0 < delta:
@@ -2141,12 +2138,19 @@ class ValueMtd(object):
             else:
                 value = min0
         elif min1 <= value <= max1:
-            value += [-step, step][delta > 0]
+            value += [-step, step][delta > 0]*direction
         elif max1 < value:
             if delta < 0:
                 value -= step
             else:
                 value = max0
+        return value
+    @classmethod
+    def set_offset_range_to(cls, value, d_value, radix, value_range, direction):
+        minimum, maximum = value_range
+        value += d_value*direction
+        value = int(value/radix)*radix
+        value = max(min(value, maximum), minimum)
         return value
     @classmethod
     def map_to(cls, value, sourceValueRange, targetValueRange):
@@ -2392,6 +2396,44 @@ Subtitle options:
         SubProcessMtd.set_run_with_result(
             cmd
         )
+
+
+class Matrix33Opt(object):
+    def __init__(self, matrix=None):
+        if matrix is None:
+            self._raw = self.get_default()
+        else:
+            self._raw = matrix
+    @classmethod
+    def get_default(cls):
+        return [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    @classmethod
+    def set_identity(cls, matrix):
+        for row in range(3):
+            for col in range(0, 3):
+                matrix[row][col] = int(row == col)
+        return matrix
+    @classmethod
+    def get_identity(cls):
+        return cls.set_identity(cls.get_default())
+
+    def set_add_to(self, matrix):
+        m1 = self._raw
+        m2 = matrix
+        m = self.get_default()
+        for row in range(0, 3):
+            for col in range(0, 3):
+                m[row][col] = self._raw[row][col] + m2[row][col]
+        return m
+
+    def set_multiply_to(self, matrix):
+        m1 = self._raw
+        m2 = matrix
+        m = self.get_default()
+        for row in range(0, 3):
+            for col in range(0, 3):
+                m[row][col] = m1[row][0] * m2[0][col] + m1[row][1] * m2[1][col] + m1[row][2] * m2[2][col]
+        return m
 
 
 class Bin(object):
@@ -2970,7 +3012,7 @@ class CoordMtd(object):
     def to_length(cls, position0, position1):
         x0, y0 = position0
         x1, y1 = position1
-        return math.sqrt(((x0 - x1) ** 2) + ((y0 - y1) ** 2))
+        return math.sqrt(((x0 - x1)**2) + ((y0 - y1)**2))
     @classmethod
     def to_angle(cls, position0, position1):
         x0, y0 = position0
@@ -3303,4 +3345,9 @@ class TimeMtd(object):
 
 
 if __name__ == '__main__':
-    print TextOpt('1001-1005, 2000,500, 500').to_frames()
+    print IntegerMtd.get_prettify_(
+        22725, 1
+    )
+    print IntegerMtd.get_prettify_(
+        22725, 0
+    )

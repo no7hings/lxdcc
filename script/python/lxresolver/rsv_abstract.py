@@ -1449,6 +1449,7 @@ class AbsRsvProject(
         # workspace
         if 'workspace' in kwargs:
             workspace = kwargs['workspace']
+            # convert other workspace to "work"
             if workspace not in [
                 'work',
                 'publish',
@@ -1598,6 +1599,7 @@ class AbsRsvProject(
     #
     def _project__set_rsv_matcher_create_(self, kwargs):
         self.__set_match_kwargs_completion_(kwargs)
+        #
         pattern = kwargs['pattern']
         return self.RSV_MATCHER_CLASS(
             self,

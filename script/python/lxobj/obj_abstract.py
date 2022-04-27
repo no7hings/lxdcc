@@ -2758,6 +2758,12 @@ class AbsObjConnection(object):
     @property
     def target_obj(self):
         return self.universe.get_obj(self._target_obj_path)
+
+    def get_source_obj(self):
+        return self.universe.get_obj(self._source_obj_path)
+
+    def get_target_obj(self):
+        return self.universe.get_obj(self._target_obj_path)
     # port
     @property
     def source(self):

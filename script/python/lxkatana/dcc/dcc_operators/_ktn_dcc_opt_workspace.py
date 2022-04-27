@@ -8,11 +8,6 @@ from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
 from lxkatana.modifiers import _ktn_mdf_utility
 
 
-class AssetWorkspaceNodeGraphOpt(object):
-    def __init__(self, workspace):
-        self._workspace = workspace
-
-
 class AssetWorkspaceOpt(object):
     WHITE_DICT = {
         'base_color':  (1, .955, .905),
@@ -263,13 +258,27 @@ class AssetWorkspaceOpt(object):
                 dcc_shader_opt.set(k, v)
         return dcc_shader_opt
     @classmethod
+    def _set_displacement_fix_(cls, dcc_material, dcc_path):
+        dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
+            ktn_dcc_objects.Node(dcc_path)
+        )
+        output_min, output_max = dcc_shader_opt.get_port_value('output_min'), dcc_shader_opt.get_port_value('output_max')
+        min_value, max_value = min(output_min, output_max), max(output_min, output_max)
+        dcc_shader_opt.set_port_value('output_min', max_value), dcc_shader_opt.set_port_value('output_max', min_value)
+        return dcc_shader_opt
+    @classmethod
     def _set_convert_to_white_(cls, dcc_material, dcc_shader_path):
-        dcc_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
-        if dcc_shader:
-            dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_shader)
-            dcc_targets = dcc_shader_opt.get_port_targets('out')
-            #
-            dcc_white_opt = cls._set_white_create_(dcc_material, dcc_shader_path)
+        dcc_surface_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
+        if dcc_surface_shader:
+            dcc_surface_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_surface_shader)
+            dcc_surface_targets = dcc_surface_shader_opt.get_port_targets('out')
+            dcc_surface_white_opt = cls._set_white_create_(dcc_material, dcc_shader_path)
+        #
+        dcc_displacement_shader = dcc_material.get_input_port('arnoldDisplacement').get_source_obj()
+        if dcc_displacement_shader:
+            dcc_displacement_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_displacement_shader)
+            dcc_displacement_targets = dcc_displacement_shader_opt.get_port_targets('out')
+            # dcc_displacement_white_opt = cls._set_displacement_fix_(dcc_material, dcc_shader_path)
     #
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_auto_geometry_properties_assign(self, pass_name='default'):

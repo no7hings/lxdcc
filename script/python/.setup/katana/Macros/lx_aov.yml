@@ -12,11 +12,6 @@ parameters:
         value: 'primary'
         tool_tip: '...'
 
-    arnold/channel:
-        widget: enumerate
-        value: ['rgba', 'primary']
-        tool_tip: '...'
-
     arnold/type:
         widget: enumerate
         value: ['file', 'local']

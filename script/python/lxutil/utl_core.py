@@ -324,27 +324,30 @@ class DialogWindow(object):
     GuiStatus = bsc_configure.GuiStatus
     @classmethod
     def set_create(
-            cls,
-            label,
-            content=None,
-            content_text_size=10,
-            window_size=(480, 160),
-            yes_method=None,
-            yes_label=None,
-            yes_visible=True,
-            #
-            no_method=None,
-            no_label=None,
-            no_visible=True,
-            #
-            cancel_fnc=None,
-            cancel_label=None,
-            cancel_visible=True,
-            #
-            button_size=160,
-            status=None,
-            show=True,
-            use_exec=True
+        cls,
+        label,
+        content=None,
+        content_text_size=10,
+        window_size=(480, 160),
+        yes_method=None,
+        yes_label=None,
+        yes_visible=True,
+        #
+        no_method=None,
+        no_label=None,
+        no_visible=True,
+        #
+        cancel_fnc=None,
+        cancel_label=None,
+        cancel_visible=True,
+        #
+        button_size=160,
+        status=None,
+        use_as_error=False,
+        use_as_warning=False,
+        show=True,
+        use_exec=True,
+        options_configure=None
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
@@ -379,6 +382,10 @@ class DialogWindow(object):
             w.set_window_title('[ {} ] {}'.format(str(status).split('.')[-1], label))
             w.set_status(status)
         #
+        if options_configure is not None:
+            w.set_options_group_enable()
+            w.set_options_create_by_configure(options_configure)
+        #
         if show is True:
             w.set_window_show()
         return w
@@ -389,6 +396,7 @@ class WaitWindow(object):
 
 
 class ExceptionCatcher(object):
+    GuiStatus = bsc_configure.GuiStatus
     @classmethod
     def _get_window_(cls):
         from lxutil_gui.proxy import utl_gui_prx_core
@@ -412,31 +420,32 @@ class ExceptionCatcher(object):
         #
         import traceback
         #
-        exc_typ, exc_vlu, exc_stk = sys.exc_info()
-        exc_txts = []
-        value = '{}: "{}"'.format(exc_typ.__name__, exc_vlu.message)
-        for seq, stk in enumerate(traceback.extract_tb(exc_stk)):
+        exc_type, exc_value, exc_stack = sys.exc_info()
+        exc_texts = []
+        value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+        for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
             i_file_path, i_line, i_fnc, i_fnc_line = stk
-            exc_txts.append(
+            exc_texts.append(
                 '    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
         #
         if use_window is True:
             w = cls._get_window_()
             #
+            w.set_status(cls.GuiStatus.Error)
             w.set_content_add('*'*72)
-            label = '{}'.format(exc_typ.__name__)
+            label = '{}'.format(exc_type.__name__)
             w.set_content_add('traceback:')
             Log.set_module_error_trace('exception-catch', label)
             #
-            [w.set_content_add(i) for i in exc_txts]
-            [Log.set_error_trace(i) for i in exc_txts]
+            [w.set_content_add(i) for i in exc_texts]
+            [Log.set_error_trace(i) for i in exc_texts]
             #
             w.set_content_add(value)
             Log.set_error_trace(value)
             return w
         else:
-            print(u'\n'.join(exc_txts))
+            print(u'\n'.join(exc_texts))
             print(value)
     @classmethod
     def set_create_for_execute(cls, use_window=True):

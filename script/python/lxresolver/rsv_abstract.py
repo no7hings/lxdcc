@@ -1,6 +1,10 @@
 # coding:utf-8
 from __future__ import print_function
 
+import itertools
+
+import functools
+
 import os
 
 import re
@@ -754,6 +758,38 @@ class AbsRsvDef(object):
         self._patterns_dict = collections.OrderedDict()
         #
         self._pattern_keys_dict = {}
+        #
+        self._includes_dict = collections.OrderedDict()
+        self._include_steps_dict = collections.OrderedDict()
+        self._patterns_dict = collections.OrderedDict()
+
+    def _set_includes_update_(self, raw):
+        for k, v in raw.items():
+            if fnmatch.filter([k], 'include-*'):
+                self._includes_dict[k] = [MtdBasic._get_rsv_pattern_real_value_(i, raw) for i in v]
+
+    def _set_include_steps_update_(self, raw):
+        for k, v in raw.items():
+            if fnmatch.filter([k], 'include-*-step'):
+                i_steps = []
+                i_v = [MtdBasic._get_rsv_pattern_real_value_(i, raw) for i in v]
+                i_steps.extend(i_v)
+                i_extra_key = '{}-extra'.format(k)
+                if i_extra_key in self._raw:
+                    i_step_extras = self._raw[i_extra_key]
+                    if i_step_extras:
+                        utl_core.Log.set_module_result_trace(
+                            'resolver step extra',
+                            u'step-extra={}'.format(', '.join(['"{}"'.format(i) for i in i_step_extras]))
+                        )
+                        for j_step, j_step_extra in itertools.product(i_v, i_step_extras):
+                            j_step_extra = j_step_extra.format(**dict(step=j_step))
+                            i_steps.append(j_step_extra)
+                #
+                self._include_steps_dict[k] = i_steps
+
+    def get_include_steps(self, key):
+        return self._include_steps_dict.get(key, [])
 
     def _get_rsv_obj_create_kwargs_(self, obj_path, input_variants, extend_keys=None):
         keyword = input_variants['keyword']
@@ -811,10 +847,8 @@ class AbsRsvDef(object):
     def get_rsv_pattern(self, keyword):
         return self.RSV_PATTERN_CLASS(self.get_pattern(keyword))
 
-    def get_include(self, keyword):
-        if keyword in self._includes_dict:
-            return self._includes_dict[keyword]
-        return []
+    def get_include(self, key):
+        return self._includes_dict.get(key, [])
 
     def get_value(self, keyword):
         if keyword not in self._raw:
@@ -1411,11 +1445,9 @@ class AbsRsvProject(
             'root-step-choice'
         )
         #
-        self._includes_dict = collections.OrderedDict()
-        self._patterns_dict = collections.OrderedDict()
-        #
         self._set_root_dict_update_()
-        self._set_includes_dict_update_(self._raw)
+        self._set_includes_update_(self._raw)
+        self._set_include_steps_update_(self._raw)
         # file-pattern(s) gain
         self._set_patterns_dict_update_(self._raw)
     @property
@@ -1523,11 +1555,6 @@ class AbsRsvProject(
                 self._root_configure.get('{}.{}'.format(i_root_choice, platform_))
             )
 
-    def _set_includes_dict_update_(self, raw):
-        for k, v in raw.items():
-            if isinstance(v, (tuple, list)):
-                self._includes_dict[k] = [MtdBasic._get_rsv_pattern_real_value_(i, raw) for i in v]
-
     def _set_patterns_dict_update_(self, raw):
         for k, v in raw.items():
             if isinstance(v, (str, unicode)):
@@ -1537,7 +1564,8 @@ class AbsRsvProject(
     def set_override_load(self, file_path):
         raw = MtdBasic._get_scheme_raw_(file_path)
         self._raw.update(raw)
-        self._set_includes_dict_update_(raw)
+        self._set_includes_update_(raw)
+        self._set_include_steps_update_(raw)
         self._set_patterns_dict_update_(raw)
 
     def get_patterns(self, regex=None):
@@ -1849,7 +1877,7 @@ class AbsRsvProject(
         #
         if type_ in kwargs_:
             name = kwargs_[type_]
-            step_include_names = self.get_include(u'include-{}-{}'.format(branch, type_)) or []
+            step_include_names = self.get_include_steps(u'include-{}-{}'.format(branch, type_)) or []
             if step_include_names:
                 if name not in step_include_names:
                     return
@@ -2378,10 +2406,9 @@ class AbsRsvRoot(
         #
         self._raw = MtdBasic._get_scheme_raw_(os.path.abspath(self.FILE_PATH))
         #
-        self._patterns_dict = collections.OrderedDict()
-        self._includes_dict = collections.OrderedDict()
+        self._set_includes_update_(self._raw)
+        self._set_include_steps_update_(self._raw)
         #
-        self._set_includes_dict_update_(self._raw)
         self._set_patterns_dict_update_(self._raw)
         #
         pattern = rsv_configure.Data.get_project_configure_path('{project}')
@@ -2429,11 +2456,6 @@ class AbsRsvRoot(
     @property
     def pattern_dict(self):
         return self._patterns_dict
-
-    def _set_includes_dict_update_(self, raw):
-        for k, v in raw.items():
-            if isinstance(v, (tuple, list)):
-                self._includes_dict[k] = [MtdBasic._get_rsv_pattern_real_value_(i, raw) for i in v]
 
     def _set_patterns_dict_update_(self, raw):
         for k, v in raw.items():

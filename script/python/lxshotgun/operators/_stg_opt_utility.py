@@ -179,16 +179,28 @@ class StgVersionOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('sg_version_type')
 
     def set_stg_type(self, stg_type):
-        self._stg_obj_query.set_update('sg_version_type', stg_type)
-        utl_core.Log.set_module_result_trace(
-            'stg-version-set',
-            u'stg-type="{}"'.format(stg_type)
-        )
+        if stg_type:
+            self._stg_obj_query.set_update('sg_version_type', stg_type)
+            utl_core.Log.set_module_result_trace(
+                'stg-version set',
+                u'stg-type="{}"'.format(stg_type)
+            )
+
+    def set_stg_user(self, stg_user):
+        if stg_user:
+            self._stg_obj_query.set_update('user', stg_user)
+            utl_core.Log.set_module_result_trace(
+                'stg-version set',
+                u'user="{}"'.format(stg_user)
+            )
+
+    def get_stg_user(self):
+        return self._stg_obj_query.get('user')
 
     def set_stg_status(self, stg_status):
         self._stg_obj_query.set_update('sg_status_list', stg_status)
         utl_core.Log.set_module_result_trace(
-            'stg-version-set',
+            'stg-version set',
             u'stg-status="{}"'.format(stg_status)
         )
 
@@ -198,7 +210,7 @@ class StgVersionOpt(AbsStgObjOpt):
     def set_stg_todo(self, stg_todo):
         self._stg_obj_query.set_update('sg_todo', stg_todo)
         utl_core.Log.set_module_result_trace(
-            'stg-version-set',
+            'stg-version set',
             u'stg-todo="{}"'.format(stg_todo)
         )
 
@@ -212,12 +224,12 @@ class StgVersionOpt(AbsStgObjOpt):
         if os.path.isfile(file_path):
             self._stg_obj_query.set_upload('sg_uploaded_movie', file_path)
             utl_core.Log.set_module_result_trace(
-                'stg-version-set',
+                'stg-version set',
                 u'file="{}"'.format(file_path)
             )
         else:
             utl_core.Log.set_module_result_trace(
-                'stg-version-set',
+                'stg-version set',
                 u'file="{}" is non-exists'.format(file_path)
             )
 

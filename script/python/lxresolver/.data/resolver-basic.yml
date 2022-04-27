@@ -637,6 +637,10 @@ include-asset-step:
     # set
     - set
 #
+include-asset-step-extra:
+    - '{step}_qc'
+    - '{step}_tech'
+#
 root-step-choice:
     work: {}
     publish: {efx: 'root_secondary'}

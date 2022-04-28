@@ -7,6 +7,8 @@ import glob
 
 import hashlib
 
+import fnmatch
+
 from lxbasic import bsc_core
 
 from lxobj import obj_abstract
@@ -691,6 +693,11 @@ class AbsOsTexture(AbsOsFile):
         if ext.lower() == '.tx':
             return cls.COLOR_SPACE_CFG.get_aces_render_color_space()
         elif ext.lower() == '.exr':
+            file_opt = bsc_core.StorageFileOpt(file_path)
+            if file_opt.get_is_match_name_pattern('*.z_disp.*.exr'):
+                return cls.COLOR_SPACE_CFG.get_aces_color_space(
+                    cls.TEXTURE_CFG.get_used_color_space(file_path)
+                )
             return cls.COLOR_SPACE_CFG.get_aces_render_color_space()
         return cls.COLOR_SPACE_CFG.get_aces_color_space(
             cls.TEXTURE_CFG.get_used_color_space(file_path)

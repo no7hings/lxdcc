@@ -277,6 +277,7 @@ tx:
         name-patterns:
             - '*.disp.*'
             - '*_disp.*'
+            - '*.z_disp.*'
         color-space: Raw
     #
     mask:

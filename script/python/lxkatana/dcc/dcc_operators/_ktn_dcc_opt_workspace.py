@@ -90,11 +90,11 @@ class AssetWorkspaceOpt(object):
                 cls._set_standard_surface_convert_to_occ_(dcc_shader_opt, dcc_shader_path)
     @classmethod
     def _set_lambert_convert_to_occ_(cls, dcc_shader_opt, dcc_shader_path):
-        opacity_value = dcc_shader_opt.get_port_value('opacity')
+        opacity_value = dcc_shader_opt.get('opacity')
         opacity_source = dcc_shader_opt.get_port_source('opacity')
         if opacity_source is None:
             if opacity_value == [1.0, 1.0, 1.0]:
-                value = dcc_shader_opt.get_port_value('Kd_color')
+                value = dcc_shader_opt.get('Kd_color')
                 dcc_source = dcc_shader_opt.get_port_source('Kd_color')
                 dcc_targets = dcc_shader_opt.get_port_targets('out')
                 #
@@ -109,11 +109,11 @@ class AssetWorkspaceOpt(object):
                         dcc_occ_opt.set_port_target('out', i_dcc_target, validation=True)
     @classmethod
     def _set_standard_surface_convert_to_occ_(cls, dcc_shader_opt, dcc_shader_path):
-        opacity_value = dcc_shader_opt.get_port_value('opacity')
+        opacity_value = dcc_shader_opt.get('opacity')
         opacity_source = dcc_shader_opt.get_port_source('opacity')
         if opacity_source is None:
             if opacity_value == [1.0, 1.0, 1.0]:
-                value = dcc_shader_opt.get_port_value('base_color')
+                value = dcc_shader_opt.get('base_color')
                 dcc_source = dcc_shader_opt.get_port_source('base_color')
                 dcc_targets = dcc_shader_opt.get_port_targets('out')
                 #
@@ -258,27 +258,22 @@ class AssetWorkspaceOpt(object):
                 dcc_shader_opt.set(k, v)
         return dcc_shader_opt
     @classmethod
-    def _set_displacement_fix_(cls, dcc_material, dcc_path):
-        dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
-            ktn_dcc_objects.Node(dcc_path)
-        )
-        output_min, output_max = dcc_shader_opt.get_port_value('output_min'), dcc_shader_opt.get_port_value('output_max')
-        min_value, max_value = min(output_min, output_max), max(output_min, output_max)
-        dcc_shader_opt.set_port_value('output_min', max_value), dcc_shader_opt.set_port_value('output_max', min_value)
+    def _set_displacement_fix_(cls, dcc_shader_opt):
+        dcc_shader_opt.set('output_min', 1), dcc_shader_opt.set('output_max', 0)
+        dcc_shader_opt.set('contrast_pivot', 0.5)
         return dcc_shader_opt
     @classmethod
     def _set_convert_to_white_(cls, dcc_material, dcc_shader_path):
         dcc_surface_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
         if dcc_surface_shader:
-            dcc_surface_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_surface_shader)
-            dcc_surface_targets = dcc_surface_shader_opt.get_port_targets('out')
+            # dcc_surface_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_surface_shader)
+            # dcc_surface_targets = dcc_surface_shader_opt.get_port_targets('out')
             dcc_surface_white_opt = cls._set_white_create_(dcc_material, dcc_shader_path)
         #
         dcc_displacement_shader = dcc_material.get_input_port('arnoldDisplacement').get_source_obj()
         if dcc_displacement_shader:
             dcc_displacement_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_displacement_shader)
-            dcc_displacement_targets = dcc_displacement_shader_opt.get_port_targets('out')
-            # dcc_displacement_white_opt = cls._set_displacement_fix_(dcc_material, dcc_shader_path)
+            dcc_displacement_white_opt = cls._set_displacement_fix_(dcc_displacement_shader_opt)
     #
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_auto_geometry_properties_assign(self, pass_name='default'):
@@ -298,5 +293,10 @@ class AssetWorkspaceOpt(object):
                             subdiv_type='catclark',
                             subdiv_iterations=2,
                             subdiv_smooth_derivs=True,
+                            #
+                            disp_padding=0,
+                            disp_height=1,
+                            disp_zero_value=0.5,
+                            disp_autobump=False,
                         )
                     )

@@ -3368,9 +3368,9 @@ class AbsOsFile(
                     self.LOG.set_result_trace(
                         'file copy: "{}" >> "{}"'.format(self.path, target_file_path))
                 else:
-                    self.LOG.set_warning_trace('file-copy: target "{}" is exist.'.format(target_file_path))
+                    self.LOG.set_warning_trace('file copy: target "{}" is exist.'.format(target_file_path))
         else:
-            self.LOG.set_warning_trace('file-copy: source "{}" is Non-exist.'.format(self.path))
+            self.LOG.set_warning_trace('file copy: source "{}" is Non-exist.'.format(self.path))
 
     def get_target_file_path(self, tgt_directory_path, fix_name_blank=False, ignore_structure=True, ext_override=None):
         tgt_directory_path = bsc_core.StoragePathOpt(tgt_directory_path).__str__()
@@ -3411,7 +3411,7 @@ class AbsOsFile(
             try:
                 shutil.copy2(self.path, target_file_path)
                 self.LOG.set_module_result_trace(
-                    'file-copy',
+                    'file copy',
                     u'file="{}" >> "{}"'.format(self.path, target_file_path)
                 )
             except:

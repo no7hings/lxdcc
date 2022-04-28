@@ -35,7 +35,6 @@ geometries:
 usdas:
     material: 'shading.usda'
     #
-    proxy: 'proxy.usda'
     payload: 'payload.usda'
     registry: 'registry.usda'
     asset: '<asset>.usda'

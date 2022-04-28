@@ -81,7 +81,7 @@ class DccTexturesOpt(object):
         )
         return self._set_repath_queue_run_(tx_repath_queue)
     #
-    def set_tx_create_and_repath(self, use_deferred=False, force=False):
+    def set_tx_create_and_repath_use_thread(self, use_deferred=False, force=False):
         objs = self._objs
         #
         tx_create_queue = []
@@ -131,6 +131,24 @@ class DccTexturesOpt(object):
             g_p.set_stop()
         #
         return results_dict
+
+    def set_tx_create_and_repath(self, force=False):
+        tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
+            self._objs, force=force
+        )
+        self._set_tx_create_queue_run_(tx_create_queue)
+        self._set_repath_queue_run_(tx_repath_queue)
+    @classmethod
+    def _set_tx_create_queue_run_(cls, queue):
+        if queue:
+            with utl_core.log_progress(maximum=len(queue), label='texture-tx create') as l_p:
+                for i_texture in queue:
+                    l_p.set_update()
+                    if i_texture.get_tx_is_exists() is False:
+                        i_texture_tiles = i_texture.get_exists_files()
+                        if i_texture_tiles:
+                            for j_texture_tile in i_texture_tiles:
+                                utl_dcc_objects.OsTexture._set_unit_tx_create_(j_texture_tile)
     @classmethod
     def _get_tx_create_process_(cls, queue, use_deferred):
         lis = []
@@ -218,7 +236,7 @@ class DccTexturesOpt(object):
         )
         return self._set_repath_queue_run_(jpg_repath_queue)
 
-    def set_jpg_create_and_repath(self, use_deferred=False, force=False):
+    def set_jpg_create_and_repath_use_thread(self, use_deferred=False, force=False):
         objs = self._objs
         #
         jpg_create_queue = []
@@ -270,6 +288,24 @@ class DccTexturesOpt(object):
             g_p.set_stop()
         #
         return results_dict
+
+    def set_jpg_create_and_repath(self, force=False):
+        jpg_create_queue, jpg_repath_queue = self._get_jpg_action_queue_(
+            self._objs, force=force
+        )
+        self._set_jpg_create_queue_run_(jpg_create_queue)
+        self._set_repath_queue_run_(jpg_repath_queue)
+    @classmethod
+    def _set_jpg_create_queue_run_(cls, queue):
+        if queue:
+            with utl_core.log_progress(maximum=len(queue), label='texture-jpg create') as l_p:
+                for i_texture in queue:
+                    l_p.set_update()
+                    if i_texture.get_tx_is_exists() is False:
+                        i_texture_tiles = i_texture.get_exists_files()
+                        if i_texture_tiles:
+                            for j_texture_tile in i_texture_tiles:
+                                utl_dcc_objects.OsTexture._set_unit_tx_create_(j_texture_tile)
     @classmethod
     def _get_jpg_create_process_(cls, queue, use_deferred):
         lis = []

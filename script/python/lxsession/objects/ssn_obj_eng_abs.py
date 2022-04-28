@@ -71,7 +71,7 @@ class AbsSsnRsvApplication(object):
                 else:
                     raise ValueError()
 
-    def get_publish_scene_src_file(self, version_scheme='match'):
+    def get_publish_scene_src_file(self, version_scheme='match', ext_extras=None):
         cur_workspace = 'publish'
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is not None:
@@ -115,13 +115,19 @@ class AbsSsnRsvApplication(object):
                                 file_path_tgt=scene_src_file_path_tgt
                             )
                         ).set_run()
+                    #
+                    if ext_extras:
+                        for i_ext in ext_extras:
+                            i_src = '{}.{}'.format(scene_src_file_src.path_base, i_ext)
+                            i_tgt = '{}.{}'.format(scene_src_file_tgt.path_base, i_ext)
+                            utl_dcc_objects.OsFile(i_src).set_copy_to_file(i_tgt)
                     return scene_src_file_path_tgt
                 else:
                     return scene_src_file_path_tgt
             else:
                 raise ValueError()
 
-    def get_output_scene_src_file(self, version_scheme='match'):
+    def get_output_scene_src_file(self, version_scheme='match', ext_extras=None):
         cur_workspace = 'output'
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is not None:
@@ -153,7 +159,7 @@ class AbsSsnRsvApplication(object):
                     )
                 else:
                     raise ValueError()
-
+                #
                 scene_src_file_src = utl_dcc_objects.OsFile(scene_src_file_path_src)
                 scene_src_file_tgt = utl_dcc_objects.OsFile(scene_src_file_path_tgt)
                 if scene_src_file_tgt.get_is_exists() is False:
@@ -165,6 +171,12 @@ class AbsSsnRsvApplication(object):
                                 file_path_tgt=scene_src_file_path_tgt
                             )
                         ).set_run()
+                    #
+                    if ext_extras:
+                        for i_ext in ext_extras:
+                            i_src = '{}.{}'.format(scene_src_file_src.path_base, i_ext)
+                            i_tgt = '{}.{}'.format(scene_src_file_tgt.path_base, i_ext)
+                            utl_dcc_objects.OsFile(i_src).set_copy_to_file(i_tgt)
                     return scene_src_file_path_tgt
                 else:
                     return scene_src_file_path_tgt

@@ -2,9 +2,9 @@
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
-class RsvTexture(utl_rsv_obj_abstract.AbsRsvObj):
-    def __init__(self, rsv_scene_properties):
-        super(RsvTexture, self).__init__(rsv_scene_properties)
+class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+    def __init__(self, rsv_scene_properties, hook_option_opt=None):
+        super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_texture_export(self, use_tx):
         import lxutil.dcc.dcc_operators as utl_dcc_operators

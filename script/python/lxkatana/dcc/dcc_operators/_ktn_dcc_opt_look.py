@@ -38,6 +38,9 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
         if port:
             return port.get()
 
+    def get(self, key):
+        return self.get_port_value(key)
+
     def set_port_value(self, and_port_path, value):
         self.get_enable_port(and_port_path).set(True)
         self.get_value_port(and_port_path).set(value)

@@ -820,6 +820,10 @@ class AndTextureOpt_(AndImageOpt):
     def _set_unit_tx_create_(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space):
         cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
         if use_aces is True:
+            utl_core.Log.set_module_result_trace(
+                'texture-tx create',
+                'color-space convert "{}" to "{}"'.format(color_space, aces_render_color_space)
+            )
             # print color_space, aces_render_color_space
             if color_space in aces_color_spaces:
                 if color_space != aces_render_color_space:
@@ -838,7 +842,6 @@ class AndTextureOpt_(AndImageOpt):
                 '--compression dwaa'
             ]
         #
-        # print cmd_args
         cmd_args += [self._file_path]
         #
         return bsc_core.SubProcessMtd.set_run(

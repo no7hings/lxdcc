@@ -2,9 +2,9 @@
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
-class RsvGeometry(utl_rsv_obj_abstract.AbsRsvObj):
-    def __init__(self, rsv_scene_properties):
-        super(RsvGeometry, self).__init__(rsv_scene_properties)
+class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+    def __init__(self, rsv_scene_properties, hook_option_opt=None):
+        super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_geometry_usd_export(self, version_scheme='match'):
         """

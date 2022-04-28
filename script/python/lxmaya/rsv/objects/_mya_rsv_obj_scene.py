@@ -65,7 +65,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             mya_root_dat_opt.get_value()
         )
         if mya_root.get_is_exists() is True:
-            ma_core.CmdObjOpt(mya_root).set_customize_attribute_create(
+            ma_core.CmdObjOpt(mya_root.path).set_customize_attribute_create(
                 'pg_{}_version'.format(task),
                 version
             )

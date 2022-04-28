@@ -429,7 +429,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         dcc_obj.get_port('arnold_name').set_create('string', i_raw)
                     else:
                         utl_core.Log.set_module_warning_trace(
-                            'shader-port-set',
+                            'shader-port set',
                             'atr-path="{}" is non-exists'.format(i_value_dcc_port.path)
                         )
 

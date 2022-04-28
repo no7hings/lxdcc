@@ -60,7 +60,9 @@ class Type(object):
     }
     @classmethod
     def get_name(cls, and_type):
-        return cls.NAME_DICT[and_type]
+        if and_type in cls.NAME_DICT:
+            return cls.NAME_DICT[and_type]
+        return obj_configure.Type.NONE
     @classmethod
     def get_is_ar_array(cls, and_type):
         return and_type == ai.AI_TYPE_ARRAY

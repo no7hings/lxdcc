@@ -60,8 +60,23 @@ class RsvAssetSetUsdCreator(object):
     def __init__(self, rsv_asset):
         self._rsv_asset = rsv_asset
     @classmethod
+    def _get_shot_asset_cache_(cls, rsv_asset, rsv_shot):
+        file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
+        if file_path:
+            yml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(file_path, 'shot-asset/{}'.format(rsv_asset.name))
+            file_opt = bsc_core.StorageFileOpt(yml_file_path)
+            if file_opt.get_is_exists() is True:
+                return file_opt.set_read()
+            else:
+                if bsc_core.SystemMtd.get_is_linux():
+                    dict_ = cls._get_shot_asset_dict_(rsv_asset, rsv_shot)
+                    file_opt.set_write(dict_)
+                    return dict_
+                return {}
+        else:
+            return bsc_objects.Content(value={})
+    @classmethod
     def _get_shot_asset_dict_(cls, rsv_asset, rsv_shot):
-        #
         dic = collections.OrderedDict()
 
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
@@ -101,7 +116,7 @@ class RsvAssetSetUsdCreator(object):
                     version='latest'
                 )
                 if i_shot_set_usd_file_path is not None:
-                    shot_assets_dict = cls._get_shot_asset_dict_(
+                    shot_assets_dict = cls._get_shot_asset_cache_(
                         rsv_asset, i_rsv_shot
                     )
                     if shot_assets_dict:
@@ -268,6 +283,22 @@ class RsvAssetSetUsdCreator(object):
         usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asst)
         return cls._get_usd_file_variant_dict_(usd_file_path)
     @classmethod
+    def _get_asset_usd_set_dress_variant_cache_(cls, rsv_asset):
+        file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
+        if file_path:
+            yml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(file_path, 'asset-versions/{}'.format(rsv_asset.name))
+            file_opt = bsc_core.StorageFileOpt(yml_file_path)
+            if file_opt.get_is_exists() is True:
+                return file_opt.set_read()
+            else:
+                if bsc_core.SystemMtd.get_is_linux():
+                    dict_ = cls._get_asset_usd_set_dress_variant_dict_(rsv_asset)
+                    file_opt.set_write(dict_)
+                    return dict_
+                return {}
+        else:
+            return bsc_objects.Content(value={})
+    @classmethod
     def _get_shot_usd_set_dress_variant_dict_(cls, rsv_shot):
         usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         return cls._get_usd_file_variant_dict_(usd_file_path)
@@ -418,7 +449,7 @@ class RsvAssetSetUsdCreator(object):
                 rsv_scene_properties
             )
             start_frame, end_frame = usd_core.UsdStageOpt(shot_set_dress_usd_file_path).get_frame_range()
-            shot_assets_dict = cls._get_shot_asset_dict_(rsv_asset, rsv_shot)
+            shot_assets_dict = cls._get_shot_asset_cache_(rsv_asset, rsv_shot)
 
             key = 'usda/shot-asset-set-v002'
 

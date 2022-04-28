@@ -108,7 +108,13 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
         if self.get_is_exists() is True:
             if self.get_has_source() is False:
                 if self.type == 'string':
-                    cmds.setAttr(self.path, value, type=self.type)
+                    if isinstance(value, (str, unicode)):
+                        cmds.setAttr(self.path, value, type=self.type)
+                    else:
+                        utl_core.Log.set_module_warning_trace(
+                            'port set',
+                            u'atr-path="{}", value="{}" is not available'.format(self.path, value)
+                        )
                 elif self.type == 'enum':
                     if isinstance(value, (str, unicode)):
                         enumerate_strings = self._obj_atr_query.get_enumerate_strings()
@@ -131,13 +137,13 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         cmds.setAttr(self.path, value, clamp=1)
                 #
                 # utl_core.Log.set_module_result_trace(
-                #     'port-set',
+                #     'port set',
                 #     u'atr-path="{}" value="{}"'.format(self.path, value)
                 # )
             else:
                 utl_core.Log.set_module_warning_trace(
-                    'port-set',
-                    'atr-path="{}" has source'.format(self.path)
+                    'port set',
+                    u'atr-path="{}" has source'.format(self.path)
                 )
 
     def _set_as_array_(self, values):
@@ -157,7 +163,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                     cmds.setAttr(atr_path, value, clamp=1)
             #
             # utl_core.Log.set_module_result_trace(
-            #     'port-set',
+            #     'port set',
             #     'atr-path="{}" value="{}"'.format(self.path, value)
             # )
 

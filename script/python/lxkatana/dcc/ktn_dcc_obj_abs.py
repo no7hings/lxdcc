@@ -104,7 +104,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             if isinstance(value, (tuple, list)):
                 self._set_array_value_(ktn_port, value, time=time)
                 # utl_core.Log.set_module_result_trace(
-                #     'array-port-set',
+                #     'array-port set',
                 #     u'atr-path="{}" value="{}"'.format(self.path, value)
                 # )
             else:
@@ -114,7 +114,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                 #
                 ktn_port.setValue(_value, time)
                 # utl_core.Log.set_module_result_trace(
-                #     'constant-port-set',
+                #     'constant-port set',
                 #     u'atr-path="{}" value="{}"'.format(self.path, _value)
                 # )
 

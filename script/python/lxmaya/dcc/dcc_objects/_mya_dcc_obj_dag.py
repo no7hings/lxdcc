@@ -26,6 +26,17 @@ class Group(_mya_dcc_obj_obj.Node):
             return cmds.ls(self.path, noIntermediate=1, dagObjects=1, type=_, long=1) or []
         return cmds.ls(self.path, shapes=1, noIntermediate=1, dagObjects=1, long=1) or []
 
+    def get_all_paths(self, include_obj_type=None):
+        if include_obj_type is not None:
+            if isinstance(include_obj_type, (str, unicode)):
+                _ = [include_obj_type]
+            elif isinstance(include_obj_type, (tuple, list)):
+                _ = include_obj_type
+            else:
+                raise TypeError()
+            return cmds.ls(self.path, noIntermediate=1, dagObjects=1, type=_, long=1) or []
+        return cmds.ls(self.path, noIntermediate=1, dagObjects=1, long=1) or []
+
 
 class Transform(_mya_dcc_obj_obj.Node):
     DEFAULT_MATRIX = [

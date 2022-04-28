@@ -201,6 +201,9 @@ class AbsDccPort(AbsDccObjDef):
     def get_targets(self):
         pass
 
+    def get_target_objs(self):
+        return [i.obj for i in self.get_targets()]
+
     def set_disconnect(self):
         pass
     @classmethod

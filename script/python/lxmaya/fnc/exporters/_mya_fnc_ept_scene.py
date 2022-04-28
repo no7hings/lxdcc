@@ -29,52 +29,81 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 import lxutil.fnc.exporters as utl_fnc_exporters
 
 
-class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
+class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     WITH_XGEN = 'with_xgen_collection'
-    OPTION = {
-        WITH_XGEN: False
-    }
-    def __init__(self, file_path, root=None, option=None):
-        super(SceneExporter, self).__init__(file_path, root, option)
+    OPTION = dict(
+        file='',
+        location='',
+        with_xgen_collection=False,
+        with_set=False,
+        ext_extras=[]
+    )
+    def __init__(self, option=None):
+        super(SceneExporter, self).__init__(option)
 
     def set_run(self):
-        with_xgen_collection = self._option[self.WITH_XGEN]
+        file_path = self.get('file')
+        location = self.get('location')
+        with_xgen_collection = self.get('with_xgen_collection')
+        with_set = self.get('with_set')
         #
-        os_file = utl_dcc_objects.OsFile(self._file_path)
+        ext_extras = self.get('ext_extras')
+        #
+        os_file = utl_dcc_objects.OsFile(file_path)
         os_file.set_directory_create()
         #
         option = dict(
-            type=mya_dcc_objects.Scene._get_file_type_name_(self._file_path),
+            type=mya_dcc_objects.Scene._get_file_type_name_(file_path),
             options='v=0;',
             force=True,
             defaultExtensions=True,
             preserveReferences=False,
         )
         _selected_paths = []
-        if self._root is not None:
-            root_mya_dag_path = self._root_dat_opt.set_translate_to(
+        if location is not None:
+            root_dag_opt = bsc_core.DccPathDagOpt(location)
+            root_mya_dag_opt = root_dag_opt.set_translate_to(
                 ma_configure.Util.OBJ_PATHSEP
             )
             _selected_paths = cmds.ls(selection=1, long=1) or []
-            cmds.select(root_mya_dag_path.path)
+            if with_set is True:
+                ss = mya_dcc_objects.Sets()
+                for i in ss.get_paths():
+                    i_set = mya_dcc_objects.Set(i)
+                    if i_set.get_elements_match('|master|*'):
+                        utl_core.Log.set_module_result_trace(
+                            'maya-scene export',
+                            u'set="{}" is add to export'.format(i_set.path)
+                        )
+                        cmds.select(i_set.path, noExpand=True, add=True)
+            #
+            cmds.select(root_mya_dag_opt.path)
             option['exportSelected'] = True
         else:
             option['exportAll'] = True
         #
-        _ = cmds.file(self._file_path, **option)
+        _ = cmds.file(file_path, **option)
         if _:
-            self._results = [self._file_path]
+            self._results = [file_path]
         #
         if with_xgen_collection is True:
             utl_fnc_exporters.DotMaExporter._set_xgen_collection_files_copy_(
                 file_path_src=mya_dcc_objects.Scene.get_current_file_path(),
-                file_path_tgt=self._file_path
+                file_path_tgt=file_path
             )
+        #
+        if ext_extras:
+            file_src = utl_dcc_objects.OsFile(mya_dcc_objects.Scene.get_current_file_path())
+            file_tgt = utl_dcc_objects.OsFile(file_path)
+            for i_ext in ext_extras:
+                i_src = '{}.{}'.format(file_src.path_base, i_ext)
+                i_tgt = '{}.{}'.format(file_tgt.path_base, i_ext)
+                utl_dcc_objects.OsFile(i_src).set_copy_to_file(i_tgt)
         #
         if self._results:
             for i in self._results:
                 utl_core.Log.set_module_result_trace(
-                    'maya-scene-exporter',
+                    'maya-scene export',
                     u'file="{}"'.format(i)
                 )
 

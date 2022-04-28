@@ -26,48 +26,44 @@ class TextureExporter(object):
                     self._option[k] = v
     @classmethod
     def _set_copy_as_src_(cls, target_tgt_dir_path, target_src_dir_path, fix_name_blank, use_tx):
-        texture_reference_objs = ktn_dcc_objects.TextureReferences().get_objs()
-        if texture_reference_objs:
-            ps = utl_core.Progress.set_create(
-                len(texture_reference_objs)
-            )
-            for obj in texture_reference_objs:
-                utl_core.Progress.set_update(ps)
-                for port_path, file_path in obj.reference_raw.items():
-                    texture = utl_dcc_objects.OsFile(file_path)
-                    texture_path = texture.path
-                    target_texture_path = texture.get_target_file_path(target_tgt_dir_path, fix_name_blank=fix_name_blank)
-                    if texture_path != target_texture_path:
-                        # copy
-                        exists_files = texture.get_exists_files()
-                        for exists_file in exists_files:
-                            exists_file.set_copy_as_src(
-                                target_tgt_dir_path,
-                                target_src_dir_path,
-                                fix_name_blank=fix_name_blank
-                            )
-                        # repath
-                        if use_tx is True:
-                            target_texture_path = texture.get_target_file_path(
-                                target_tgt_dir_path,
-                                fix_name_blank=fix_name_blank,
-                                ext_override='.tx'
-                            )
-                            if utl_dcc_objects.OsFile(target_texture_path).get_is_exists() is True:
-                                target_texture_path = target_texture_path
-                            else:
-                                utl_core.Log.set_module_warning_trace(
-                                    'texture-search',
-                                    u'file="{}" is Non-exists'.format(target_texture_path)
+        objs = ktn_dcc_objects.TextureReferences().get_objs()
+        if objs:
+            with utl_core.log_progress_bar(maximum=len(objs), label='texture export') as l_p:
+                for obj in objs:
+                    l_p.set_update()
+                    for port_path, file_path in obj.reference_raw.items():
+                        texture = utl_dcc_objects.OsFile(file_path)
+                        texture_path = texture.path
+                        target_texture_path = texture.get_target_file_path(target_tgt_dir_path, fix_name_blank=fix_name_blank)
+                        if texture_path != target_texture_path:
+                            # copy
+                            exists_files = texture.get_exists_files()
+                            for exists_file in exists_files:
+                                exists_file.set_copy_as_src(
+                                    target_tgt_dir_path,
+                                    target_src_dir_path,
+                                    fix_name_blank=fix_name_blank
                                 )
-                        #
-                        port = obj.get_port(port_path)
-                        ktn_dcc_objects.TextureReferences._set_real_file_path_(
-                            port,
-                            target_texture_path
-                        )
-            #
-            utl_core.Progress.set_stop(ps)
+                            # repath
+                            if use_tx is True:
+                                target_texture_path = texture.get_target_file_path(
+                                    target_tgt_dir_path,
+                                    fix_name_blank=fix_name_blank,
+                                    ext_override='.tx'
+                                )
+                                if utl_dcc_objects.OsFile(target_texture_path).get_is_exists() is True:
+                                    target_texture_path = target_texture_path
+                                else:
+                                    utl_core.Log.set_module_warning_trace(
+                                        'texture search',
+                                        u'file="{}" is Non-exists'.format(target_texture_path)
+                                    )
+                            #
+                            port = obj.get_port(port_path)
+                            ktn_dcc_objects.TextureReferences._set_real_file_path_(
+                                port,
+                                target_texture_path
+                            )
 
     def set_run(self):
         fix_name_blank = self._option[self.FIX_NAME_BLANK]

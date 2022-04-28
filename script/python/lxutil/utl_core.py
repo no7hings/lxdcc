@@ -320,6 +320,10 @@ def log_progress(maximum, label, use_as_progress_bar=False):
     return LogProgressRunner(maximum, label, use_as_progress_bar)
 
 
+def log_progress_bar(maximum, label, use_as_progress_bar=True):
+    return LogProgressRunner(maximum, label, use_as_progress_bar)
+
+
 class DialogWindow(object):
     GuiStatus = bsc_configure.GuiStatus
     @classmethod

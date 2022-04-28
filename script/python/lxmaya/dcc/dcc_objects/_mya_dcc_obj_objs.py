@@ -32,6 +32,14 @@ class Nodes(object):
         return [self.DCC_OBJ_CLASS(i) for i in self.get_obj_paths()]
 
 
+class Sets(mya_dcc_obj_abs.AbsMyaObjs):
+    INCLUDE_DCC_TYPES = ['objectSet']
+    EXCLUDE_DCC_PATHS = ['defaultLightSet', 'defaultObjectSet']
+    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Shape
+    def __init__(self, *args):
+        super(Sets, self).__init__(*args)
+
+
 class Cameras(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['camera']
     EXCLUDE_DCC_PATHS = ['|persp|perspShape', '|top|topShape', '|front|frontShape', '|side|sideShape']

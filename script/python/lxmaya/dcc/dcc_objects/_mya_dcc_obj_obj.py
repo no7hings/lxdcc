@@ -1,4 +1,5 @@
 # coding:utf-8
+import fnmatch
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
@@ -322,3 +323,8 @@ class Set(mya_dcc_obj_abs.AbsMyaObj):
     def set_elements_clear(self):
         _ = self.get_elements()
         [self.set_element_remove(i) for i in _]
+
+    def get_elements_match(self, pattern):
+        return fnmatch.filter(
+            [cmds.ls(i, long=1)[0] for i in self.get_elements()], pattern
+        )

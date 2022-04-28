@@ -1767,6 +1767,11 @@ class CmdPortOpt(object):
 
     def set(self, value, enumerate_strings=None):
         if self.get_has_source() is False:
+            # unlock first
+            is_lock = cmds.getAttr(self.get_path(), lock=1)
+            if is_lock:
+                cmds.setAttr(self.get_path(), lock=0)
+            #
             if self.get_port_query().get_is_writable(self.get_obj_path()) is True:
                 if self.get_type_name() == 'string':
                     cmds.setAttr(self.get_path(), value, type=self.get_type_name())

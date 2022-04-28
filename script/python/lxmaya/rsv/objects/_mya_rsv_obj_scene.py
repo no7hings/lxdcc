@@ -7,8 +7,6 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_scene_export(self):
-        import lxutil.dcc.dcc_objects as utl_dcc_objects
-
         import lxmaya.fnc.exporters as mya_fnc_exporters
         #
         workspace = self._rsv_scene_properties.get('workspace')
@@ -25,25 +23,18 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         maya_scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )
-        maya_scene_src_file_path = self._hook_option_opt.get('file')
         maya_scene_file_path = maya_scene_file_rsv_unit.get_result(version=version)
         mya_fnc_exporters.SceneExporter(
-            file_path=maya_scene_file_path,
-            root=root,
             option=dict(
+                file=maya_scene_file_path,
+                location=root,
+                #
                 with_xgen_collection=True,
-                with_set=True
+                with_set=True,
+                #
+                ext_extras=self._hook_option_opt.get('ext_extras', as_array=True)
             )
         ).set_run()
-        #
-        ext_extras = self._hook_option_opt.get('ext_extras', as_array=True)
-        if ext_extras:
-            file_src = utl_dcc_objects.OsFile(maya_scene_src_file_path)
-            file_tgt = utl_dcc_objects.OsFile(maya_scene_file_path)
-            for i_ext in ext_extras:
-                i_src = '{}.{}'.format(file_src.path_base, i_ext)
-                i_tgt = '{}.{}'.format(file_tgt.path_base, i_ext)
-                utl_dcc_objects.OsFile(i_src).set_copy_to_file(i_tgt)
         return maya_scene_file_path
 
     def set_root_property_refresh(self):

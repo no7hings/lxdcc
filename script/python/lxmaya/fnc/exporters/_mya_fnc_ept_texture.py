@@ -37,70 +37,65 @@ class TextureExporter(object):
     @classmethod
     def _set_copy_as_src_(cls, tgt_dir_path, src_dir_path, objs, fix_name_blank, use_tx, with_reference):
         if objs:
-            ps = utl_core.Progress.set_create(
-                len(objs)
-            )
-            for obj in objs:
-                utl_core.Progress.set_update(ps)
-                #
-                for port_path, file_path in obj.reference_raw.items():
-                    i_src_texture_file_obj = utl_dcc_objects.OsFile(file_path)
-                    i_src_texture_file_path = i_src_texture_file_obj.path
-                    # map path to current platform
-                    i_src_texture_file_path = utl_core.Path.set_map_to_platform(i_src_texture_file_path)
-                    i_src_texture_file_obj = utl_dcc_objects.OsFile(i_src_texture_file_path)
-                    #
-                    i_tgt_texture_file_path = i_src_texture_file_obj.get_target_file_path(
-                        tgt_dir_path,
-                        fix_name_blank=fix_name_blank
-                    )
-                    if i_src_texture_file_path != i_tgt_texture_file_path:
-                        # copy
-                        src_texture_file_tiles = i_src_texture_file_obj.get_exists_files()
-                        if src_texture_file_tiles:
-                            for src_texture_file_tile_obj in src_texture_file_tiles:
-                                src_texture_file_tile_obj.set_copy_as_src(
-                                    tgt_dir_path, src_dir_path,
-                                    fix_name_blank=fix_name_blank,
-                                    force=True
-                                )
-                        else:
-                            utl_core.Log.set_module_warning_trace(
-                                'texture-search',
-                                u'file="{}" is Non-exists'.format(i_src_texture_file_path)
-                            )
-                            continue
-                        # repath
-                        if use_tx is True:
-                            tgt_texture_tx_file_path = i_src_texture_file_obj.get_target_file_path(
-                                tgt_dir_path,
-                                fix_name_blank=fix_name_blank,
-                                ext_override='.tx'
-                            )
-                            if utl_dcc_objects.OsFile(tgt_texture_tx_file_path).get_is_exists() is True:
-                                i_tgt_texture_file_path = tgt_texture_tx_file_path
+            with utl_core.log_progress_bar(maximum=len(objs), label='texture export') as l_p:
+                for obj in objs:
+                    l_p.set_update()
+                    for i_port_path, i_file_path in obj.reference_raw.items():
+                        i_src_texture_file_obj = utl_dcc_objects.OsFile(i_file_path)
+                        i_src_texture_file_path = i_src_texture_file_obj.path
+                        # map path to current platform
+                        i_src_texture_file_path = utl_core.Path.set_map_to_platform(i_src_texture_file_path)
+                        i_src_texture_file_obj = utl_dcc_objects.OsFile(i_src_texture_file_path)
+                        #
+                        i_tgt_texture_file_path = i_src_texture_file_obj.get_target_file_path(
+                            tgt_dir_path,
+                            fix_name_blank=fix_name_blank
+                        )
+                        if i_src_texture_file_path != i_tgt_texture_file_path:
+                            # copy
+                            src_texture_file_tiles = i_src_texture_file_obj.get_exists_files()
+                            if src_texture_file_tiles:
+                                for src_texture_file_tile_obj in src_texture_file_tiles:
+                                    src_texture_file_tile_obj.set_copy_as_src(
+                                        tgt_dir_path, src_dir_path,
+                                        fix_name_blank=fix_name_blank,
+                                        force=True
+                                    )
                             else:
                                 utl_core.Log.set_module_warning_trace(
-                                    'texture-tx search',
-                                    u'file="{}" is Non-exists'.format(tgt_texture_tx_file_path)
+                                    'texture search',
+                                    u'file="{}" is Non-exists'.format(i_src_texture_file_path)
                                 )
-                        #
-                        tgt_texture_file_obj = utl_dcc_objects.OsFile(i_tgt_texture_file_path)
-                        if tgt_texture_file_obj.get_exists_files():
-                            port = obj.get_port(port_path)
-                            if port.get() != i_tgt_texture_file_path:
-                                port.set(i_tgt_texture_file_path)
-                                utl_core.Log.set_module_result_trace(
-                                    'texture repath',
-                                    u'"{}" >> "{}"'.format(i_src_texture_file_path, i_tgt_texture_file_path)
+                                continue
+                            # repath
+                            if use_tx is True:
+                                tgt_texture_tx_file_path = i_src_texture_file_obj.get_target_file_path(
+                                    tgt_dir_path,
+                                    fix_name_blank=fix_name_blank,
+                                    ext_override='.tx'
                                 )
-                        else:
-                            utl_core.Log.set_module_warning_trace(
-                                'texture-search',
-                                u'file="{}" is Non-exists'.format(i_tgt_texture_file_path)
-                            )
-            #
-            utl_core.Progress.set_stop(ps)
+                                if utl_dcc_objects.OsFile(tgt_texture_tx_file_path).get_is_exists() is True:
+                                    i_tgt_texture_file_path = tgt_texture_tx_file_path
+                                else:
+                                    utl_core.Log.set_module_warning_trace(
+                                        'texture-tx search',
+                                        u'file="{}" is Non-exists'.format(tgt_texture_tx_file_path)
+                                    )
+                            #
+                            tgt_texture_file_obj = utl_dcc_objects.OsFile(i_tgt_texture_file_path)
+                            if tgt_texture_file_obj.get_exists_files():
+                                port = obj.get_port(i_port_path)
+                                if port.get() != i_tgt_texture_file_path:
+                                    port.set(i_tgt_texture_file_path)
+                                    utl_core.Log.set_module_result_trace(
+                                        'texture repath',
+                                        u'"{}" >> "{}"'.format(i_src_texture_file_path, i_tgt_texture_file_path)
+                                    )
+                            else:
+                                utl_core.Log.set_module_warning_trace(
+                                    'texture search',
+                                    u'file="{}" is Non-exists'.format(i_tgt_texture_file_path)
+                                )
     #
     def set_run(self):
         fix_name_blank = self._option[self.FIX_NAME_BLANK]

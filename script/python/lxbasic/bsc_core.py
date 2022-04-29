@@ -1247,9 +1247,11 @@ class KeywordArgumentsOpt(object):
         if key in self._option_dict:
             _ = self._option_dict[key]
             if as_array is True:
-                if isinstance(_, list):
+                if isinstance(_, (tuple, list)):
                     return _
-                return [_]
+                if _:
+                    return [_]
+                return []
             return self._option_dict[key]
 
     def pop(self, key):
@@ -2903,7 +2905,7 @@ class ImageOpt(object):
         path_base, ext = os.path.splitext(self._file_path)
         return '{}{}'.format(path_base, '.jpg')
 
-    def get_jpg(self, width=1024):
+    def get_jpg(self, width=1024, block=False):
         file_path = self._file_path
         #
         jpg_file_path = self.get_jpg_file_path()
@@ -2924,10 +2926,16 @@ class ImageOpt(object):
                 '--threads 1',
                 u'-o "{}"'.format(jpg_file_path),
             ]
-            s_p = SubProcessMtd.set_run(
-                ' '.join(cmd_args)
-            )
-            return s_p
+            if block is True:
+                SubProcessMtd.set_run_with_result(
+                    ' '.join(cmd_args)
+                )
+                return True
+            else:
+                s_p = SubProcessMtd.set_run(
+                    ' '.join(cmd_args)
+                )
+                return s_p
 
 
 class ListMtd(object):
@@ -3135,15 +3143,16 @@ class ExceptionMtd(object):
         #
         import traceback
         #
-        exc_typ, exc_vlu, exc_stk = sys.exc_info()
-        exc_txts = []
-        # value = '{}: "{}"'.format(exc_typ.__name__, exc_vlu.message)
-        for seq, stk in enumerate(traceback.extract_tb(exc_stk)):
+        exc_type, exc_value, exc_stack = sys.exc_info()
+        exc_texts = []
+        # value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+        for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
             i_file_path, i_line, i_fnc, i_fnc_line = stk
-            exc_txts.append(
+            exc_texts.append(
                 u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
-        print exc_txts
+        if exc_texts:
+            print exc_texts
 
 
 class PointArrayOpt(object):
@@ -3345,9 +3354,6 @@ class TimeMtd(object):
 
 
 if __name__ == '__main__':
-    print IntegerMtd.get_prettify_(
-        22725, 1
-    )
-    print IntegerMtd.get_prettify_(
-        22725, 0
-    )
+    print KeywordArgumentsOpt(
+        'application=maya&asset=nn_4y_test&choice_scheme=asset-model-maya-output&choice_scheme_includes=asset-model-maya-output+asset-model-rig-output&create_review_link=False&create_scene_src=False&dependencies=rsv-task-batchers/asset/gen-cmb-render-submit&ext_extras=&file=/l/prod/cgm/output/assets/chr/nn_4y_test/mod/modeling/nn_4y_test.mod.modeling.v032/scene/nn_4y_test.ma&hook_engine=maya&open_file=True&option_hook_key=rsv-task-methods/asset/maya/gen-scene-export&project=cgm&refresh_root_property=False&rez_beta=True&rez_extend_packages=ffmpeg&save_file=False&step=mod&task=modeling&td_enable=False&time_tag=2022_0428_2101_56_177000&user=ningmeng002&version=v032&with_render_preview=False&with_scene=True&with_snapshot_preview=False&with_texture=False&with_texture_tx=True&workspace=output'
+    ).get('choice_scheme_includes', as_array=True)

@@ -1782,6 +1782,7 @@ class CmdPortOpt(object):
                             enumName=':'.join(enumerate_strings),
                             edit=1
                         )
+                    #
                     if isinstance(value, (str, unicode)):
                         enumerate_strings = self.get_port_query().get_enumerate_strings(self.get_obj_path())
                         index = enumerate_strings.index(value)

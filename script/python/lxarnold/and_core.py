@@ -817,7 +817,7 @@ class AndTextureOpt_(AndImageOpt):
         directory_path = os.path.dirname(self._file_path)
         return '{}/{}{}'.format(directory_path, name_base, self.TX_EXT)
 
-    def _set_unit_tx_create_(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space):
+    def _set_unit_tx_create_(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, block=False):
         cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
         if use_aces is True:
             utl_core.Log.set_module_result_trace(
@@ -844,9 +844,15 @@ class AndTextureOpt_(AndImageOpt):
         #
         cmd_args += [self._file_path]
         #
-        return bsc_core.SubProcessMtd.set_run(
-            ' '.join(cmd_args)
-        )
+        if block is True:
+            bsc_core.SubProcessMtd.set_run_with_result(
+                ' '.join(cmd_args)
+            )
+            return True
+        else:
+            return bsc_core.SubProcessMtd.set_run(
+                ' '.join(cmd_args)
+            )
 
     def set_tx_create(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, with_result=False):
         cmd_args = ['maketx', '-v', '-u', '--unpremult', '--oiio']

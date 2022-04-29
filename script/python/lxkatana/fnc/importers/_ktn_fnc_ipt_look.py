@@ -32,8 +32,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         root_lstrip=None,
         material_root='/root/materials',
         frame=None,
-        auto_ambocc_assign=False,
-        auto_white_disp_assign=False,
+        #
         with_properties=True,
         with_visibilities=True,
         # if set shader is not in includes create is ignore
@@ -42,6 +41,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             # 'displacement',
             # 'volume'
         ],
+        #
+        auto_ambocc_assign=False,
+        auto_white_disp_assign=False,
+        auto_white_zbrush_assign=False,
     )
     @classmethod
     def _set_look_create_by_geometry_(cls, and_geometry):
@@ -523,11 +526,31 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         if auto_white_disp_assign is True:
             ktn_dcc_operators.AssetWorkspaceOpt(
                 self._workspace
-            ).set_auto_white_disp_assign(pass_name=self._pass_name)
+            ).set_auto_white_disp_assign(
+                pass_name=self._pass_name
+            )
             #
             ktn_dcc_operators.AssetWorkspaceOpt(
                 self._workspace
-            ).set_auto_geometry_properties_assign(pass_name=self._pass_name)
+            ).set_auto_geometry_properties_assign(
+                pass_name=self._pass_name,
+                geometry_properties=ktn_dcc_operators.AssetWorkspaceOpt.WHITE_DISP_GEOMETRY_PROPERTIES_DICT
+            )
+
+        auto_white_zbrush_assign = self._option['auto_white_zbrush_assign']
+        if auto_white_zbrush_assign is True:
+            ktn_dcc_operators.AssetWorkspaceOpt(
+                self._workspace
+            ).set_auto_white_zbrush_assign(
+                pass_name=self._pass_name
+            )
+            #
+            ktn_dcc_operators.AssetWorkspaceOpt(
+                self._workspace
+            ).set_auto_geometry_properties_assign(
+                pass_name=self._pass_name,
+                geometry_properties=ktn_dcc_operators.AssetWorkspaceOpt.WHITE_ZBRUSH_GEOMETRY_PROPERTIES_DICT
+            )
 
 
 class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):

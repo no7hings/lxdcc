@@ -9,7 +9,7 @@ from lxkatana.modifiers import _ktn_mdf_utility
 
 
 class AssetWorkspaceOpt(object):
-    WHITE_DICT = {
+    WHITE_SHADER_DICT = {
         'base_color':  (1, .955, .905),
         #
         'specular': 0.75,
@@ -24,6 +24,20 @@ class AssetWorkspaceOpt(object):
         'subsurface_radius': (0.8, 0.8, 0.8),
         'subsurface_scale': 0.125,
     }
+    WHITE_DISP_GEOMETRY_PROPERTIES_DICT = dict(
+        smoothing=True,
+        subdiv_type='catclark',
+        subdiv_iterations=2,
+        subdiv_smooth_derivs=True,
+        #
+        disp_padding=0,
+        disp_height=1,
+        disp_zero_value=0.5,
+        disp_autobump=False,
+    )
+    WHITE_ZBRUSH_GEOMETRY_PROPERTIES_DICT = dict(
+        smoothing=True,
+    )
     def __init__(self, workspace):
         self._workspace = workspace
     #
@@ -40,12 +54,15 @@ class AssetWorkspaceOpt(object):
                 pass_name=pass_name
             )
             if i_ktn_material_assign is None:
+                i_name = '{}__{}'.format(
+                    pass_name, i_geometry.name
+                )
                 i_dcc_material, i_ktn_material = self._workspace.set_ng_material_create(
-                    name=i_geometry.name,
+                    name=i_name,
                     pass_name=pass_name
                 )
                 self._workspace.set_ng_geometry_material_assign_create(
-                    name=i_geometry.name,
+                    name=i_name,
                     assign=(
                         i_geometry.path,
                         '{}/{}'.format(material_root, i_dcc_material.name)
@@ -162,12 +179,15 @@ class AssetWorkspaceOpt(object):
                 pass_name=pass_name
             )
             if i_ktn_material_assign is None:
+                i_name = '{}__{}'.format(
+                    pass_name, i_geometry.name
+                )
                 i_dcc_material, i_ktn_material = self._workspace.set_ng_material_create(
-                    name=i_geometry.name,
+                    name=i_name,
                     pass_name=pass_name
                 )
                 self._workspace.set_ng_geometry_material_assign_create(
-                    name=i_geometry.name,
+                    name=i_name,
                     assign=(
                         i_geometry.path,
                         '{}/{}'.format(material_root, i_dcc_material.name)
@@ -200,7 +220,7 @@ class AssetWorkspaceOpt(object):
                     if i_geometry_type_name in ['renderer procedural']:
                         self._set_convert_to_plastic_(i_dcc_material, i_dcc_shader_path, (1,  0.955,  0.905))
                     elif i_geometry_type_name in ['subdmesh']:
-                        self._set_convert_to_white_(i_dcc_material, i_dcc_shader_path)
+                        self._set_convert_to_white_disp_(i_dcc_material, i_dcc_shader_path)
 
         dcc_look_pass, ktn_look_pass = self._workspace.get_ng_look_pass(pass_name)
         if ktn_look_pass is not None:
@@ -254,7 +274,7 @@ class AssetWorkspaceOpt(object):
                 'out', dcc_material.get_input_port('arnoldSurface'),
                 validation=True
             )
-            for k, v in cls.WHITE_DICT.items():
+            for k, v in cls.WHITE_SHADER_DICT.items():
                 dcc_shader_opt.set(k, v)
         return dcc_shader_opt
     @classmethod
@@ -263,20 +283,85 @@ class AssetWorkspaceOpt(object):
         dcc_shader_opt.set('contrast_pivot', 0.5)
         return dcc_shader_opt
     @classmethod
-    def _set_convert_to_white_(cls, dcc_material, dcc_shader_path):
+    def _set_convert_to_white_disp_(cls, dcc_material, dcc_shader_path):
         dcc_surface_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
         if dcc_surface_shader:
-            # dcc_surface_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_surface_shader)
-            # dcc_surface_targets = dcc_surface_shader_opt.get_port_targets('out')
-            dcc_surface_white_opt = cls._set_white_create_(dcc_material, dcc_shader_path)
+            cls._set_white_create_(dcc_material, dcc_shader_path)
         #
         dcc_displacement_shader = dcc_material.get_input_port('arnoldDisplacement').get_source_obj()
         if dcc_displacement_shader:
             dcc_displacement_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_displacement_shader)
-            dcc_displacement_white_opt = cls._set_displacement_fix_(dcc_displacement_shader_opt)
+            cls._set_displacement_fix_(dcc_displacement_shader_opt)
+    @classmethod
+    def _set_convert_to_white_zbrush_(cls, dcc_material, dcc_shader_path):
+        dcc_surface_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
+        if dcc_surface_shader:
+            cls._set_white_create_(dcc_material, dcc_shader_path)
+
+    @_ktn_mdf_utility.set_undo_mark_mdf
+    def set_auto_white_zbrush_assign(self, pass_name='default'):
+        configure = self._workspace.get_configure(pass_name)
+        # geometry_root = configure.get('option.geometry_root')
+        material_root = configure.get('option.material_root')
+        geometries = self._workspace.get_sg_geometries(pass_name)
+        for i_geometry in geometries:
+            i_geometry_type_name = i_geometry.type_name
+            i_dcc_material_assign, i_ktn_material_assign = self._workspace.get_ng_geometry_material_assign(
+                name=i_geometry.name,
+                pass_name=pass_name
+            )
+            if i_ktn_material_assign is None:
+                i_name = '{}__{}'.format(
+                    pass_name, i_geometry.name
+                )
+                i_dcc_material, i_ktn_material = self._workspace.set_ng_material_create(
+                    name=i_name,
+                    pass_name=pass_name
+                )
+                self._workspace.set_ng_geometry_material_assign_create(
+                    name=i_name,
+                    assign=(
+                        i_geometry.path,
+                        '{}/{}'.format(material_root, i_dcc_material.name)
+                    ),
+                    pass_name=pass_name
+                )
+                i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
+                i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
+                if i_geometry_type_name in ['renderer procedural']:
+                    i_color = (1,  0.955,  0.905)
+                    self._set_plastic_create_(
+                        i_dcc_material,
+                        i_dcc_shader_path,
+                        i_color
+                    )
+                elif i_geometry_type_name in ['subdmesh']:
+                    self._set_white_create_(
+                        i_dcc_material,
+                        i_dcc_shader_path,
+                    )
+            else:
+                i_material_path = i_dcc_material_assign.get_port(
+                    'args.materialAssign.value'
+                ).get()
+                if i_material_path:
+                    i_material_name = bsc_core.DccPathDagOpt(i_material_path).name
+                    i_dcc_material = ktn_dcc_objects.Node(i_material_name)
+                    i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
+                    i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
+                    if i_geometry_type_name in ['renderer procedural']:
+                        self._set_convert_to_plastic_(i_dcc_material, i_dcc_shader_path, (1,  0.955,  0.905))
+                    elif i_geometry_type_name in ['subdmesh']:
+                        self._set_convert_to_white_zbrush_(i_dcc_material, i_dcc_shader_path)
+
+        dcc_look_pass, ktn_look_pass = self._workspace.get_ng_look_pass(pass_name)
+        if ktn_look_pass is not None:
+            dcc_look_pass.set(
+                'look_pass.scheme', pass_name
+            )
     #
     @_ktn_mdf_utility.set_undo_mark_mdf
-    def set_auto_geometry_properties_assign(self, pass_name='default'):
+    def set_auto_geometry_properties_assign(self, pass_name='default', geometry_properties=None):
         geometries = self._workspace.get_sg_geometries(pass_name)
         for i_geometry in geometries:
             i_geometry_type_name = i_geometry.type_name
@@ -288,15 +373,5 @@ class AssetWorkspaceOpt(object):
                 if i_geometry_type_name in ['subdmesh']:
                     self._workspace._set_arnold_geometry_properties_(
                         i_dcc_material_assign,
-                        dict(
-                            smoothing=True,
-                            subdiv_type='catclark',
-                            subdiv_iterations=2,
-                            subdiv_smooth_derivs=True,
-                            #
-                            disp_padding=0,
-                            disp_height=1,
-                            disp_zero_value=0.5,
-                            disp_autobump=False,
-                        )
+                        geometry_properties
                     )

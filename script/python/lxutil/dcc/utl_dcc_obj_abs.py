@@ -730,7 +730,7 @@ class AbsOsTexture(AbsOsFile):
     def _get_unit_jpg_is_exists_(cls, file_path):
         pass
     @classmethod
-    def _set_unit_tx_create_(cls, file_path):
+    def _set_unit_tx_create_(cls, file_path, block=False):
         path_base, ext = os.path.splitext(file_path)
         if ext != cls.TX_EXT:
             from lxarnold import and_core
@@ -743,17 +743,17 @@ class AbsOsTexture(AbsOsFile):
             aces_file = cls.COLOR_SPACE_CFG.get_aces_file()
             if cls._get_unit_tgt_ext_is_exists_(file_path, tgt_ext=cls.TX_EXT) is False:
                 return and_core.AndTextureOpt_(file_path)._set_unit_tx_create_(
-                    color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space
+                    color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, block
                 )
         return True
     @classmethod
-    def _set_unit_jpg_create_(cls, file_path):
+    def _set_unit_jpg_create_(cls, file_path, block=False):
         path_base, ext = os.path.splitext(file_path)
         if ext != cls.JPG_EXT:
             if cls._get_unit_tgt_ext_is_exists_(file_path, tgt_ext=cls.JPG_EXT) is False:
-                return bsc_core.ImageOpt(file_path).get_jpg(width=2048)
+                return bsc_core.ImageOpt(file_path).get_jpg(width=2048, block=block)
         return True
-
+    #
     def get_thumbnail_file_path(self):
         _ = self._get_exists_file_paths_(self._path)
         if _:

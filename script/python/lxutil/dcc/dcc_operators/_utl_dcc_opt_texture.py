@@ -132,7 +132,7 @@ class DccTexturesOpt(object):
         #
         return results_dict
 
-    def set_tx_create_and_repath(self, force=False):
+    def set_tx_create_and_repath(self, force=False, check_exists=True):
         tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
             self._objs, force=force
         )
@@ -148,7 +148,9 @@ class DccTexturesOpt(object):
                         i_texture_tiles = i_texture.get_exists_files()
                         if i_texture_tiles:
                             for j_texture_tile in i_texture_tiles:
-                                utl_dcc_objects.OsTexture._set_unit_tx_create_(j_texture_tile)
+                                utl_dcc_objects.OsTexture._set_unit_tx_create_(
+                                    j_texture_tile.path, block=True
+                                )
     @classmethod
     def _get_tx_create_process_(cls, queue, use_deferred):
         lis = []
@@ -305,7 +307,9 @@ class DccTexturesOpt(object):
                         i_texture_tiles = i_texture.get_exists_files()
                         if i_texture_tiles:
                             for j_texture_tile in i_texture_tiles:
-                                utl_dcc_objects.OsTexture._set_unit_tx_create_(j_texture_tile)
+                                utl_dcc_objects.OsTexture._set_unit_jpg_create_(
+                                    j_texture_tile.path, block=True
+                                )
     @classmethod
     def _get_jpg_create_process_(cls, queue, use_deferred):
         lis = []
@@ -422,7 +426,7 @@ class DccTexturesOpt(object):
         pass
 
     def set_repair(self, use_deferred=False):
-        return self.set_tx_create_and_repath(use_deferred)
+        return self.set_tx_create_and_repath()
     @classmethod
     def _get_search_dict_(cls, target_directory_paths):
         def _rcs_fnc(path_):

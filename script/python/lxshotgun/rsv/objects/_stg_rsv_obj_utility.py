@@ -4,7 +4,7 @@ import lxshotgun.objects as stg_objects
 import lxshotgun.operators as stg_operators
 
 
-class StgRsvTaskOpt(object):
+class RsvStgTaskOpt(object):
     def __init__(self, rsv_task):
         self._rsv_task = rsv_task
 
@@ -58,3 +58,4 @@ class StgRsvTaskOpt(object):
         stg_version_opt.set_stg_tags_append(
             stg_tag
         )
+

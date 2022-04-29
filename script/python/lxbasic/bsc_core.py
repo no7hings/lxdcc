@@ -3319,6 +3319,27 @@ class TimeMtd(object):
                 language=language,
                 )
     @classmethod
+    def to_prettify_by_time_tag(cls, time_tag, language=0):
+        year = int(time_tag[:4])
+        month = int(time_tag[5:7])
+        day = int(time_tag[7:9])
+        hour = int(time_tag[10:12])
+        minute = int(time_tag[12:14])
+        second = int(time_tag[15:16])
+        if year > 0:
+            timetuple = datetime.datetime(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                second=second
+            ).timetuple()
+            return cls.to_prettify_by_timetuple(
+                timetuple,
+                language=language
+            )
+    @classmethod
     def to_prettify_by_timetuple(cls, timetuple, language=0):
         year, month, day, hour, minute, second, week, dayCount, isDst = timetuple
         cur_timetuple = time.localtime(time.time())
@@ -3354,6 +3375,6 @@ class TimeMtd(object):
 
 
 if __name__ == '__main__':
-    print KeywordArgumentsOpt(
-        'application=maya&asset=nn_4y_test&choice_scheme=asset-model-maya-output&choice_scheme_includes=asset-model-maya-output+asset-model-rig-output&create_review_link=False&create_scene_src=False&dependencies=rsv-task-batchers/asset/gen-cmb-render-submit&ext_extras=&file=/l/prod/cgm/output/assets/chr/nn_4y_test/mod/modeling/nn_4y_test.mod.modeling.v032/scene/nn_4y_test.ma&hook_engine=maya&open_file=True&option_hook_key=rsv-task-methods/asset/maya/gen-scene-export&project=cgm&refresh_root_property=False&rez_beta=True&rez_extend_packages=ffmpeg&save_file=False&step=mod&task=modeling&td_enable=False&time_tag=2022_0428_2101_56_177000&user=ningmeng002&version=v032&with_render_preview=False&with_scene=True&with_snapshot_preview=False&with_texture=False&with_texture_tx=True&workspace=output'
-    ).get('choice_scheme_includes', as_array=True)
+    print TimeMtd.to_prettify_by_time_tag(
+        '2022_0429_1117_48_173000'
+    )

@@ -16,7 +16,7 @@ rsv_task = rsv_project.get_rsv_task(
 print rsv_task.properties
 
 rsv_unit = rsv_task.get_rsv_unit(
-    keyword='shot-output-katana-render-movie-file'
+    keyword='shot-output-katana-render-video-mov-file'
 )
 
 result = rsv_unit.get_result(version='latest')

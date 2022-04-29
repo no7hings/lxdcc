@@ -582,19 +582,18 @@ class AbsObjScene(
         and_obj_iterator = ai.AiUniverseGetNodeIterator(self._and_universe, sum(self.AR_OBJ_CATEGORY_MASK))
         self.get_index_dict()
         utl_core.Log.set_module_result_trace(
-            'ass-load',
-            'file="{}"'.format(file_path)
+            'ass load',
+            u'file="{}"'.format(file_path)
         )
-        l_p = utl_core.LogProgressRunner(maximum=len(self._index_dict.keys()), label='ass-load')
-        while not ai.AiNodeIteratorFinished(and_obj_iterator):
-            l_p.set_update()
-            and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)
-            and_obj_mtd = and_core.AndObjMtd(self._and_universe, and_obj)
-            and_obj_name = and_obj_mtd.name
-            if and_obj_name not in and_configure.Node.BUILTINS:
-                # filter by node-type-category
-                self._set_dcc_obj_build_(and_obj_mtd)
-        l_p.set_stop()
+        with utl_core.log_progress_bar(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
+            while not ai.AiNodeIteratorFinished(and_obj_iterator):
+                l_p.set_update()
+                and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)
+                and_obj_mtd = and_core.AndObjMtd(self._and_universe, and_obj)
+                and_obj_name = and_obj_mtd.name
+                if and_obj_name not in and_configure.Node.BUILTINS:
+                    # filter by node-type-category
+                    self._set_dcc_obj_build_(and_obj_mtd)
         # node iterator finish
         ai.AiNodeIteratorDestroy(and_obj_iterator)
         #

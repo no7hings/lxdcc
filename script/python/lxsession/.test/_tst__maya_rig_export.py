@@ -31,6 +31,8 @@ for i_file_path in [
         option=dict(
             option_hook_key='rsv-task-batchers/asset/gen-rig-export',
             #
+            choice_scheme='asset-maya-output',
+            #
             file=i_file_path,
             user=bsc_core.SystemMtd.get_user_name(),
             #

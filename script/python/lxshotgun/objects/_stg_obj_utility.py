@@ -61,6 +61,14 @@ class StgObjQuery(object):
             self.type, self.id,
             {key: value}
         )
+        utl_core.Log.set_module_result_trace(
+            'shotgun entity property set',
+            'type="{}", id="{}", property="{}"'.format(
+                self.type,
+                self.id,
+                key
+            )
+        )
 
     def set_update(self, key, value):
         self.set(key, value)
@@ -70,6 +78,14 @@ class StgObjQuery(object):
             self.type, self.id,
             value,
             field_name=key
+        )
+        utl_core.Log.set_module_result_trace(
+            'shotgun entity upload',
+            'type="{}", id="{}", property="{}"'.format(
+                self.type,
+                self.id,
+                key
+            )
         )
 
     def set_stg_obj_append(self, key, stg_obj):
@@ -210,7 +226,7 @@ class StgConnector(object):
         )
         #
         utl_core.Log.set_module_result_trace(
-            'shotgun create',
+            'shotgun entity create',
             u'stg-{}="{}"'.format(branch, entity_name)
         )
         return _
@@ -361,7 +377,7 @@ class StgConnector(object):
             )
         )
         utl_core.Log.set_module_result_trace(
-            'shotgun create',
+            'shotgun entity create',
             u'task="{}"'.format(task)
         )
         return _
@@ -449,7 +465,7 @@ class StgConnector(object):
             )
         )
         utl_core.Log.set_module_result_trace(
-            'shotgun create',
+            'shotgun entity create',
             u'stg-version="{}"'.format(name)
         )
         return _
@@ -514,7 +530,7 @@ class StgConnector(object):
                      }
                 )
                 utl_core.Log.set_module_result_trace(
-                    'shotgun create',
+                    'shotgun entity create',
                     u'stg-published-file="{}"'.format(file_path)
                 )
                 return _
@@ -545,7 +561,7 @@ class StgConnector(object):
             )
         ]
         utl_core.Log.set_module_result_trace(
-            'shotgun create',
+            'shotgun entity create',
             u'stg-tag="{}"'.format(tag_name)
         )
         return _
@@ -599,7 +615,7 @@ class StgConnector(object):
                 )
             ]
             utl_core.Log.set_module_result_trace(
-                'shotgun create',
+                'shotgun entity create',
                 u'stg-look-pass="{}"'.format(look_pass_code)
             )
             return _

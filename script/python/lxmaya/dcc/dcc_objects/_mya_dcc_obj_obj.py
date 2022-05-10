@@ -81,6 +81,10 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
     def set_replace(self, file_path):
         cmds.file(file_path, loadReference=self.name)
+        utl_core.Log.set_module_result_trace(
+            'reference replace',
+            u'file="{}"'.format(file_path)
+        )
 
     def set_reload(self):
         cmds.file(loadReference=self.name)
@@ -117,7 +121,7 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
             cmds.file(file_path, namespace=namespace_path, edit=1)
 
     def get_content_obj_paths(self):
-        return cmds.referenceQuery(self.name, nodes=1, dagPath=1)
+        return [cmds.ls(i, long=1)[0] for i in cmds.referenceQuery(self.name, nodes=1, dagPath=1) or []]
 
     def set_load_from_file(self, file_path, namespace):
         if cmds.objExists(self.name) is False:
@@ -129,8 +133,7 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
                 cmds.lockNode(r, lock=1)
 
     def get_content_root_paths(self):
-        _ = cmds.referenceQuery(self.name, nodes=1, dagPath=1) or []
-        paths = [cmds.ls(i, long=1)[0] for i in _]
+        paths = [cmds.ls(i, long=1)[0] for i in cmds.referenceQuery(self.name, nodes=1, dagPath=1) or []]
         return [path for path in paths if len(path.split(self.PATHSEP)) == 2]
 
     def _test(self):

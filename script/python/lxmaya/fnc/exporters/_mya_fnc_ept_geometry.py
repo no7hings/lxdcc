@@ -359,6 +359,7 @@ class GeometryUsdExporter_(object):
         namespace_clear=True,
         with_visible=True,
         with_display_color=True,
+        port_macth_patterns=[]
     )
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
@@ -377,6 +378,7 @@ class GeometryUsdExporter_(object):
         usd_root_lstrip = self._option['root_lstrip']
         with_visible = self._option['with_visible']
         with_display_color = self._option['with_display_color']
+        port_macth_patterns = self._option['port_macth_patterns']
         #
         if self._root.startswith('|'):
             self._root = self._root.replace('|', '/')
@@ -431,6 +433,14 @@ class GeometryUsdExporter_(object):
                             transform_usd_obj_opt.set_visible(
                                 transform_mya_obj.get_visible()
                             )
+                        #
+                        if port_macth_patterns:
+                            i_customize_ports = ma_core.CmdObjOpt(i_mya_obj_path).get_customize_ports()
+                            for j_port in i_customize_ports:
+                                if j_port.get_is_naming_matches(port_macth_patterns) is True:
+                                    transform_usd_obj_opt.set_customize_attribute_add(
+                                        j_port.port_path, j_port.get()
+                                    )
                     elif i_mya_obj_type == ma_configure.Util.MESH_TYPE:
                         i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
                         if i_mya_mesh.get_port('intermediateObject').get() is False:

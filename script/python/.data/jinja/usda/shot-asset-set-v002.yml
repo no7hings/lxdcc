@@ -3,7 +3,8 @@ asset:
     role: ''
     name: ''
     #
-    root_name: master
+    root: '/master'
+    root_name: 'master'
     #
     version_main:
         model: {}
@@ -23,15 +24,24 @@ shot:
     sequence: ''
     name: ''
     #
-    root_name: assets
+    root: '/assets'
+    root_name: 'assets'
     #
     start_frame: 1001
     end_frame: 1024
     #
     set_file: ''
     #
+    version_main:
+        animation: {}
+        simulation: {}
+    #
     version_override:
         animation: {}
+        simulation: {}
+    #
+    shot_asset_main: {}
+    shot_asset_override: {}
 #
 camera:
     root_name: cameras

@@ -86,7 +86,7 @@ def set_hook_execute(key):
 def get_option_hook_args(option):
     def execute_fnc():
         utl_core.Log.set_module_result_trace(
-            'option-hook execute is started', 'file="{}"'.format(
+            'option-hook execute', 'file="{}" is started'.format(
                 python_file_path
             )
         )
@@ -94,7 +94,7 @@ def get_option_hook_args(option):
             python_file_path, dict(session=session)
         )
         utl_core.Log.set_module_result_trace(
-            'option-hook execute is completed', 'file="{}"'.format(
+            'option-hook execute', 'file="{}" is completed'.format(
                 python_file_path
             )
         )

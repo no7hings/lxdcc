@@ -1300,8 +1300,11 @@ class NGMacro(object):
             k = k.replace('/', '.')
             self.set_parameter_create(k, v)
     @ktn_modifiers.set_undo_mark_mdf
-    def set_create_to_op_script_by_configure_file(self, file_path):
-        ktn_op_scripts = NGObjOpt(self._ktn_obj).get_children(include_type_names=['OpScript'])
+    def set_create_to_op_script_by_configure_file(self, file_path, paths=None):
+        if paths is not None:
+            ktn_op_scripts = [NodegraphAPI.GetNode(i) for i in paths]
+        else:
+            ktn_op_scripts = NGObjOpt(self._ktn_obj).get_children(include_type_names=['OpScript'])
         for i_ktn_op_script in ktn_op_scripts:
             configure = bsc_objects.Configure(value=file_path)
             parameters = configure.get('parameters') or {}

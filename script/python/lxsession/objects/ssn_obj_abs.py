@@ -646,19 +646,19 @@ class AbsOptionRsvTaskMethodSession(
     def get_batch_key(self):
         option_opt = self.get_option_opt()
         return bsc_core.SessionYamlMtd.get_key(
-            version=self.get_rsv_version_name(),
+            user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
 
     def get_batch_file_path(self):
         option_opt = self.get_option_opt()
         file_path = bsc_core.SessionYamlMtd.get_file_path(
-            version=self.get_rsv_version_name(),
+            user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
         if bsc_core.StoragePathMtd.get_path_is_exists(file_path) is False:
             raw = dict(
-                version=self.get_rsv_version_name(),
+                user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
             )
             utl_core.File.set_write(file_path, raw)
@@ -763,8 +763,7 @@ class AbsOptionRsvTaskMethodSession(
     def get_ddl_dependent_unique_id(self):
         option_opt = self.get_option_opt()
         return bsc_core.SessionYamlMtd.get_key(
-            version=self.get_rsv_version_name(),
-            # user=option_opt.get('user'),
+            user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
 

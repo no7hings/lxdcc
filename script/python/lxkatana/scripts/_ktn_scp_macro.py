@@ -287,7 +287,7 @@ class LxAsset(object):
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         #
-        rsv_shots = usd_rsv_objects.RsvAssetSetUsdCreator._get_rsv_asset_shots_(rsv_asset)
+        rsv_shots = usd_rsv_objects.RsvUsdAssetSetCreator._get_rsv_asset_shots_(rsv_asset)
         if rsv_shots:
             obj_opt.set_as_enumerate(
                 'options.shot', [i.path for i in rsv_shots]
@@ -310,7 +310,7 @@ class LxAsset(object):
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
-        rsv_shots = usd_rsv_objects.RsvAssetSetUsdCreator._get_rsv_asset_shots_(rsv_asset)
+        rsv_shots = usd_rsv_objects.RsvUsdAssetSetCreator._get_rsv_asset_shots_(rsv_asset)
         if rsv_shots:
             obj_opt.set_as_enumerate(
                 'options.shot', [i.path for i in rsv_shots]
@@ -332,7 +332,7 @@ class LxAsset(object):
         resolver = rsv_commands.get_resolver()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
-            asset_set_usd_file_path = usd_rsv_objects.RsvAssetSetUsdCreator._set_asset_usd_file_create_(
+            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._set_asset_usd_file_create_(
                 rsv_asset,
                 rsv_scene_properties
             )
@@ -343,7 +343,7 @@ class LxAsset(object):
                 obj_opt.set('lynxi_settings.render_start_frame', 1001.0)
                 obj_opt.set('lynxi_settings.render_end_frame', 1240.0)
                 obj_opt.set('lynxi_settings.render_resolution', '2048x2048')
-                usd_variant_dict = usd_rsv_objects.RsvAssetSetUsdCreator._get_usd_variant_dict_(
+                usd_variant_dict = usd_rsv_objects.RsvUsdAssetSetCreator._get_usd_variant_dict_(
                     rsv_scene_properties,
                     asset_set_usd_file_path
                 )
@@ -367,7 +367,7 @@ class LxAsset(object):
         resolver = rsv_commands.get_resolver()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
-            asset_shot_set_usd_file_path = usd_rsv_objects.RsvAssetSetUsdCreator._set_asset_shot_usd_file_create_(
+            asset_shot_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._set_asset_shot_usd_file_create_(
                 rsv_asset, rsv_shot,
                 rsv_scene_properties
             )
@@ -375,21 +375,33 @@ class LxAsset(object):
                 obj_opt.set(
                     'usd.asset.file', asset_shot_set_usd_file_path
                 )
-                start_frame, end_frame = usd_rsv_objects.RsvAssetSetUsdCreator._get_shot_frame_range_(rsv_shot)
+                start_frame, end_frame = usd_rsv_objects.RsvUsdAssetSetCreator._get_shot_frame_range_(rsv_shot)
                 obj_opt.set('lynxi_settings.render_start_frame', start_frame)
                 obj_opt.set('lynxi_settings.render_end_frame', end_frame)
                 #
                 obj_opt.set('lynxi_settings.render_resolution', '2048x858')
                 #
-                shot_assets_dict = usd_rsv_objects.RsvAssetSetUsdCreator._get_shot_asset_dict_(
+                shot_asset_main_dict = usd_rsv_objects.RsvUsdAssetSetCreator._get_shot_asset_dict_(
                     rsv_asset, rsv_shot
+                )
+                shot_assets = [i for i in shot_asset_main_dict.keys()]
+                shot_assets.append('None')
+                obj_opt.set_port_enumerate_raw(
+                    'usd.variants.shot_asset', shot_assets
+                )
+                #
+                shot_asset_override_dict = usd_rsv_objects.RsvUsdAssetSetCreator._get_shot_asset_override_dict_(
+                    rsv_asset, rsv_shot, rsv_scene_properties
+                )
+                shot_assets_override = [i for i in shot_asset_override_dict.keys()]
+                shot_assets_override.append('None')
+                obj_opt.set_port_enumerate_raw(
+                    'usd.variants.shot_asset_override', shot_assets_override
                 )
                 #
                 ktn_dcc_objects.Scene.set_frame_range(start_frame, end_frame)
-                obj_opt.set_port_enumerate_raw(
-                    'usd.variants.shot_asset', shot_assets_dict.keys()
-                )
-                usd_variant_dict = usd_rsv_objects.RsvAssetSetUsdCreator._get_usd_variant_dict_(
+                #
+                usd_variant_dict = usd_rsv_objects.RsvUsdAssetSetCreator._get_usd_variant_dict_(
                     rsv_scene_properties,
                     asset_shot_set_usd_file_path
                 )
@@ -490,7 +502,7 @@ class LxAsset(object):
                 rsv_shot = self._get_rsv_shot_auto_(rsv_asset)
 
             if rsv_asset and rsv_shot:
-                shot_set_dress_usd_file_path = usd_rsv_objects.RsvAssetSetUsdCreator._get_shot_set_dress_file_path_(
+                shot_set_dress_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._get_shot_set_dress_file_path_(
                     rsv_shot
                 )
                 if shot_set_dress_usd_file_path:

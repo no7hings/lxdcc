@@ -134,7 +134,7 @@ class Scene(utl_abstract.AbsDccScene):
     def set_file_save_to(cls, file_path):
         hou.hipFile.save(file_path)
         utl_core.Log.set_module_result_trace(
-            'scene-file-save',
+            'scene save',
             u'file="{}"'.format(file_path)
         )
     @classmethod

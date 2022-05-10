@@ -17,14 +17,19 @@ import lxresolver.commands as rsv_commands
 
 from lxusd import usd_core
 
+from lxutil.rsv import utl_rsv_obj_abstract
 
-class RsvAssetSetUsdCreator(object):
+
+class RsvUsdAssetSetCreator(object):
     ASSET_OVERRIDE_VARIANTS = {
         ('mod', 'modeling', 'model'),
         ('grm', 'groom', 'groom'),
         ('efx', 'effects', 'effect'),
         ('rig', 'rigging', 'rig'),
         ('srf', 'surfacing', 'surface'),
+    }
+    SHOT_ASSET_OVERRIDE_VARIANTS = {
+        ('rig', 'rigging', 'animation'),
     }
     STEP_MAPPER = {
         'mod': 'model',
@@ -77,7 +82,7 @@ class RsvAssetSetUsdCreator(object):
             return bsc_objects.Content(value={})
     @classmethod
     def _get_shot_asset_dict_(cls, rsv_asset, rsv_shot):
-        dic = collections.OrderedDict()
+        dict_ = collections.OrderedDict()
 
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         #
@@ -93,8 +98,40 @@ class RsvAssetSetUsdCreator(object):
         #
         for i_location in paths:
             i_shot_asset = i_location.split('/')[-1]
-            dic[i_shot_asset] = i_location
-        return dic
+            dict_[i_shot_asset] = i_location
+        return dict_
+    @classmethod
+    def _get_shot_asset_override_dict_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
+        dict_ = collections.OrderedDict()
+        shot_asset = rsv_asset.get('asset')
+        asset_shot = rsv_shot.get('shot')
+        #
+        cur_workspace = rsv_scene_properties.get('workspace')
+        cur_step = rsv_scene_properties.get('step')
+        cur_task = rsv_scene_properties.get('task')
+        cur_version = rsv_scene_properties.get('version')
+        cur_rsv_task = rsv_asset.get_rsv_task(
+            step=cur_step,
+            task=cur_task
+        )
+        if cur_workspace == 'work':
+            pass
+        elif cur_workspace == 'publish':
+            pass
+        elif cur_workspace == 'output':
+            comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
+                keyword='asset-output-shot_asset-component-registry-usd-file'
+            )
+            register_usd_file_path = comp_register_usd_file_rsv_unit.get_result(
+                version=cur_version,
+                extend_variants=dict(
+                    asset_shot=asset_shot,
+                    shot_asset=shot_asset
+                )
+            )
+            if register_usd_file_path is not None:
+                dict_[shot_asset] = register_usd_file_path
+        return dict_
     @classmethod
     def _get_rsv_asset_shots_(cls, rsv_asset):
         lis = []
@@ -193,7 +230,7 @@ class RsvAssetSetUsdCreator(object):
             version = rsv_scene_properties.get('version')
             if workspace in ['work']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-work-asset-shot-set-usd-file'
+                    keyword='asset-work-shot-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version=version,
@@ -203,7 +240,7 @@ class RsvAssetSetUsdCreator(object):
                 )
             elif workspace in ['publish']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-asset-shot-set-usd-file'
+                    keyword='asset-shot-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version=version,
@@ -213,7 +250,7 @@ class RsvAssetSetUsdCreator(object):
                 )
             elif workspace in ['output']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-output-asset-shot-set-usd-file'
+                    keyword='asset-output-shot-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version=version,
@@ -227,57 +264,6 @@ class RsvAssetSetUsdCreator(object):
                 rsv_asset.path
             )
         return usd_file_path
-    @classmethod
-    def _get_asset_comp_registry_(cls, rsv_scene_properties, per_rsv_task):
-        dic = collections.OrderedDict()
-        if per_rsv_task is not None:
-            comp_register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
-                keyword='asset-comp-registry-usd-file'
-            )
-            register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
-                version='all'
-            )
-            for i_file_path in register_usd_file_paths:
-                i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
-                i_version = i_properties.get('version')
-                dic[i_version] = i_file_path
-        return dic
-    @classmethod
-    def _get_asset_comp_registry_override_(cls, rsv_scene_properties, per_rsv_task):
-        workspace = rsv_scene_properties.get('workspace')
-        per_step = per_rsv_task.get('step')
-        dic = collections.OrderedDict()
-        if per_rsv_task is not None:
-            if workspace == 'work':
-                if per_step in ['srf']:
-                    RsvTaskOverrideUsdCreator(
-                        per_rsv_task
-                    )._set_geometry_uv_map_create_()
-                    #
-                    work_asset_geometry_uv_map_var_file_unit = per_rsv_task.get_rsv_unit(
-                        keyword='asset-work-geometry-uv_map-usd-var-file'
-                    )
-                    work_asset_geometry_uv_map_var_file_paths = work_asset_geometry_uv_map_var_file_unit.get_result(
-                        version='all', extend_variants=dict(var='hi')
-                    )
-                    for i_file_path in work_asset_geometry_uv_map_var_file_paths:
-                        i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties_by_result(i_file_path)
-                        i_version = i_properties.get('version')
-                        dic[i_version] = i_file_path
-            elif workspace == 'publish':
-                pass
-            elif workspace == 'output':
-                comp_register_usd_file_rsv_unit = per_rsv_task.get_rsv_unit(
-                    keyword='asset-output-component-registry-usd-file'
-                )
-                register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
-                    version='all'
-                )
-                for i_file_path in register_usd_file_paths:
-                    i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
-                    i_version = i_properties.get('version')
-                    dic[i_version] = i_file_path
-        return dic
     @classmethod
     def _get_asset_usd_set_dress_variant_dict_(cls, rsv_asst):
         usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asst)
@@ -384,22 +370,73 @@ class RsvAssetSetUsdCreator(object):
     @classmethod
     def _set_asset_all_comp_registry_update_(cls, configure, rsv_asset, rsv_scene_properties):
         for i_step, i_task, i_key in cls.ASSET_OVERRIDE_VARIANTS:
-            i_per_rsv_task = rsv_asset.get_rsv_task(
+            i_cur_rsv_task = rsv_asset.get_rsv_task(
                 step=i_step, task=i_task
             )
-            if i_per_rsv_task is not None:
-                i_comp_registry = cls._get_asset_comp_registry_(
-                    rsv_scene_properties, i_per_rsv_task
+            if i_cur_rsv_task is not None:
+                i_version_main_dict = cls._get_asset_version_main_dict_(
+                    i_cur_rsv_task
                 )
                 configure.set(
-                    'asset.version_main.{}'.format(i_key), i_comp_registry
+                    'asset.version_main.{}'.format(i_key), i_version_main_dict
                 )
-                i_comp_registry_override = cls._get_asset_comp_registry_override_(
-                    rsv_scene_properties, i_per_rsv_task
+                i_version_override_dict = cls._get_asset_version_override_dict_(
+                    rsv_scene_properties,
+                    i_cur_rsv_task
                 )
                 configure.set(
-                    'asset.version_override.{}'.format(i_key), i_comp_registry_override
+                    'asset.version_override.{}'.format(i_key), i_version_override_dict
                 )
+    @classmethod
+    def _get_asset_version_main_dict_(cls, cur_rsv_task):
+        dict_ = collections.OrderedDict()
+        comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
+            keyword='asset-comp-registry-usd-file'
+        )
+        comp_register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
+            version='all'
+        )
+        for i_file_path in comp_register_usd_file_paths:
+            i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
+            i_version = i_properties.get('version')
+            dict_[i_version] = i_file_path
+        return dict_
+    @classmethod
+    def _get_asset_version_override_dict_(cls, rsv_scene_properties, cur_rsv_task):
+        dict_ = collections.OrderedDict()
+        #
+        cur_workspace = rsv_scene_properties.get('workspace')
+        cur_step = cur_rsv_task.get('step')
+        if cur_workspace == 'work':
+            if cur_step in ['srf']:
+                RsvTaskOverrideUsdCreator(
+                    cur_rsv_task
+                )._set_geometry_uv_map_create_()
+                #
+                work_asset_geometry_uv_map_var_file_unit = cur_rsv_task.get_rsv_unit(
+                    keyword='asset-work-geometry-uv_map-usd-var-file'
+                )
+                work_asset_geometry_uv_map_var_file_paths = work_asset_geometry_uv_map_var_file_unit.get_result(
+                    version='all', extend_variants=dict(var='hi')
+                )
+                for i_file_path in work_asset_geometry_uv_map_var_file_paths:
+                    i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties_by_result(i_file_path)
+                    i_version = i_properties.get('version')
+                    dict_[i_version] = i_file_path
+        elif cur_workspace == 'publish':
+            pass
+        elif cur_workspace == 'output':
+            comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
+                keyword='asset-output-component-registry-usd-file'
+            )
+            register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
+                version='all'
+            )
+            for i_file_path in register_usd_file_paths:
+                i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
+                i_version = i_properties.get('version')
+                dict_[i_version] = i_file_path
+        return dict_
     @classmethod
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
@@ -449,7 +486,8 @@ class RsvAssetSetUsdCreator(object):
                 rsv_scene_properties
             )
             start_frame, end_frame = usd_core.UsdStageOpt(shot_set_dress_usd_file_path).get_frame_range()
-            shot_assets_dict = cls._get_shot_asset_cache_(rsv_asset, rsv_shot)
+            shot_asset_main_dict = cls._get_shot_asset_dict_(rsv_asset, rsv_shot)
+            shot_asset_override_dict = cls._get_shot_asset_override_dict_(rsv_asset, rsv_shot, rsv_scene_properties)
 
             key = 'usda/shot-asset-set-v002'
 
@@ -471,7 +509,8 @@ class RsvAssetSetUsdCreator(object):
             c.set('shot.end_frame', end_frame)
             c.set('shot.set_file', shot_set_dress_usd_file_path)
 
-            c.set('shot_assets', shot_assets_dict)
+            c.set('shot.shot_asset_main', shot_asset_main_dict)
+            c.set('shot.shot_asset_override', shot_asset_override_dict)
 
             cls._set_asset_all_comp_registry_update_(
                 c, rsv_asset, rsv_scene_properties
@@ -498,7 +537,7 @@ class RsvAssetSetUsdCreator(object):
         pass
 
 
-class RsvShotSetUsdCreator(object):
+class RsvUsdShotSetCreator(object):
     def __init__(self, rsv_shot):
         self._rsv_shot = rsv_shot
     @classmethod
@@ -561,4 +600,126 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         pass
 
     def set_run(self):
+        pass
+
+
+class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+    def __init__(self, rsv_scene_properties, hook_option_opt=None):
+        super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
+
+    def set_component_usd_create(self):
+        step = self._rsv_scene_properties.get('step')
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'work':
+            keyword = 'asset-work-comp-usd-dir'
+        elif workspace == 'publish':
+            keyword = 'asset-component-usd-dir'
+        elif workspace == 'output':
+            keyword = 'asset-output-component-usd-dir'
+        else:
+            raise TypeError()
+        #
+        component_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        #
+        component_usd_directory_path = component_usd_directory_rsv_unit.get_result(
+            version=version
+        )
+        #
+        step_mapper = dict(
+            mod='usda/set/model',
+            srf='usda/set/surface',
+            rig='usda/set/rig',
+            grm='usda/set/groom',
+        )
+        if step in step_mapper:
+            key = step_mapper[step]
+            #
+            c = utl_configure.Jinja.get_configure(key)
+            c.set_update(
+                self._rsv_scene_properties.value
+            )
+            #
+            c.set_flatten()
+            #
+            usda_dict = c.get('usdas')
+            #
+            for k, v in usda_dict.items():
+                t = utl_configure.Jinja.get_template('{}/{}'.format(key, k))
+                i_raw = t.render(
+                    **c.value
+                )
+                i_usda_file_path = '{}/{}'.format(
+                    component_usd_directory_path, v
+                )
+                i_file = utl_dcc_objects.OsFile(i_usda_file_path)
+                if i_file.get_is_exists() is False:
+                    utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                        i_raw
+                    )
+            #
+            if workspace in ['publish']:
+                # noinspection PyUnresolvedReferences
+                import production.gen.record_set_registry as pgs
+                register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
+                pgs.run(register_file_path)
+
+    def set_asset_shot_asset_component_usd_create(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        asset_shot = self._hook_option_opt.get('shot')
+        shot_asset = self._hook_option_opt.get('shot_asset')
+        #
+        if workspace == 'publish':
+            keyword = 'asset-shot_asset-component-usd-dir'
+        elif workspace == 'output':
+            keyword = 'asset-output-shot_asset-component-usd-dir'
+        else:
+            raise TypeError()
+        #
+        component_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        component_usd_directory_path = component_usd_directory_rsv_unit.get_result(
+            version=version,
+            extend_variants=dict(
+                asset_shot=asset_shot,
+                shot_asset=shot_asset,
+            )
+        )
+        key = 'usda/set/shot-asset'
+        c = utl_configure.Jinja.get_configure(key)
+        c.set_update(
+            self._rsv_scene_properties.value
+        )
+        c.set_update(
+            dict(
+                asset_shot=asset_shot,
+                shot_asset=shot_asset,
+            )
+        )
+        c.set_flatten()
+
+        usda_dict = c.get('usdas')
+        #
+        for k, v in usda_dict.items():
+            t = utl_configure.Jinja.get_template(
+                u'{}/{}'.format(key, k)
+            )
+            i_raw = t.render(
+                **c.value
+            )
+            i_usda_file_path = u'{}/{}'.format(
+                component_usd_directory_path, v
+            )
+            i_file = utl_dcc_objects.OsFile(i_usda_file_path)
+            if i_file.get_is_exists() is False:
+                utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                    i_raw
+                )
+
+    def set_asset_shot_set_usd_create(self):
         pass

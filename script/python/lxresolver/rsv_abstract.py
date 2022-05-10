@@ -682,6 +682,9 @@ class AbsRsvObj(
             u'\n'.join([u'{} : {}'.format(k, v) for k, v in bsc_core.DictMtd.set_key_sort_to(kwargs).items()])
         )
 
+    def get_rsv_project(self):
+        return self._rsv_project
+
     def __get_src_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
         kwargs['workspace'] = self.rsv_project.get_workspace_src()
@@ -1228,8 +1231,6 @@ class AbsRsvTask(
                             j_rsv_properties.set('dcc.pathsep', rsv_configure.Application.get_pathsep(i_application))
                             return j_rsv_properties
     # ================================================================================================================ #
-    def get_rsv_project(self):
-        return self._rsv_project
     # tag
     def get_rsv_tag(self):
         return self.get_parent().get_parent().get_parent()
@@ -1338,10 +1339,30 @@ class AbsRsvEntity(
         )
 
     def get_rsv_unit(self, **kwargs):
+        """
+        :param kwargs:
+            task: str
+            keyword: str
+        :return:
+        """
         return self.rsv_project._project__get_rsv_unit_(
             rsv_obj=self,
             **kwargs
         )
+
+    def get_available_rsv_unit(self, **kwargs):
+        """
+        :param kwargs:
+            task: str / [str, ...]
+            keyword: str
+        :return:
+        """
+        rsv_tasks = self.get_rsv_tasks(**kwargs)
+        keyword = kwargs['keyword']
+        for i_rsv_task in rsv_tasks:
+            i_rsv_unit = i_rsv_task.get_rsv_unit(keyword=keyword)
+            if i_rsv_unit.get_result(version='latest'):
+                return i_rsv_unit
 
 
 class AbsRsvTag(

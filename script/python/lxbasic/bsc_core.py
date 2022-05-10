@@ -49,6 +49,8 @@ import itertools
 
 import functools
 
+import urllib
+
 from lxbasic import bsc_configure
 
 import shutil
@@ -1063,6 +1065,7 @@ class SubProcessMtd(object):
         #
         return_code = s_p.wait()
         if return_code:
+            ExceptionMtd.set_print()
             ExceptionMtd.set_stack_print()
             #
             raise subprocess.CalledProcessError(
@@ -1117,6 +1120,7 @@ class SubProcessMtd(object):
         #
         return_code = s_p.wait()
         if return_code:
+            ExceptionMtd.set_print()
             ExceptionMtd.set_stack_print()
             #
             raise subprocess.CalledProcessError(
@@ -3057,32 +3061,36 @@ class CoordMtd(object):
 
 class NestedArrayMtd(object):
     @classmethod
-    def set_map_to(cls, nestedArray):
+    def set_map_to(cls, array):
         """
-        :param nestedArray: etc.[[1, 2], [1, 2]]
+        :param array: etc.[[1, 2], [1, 2]]
         :return: etc.[[1, 1], [1, 2], [2, 1], [2, 2]]
         """
-        def rcsFnc_(index_):
+        def rcs_fnc_(index_):
             if index_ < count:
-                _array = nestedArray[index_]
+                _array = array[index_]
                 for _i in _array:
                     c[index_] = _i
-                    rcsFnc_(index_ + 1)
+                    rcs_fnc_(index_ + 1)
             else:
                 lis.append(
                     copy.copy(c)
                 )
-
+        #
         lis = []
-        count = len(nestedArray)
+        count = len(array)
         c = [None]*count
-        rcsFnc_(0)
+        rcs_fnc_(0)
         return lis
 
 
 class IntegerArrayMtd(object):
     @staticmethod
     def set_merge_to(array):
+        """
+        :param array: etc.[1, 2, 3, 5, 6, 9]
+        :return: etc.[(1, 3), (5, 6), 9]
+        """
         lis = []
         #
         if array:
@@ -3263,6 +3271,21 @@ class FrameRangeMtd(object):
             raise ValueError()
 
 
+class FramesMtd(object):
+    @classmethod
+    def to_text(cls, frames):
+        lis = []
+        _ = IntegerArrayMtd.set_merge_to(
+            frames
+        )
+        for i in _:
+            if isinstance(i, tuple):
+                lis.append('{}-{}'.format(*i))
+            else:
+                lis.append(str(i))
+        return ','.join(lis)
+
+
 class ParsePatternOpt(object):
     def __init__(self, pattern):
         self._pattern = pattern
@@ -3373,8 +3396,9 @@ class TimeMtd(object):
             return u'{}{}'.format(year_str, month_str)
         return '{} {}'.format(month_str, year_str)
 
+    def time_tag2timestamp(self, time_tag):
+        pass
+
 
 if __name__ == '__main__':
-    print TimeMtd.to_prettify_by_time_tag(
-        '2022_0429_1117_48_173000'
-    )
+    print '{}-{}'.format(*(1001.0, 1240.0))

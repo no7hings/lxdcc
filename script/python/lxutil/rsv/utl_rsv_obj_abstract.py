@@ -10,3 +10,6 @@ class AbsRsvOHookOpt(object):
             **self._rsv_scene_properties.value
         )
         self._hook_option_opt = hook_option_opt
+    @classmethod
+    def get_resolver(cls):
+        return rsv_commands.get_resolver()

@@ -41,9 +41,9 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
             if role in ['chr']:
                 ktn_core.VariablesSetting().set_register_by_configure(
                     {
-                        'layer': ['master'],
+                        'layer': ['master', 'no_hair'],
                         'quality': ['low', 'med', 'hi', 'custom'],
-                        'camera': ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
+                        'camera': ['full_body', 'upper_body', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
                         'light_pass': ['all'],
                         'look_pass': ['default', 'plastic', 'ambocc', 'wire', 'white'],
                         'variables_enable': ['on', 'off']

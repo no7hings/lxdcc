@@ -343,7 +343,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             type=cls._get_file_type_name_(file_path)
         )
         utl_core.Log.set_module_result_trace(
-            'scene-file-save',
+            'scene save',
             u'file="{}"'.format(file_path)
         )
     @classmethod
@@ -356,7 +356,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             type=cls._get_file_type_name_(file_path)
         )
         utl_core.Log.set_module_result_trace(
-            'scene-file-save',
+            'scene save',
             u'file="{}"'.format(file_path)
         )
     @classmethod

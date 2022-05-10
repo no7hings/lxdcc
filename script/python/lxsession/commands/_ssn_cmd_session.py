@@ -40,6 +40,7 @@ def set_session_option_hooks_execute_by_deadline(session):
         _dependencies = _hook_option_opt.get('dependencies') or []
         _dependencies.append(batch_option_hook_key_)
         _hook_option_opt.set('dependencies', _dependencies)
+        # _hook_option_opt.set('dependency_job_ids', )
         #
         _choice_scheme_includes = _hook_option_opt.get('choice_scheme_includes', as_array=True)
         if _choice_scheme_includes:
@@ -68,9 +69,9 @@ def set_session_option_hooks_execute_by_deadline(session):
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
     with utl_core.log_progress(
-            maximum=len(option_hook_keys),
-            label='option hooks execute by deadline',
-            use_as_progress_bar=True
+        maximum=len(option_hook_keys),
+        label='option hooks execute by deadline',
+        use_as_progress_bar=True,
     ) as g_p:
         for i in option_hook_keys:
             g_p.set_update()

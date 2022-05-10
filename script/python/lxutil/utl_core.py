@@ -187,6 +187,27 @@ class Log(object):
         return '\n'.join(lines)
 
 
+class ModuleResultLog(object):
+    def __init__(self, module, result):
+        self._module = module
+        self._result = result
+
+    def __enter__(self):
+        Log.set_module_result_trace(
+            self._module, self._result, ' is started'
+        )
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        Log.set_module_result_trace(
+            self._module, self._result, ' is completed'
+        )
+
+
+def module_resulter_log(module, result):
+    return ModuleResultLog(module, result)
+
+
 class Progress(object):
     PROGRESSES = []
     @classmethod
@@ -408,30 +429,32 @@ class ExceptionCatcher(object):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
         w_cls = prx_widgets.PrxTipWindow
-        _ = utl_gui_prx_core.get_gui_proxy_by_class(w_cls)
-        if _:
-            return _[0]
+        _0 = utl_gui_prx_core.get_gui_proxy_by_class(w_cls)
+        if _0:
+            return _0[0]
         #
-        __ = prx_widgets.PrxTipWindow()
+        _1 = prx_widgets.PrxTipWindow()
         #
-        __.set_window_title('Exception')
-        __.set_definition_window_size((640, 320))
-        __.set_window_show()
-        return __
+        _1.set_window_title('Exception')
+        _1.set_definition_window_size((640, 320))
+        _1.set_window_show()
+        return _1
     @classmethod
     def set_create(cls, use_window=True):
         import sys
         #
         import traceback
         #
-        exc_type, exc_value, exc_stack = sys.exc_info()
         exc_texts = []
-        value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
-        for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
-            i_file_path, i_line, i_fnc, i_fnc_line = stk
-            exc_texts.append(
-                '    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
-            )
+        value = ''
+        exc_type, exc_value, exc_stack = sys.exc_info()
+        if exc_type:
+            value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+            for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
+                i_file_path, i_line, i_fnc, i_fnc_line = stk
+                exc_texts.append(
+                    '    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
+                )
         #
         if use_window is True:
             w = cls._get_window_()

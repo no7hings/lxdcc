@@ -40,6 +40,7 @@ quality: '{quality}'
 render-pass: '{render_pass}'
 #
 asset-shot-name: '{asset_shot}'
+shot-asset-name: '{shot_asset}'
 #
 key-glob-pattern:
     role: '[a-z][a-z][a-z]'
@@ -183,7 +184,7 @@ asset-work-set-usd-surface-file: <asset-work-set-dir>/surface.usda
 #
 asset-work-asset-set-usd-override-file: <asset-work-set-dir>/<asset-name>.override.usda
 asset-work-asset-set-usd-file: <asset-work-set-dir>/<asset-name>.usda
-asset-work-asset-shot-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
+asset-work-shot-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
 #
 asset-work-comp-usd-dir: <asset-task-dir>/cache/usd/<version-name>
 #
@@ -382,9 +383,30 @@ asset-usd-groom-file: <asset-usd-groom-dir>/<asset-name>.usda
 asset-set-dir: <asset-no-version-dir>/cache
 asset-set-usd-dir: <asset-set-dir>/usd
 asset-set-dress-usd-file: <asset-set-usd-dir>/<asset-name>.usda
-
+#
 asset-asset-set-usd-file: <asset-version-dir>/set/usd/<asset-name>.usda
-asset-asset-shot-set-usd-file: <asset-version-dir>/set/usd/<asset-shot-name>.usda
+asset-shot-set-usd-file: <asset-version-dir>/set/usd/<asset-shot-name>.usda
+#
+asset-shot-dir: <asset-version-dir>/shot/<asset-shot-name>
+#
+asset-shot-scene-src-dir: <asset-shot-dir>/scene/src
+asset-shot-maya-scene-src-file: <asset-shot-scene-src-dir>/<asset-shot-name>.ma
+#
+asset-shot-scene-dir: <asset-shot-dir>/scene
+asset-shot-maya-scene-file: <asset-shot-scene-dir>/<asset-shot-name>.ma
+#
+asset-shot-cache-dir: <asset-shot-dir>/cache
+asset-shot_asset-component-dir: <asset-shot-cache-dir>/<shot-asset-name>
+asset-shot_asset-component-usd-dir: <asset-shot_asset-component-dir>/usd
+asset-shot_asset-component-registry-usd-file: <asset-shot_asset-component-usd-dir>/registry.usda
+#
+asset-shot_asset-geometry-usd-var-dir: <asset-shot_asset-component-usd-dir>/geo
+asset-shot_asset-geometry-usd-var-file: <asset-shot_asset-geometry-usd-var-dir>/<var-name>.usd
+#
+asset-shot-set-dir: <asset-shot-dir>/manifest
+asset-shot-set-usd-dir: <asset-shot-set-dir>/usd
+asset-shot-set-scenegraph-usd-file: <asset-shot-set-usd-dir>/scenegraph.usda
+asset-shot-set-cache-usd-file: <asset-shot-set-usd-dir>/cache.usda
 # asset output ======================================================================================================= #
 asset-output-step-dir: <asset-dir>/<step-name>
 asset-output-task-dir: <asset-output-step-dir>/<task-name>
@@ -420,7 +442,7 @@ asset-output-katana-render-image-file: <asset-output-katana-render-output-dir>/m
 asset-output-katana-render-video-mov-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
 #
 asset-output-asset-set-usd-file: <asset-output-set-dir>/usd/<asset-name>.usda
-asset-output-asset-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usda
+asset-output-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usda
 # geometry
 asset-output-geometry-dir: <asset-output-version-dir>/cache
 # geometry usd
@@ -451,7 +473,27 @@ asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-p
 #
 asset-output-geometry-xgen-glow-dir: <asset-output-version-dir>/maya
 asset-output-geometry-xgen-collection-dir: <asset-output-version-dir>/cache/xgen/collections
+# output shot
+asset-output-shot-dir: <asset-output-version-dir>/shot/<asset-shot-name>
+asset-output-shot-scene-src-dir: <asset-output-shot-dir>/scene/src
+asset-output-shot-maya-scene-src-file: <asset-output-shot-scene-src-dir>/<asset-shot-name>.ma
 #
+asset-output-shot-scene-dir: <asset-output-shot-dir>/scene
+asset-output-shot-maya-scene-file: <asset-output-shot-scene-dir>/<asset-shot-name>.ma
+#
+asset-output-shot-cache-dir: <asset-output-shot-dir>/cache
+asset-output-shot_asset-component-dir: <asset-output-shot-cache-dir>/<shot-asset-name>
+asset-output-shot_asset-component-usd-dir: <asset-output-shot_asset-component-dir>/usd
+asset-output-shot_asset-component-registry-usd-file: <asset-output-shot_asset-component-usd-dir>/registry.usda
+#
+asset-output-shot_asset-geometry-usd-var-dir: <asset-output-shot_asset-component-usd-dir>/geo
+asset-output-shot_asset-geometry-usd-var-file: <asset-output-shot_asset-geometry-usd-var-dir>/<var-name>.usd
+#
+asset-output-shot-set-dir: <asset-output-shot-dir>/manifest
+asset-output-shot-set-usd-dir: <asset-output-shot-set-dir>/usd
+asset-output-shot-set-scenegraph-usd-file: <asset-output-shot-set-usd-dir>/scenegraph.usda
+asset-output-shot-set-cache-usd-file: <asset-output-shot-set-usd-dir>/cache.usda
+# ==================================================================================================================== #
 project-effect-dir: <project-root-dir>/<project-name>
 project-effect-workspace-dir: <project-effect-dir>/<workspace-name>
 #

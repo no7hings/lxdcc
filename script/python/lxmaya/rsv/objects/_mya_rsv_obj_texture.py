@@ -23,9 +23,11 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             keyword_0 = 'asset-output-texture-src-dir'
             keyword_1 = 'asset-output-texture-tgt-dir'
         else:
-            raise TypeError()
+            raise RuntimeError()
         #
-        if use_tx is True:
+        with_texture_tx = self._hook_option_opt.get('with_texture_tx') or False
+        #
+        if with_texture_tx is True:
             utl_dcc_operators.DccTexturesOpt(
                 mya_dcc_objects.TextureReferences(
                     option=dict(
@@ -61,7 +63,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             root=location,
             option=dict(
                 fix_name_blank=True,
-                use_tx=use_tx,
+                use_tx=with_texture_tx,
                 with_reference=False
             )
         ).set_run()

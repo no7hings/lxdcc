@@ -1866,6 +1866,15 @@ class CmdPortOpt(object):
         if default_value is not None:
             self.set(default_value)
 
+    def get_is_naming_match(self, pattern):
+        return fnmatch.filter(
+            [self.get_port_path()], pattern
+        ) != []
+    def get_is_naming_matches(self, patterns):
+        for i in patterns:
+            if self.get_is_naming_match(i) is True:
+                return True
+        return False
     def __str__(self):
         return '{}(path="{}")'.format(
             self.get_type_name(), self.get_path()

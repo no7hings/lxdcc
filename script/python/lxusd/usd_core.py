@@ -335,6 +335,25 @@ class UsdPrimOpt(object):
             i_variant_set_opt = UsdVariantSetOpt(i)
             dic[i_variant_set_opt.get_name()] = i_variant_set_opt.get_current_variant_name(), i_variant_set_opt.get_variant_names()
         return dic
+    @classmethod
+    def _set_customize_attribute_add_(cls, usd_obj, key, value):
+        if isinstance(value, bool):
+            dcc_type_name = obj_configure.Type.CONSTANT_BOOLEAN
+        elif isinstance(value, int):
+            dcc_type_name = obj_configure.Type.CONSTANT_INTEGER
+        elif isinstance(value, float):
+            dcc_type_name = obj_configure.Type.CONSTANT_FLOAT
+        elif isinstance(value, (str, unicode)):
+            dcc_type_name = obj_configure.Type.CONSTANT_STRING
+        else:
+            raise TypeError()
+        #
+        usd_type = UsdDataMapper.MAPPER[dcc_type_name]
+        p = usd_obj.CreatePrimvar(
+            key,
+            usd_type
+        )
+        p.Set(value)
 
     def __str__(self):
         return '{}(path={})'.format(

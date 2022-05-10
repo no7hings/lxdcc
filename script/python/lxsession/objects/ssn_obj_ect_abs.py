@@ -116,6 +116,10 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
                     )
             else:
                 self._ddl_submiter.option.set('deadline.output_file', scene_file_path)
+            # Priority
+            deadline_priority = hook_option_opt.get('deadline_priority')
+            if deadline_priority is not None:
+                self._ddl_submiter.job_info.set('Priority', int(deadline_priority))
             #
             option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
             if option_hook_key_extend:

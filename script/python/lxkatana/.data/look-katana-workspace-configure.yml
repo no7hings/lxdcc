@@ -798,6 +798,7 @@ workspace:
                     parameters:
                         quality/scheme: low
                         lynxi_variants/percent: '50%'
+                        lynxi_variants/arnold_override/aa_sample: 2.0
                     connections:
                         - <.....light_pass_switch.main.output>
                         - <.path>.input
@@ -817,6 +818,7 @@ workspace:
                     parameters:
                         quality/scheme: med
                         lynxi_variants/percent: '75%'
+                        lynxi_variants/arnold_override/aa_sample: 3.0
                     connections:
                         - <.....light_pass_switch.main.output>
                         - <.path>.input
@@ -836,6 +838,7 @@ workspace:
                     parameters:
                         quality/scheme: hi
                         lynxi_variants/percent: '100%'
+                        lynxi_variants/arnold_override/aa_sample: 6.0
                     connections:
                         - <.....light_pass_switch.main.output>
                         - <.path>.input
@@ -855,6 +858,7 @@ workspace:
                     parameters:
                         quality/scheme: hi
                         lynxi_variants/percent: '100%'
+                        lynxi_variants/arnold_override/aa_sample: 6.0
                     connections:
                         - <.....light_pass_switch.main.output>
                         - <.path>.input
@@ -899,6 +903,44 @@ workspace:
                 ns_colorb: 0.5
                 ns_text: 'layer(s)'
                 ns_fontScale: 6.0
+        node_graph:
+            nodes:
+                master:
+                    path: <option.root>/<..key>__layer
+                    obj_category: node
+                    obj_type: lx_layer
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*0
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        layer/scheme: master
+                    connections:
+                        - <.....quality_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                no_hair:
+                    path: <option.root>/<..key>__layer
+                    obj_category: node
+                    obj_type: lx_layer
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*1
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        layer/scheme: no_hair
+                    connections:
+                        - <.....quality_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
     # render settings
     # y=-5.5
     render_settings:

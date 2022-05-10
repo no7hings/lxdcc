@@ -32,4 +32,18 @@ def "{{ dcc.root_name }}" (
     )
     {
     }
+
+    over "aux" (
+        active = true
+        kind = "subcomponent"
+    )
+    {
+    }
+
+    over "proxy" (
+        kind = "subcomponent"
+    )
+    {
+        uniform token purpose = "proxy"
+    }
 }

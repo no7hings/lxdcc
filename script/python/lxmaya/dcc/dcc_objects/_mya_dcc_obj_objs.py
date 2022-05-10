@@ -95,10 +95,20 @@ class References(mya_dcc_obj_abs.AbsMyaObjs):
     def get_reference_raw(self):
         lis = []
         for i in self.get_custom_nodes():
-            file_path = i.get_file_path()
-            namespace = i.get_namespace()
-            lis.append((file_path, namespace))
+            i_namespace = i.get_namespace()
+            i_file_path = i.get_file_path()
+            lis.append(
+                (i, i_namespace, i_file_path)
+            )
         return lis
+
+    def get_reference_dict(self):
+        dict_ = {}
+        for i_obj in self.get_custom_nodes():
+            i_namespace = i_obj.get_namespace()
+            i_file_path = i_obj.get_file_path()
+            dict_[i_namespace] = i_obj, i_file_path
+        return dict_
 
 
 class Materials(mya_dcc_obj_abs.AbsMyaObjs):
@@ -116,9 +126,9 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
     def get_reference_raw(self):
         lis = []
         for i in self.get_custom_nodes():
-            file_path = i.get_file_path()
-            namespace = i.get_namespace()
-            lis.append((file_path, namespace))
+            i_file_path = i.get_file_path()
+            i_namespace = i.get_namespace()
+            lis.append((i, i_namespace, i_file_path))
         return lis
 
 

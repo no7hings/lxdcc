@@ -61,6 +61,71 @@ parameters:
         value: 1
         tool_tip: '...'
 
+    cameras/close_up_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    cameras/upper_body_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    cameras/upper_body_35_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/upper_body_50_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/full_body_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    cameras/full_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/half_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/add_0_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/add_1_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/free_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/asset_free_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/shot_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/shot_free_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
     cameras/close_up/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_closeUp/cam_closeUpShape'
@@ -81,10 +146,12 @@ parameters:
         value: '/root/world/cam/cameras/main/cam_upperbody50/cam_upperbody50Shape'
         tool_tip: '...'
 
+
     cameras/full_body/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_fullbody/cam_fullbodyShape'
         tool_tip: '...'
+
     # prop
     cameras/full/location:
         widget: path

@@ -9,7 +9,8 @@
 def Xform "{{ asset.root_name }}" (
     kind = "component"
     variants = {
-        string shot_asset = "{{ shot_assets.keys()[0] }}"
+        string shot_asset = "{{ shot.shot_asset_main.keys()[0] }}"
+        string shot_asset_override = "None"
         string model_main = "None"
         string model_override = "None"
         string groom_main = "None"
@@ -22,6 +23,7 @@ def Xform "{{ asset.root_name }}" (
         string surface_override = "None"
     }
     prepend variantSets = [
+        "shot_asset_override",
         "shot_asset",
         "surface_override",
         "surface_main",
@@ -46,11 +48,22 @@ def Xform "{{ asset.root_name }}" (
     variantSet "shot_asset" = {
         "None" {
         }
-        {% for i_shot_asset, i_location in shot_assets.iteritems() -%}
+        {% for i_shot_asset, i_location in shot.shot_asset_main.iteritems() -%}
         "{{ i_shot_asset }}" (
             prepend references = {{ '@%s@<%s>' | format(shot.set_file, i_location) }}
         ) {
             string userProperties:usd:variants:shot_asset:name = "{{ i_shot_asset }}"
+        }
+        {%- endfor %}
+    }
+    variantSet "shot_asset_override" = {
+        "None" {
+        }
+        {% for i_variant_key, i_variant_file in shot.shot_asset_override.iteritems() -%}
+        "{{ i_variant_key }}" (
+            prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
+        ) {
+            string userProperties:usd:variants:shot_asset:name:override = "{{ i_variant_key }}"
         }
         {%- endfor %}
     }

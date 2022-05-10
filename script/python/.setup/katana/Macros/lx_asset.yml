@@ -67,6 +67,12 @@ parameters:
             - 'None'
         tool_tip: '...'
 
+    usd/variants/shot_asset_override:
+        widget: enumerate
+        value:
+            - 'None'
+        tool_tip: '...'
+
     usd/variants/enable:
         widget: boolean
         value: True

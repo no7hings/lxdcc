@@ -141,6 +141,26 @@ class Camera(Shape):
     def get_is_renderable(self):
         return self.get_port('renderable').get()
 
+    def set_display_(self):
+        cmds.camera(
+            self.path,
+            edit=1,
+            displayFilmGate=0,
+            displaySafeAction=0,
+            displaySafeTitle=0,
+            displayFieldChart=0,
+            displayResolution=1,
+            displayGateMask=1,
+            nearClipPlane=0.1,
+            farClipPlane=1000000.0,
+        )
+        cmds.setAttr(
+            self.path + '.displayGateMaskOpacity', 1
+        )
+        cmds.setAttr(
+            self.path + '.displayGateMaskColor', 0, 0, 0, type='double3'
+        )
+
 
 class Light(Shape):
     PORT_CLASS = _mya_dcc_obj_utility.Port

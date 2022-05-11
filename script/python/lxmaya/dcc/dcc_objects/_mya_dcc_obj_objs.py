@@ -13,7 +13,7 @@ from lxutil import utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-from lxmaya import ma_configure
+from lxmaya import ma_configure, ma_core
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
@@ -229,7 +229,8 @@ class AbsFileReferences(object):
                 exists_file_paths = file_.get_exists_file_paths()
                 port.set(exists_file_paths[0])
         # crash error for close
-        # mel.eval('generateUvTilePreview {}'.format(obj.path))
+        if ma_core._get_is_ui_mode_():
+            mel.eval('generateUvTilePreview {}'.format(obj.path))
     @classmethod
     def set_files_value_repair(cls):
         fs = cmds.ls(type='file')

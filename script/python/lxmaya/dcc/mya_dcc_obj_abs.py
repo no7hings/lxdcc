@@ -603,7 +603,7 @@ class AbsMyaObj(
             if cmds.listRelatives(self.path, parent=1):
                 cmds.parent(self.path, world=1)
                 utl_core.Log.set_module_result_trace(
-                    'parent-set',
+                    'parent set',
                     u'obj="{}"'.format(self.PATHSEP)
                 )
         else:
@@ -617,18 +617,18 @@ class AbsMyaObj(
                 cmds.parent(self.path, parent_obj.path)
                 #
                 utl_core.Log.set_module_result_trace(
-                    'parent-set',
+                    'parent set',
                     u'obj="{}"'.format(parent_obj.path)
                 )
             else:
                 utl_core.Log.set_module_warning_trace(
-                    'parent-set',
-                    'obj="{}" is non-changed'.format(parent_obj.path)
+                    'parent set',
+                    u'obj="{}" is non-changed'.format(parent_obj.path)
                 )
         else:
             utl_core.Log.set_module_warning_trace(
-                'parent-set',
-                'obj="{}" is non-exists'.format(parent_obj.path)
+                'parent set',
+                u'obj="{}" is non-exists'.format(parent_obj.path)
             )
 
     def get_dcc_instance(self, obj_type, obj_path=None, *args, **kwargs):

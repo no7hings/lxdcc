@@ -244,6 +244,8 @@ asset-katana-scene-src-file: <asset-katana-scene-src-dir>/<asset-name>.katana
 asset-light-dir: <asset-version-dir>/light
 asset-light-live_group-file: <asset-light-dir>/<asset-name>.livegroup
 #
+asset-light-ass-file: <asset-version-dir>/ass/<asset-name>.ass
+#
 asset-nuke-scene-src-dir: <asset-version-dir>/scene
 asset-nuke-scene-src-file: <asset-nuke-scene-src-dir>/<asset-name>.nk
 #
@@ -298,6 +300,7 @@ asset-geometry-xgen-glow-dir: <asset-version-dir>/maya
 asset-geometry-xgen-grow-mesh-file: <asset-version-dir>/maya/<asset-name>__<xgen-name>.abc
 #
 asset-geometry-xgen-collection-dir: <asset-version-dir>/cache/xgen/collections
+asset-geometry-xgen-data-dir: <asset-geometry-xgen-collection-dir>/<xgen-name>
 #
 asset-xgen-usd-dir: <asset-version-dir>/cache/usd
 asset-xgen-usd-file: <asset-xgen-usd-dir>/xgen.usda

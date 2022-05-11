@@ -1,12 +1,12 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
-from maya import cmds
+from maya import cmds, mel
 
 import copy
 
 import os
 
-from lxmaya import ma_configure
+from lxmaya import ma_configure, ma_core
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
@@ -265,55 +265,109 @@ class GeometryAbcImporter(utl_fnc_obj_abs.AbsDccExporter):
         return self._results
 
 
-class GeometryXgenImporter(utl_fnc_obj_abs.AbsDccExporter):
+class GeometryXgenImporter(
+    utl_fnc_obj_abs.AbsFncOptionMethod,
+    utl_fnc_obj_abs.AbsDotXgenDef
+):
     OPTION = dict(
+        xgen_collection_file='',
+        xgen_collection_directory='',
+        xgen_location='',
+        #
+        grow_file='',
+        grow_location='',
+        #
         namespace=':',
     )
     PLUG_NAME = 'xgenToolkit'
-    def __init__(self, file_path, root=None, option=None):
-        super(GeometryXgenImporter, self).__init__(file_path, root, option)
-
-        self._grow_mesh_paths = []
-
-    def set_glow_import(self, file_path, root):
-        if isinstance(file_path, (str, unicode)):
-            file_paths = [file_path]
+    def __init__(self, option=None):
+        super(GeometryXgenImporter, self).__init__(option)
+    @classmethod
+    def set_glow_import(cls, grow_file, grow_location):
+        if isinstance(grow_file, (str, unicode)):
+            file_paths = [grow_file]
         else:
-            file_paths = file_path
+            file_paths = grow_file
         #
         for i_file_path in file_paths:
             results = GeometryAbcImporter(
                 file_path=i_file_path,
-                root=root,
+                root=grow_location,
                 option=dict(
                     namespace=':',
                     hidden=True
                 )
             ).set_run()
             if results:
-                self._grow_mesh_paths.append(results[-1])
+                utl_core.Log.set_module_result_trace(
+                    'xgen glow import',
+                    u'result="{}"'.format(','.join(results))
+                )
     @classmethod
-    def set_import(cls, file_path):
+    def set_xgen_import(cls, xgen_collection_file, xgen_collection_directory, xgen_location):
         # noinspection PyUnresolvedReferences
         import xgenm as xg
+        # noinspection PyUnresolvedReferences
+        import xgenm.xgGlobal as xgg
         #
-        if isinstance(file_path, (str, unicode)):
-            file_paths = [file_path]
+        group = mya_dcc_objects.Group(
+            bsc_core.DccPathDagOpt(xgen_location).set_translate_to('|').get_value()
+        )
+        group.set_dag_components_create()
+        #
+        if isinstance(xgen_collection_file, (str, unicode)):
+            file_paths = [xgen_collection_file]
         else:
-            file_paths = file_path
+            file_paths = xgen_collection_file
         #
         namespace = ''
         for i_file_path in file_paths:
-            _col_name = xg.importPalette(
+            i_xgen_collection_name = xg.importPalette(
                 str(i_file_path),
                 [],
                 namespace
             )
+            i_xgen_collection_data_directory = '{}/{}'.format(
+                xgen_collection_directory, i_xgen_collection_name
+            )
+            cmds.xgmSetAttr(
+                attribute='xgDataPath',
+                object=i_xgen_collection_name,
+                palette=i_xgen_collection_name,
+                value=i_xgen_collection_data_directory,
+            )
+            for i_xgen_guide in mya_dcc_objects.Group(
+                bsc_core.DccPathDagOpt(xgen_location).set_translate_to('|').value
+            ).get_all_paths(include_obj_type=['xgmSplineGuide']):
+                mya_dcc_objects.Node(i_xgen_guide).set('width', .01)
+            #
+            if ma_core._get_is_ui_mode_() is True:
+                mel.eval('XgCreateDescriptionEditor;')
+                de = xgg.DescriptionEditor
+                de.clearCacheAction.setChecked(True)
+                de.updateClearControls()
+                de.previewAutoAction.setChecked(False)
 
     def set_run(self):
         cmds.loadPlugin(self.PLUG_NAME, quiet=1)
+        xgen_collection_file = self.get('xgen_collection_file')
+        xgen_collection_directory = self.get('xgen_collection_directory')
+        xgen_location = self.get('xgen_location')
         #
-        self.set_import(self._file_path)
+        grow_file = self.get('grow_file')
+        grow_location = self.get('grow_location')
+        if grow_file:
+            self.set_glow_import(
+                grow_file,
+                grow_location,
+            )
+        #
+        if xgen_collection_file:
+            self.set_xgen_import(
+                xgen_collection_file,
+                xgen_collection_directory,
+                xgen_location
+            )
 
 
 class DatabaseGeometryImporter(object):
@@ -322,9 +376,9 @@ class DatabaseGeometryImporter(object):
 
     def _set_uv_map_export_import_(self):
         if self._selected_path:
-            gp = utl_core.GuiProgressesRunner(maximum=len(self._selected_path))
+            g_p = utl_core.GuiProgressesRunner(maximum=len(self._selected_path))
             for path in self._selected_path:
-                gp.set_update()
+                g_p.set_update()
                 mesh = mya_dcc_objects.Mesh(path)
                 mesh_opt = mya_dcc_operators.MeshOpt(mesh)
                 if mesh_opt.get_shell_count() == 1:
@@ -332,7 +386,7 @@ class DatabaseGeometryImporter(object):
                     uv_maps = bsc_core.DatabaseGeometryUvMapMtd.get_value(key)
                     mesh_opt.set_uv_maps(uv_maps, clear=True)
             #
-            gp.set_stop()
+            g_p.set_stop()
 
     def set_run(self):
         self._set_uv_map_export_import_()

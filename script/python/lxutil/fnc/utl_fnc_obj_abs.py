@@ -1,6 +1,10 @@
 # coding:utf-8
 import copy
 
+import os
+
+import glob
+
 from lxbasic import bsc_core
 
 import lxobj.core_objects as core_objects
@@ -10,6 +14,10 @@ import lxresolver.commands as rsv_commands
 import lxresolver.operators as rsv_operators
 
 from lxutil import utl_configure, utl_core
+
+import lxutil.objects as utl_objects
+
+import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 import lxbasic.objects as bsc_objects
 
@@ -605,3 +613,76 @@ class AbsFncOptionMethod(object):
 
     def get(self, key):
         return self._option.get(key)
+
+
+class AbsDotXgenDef(object):
+    @classmethod
+    def _get_xgen_collection_file_paths_(cls, maya_scene_file_path):
+        d = os.path.splitext(maya_scene_file_path)[0]
+        glob_pattern = '{}__*.xgen'.format(d)
+        return glob.glob(glob_pattern) or []
+    @classmethod
+    def _get_xgen_collection_names_(cls, maya_scene_file_path):
+        file_paths = cls._get_xgen_collection_file_paths_(maya_scene_file_path)
+        return [cls._get_xgen_collection_name_(i) for i in file_paths]
+    @classmethod
+    def _get_xgen_collection_name_(cls, xgen_collection_file_path):
+        """
+        :param xgen_collection_file_path: str()
+        :return:
+        """
+        file_opt = bsc_core.StorageFileOpt(xgen_collection_file_path)
+        file_name_base = file_opt.name_base
+        return file_name_base.split('__')[-1]
+    @classmethod
+    def _set_xgen_collection_files_copy_(cls, file_path_src, file_path_tgt):
+        file_paths_src = cls._get_xgen_collection_file_paths_(file_path_src)
+        file_opt_tgt = bsc_core.StorageFileOpt(file_path_tgt)
+        file_name_base_tgt = file_opt_tgt.name_base
+        file_directory_path_tgt = file_opt_tgt.directory_path
+        replace_list = []
+        #
+        for i_file_path_src in file_paths_src:
+            i_file_opt_src = bsc_core.StorageFileOpt(i_file_path_src)
+            i_file_name_src = i_file_opt_src.name
+            i_xgen_collection_name = cls._get_xgen_collection_name_(i_file_path_src)
+            i_file_name_tgt = '{}__{}.xgen'.format(file_name_base_tgt, i_xgen_collection_name)
+            i_xgen_collection_file_path_tgt = '{}/{}'.format(file_directory_path_tgt, i_file_name_tgt)
+            utl_dcc_objects.OsFile(i_file_path_src).set_copy_to_file(i_xgen_collection_file_path_tgt)
+            #
+            cls._set_xgen_collection_file_repair_(i_xgen_collection_file_path_tgt)
+            #
+            replace_list.append(
+                (i_file_name_src, i_file_name_tgt)
+            )
+        #
+        if replace_list:
+            if os.path.isfile(file_path_tgt):
+                with open(file_path_tgt) as f_r:
+                    d = f_r.read()
+                    for i in replace_list:
+                        s, t = i
+                        d = d.replace(
+                            r'setAttr ".xfn" -type "string" "{}";'.format(s),
+                            r'setAttr ".xfn" -type "string" "{}";'.format(t)
+                        )
+                        d = d.replace(
+                            r'"xgFileName" " -type \"string\" \"{}\""'.format(s),
+                            r'"xgFileName" " -type \"string\" \"{}\""'.format(t)
+                        )
+                    with open(file_path_tgt, 'w') as f_w:
+                        f_w.write(d)
+    @classmethod
+    def _set_xgen_collection_file_repath_(cls, xgen_collection_file_path, xgen_project_directory_path, xgen_collection_directory_path, xgen_collection_name):
+        dot_xgen_file_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
+        dot_xgen_file_reader.set_project_directory_repath(xgen_project_directory_path)
+        dot_xgen_file_reader.set_collection_directory_repath(
+            xgen_collection_directory_path, xgen_collection_name
+        )
+        #
+        dot_xgen_file_reader.set_save()
+    @classmethod
+    def _set_xgen_collection_file_repair_(cls, xgen_collection_file_path):
+        i_dot_xgen_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
+        i_dot_xgen_reader.set_repair()
+        i_dot_xgen_reader.set_save()

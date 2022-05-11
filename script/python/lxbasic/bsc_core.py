@@ -944,6 +944,22 @@ class DatabaseMtd(object):
             return True
 
 
+class TemporaryMtd(object):
+    ROOT = '/l/temp'
+    @classmethod
+    def get_user_directory(cls, tag):
+        return StoragePathMtd.set_map_to_platform(
+            u'{root}/temporary/{tag}/{date_tag}-{user}'.format(
+                **dict(
+                    root=cls.ROOT,
+                    date_tag=SystemMtd.get_date_tag(),
+                    user=SystemMtd.get_user_name(),
+                    tag=tag
+                )
+            )
+        )
+
+
 class DatabaseGeometryUvMapMtd(object):
     @classmethod
     def get_value(cls, key):
@@ -2118,7 +2134,7 @@ class TextOpt(object):
         texts = [i.strip() for i in s.split(',')]
         for i in texts:
             if '-' in i:
-                i_start_frame, i_end_frame = [j.strip() for j in i.split('-')]
+                i_start_frame, i_end_frame = [j.strip() for j in i.split('-')][:2]
                 lis.extend(list(range(int(i_start_frame), int(i_end_frame)+1)))
             else:
                 lis.append(int(i))
@@ -3401,4 +3417,4 @@ class TimeMtd(object):
 
 
 if __name__ == '__main__':
-    print '{}-{}'.format(*(1001.0, 1240.0))
+    print TextOpt('1001-1001').to_frames()

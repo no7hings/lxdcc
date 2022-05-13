@@ -580,7 +580,11 @@ class StoragePathOpt(object):
         return os.stat(self._path).st_atime
 
     def get_is_same_timestamp_to(self, file_path):
-        return str(self.get_modify_timestamp()) == str(self.__class__(file_path).get_modify_timestamp())
+        if file_path is not None:
+            if self.get_is_exists() is True and self.__class__(file_path).get_is_exists() is True:
+                return str(self.get_modify_timestamp()) == str(self.__class__(file_path).get_modify_timestamp())
+            return False
+        return False
 
     def __str__(self):
         return self._path
@@ -801,6 +805,12 @@ class EnvironMtd(object):
             cls.set(cls.TD_ENABLE_KEY, cls.TRUE)
         else:
             cls.set(cls.TD_ENABLE_KEY, cls.FALSE)
+    @classmethod
+    def get_rez_beta(cls):
+        _ = cls.get('REZ_BETA')
+        if _ == '1':
+            return True
+        return False
     @classmethod
     def get_temporary_root(cls):
         _ = cls.get(cls.TEMPORARY_ROOT_KEY)
@@ -1433,6 +1443,10 @@ class StorageFileOpt(StoragePathOpt):
                     f.close()
                     return raw
 
+    def set_directory_create(self):
+        StoragePathMtd.set_directory_create(
+            self.get_directory_path()
+        )
 
 class GzipStorageFileOpt(StorageFileOpt):
     def __init__(self, *args, **kwargs):

@@ -372,7 +372,8 @@ class DialogWindow(object):
         use_as_warning=False,
         show=True,
         use_exec=True,
-        options_configure=None
+        options_configure=None,
+        use_thread=True
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
@@ -381,6 +382,7 @@ class DialogWindow(object):
         else:
             w = prx_widgets.PrxDialogWindow0()
         #
+        w.set_use_thread(use_thread)
         w.set_window_title(label)
         w.set_content(content)
         w.set_content_font_size(content_text_size)
@@ -1514,6 +1516,20 @@ class KatanaLauncher(object):
             cmd
         )
 
+    def set_file_new(self, file_path):
+        from lxkatana import ktn_configure
+        create_args = [
+            '-c'
+            '"katana --script={} \"set_scene_new\" \"{}\""'.format(
+                ktn_configure.Data.SCRIPT_FILE, file_path
+            )
+        ]
+        cmd = ' '.join(create_args)
+        AppLauncher(**self._kwargs).set_cmd_run_with_result(
+            cmd
+        )
+        self.set_file_open(file_path)
+
 
 class UsdViewLauncher(object):
     def __init__(self, **kwargs):
@@ -1941,3 +1957,9 @@ class Resources(object):
                     i_glob_pattern
                 )
                 return i_results
+
+
+if __name__ == '__main__':
+    KatanaLauncher(project='cgm').set_file_new(
+        '/l/prod/cgm/work/assets/prp/car_b/mod/modeling/katana/car_b.mod.modeling.v001.katana'
+    )

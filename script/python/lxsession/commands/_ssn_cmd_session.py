@@ -3,7 +3,6 @@
 def set_session_option_hooks_execute_by_deadline(session):
     """
     execute contain option-hooks by deadline
-
     :param session: <instance of session>
     :return: None
     """

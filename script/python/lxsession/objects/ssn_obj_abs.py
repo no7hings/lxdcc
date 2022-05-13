@@ -49,9 +49,12 @@ class AbsSsnGuiDef(object):
 class AbsSsnRezDef(object):
     def _set_rez_def_init_(self):
         self._rez_beta = bsc_core.EnvironMtd.get('REZ_BETA')
-
-    def get_rez_beta(self):
-        return self._rez_beta
+    @classmethod
+    def get_td_enable(cls):
+        return bsc_core.EnvironMtd.get_td_enable()
+    @classmethod
+    def get_rez_beta(cls):
+        return bsc_core.EnvironMtd.get_rez_beta()
 
 
 class AbsSsnObj(
@@ -117,6 +120,10 @@ class AbsSsnObj(
     def get_name(self):
         return self._name
     name = property(get_name)
+
+    def get_hook(self):
+        return self._hook
+    hook = property(get_hook)
 
     def get_group(self):
         pass
@@ -186,8 +193,18 @@ class AbsSsnObj(
         #     exec (f.read())
         #
         # use for python 2
+        utl_core.Log.set_module_result_trace(
+            'option-hook execute', 'file="{}" is started'.format(
+                file_path
+            )
+        )
         kwargs['__name__'] = '__main__'
         execfile(file_path, kwargs)
+        utl_core.Log.set_module_result_trace(
+            'option-hook execute', 'file="{}" is completed'.format(
+                file_path
+            )
+        )
 
     def get_is_system_matched(self, system_key):
         return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
@@ -240,9 +257,6 @@ class AbsSsnObj(
         return self._configure.get(
             'hook_option.engine'
         )
-
-    def get_hook(self):
-        return self._hook
 
     def get_rez_extend_packages(self):
         return self._configure.get(
@@ -455,11 +469,30 @@ class AbsSsnGui(
         super(AbsSsnGui, self).__init__(*args, **kwargs)
 
 
-class AbsSsnOptionDef(object):
+class AbsSsnOptionObj(AbsSsnObj):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnOptionObj, self).__init__(*args, **kwargs)
+        self._set_option_def_init_(kwargs['option'])
+
     def _set_option_def_init_(self, option):
         self._option_opt = bsc_core.KeywordArgumentsOpt(
             option
         )
+        self.__set_option_completion_by_script_()
+
+    def __set_option_completion_by_script_(self):
+        option_opt = self.get_option_opt()
+        #
+        # inherit_keys = option_opt.get('inherit_keys')
+        script_dict = self.configure.get('hook_option.script') or {}
+        for k, v in script_dict.items():
+            if option_opt.get_key_is_exists(k) is False:
+                if isinstance(v, dict):
+                    pass
+                else:
+                    option_opt.set(
+                        k, v
+                    )
 
     def get_option_opt(self):
         return self._option_opt
@@ -469,14 +502,49 @@ class AbsSsnOptionDef(object):
         return self._option_opt.to_string()
     option = property(get_option)
 
+    def get_extra_hook_options(self):
+        lis = []
+        script_dict = self.configure.get('hook_option.script') or {}
+        extra_dict = self.configure.get('hook_option.extra') or {}
+        for k, v in extra_dict.items():
+            i_script_dict = v['script']
+            i_dict = {}
+            for i_k, i_v in script_dict.items():
+                if i_k in i_script_dict:
+                    i_dict[i_k] = i_script_dict[i_k]
+                else:
+                    i_dict[i_k] = [i_v]
+            #
+            i_hook_option_opt = bsc_core.KeywordArgumentsOpt(v['script'])
+            i_hook_option_opt.set(
+                'option_hook_key', self.option_opt.get('option_hook_key')
+            )
+            lis.append(
+                i_hook_option_opt.to_string()
+            )
+        return lis
+
+    def __str__(self):
+        return '{}(type="{}", hook={}, option="{}")'.format(
+            self.__class__.__name__,
+            self.type,
+            self.hook,
+            self.option
+        )
+
 
 class AbsSsnOptionAction(
-    AbsSsnObj,
-    AbsSsnOptionDef
+    AbsSsnOptionObj
 ):
     def __init__(self, *args, **kwargs):
-        self._set_option_def_init_(kwargs.pop('option'))
         super(AbsSsnOptionAction, self).__init__(*args, **kwargs)
+
+
+class AbsSsnOptionLauncher(
+    AbsSsnOptionObj
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnOptionLauncher, self).__init__(*args, **kwargs)
 
 
 class AbsSsnShellExecuteDef(object):
@@ -512,12 +580,10 @@ class AbsSsnShellExecuteDef(object):
 
 
 class AbsSsnOptionToolPanel(
-    AbsSsnObj,
-    AbsSsnOptionDef,
+    AbsSsnOptionObj,
     AbsSsnShellExecuteDef
 ):
     def __init__(self, *args, **kwargs):
-        self._set_option_def_init_(kwargs.pop('option'))
         super(AbsSsnOptionToolPanel, self).__init__(*args, **kwargs)
         #
         self._set_shell_execute_def_init_(self._configure)
@@ -525,17 +591,13 @@ class AbsSsnOptionToolPanel(
 
 # session for deadline job
 class AbsOptionMethodSession(
-    AbsSsnObj,
-    AbsSsnOptionDef,
+    AbsSsnOptionObj,
     AbsSsnRsvOptionExecuteDef
 ):
     def __init__(self, *args, **kwargs):
-        self._set_option_def_init_(kwargs.pop('option'))
-        #
         super(AbsOptionMethodSession, self).__init__(*args, **kwargs)
         #
         self.__set_option_completion_()
-        self.__set_option_completion_by_script_()
         #
         self._set_hook_execute_def_init_(
             self._configure.get_content('hook_option.deadline')
@@ -551,34 +613,11 @@ class AbsOptionMethodSession(
         if rez_extend_packages:
             option_opt.set('rez_extend_packages', rez_extend_packages)
 
-    def __set_option_completion_by_script_(self):
-        option_opt = self.get_option_opt()
-        #
-        # inherit_keys = option_opt.get('inherit_keys')
-        script_kwargs = self._configure.get('hook_option.script') or {}
-        for k, v in script_kwargs.items():
-            if option_opt.get_key_is_exists(k) is False:
-                if isinstance(v, dict):
-                    pass
-                else:
-                    option_opt.set(
-                        # etc: asset-{application}-publish
-                        k, v
-                    )
-
-    def get_option_opt(self):
-        return self._option_opt
-    option_opt = property(get_option_opt)
-
-    def get_option(self):
-        return self._option_opt.to_string()
-    option = property(get_option)
-
     def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
         return
 
 
-class AbsSsnResolverDef(object):
+class AbsSsnRsvDef(object):
     def _set_rsv_def_init_(self):
         self._resolver = rsv_commands.get_resolver()
 
@@ -590,7 +629,7 @@ class AbsSsnResolverDef(object):
 # session for rsv task deadline job
 class AbsOptionRsvTaskMethodSession(
     AbsOptionMethodSession,
-    AbsSsnResolverDef
+    AbsSsnRsvDef
 ):
     def __init__(self, *args, **kwargs):
         super(AbsOptionRsvTaskMethodSession, self).__init__(*args, **kwargs)

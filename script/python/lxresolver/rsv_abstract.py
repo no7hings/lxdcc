@@ -2394,6 +2394,10 @@ class AbsRsvProject(
             'project': 'project-dir'
         }
 
+    def set_gui_restore(self):
+        for i in self._rsv_obj_stack.get_objects():
+            i.set_obj_gui(None)
+
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
             self.__class__.__name__,

@@ -3,6 +3,8 @@ from lxutil.rsv import utl_rsv_obj_abstract
 
 from lxbasic import bsc_core
 
+from lxutil import utl_core
+
 from lxmaya import ma_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -11,39 +13,63 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.fnc.exporters as mya_fnc_exporters
 
+import lxmaya.fnc.builders as mya_fnc_builders
+
 
 class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_scene_export(self):
+        key = 'asset scene export'
         workspace = self._rsv_scene_properties.get('workspace')
+        step = self._rsv_scene_properties.get('step')
         version = self._rsv_scene_properties.get('version')
         root = self._rsv_scene_properties.get('dcc.root')
+        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
         #
-        if workspace == 'publish':
-            keyword_0 = 'asset-maya-scene-file'
-        elif workspace == 'output':
-            keyword_0 = 'asset-output-maya-scene-file'
+        if step in ['cam']:
+            location = '/camera_grp'
         else:
-            raise TypeError()
+            location = root
         #
-        maya_scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword_0
+        mya_location = bsc_core.DccPathDagOpt(location).set_translate_to(
+            pathsep=pathsep
+        ).to_string()
+        mya_group = mya_dcc_objects.Group(
+            mya_location
         )
-        maya_scene_file_path = maya_scene_file_rsv_unit.get_result(version=version)
-        mya_fnc_exporters.SceneExporter(
-            option=dict(
-                file=maya_scene_file_path,
-                location=root,
-                #
-                with_xgen_collection=True,
-                with_set=True,
-                #
-                ext_extras=self._hook_option_opt.get('ext_extras', as_array=True)
+        if mya_group.get_is_exists() is True:
+            if workspace == 'publish':
+                keyword_0 = 'asset-maya-scene-file'
+            elif workspace == 'output':
+                keyword_0 = 'asset-output-maya-scene-file'
+            else:
+                raise TypeError()
+            #
+            maya_scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                keyword=keyword_0
             )
-        ).set_run()
-        return maya_scene_file_path
+            maya_scene_file_path = maya_scene_file_rsv_unit.get_result(version=version)
+            mya_fnc_exporters.SceneExporter(
+                option=dict(
+                    file=maya_scene_file_path,
+                    location=location,
+                    #
+                    with_xgen_collection=True,
+                    with_set=True,
+                    #
+                    ext_extras=self._hook_option_opt.get('ext_extras', as_array=True)
+                )
+            ).set_run()
+            return maya_scene_file_path
+        else:
+            raise RuntimeError(
+                utl_core.Log.set_module_error_trace(
+                    key,
+                    u'obj="{}" is non-exists'.format(mya_group.path)
+                )
+            )
 
     def set_asset_root_property_refresh(self):
         task = self._rsv_scene_properties.get('task')
@@ -61,6 +87,79 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 'pg_{}_version'.format(task),
                 version
             )
+
+    def set_asset_camera_scene_src_create(self):
+        project = self._rsv_scene_properties.get('project')
+        asset = self._rsv_scene_properties.get('asset')
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        root = self._rsv_scene_properties.get('dcc.root')
+        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        #
+        if workspace == 'publish':
+            keyword_0 = 'asset-maya-scene-src-file'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-maya-scene-src-file'
+        else:
+            raise TypeError()
+        #
+        orig_file_path = '/l/resource/td/asset/maya/asset-camera.ma'
+        orig_file_path = bsc_core.StoragePathMtd.set_map_to_platform(orig_file_path)
+
+        maya_scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        maya_scene_src_file_path = maya_scene_src_file_rsv_unit.get_result(version=version)
+        orig_file = utl_dcc_objects.OsFile(orig_file_path)
+        if orig_file.get_is_exists() is True:
+            orig_file.set_copy_to_file(maya_scene_src_file_path, force=True)
+            #
+            maya_scene_src_file = utl_dcc_objects.OsFile(maya_scene_src_file_path)
+            if maya_scene_src_file.get_is_exists() is True:
+                mya_dcc_objects.Scene.set_file_open(maya_scene_src_file_path)
+                camera_location = '/camera_grp'
+                mya_camera_location = bsc_core.DccPathDagOpt(camera_location).set_translate_to(pathsep).to_string()
+                mya_camera_group = mya_dcc_objects.Group(mya_camera_location)
+                if mya_camera_group.get_is_exists() is True:
+                    mya_fnc_builders.AssetBuilder(
+                        option=dict(
+                            project=project,
+                            asset=asset,
+                            #
+                            with_model_geometry=True,
+                            render_resolution=(2048, 2048),
+                        )
+                    ).set_run()
+                    mya_root = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
+                    mya_group = mya_dcc_objects.Group(mya_root)
+                    if mya_group.get_is_exists() is True:
+                        mya_dcc_objects.Scene.set_current_frame(4)
+                        for i in mya_camera_group.get_all_shape_paths(include_obj_type=['camera']):
+                            i_camera = mya_dcc_objects.Camera(i)
+                            i_camera.set_display_()
+                            i_camera.set_frame_to(
+                                mya_group.path,
+                                percent=.5
+                            )
+                    else:
+                        raise RuntimeError(
+                            utl_core.Log.set_module_error_trace(
+                                'camera scene create',
+                                u'obj="{}" is non-exists'.format(mya_root)
+                            )
+                        )
+                else:
+                    raise RuntimeError(
+                        utl_core.Log.set_module_error_trace(
+                            'camera scene create',
+                            u'obj="{}" is non-exists'.format(mya_camera_location)
+                        )
+                    )
+                mya_dcc_objects.Scene.set_file_save()
+            else:
+                raise RuntimeError()
+        else:
+            raise RuntimeError()
 
 
 class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):

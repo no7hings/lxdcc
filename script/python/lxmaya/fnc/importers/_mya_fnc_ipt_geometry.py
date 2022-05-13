@@ -58,7 +58,7 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
             if root_override is not None:
                 self._set_path_create_(root_override)
             #
-            l_p = utl_core.LogProgressRunner(maximum=c, label='geometry-usd-import')
+            l_p = utl_core.LogProgressRunner(maximum=c, label='usd import')
             for i_usd_prim in self._usd_stage.TraverseAll():
                 l_p.set_update()
                 #

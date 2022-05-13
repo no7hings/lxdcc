@@ -5,4 +5,7 @@ from ._mya_rsv_obj_texture import *
 
 from ._mya_rsv_obj_geometry import *
 
+from ._mya_rsv_obj_camera import *
+
+
 

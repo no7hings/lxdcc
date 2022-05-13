@@ -6,6 +6,8 @@ class Data(object):
     ROOT = os.path.dirname(__file__.replace('\\', '/'))
     LOOK_KATANA_WORKSPACE_CONFIGURE_PATH = '{}/.data/look-katana-workspace-configure.yml'.format(ROOT)
 
+    SCRIPT_FILE = '{}/ktn_script.py'.format(ROOT)
+
 
 class Util(object):
     OBJ_PATHSEP = '/'

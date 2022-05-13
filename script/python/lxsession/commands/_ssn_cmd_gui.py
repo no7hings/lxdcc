@@ -10,9 +10,9 @@ def get_menu_content_by_hook_options(hook_options):
 
     content = bsc_objects.Dict()
     for i_hook_option in hook_options:
-        i_args = _ssn_cmd_hook.get_option_hook_args(i_hook_option)
-        if i_args:
-            i_session, i_execute_fnc = i_args
+        i_hook_args = _ssn_cmd_hook.get_option_hook_args(i_hook_option)
+        if i_hook_args:
+            i_session, i_execute_fnc = i_hook_args
             if i_session.get_is_loadable() is True:
                 i_hook_option_opt = i_session.option_opt
                 i_gui_configure = i_session.gui_configure
@@ -95,9 +95,9 @@ def get_menu_content_by_hooks(hooks):
         else:
             raise RuntimeError()
         #
-        i_args = _ssn_cmd_hook.get_hook_args(i_hook_key)
-        if i_args:
-            i_session, i_execute_fnc = i_args
+        i_hook_args = _ssn_cmd_hook.get_hook_args(i_hook_key)
+        if i_hook_args:
+            i_session, i_execute_fnc = i_hook_args
             if i_session.get_is_loadable() is True:
                 i_gui_configure = i_session.gui_configure
                 #

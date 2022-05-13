@@ -62,7 +62,7 @@ class StgObjQuery(object):
             {key: value}
         )
         utl_core.Log.set_module_result_trace(
-            'shotgun entity property set',
+            'shotgun property set',
             'type="{}", id="{}", property="{}"'.format(
                 self.type,
                 self.id,

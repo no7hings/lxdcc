@@ -37,28 +37,15 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         rsv_asset = self._get_rsv_asset_auto_()
         if rsv_asset is not None:
-            role = rsv_asset.get('role')
-            if role in ['chr']:
-                ktn_core.VariablesSetting().set_register_by_configure(
-                    {
-                        'layer': ['master', 'no_hair'],
-                        'quality': ['low', 'med', 'hi', 'custom'],
-                        'camera': ['full_body', 'upper_body', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
-                        'light_pass': ['all'],
-                        'look_pass': ['default', 'plastic', 'ambocc', 'wire', 'white'],
-                        'variables_enable': ['on', 'off']
-                    }
-                )
-            else:
-                ktn_core.VariablesSetting().set_register_by_configure(
-                    {
-                        'layer': ['master'],
-                        'quality': ['low', 'med', 'hi', 'custom'],
-                        'camera': ['full', 'half', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
-                        'light_pass': ['all'],
-                        'look_pass': ['default', 'plastic', 'ambocc', 'wire', 'white'],
-                        'variables_enable': ['on', 'off']
-                    }
-                )
+            ktn_core.VariablesSetting().set_register_by_configure(
+                {
+                    'layer': ['master', 'no_hair'],
+                    'quality': ['low', 'med', 'hi', 'custom'],
+                    'camera': ['full_body', 'upper_body', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
+                    'light_pass': ['all'],
+                    'look_pass': ['default', 'plastic', 'ambocc', 'wire', 'white'],
+                    'variables_enable': ['on', 'off']
+                }
+            )
 
 

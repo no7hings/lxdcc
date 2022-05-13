@@ -666,6 +666,7 @@ workspace:
                         ns_colorg: 0.25
                         ns_colorb: 0.25
                     parameters:
+                        alembic/location: '/root/world/cam/cameras/main'
                         settings/resolution_enable: True
                         settings/frame_offset_enable: True
                         settings/frame_offset: 997.0

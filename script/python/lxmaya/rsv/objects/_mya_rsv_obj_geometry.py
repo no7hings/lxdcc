@@ -33,10 +33,10 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
             pathsep=pathsep
         )
-        mya_root = mya_dcc_objects.Group(
+        mya_group = mya_dcc_objects.Group(
             mya_root_dag_opt.get_value()
         )
-        if mya_root.get_is_exists() is True:
+        if mya_group.get_is_exists() is True:
             if workspace == 'work':
                 keyword = 'asset-work-geometry-usd-var-file'
             elif workspace == 'publish':
@@ -45,7 +45,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 keyword = 'asset-output-geometry-usd-var-file'
             else:
                 raise TypeError()
-            # location_names = [i.name for i in mya_root.get_children()]
+            # location_names = [i.name for i in mya_group.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
             with utl_core.gui_progress(maximum=len(location_names)) as g_p:
@@ -138,10 +138,10 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
             pathsep=pathsep
         )
-        mya_root = mya_dcc_objects.Group(
+        mya_group = mya_dcc_objects.Group(
             mya_root_dag_opt.get_value()
         )
-        if mya_root.get_is_exists() is True:
+        if mya_group.get_is_exists() is True:
             if workspace == 'work':
                 keyword = 'asset-work-geometry-abc-var-file'
             elif workspace == 'publish':
@@ -150,7 +150,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 keyword = 'asset-output-geometry-abc-var-file'
             else:
                 raise TypeError()
-            # location_names = [i.name for i in mya_root.get_children()]
+            # location_names = [i.name for i in mya_group.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
             with utl_core.gui_progress(maximum=len(location_names)) as g_p:

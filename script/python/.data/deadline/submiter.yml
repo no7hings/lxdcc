@@ -48,7 +48,7 @@ output:
         Name: <option.deadline.job_name>
         #
         Frame: "0"
-        Department: <option.extra.application>
+        Department: <option.extra.step>
         ChunkSize: "1"
         Priority: 50
         Pool: <option.deadline.pool>

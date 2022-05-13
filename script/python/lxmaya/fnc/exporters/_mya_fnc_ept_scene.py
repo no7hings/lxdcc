@@ -72,7 +72,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_set = mya_dcc_objects.Set(i)
                     if i_set.get_elements_match('|master|*'):
                         utl_core.Log.set_module_result_trace(
-                            'maya-scene export',
+                            'maya scene export',
                             u'set="{}" is add to export'.format(i_set.path)
                         )
                         cmds.select(i_set.path, noExpand=True, add=True)
@@ -103,7 +103,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         if self._results:
             for i in self._results:
                 utl_core.Log.set_module_result_trace(
-                    'maya-scene export',
+                    'maya scene export',
                     u'file="{}"'.format(i)
                 )
 

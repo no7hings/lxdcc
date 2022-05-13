@@ -151,7 +151,10 @@ class Camera(Shape):
             displayFieldChart=0,
             displayResolution=1,
             displayGateMask=1,
-            nearClipPlane=0.1,
+            #
+            overscan=1.0,
+            #
+            nearClipPlane=0.01,
             farClipPlane=1000000.0,
         )
         cmds.setAttr(
@@ -159,6 +162,18 @@ class Camera(Shape):
         )
         cmds.setAttr(
             self.path + '.displayGateMaskColor', 0, 0, 0, type='double3'
+        )
+
+    def set_frame_to(self, location, percent=1.0):
+        cmds.viewFit(
+            self.path,
+            [location],
+            fitFactor=percent,
+            animate=0
+        )
+        utl_core.Log.set_module_result_trace(
+            'camera frame to',
+            'camera="{}", obj="{}"'.format(self.path, location)
         )
 
 

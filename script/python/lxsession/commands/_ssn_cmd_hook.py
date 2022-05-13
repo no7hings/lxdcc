@@ -85,18 +85,8 @@ def set_hook_execute(key):
 
 def get_option_hook_args(option):
     def execute_fnc():
-        utl_core.Log.set_module_result_trace(
-            'option-hook execute', 'file="{}" is started'.format(
-                python_file_path
-            )
-        )
         session._set_file_execute_(
             python_file_path, dict(session=session)
-        )
-        utl_core.Log.set_module_result_trace(
-            'option-hook execute', 'file="{}" is completed'.format(
-                python_file_path
-            )
         )
     #
     from lxbasic import bsc_core
@@ -113,11 +103,11 @@ def get_option_hook_args(option):
     #
     option_opt = bsc_core.KeywordArgumentsOpt(option)
     #
-    hook_key = option_opt.get('option_hook_key')
+    option_hook_key = option_opt.get('option_hook_key')
     #
-    yaml_file_path = ssn_core.RscOptionHookFile.get_yaml(hook_key)
+    yaml_file_path = ssn_core.RscOptionHookFile.get_yaml(option_hook_key)
     if yaml_file_path:
-        python_file_path = ssn_core.RscOptionHookFile.get_python(hook_key)
+        python_file_path = ssn_core.RscOptionHookFile.get_python(option_hook_key)
         python_file = utl_dcc_objects.OsPythonFile(python_file_path)
         yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
         if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
@@ -128,42 +118,49 @@ def get_option_hook_args(option):
             if type_name == 'action':
                 session = ssn_objects.OptionActionSession(
                     type=type_name,
-                    hook=hook_key,
+                    hook=option_hook_key,
+                    configure=configure,
+                    option=option_opt.to_string()
+                )
+            elif type_name == 'launcher':
+                session = ssn_objects.OptionLauncherSession(
+                    type=type_name,
+                    hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
             elif type_name == 'tool-panel':
                 session = ssn_objects.OptionToolPanelSession(
                     type=type_name,
-                    hook=hook_key,
+                    hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
             elif type_name == 'method':
                 session = ssn_objects.OptionMethodSession(
                     type=type_name,
-                    hook=hook_key,
+                    hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
             elif type_name == 'rsv-task-method':
                 session = ssn_objects.RsvOptionHookMethodSession(
                     type=type_name,
-                    hook=hook_key,
+                    hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
             elif type_name == 'rsv-task-batcher':
                 session = ssn_objects.RsvOptionHookMethodSession(
                     type=type_name,
-                    hook=hook_key,
+                    hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
             elif type_name == 'kit-panel':
                 session = ssn_objects.OptionGuiSession(
                     type=type_name,
-                    hook=hook_key,
+                    hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
@@ -177,7 +174,7 @@ def get_option_hook_args(option):
         raise RuntimeError(
             utl_core.Log.set_module_error_trace(
                 'option-hook gain',
-                'option-hook key="{}" configue (.yml) is not found'.format(hook_key)
+                'option-hook key="{}" configue (.yml) is not found'.format(option_hook_key)
             )
         )
 

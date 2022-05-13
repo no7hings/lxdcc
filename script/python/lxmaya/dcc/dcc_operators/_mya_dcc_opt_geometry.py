@@ -379,13 +379,13 @@ class MeshOpt(
                 om2_obj.assignUVs(uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_name)
                 #
                 utl_core.Log.set_module_result_trace(
-                    'mesh-uv-map-assign',
+                    'mesh uv-map assign',
                     u'obj="{}"; uv-map-name="{}"'.format(self.obj.path, uv_map_name)
                 )
         except:
             bsc_core.ExceptionMtd.set_print()
             utl_core.Log.set_module_error_trace(
-                'mesh-uv-map-assign',
+                'mesh uv-map assign',
                 'obj="{}"'.format(self.obj.path)
             )
 

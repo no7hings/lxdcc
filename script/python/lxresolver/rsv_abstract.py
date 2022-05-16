@@ -1382,14 +1382,16 @@ class AbsRsvTag(
         )
         return rsv_obj
 
-    def get_rsv_entities(self):
+    def get_rsv_entities(self, **kwargs):
+        kwargs.update(self._rsv_properties.value)
         return self._rsv_project._project__get_rsv_entities_(
-            **self._rsv_properties.value
+            **kwargs
         )
 
-    def get_rsv_steps(self):
+    def get_rsv_steps(self, **kwargs):
+        kwargs.update(self._rsv_properties.value)
         return self._rsv_project._project__get_rsv_steps_(
-            **self._rsv_properties.value
+            **kwargs
         )
 
     def get_rsv_tasks(self, **kwargs):
@@ -2394,7 +2396,7 @@ class AbsRsvProject(
             'project': 'project-dir'
         }
 
-    def set_gui_restore(self):
+    def set_gui_attribute_restore(self):
         for i in self._rsv_obj_stack.get_objects():
             i.set_obj_gui(None)
 
@@ -2436,7 +2438,9 @@ class AbsRsvRoot(
         #
         self._set_patterns_dict_update_(self._raw)
         #
-        pattern = rsv_configure.Data.get_project_configure_path('{project}')
+        pattern = rsv_configure.Data.get_project_configure_path(
+            '{project}'
+        )
         results = MtdBasic._get_stg_paths_by_parse_pattern_(pattern)
         if results:
             for result in results:
@@ -2584,6 +2588,7 @@ class AbsRsvRoot(
     def _resolver__get_rsv_project_by_file_path_(self, file_path):
         rsv_projects = self.get_rsv_projects()
         for i_rsv_project in rsv_projects:
+            i_project = i_rsv_project.get('project')
             for j_platform in rsv_configure.Platform.ALL:
                 j_root = i_rsv_project.get_pattern('project-root-{}-dir'.format(j_platform))
                 j_glob_pattern = '{}/*'.format(j_root)
@@ -2600,9 +2605,11 @@ class AbsRsvRoot(
                     )
                     j_project_rsv_properties = j_rsv_matcher.get_properties_by_result(file_path)
                     if j_project_rsv_properties:
-                        i_rsv_project.properties.set('platform', j_platform)
-                        i_rsv_project.properties.set('root', j_root)
-                        return i_rsv_project
+                        j_project = j_project_rsv_properties.get('project')
+                        if j_project == i_project:
+                            i_rsv_project.properties.set('platform', j_platform)
+                            i_rsv_project.properties.set('root', j_root)
+                            return i_rsv_project
         #
         return self._resolver__get_rsv_project_use_default_(file_path)
     # = rsv_project.get_rsv_entities

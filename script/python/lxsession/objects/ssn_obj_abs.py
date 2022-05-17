@@ -682,7 +682,7 @@ class AbsOptionRsvTaskMethodSession(
         else:
             raise RuntimeError()
 
-    def get_batch_key(self):
+    def get_session_key(self):
         option_opt = self.get_option_opt()
         return bsc_core.SessionYamlMtd.get_key(
             user=option_opt.get('user'),

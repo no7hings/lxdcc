@@ -1,4 +1,6 @@
 # coding:utf-8
+import functools
+
 import re
 
 import os
@@ -47,6 +49,7 @@ class SignalInstance(object):
     def set_emit_send(self, *args, **kwargs):
         if self._methods:
             for i in self._methods:
+                print i
                 i(*args, **kwargs)
             # THREAD_MAXIMUM.acquire()
             # #
@@ -386,6 +389,101 @@ class SubProcess(object):
             self.Status.Failed,
             self.Status.Error,
         ]
+
+
+class GainSignal(object):
+    def __init__(self, *args, **kwargs):
+        self._methods = []
+
+    def set_connect_to(self, method):
+        self._methods.append(method)
+
+    def set_emit_send(self, *args, **kwargs):
+        if self._methods:
+            THREAD_MAXIMUM.acquire()
+            #
+            ts = [threading.Thread(target=i_method, args=args, kwargs=kwargs) for i_method in self._methods]
+            for t in ts:
+                t.start()
+            for t in ts:
+                t.join()
+            #
+            THREAD_MAXIMUM.release()
+
+    def get_methods(self):
+        return self._methods
+
+
+class GainThread(threading.Thread):
+    def __init__(self):
+        super(GainThread, self).__init__()
+        #
+        self.run_started = GainSignal()
+        self.run_finished = GainSignal()
+        #
+        self._fnc = None
+        #
+        self._data = None
+    #
+    def set_fnc_(self, fnc):
+        self._fnc = fnc
+    #
+    def set_data(self, data):
+        self._data = data
+        self.run_finished.set_emit_send()
+    #
+    def get_data(self):
+        return self._data
+    #
+    def run(self):
+        THREAD_MAXIMUM.acquire()
+        self.run_started.set_emit_send()
+        #
+        self.set_data(
+            self._fnc()
+        )
+
+        THREAD_MAXIMUM.release()
+
+
+class GainThreadsRunner(object):
+    def __init__(self):
+        self.run_started = GainSignal()
+        self.run_finished = GainSignal()
+        #
+        self._fncs = []
+        self._results = []
+        self._data = []
+
+    def get_data(self):
+        return self._data
+
+    def set_fnc_add(self, fnc):
+        self._fncs.append(fnc)
+        self._results.append(0)
+
+    def set_result_at(self, thread, index, result):
+        self._results[index] = result
+        self._data.extend(
+            thread.get_data()
+        )
+        if sum(self._results) == len(self._results):
+            self.run_finished.set_emit_send()
+
+    def set_start(self):
+        c = len(self._fncs)
+        self.run_started.set_emit_send()
+        for i in range(c):
+            i_fnc = self._fncs[i]
+            #
+            i_t = GainThread()
+            i_t.set_fnc_(i_fnc)
+            i_t.run_finished.set_connect_to(
+                functools.partial(self.set_result_at, i_t, i, 1)
+            )
+            #
+            i_t.start()
+            i_t.join()
 
 
 if __name__ == '__main__':

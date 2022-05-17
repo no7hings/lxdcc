@@ -238,6 +238,7 @@ class SystemMtd(object):
             target=functools.partial(SubProcessMtd.set_run_with_result, cmd)
         )
         t_0.start()
+        # t_0.join()
     @classmethod
     def set_file_open(cls, path):
         if cls.get_is_windows():
@@ -254,6 +255,7 @@ class SystemMtd(object):
             target=functools.partial(SubProcessMtd.set_run_with_result, cmd)
         )
         t_0.start()
+        # t_0.join()
     @classmethod
     def get_user_directory_path(cls):
         if cls.get_is_windows():
@@ -749,6 +751,7 @@ class DirectoryMtd(object):
                 )
                 threads.append(i_thread)
                 i_thread.start()
+                # i_thread.join()
         #
         [i.join() for i in threads]
 
@@ -1180,6 +1183,7 @@ class SubProcessMtd(object):
             )
         )
         t_0.start()
+        # t_0.join()
 
 
 class MultiProcessMtd(object):
@@ -1405,7 +1409,11 @@ class StorageFileOpt(StoragePathOpt):
     def set_write(self, raw):
         directory = os.path.dirname(self.path)
         if os.path.isdir(directory) is False:
-            os.makedirs(directory)
+            # noinspection PyBroadException
+            try:
+                os.makedirs(directory)
+            except:
+                pass
         if self.ext in ['.json']:
             with open(self.path, 'w') as j:
                 json.dump(
@@ -1447,6 +1455,7 @@ class StorageFileOpt(StoragePathOpt):
         StoragePathMtd.set_directory_create(
             self.get_directory_path()
         )
+
 
 class GzipStorageFileOpt(StorageFileOpt):
     def __init__(self, *args, **kwargs):
@@ -1563,6 +1572,9 @@ class TimestampOpt(object):
             self.TIME_TAG_FORMAT,
             time.localtime(self._timestamp)
         )
+
+    def to_prettify(self):
+        print self._timestamp
 
 
 class TimestampMtd(object):

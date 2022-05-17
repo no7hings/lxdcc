@@ -15,24 +15,16 @@ p = r.get_rsv_project(
 def post_fnc():
     t_e = bsc_core.SystemMtd.get_timestamp()
 
-    print r.get_data()
+    # print p._rsv_obj_stack.get_objects()
     print 'Cost', t_e - t_s
 
 
 t_s = bsc_core.SystemMtd.get_timestamp()
-r = bsc_objects.GainThreadsRunner()
-r.run_finished.set_connect_to(post_fnc)
 for i in p.get_rsv_tags(
     branch='asset'
 ):
-    j_entities = i.get_rsv_entities()
-    for j_entity in j_entities:
-        r.set_fnc_add(
-            j_entity.get_rsv_tasks
-        )
+    i.get_rsv_tasks()
 
-r.set_start()
-# post_fnc()
+post_fnc()
 
-# Cost 0.24870800972
 

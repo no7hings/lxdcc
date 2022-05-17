@@ -538,6 +538,7 @@ class SubProcessRunner(object):
             )
         )
         t_0.start()
+        # t_0.join()
     @classmethod
     def set_run_with_result_use_log(cls):
         pass
@@ -983,7 +984,8 @@ class AppLauncher(object):
     @classmethod
     def _set_run_with_result_use_thread_(cls, *args):
         SubProcessRunner.set_run_with_result_use_thread(
-            ' '.join(['rez-env'] + list(args)), clear_environ=True
+            ' '.join(['rez-env'] + list(args)),
+            clear_environ=True
         )
 
     def get_rez_packages(self):

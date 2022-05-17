@@ -18,7 +18,7 @@ from lxbasic import bsc_configure, bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxutil import utl_configure, utl_core
+from lxutil import utl_core
 
 import lxutil.configures as utl_configures
 

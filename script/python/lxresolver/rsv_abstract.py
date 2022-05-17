@@ -241,9 +241,9 @@ class MtdBasic(object):
         return lis
 
 
-class _Thread(threading.Thread):
+class RsvThread(threading.Thread):
     def __init__(self, fnc, *args, **kwargs):
-        super(_Thread, self).__init__()
+        super(RsvThread, self).__init__()
         self._fnc = fnc
         self._args = args
         self._kwargs = kwargs
@@ -258,7 +258,9 @@ class _Thread(threading.Thread):
     #
     def run(self):
         THREAD_MAXIMUM.acquire()
-        self.set_data(self._fnc(*self._args, **self._kwargs))
+        self.set_data(
+            self._fnc(*self._args, **self._kwargs)
+        )
         THREAD_MAXIMUM.release()
 
 
@@ -1327,9 +1329,10 @@ class AbsRsvEntity(
         if rsv_step is not None:
             return rsv_step.get_rsv_task(**kwargs)
 
-    def get_rsv_steps(self):
+    def get_rsv_steps(self, **kwargs):
+        kwargs.update(self._rsv_properties.value)
         return self._rsv_project._project__get_rsv_steps_(
-            **self._rsv_properties.value
+            **kwargs
         )
 
     def get_rsv_tasks(self, **kwargs):
@@ -1912,6 +1915,7 @@ class AbsRsvProject(
         kwargs_[type_] = name
         #
         obj_path = self._get_rsv_obj_path_(kwargs_)
+        # exists_objs = self._rsv_obj_stack.get_objects(regex=obj_path)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
         variants = self._get_rsv_obj_create_kwargs_(

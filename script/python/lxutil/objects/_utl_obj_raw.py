@@ -97,9 +97,9 @@ class DotAssReader(bsc_obj_abs.AbsFileReader):
             filter_pattern = '*maya_full_name "*"*'
             results = fnmatch.filter(self._lines, filter_pattern)
             if results:
-                for result in results:
+                for i_result in results:
                     p = parse.parse(
-                        parse_pattern, result
+                        parse_pattern, i_result
                     )
                     if p:
                         path = p['geometry_path']
@@ -113,9 +113,9 @@ class DotAssReader(bsc_obj_abs.AbsFileReader):
             filter_pattern = '*filename "*"*'
             results = fnmatch.filter(self._lines, filter_pattern)
             if results:
-                for result in results:
+                for i_result in results:
                     p = parse.parse(
-                        parse_pattern, result
+                        parse_pattern, i_result
                     )
                     if p:
                         self._texture_paths.append(p['texture_path'])

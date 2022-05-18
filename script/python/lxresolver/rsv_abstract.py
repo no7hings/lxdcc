@@ -1027,9 +1027,9 @@ class AbsRsvUnit(
         )
         return rsv_version
 
-    def get_rsv_versions(self):
+    def get_rsv_versions(self, trim=None):
         lis = []
-        results = self.get_result(version='all')
+        results = self.get_result(version='all', trim=trim)
         for i_result in results:
             i_properties = self.get_properties_by_result(i_result)
             i_properties.set('keyword', self.get('keyword'))

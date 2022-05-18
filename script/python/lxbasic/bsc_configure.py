@@ -70,6 +70,16 @@ class Status(enum.IntEnum):
     Error = 8
 
 
+class ShowStatus(enum.IntEnum):
+    Started = 0
+    Loading = 1
+    Waiting = 2
+    Finished = 3
+    Completed = 4
+    Failed = 5
+    Stopped = 6
+
+
 class GuiStatus(enum.IntEnum):
     Normal = 0x20
     Warning = 0x21

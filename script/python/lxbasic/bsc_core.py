@@ -1887,6 +1887,9 @@ class DccPathDagOpt(object):
     def get_ancestor_paths(self):
         return self.get_component_paths()[1:]
 
+    def  get_ancestors(self):
+        return [self.__class__(i) for i in self.get_ancestor_paths()]
+
     def get_parent(self):
         _ = self.get_parent_path()
         if _:
@@ -3443,4 +3446,4 @@ class TimeMtd(object):
 
 
 if __name__ == '__main__':
-    print TextOpt('1001-1001').to_frames()
+    print ColorMtd.rgb2hex(47, 47, 47)

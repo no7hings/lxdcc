@@ -457,22 +457,22 @@ class ExceptionCatcher(object):
                 exc_texts.append(
                     '    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
                 )
-        #
-        if use_window is True:
-            w = cls._get_window_()
             #
-            w.set_status(cls.GuiStatus.Error)
-            w.set_content_add('*'*72)
-            label = '{}'.format(exc_type.__name__)
-            w.set_content_add('traceback:')
-            Log.set_module_error_trace('exception-catch', label)
-            #
-            [w.set_content_add(i) for i in exc_texts]
-            [Log.set_error_trace(i) for i in exc_texts]
-            #
-            w.set_content_add(value)
-            Log.set_error_trace(value)
-            return w
+            if use_window is True:
+                w = cls._get_window_()
+                #
+                w.set_status(cls.GuiStatus.Error)
+                w.set_content_add('*'*72)
+                label = '{}'.format(exc_type.__name__)
+                w.set_content_add('traceback:')
+                Log.set_module_error_trace('exception-catch', label)
+                #
+                [w.set_content_add(i) for i in exc_texts]
+                [Log.set_error_trace(i) for i in exc_texts]
+                #
+                w.set_content_add(value)
+                Log.set_error_trace(value)
+                return w
         else:
             print(u'\n'.join(exc_texts))
             print(value)

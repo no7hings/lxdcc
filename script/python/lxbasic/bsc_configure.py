@@ -68,6 +68,8 @@ class Status(enum.IntEnum):
     Failed = 6
     Stopped = 7
     Error = 8
+    Killed = 9
+    Finished = 10
 
 
 class ShowStatus(enum.IntEnum):

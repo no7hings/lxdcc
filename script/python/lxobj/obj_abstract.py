@@ -1134,11 +1134,23 @@ class AbsObjGuiDef(object):
     def get_gui_attribute(self, key):
         return self._custom_raw.get(key)
 
-    def set_obj_gui(self, obj):
-        self.set_gui_attribute('gui_obj', obj)
+    def set_obj_gui(self, gui):
+        self.set_gui_attribute('gui_obj', gui)
 
     def get_obj_gui(self):
         return self.get_gui_attribute('gui_obj')
+
+    def set_gui_ng_graph_node(self, gui):
+        self.set_gui_attribute('gui_ng_graph_node', gui)
+
+    def get_gui_ng_graph_node(self):
+        return self.get_gui_attribute('gui_ng_graph_node')
+
+    def set_gui_ng_tree_node(self, gui):
+        self.set_gui_attribute('gui_ng_tree_node', gui)
+
+    def get_gui_ng_tree_node(self):
+        return self.get_gui_attribute('gui_ng_tree_node')
 
     def set_gui_menu_raw(self, raw):
         self.set_gui_attribute('gui_menu', raw)
@@ -2970,7 +2982,7 @@ class AbsObjUniverseDef(object):
         :param new_obj: instance(<obj>)
         :return:
         """
-        self._obj_stack.set_obj_override(old_obj, new_obj)
+        self._obj_stack.set_object_override(old_obj, new_obj)
     # noinspection PyMethodMayBeStatic
     def _set_obj_copy_to_(self, source_obj, target_path):
         """
@@ -3096,6 +3108,12 @@ class AbsObjUniverseDef(object):
                 )
         #
         return content
+
+    def get_basic_source_objs(self, objs=None):
+        if isinstance(objs, (tuple, list)):
+            return [i for i in objs if not i.get_target_connections()]
+        else:
+            return [i for i in self.get_objs() if not i.get_target_connections()]
 
 
 class AbsObjUniverse(

@@ -1155,6 +1155,11 @@ class MayaLauncher(object):
             cmd
         )
 
+    def get_rez_packages(self):
+        return AppLauncher(
+            **self._kwargs
+        ).get_rez_packages()
+
 
 class MayaArnoldRenderCommand(object):
     """
@@ -1531,6 +1536,11 @@ class KatanaLauncher(object):
             cmd
         )
         self.set_file_open(file_path)
+
+    def get_rez_packages(self):
+        return AppLauncher(
+            **self._kwargs
+        ).get_rez_packages()
 
 
 class UsdViewLauncher(object):

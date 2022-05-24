@@ -945,6 +945,10 @@ class AbsRsvUnit(
             return results
         return []
 
+    def get_exists_results(self, *args, **kwargs):
+        kwargs['check_exists'] = True
+        return self.get_results(*args, **kwargs)
+
     def get_other_result(self, **kwargs):
         pass
     #
@@ -997,6 +1001,10 @@ class AbsRsvUnit(
             result=file_path
         )
         return file_properties
+
+    def get_properties(self, file_path, override_variants=None):
+        # old method , do not delete or rename
+        return self.get_properties_by_result(file_path, override_variants)
 
     def get_latest_version(self):
         kwargs = copy.copy(self.properties.value)

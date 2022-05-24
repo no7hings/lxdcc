@@ -45,7 +45,7 @@ class RsvUsdAssetSetCreator(object):
         'effects': 'effect',
         'surfacing': 'surface',
     }
-    VARIANTS = {
+    VARIANTS_MAPPER = {
         'modeling': 'variants.asset_version.model',
         'groom': 'variants.asset_version.groom',
         'rigging': 'variants.asset_version.rig',
@@ -61,6 +61,30 @@ class RsvUsdAssetSetCreator(object):
         'animation': 'variants.shot_version.animation',
         #
         'animation_override': 'variants.shot_version_override.animation',
+    }
+    VARIANTS_MAPPER_0 = {
+        'model_main': 'variants.asset_version.model',
+        'groom_main': 'variants.asset_version.groom',
+        'rig_main': 'variants.asset_version.rig',
+        'effect_main': 'variants.asset_version.effect',
+        'surface_main': 'variants.asset_version.surface',
+        #
+        'model_override': 'variants.asset_version_override.model',
+        'groom_override': 'variants.asset_version_override.groom',
+        'rig_override': 'variants.asset_version_override.rig',
+        'effect_override': 'variants.asset_version_override.effect',
+        'surface_override': 'variants.asset_version_override.surface',
+        #
+        'animation': 'variants.shot_version.animation',
+        #
+        'animation_override': 'variants.shot_version_override.animation',
+    }
+    VARIANTS_VERSION_INDEX = {
+        'model_main': -1,
+        'groom_main': -1,
+        'rig_main': 0,
+        'effect_main': -1,
+        'surface_main': -1,
     }
     def __init__(self, rsv_asset):
         self._rsv_asset = rsv_asset
@@ -295,7 +319,7 @@ class RsvUsdAssetSetCreator(object):
         usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
         if usd_file_path:
             usd_variant_dict = usd_prim_opt.get_variant_dict()
-            for i_variant_set_name, i_port_path in cls.VARIANTS.items():
+            for i_variant_set_name, i_port_path in cls.VARIANTS_MAPPER.items():
                 c.set(
                     '{}.port_path'.format(i_variant_set_name),
                     i_port_path
@@ -321,14 +345,22 @@ class RsvUsdAssetSetCreator(object):
                     )
         return c.value
     @classmethod
-    def _get_usd_variant_dict_(cls, rsv_scene_properties, asset_usd_file_path):
+    def _get_usd_variant_dict_(cls, rsv_asset, rsv_scene_properties, asset_usd_file_path):
         c = bsc_objects.Configure(value=collections.OrderedDict())
         cur_step = rsv_scene_properties.get('step')
         cur_key = cls.STEP_MAPPER[cur_step]
         usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
         usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
         usd_variant_dict = usd_prim_opt.get_variant_dict()
-        for i_variant_set_name, i_port_path in cls.VARIANTS.items():
+        asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
+        if asset_set_dress_usd_file_path:
+            variants_mapper = cls.VARIANTS_MAPPER
+            mode = 0
+        else:
+            variants_mapper = cls.VARIANTS_MAPPER_0
+            mode = 1
+        #
+        for i_variant_set_name, i_port_path in variants_mapper.items():
             c.set(
                 '{}.port_path'.format(i_variant_set_name),
                 i_port_path
@@ -351,6 +383,10 @@ class RsvUsdAssetSetCreator(object):
                                 per_key = cls.TASK_MAPPER[i_variant_set_name]
                                 if cur_key == per_key:
                                     i_current_variant_name = 'None'
+                    #
+                    if i_variant_set_name in cls.VARIANTS_VERSION_INDEX:
+                        if i_variant_names:
+                            i_current_variant_name = i_variant_names[cls.VARIANTS_VERSION_INDEX[i_variant_set_name]]
                     #
                     c.set(
                         '{}.variant_name'.format(i_variant_set_name),
@@ -391,7 +427,7 @@ class RsvUsdAssetSetCreator(object):
     def _get_asset_version_main_dict_(cls, cur_rsv_task):
         dict_ = collections.OrderedDict()
         comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
-            keyword='asset-comp-registry-usd-file'
+            keyword='asset-component-registry-usd-file'
         )
         comp_register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
             version='all'
@@ -424,7 +460,16 @@ class RsvUsdAssetSetCreator(object):
                     i_version = i_properties.get('version')
                     dict_[i_version] = i_file_path
         elif cur_workspace == 'publish':
-            pass
+            comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
+                keyword='asset-component-registry-usd-file'
+            )
+            register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
+                version='all'
+            )
+            for i_file_path in register_usd_file_paths:
+                i_properties = comp_register_usd_file_rsv_unit.get_properties_by_result(i_file_path)
+                i_version = i_properties.get('version')
+                dict_[i_version] = i_file_path
         elif cur_workspace == 'output':
             comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
                 keyword='asset-output-component-registry-usd-file'
@@ -441,42 +486,44 @@ class RsvUsdAssetSetCreator(object):
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
         if asset_set_dress_usd_file_path:
-            asset_set_usd_file_path = cls._get_asset_usd_file_path_(
-                rsv_asset,
-                rsv_scene_properties
-            )
-            key = 'usda/asset-set-v002'
+            pass
+        #
+        asset_set_usd_file_path = cls._get_asset_usd_file_path_(
+            rsv_asset,
+            rsv_scene_properties
+        )
+        key = 'usda/asset-set-v002'
 
-            t = utl_configure.Jinja.get_template(
-                key
-            )
+        t = utl_configure.Jinja.get_template(
+            key
+        )
 
-            c = utl_configure.Jinja.get_configure(
-                key
-            )
+        c = utl_configure.Jinja.get_configure(
+            key
+        )
 
-            c.set('file', asset_set_usd_file_path)
-            c.set('asset.project', rsv_asset.get('project'))
-            c.set('asset.role', rsv_asset.get('role'))
-            c.set('asset.name', rsv_asset.get('asset'))
-            #
-            c.set('asset.set_file', asset_set_dress_usd_file_path)
+        c.set('file', asset_set_usd_file_path)
+        c.set('asset.project', rsv_asset.get('project'))
+        c.set('asset.role', rsv_asset.get('role'))
+        c.set('asset.name', rsv_asset.get('asset'))
+        #
+        c.set('asset.set_file', asset_set_dress_usd_file_path)
 
-            cls._set_asset_all_comp_registry_update_(
-                c, rsv_asset, rsv_scene_properties
-            )
+        cls._set_asset_all_comp_registry_update_(
+            c, rsv_asset, rsv_scene_properties
+        )
 
-            c.set_flatten()
-            raw = t.render(
-                c.value
-            )
+        c.set_flatten()
+        raw = t.render(
+            c.value
+        )
 
-            bsc_core.StorageFileOpt(
-                asset_set_usd_file_path
-            ).set_write(
-                raw
-            )
-            return asset_set_usd_file_path
+        bsc_core.StorageFileOpt(
+            asset_set_usd_file_path
+        ).set_write(
+            raw
+        )
+        return asset_set_usd_file_path
     @classmethod
     def _set_asset_shot_usd_file_create_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)

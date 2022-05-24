@@ -378,18 +378,18 @@ usds:
             version: latest
     registry:
         file:
-            keyword: asset-comp-registry-usd-file
+            keyword: asset-component-registry-usd-file
             workspace: publish
             version: latest
         #
         model-file:
-            keyword: asset-comp-registry-usd-file
+            keyword: asset-component-registry-usd-file
             workspace: publish
             step: <option.steps.model>
             task: <option.tasks.model>
             version: latest
         surface-file:
-            keyword: asset-comp-registry-usd-file
+            keyword: asset-component-registry-usd-file
             workspace: publish
             step: <option.steps.surface>
             task: <option.tasks.surface>

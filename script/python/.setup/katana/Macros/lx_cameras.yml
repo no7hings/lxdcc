@@ -126,6 +126,11 @@ parameters:
         value: False
         tool_tip: '...'
 
+    cameras/front_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
     cameras/close_up/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_closeUp/cam_closeUpShape'
@@ -146,12 +151,10 @@ parameters:
         value: '/root/world/cam/cameras/main/cam_upperbody50/cam_upperbody50Shape'
         tool_tip: '...'
 
-
     cameras/full_body/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_fullbody/cam_fullbodyShape'
         tool_tip: '...'
-
     # prop
     cameras/full/location:
         widget: path
@@ -193,6 +196,36 @@ parameters:
         value: '/root/world/cam/cameras/cam_shot_free/cam_shot_freeShape'
         tool_tip: '...'
 
+    cameras/front/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_front/cam_frontShape'
+        tool_tip: '...'
+
+    cameras/front/fov:
+        widget: float
+        value: 1.0
+        tool_tip: '...'
+
+    cameras/front/translate:
+        widget: float3
+        value: [ 0, 8, 1000 ]
+        tool_tip: '...'
+
+    cameras/front/rotate:
+        widget: float3
+        value: [ 0, 0, 0 ]
+        tool_tip: '...'
+
+    cameras/front/scale:
+        widget: float3
+        value: [ 1, 1, 1 ]
+        tool_tip: '...'
+
+    cameras/front/resolution:
+        widget: resolution
+        value: '160x160'
+        tool_tip: '...'
+
     lynxi_info/type:
         widget: string
         value: 'lx_camera_loader'
@@ -212,3 +245,45 @@ parameters:
         widget: button
         value: ''
         tool_tip: '...'
+
+op_script:
+    settings:
+        script:
+            |-
+            local location = Interface.GetInputLocationPath()
+    
+            local camera = Interface.GetOpArg('user.lynxi_variants.camera_key')
+            
+            Interface.SetAttr(
+                'lynxi.variants.camera', camera
+            )
+            
+            local camera_location = Interface.GetOpArg('user.lynxi_variants.camera_location')
+            
+            Interface.SetAttr(
+                'renderSettings.cameraName', camera_location
+            )
+            
+            Interface.SetAttr(
+                'lynxi.settings.camera_location', camera_location
+            )
+
+        parameters:
+            user/lynxi_variants/camera_key:
+                widget: string
+                value: ''
+                expression: 'self.getNode().getOutputPort("out").getConnectedPorts()[0].getName()'
+                tool_tip: '...'
+
+            user/lynxi_variants/camera_location:
+                widget: string
+                value: ''
+                expression: 'self.getNode().getParent().getParameter("cameras.{}.location".format(self.getNode().getOutputPort("out").getConnectedPorts()[0].getName())).getValue(0)'
+                tool_tip: '...'
+
+            user/lynxi_variants/camera_resolution:
+                widget: string
+                value: ''
+                expression: 'self.getNode().getParent().getParameter("cameras.{}.resolution".format(self.getNode().getOutputPort("out").getConnectedPorts()[0].getName())).getValue(0)'
+                tool_tip: '...'
+

@@ -255,6 +255,29 @@ class UsdStageOpt(object):
         get_fnc_('/', 0)
         return lis
 
+    def get_bounding_box(self, location=None):
+        b_box_cache = UsdGeom.BBoxCache(
+            1,
+            includedPurposes=[
+                UsdGeom.Tokens.default_,
+            ],
+            useExtentsHint=True
+        )
+        if location is not None:
+            usd_prim = self._usd_stage.GetPrimAtPath(location)
+        else:
+            usd_prim = self._usd_stage.GetDefaultPrim()
+        return b_box_cache.ComputeWorldBound(usd_prim)
+
+    def get_geometry_args(self, location=None):
+        b_box = self.get_bounding_box(location)
+        r = b_box.GetRange()
+        x_0, y_0, z_0 = r.GetMin()
+        x_1, y_1, z_1 = r.GetMax()
+        c_x, c_y, c_z = x_0 + (x_1 - x_0) / 2, y_0 + (y_1 - y_0) / 2, z_0 + (z_1 - z_0) / 2
+        w, h, d = x_1 - x_0, y_1 - y_0, z_1 - z_0
+        return (x_0, y_0, z_0), (c_x, c_y, c_z), (w, h, d)
+
 
 class UsdFileOpt(object):
     def __init__(self, file_path, location=None):
@@ -495,6 +518,9 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
         else:
             p = self._usd_mesh.CreateDisplayColorAttr()
         return p.Get()
+
+    def get_bounding_box(self):
+        b_box = self._usd_mesh.ComputeExtent()
 
 
 class UsdMeshOpt(object):

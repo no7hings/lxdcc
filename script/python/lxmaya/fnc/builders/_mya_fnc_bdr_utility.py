@@ -184,7 +184,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 #
                 root = '/master'
                 #
-                keyword = 'asset-comp-registry-usd-file'
+                keyword = 'asset-component-registry-usd-file'
                 model_act__usd_registry__file = rsv_task.get_rsv_unit(keyword=keyword)
                 model_act__usd_registry__file_path = model_act__usd_registry__file.get_result(version='latest')
                 if model_act__usd_registry__file_path:

@@ -344,6 +344,7 @@ class LxAsset(object):
                 obj_opt.set('lynxi_settings.render_end_frame', 1240.0)
                 obj_opt.set('lynxi_settings.render_resolution', '2048x2048')
                 usd_variant_dict = usd_rsv_objects.RsvUsdAssetSetCreator._get_usd_variant_dict_(
+                    rsv_asset,
                     rsv_scene_properties,
                     asset_set_usd_file_path
                 )
@@ -402,6 +403,7 @@ class LxAsset(object):
                 ktn_dcc_objects.Scene.set_frame_range(start_frame, end_frame)
                 #
                 usd_variant_dict = usd_rsv_objects.RsvUsdAssetSetCreator._get_usd_variant_dict_(
+                    rsv_asset,
                     rsv_scene_properties,
                     asset_shot_set_usd_file_path
                 )

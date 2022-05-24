@@ -1,10 +1,12 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
-import fnmatch
-# noinspection PyUnresolvedReferences
 from maya import cmds, OpenMayaUI
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.api.OpenMaya as om2
+
+import fnmatch
+
+import math
 
 from lxbasic import bsc_core
 
@@ -2212,6 +2214,9 @@ class CmdObjOpt(object):
                     )
                 )
 
+    def set(self, key, value):
+        self.get_port(key).set(value)
+
     def __str__(self):
         return '{}(path="{}")'.format(
             self.get_type_name(), self.get_path()
@@ -2278,7 +2283,7 @@ class CmdMeshesOpt(object):
             )
             dic_0[i] = v
         count = len(self._mesh_paths)
-        box = dic_0['boundingBox']
+        b_box = dic_0['boundingBox']
         #
         dic['geometry'] = count
         dic['vertex'] = dic_0['vertex']
@@ -2289,15 +2294,15 @@ class CmdMeshesOpt(object):
         dic['area'] = dic_0['area']
         dic['world-area'] = dic_0['worldArea']
         dic['shell'] = dic_0['shell']
-        dic['center-x'] = box[0][0] + box[0][1]
-        dic['center-y'] = box[1][0] + box[1][1]
-        dic['center-z'] = box[2][0] + box[2][1]
-        dic['clip-x'] = box[0][0]
-        dic['clip-y'] = box[1][0]
-        dic['clip-z'] = box[2][0]
-        dic['width'] = box[0][1] - box[0][0]
-        dic['height'] = box[1][1] - box[1][0]
-        dic['depth'] = box[2][1] - box[2][0]
+        dic['center-x'] = b_box[0][0]+b_box[0][1]
+        dic['center-y'] = b_box[1][0]+b_box[1][1]
+        dic['center-z'] = b_box[2][0]+b_box[2][1]
+        dic['clip-x'] = b_box[0][0]
+        dic['clip-y'] = b_box[1][0]
+        dic['clip-z'] = b_box[2][0]
+        dic['width'] = b_box[0][1]-b_box[0][0]
+        dic['height'] = b_box[1][1]-b_box[1][0]
+        dic['depth'] = b_box[2][1]-b_box[2][0]
         #
         return dic
 
@@ -2368,6 +2373,27 @@ class CmdMeshesOpt(object):
         )
         cmds.polyTriangulate(mesh_path, constructionHistory=0)
         cmds.delete(mesh_path, constructionHistory=1)
+
+    def get_bounding_box(self):
+        return cmds.polyEvaluate(self._mesh_paths, boundingBox=1)
+
+    def get_geometry_args(self):
+        b_box = self.get_bounding_box()
+        x_0, y_0, z_0 = b_box[0][0], b_box[1][0], b_box[2][0]
+        x_1, y_1, z_1 = b_box[0][1], b_box[1][1], b_box[2][1]
+        c_x, c_y, c_z = x_0+(x_1-x_0)/2, y_0+(y_1-y_0)/2, z_0+(z_1-z_0)/2
+        w, h, d = x_1-x_0, y_1-y_0, z_1-z_0
+        return (x_0, y_0, z_0), (c_x, c_y, c_z), (w, h, d)
+
+
+class CmdCameraOpt(CmdObjOpt):
+    def __init__(self, obj_path):
+        super(CmdCameraOpt, self).__init__(obj_path)
+    @classmethod
+    def get_front_frame_args(cls, geometry_args, angle):
+        _, (c_x, c_y, c_z), (w, h, d) = geometry_args
+        z_1 = h / math.tan(math.radians(angle))
+        return (c_x, c_y, z_1 - c_z), (0, 0, 0)
 
 
 class CmdUndoStack(object):

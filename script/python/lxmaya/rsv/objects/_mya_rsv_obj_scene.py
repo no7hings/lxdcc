@@ -161,6 +161,56 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         else:
             raise RuntimeError()
 
+    def set_asset_snapshot_preview_export(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        root = self._rsv_scene_properties.get('dcc.root')
+        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        #
+        if workspace == 'publish':
+            keyword_0 = 'asset-preview-mov-file'
+            keyword_1 = 'asset-review-mov-file'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-preview-mov-file'
+            keyword_1 = 'asset-output-review-mov-file'
+        else:
+            raise TypeError()
+
+        preview_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        preview_mov_file_path = preview_mov_file_rsv_unit.get_result(
+            version=version
+        )
+
+        mya_root = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
+
+        mya_fnc_exporters.PreviewExporter(
+            file_path=preview_mov_file_path,
+            root=mya_root,
+            option=dict(
+                use_render=False,
+                convert_to_dot_mov=True,
+            )
+        ).set_run()
+
+        create_review_link = self._hook_option_opt.get('create_review_link') or False
+        if create_review_link is True:
+            review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                keyword=keyword_1
+            )
+            review_mov_file_path = review_mov_file_rsv_unit.get_result(
+                version=version
+            )
+            preview_mov_file = utl_dcc_objects.OsFile(
+                preview_mov_file_path
+            )
+            review_mov_file = utl_dcc_objects.OsFile(review_mov_file_path)
+            if review_mov_file.get_is_exists() is False:
+                preview_mov_file.set_link_to(
+                    review_mov_file.path
+                )
+
 
 class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
@@ -172,14 +222,14 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         asset_shot = self._hook_option_opt.get('shot')
         #
         if workspace == 'publish':
-            keyword_1 = 'asset-shot-maya-scene-file'
+            keyword_0 = 'asset-shot-maya-scene-file'
         elif workspace == 'output':
-            keyword_1 = 'asset-output-shot-maya-scene-file'
+            keyword_0 = 'asset-output-shot-maya-scene-file'
         else:
             raise TypeError()
         #
         asset_shot_scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword_1
+            keyword=keyword_0
         )
         asset_shot_scene_file_path = asset_shot_scene_file_rsv_unit.get_exists_result(
             version=version,

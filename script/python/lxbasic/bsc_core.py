@@ -2438,6 +2438,20 @@ Subtitle options:
                     cmd
                 )
 
+    def set_create_from(self, image_file_path, start_frame=0):
+        cmd = '/opt/rv/bin/rvio "{image_file}" -overlay frameburn .4 1.0 30.0 -dlut "{lut_directory}" -o "{movie_file}" -comment "{user}" -outparams timecode={start_frame}'.format(
+            **dict(
+                movie_file=self._file_path,
+                image_file=image_file_path,
+                lut_directory='/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp',
+                start_frame=start_frame,
+                user=SystemMtd.get_user_name()
+            )
+        )
+        SubProcessMtd.set_run_with_result(
+            cmd
+        )
+
     def get_size(self):
         cmd_args = [
             Bin.get_ffmpeg(),
@@ -3443,6 +3457,28 @@ class TimeMtd(object):
 
     def time_tag2timestamp(self, time_tag):
         pass
+
+
+class BBoxMtd(object):
+    @classmethod
+    def get_geometry_args(cls, p_0, p_1):
+        x_0, y_0, z_0 = p_0
+        x_1, y_1, z_1 = p_1
+        c_x, c_y, c_z = x_0 + (x_1 - x_0) / 2, y_0 + (y_1 - y_0) / 2, z_0 + (z_1 - z_0) / 2
+        w, h, d = x_1 - x_0, y_1 - y_0, z_1 - z_0
+        return (x_0, y_0, z_0), (c_x, c_y, c_z), (w, h, d)
+
+
+class CameraMtd(object):
+    @classmethod
+    def get_front_transformation(cls, geometry_args, angle):
+        _, (c_x, c_y, c_z), (w, h, d) = geometry_args
+        r = max(w, h)
+        z_1 = r / math.tan(math.radians(angle))
+        t_x, t_y, t_z = (c_x, c_y, z_1 - c_z)
+        r_x, r_y, r_z = 0, 0, 0
+        s_x, s_y, s_z = 1, 1, 1
+        return (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z)
 
 
 if __name__ == '__main__':

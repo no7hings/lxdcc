@@ -1197,10 +1197,11 @@ class NGMacro(object):
             widget=port_raw.get('widget'),
             name=port_name,
             value=port_raw.get('value'),
+            expression=port_raw.get('expression'),
             tool_tip=port_raw.get('tool_tip')
         )
     @classmethod
-    def _set_type_parameter_create_(cls, ktn_group_port, name, widget, value, tool_tip):
+    def _set_type_parameter_create_(cls, ktn_group_port, name, widget, value, expression, tool_tip):
         label = bsc_core.StrUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = ktn_group_port.getChild(name)
         if ktn_port is None:
@@ -1209,6 +1210,8 @@ class NGMacro(object):
                 ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
             elif isinstance(value, (str, unicode)):
                 ktn_port = ktn_group_port.createChildString(name, value)
+                if expression:
+                    ktn_port.setExpression(expression)
                 if widget in ['path']:
                     ktn_port.setHintString(
                         str({'widget': 'scenegraphLocation'})
@@ -1251,6 +1254,12 @@ class NGMacro(object):
                     ktn_port.setHintString(
                         str(dict(widget='color'))
                     )
+                elif widget in ['float3']:
+                    c = 3
+                    ktn_port = ktn_group_port.createChildNumberArray(name, c)
+                    for i in range(c):
+                        i_ktn_port = ktn_port.getChildByIndex(i)
+                        i_ktn_port.setValue(value[i], 0)
                 else:
                     c = len(value)
                     if isinstance(value[0], (str, unicode)):
@@ -1316,6 +1325,19 @@ class NGMacro(object):
                     i_k_t = 'user.{}'.format(i_k_t)
                     NGMacro(i_ktn_op_script).set_parameter_create(i_k_t, v)
                     NGPortOpt(NGObjOpt(i_ktn_op_script).get_port(i_k_t)).set_expression('getParent().{}'.format(i_k_s))
+
+    def set_sub_op_script_create_by_configure_file(self, file_path, key, paths):
+        ktn_op_scripts = [NodegraphAPI.GetNode(i) for i in paths]
+        for i_ktn_op_script in ktn_op_scripts:
+            configure = bsc_objects.Configure(value=file_path)
+            parameters = configure.get('op_script.{}.parameters'.format(key)) or {}
+            NGObjOpt(i_ktn_op_script).set_ports_clear('user')
+            for k, v in parameters.items():
+                k = k.replace('/', '.')
+                NGMacro(i_ktn_op_script).set_parameter_create(k, v)
+            #
+            script = configure.get('op_script.{}.script'.format(key))
+            NGObjOpt(i_ktn_op_script).set('script.lua', script)
 
 
 class LXRenderSettingsOpt(object):

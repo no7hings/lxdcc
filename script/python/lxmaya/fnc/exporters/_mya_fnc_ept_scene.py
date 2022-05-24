@@ -60,7 +60,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             preserveReferences=False,
         )
         _selected_paths = []
-        if location is not None:
+        if location:
             root_dag_opt = bsc_core.DccPathDagOpt(location)
             root_mya_dag_opt = root_dag_opt.set_translate_to(
                 ma_configure.Util.OBJ_PATHSEP
@@ -326,8 +326,8 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             if jpg_seq_file.get_exists_files():
                 bsc_core.VedioOpt(
                     mov_file_path
-                ).set_mov_create_from(
-                    jpg_seq_file_path, block=True
+                ).set_create_from(
+                    jpg_seq_file_path
                 )
                 # stg_operators.ImageOpt(
                 #     jpg_seq_file
@@ -343,8 +343,6 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         self._results = [mov_file_path]
 
     def _set_render_run_(self):
-        import lxshotgun.operators as stg_operators
-        #
         self._file_obj = utl_dcc_objects.OsFile(self._file_path)
         file_path_base = self._file_obj.path_base
         #
@@ -361,8 +359,8 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             if jpg_seq_file.get_exists_files():
                 bsc_core.VedioOpt(
                     mov_file_path
-                ).set_mov_create_from(
-                    jpg_seq_file_path, block=True
+                ).set_create_from(
+                    jpg_seq_file_path
                 )
                 # stg_operators.ImageOpt(
                 #     utl_dcc_objects.OsFile(jpg_seq_file_path)

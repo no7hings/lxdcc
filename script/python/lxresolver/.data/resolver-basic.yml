@@ -357,7 +357,7 @@ asset-texture-tgt-dir: <asset-version-dir>/texture
 # <asset-usd>
 asset-component-usd-dir: <asset-version-dir>/cache/usd
 asset-usd-payload-file: <asset-component-usd-dir>/payload.usda
-asset-comp-registry-usd-file: <asset-component-usd-dir>/registry.usda
+asset-component-registry-usd-file: <asset-component-usd-dir>/registry.usda
 #
 asset-component-usd-file: <asset-component-usd-dir>/<asset-name>.usda
 #

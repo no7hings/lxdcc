@@ -260,8 +260,11 @@ class UsdStageOpt(object):
             1,
             includedPurposes=[
                 UsdGeom.Tokens.default_,
+                UsdGeom.Tokens.render,
+                UsdGeom.Tokens.proxy
             ],
-            useExtentsHint=True
+            useExtentsHint=True,
+            ignoreVisibility=True,
         )
         if location is not None:
             usd_prim = self._usd_stage.GetPrimAtPath(location)
@@ -269,14 +272,12 @@ class UsdStageOpt(object):
             usd_prim = self._usd_stage.GetDefaultPrim()
         return b_box_cache.ComputeWorldBound(usd_prim)
 
-    def get_geometry_args(self, location=None):
+    def get_geometry_args(self, location=None, use_int_size=False):
         b_box = self.get_bounding_box(location)
         r = b_box.GetRange()
-        x_0, y_0, z_0 = r.GetMin()
-        x_1, y_1, z_1 = r.GetMax()
-        c_x, c_y, c_z = x_0 + (x_1 - x_0) / 2, y_0 + (y_1 - y_0) / 2, z_0 + (z_1 - z_0) / 2
-        w, h, d = x_1 - x_0, y_1 - y_0, z_1 - z_0
-        return (x_0, y_0, z_0), (c_x, c_y, c_z), (w, h, d)
+        return bsc_core.BBoxMtd.get_geometry_args(
+            r.GetMin(), r.GetMax(), use_int_size
+        )
 
 
 class UsdFileOpt(object):

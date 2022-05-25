@@ -4,6 +4,8 @@ from pxr import Usd, Sdf, Vt, UsdGeom, Gf
 
 from lxbasic import bsc_core
 
+from lxutil import utl_core
+
 from lxutil.dcc import utl_dcc_opt_abs
 
 from lxusd import usd_core
@@ -47,6 +49,9 @@ class AbsUsdOptDef(object):
     @property
     def stage(self):
         return self.prim.GetStage()
+    @property
+    def path(self):
+        return self._prim.GetPath().pathString
 
 
 class TransformOpt(AbsUsdOptDef):
@@ -203,27 +208,40 @@ class MeshOpt(
     def get_uv_maps(self, default_uv_map_name='st'):
         dic = {}
         uv_map_names = self.get_uv_map_names()
-        for uv_map_name in uv_map_names:
-            uv_map = self.get_uv_map(uv_map_name)
-            dic[uv_map_name] = uv_map
+        for i_uv_map_name in uv_map_names:
+            uv_map = self.get_uv_map(i_uv_map_name)
+            dic[i_uv_map_name] = uv_map
         return dic
 
     def set_uv_maps(self, raw):
         if raw:
             usd_mesh = self.usd_mesh
-            for uv_map_name, v in raw.items():
-                if uv_map_name == 'map1':
-                    uv_map_name = 'st'
+            for i_uv_map_name, v in raw.items():
+                if i_uv_map_name == 'map1':
+                    i_uv_map_name = 'st'
+                #
+                if ' ' in i_uv_map_name:
+                    i_uv_map_name_new = i_uv_map_name.replace(' ', '_')
+                    utl_core.Log.set_module_warning_trace(
+                        'usd uv-map set',
+                        u'uv-map="{1}" in "{0}" name is "contain space", auto convert to "{2}"'.format(
+                            self.path,
+                            i_uv_map_name,
+                            i_uv_map_name_new
+                        )
+                    )
+                    i_uv_map_name = i_uv_map_name_new
+                #
                 uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = v
-                if usd_mesh.HasPrimvar(uv_map_name) is False:
+                if usd_mesh.HasPrimvar(i_uv_map_name) is False:
                     primvar = usd_mesh.CreatePrimvar(
-                        uv_map_name,
+                        i_uv_map_name,
                         Sdf.ValueTypeNames.TexCoord2fArray,
                         UsdGeom.Tokens.faceVarying
                     )
                 else:
                     primvar = usd_mesh.GetPrimvar(
-                        uv_map_name
+                        i_uv_map_name
                     )
                 primvar.Set(uv_map_coords)
                 primvar.SetIndices(Vt.IntArray(uv_map_face_vertex_indices))

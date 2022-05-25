@@ -403,10 +403,18 @@ class MeshOpt(
             self.set_uv_map(uv_map_name, uv_map)
 
     def get_normals(self):
+        """
+        :return: list(
+            (float, float, float),
+            ...
+        )
+        """
         lis = []
         for vertex_id in xrange(self.om2_obj.numVertices):
             om2_float_vector = self.om2_obj.getVertexNormal(vertex_id, True)
-            lis.append(ma_core.Om2Method._get_float_vector_(om2_float_vector))
+            lis.append(
+                ma_core.Om2Method._get_float_vector_(om2_float_vector)
+            )
         return lis
 
     def get_color_map_names(self):
@@ -562,7 +570,14 @@ class MeshOpt(
         return lis
 
     def get_shell_count(self):
-        return cmds.polyEvaluate(self.obj.path, shell=1)
+        return cmds.polyEvaluate(
+            self.obj.path,
+            shell=1
+        )
+
+    def set_uv_map_rename(self, uv_map_name, new_uv_map_name):
+        om2_obj = self.get_om2_obj()
+        om2_obj.renameUVSet(uv_map_name, new_uv_map_name)
 
 
 class MeshChecker(

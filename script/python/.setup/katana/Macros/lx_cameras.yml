@@ -136,9 +136,19 @@ parameters:
         value: '/root/world/cam/cameras/main/cam_closeUp/cam_closeUpShape'
         tool_tip: '...'
 
+    cameras/close_up/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
     cameras/upper_body/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_upperbody/cam_upperbodyShape'
+        tool_tip: '...'
+
+    cameras/upper_body/render_resolution:
+        widget: resolution
+        value: '2048x2048'
         tool_tip: '...'
 
     cameras/upper_body_35/location:
@@ -146,14 +156,29 @@ parameters:
         value: '/root/world/cam/cameras/main/cam_upperbody35/cam_upperbody35Shape'
         tool_tip: '...'
 
+    cameras/upper_body_35/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
     cameras/upper_body_50/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_upperbody50/cam_upperbody50Shape'
         tool_tip: '...'
 
+    cameras/upper_body_50/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
     cameras/full_body/location:
         widget: path
         value: '/root/world/cam/cameras/main/cam_fullbody/cam_fullbodyShape'
+        tool_tip: '...'
+
+    cameras/full_body/render_resolution:
+        widget: resolution
+        value: '2048x2048'
         tool_tip: '...'
     # prop
     cameras/full/location:
@@ -161,9 +186,19 @@ parameters:
         value: '/root/world/cam/cameras/sub/cam_full/cam_fullShape'
         tool_tip: '...'
 
+    cameras/full/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
     cameras/half/location:
         widget: path
         value: '/root/world/cam/cameras/sub/cam_half/cam_halfShape'
+        tool_tip: '...'
+
+    cameras/half/render_resolution:
+        widget: resolution
+        value: '2048x2048'
         tool_tip: '...'
 
     cameras/add_0/location:
@@ -171,24 +206,50 @@ parameters:
         value: '/root/world/cam/cameras/sub/cam_add_0/cam_add_0Shape'
         tool_tip: '...'
 
+    cameras/add_0/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
     cameras/add_1/location:
         widget: path
         value: '/root/world/cam/cameras/sub/cam_add_1/cam_add_1Shape'
+        tool_tip: '...'
+
+    cameras/add_1/render_resolution:
+        widget: resolution
+        value: '2048x2048'
         tool_tip: '...'
     #
     cameras/free/location:
         widget: path
         value: '/root/world/cam/cameras/cam_free/cam_freeShape'
         tool_tip: '...'
+
+    cameras/free/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
     #
     cameras/asset_free/location:
         widget: path
         value: '/root/world/cam/cameras/cam_asset_free/cam_asset_freeShape'
         tool_tip: '...'
+
+    cameras/asset_free/render_resolution:
+        widget: resolution
+        value: '2048x2048'
+        tool_tip: '...'
+
     # shot
     cameras/shot/location:
         widget: path
         value: '/root/world/geo/cameras/defaultCamera/defaultCameraCenterShape'
+        tool_tip: '...'
+
+    cameras/shot/render_resolution:
+        widget: resolution
+        value: '2048x858'
         tool_tip: '...'
 
     cameras/shot_free/location:
@@ -196,9 +257,19 @@ parameters:
         value: '/root/world/cam/cameras/cam_shot_free/cam_shot_freeShape'
         tool_tip: '...'
 
+    cameras/shot_free/render_resolution:
+        widget: resolution
+        value: '2048x858'
+        tool_tip: '...'
+    #
     cameras/front/location:
         widget: path
         value: '/root/world/cam/cameras/sub/cam_front/cam_frontShape'
+        tool_tip: '...'
+
+    cameras/front/render_resolution:
+        widget: resolution
+        value: '512x512'
         tool_tip: '...'
 
     cameras/front/fov:
@@ -219,11 +290,6 @@ parameters:
     cameras/front/scale:
         widget: float3
         value: [ 1, 1, 1 ]
-        tool_tip: '...'
-
-    cameras/front/resolution:
-        widget: resolution
-        value: '160x160'
         tool_tip: '...'
 
     lynxi_info/type:
@@ -250,40 +316,56 @@ op_script:
     settings:
         script:
             |-
-            local location = Interface.GetInputLocationPath()
-    
-            local camera = Interface.GetOpArg('user.lynxi_variants.camera_key')
+            local camera = Interface.GetOpArg('user.lynxi_variants.camera')
+            local camera_location = Interface.GetOpArg('user.lynxi_variants.camera_location')
+            local render_resolution = Interface.GetOpArg('user.lynxi_variants.render_resolution')
             
             Interface.SetAttr(
                 'lynxi.variants.camera', camera
             )
             
-            local camera_location = Interface.GetOpArg('user.lynxi_variants.camera_location')
+            Interface.SetAttr(
+                'lynxi.settings.camera_location', camera_location
+            )
+            
+            Interface.SetAttr(
+                'lynxi.settings.render_resolution', render_resolution
+            )
             
             Interface.SetAttr(
                 'renderSettings.cameraName', camera_location
             )
-            
-            Interface.SetAttr(
-                'lynxi.settings.camera_location', camera_location
-            )
 
         parameters:
-            user/lynxi_variants/camera_key:
+            user/lynxi_variants/camera:
                 widget: string
                 value: ''
-                expression: 'self.getNode().getOutputPort("out").getConnectedPorts()[0].getName()'
+                expression:
+                    |-
+                    self.getNode().getOutputPort("out").getConnectedPorts()[0].getName()
                 tool_tip: '...'
 
             user/lynxi_variants/camera_location:
                 widget: string
                 value: ''
-                expression: 'self.getNode().getParent().getParameter("cameras.{}.location".format(self.getNode().getOutputPort("out").getConnectedPorts()[0].getName())).getValue(0)'
+                expression:
+                    |-
+                    self.getNode().getParent().getParameter(
+                        "cameras.{}.location".format(
+                            self.getNode().getParameter("user.lynxi_variants.camera").getValue(0)
+                        )
+                    ).getValue(0)
                 tool_tip: '...'
 
-            user/lynxi_variants/camera_resolution:
+            user/lynxi_variants/render_resolution:
                 widget: string
                 value: ''
-                expression: 'self.getNode().getParent().getParameter("cameras.{}.resolution".format(self.getNode().getOutputPort("out").getConnectedPorts()[0].getName())).getValue(0)'
+                expression:
+                    |-
+                    self.getNode().getParent().getParameter(
+                        "cameras.{}.render_resolution".format(
+                            self.getNode().getParameter("user.lynxi_variants.camera").getValue(0)
+                        )
+                    ).getValue(0)
                 tool_tip: '...'
 

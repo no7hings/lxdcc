@@ -1,0 +1,27 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: ''
+        tool_tip: 'press to rest all parameters'
+    #
+    look_pass/scheme:
+        widget: enumerate
+        value: ['passthrough', 'lambert', 'plastic', 'metal', 'ambocc', 'wire', 'white', 'white_disp', 'white_zbrush']
+        tool_tip: '...'
+    #
+    lynxi_info/type:
+        widget: string
+        value: 'lx_look_pass'
+        tool_tip: '...'
+    #
+    lynxi_scheme/override/look_pass:
+        widget: string
+        value: 'default'
+        tool_tip: '...'

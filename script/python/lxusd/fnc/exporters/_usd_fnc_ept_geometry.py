@@ -21,7 +21,6 @@ from lxutil.fnc import utl_fnc_obj_abs
 
 
 class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
-    ROOT_LSTRIP = 'root_lstrip'
     OPTION = dict(
         root_lstrip=False,
         file_0=None,
@@ -78,8 +77,8 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             output_prim = self._output_stage_opt.set_obj_create_as_override(obj_path)
             if i_obj_type_name == 'Mesh':
                 _ = self._geometry_stage_1.GetPrimAtPath(obj_path)
-                output_usd_mesh = UsdGeom.Mesh(output_prim)
-                output_usd_mesh_opt = usd_core.UsdMeshOpt(output_usd_mesh)
+                i_output_usd_mesh = UsdGeom.Mesh(output_prim)
+                i_output_usd_mesh_opt = usd_core.UsdMeshOpt(i_output_usd_mesh)
                 if _.IsValid() is True:
                     surface_geometry_prim = _
                     input_usd_mesh = UsdGeom.Mesh(surface_geometry_prim)
@@ -97,12 +96,12 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 if uv_map_names:
                     for uv_map_name in uv_map_names:
                         uv_map = input_usd_mesh_opt.get_uv_map(uv_map_name)
-                        output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
+                        i_output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
                 #
                 input_usd_mesh_opt.set_display_color_fill(
                     display_color
                 )
-                output_usd_mesh_opt.set_usd_display_colors(
+                i_output_usd_mesh_opt.set_usd_display_colors(
                     input_usd_mesh_opt.get_usd_display_colors()
                 )
         #
@@ -118,6 +117,37 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_run(self):
         self.set_uv_map_export()
+
+
+class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+        input_file='',
+        output_file='',
+        location=''
+    )
+    def __init__(self, option):
+        super(GeometryDebugger, self).__init__(option)
+
+    def set_face_vertex_indices_reverse_create(self):
+        input_file_path = self.get('input_file')
+        output_file_path = self.get('output_file')
+        #
+        self._input_stage_opt = usd_core.UsdStageOpt(input_file_path)
+
+        self._output_stage_opt = usd_core.UsdStageOpt()
+
+        with utl_core.log_progress_bar(
+            maximum=self._input_stage_opt.get_count(),
+            label='face vertex indices reverse create'
+        ) as l_p:
+            for i_input_prim in self._input_stage_opt.usd_instance.TraverseAll():
+                l_p.set_update()
+                #
+                i_obj_type_name = i_input_prim.GetTypeName()
+                if i_obj_type_name == 'Mesh':
+                    i_input_mesh = UsdGeom.Mesh(i_input_prim)
+                    i_input_mesh_opt = usd_core.UsdMeshOpt(i_input_mesh)
+                    print i_input_mesh_opt.get_face_vertex_indices()
 
 
 class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):

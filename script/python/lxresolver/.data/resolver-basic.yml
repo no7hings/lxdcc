@@ -244,6 +244,9 @@ asset-katana-scene-src-file: <asset-katana-scene-src-dir>/<asset-name>.katana
 asset-light-dir: <asset-version-dir>/light
 asset-light-live_group-file: <asset-light-dir>/<asset-name>.livegroup
 #
+asset-live_group-dir: <asset-version-dir>/livegroup
+asset-live_group-file: <asset-live_group-dir>/<asset-name>.livegroup
+#
 asset-light-ass-file: <asset-version-dir>/ass/<asset-name>.ass
 #
 asset-nuke-scene-src-dir: <asset-version-dir>/scene
@@ -443,6 +446,12 @@ asset-output-katana-scene-file: <asset-output-katana-scene-dir>/<asset-name>.kat
 asset-output-katana-render-output-dir: <asset-output-render-dir>/katana-images
 asset-output-katana-render-image-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr
 asset-output-katana-render-video-mov-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
+#
+asset-output-nuke-scene-src-dir: <asset-output-version-dir>/scene
+asset-output-nuke-scene-src-file: <asset-output-maya-scene-src-dir>/<asset-name>.nk
+asset-output-nuke-scene-dir: <asset-output-version-dir>/nuke
+asset-output-nuke-scene-file: <asset-output-maya-scene-dir>/<asset-name>.nk
+asset-output-nuke-render-output-dir: <asset-output-render-dir>/nuke-images
 #
 asset-output-asset-set-usd-file: <asset-output-set-dir>/usd/<asset-name>.usda
 asset-output-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usda

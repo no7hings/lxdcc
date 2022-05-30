@@ -1277,9 +1277,11 @@ class KeywordArgumentsOpt(object):
         return self._option_dict
     value = property(get_value)
 
-    def get(self, key, as_array=False):
+    def get(self, key, as_array=False, as_integer=False):
         if key in self._option_dict:
             _ = self._option_dict[key]
+            if as_integer is True:
+                return int(_)
             if as_array is True:
                 if isinstance(_, (tuple, list)):
                     return _
@@ -3462,13 +3464,13 @@ class TimeMtd(object):
 class BBoxMtd(object):
     @classmethod
     def get_geometry_args(cls, p_0, p_1, use_int_size=False):
-        x_0, y_0, z_0 = p_0
+        x, y, z = p_0
         x_1, y_1, z_1 = p_1
-        c_x, c_y, c_z = x_0 + (x_1 - x_0) / 2, y_0 + (y_1 - y_0) / 2, z_0 + (z_1 - z_0) / 2
-        w, h, d = x_1 - x_0, y_1 - y_0, z_1 - z_0
+        c_x, c_y, c_z = x + (x_1 - x) / 2, y + (y_1 - y) / 2, z + (z_1 - z) / 2
+        w, h, d = x_1 - x, y_1 - y, z_1 - z
         if use_int_size is True:
             w, h, d = int(math.ceil(w)), int(math.ceil(h)), int(math.ceil(d))
-        return (x_0, y_0, z_0), (c_x, c_y, c_z), (w, h, d)
+        return (x, y, z), (c_x, c_y, c_z), (w, h, d)
 
 
 class CameraMtd(object):
@@ -3485,5 +3487,41 @@ class CameraMtd(object):
         return (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z)
 
 
+class MeshFaceVertexIndicesOpt(object):
+    def __init__(self, face_vertex_indices):
+        self._raw = face_vertex_indices
+
+    def set_reverse_by_counts(self, counts):
+        lis = []
+        start_index = 0
+        for i_count in counts:
+            i_indices = self._raw[start_index:start_index+i_count]
+            i_indices.reverse()
+            lis.extend(i_indices)
+            #
+            start_index += i_count
+        return lis
+
+    def set_reverse_by_start_indices(self, start_indices):
+        lis = []
+        start_index = 0
+        for i_start_index in start_indices[1:]:
+            i_indices = self._raw[start_index:i_start_index]
+            i_indices.reverse()
+            lis.extend(i_indices)
+            #
+            start_index = i_start_index
+        return lis
+
+
 if __name__ == '__main__':
-    print ColorMtd.rgb2hex(47, 47, 47)
+    print MeshFaceVertexIndicesOpt(
+        [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
+    ).set_reverse_by_counts(
+        [4, 4, 4, 4, 4, 4, 4, 4, 4]
+    )
+    print MeshFaceVertexIndicesOpt(
+        [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
+    ).set_reverse_by_start_indices(
+        [0, 4, 8, 12, 16, 20, 24, 28, 32, 36]
+    )

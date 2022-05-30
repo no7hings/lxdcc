@@ -34,18 +34,19 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_run(self):
         self._ktn_workspace.set_workspace_create()
+        self._ktn_workspace.set_variables_registry()
         #
-        rsv_asset = self._get_rsv_asset_auto_()
-        if rsv_asset is not None:
-            ktn_core.VariablesSetting().set_register_by_configure(
-                {
-                    'layer': ['master', 'no_hair'],
-                    'quality': ['low', 'med', 'hi', 'custom'],
-                    'camera': ['full_body', 'upper_body', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
-                    'light_pass': ['all'],
-                    'look_pass': ['default', 'plastic', 'ambocc', 'wire', 'white'],
-                    'variables_enable': ['on', 'off']
-                }
-            )
+        # rsv_asset = self._get_rsv_asset_auto_()
+        # if rsv_asset is not None:
+        #     ktn_core.VariablesSetting().set_register_by_configure(
+        #         {
+        #             'layer': ['master', 'no_hair'],
+        #             'quality': ['low', 'med', 'hi', 'custom'],
+        #             'camera': ['full_body', 'upper_body', 'close_up', 'add_0', 'add_1', 'asset_free', 'shot', 'shot_free'],
+        #             'light_pass': ['all'],
+        #             'look_pass': ['default', 'plastic', 'ambocc', 'wire', 'white'],
+        #             'variables_enable': ['on', 'off']
+        #         }
+        #     )
 
 

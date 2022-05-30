@@ -115,7 +115,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             version=version
         )
         return scene_src_file_path
-
+    # for render
     def set_asset_scene_create(self):
         import fnmatch
 
@@ -126,6 +126,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         import lxkatana.fnc.creators as ktn_fnc_creators
         #
         workspace = self._rsv_scene_properties.get('workspace')
+        step = self._rsv_scene_properties.get('step')
+        task = self._rsv_scene_properties.get('task')
         version = self._rsv_scene_properties.get('version')
         root = self._rsv_scene_properties.get('dcc.root')
         #
@@ -161,14 +163,19 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             if _:
                 shot_geometries_node_opt.set('options.shot', _[0])
             shot_geometries_node_opt.set_port_execute('usd.create')
-        #
+        # usd override enable
+        usd_variant_scheme = self._hook_option_opt.get('usd_variant_scheme')
+        if usd_variant_scheme:
+            if usd_variant_scheme == 'main':
+                pass
+        # render arnold aov
         render_arnold_aov_enable = self._hook_option_opt.get('render_arnold_aov_enable')
         qualities = self._hook_option_opt.get('qualities', as_array=True)
         for i_quality in qualities:
             i_quality_dcc_node = ktn_dcc_objects.Node('{}__quality'.format(i_quality))
             #
             i_quality_dcc_node.set('lynxi_variants.arnold.aov_enable', render_arnold_aov_enable)
-        #
+        # render over
         render_override_enable = self._hook_option_opt.get('render_override_enable')
         if render_override_enable is True:
             render_override_percent = self._hook_option_opt.get('render_override_percent')
@@ -178,7 +185,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 i_quality_dcc_node = ktn_dcc_objects.Node('{}__quality'.format(i_quality))
                 #
                 i_quality_dcc_node.set('lynxi_variants.percent', render_override_percent)
-        #
+        # render arnold over
         render_arnold_override_enable = self._hook_option_opt.get('render_arnold_override_enable')
         if render_arnold_override_enable is True:
             render_arnold_override_aa_sample = self._hook_option_opt.get('render_arnold_override_aa_sample')
@@ -200,7 +207,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         )
         #
         renderer_node_opt = ktn_core.NGObjOpt('render_outputs')
-
+        #
         variable_keys = [
             'cameras',
             'layers',
@@ -264,6 +271,53 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                     look_pass='white_zbrush'
                 )
             ).set_run()
+    @classmethod
+    def _set_front_camera_(cls):
+        from lxbasic import bsc_core
 
-    def set_front_camera(self):
-        pass
+        from lxusd import usd_core
+
+        import lxresolver.commands as rsv_commands
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        r = rsv_commands.get_resolver()
+
+        rsv_task = r.get_rsv_task(
+            project='cgm',
+            asset='bl_xiz_f',
+            step='mod',
+            task='modeling'
+        )
+
+        s = usd_core.UsdStageOpt()
+        geometry_usd_var_file_rsv_unit = rsv_task.get_rsv_unit(
+            keyword='asset-geometry-usd-var-file'
+        )
+
+        for i_var in ['hi', 'shape']:
+            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_result(
+                version='latest',
+                extend_variants=dict(var=i_var)
+            )
+            s.set_sublayer_append(i_geometry_usd_var_file_path)
+
+        s.set_flatten()
+
+        g = s.get_geometry_args('/master')
+
+        (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
+
+        (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z) = bsc_core.CameraMtd.get_front_transformation(
+            g, 1
+        )
+
+        c = ktn_dcc_objects.Node('cameras')
+
+        c.set('cameras.front.translate', (t_x, t_y, t_z))
+        c.set('cameras.front.rotate', (r_x, r_y, r_z))
+        c.set('cameras.front.scale', (s_x, s_y, s_z))
+
+        r = max(w, h)
+
+        c.set('cameras.front.render_resolution', '{0}x{0}'.format(int(r)*100))

@@ -87,6 +87,8 @@ workspace:
                         - <.path>.output
                         - <....main.path>.<.name>
                     executes:
+                        - 'reset'
+                        - 'usd.guess'
                         - 'usd.create'
     # shot
     shot_geometries:
@@ -142,8 +144,10 @@ workspace:
                         lynxi_settings/resolution: '2048x858'
                     connections:
                         - <.path>.output
-                        - <....main.path>.<..key>
+                        - <....main.path>.<.name>
                     executes:
+                        - 'reset'
+                        - 'usd.guess'
                         - 'usd.create'
     # geometry switch
     # materials
@@ -727,23 +731,25 @@ workspace:
                     obj_type: lx_light_pass
                     base_obj_type: Group
                     attributes:
+                        x: =<.....geometry.x>-<option.w>/2*0
+                        y: =<.....geometry.y>+<option.h>/4
                         ns_colorr: 0.25
                         ns_colorg: 0.5
                         ns_colorb: 0.75
                     parameters:
+                        options/scheme: 'light_rig'
                         rotations/enable: 1
                         rotations/value_offset: 0.0
                         rotations/start_frame: 121.0
                         rotations/end_frame: 240.0
                         rotations/frame_offset: 1000.0
-                        #
-                        settings/background_enable: 1
-                    insert_scheme: TB
-                    insert_connections:
+                    connections:
                         - <.....cameras.main.path>.out
-                        - <....main.path>.<option.light_pass>
                         - <.path>.input
                         - <.path>.output
+                        - <....main.path>.<option.light_pass>
+                    executes:
+                        - 'lights.light_rig.load'
     # quality
     # y=-8.0
     quality_switch:

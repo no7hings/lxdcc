@@ -18,8 +18,9 @@ user = bsc_core.SystemMtd.get_user_name()
 time_tag = bsc_core.SystemMtd.get_time_tag()
 
 for i_f in [
-    '/l/prod/xkt/publish/assets/chr/jiguang/srf/srf_anishading/jiguang.srf.srf_anishading.v006/scene/jiguang.ma',
+    # '/l/prod/xkt/publish/assets/chr/jiguang/srf/srf_anishading/jiguang.srf.srf_anishading.v006/scene/jiguang.ma',
     # '/l/prod/xkt/publish/assets/chr/heidong/srf/srf_anishading/heidong.srf.srf_anishading.v015/scene/heidong.ma'
+    '/l/prod/cgm/publish/assets/chr/nn_4y_test/srf/srf_anishading/nn_4y_test.srf.srf_anishading.v001/scene/nn_4y_test.ma',
 ]:
     for j_seq, (j_option_hook_key, j_script_option) in enumerate(
         [

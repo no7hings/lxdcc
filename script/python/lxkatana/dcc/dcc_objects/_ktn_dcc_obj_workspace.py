@@ -13,7 +13,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxkatana import ktn_configure, ktn_core
 
-from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node
+from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node, _ktn_dcc_obj_nodes
 
 from lxkatana.modifiers import _ktn_mdf_utility
 
@@ -81,6 +81,44 @@ class AssetWorkspace(object):
         else:
             raise RuntimeError()
 
+    def set_all_executes_run(self):
+        configure = self._default_configure
+        pass_name = configure.get('option.look_pass')
+        workspace_keys = configure.get('workspace').keys()
+        for i_key in workspace_keys:
+            for j_sub_key in ['main']:
+                j_node_path = configure.get('workspace.{}.{}.path'.format(i_key, j_sub_key))
+                j_node = _ktn_dcc_obj_node.Node(j_node_path)
+                if j_node.get_is_exists() is True:
+                    j_node_executes = configure.get('workspace.{}.{}.executes'.format(i_key, j_sub_key))
+                    if j_node_executes:
+                        self._set_node_executes_(j_node.ktn_obj, j_node_executes)
+            #
+            i_node_graph_node_dict = configure.get('workspace.{}.node_graph.nodes'.format(i_key))
+            if i_node_graph_node_dict:
+                for seq, (j_key, j_node_dict) in enumerate(i_node_graph_node_dict.items()):
+                    j_node_path = j_node_dict['path']
+                    j_node = _ktn_dcc_obj_node.Node(j_node_path)
+                    if j_node.get_is_exists() is True:
+                        j_node_executes = j_node_dict.get('executes')
+                        if j_node_executes:
+                            self._set_node_executes_(j_node.ktn_obj, j_node_executes)
+
+    def set_variables_registry(self):
+        keys = ['layer', 'quality', 'camera', 'look_pass', 'light_pass']
+        variable_switches = ktn_core.NGObjTypeOpt('VariableSwitch').get_objs()
+        for i in variable_switches:
+            i_obj_opt = ktn_core.NGObjOpt(i)
+            i_key = i_obj_opt.get('lynxi_variants.key')
+            if i_key in keys:
+                i_obj_opt.set_port_execute('lynxi_variants.register_variable')
+        #
+        ktn_core.VariablesSetting().set_register_by_configure(
+            {
+                'variables_enable': ['on', 'off']
+            }
+        )
+
     def _get_look_pass_names_(self):
         lis = []
         node_key = 'look_outputs'
@@ -134,10 +172,10 @@ class AssetWorkspace(object):
     def _set_workspace_nodes_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
         with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
-            for key in workspace_keys:
+            for i_key in workspace_keys:
                 g_p.set_update()
-                for sub_key in ['main', 'backdrop']:
-                    cls._set_workspace_node_create_(configure, key, sub_key, pass_name)
+                for j_sub_key in ['main', 'backdrop']:
+                    cls._set_workspace_node_create_(configure, i_key, j_sub_key, pass_name)
     @classmethod
     def _set_workspace_node_create_(cls, configure, key, sub_key, pass_name='default'):
         variable = configure.get('workspace.{}.{}.variable'.format(key, sub_key))
@@ -207,13 +245,13 @@ class AssetWorkspace(object):
                 cls._set_workspace_node_graph_create_(configure, key, pass_name)
     @classmethod
     def _set_workspace_node_graph_create_(cls, configure, key, pass_name):
-        sub_nodes = configure.get('workspace.{}.node_graph.nodes'.format(key))
-        cls._set_node_graph_nodes_create_(sub_nodes, pass_name)
+        node_graph_node_dict = configure.get('workspace.{}.node_graph.nodes'.format(key))
+        cls._set_node_graph_nodes_create_(node_graph_node_dict, pass_name)
     @classmethod
     def _set_node_graph_nodes_create_(cls, nodes_dict, pass_name='default'):
         if nodes_dict:
-            for seq, (k, v) in enumerate(nodes_dict.items()):
-                cls._set_node_graph_node_create_(v, pass_name)
+            for seq, (k, i_node_dict) in enumerate(nodes_dict.items()):
+                cls._set_node_graph_node_create_(i_node_dict, pass_name)
     @classmethod
     def _set_node_graph_node_create_(cls, node_dict, pass_name='default'):
         variable = node_dict.get('variable')

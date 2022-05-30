@@ -28,12 +28,11 @@ class AssetWorkspaceOpt(object):
         smoothing=True,
         subdiv_type='catclark',
         subdiv_iterations=2,
-        subdiv_smooth_derivs=True,
         #
         disp_padding=0,
         disp_height=1,
-        disp_zero_value=0.5,
-        disp_autobump=False,
+        disp_zero_value=0,
+        disp_autobump=True,
     )
     WHITE_ZBRUSH_GEOMETRY_PROPERTIES_DICT = dict(
         smoothing=True,
@@ -291,7 +290,7 @@ class AssetWorkspaceOpt(object):
         dcc_displacement_shader = dcc_material.get_input_port('arnoldDisplacement').get_source_obj()
         if dcc_displacement_shader:
             dcc_displacement_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_displacement_shader)
-            cls._set_displacement_fix_(dcc_displacement_shader_opt)
+            # cls._set_displacement_fix_(dcc_displacement_shader_opt)
     @classmethod
     def _set_convert_to_white_zbrush_(cls, dcc_material, dcc_shader_path):
         dcc_surface_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()

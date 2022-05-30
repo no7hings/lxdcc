@@ -514,10 +514,11 @@ class LookYamlExporter(object):
         return dic
 
 
-class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
     OPTION = dict(
         directory='',
         location='',
+        include_indices=[],
         frame=None,
         resolution=512,
         aa_samples=3
@@ -546,6 +547,7 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         # frame_step=frameStep,
         # frame_padding=framePadding
         #
+        print kwargs
         cmds.select(mya_mesh_path)
         cmds.arnoldRenderToTexture(
             **kwargs
@@ -579,7 +581,9 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         beauty_texture_jpgs = dic.get('beauty') or []
         if beauty_texture_jpgs:
             beauty_texture_jpg = beauty_texture_jpgs[0]
-            cls._set_preview_shader_create_(mya_mesh, beauty_texture_jpg)
+            cls._set_preview_shader_create_(
+                mya_mesh, beauty_texture_jpg
+            )
     @classmethod
     def _set_texture_jpg_convert_(cls, patterns):
         dic = {}
@@ -639,6 +643,12 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         # noinspection PyUnresolvedReferences
         import mtoa.core as core
         core.createOptions()
+        #
+        mya_dcc_objects.Node(
+            'defaultArnoldRenderOptions'
+        ).set(
+            'ignoreDisplacement', True
+        )
     @classmethod
     def _set_arnold_light_create_(cls):
         light = mya_dcc_objects.Shape('light')
@@ -708,15 +718,16 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 set_filter_create_fnc_(i_aov)
 
     def __init__(self, option):
-        super(LookPreviewExporter, self).__init__(option)
+        super(TextureBaker, self).__init__(option)
 
     def set_run(self):
-        directory_path = self.option.get('directory')
+        directory_path = self.get('directory')
+        location_path = self.option.get('location')
+        include_indices = self.get('include_indices')
         directory = utl_dcc_objects.OsDirectory_(directory_path)
         directory.set_create()
         #
         mya_hide_set = mya_dcc_objects.Set('look_preview_export_hide_set')
-        #
         if mya_hide_set.get_is_exists() is False:
             mya_hide_set.set_create(
                 'set'
@@ -731,9 +742,10 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 'set'
             )
             self._set_arnold_visibilities_create_(mya_show_set)
+            #
             mya_show_set.get_port('primaryVisibility').set(True)
-        #
-        location_path = self.option.get('location')
+            # debug, render a black texture when "castsShadows" is "False"
+            mya_show_set.get_port('castsShadows').set(True)
         #
         mya_location_path = bsc_core.DccPathDagOpt(location_path).set_translate_to('|').get_value()
         #
@@ -748,7 +760,15 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._set_arnold_light_create_()
         self._set_arnold_aovs_create_()
         #
-        with utl_core.log_progress(maximum=len(mya_mesh_paths), label='look-preview-export') as l_p:
+        if include_indices:
+            mya_mesh_paths = [mya_mesh_paths[i] for i in include_indices]
+        #
+        utl_core.Log.set_module_result_trace(
+            'texture bake',
+            'objs=[{}]'.format(', '.join(['"{}"'.format(i) for i in mya_mesh_paths]))
+        )
+        #
+        with utl_core.log_progress_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
                 l_p.set_update()
                 #
@@ -770,6 +790,32 @@ class LookPreviewExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 #
                 mya_hide_set.set_element_add(i_mya_mesh_path)
                 mya_show_set.set_element_remove(i_mya_mesh_path)
+                #
+                i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
+                #
+                # self._set_preview_shader_convert_(directory, i_mya_mesh)
+        #
+        # file_path = mya_dcc_objects.Scene.get_current_file_path()
+        # import os
+        # base, ext = os.path.splitext(file_path)
+        # mya_dcc_objects.Scene.set_file_save_to(
+        #     '{}.bck.ma'.format(base)
+        # )
+
+    def set_convert_run(self):
+        directory_path = self.get('directory')
+        location_path = self.option.get('location')
+        directory = utl_dcc_objects.OsDirectory_(directory_path)
+
+        mya_group = mya_dcc_objects.Group(
+            bsc_core.DccPathDagOpt(location_path).set_translate_to('|').get_value()
+        )
+        mya_mesh_paths = mya_group.get_all_shape_paths(
+            include_obj_type=['mesh']
+        )
+        with utl_core.log_progress_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
+            for i_mya_mesh_path in mya_mesh_paths:
+                l_p.set_update()
                 #
                 i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
                 #

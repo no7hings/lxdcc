@@ -232,19 +232,20 @@ class MeshOpt(
                     )
                     i_uv_map_name = i_uv_map_name_new
                 #
-                uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = v
+                i_uv_map_face_vertex_counts, i_uv_map_face_vertex_indices, i_uv_map_coords = v
                 if usd_mesh.HasPrimvar(i_uv_map_name) is False:
-                    primvar = usd_mesh.CreatePrimvar(
+                    i_primvar = usd_mesh.CreatePrimvar(
                         i_uv_map_name,
                         Sdf.ValueTypeNames.TexCoord2fArray,
                         UsdGeom.Tokens.faceVarying
                     )
                 else:
-                    primvar = usd_mesh.GetPrimvar(
+                    i_primvar = usd_mesh.GetPrimvar(
                         i_uv_map_name
                     )
-                primvar.Set(uv_map_coords)
-                primvar.SetIndices(Vt.IntArray(uv_map_face_vertex_indices))
+                #
+                i_primvar.Set(i_uv_map_coords)
+                i_primvar.SetIndices(Vt.IntArray(i_uv_map_face_vertex_indices))
 
     def get_face_vertices_as_uuid(self):
         raw = self.get_face_vertices()

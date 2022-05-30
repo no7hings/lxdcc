@@ -54,6 +54,15 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: set_dcc_workspace_create
+                #
+                load_dcc_workspace:
+                    enable: True
+                    name: Load Dcc-workspace
+                    icon: python
+                    description: Load workspace node(s) in katana
+                    type: PrxPressItem
+                    path: <...path>/<..key>
+                    click_method: set_dcc_workspace_load
         geometry:
             name: Geometry(s)
             type: PrxExpandedGroup

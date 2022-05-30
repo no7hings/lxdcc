@@ -6,7 +6,7 @@ output_ports: []
 parameters:
     lynxi_variants/key:
         widget: enumerate
-        value: ['geometry', 'look', 'layer', 'quality', 'camera', 'look_pass', 'light_pass']
+        value: ['geometry', 'layer', 'quality', 'camera', 'look_pass', 'light_pass']
         tool_tip: '...'
 
     lynxi_variants/enable:

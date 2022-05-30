@@ -227,6 +227,9 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             )
         else:
             no_fnc_()
+    @classmethod
+    def set_file_import(cls, file_path):
+        KatanaFile.Import(file_path)
 
 
 class Selection(object):

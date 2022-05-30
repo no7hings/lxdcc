@@ -645,6 +645,14 @@ class NodeGraphInputPort(object):
     pass
 
 
+class NGObjTypeOpt(object):
+    def __init__(self, obj_type_name):
+        self._obj_type_name = obj_type_name
+
+    def get_objs(self):
+        return NodegraphAPI.GetAllNodesByType(self._obj_type_name)
+
+
 class EventOpt(object):
     def __init__(self, handler, event_type):
         self._handler = handler

@@ -446,32 +446,33 @@ class AbsOsFile(
 
     def set_link_to(self, tgt_file_path, force=False):
         tgt_file = self.__class__(tgt_file_path)
-        if tgt_file.get_is_exists():
-            if force is False:
+        if self.get_is_exists() is True:
+            if tgt_file.get_is_exists():
+                if force is False:
+                    utl_core.Log.set_module_result_trace(
+                        'link create',
+                        u'path="{}" is exists'.format(tgt_file.path)
+                    )
+                    return
+                else:
+                    if os.path.islink(tgt_file.path) is True:
+                        os.remove(tgt_file.path)
+                        utl_core.Log.set_module_result_trace(
+                            'path-link-remove',
+                            u'path="{}"'.format(tgt_file.path)
+                        )
+            #
+            if tgt_file.get_is_exists() is False:
+                tgt_file.set_directory_create()
+                #
+                bsc_core.StorageLinkMtd.set_link_to(
+                    self.path, tgt_file.path
+                )
+                #
                 utl_core.Log.set_module_result_trace(
                     'link create',
-                    u'path="{}" is exists'.format(tgt_file.path)
+                    u'link="{} >> {}"'.format(self.path, tgt_file.path)
                 )
-                return
-            else:
-                if os.path.islink(tgt_file.path) is True:
-                    os.remove(tgt_file.path)
-                    utl_core.Log.set_module_result_trace(
-                        'path-link-remove',
-                        u'path="{}"'.format(tgt_file.path)
-                    )
-        #
-        if tgt_file.get_is_exists() is False:
-            tgt_file.set_directory_create()
-            #
-            bsc_core.StorageLinkMtd.set_link_to(
-                self.path, tgt_file.path
-            )
-            #
-            utl_core.Log.set_module_result_trace(
-                'link create',
-                u'link="{} >> {}"'.format(self.path, tgt_file.path)
-            )
 
 
 class AbsOsTexture(AbsOsFile):
@@ -549,9 +550,9 @@ class AbsOsTexture(AbsOsFile):
         return [bsc_core.StoragePathMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
     # tx
     @classmethod
-    def _get_unit_tgt_ext_is_exists_(cls, file_path, tgt_ext):
-        tgt_ext_orig_path = cls._get_unit_tgt_ext_orig_path_(file_path, tgt_ext)
-        tgt_ext_path = cls._get_tgt_ext_path_(file_path, tgt_ext)
+    def _get_unit_tgt_ext_is_exists_(cls, any_file_path, tgt_ext):
+        tgt_ext_orig_path = cls._get_unit_tgt_ext_orig_path_(any_file_path, tgt_ext)
+        tgt_ext_path = cls._get_tgt_ext_path_(any_file_path, tgt_ext)
         tgt_ext_orig_timestamp = cls(tgt_ext_orig_path).get_modify_timestamp() or 0
         tgt_ext_timestamp = cls(tgt_ext_path).get_modify_timestamp() or 0
         return int(tgt_ext_orig_timestamp) == int(tgt_ext_timestamp)
@@ -579,6 +580,7 @@ class AbsOsTexture(AbsOsFile):
     @classmethod
     def _get_unit_tgt_ext_orig_path_(cls, file_path, tgt_ext):
         path_base, ext = os.path.splitext(file_path)
+        # etc ext=".tx"
         if ext == tgt_ext:
             ext_ = cls._get_unit_tgt_ext_orig_ext_(file_path, tgt_ext)
             if ext_ is not None:
@@ -602,13 +604,33 @@ class AbsOsTexture(AbsOsFile):
         )
 
     def get_tx_is_exists(self):
+        return self.get_is_exists_as_tgt_ext(self.TX_EXT)
+
+    def _get_tgt_ext_is_exists_(self, tgt_ext):
+        # TODO: if ext is ".tx", "*.1001.exr" is exists and "*.1001.tx" is lost
         _ = self._get_exists_files_(self.path)
         if _:
+            # find orig ext
+            orig_ext = None
             for i in _:
-                tx_orig_path = self._get_unit_tgt_ext_orig_path_(i.path, self.TX_EXT)
-                if i._get_unit_tgt_ext_is_exists_(tx_orig_path, tgt_ext=self.TX_EXT) is False:
-                    return False
+                if orig_ext is None:
+                    i_orig_ext = self._get_unit_tgt_ext_orig_ext_(i.path, tgt_ext)
+                    if i_orig_ext != tgt_ext:
+                        orig_ext = i_orig_ext
+                #
+                orig_file_path = self._get_tgt_ext_path_(i.path, orig_ext)
+                if os.path.isfile(orig_file_path):
+                    if i._get_unit_tgt_ext_is_exists_(orig_file_path, tgt_ext) is False:
+                        return False
             return True
+
+    def _get_tgt_ext_orig_path_(self, tgt_ext):
+        ext = self.ext
+        if ext == tgt_ext:
+            _ = self._get_exists_files_(self.path)
+            for i in _:
+                print self._get_unit_tgt_ext_orig_ext_(i.path, tgt_ext), 'AAA'
+        return tgt_ext
 
     def get_tx_orig_path(self):
         _ = self._get_exists_file_paths_(self.path)
@@ -657,13 +679,7 @@ class AbsOsTexture(AbsOsFile):
         return self.ext == ext
 
     def get_is_exists_as_tgt_ext(self, tgt_ext):
-        _ = self._get_exists_files_(self.path)
-        if _:
-            for i in _:
-                tx_orig_path = self._get_unit_tgt_ext_orig_path_(i.path, tgt_ext)
-                if i._get_unit_tgt_ext_is_exists_(tx_orig_path, tgt_ext) is False:
-                    return False
-            return True
+        return self._get_tgt_ext_is_exists_(tgt_ext)
 
     def get_is_exr(self):
         return self.ext == self.EXR_EXT

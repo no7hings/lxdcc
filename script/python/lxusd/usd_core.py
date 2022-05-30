@@ -224,6 +224,9 @@ class UsdStageOpt(object):
             lis.append(i_usd_prim)
         return lis
 
+    def get_count(self):
+        return len([i for i in self._usd_stage.TraverseAll()])
+
     def set_obj_paths_find(self, regex):
         def get_fnc_(path_, depth_):
             _depth = depth_+1
@@ -592,7 +595,9 @@ class UsdMeshOpt(object):
         #
         uv_map_face_vertex_indices, uv_map_coords = uv_map
         primvar.Set(uv_map_coords)
-        primvar.SetIndices(Vt.IntArray(uv_map_face_vertex_indices))
+        primvar.SetIndices(
+            Vt.IntArray(uv_map_face_vertex_indices)
+        )
 
     def set_display_color_fill(self, color):
         UsdGeometryMeshOpt(
@@ -612,3 +617,6 @@ class UsdMeshOpt(object):
         return UsdGeometryMeshOpt(
             self._usd_prim
         ).get_usd_display_colors()
+
+    def get_face_vertex_indices(self, reverse=False):
+        pass

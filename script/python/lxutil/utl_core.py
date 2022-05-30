@@ -926,9 +926,10 @@ class Path(object):
             # fix windows path
             if platform.system() == 'Windows':
                 _ = [i.replace('\\', '/') for i in _]
-            # sort by number
-            if sort_by == 'number':
-                _.sort(key=lambda x: cls._str_to_number_embedded_args_(x))
+            if len(_) > 1:
+                # sort by number
+                if sort_by == 'number':
+                    _.sort(key=lambda x: cls._str_to_number_embedded_args_(x))
         return _
 
 

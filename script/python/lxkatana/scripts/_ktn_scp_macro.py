@@ -190,11 +190,11 @@ class LxAsset(object):
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
-        obj_opt.set_port_raw(
-            'option.asset', ''
+        obj_opt.set(
+            'options.asset', ''
         )
-        obj_opt.set_port_raw(
-            'option.scheme', 'asset'
+        obj_opt.set_as_enumerate(
+            'options.shot', ['None']
         )
         obj_opt.set_port_raw(
             'usd.asset.file', ''
@@ -221,9 +221,7 @@ class LxAsset(object):
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:
             rsv_asset = self._get_rsv_asset_(rsv_asset_path)
-            if rsv_asset is not None:
-                pass
-            else:
+            if rsv_asset is None:
                 content = 'asset="{}" is not available'.format(rsv_asset_path)
         else:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
@@ -243,7 +241,7 @@ class LxAsset(object):
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Error,
+                    status=utl_core.DialogWindow.GuiStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -256,7 +254,10 @@ class LxAsset(object):
         _ = rsv_asset_path.split('/')
         project, role, asset = _[1:]
         resolver = rsv_commands.get_resolver()
-        return resolver.get_rsv_entity(project=project, asset=asset)
+        return resolver.get_rsv_entity(
+            project=project,
+            asset=asset
+        )
     @classmethod
     def _get_rsv_shot_(cls, rsv_shot_path):
         import lxresolver.commands as rsv_commands
@@ -459,6 +460,8 @@ class LxAsset(object):
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:
             rsv_asset = self._get_rsv_asset_(rsv_asset_path)
+            if rsv_asset is None:
+                content = 'asset="{}" is not available'.format(rsv_asset_path)
         else:
             rsv_asset = self._get_rsv_asset_auto_()
         #
@@ -471,7 +474,7 @@ class LxAsset(object):
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Error,
+                    status=utl_core.DialogWindow.GuiStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -491,6 +494,8 @@ class LxAsset(object):
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:
             rsv_asset = self._get_rsv_asset_(rsv_asset_path)
+            if rsv_asset is None:
+                content = 'asset="{}" is not available'.format(rsv_asset_path)
         else:
             rsv_asset = self._get_rsv_asset_auto_()
 
@@ -515,19 +520,19 @@ class LxAsset(object):
                 else:
                     content = u'shot="{}" set-dress file is non-exists'.format(rsv_shot_path)
             else:
-                content = u'shot="{}" is not available'.format(rsv_shot_path)
-            #
-            if content is not None:
-                if ktn_core._get_is_ui_mode_():
-                    utl_core.DialogWindow.set_create(
-                        'Shot Asset Loader',
-                        content=content,
-                        status=utl_core.DialogWindow.GuiStatus.Error,
-                        #
-                        yes_label='Close',
-                        #
-                        no_visible=False, cancel_visible=False
-                    )
+                content = u'asset="{}" shot(s) is non-exists'.format(rsv_asset.path)
+        #
+        if content is not None:
+            if ktn_core._get_is_ui_mode_():
+                utl_core.DialogWindow.set_create(
+                    'Shot Asset Loader',
+                    content=content,
+                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
 
 
 class LxCamera(object):
@@ -549,7 +554,8 @@ class LxCamera(object):
         )
 
     def set_load(self):
-        # adjustScreenWindow=Adjust width to match resolution
+        from lxutil import utl_core
+        #
         import lxresolver.commands as rsv_commands
         #
         from lxkatana import ktn_core
@@ -562,6 +568,8 @@ class LxCamera(object):
             'alembic.enable',
             0
         )
+        #
+        content = None
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
@@ -592,6 +600,24 @@ class LxCamera(object):
                             'alembic.location',
                             '/root/world/cam/cameras/main'
                         )
+                else:
+                    content = u'asset="{}" camera task is non-exists'.format(rsv_entity.path)
+            else:
+                content = u'file={} is not not available'.format(f)
+        else:
+            content = u'file={} is not not available'.format(f)
+
+        if content is not None:
+            if ktn_core._get_is_ui_mode_():
+                utl_core.DialogWindow.set_create(
+                    'Asset Camera Loader',
+                    content=content,
+                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
 
     def set_variable_register(self):
         from lxkatana import ktn_core
@@ -852,14 +878,17 @@ class LxLight(object):
         )
 
     def set_create(self):
+        pass
+
+    def set_refresh_light_rig(self):
         from lxutil import utl_core
-        #
+
         from lxkatana import ktn_core
-        #
-        content = None
-        #
+
+        contents = []
+
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        #
+
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:
             rsv_asset = LxAsset._get_rsv_asset_(rsv_asset_path)
@@ -868,15 +897,91 @@ class LxLight(object):
         #
         if rsv_asset is not None:
             self.__set_rsv_asset_(rsv_asset)
+            rsv_project = rsv_asset.get_rsv_project()
+
+            current_asset = obj_opt.get('lights.light_rig.name')
+
+            rsv_assets = rsv_project.get_rsv_entities(
+                asset='*_lightrig'
+            )
+            if rsv_assets:
+                obj_opt.set_as_enumerate(
+                    'lights.light_rig.name',
+                    [i.name for i in rsv_assets]
+                )
+                obj_opt.set('lights.light_rig.name', current_asset)
+
+    def set_load_light_rig(self):
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        asset = obj_opt.get('lights.light_rig.name')
+
+        self._set_load_from_asset_light_rig_(asset)
+
+    def _set_load_from_asset_light_rig_(self, asset):
+        from lxutil import utl_core
+
+        from lxkatana import ktn_core
+
+        contents = []
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        rsv_asset_path = obj_opt.get_port_raw('options.asset')
+        if rsv_asset_path:
+            rsv_asset = LxAsset._get_rsv_asset_(rsv_asset_path)
+        else:
+            rsv_asset = LxAsset._get_rsv_asset_auto_()
+        #
+        if rsv_asset is not None:
+            self.__set_rsv_asset_(rsv_asset)
+            rsv_project = rsv_asset.get_rsv_project()
+
+            light_rsv_task = rsv_project.get_rsv_task(
+                workspace='publish', asset=asset, step='lgt', task='lighting'
+            )
+            if light_rsv_task:
+                light_group_rsv_unit = light_rsv_task.get_rsv_unit(
+                    keyword='asset-live_group-file'
+                )
+                light_group_file_path = light_group_rsv_unit.get_result(
+                    version='latest'
+                )
+                if light_group_file_path:
+                    obj_opt.set(
+                        'lights.light_rig.live_group', light_group_file_path
+                    )
+                else:
+                    contents.append(
+                        u'light-group="{}" file is non-exists, use default'.format(
+                            asset
+                        )
+                    )
             #
-            rsv_asset_light_task = rsv_asset.get_rsv_task(
-                workspace='publish', step='lgt', task='lighting'
-            )
-            asset_light_live_group_unit = rsv_asset_light_task.get_rsv_unit(
-                keyword='asset-light-live_group-file'
-            )
-            asset_light_live_group_file_path = asset_light_live_group_unit.get_result(
-                version='latest'
-            )
-            if asset_light_live_group_file_path is not None:
-                obj_opt.set('live_group.file', asset_light_live_group_file_path)
+            # CacheManager.flush()
+            self.set_live_groups_update()
+        #
+        if contents:
+            if ktn_core._get_is_ui_mode_():
+                utl_core.DialogWindow.set_create(
+                    'Shot Asset Loader',
+                    content=u'\n'.join(contents),
+                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
+
+    def set_live_groups_update(self):
+        from lxkatana import ktn_core
+
+        contents = []
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        children = obj_opt.get_children(include_type_names=['LiveGroup'])
+
+        for i in children:
+            i.reloadFromSource()

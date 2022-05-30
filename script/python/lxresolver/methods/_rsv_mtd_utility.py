@@ -208,6 +208,9 @@ if __name__ == '__main__':
     # for project, role, asset in asset_args:
     #     rsv_asset = r.get_rsv_entity(project=project, role=role, asset=asset)
     #     print rsv_asset
+    # RsvPermissionMtd.set_entity_task_create(
+    #     project='lib', role='flg', asset='shl__cao_a', step='srf', task='surfacing'
+    # )
     RsvPermissionMtd.set_entity_task_create(
-        project='lib', role='flg', asset='shl__cao_a', step='srf', task='surfacing'
+        project='cgm', role='wsp', asset='surface_workspace', step='srf', task='surfacing'
     )

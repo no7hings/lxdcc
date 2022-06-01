@@ -629,13 +629,14 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
             shader.get_port('color').set_source(
                 image.get_port('outColor')
             )
+            image.set('colorSpace', 'ACES - ACEScg')
+            image.set('ignoreColorSpaceFileRules', True)
         #
-        image.get_port('fileTextureName').set(texture_jpg.path)
-        image.get_port('uvTilingMode').set(3)
+        image.set('fileTextureName', texture_jpg.path)
+        image.set('uvTilingMode', 3)
         #
         mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(mya_mesh)
         mya_mesh_look_opt.set_material(material.path)
-        #
         if ma_core._get_is_ui_mode_() is True:
             mel.eval('generateUvTilePreview {}'.format(image.path))
     @classmethod

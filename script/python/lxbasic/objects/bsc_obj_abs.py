@@ -50,7 +50,11 @@ class AbsContent(object):
         self._unfold_exludes = []
 
     def set_save_to(self, file_path):
-        bsc_core.StorageFileOpt(file_path).set_write(self._value)
+        bsc_core.StorageFileOpt(
+            file_path
+        ).set_write(
+            self._value
+        )
     @property
     def key(self):
         return self._key

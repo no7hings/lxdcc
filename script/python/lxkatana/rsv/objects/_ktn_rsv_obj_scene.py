@@ -144,6 +144,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         katana_scene_file_path = katana_scene_file_rsv_unit.get_result(version=version)
 
         render_file_path = katana_scene_file_path
+        # save file first
         ktn_dcc_objects.Scene.set_file_save_to(render_file_path)
         # create workspace
         ktn_fnc_creators.LookWorkspaceCreator().set_run()
@@ -163,11 +164,20 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             if _:
                 shot_geometries_node_opt.set('options.shot', _[0])
             shot_geometries_node_opt.set_port_execute('usd.create')
-        # usd override enable
+        #
+        asset_dcc_nodes = [ktn_dcc_objects.Node(i) for i in ['asset__geometries', 'asset__geometries']]
+        # usd variants
         usd_variant_scheme = self._hook_option_opt.get('usd_variant_scheme')
         if usd_variant_scheme:
             if usd_variant_scheme == 'main':
                 pass
+        # usd debuggers
+        usd_reverse_face_vertex_enable = self._hook_option_opt.get_as_boolean('usd_reverse_face_vertex_enable')
+        for i_asset_dcc_node in asset_dcc_nodes:
+            if i_asset_dcc_node.get_is_exists() is True:
+                i_asset_dcc_node.set(
+                    'usd.debuggers.reverse_face_vertex_enable', usd_reverse_face_vertex_enable
+                )
         # render arnold aov
         render_arnold_aov_enable = self._hook_option_opt.get('render_arnold_aov_enable')
         qualities = self._hook_option_opt.get('qualities', as_array=True)

@@ -25,14 +25,15 @@ class AssetWorkspaceOpt(object):
         'subsurface_scale': 0.125,
     }
     WHITE_DISP_GEOMETRY_PROPERTIES_DICT = dict(
+        # invert_normals=False,
         smoothing=True,
         subdiv_type='catclark',
         subdiv_iterations=2,
         #
-        disp_padding=0,
-        disp_height=1,
-        disp_zero_value=0,
-        disp_autobump=True,
+        # disp_padding=0,
+        # disp_height=1,
+        # disp_zero_value=0,
+        # disp_autobump=True,
     )
     WHITE_ZBRUSH_GEOMETRY_PROPERTIES_DICT = dict(
         smoothing=True,
@@ -296,7 +297,7 @@ class AssetWorkspaceOpt(object):
         dcc_surface_shader = dcc_material.get_input_port('arnoldSurface').get_source_obj()
         if dcc_surface_shader:
             cls._set_white_create_(dcc_material, dcc_shader_path)
-
+    #
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_auto_white_zbrush_assign(self, pass_name='default'):
         configure = self._workspace.get_configure(pass_name)

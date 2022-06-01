@@ -1281,7 +1281,19 @@ class KeywordArgumentsOpt(object):
         if key in self._option_dict:
             _ = self._option_dict[key]
             if as_integer is True:
-                return int(_)
+                if isinstance(_, int):
+                    return _
+                elif isinstance(_, float):
+                    return int(_)
+                elif isinstance(_, (str, unicode)):
+                    if _:
+                        if str(_).isdigit():
+                            return int(_)
+                        elif TextOpt(_).get_is_float():
+                            return int(float(_))
+                        return 0
+                    return 0
+                return 0
             if as_array is True:
                 if isinstance(_, (tuple, list)):
                     return _
@@ -1289,6 +1301,15 @@ class KeywordArgumentsOpt(object):
                     return [_]
                 return []
             return self._option_dict[key]
+
+    def get_as_array(self, key):
+        return self.get(key, as_array=True)
+
+    def get_as_boolean(self, key):
+        return self.get(key) or False
+
+    def get_as_integer(self, key):
+        return self.get(key, as_integer=True)
 
     def pop(self, key):
         if key in self._option_dict:
@@ -2122,7 +2143,10 @@ class ColorSpaceMtd(object):
 
 class TextOpt(object):
     def __init__(self, raw):
-        self._raw = raw
+        if isinstance(raw, (str, unicode)):
+            self._raw = raw
+        else:
+            raise TypeError()
 
     def get_is_contain_chinese(self):
         check_str = self._raw
@@ -2178,6 +2202,9 @@ class TextOpt(object):
     def to_frame_range(self):
         frames = self.to_frames()
         return min(frames), max(frames)
+
+    def get_is_float(self):
+        return sum([n.isdigit() for n in self._raw.strip().split('.')]) == 2
 
 
 class ValueMtd(object):
@@ -3488,6 +3515,16 @@ class CameraMtd(object):
 
 
 class MeshFaceVertexIndicesOpt(object):
+    # print MeshFaceVertexIndicesOpt(
+    #     [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
+    # ).set_reverse_by_counts(
+    #     [4, 4, 4, 4, 4, 4, 4, 4, 4]
+    # )
+    # print MeshFaceVertexIndicesOpt(
+    #     [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
+    # ).set_reverse_by_start_indices(
+    #     [0, 4, 8, 12, 16, 20, 24, 28, 32, 36]
+    # )
     def __init__(self, face_vertex_indices):
         self._raw = face_vertex_indices
 
@@ -3495,33 +3532,25 @@ class MeshFaceVertexIndicesOpt(object):
         lis = []
         start_index = 0
         for i_count in counts:
-            i_indices = self._raw[start_index:start_index+i_count]
-            i_indices.reverse()
-            lis.extend(i_indices)
+            end_index = start_index+i_count
+            for j in range(end_index - start_index):
+                lis.append(self._raw[end_index-j-1])
             #
             start_index += i_count
         return lis
 
     def set_reverse_by_start_indices(self, start_indices):
         lis = []
-        start_index = 0
-        for i_start_index in start_indices[1:]:
-            i_indices = self._raw[start_index:i_start_index]
-            i_indices.reverse()
-            lis.extend(i_indices)
-            #
-            start_index = i_start_index
+        for i in range(len(start_indices)):
+            if i > 0:
+                start_index = start_indices[i-1]
+                end_index = start_indices[i]
+                for j in range(end_index-start_index):
+                    lis.append(self._raw[end_index-j-1])
         return lis
 
 
 if __name__ == '__main__':
-    print MeshFaceVertexIndicesOpt(
-        [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
-    ).set_reverse_by_counts(
-        [4, 4, 4, 4, 4, 4, 4, 4, 4]
-    )
-    print MeshFaceVertexIndicesOpt(
-        [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
-    ).set_reverse_by_start_indices(
-        [0, 4, 8, 12, 16, 20, 24, 28, 32, 36]
-    )
+    print KeywordArgumentsOpt(
+        'a=2.0'
+    ).get_as_integer('a')

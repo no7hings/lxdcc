@@ -75,6 +75,8 @@ output:
         #
         OnJobComplete: Nothing
         #
+        OnTaskTimeout: Notify
+        #
         JobDependencies: ''
         #
         StartupDirectory: <option.deadline.output_directory>

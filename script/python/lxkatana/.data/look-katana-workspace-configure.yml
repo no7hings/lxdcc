@@ -683,6 +683,7 @@ workspace:
                         - <.output>
                         - <.....cameras.main.path>.cameras
                     executes:
+                        - 'reset'
                         - 'alembic.load'
     # light-pass
     # y=-7.0

@@ -212,5 +212,5 @@ if __name__ == '__main__':
     #     project='lib', role='flg', asset='shl__cao_a', step='srf', task='surfacing'
     # )
     RsvPermissionMtd.set_entity_task_create(
-        project='cgm', role='wsp', asset='surface_workspace', step='srf', task='surfacing'
+        project='cgm', role='chr', asset='nn_4y_test', step='srf', task='srf_anishading'
     )

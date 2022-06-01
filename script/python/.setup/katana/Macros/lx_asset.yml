@@ -31,6 +31,11 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_guess()'
         tool_tip: '...'
 
+    usd/asset/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
     usd/asset/file:
         widget: file
         value: ''
@@ -153,6 +158,11 @@ parameters:
         widget: enumerate
         value:
             - 'None'
+        tool_tip: '...'
+    #
+    usd/debuggers/reverse_face_vertex_enable:
+        widget: boolean
+        value: False
         tool_tip: '...'
 
     usd/create:

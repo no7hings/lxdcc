@@ -398,9 +398,6 @@ class AbsSsnRsvOptionExecuteDef(object):
     def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
         pass
 
-    def get_ddl_dependent_unique_id(self):
-        pass
-
     def get_executor(self):
         return self.EXECUTOR(
             self
@@ -716,8 +713,6 @@ class AbsOptionRsvTaskMethodSession(
         if option_hook_key_extend:
             keys.extend(option_hook_key_extend)
         #
-        hook_dependencies = hook_option_opt.get('dependencies')
-        #
         key = '/'.join(keys)
         c.set(
             'deadline.{}.job_id'.format(key), ddl_job_id
@@ -797,13 +792,6 @@ class AbsOptionRsvTaskMethodSession(
     def get_rsv_version_name(self):
         return self._get_rsv_task_version_(
             self.get_rsv_scene_properties()
-        )
-
-    def get_ddl_dependent_unique_id(self):
-        option_opt = self.get_option_opt()
-        return bsc_core.SessionYamlMtd.get_key(
-            user=option_opt.get('user'),
-            time_tag=option_opt.get('time_tag'),
         )
 
     def get_group(self):

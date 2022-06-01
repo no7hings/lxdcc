@@ -112,6 +112,7 @@ shaders:
         aiVolumeSampleFloat: volume_sample_float
         aiVolumeSampleRgb: volume_sample_rgb
         aiWireframe: wireframe
+    #
     to-maya:
         abs: aiAbs
         add: aiAdd
@@ -153,6 +154,8 @@ shaders:
         flat: aiFlat
         float_to_int: aiFloatToInt
         float_to_rgba: aiFloatToRgba
+        # maya do not has float_to_rgb
+        float_to_rgb: aiFloatToRgba
         fog: aiFog
         fraction: aiFraction
         hair: aiHair
@@ -227,6 +230,7 @@ shaders:
         volume_sample_float: aiVolumeSampleFloat
         volume_sample_rgb: aiVolumeSampleRgb
         wireframe: aiWireframe
+        #
         switch_rgba: aiSwitch
 #
 input-ports:

@@ -262,21 +262,23 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             keyword=keyword_0
         )
         scene_src_file_path = scene_src_file_rsv_unit.get_result(version=version)
-        #
-        mya_fnc_builders.AssetBuilder(
-            option=dict(
-                project=project,
-                asset=asset,
-                #
-                with_model_geometry=self._hook_option_opt.get('with_model_geometry') or False,
-                #
-                with_surface_look=self._hook_option_opt.get('with_surface_look') or False,
-                with_surface_geometry_uv_map=self._hook_option_opt.get('with_surface_geometry_uv_map') or False,
-                #
-                geometry_var_names=self._hook_option_opt.get('geometry_var_names', as_array=True) or [],
-            )
-        ).set_run()
 
+        with_build = self._hook_option_opt.get_as_boolean('with_build')
+        if with_build is True:
+            mya_fnc_builders.AssetBuilder(
+                option=dict(
+                    project=project,
+                    asset=asset,
+                    #
+                    with_model_geometry=self._hook_option_opt.get('with_model_geometry') or False,
+                    #
+                    with_surface_look=self._hook_option_opt.get('with_surface_look') or False,
+                    with_surface_geometry_uv_map=self._hook_option_opt.get('with_surface_geometry_uv_map') or False,
+                    #
+                    geometry_var_names=self._hook_option_opt.get('geometry_var_names', as_array=True) or [],
+                )
+            ).set_run()
+        #
         mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
 
     def set_asset_texture_bake_create(self):
@@ -299,6 +301,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         )
         if mya_group.get_is_exists() is True:
             bake_resolution = self._hook_option_opt.get('bake_resolution', as_integer=True)
+            with_work_scene_src_link = self._hook_option_opt.get('with_work_scene_src_link') or False
             #
             mesh_paths = mya_group.get_all_shape_paths(include_obj_type='mesh')
             bake_option_opt = bsc_core.KeywordArgumentsOpt(
@@ -335,6 +338,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                         #
                         with_texture_bake_convert=True,
                         bake_resolution=bake_resolution,
+                        with_work_scene_src_link=with_work_scene_src_link,
                         #
                         dependencies=[option_hook_key],
                         #
@@ -430,9 +434,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             texture_tgt_directory_path = texture_tgt_directory_tgt_unit.get_result(
                 version=version
             )
-
+            #
             bake_resolution = self._hook_option_opt.get('bake_resolution', as_integer=True)
-
+            #
             mya_fnc_exporters.TextureBaker(
                 option=dict(
                     directory=texture_tgt_directory_path,
@@ -444,6 +448,49 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             mya_dcc_objects.Scene.set_file_save_to(
                 scene_file_path
             )
+
+    def set_asset_work_scene_src_link(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword_0 = 'asset-maya-scene-file'
+            keyword_1 = 'asset-work-maya-scene-src-file'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-maya-scene-file'
+            keyword_1 = 'asset-work-maya-scene-src-file'
+        else:
+            raise TypeError()
+        #
+        scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        scene_file_path = scene_file_rsv_unit.get_result(version=version)
+
+        work_scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_1
+        )
+        latest_work_scene_src_file_path = work_scene_src_file_rsv_unit.get_result(
+            version='latest'
+        )
+        if latest_work_scene_src_file_path:
+            if bsc_core.StorageLinkMtd.get_is_link_source_to(
+                    scene_file_path, latest_work_scene_src_file_path
+            ) is False:
+                new_work_scene_src_file_path = work_scene_src_file_rsv_unit.get_result(
+                    version='new'
+                )
+                #
+                utl_dcc_objects.OsFile(
+                    scene_file_path
+                ).set_link_to(new_work_scene_src_file_path)
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'preview work-scene-src link create',
+                    u'link="{}" >> "{}" is exists'.format(
+                        scene_file_path, latest_work_scene_src_file_path
+                    )
+                )
 
 
 class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):

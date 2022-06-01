@@ -196,6 +196,10 @@ class LxAsset(object):
         obj_opt.set_as_enumerate(
             'options.shot', ['None']
         )
+
+        obj_opt.set_port_raw(
+            'usd.asset.enable', 0
+        )
         obj_opt.set_port_raw(
             'usd.asset.file', ''
         )
@@ -338,6 +342,9 @@ class LxAsset(object):
                 rsv_scene_properties
             )
             if asset_set_usd_file_path:
+                obj_opt.set_port_raw(
+                    'usd.asset.enable', 1
+                )
                 obj_opt.set(
                     'usd.asset.file', asset_set_usd_file_path
                 )
@@ -374,6 +381,9 @@ class LxAsset(object):
                 rsv_scene_properties
             )
             if asset_shot_set_usd_file_path:
+                obj_opt.set_port_raw(
+                    'usd.asset.enable', 1
+                )
                 obj_opt.set(
                     'usd.asset.file', asset_shot_set_usd_file_path
                 )
@@ -408,7 +418,10 @@ class LxAsset(object):
                     rsv_scene_properties,
                     asset_shot_set_usd_file_path
                 )
-                self.__set_usd_variant_by_dict_(usd_variant_dict)
+                #
+                self.__set_usd_variant_by_dict_(
+                    usd_variant_dict
+                )
         #
         CacheManager.flush()
 
@@ -422,7 +435,7 @@ class LxAsset(object):
 
     def __set_usd_variant_by_dict_(self, dict_):
         from lxkatana import ktn_core
-
+        #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         for k, v in dict_.items():
             i_port_path = 'usd.{}'.format(v['port_path'])
@@ -440,6 +453,10 @@ class LxAsset(object):
         from lxkatana import ktn_core
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        obj_opt.set_port_raw(
+            'usd.asset.enable', 0
+        )
         #
         scheme = obj_opt.get('options.scheme')
         #
@@ -491,6 +508,7 @@ class LxAsset(object):
         content = None
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:
             rsv_asset = self._get_rsv_asset_(rsv_asset_path)

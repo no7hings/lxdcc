@@ -857,6 +857,11 @@ class EnvironMtd(object):
         python_paths = sys.path
         if path not in python_paths:
             sys.path.insert(0, path)
+    @classmethod
+    def get_qt_thread_enable(cls):
+        if ApplicationMtd.get_is_maya():
+            return False
+        return True
 
 
 class HashMtd(object):
@@ -3029,6 +3034,26 @@ class ImageOpt(object):
                 )
                 return s_p
 
+    def set_convert_to(self, file_path_tgt):
+        file_opt = StorageFileOpt(self._file_path)
+        if file_opt.get_is_file() is True:
+            file_opt_tgt = StorageFileOpt(file_path_tgt)
+            ext_tgt = file_opt_tgt.get_ext()
+            data_time = TimestampMtd.to_string(
+                '%Y:%m:%d %H:%M:%S', file_opt.get_modify_timestamp()
+            )
+            cmd_args = [
+                Bin.get_oiiotool(),
+                u'-i "{}"'.format(file_opt.path),
+                '--attrib:type=string DateTime "{}"'.format(data_time),
+                '--adjust-time ',
+                '--threads 1',
+                u'-o "{}"'.format(file_opt_tgt.path),
+            ]
+            SubProcessMtd.set_run_with_result(
+                ' '.join(cmd_args)
+            )
+
 
 class ListMtd(object):
     @classmethod
@@ -3506,8 +3531,11 @@ class CameraMtd(object):
         _, (c_x, c_y, c_z), (w, h, d) = geometry_args
 
         r = max(w, h)
+        print r
         z_1 = r / math.tan(math.radians(angle))
         t_x, t_y, t_z = (c_x, c_y, z_1 - c_z)
+
+        print z_1
 
         r_x, r_y, r_z = 0, 0, 0
         s_x, s_y, s_z = 1, 1, 1
@@ -3551,6 +3579,8 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print KeywordArgumentsOpt(
-        'a=2.0'
-    ).get_as_integer('a')
+    ImageOpt(
+        '/data/f/arnold-render-to-texture/test-15/star_001_hiShape.exr'
+    ).set_convert_to(
+        '/data/f/arnold-render-to-texture/test-15/star_001_hiShape.png'
+    )

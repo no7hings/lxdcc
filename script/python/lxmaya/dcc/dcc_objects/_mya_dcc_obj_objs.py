@@ -154,6 +154,9 @@ class AbsFileReferences(object):
         'aiMaterialx': _mya_dcc_obj_arnold.AndMaterialx,
         #
         'osl_file_path': _mya_dcc_obj_obj.TextureReference,
+        'osl_window_box': _mya_dcc_obj_obj.TextureReference,
+        'osl_window_box_s': _mya_dcc_obj_obj.TextureReference,
+
     }
     #
     CUSTOM_SEARCH_KEYS = [
@@ -172,7 +175,9 @@ class AbsFileReferences(object):
         'aiVolume': ['filename'],
         'aiMaterialx': ['filename'],
         #
-        'osl_file_path': ['filename']
+        'osl_file_path': ['filename'],
+        'osl_window_box': ['filename'],
+        'osl_window_box_s': ['filename']
     }
     PORT_PATHSEP = ma_configure.Util.PORT_PATHSEP
     #

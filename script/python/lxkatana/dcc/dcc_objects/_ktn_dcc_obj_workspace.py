@@ -669,15 +669,17 @@ class AssetWorkspace(object):
             os_file = utl_dcc_objects.OsFile(file_path)
             os_file.set_directory_create()
             ktn_obj.WriteToLookFile(None, file_path)
-
+            #
             utl_core.Log.set_module_result_trace(
                 'look-klf export',
                 '"{}"'.format(file_path)
             )
         else:
-            utl_core.Log.set_module_warning_trace(
-                'look-klf export',
-                'obj="{}" is non-exists'.format(dcc_obj.path)
+            raise RuntimeError(
+                utl_core.Log.set_module_error_trace(
+                    'look-klf export',
+                    'obj="{}" is non-exists'.format(dcc_obj.path)
+                )
             )
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_light_rig_update(self):
@@ -779,6 +781,12 @@ class AssetWorkspace(object):
         if dcc_obj.get_is_exists() is True:
             scene_graph_opt = ktn_core.SceneGraphOpt(dcc_obj.ktn_obj)
             return scene_graph_opt.get_port_raw(atr_path)
+        else:
+            raise RuntimeError(
+                utl_core.Log.set_module_error_trace(
+                    'obj="{}" is non-exists'.format(dcc_obj.path)
+                )
+            )
 
     def get_sg_geometries(self, pass_name='default'):
         configure = self.get_configure(pass_name)

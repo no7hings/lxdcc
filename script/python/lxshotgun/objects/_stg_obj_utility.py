@@ -631,7 +631,31 @@ class StgConnector(object):
     def get_stg_look_pass_queries(self, **kwargs):
         return [self.STG_OBJ_QUERY_CLS(self, i) for i in self.get_stg_look_passes(**kwargs)]
 
+    def get_stg_deadline_render_info_query(self, **kwargs):
+        mapper = dict(
+            mod='MOD',
+            grm='GRM',
+            srf='LOOKDEV',
+            rig='LOOKDEV',
+            ani='ANI',
+            cfx='CFX',
+            efx='EFX',
+            dmt='DMT',
+        )
+        step = kwargs['step']
+        if step in mapper:
+            stg_entity = self._shotgun.find_one(
+                entity_type='CustomNonProjectEntity01',
+                filters=[
+                    ['sg_department', 'is', mapper[step]],
+                    ['sg_job_type', 'is', 'Render']
+                ]
+            )
+            if stg_entity is not None:
+                stg_entity_query = self.STG_OBJ_QUERY_CLS(self, stg_entity)
+                return stg_entity_query
+
 
 if __name__ == '__main__':
     import lxshotgun.objects as stg_objects
-    stg_objects.StgConnector().get_stg_entity(project='shl', asset='shengbei')
+    stg_objects.StgConnector().get_stg_deadline_render_info_query(step='mod')

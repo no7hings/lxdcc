@@ -119,6 +119,7 @@ class AssetWorkspaceOpt(object):
                 dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_occ)
                 dcc_occ_opt.set_create('ambient_occlusion')
                 dcc_occ_opt.set('white', value)
+                dcc_occ_opt.set('far_clip', 10)
                 if dcc_source is not None:
                     dcc_occ_opt.set_port_source('white', dcc_source, validation=True)
                 if dcc_targets:
@@ -138,6 +139,7 @@ class AssetWorkspaceOpt(object):
                 dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_occ)
                 dcc_occ_opt.set_create('ambient_occlusion')
                 dcc_occ_opt.set('white', value)
+                dcc_occ_opt.set('far_clip', 10)
                 if dcc_source is not None:
                     dcc_occ_opt.set_port_source('white', dcc_source, validation=True)
                 if dcc_targets:
@@ -145,15 +147,16 @@ class AssetWorkspaceOpt(object):
                         dcc_occ_opt.set_port_target('out', i_dcc_target, validation=True)
     @classmethod
     def _set_occ_create_(cls, dcc_material, dcc_path, color):
-        dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
+        dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(
             ktn_dcc_objects.Node(dcc_path)
         )
-        dcc_shader_opt.set_create('ambient_occlusion')
-        dcc_shader_opt.set_port_target(
+        dcc_occ_opt.set_create('ambient_occlusion')
+        dcc_occ_opt.set_port_target(
             'out', dcc_material.get_input_port('arnoldSurface'),
             validation=True
         )
-        dcc_shader_opt.set('white', color)
+        dcc_occ_opt.set('white', color)
+        dcc_occ_opt.set('far_clip', 10)
     @classmethod
     def _set_opacity_lambert_create_(cls, dcc_material, dcc_path):
         dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(

@@ -154,10 +154,16 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
 class AbsTextureReferences(object):
     OBJ_CLASS_DICT = {
         'image': _ktn_dcc_obj_node.TextureReference,
+        'osl_file_path': _ktn_dcc_obj_node.TextureReference,
+        'osl_window_box': _ktn_dcc_obj_node.TextureReference,
+        'osl_window_box_s': _ktn_dcc_obj_node.TextureReference,
         'custom': _ktn_dcc_obj_node.FileReference,
     }
     CUSTOM_SEARCH_KEYS = [
-        'image.parameters.filename'
+        'image.parameters.filename',
+        'osl_file_path.parameters.filename',
+        'osl_window_box.parameters.filename',
+        'osl_window_box_s.parameters.filename',
     ]
     #
     PORT_PATHSEP = ktn_configure.Util.PORT_PATHSEP
@@ -166,6 +172,12 @@ class AbsTextureReferences(object):
     )
     PORT_QUERY_DICT = {
         'image': [
+            'parameters.filename'
+        ],
+        'osl_file_path': [
+            'parameters.filename'
+        ],
+        'osl_window_box': [
             'parameters.filename'
         ]
     }
@@ -300,7 +312,9 @@ class AbsTextureReferences(object):
 
 class TextureReferences(AbsTextureReferences):
     INCLUDE_SEARCH_KEYS = [
-        'image.parameters.filename'
+        'image.parameters.filename',
+        'osl_file_path.parameters.filename',
+        'osl_window_box.parameters.filename',
     ]
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)

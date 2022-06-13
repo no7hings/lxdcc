@@ -1,0 +1,69 @@
+<args format="1.0">
+    <help>
+    build by lynxi
+    </help>
+    <param name="space" constant="True" widget="mapper">
+        <hintdict name="options">
+            <int value="0" name="x"/>
+            <int value="1" name="-x"/>
+            <int value="2" name="y"/>
+            <int value="3" name="-y"/>
+            <int value="4" name="z"/>
+            <int value="5" name="-z"/>
+        </hintdict>
+        <help>
+        </help>
+    </param>
+    <param name="filename" constant="True" widget="fileInput">
+        <help>
+        </help>
+    </param>
+    <param name="texture_flip" constant="True" widget="checkBox">
+        <help>
+        </help>
+    </param>
+    <param name="texture_flop" constant="True" widget="checkBox">
+        <help>
+        </help>
+    </param>
+    <param name="room_depth" constant="True" slider="True" slidermin="0.1" slidermax="100">
+        <help>
+        </help>
+    </param>
+    <param name="width_overscan" constant="True" slider="True" slidermin="0" slidermax="0.9">
+        <help>
+        </help>
+    </param>
+    <param name="height_overscan" constant="True" slider="True" slidermin="0" slidermax="0.9">
+        <help>
+        </help>
+    </param>
+    <param name="midground_enable" constant="True" widget="checkBox">
+        <help>
+        </help>
+    </param>
+    <param name="midground_depth" constant="True" slider="True" slidermin="0.05" slidermax="99">
+        <help>
+        </help>
+    </param>
+    <param name="midground_offset_x" constant="True">
+        <help>
+        </help>
+    </param>
+    <param name="midground_offset_y" constant="True">
+        <help>
+        </help>
+    </param>
+    <param name="add">
+        <help>
+        </help>
+    </param>
+    <param name="multiply">
+        <help>
+        </help>
+    </param>
+    <param name="curtains_enable" constant="True" widget="checkBox">
+        <help>
+        </help>
+    </param>
+</args>

@@ -2046,11 +2046,14 @@ class AbsObjPortDef(object):
             self._port_stack.set_object_add(port)
         return port
 
+    def set_variant_port_create(self, type_args, port_path):
+        return self.set_port_create(type_args, port_path, obj_configure.PortAssign.VARIANTS)
+
     def set_input_port_create(self, type_args, port_path):
-        self.set_port_create(type_args, port_path, obj_configure.PortAssign.INPUTS)
+        return self.set_port_create(type_args, port_path, obj_configure.PortAssign.INPUTS)
 
     def set_output_port_create(self, type_args, port_path):
-        self.set_port_create(type_args, port_path, obj_configure.PortAssign.OUTPUTS)
+        return self.set_port_create(type_args, port_path, obj_configure.PortAssign.OUTPUTS)
 
     def _set_port_create_(self, type_args, port_path, port_assign):
         port = self.PORT_CLASS(
@@ -2173,6 +2176,12 @@ class AbsObjPortDef(object):
         port = self.get_variant_port(port_path)
         if port:
             return port.set(raw)
+
+    def get(self, key):
+        return self.get_variant(key)
+
+    def set(self, key, value):
+        self.set_variant(key, value)
 
     def _format_dict_(self):
         raise NotImplementedError()

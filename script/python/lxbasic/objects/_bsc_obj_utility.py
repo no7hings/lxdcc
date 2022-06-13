@@ -1,4 +1,5 @@
 # coding:utf-8
+import collections
 import functools
 
 import re
@@ -486,5 +487,76 @@ class GainThreadsRunner(object):
             i_t.join()
 
 
-if __name__ == '__main__':
-    pass
+class UndoFnc(object):
+    def __init__(self, obj):
+        self._obj = obj
+
+    def set_redo(self):
+        pass
+
+    def set_undo(self):
+        pass
+
+
+class UndoGroup(object):
+    def __init__(self, key):
+        self._key = key
+
+        self._keys = []
+        self._fnc_dict = collections.OrderedDict()
+
+    def set_register(self, key, fnc):
+        self._keys.append(key)
+        self._fnc_dict[key] = fnc
+
+    def set_run(self):
+        for k, v in self._fnc_dict.items():
+            print 'undo >> "{}"'.format(k)
+            v()
+
+
+class UndoStack(object):
+    def __init__(self, obj):
+        self._obj = obj
+        #
+        self._keys = []
+        self._fncs = []
+        self._undo_index = None
+
+        self._cur_group = None
+
+    def set_group_open(self, key):
+        print 'undo group open: "{}"'.format(key)
+        self._cur_group = UndoGroup(key)
+        self._keys.append(key)
+        self._fncs.append(self._cur_group)
+        self._undo_index = len(self._fncs) - 1
+
+    def set_group_close(self):
+        print 'undo group close: "{}"'.format(self._cur_group._key)
+        self._cur_group = None
+
+    def set_register(self, key, fnc):
+        if self._cur_group is not None:
+            self._cur_group.set_register(key, fnc)
+        else:
+            self._keys.append(key)
+            self._fncs.append(fnc)
+            self._undo_index = len(self._fncs)-1
+
+    def set_redo(self):
+        pass
+
+    def set_undo(self):
+        if self._fncs and self._undo_index is not None:
+            print self._undo_index
+            if self._undo_index > 0:
+                self._undo_index -= 1
+                key = self._keys[self._undo_index]
+                fnc = self._fncs[self._undo_index]
+                if isinstance(fnc, UndoGroup):
+                    print 'undo group >> "{}"'.format(key)
+                    fnc.set_run()
+                else:
+                    print 'undo >> "{}"'.format(key)
+                    fnc()

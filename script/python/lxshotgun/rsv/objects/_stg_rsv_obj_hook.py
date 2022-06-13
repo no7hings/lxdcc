@@ -156,3 +156,11 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 stg_version_opt.set_link_model_version(
                     stg_model_version
                 )
+    @classmethod
+    def get_deadline_job_info(cls, step):
+        from lxutil import utl_core
+        #
+        import lxshotgun.objects as stg_objects
+        #
+        stg_connector = stg_objects.StgConnector()
+        print stg_connector.get_stg_entity()

@@ -535,7 +535,7 @@ workspace:
                         - <.....property_assigns.main.output>
                         - <.input>
                         - <.output>
-                        - <.....look_pass_switch.main.path>.<option.look_pass>
+                        - <....main.path>.<option.look_pass>
                 #
                 plastic:
                     path: <option.root>/<..key>__look
@@ -556,7 +556,7 @@ workspace:
                         - <.....geometry_switch.main.output>
                         - <.input>
                         - <.output>
-                        - <.....look_pass_switch.main.path>.<..key>
+                        - <....main.path>.<..key>
                 ambocc:
                     path: <option.root>/<..key>__look
                     obj_category: node
@@ -576,7 +576,7 @@ workspace:
                         - <.....geometry_switch.main.output>
                         - <.input>
                         - <.output>
-                        - <.....look_pass_switch.main.path>.<..key>
+                        - <....main.path>.<..key>
                 wire:
                     path: <option.root>/<..key>__look
                     obj_category: node
@@ -596,7 +596,7 @@ workspace:
                         - <.....geometry_switch.main.output>
                         - <.input>
                         - <.output>
-                        - <.....look_pass_switch.main.path>.<..key>
+                        - <....main.path>.<..key>
                 white:
                     path: <option.root>/<..key>__look
                     obj_category: node
@@ -616,7 +616,7 @@ workspace:
                         - <.....geometry_switch.main.output>
                         - <.input>
                         - <.output>
-                        - <.....look_pass_switch.main.path>.<..key>
+                        - <....main.path>.<..key>
     # camera
     # y=-6.0
     cameras:
@@ -671,7 +671,8 @@ workspace:
                         ns_colorb: 0.25
                     parameters:
                         alembic/location: '/root/world/cam/cameras/main'
-                        settings/resolution_enable: True
+                        settings/screen_modify_enable: True
+                        settings/screen_modify_mode: 'fill'
                         settings/frame_offset_enable: True
                         settings/frame_offset: 997.0
                         settings/visible_enable: True
@@ -739,6 +740,7 @@ workspace:
                         ns_colorb: 0.75
                     parameters:
                         options/scheme: 'light_rig'
+                        lights/light_rig/name: 'sunny01_lightrig'
                         rotations/enable: 1
                         rotations/value_offset: 0.0
                         rotations/start_frame: 121.0
@@ -748,8 +750,65 @@ workspace:
                         - <.....cameras.main.path>.out
                         - <.path>.input
                         - <.path>.output
-                        - <....main.path>.<option.light_pass>
+                        - <....main.path>.<..key>
                     executes:
+                        - 'lights.light_rig.refresh'
+                        - 'lights.light_rig.load'
+                #
+                light_rig_1:
+                    path: <option.root>/<..key>__light
+                    obj_category: node
+                    obj_type: lx_light_pass
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*1
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        options/scheme: 'light_rig'
+                        lights/light_rig/name: 'studio02_lightrig'
+                        rotations/enable: 1
+                        rotations/value_offset: 0.0
+                        rotations/start_frame: 121.0
+                        rotations/end_frame: 240.0
+                        rotations/frame_offset: 1000.0
+                    connections:
+                        - <.....cameras.main.path>.out
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                    executes:
+                        - 'lights.light_rig.refresh'
+                        - 'lights.light_rig.load'
+                #
+                light_rig_2:
+                    path: <option.root>/<..key>__light
+                    obj_category: node
+                    obj_type: lx_light_pass
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*2
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        options/scheme: 'light_rig'
+                        lights/light_rig/name: 'overcast01_lightrig'
+                        rotations/enable: 1
+                        rotations/value_offset: 0.0
+                        rotations/start_frame: 121.0
+                        rotations/end_frame: 240.0
+                        rotations/frame_offset: 1000.0
+                    connections:
+                        - <.....cameras.main.path>.out
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                    executes:
+                        - 'lights.light_rig.refresh'
                         - 'lights.light_rig.load'
     # quality
     # y=-8.0

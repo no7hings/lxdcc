@@ -257,11 +257,19 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     # debug
                     # do not check create, material can use same shader
                     i_shader_dcc_bind_port_name = convert_dict[i_shader_and_bind_port_name]
-                    shader_dcc_obj.get_port('outColor').set_target(
+
+                    i_shader_and_source_and_port = shader_and_obj.get_output_ports()[0]
+                    i_shader_and_source_and_port_path = i_shader_and_source_and_port.port_path
+                    if i_shader_and_source_and_port.get_is_channel():
+                        key = 'output-ports.to-maya.channels.{}'.format(i_shader_and_source_and_port_path)
+                    else:
+                        key = 'output-ports.to-maya.{}'.format(i_shader_and_source_and_port_path)
+
+                    source_dcc_port_path = self._dcc_importer_configure.get(key)
+
+                    shader_dcc_obj.get_port(source_dcc_port_path).set_target(
                         material_dcc_obj.get_port(i_shader_dcc_bind_port_name)
                     )
-                    #
-                    # self._set_material_shader_node_graph_rename_(material_seq, i_shader_and_bind_port_name, shader_and_obj)
 
     def __set_material_shader_create_(self, shader_and_obj):
         create_args = self.__set_shader_create_(shader_and_obj)
@@ -302,100 +310,103 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 self.__set_shader_ports_(source_and_obj, source_dcc_obj)
         #
         and_connections = and_obj.get_all_source_connections()
-        self._set_connection_create_(and_connections)
+        self._set_connections_create_(and_connections)
     
-    def _set_connection_create_(self, and_connections):
-        for and_connection in and_connections:
-            source_and_obj, target_and_obj = (
-                and_connection.source_obj, and_connection.target_obj
-            )
-            source_and_obj_type_name, target_and_obj_type_name = (
-                source_and_obj.type.name, target_and_obj.type.name
-            )
-            source_and_port, target_and_port = (
-                and_connection.source, and_connection.target
-            )
-            #
-            source_and_port_path, target_and_port_path = (
-                source_and_port.port_path, target_and_port.port_path
-            )
-            if source_and_port.get_is_channel():
-                key = 'output-ports.to-maya.channels.{}'.format(source_and_port_path)
-            else:
-                key = 'output-ports.to-maya.{}'.format(source_and_port_path)
-            #
-            source_dcc_port_path = self._dcc_importer_configure.get(key)
-            #
-            if target_and_port.get_is_channel():
-                a, b = target_and_port_path.split('.')
-                target_dcc_port_path = '{0}.{0}{1}'.format(a, b.upper())
-            else:
-                target_dcc_port_path = bsc_objects.StrUnderline(target_and_port_path).to_camelcase()
-            #
-            and_obj_type_names = self._dcc_importer_configure.get_branch_keys(
-                'input-ports.to-maya'
-            )
-            if target_and_obj_type_name in and_obj_type_names:
-                and_port_names = self._dcc_importer_configure.get_branch_keys(
-                    'input-ports.to-maya.{}'.format(target_and_obj_type_name)
-                )
-                if target_and_port_path in and_port_names:
-                    if target_and_port.get_is_channel():
-                        a, b = target_and_port_path.split('.')
-                        a = self._dcc_importer_configure.get(
-                            'input-ports.to-maya.{}.{}'.format(target_and_obj_type_name, target_and_port_path)
-                        )
-                        target_dcc_port_path = '{0}.{0}{1}'.format(a, b.upper())
-                    else:
-                        target_dcc_port_path = self._dcc_importer_configure.get(
-                            'input-ports.to-maya.{}.{}'.format(target_and_obj_type_name, target_and_port_path)
-                        )
+    def _set_connections_create_(self, and_connections):
+        for i_and_connection in and_connections:
+            self._set_connection_create_(i_and_connection)
 
-            source_and_obj_name, target_and_obj_name = (
-                source_and_obj.name, target_and_obj.name
+    def _set_connection_create_(self, and_connection):
+        source_and_obj, target_and_obj = (
+            and_connection.source_obj, and_connection.target_obj
+        )
+        source_and_obj_type_name, target_and_obj_type_name = (
+            source_and_obj.type.name, target_and_obj.type.name
+        )
+        source_and_port, target_and_port = (
+            and_connection.source, and_connection.target
+        )
+        #
+        source_and_port_path, target_and_port_path = (
+            source_and_port.port_path, target_and_port.port_path
+        )
+        if source_and_port.get_is_channel():
+            key = 'output-ports.to-maya.channels.{}'.format(source_and_port_path)
+        else:
+            key = 'output-ports.to-maya.{}'.format(source_and_port_path)
+        #
+        source_dcc_port_path = self._dcc_importer_configure.get(key)
+        #
+        if target_and_port.get_is_channel():
+            a, b = target_and_port_path.split('.')
+            target_dcc_port_path = '{0}.{0}{1}'.format(a, b.upper())
+        else:
+            target_dcc_port_path = bsc_objects.StrUnderline(target_and_port_path).to_camelcase()
+        #
+        and_obj_type_names = self._dcc_importer_configure.get_branch_keys(
+            'input-ports.to-maya'
+        )
+        if target_and_obj_type_name in and_obj_type_names:
+            and_port_names = self._dcc_importer_configure.get_branch_keys(
+                'input-ports.to-maya.{}'.format(target_and_obj_type_name)
             )
-            #
-            source_dcc_obj_name, target_dcc_obj_name = (
-                source_and_obj_name, target_and_obj_name
+            if target_and_port_path in and_port_names:
+                if target_and_port.get_is_channel():
+                    a, b = target_and_port_path.split('.')
+                    a = self._dcc_importer_configure.get(
+                        'input-ports.to-maya.{}.{}'.format(target_and_obj_type_name, target_and_port_path)
+                    )
+                    target_dcc_port_path = '{0}.{0}{1}'.format(a, b.upper())
+                else:
+                    target_dcc_port_path = self._dcc_importer_configure.get(
+                        'input-ports.to-maya.{}.{}'.format(target_and_obj_type_name, target_and_port_path)
+                    )
+
+        source_and_obj_name, target_and_obj_name = (
+            source_and_obj.name, target_and_obj.name
+        )
+        #
+        source_dcc_obj_name, target_dcc_obj_name = (
+            source_and_obj_name, target_and_obj_name
+        )
+
+        source_dcc_obj, target_dcc_obj = (
+            mya_dcc_objects.AndShader(source_dcc_obj_name), mya_dcc_objects.AndShader(target_and_obj_name)
+        )
+        #
+        if source_dcc_obj.get_is_exists() is False:
+            utl_core.Log.set_module_warning_trace(
+                'connection create',
+                'obj="{}" is non-exists'.format(source_and_obj.path)
             )
+            return
 
-            source_dcc_obj, target_dcc_obj = (
-                mya_dcc_objects.AndShader(source_dcc_obj_name), mya_dcc_objects.AndShader(target_and_obj_name)
+        if target_dcc_obj.get_is_exists() is False:
+            utl_core.Log.set_module_warning_trace(
+                'connection create',
+                'obj="{}" is non-exists'.format(target_and_obj.path)
             )
-            #
-            if source_dcc_obj.get_is_exists() is False:
-                utl_core.Log.set_module_warning_trace(
-                    'connection create',
-                    'obj="{}" is non-exists'.format(source_and_obj.path)
-                )
-                continue
+            return
 
-            if target_dcc_obj.get_is_exists() is False:
-                utl_core.Log.set_module_warning_trace(
-                    'connection create',
-                    'obj="{}" is non-exists'.format(target_and_obj.path)
-                )
-                continue
+        if source_dcc_port_path is None:
+            return
 
-            if source_dcc_port_path is None:
-                continue
-
-            source_dcc_port, target_dcc_port = (
-                source_dcc_obj.get_port(source_dcc_port_path), target_dcc_obj.get_port(target_dcc_port_path)
+        source_dcc_port, target_dcc_port = (
+            source_dcc_obj.get_port(source_dcc_port_path), target_dcc_obj.get_port(target_dcc_port_path)
+        )
+        if source_dcc_port.get_is_exists() is False:
+            utl_core.Log.set_module_warning_trace(
+                'connection create', 'atr-src-path:"{}" is non-exists'.format(source_dcc_port.path)
             )
-            if source_dcc_port.get_is_exists() is False:
-                utl_core.Log.set_module_warning_trace(
-                    'connection create', 'atr-src-path:"{}" is non-exists'.format(source_dcc_port.path)
-                )
-                continue
+            return
 
-            if target_dcc_port.get_is_exists() is False:
-                utl_core.Log.set_module_warning_trace(
-                    'connection create', 'atr-tgt-path:"{}" is non-exists'.format(target_dcc_port.path)
-                )
-                continue
+        if target_dcc_port.get_is_exists() is False:
+            utl_core.Log.set_module_warning_trace(
+                'connection create', 'atr-tgt-path:"{}" is non-exists'.format(target_dcc_port.path)
+            )
+            return
 
-            source_dcc_port.set_target(target_dcc_port, validation=True)
+        source_dcc_port.set_target(target_dcc_port, validation=True)
 
     def __set_shader_create_(self, and_obj):
         and_obj_type_name = and_obj.type.name

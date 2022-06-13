@@ -138,12 +138,12 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         else:
             raise TypeError()
 
-        katana_scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
+        scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )
-        katana_scene_file_path = katana_scene_file_rsv_unit.get_result(version=version)
+        scene_file_path = scene_file_rsv_unit.get_result(version=version)
 
-        render_file_path = katana_scene_file_path
+        render_file_path = scene_file_path
         # save file first
         ktn_dcc_objects.Scene.set_file_save_to(render_file_path)
         # create workspace
@@ -164,27 +164,61 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             if _:
                 shot_geometries_node_opt.set('options.shot', _[0])
             shot_geometries_node_opt.set_port_execute('usd.create')
-        #
-        asset_dcc_nodes = [ktn_dcc_objects.Node(i) for i in ['asset__geometries', 'asset__geometries']]
-        # usd variants
-        usd_variant_scheme = self._hook_option_opt.get('usd_variant_scheme')
-        if usd_variant_scheme:
-            if usd_variant_scheme == 'main':
-                pass
-        # usd debuggers
+        # usd
+        geometries = [ktn_dcc_objects.Node(i) for i in ['asset__geometries', 'asset__geometries']]
+        usd_version_enable = self._hook_option_opt.get_as_boolean('usd_version_enable')
+        usd_version_override_enable = self._hook_option_opt.get_as_boolean('usd_version_override_enable')
         usd_reverse_face_vertex_enable = self._hook_option_opt.get_as_boolean('usd_reverse_face_vertex_enable')
-        for i_asset_dcc_node in asset_dcc_nodes:
-            if i_asset_dcc_node.get_is_exists() is True:
-                i_asset_dcc_node.set(
+        for i_geometry_dcc_node in geometries:
+            if i_geometry_dcc_node.get_is_exists() is True:
+                i_geometry_dcc_node.set(
+                    'usd.variants.enable', usd_version_enable
+                )
+                i_geometry_dcc_node.set(
+                    'usd.variants.override_enable', usd_version_override_enable
+                )
+                i_geometry_dcc_node.set(
                     'usd.debuggers.reverse_face_vertex_enable', usd_reverse_face_vertex_enable
                 )
-        # render arnold aov
+        # camera
+        cameras = self._hook_option_opt.get_as_array('cameras')
+        for i_camera in cameras:
+            if i_camera == 'front':
+                self.set_front_camera()
+        #
+        light_pass_all = self._hook_option_opt.get('light_pass_all')
+        if light_pass_all:
+            light_pass_dcc_node = ktn_dcc_objects.Node('all__light')
+            if light_pass_dcc_node.get_is_exists() is True:
+                light_pass_dcc_node.set('lights.light_rig.name', light_pass_all)
+        #
+        light_pass_light_rig_1 = self._hook_option_opt.get('light_pass_light_rig_1')
+        if light_pass_light_rig_1:
+            light_pass_dcc_node = ktn_dcc_objects.Node('light_rig_1__light')
+            if light_pass_dcc_node.get_is_exists() is True:
+                light_pass_dcc_node.set('lights.light_rig.name', light_pass_all)
+        #
+        light_pass_light_rig_2 = self._hook_option_opt.get('light_pass_light_rig_2')
+        if light_pass_light_rig_2:
+            light_pass_dcc_node = ktn_dcc_objects.Node('light_rig_2__light')
+            if light_pass_dcc_node.get_is_exists() is True:
+                light_pass_dcc_node.set('lights.light_rig.name', light_pass_all)
+        # light
+        light_pass_override_enable = self._hook_option_opt.get_as_boolean('light_pass_override_enable')
+        if light_pass_override_enable is True:
+            light_passes = self._hook_option_opt.get_as_array('light_passes')
+            light_pass_override_scheme = self._hook_option_opt.get('light_pass_override_scheme')
+            for i_light_pass in light_passes:
+                i_light_pass_dcc_node = ktn_dcc_objects.Node('{}__light'.format(i_light_pass))
+                if i_light_pass_dcc_node.get_is_exists() is True:
+                    i_light_pass_dcc_node.set('options.scheme', light_pass_override_scheme)
+        # quality
         render_arnold_aov_enable = self._hook_option_opt.get('render_arnold_aov_enable')
-        qualities = self._hook_option_opt.get('qualities', as_array=True)
+        qualities = self._hook_option_opt.get_as_array('qualities')
         for i_quality in qualities:
             i_quality_dcc_node = ktn_dcc_objects.Node('{}__quality'.format(i_quality))
-            #
-            i_quality_dcc_node.set('lynxi_variants.arnold.aov_enable', render_arnold_aov_enable)
+            if i_quality_dcc_node.get_is_exists() is True:
+                i_quality_dcc_node.set('lynxi_variants.arnold.aov_enable', render_arnold_aov_enable)
         # render over
         render_override_enable = self._hook_option_opt.get('render_override_enable')
         if render_override_enable is True:
@@ -209,12 +243,13 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         #
         render_settings_node_opt = ktn_core.NGObjOpt('render_settings')
         render_output_directory_path = self._hook_option_opt.get('render_output_directory')
-        render_output_file_path = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr'.format(
-            render_output_directory_path
-        )
-        render_settings_node_opt.set(
-            'lynxi_settings.render_output', render_output_file_path
-        )
+        if render_output_directory_path is not None:
+            render_output_file_path = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr'.format(
+                render_output_directory_path
+            )
+            render_settings_node_opt.set(
+                'lynxi_settings.render_output', render_output_file_path
+            )
         #
         renderer_node_opt = ktn_core.NGObjOpt('render_outputs')
         #
@@ -232,7 +267,42 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             )
 
         renderer_node_opt.set_port_execute('create')
+        #
         ktn_dcc_objects.Scene.set_file_save()
+
+    def set_scene_src_link(self):
+        from lxbasic import bsc_core
+        #
+        import lxutil.dcc.dcc_objects as utl_dcc_objects
+        #
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword_0 = 'asset-katana-scene-file'
+            keyword_1 = 'asset-katana-scene-src-file'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-katana-scene-file'
+            keyword_1 = 'asset-output-katana-scene-src-file'
+        else:
+            raise TypeError()
+        #
+        scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        scene_file_path = scene_file_rsv_unit.get_result(version=version)
+        #
+        scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_1
+        )
+        scene_src_file_path = scene_src_file_rsv_unit.get_result(version=version)
+        #
+        if bsc_core.StoragePathMtd.get_path_is_exists(scene_src_file_path) is False:
+            utl_dcc_objects.OsFile(
+                scene_file_path
+            ).set_link_to(
+                scene_src_file_path
+            )
 
     def set_white_disp_create(self):
         import lxkatana.fnc.importers as ktn_fnc_importers
@@ -281,53 +351,56 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                     look_pass='white_zbrush'
                 )
             ).set_run()
-    @classmethod
-    def _set_front_camera_(cls):
+
+    def set_front_camera(self):
         from lxbasic import bsc_core
+
+        from lxutil import utl_core
 
         from lxusd import usd_core
 
-        import lxresolver.commands as rsv_commands
-
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-        r = rsv_commands.get_resolver()
-
-        rsv_task = r.get_rsv_task(
-            project='cgm',
-            asset='bl_xiz_f',
-            step='mod',
-            task='modeling'
-        )
-
+        #
         s = usd_core.UsdStageOpt()
-        geometry_usd_var_file_rsv_unit = rsv_task.get_rsv_unit(
+        geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='asset-geometry-usd-var-file'
         )
-
+        #
         for i_var in ['hi', 'shape']:
             i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_result(
                 version='latest',
                 extend_variants=dict(var=i_var)
             )
-            s.set_sublayer_append(i_geometry_usd_var_file_path)
-
+            if i_geometry_usd_var_file_path is not None:
+                s.set_sublayer_append(i_geometry_usd_var_file_path)
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'file resolver',
+                    u'var="{}", usd file is non-exists'.format(i_var)
+                )
+        #
         s.set_flatten()
-
+        #
         g = s.get_geometry_args('/master')
-
+        #
         (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
-
+        #
+        w += .1
+        h += .2
+        c_y += .1
+        #
         (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z) = bsc_core.CameraMtd.get_front_transformation(
-            g, 1
+            ((x, y, z), (c_x, c_y, c_z), (w, h, d)), 1
         )
-
-        c = ktn_dcc_objects.Node('cameras')
-
-        c.set('cameras.front.translate', (t_x, t_y, t_z))
-        c.set('cameras.front.rotate', (r_x, r_y, r_z))
-        c.set('cameras.front.scale', (s_x, s_y, s_z))
-
-        r = max(w, h)
-
-        c.set('cameras.front.render_resolution', '{0}x{0}'.format(int(r)*100))
+        #
+        dcc_camera = ktn_dcc_objects.Node('cameras')
+        #
+        dcc_camera.set('cameras.front.translate', (t_x, t_y, t_z))
+        dcc_camera.set('cameras.front.rotate', (r_x, r_y, r_z))
+        dcc_camera.set('cameras.front.scale', (s_x, s_y, s_z))
+        #
+        width, height = int(w*50), int(h*50)
+        #
+        dcc_camera.set(
+            'cameras.front.render_resolution', '{}x{}'.format(width, height)
+        )

@@ -31,14 +31,14 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_load()'
         tool_tip: '...'
     #
-    settings/resolution_enable:
+    settings/screen_modify_enable:
         widget: boolean
         value: True
         tool_tip: '...'
 
-    settings/resolution:
-        widget: resolution
-        value: '2048x2048'
+    settings/screen_modify_mode:
+        widget: enumerate
+        value: ['horizontal', 'vertical', 'fill']
         tool_tip: '...'
 
     settings/frame_offset_enable:
@@ -60,6 +60,11 @@ parameters:
         widget: boolean
         value: 1
         tool_tip: '...'
+
+    cameras/location:
+        widget: path
+        value: '/root/world/cam/cameras'
+        tool_tip: 'location'
 
     cameras/close_up_enable:
         widget: boolean

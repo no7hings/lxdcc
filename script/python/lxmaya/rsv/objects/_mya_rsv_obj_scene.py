@@ -491,6 +491,13 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                         scene_file_path, latest_work_scene_src_file_path
                     )
                 )
+        else:
+            new_work_scene_src_file_path = work_scene_src_file_rsv_unit.get_result(
+                version='new'
+            )
+            utl_dcc_objects.OsFile(
+                scene_file_path
+            ).set_link_to(new_work_scene_src_file_path)
 
 
 class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):

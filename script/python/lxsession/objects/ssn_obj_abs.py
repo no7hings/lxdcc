@@ -48,7 +48,8 @@ class AbsSsnGuiDef(object):
 
 class AbsSsnRezDef(object):
     def _set_rez_def_init_(self):
-        self._rez_beta = bsc_core.EnvironMtd.get('REZ_BETA')
+        # self._rez_beta = bsc_core.EnvironMtd.get('REZ_BETA')
+        pass
     @classmethod
     def get_td_enable(cls):
         return bsc_core.EnvironMtd.get_td_enable()

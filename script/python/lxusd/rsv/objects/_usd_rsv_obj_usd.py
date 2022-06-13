@@ -355,10 +355,8 @@ class RsvUsdAssetSetCreator(object):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
         if asset_set_dress_usd_file_path:
             variants_mapper = cls.VARIANTS_MAPPER
-            mode = 0
         else:
             variants_mapper = cls.VARIANTS_MAPPER_0
-            mode = 1
         #
         for i_variant_set_name, i_port_path in variants_mapper.items():
             c.set(

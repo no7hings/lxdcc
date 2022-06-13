@@ -5,4 +5,7 @@ from ._ktn_rsv_obj_scene import *
 
 from ._ktn_rsv_obj_look import *
 
+from ._ktn_rsv_obj_render import *
+
+
 

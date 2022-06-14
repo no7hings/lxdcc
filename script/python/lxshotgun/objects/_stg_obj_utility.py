@@ -126,7 +126,16 @@ class StgConnector(object):
         return self._shotgun
     @classmethod
     def _get_stg_entity_type_(cls, branch):
-        return str(branch).capitalize()
+        return {
+            'asset': 'Asset',
+            'shot': 'Shot'
+        }[branch]
+
+    def _set_stg_filters_completion_by_tags_(self, filters, **kwargs):
+        if 'tags' in kwargs:
+            filters.append(
+                ['tags', 'in', [self.get_stg_tag(i) for i in kwargs['tags']]]
+            )
 
     def get_stg_scheme(self, stg_type):
         return self.shotgun.schema_field_read(
@@ -235,21 +244,38 @@ class StgConnector(object):
         """
         :param kwargs:
             project=<project-name>
-            branch=<branch-name>
+            branch=<branch-name> / role=<role-name> / sequence=<sequence-name>
         :return: list(
         )
         """
+        filters = [
+            ['project', 'is', self.get_stg_project(**kwargs)],
+        ]
         if 'branch' in kwargs:
             branches = [kwargs['branch']]
         else:
-            branches = ['asset', 'shot']
+            if 'role' in kwargs:
+                branches = ['asset']
+            elif 'sequence' in kwargs:
+                branches = ['shot']
+            else:
+                branches = ['asset', 'shot']
+        #
+        if 'role' in kwargs:
+            filters.append(
+                ['sg_asset_type', 'is', kwargs['role']]
+            )
+        elif 'sequence' in kwargs:
+            filters.append(
+                ['sg_sequence', 'is', kwargs['sequence']]
+            )
+        #
+        self._set_stg_filters_completion_by_tags_(filters, **kwargs)
         #
         for i_branch in branches:
             return self._shotgun.find(
                 entity_type=self._get_stg_entity_type_(i_branch),
-                filters=[
-                    ['project', 'is', self.get_stg_project(**kwargs)],
-                ]
+                filters=filters
             )
 
     def get_stg_entity_queries(self, **kwargs):
@@ -260,7 +286,10 @@ class StgConnector(object):
         :return: list(
         )
         """
-        return [self.STG_OBJ_QUERY_CLS(self, i) for i in self.get_stg_entities(**kwargs)]
+        return [
+            self.STG_OBJ_QUERY_CLS(self, i)
+            for i in self.get_stg_entities(**kwargs)
+        ]
     # step
     def get_stg_steps(self, **kwargs):
         """
@@ -538,7 +567,7 @@ class StgConnector(object):
     def get_stg_published_file(self, **kwargs):
         pass
 
-    def get_sgt_tag(self, tag_name):
+    def get_stg_tag(self, tag_name):
         _ = self._shotgun.find_one(
             entity_type='Tag',
             filters=[
@@ -548,7 +577,7 @@ class StgConnector(object):
         return _
 
     def get_stg_tag_force(self, tag_name):
-        stg_obj = self.get_sgt_tag(tag_name)
+        stg_obj = self.get_stg_tag(tag_name)
         if stg_obj:
             return stg_obj
         return self.set_stg_tag_create(tag_name)
@@ -658,4 +687,8 @@ class StgConnector(object):
 
 if __name__ == '__main__':
     import lxshotgun.objects as stg_objects
-    stg_objects.StgConnector().get_stg_deadline_render_info_query(step='mod')
+    _ss = stg_objects.StgConnector().get_stg_entity_queries(
+        project='cgm', role='lig', tags=['DefaultRig']
+    )
+    for _i in _ss:
+        print _i.get('code')

@@ -41,16 +41,6 @@ parameters:
         value: ['horizontal', 'vertical', 'fill']
         tool_tip: '...'
 
-    settings/frame_offset_enable:
-        widget: boolean
-        value: True
-        tool_tip: '...'
-
-    settings/frame_offset:
-        widget: integer
-        value: 1000.0
-        tool_tip: '...'
-
     settings/visible_enable:
         widget: boolean
         value: False
@@ -295,6 +285,36 @@ parameters:
     cameras/front/scale:
         widget: float3
         value: [ 1, 1, 1 ]
+        tool_tip: '...'
+    #
+    rotations/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    rotations/locations/main:
+        widget: path
+        value: '/root/world/cam/cameras/main'
+        tool_tip: '...'
+
+    rotations/locations/sub:
+        widget: path
+        value: '/root/world/cam/cameras/sub'
+        tool_tip: '...'
+
+    rotations/value_offset:
+        widget: float
+        value: 0.0
+        tool_tip: '...'
+
+    rotations/frame_ranges:
+        widget: string
+        value: '1-120'
+        tool_tip: '...'
+
+    rotations/frame_offset:
+        widget: float
+        value: 1000.0
         tool_tip: '...'
 
     lynxi_info/type:

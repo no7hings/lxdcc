@@ -560,6 +560,12 @@ class NGPortOpt(object):
             if isinstance(value, unicode):
                 _value = str(value)
             #
+            if self.get_is_enumerate() is True:
+                if isinstance(value, int):
+                    strings = self.get_enumerate_strings()
+                    index = max(min(value, len(strings)-1), 0)
+                    _value = strings[index]
+
             self.ktn_port.setValue(_value, frame)
 
     def set_help_string(self, value):
@@ -574,6 +580,12 @@ class NGPortOpt(object):
         self.ktn_port.setHintString(
             str(hint_dict)
         )
+
+    def get_is_enumerate(self):
+        hint_string = self.ktn_port.getHintString()
+        if hint_string:
+            hint_dict = eval(hint_string)
+            return hint_dict.get('widget') == 'popup'
 
     def set_enumerate_strings(self, value, frame=0):
         hint_string = self.ktn_port.getHintString()
@@ -595,7 +607,7 @@ class NGPortOpt(object):
         hint_string = self.ktn_port.getHintString()
         if hint_string:
             hint_dict = eval(hint_string)
-            return hint_dict.get('options', [])
+            return map(str, hint_dict.get('options', []))
         return []
 
     def set_connect_to(self, input_port):

@@ -14,7 +14,9 @@ class ShotgunMtd(object):
             stg_configure.Util.URL,
             stg_configure.Util.SCRIPT,
             stg_configure.Util.CODE,
-            ca_certs=utl_core.Path.set_map_to_platform('/l/packages/pg/prod/pgtk/9.9.9/certs/cacerts.txt')
+            ca_certs=utl_core.Path.set_map_to_platform(
+                stg_configure.Util.CA_CERTS
+            )
         )
         return _
     @classmethod

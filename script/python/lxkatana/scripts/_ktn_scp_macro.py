@@ -903,6 +903,8 @@ class LxLight(object):
 
         from lxkatana import ktn_core
 
+        import lxshotgun.rsv.objects as stg_rsv_objects
+
         contents = []
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -916,18 +918,43 @@ class LxLight(object):
         if rsv_asset is not None:
             self.__set_rsv_asset_(rsv_asset)
             rsv_project = rsv_asset.get_rsv_project()
+            name = obj_opt.get('lights.light_rig.name')
+            index = obj_opt.get('lights.light_rig.index') or 0
 
-            current_asset = obj_opt.get('lights.light_rig.name')
-
-            rsv_assets = rsv_project.get_rsv_entities(
-                asset='*_lightrig'
-            )
-            if rsv_assets:
+            light_rig_rsv_assets = stg_rsv_objects.RsvStgProjectOpt(
+                rsv_project
+            ).get_standard_light_rig_rsv_assets()
+            if light_rig_rsv_assets:
+                #
+                names = [i.name for i in light_rig_rsv_assets]
                 obj_opt.set_as_enumerate(
                     'lights.light_rig.name',
-                    [i.name for i in rsv_assets]
+                    names
                 )
-                obj_opt.set('lights.light_rig.name', current_asset)
+                index = max(min(int(index), len(names)-1), 0)
+                if name != 'None':
+                    if name in names:
+                        obj_opt.set('lights.light_rig.name', name)
+                    else:
+                        obj_opt.set('lights.light_rig.name', names[index])
+                else:
+                    obj_opt.set('lights.light_rig.name', names[index])
+            else:
+                contents.append(
+                    'light-rig(s) is not found'
+                )
+            #
+            if contents:
+                if ktn_core._get_is_ui_mode_():
+                    utl_core.DialogWindow.set_create(
+                        'Light-rig Refresh',
+                        content=u'\n'.join(contents),
+                        status=utl_core.DialogWindow.GuiStatus.Error,
+                        #
+                        yes_label='Close',
+                        #
+                        no_visible=False, cancel_visible=False
+                    )
 
     def set_load_light_rig(self):
         from lxkatana import ktn_core
@@ -937,10 +964,12 @@ class LxLight(object):
 
         self._set_load_from_asset_light_rig_(asset)
 
-    def _set_load_from_asset_light_rig_(self, asset):
+    def _set_load_from_asset_light_rig_(self, light_rig_asset):
         from lxutil import utl_core
 
         from lxkatana import ktn_core
+
+        import lxshotgun.rsv.objects as stg_rsv_objects
 
         contents = []
 
@@ -954,10 +983,11 @@ class LxLight(object):
         #
         if rsv_asset is not None:
             self.__set_rsv_asset_(rsv_asset)
+
             rsv_project = rsv_asset.get_rsv_project()
 
             light_rsv_task = rsv_project.get_rsv_task(
-                workspace='publish', asset=asset, step='lgt', task='lighting'
+                asset=light_rig_asset, step='lgt', task='lighting'
             )
             if light_rsv_task:
                 light_group_rsv_unit = light_rsv_task.get_rsv_unit(
@@ -972,8 +1002,8 @@ class LxLight(object):
                     )
                 else:
                     contents.append(
-                        u'light-group="{}" file is non-exists, use default'.format(
-                            asset
+                        u'light-rig="{}" file is non-exists, use default'.format(
+                            light_rig_asset
                         )
                     )
             #
@@ -983,7 +1013,7 @@ class LxLight(object):
         if contents:
             if ktn_core._get_is_ui_mode_():
                 utl_core.DialogWindow.set_create(
-                    'Shot Asset Loader',
+                    'Load Light-rig',
                     content=u'\n'.join(contents),
                     status=utl_core.DialogWindow.GuiStatus.Warning,
                     #
@@ -994,8 +1024,6 @@ class LxLight(object):
 
     def set_live_groups_update(self):
         from lxkatana import ktn_core
-
-        contents = []
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 

@@ -3,11 +3,53 @@ import lxshotgun.objects as stg_objects
 
 import lxshotgun.operators as stg_operators
 
+import lxresolver.commands as rsv_commands
+
+
+class RsvStgProjectOpt(object):
+    def __init__(self, rsv_project):
+        self._resolver = rsv_commands.get_resolver()
+        self._rsv_project = rsv_project
+        self._stg_connector = stg_objects.StgConnector()
+
+    def get_default_light_rig_rsv_asset(self):
+        _ = self._stg_connector.get_stg_entity_queries(
+            project=self._rsv_project.name,
+            role='lig',
+            tags=['DefaultRig']
+        )
+        if _:
+            return self._rsv_project.get_rsv_entity(
+                role='lig',
+                asset=_[0].get('code')
+            )
+
+    def get_standard_light_rig_rsv_assets(self):
+        _ = self._stg_connector.get_stg_entity_queries(
+            project=self._rsv_project.name,
+            role='lig',
+            tags=['StandardRig']
+        )
+        if _:
+            rsv_assets = [
+                self._rsv_project.get_rsv_entity(
+                    role='lig',
+                    asset=i.get('code')
+                )
+                for i in _
+            ]
+            default_rsv_asset = self.get_default_light_rig_rsv_asset()
+            if default_rsv_asset in rsv_assets:
+                rsv_assets.remove(default_rsv_asset)
+            #
+            rsv_assets.insert(0, default_rsv_asset)
+            return rsv_assets
+        return []
+
 
 class RsvStgTaskOpt(object):
     def __init__(self, rsv_task):
         self._rsv_task = rsv_task
-
         self._stg_connector = stg_objects.StgConnector()
 
     def set_stg_version_create(self, version, version_type=None, movie_file=None, user=None, description=None):
@@ -58,4 +100,3 @@ class RsvStgTaskOpt(object):
         stg_version_opt.set_stg_tags_append(
             stg_tag
         )
-

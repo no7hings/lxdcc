@@ -41,9 +41,14 @@ parameters:
         value: '/l/resource/td/asset/live-group/default.livegroup'
         tool_tip: '...'
 
+    lights/light_rig/index:
+        widget: interge
+        value: 0
+        tool_tip: 'if name is "None", use index'
+
     lights/light_rig/name:
         widget: enumerate
-        value: [ 'sunny01_lightrig', 'studio02_lightrig', 'overcast01_lightrig', 'overcast02_lightrig' ]
+        value: ['None']
         tool_tip: '...'
 
     lights/light_rig/refresh:
@@ -91,14 +96,9 @@ parameters:
         value: 0.0
         tool_tip: '...'
 
-    rotations/start_frame:
-        widget: float
-        value: 121.0
-        tool_tip: '...'
-
-    rotations/end_frame:
-        widget: float
-        value: 240.0
+    rotations/frame_ranges:
+        widget: string
+        value: '1-120,121-240'
         tool_tip: '...'
 
     rotations/frame_offset:

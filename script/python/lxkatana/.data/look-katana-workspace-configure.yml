@@ -673,10 +673,11 @@ workspace:
                         alembic/location: '/root/world/cam/cameras/main'
                         settings/screen_modify_enable: True
                         settings/screen_modify_mode: 'fill'
-                        settings/frame_offset_enable: True
-                        settings/frame_offset: 997.0
                         settings/visible_enable: True
                         settings/visible: 0
+                        rotations/value_offset: 0.0
+                        rotations/frame_ranges: '1-120'
+                        rotations/frame_offset: 1000.0
                     #
                     connections:
                         - <.....look_pass_switch.main.output>
@@ -740,11 +741,10 @@ workspace:
                         ns_colorb: 0.75
                     parameters:
                         options/scheme: 'light_rig'
-                        lights/light_rig/name: 'sunny01_lightrig'
+                        lights/light_rig/index: 0
                         rotations/enable: 1
                         rotations/value_offset: 0.0
-                        rotations/start_frame: 121.0
-                        rotations/end_frame: 240.0
+                        rotations/frame_ranges: '1-120,121-240'
                         rotations/frame_offset: 1000.0
                     connections:
                         - <.....cameras.main.path>.out
@@ -768,7 +768,7 @@ workspace:
                         ns_colorb: 0.75
                     parameters:
                         options/scheme: 'light_rig'
-                        lights/light_rig/name: 'studio02_lightrig'
+                        lights/light_rig/index: 1
                         rotations/enable: 1
                         rotations/value_offset: 0.0
                         rotations/start_frame: 121.0
@@ -796,7 +796,7 @@ workspace:
                         ns_colorb: 0.75
                     parameters:
                         options/scheme: 'light_rig'
-                        lights/light_rig/name: 'overcast01_lightrig'
+                        lights/light_rig/index: 2
                         rotations/enable: 1
                         rotations/value_offset: 0.0
                         rotations/start_frame: 121.0

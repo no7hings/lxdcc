@@ -688,7 +688,7 @@ class TextureTxMainProcess(bsc_obj_abs.AbsProcess):
     LOGGER = utl_core.Log
     #
     PROCESS_COUNT = 0
-    PROCESS_COUNT_MAXIMUM = 4
+    PROCESS_COUNT_MAXIMUM = 2
     ELEMENT_PROCESS_CLS = TextureTxSubProcess
     def __init__(self, file_paths):
         super(TextureTxMainProcess, self).__init__()
@@ -732,7 +732,7 @@ class TextureJpgMainProcess(bsc_obj_abs.AbsProcess):
     LOGGER = utl_core.Log
     #
     PROCESS_COUNT = 0
-    PROCESS_COUNT_MAXIMUM = 4
+    PROCESS_COUNT_MAXIMUM = 2
     ELEMENT_PROCESS_CLS = TextureJpgSubProcess
     def __init__(self, file_paths):
         super(TextureJpgMainProcess, self).__init__()

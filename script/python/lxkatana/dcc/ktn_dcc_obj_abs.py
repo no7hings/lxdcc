@@ -89,6 +89,9 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             return ktn_port, True
         return ktn_port, False
 
+    def get_is_enumerate(self):
+        pass
+
     def get(self, time=0):
         ktn_port = self._get_ktn_port_()
         if ktn_port is not None:

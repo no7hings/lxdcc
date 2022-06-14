@@ -228,14 +228,20 @@ class AbsFileReferences(object):
     def _set_file_value_repair_(cls, obj):
         port = obj.get_port('fileTextureName')
         file_path = port.get()
-        file_ = utl_dcc_objects.OsFile(file_path)
-        if file_.get_is_udim():
-            if obj.get_port('uvTilingMode').get() == 3:
-                exists_file_paths = file_.get_exists_file_paths()
-                port.set(exists_file_paths[0])
-        # crash error for close
-        if ma_core._get_is_ui_mode_():
-            mel.eval('generateUvTilePreview {}'.format(obj.path))
+        if file_path is not None:
+            file_ = utl_dcc_objects.OsFile(file_path)
+            if file_.get_is_udim():
+                if obj.get_port('uvTilingMode').get() == 3:
+                    exists_file_paths = file_.get_exists_file_paths()
+                    port.set(exists_file_paths[0])
+            # crash error for close
+            if ma_core._get_is_ui_mode_():
+                mel.eval('generateUvTilePreview {}'.format(obj.path))
+        else:
+            utl_core.Log.set_module_warning_trace(
+                'file value repair',
+                'attribute="{}" gain "None" value'.format(port.path)
+            )
     @classmethod
     def set_files_value_repair(cls):
         fs = cmds.ls(type='file')

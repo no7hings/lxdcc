@@ -71,7 +71,7 @@ class AbsOsDirectory(
         tgt_directory = self.__class__(tgt_directory_path)
         if tgt_directory.get_is_exists():
             if force is False:
-                utl_core.Log.set_module_result_trace(
+                utl_core.Log.set_module_warning_trace(
                     'link create',
                     u'path="{}" is exists'.format(tgt_directory.path)
                 )
@@ -366,13 +366,17 @@ class AbsOsFile(
             target_tgt_file = self.__class__(target_tgt_file_path)
             if target_tgt_file.get_is_exists() is True:
                 if force is False:
-                    utl_core.Log.set_module_result_trace(
+                    utl_core.Log.set_module_warning_trace(
                         'link create',
                         u'file="{}" is exists'.format(target_tgt_file.path)
                     )
                     return
                 else:
                     if os.path.islink(target_tgt_file.path) is True:
+                        utl_core.Log.set_module_result_trace(
+                            'link remove',
+                            u'file="{}"'.format(target_tgt_file.path)
+                        )
                         os.remove(target_tgt_file.path)
             #
             if target_tgt_file.get_is_exists() is False:
@@ -449,7 +453,7 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             if tgt_file.get_is_exists():
                 if force is False:
-                    utl_core.Log.set_module_result_trace(
+                    utl_core.Log.set_module_warning_trace(
                         'link create',
                         u'path="{}" is exists'.format(tgt_file.path)
                     )

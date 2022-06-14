@@ -380,6 +380,20 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                             )
                         )
 
+    def get_is_locked(self):
+        return cmds.getAttr(
+            self.path, lock=1
+        )
+
+    def set_unlock(self):
+        cmds.setAttr(
+            self.path, lock=0
+        )
+        utl_core.Log.set_module_result_trace(
+            'port unlock',
+            'attribute="{}"'.format(self.path)
+        )
+
 
 class AbsMyaObjConnection(utl_abstract.AbsDccObjConnection):
     def __init__(self, source, target):

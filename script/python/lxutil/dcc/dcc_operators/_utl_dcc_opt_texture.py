@@ -349,23 +349,23 @@ class DccTexturesOpt(object):
     @classmethod
     def _set_copy_queue_run_(cls, queue):
         utl_core.Log.set_module_result_trace(
-            'texture-copy',
+            'texture copy',
             'start'
         )
         if queue:
             g_p = utl_core.GuiProgressesRunner(
                 maximum=len(queue)
             )
-            for src_stg_file, tgt_stg_file in queue:
+            for i_src_stg_file, i_tgt_stg_file in queue:
                 g_p.set_update()
-                src_stg_file.set_copy_to_file(
-                    tgt_stg_file.path
+                i_src_stg_file.set_copy_to_file(
+                    i_tgt_stg_file.path
                 )
             #
             g_p.set_stop()
         #
         utl_core.Log.set_module_result_trace(
-            'texture-copy',
+            'texture copy',
             'complete'
         )
 
@@ -419,7 +419,7 @@ class DccTexturesOpt(object):
         )
         utl_core.Log.set_module_result_trace(
             'texture repath',
-            u'port="{}", file="{}"'.format(port.path, stg_texture.path)
+            u'attribute="{}", file="{}"'.format(port.path, stg_texture.path)
         )
 
     def set_check(self):

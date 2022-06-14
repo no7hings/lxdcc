@@ -3579,8 +3579,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    ImageOpt(
-        '/data/f/arnold-render-to-texture/test-15/star_001_hiShape.exr'
-    ).set_convert_to(
-        '/data/f/arnold-render-to-texture/test-15/star_001_hiShape.png'
+    print StoragePathMtd.set_map_to_platform(
+        'L:\prod\cgm\work\assets\chr\nn_4y\rig\rigging\maya\scenes\nn_4y.rig.rigging.v019.ma'
     )
+

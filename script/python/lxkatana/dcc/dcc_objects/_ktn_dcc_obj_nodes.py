@@ -240,11 +240,7 @@ class AbsTextureReferences(object):
                     ktn_port.setExpression(new_expression)
                     utl_core.Log.set_module_result_trace(
                         'texture repath',
-                        'port="{}"'.format(port.path)
-                    )
-                    utl_core.Log.set_module_result_trace(
-                        'texture repath',
-                        'expression="{}"'.format(new_expression)
+                        u'attribute="{}", expression="{}"'.format(port.path, new_expression)
                     )
         else:
             v = ktn_port.getValue(0)
@@ -253,11 +249,7 @@ class AbsTextureReferences(object):
                 #
                 utl_core.Log.set_module_result_trace(
                     'texture repath',
-                    'port="{}"'.format(port.path)
-                )
-                utl_core.Log.set_module_result_trace(
-                    'texture repath',
-                    'file="{}"'.format(file_path)
+                    u'attribute="{}", file="{}"'.format(port.path, file_path)
                 )
     @classmethod
     def _get_obj_cls_(cls, shader_type_name):

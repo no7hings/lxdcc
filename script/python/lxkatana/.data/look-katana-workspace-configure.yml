@@ -755,7 +755,7 @@ workspace:
                         - 'lights.light_rig.refresh'
                         - 'lights.light_rig.load'
                 #
-                light_rig_1:
+                add_1:
                     path: <option.root>/<..key>__light
                     obj_category: node
                     obj_type: lx_light_pass
@@ -783,7 +783,7 @@ workspace:
                         - 'lights.light_rig.refresh'
                         - 'lights.light_rig.load'
                 #
-                light_rig_2:
+                add_2:
                     path: <option.root>/<..key>__light
                     obj_category: node
                     obj_type: lx_light_pass

@@ -195,20 +195,20 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                     'lights.light_rig.load'
                 )
         #
-        light_pass_light_rig_1 = self._hook_option_opt.get('light_pass_light_rig_1')
-        if light_pass_light_rig_1:
+        light_pass_add_1 = self._hook_option_opt.get('light_pass_add_1')
+        if light_pass_add_1:
             light_pass_dcc_node = ktn_dcc_objects.Node('light_rig_1__light')
             if light_pass_dcc_node.get_is_exists() is True:
-                light_pass_dcc_node.set('lights.light_rig.name', light_pass_light_rig_1)
+                light_pass_dcc_node.set('lights.light_rig.name', light_pass_add_1)
                 ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).set_port_execute(
                     'lights.light_rig.load'
                 )
         #
-        light_pass_light_rig_2 = self._hook_option_opt.get('light_pass_light_rig_2')
-        if light_pass_light_rig_2:
+        light_pass_add_2 = self._hook_option_opt.get('light_pass_add_2')
+        if light_pass_add_2:
             light_pass_dcc_node = ktn_dcc_objects.Node('light_rig_2__light')
             if light_pass_dcc_node.get_is_exists() is True:
-                light_pass_dcc_node.set('lights.light_rig.name', light_pass_light_rig_2)
+                light_pass_dcc_node.set('lights.light_rig.name', light_pass_add_2)
                 ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).set_port_execute(
                     'lights.light_rig.load'
                 )

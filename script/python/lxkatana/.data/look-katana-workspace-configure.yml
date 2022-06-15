@@ -50,7 +50,7 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.25
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -62,6 +62,7 @@ workspace:
                 ns_colorr: 0.1725
                 ns_colorg: 0.5333
                 ns_colorb: 0.851
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 asset:
@@ -111,7 +112,7 @@ workspace:
             parameters:
                 lynxi_variants/look: asset-work
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -123,6 +124,7 @@ workspace:
                 ns_colorr: 0.1725
                 ns_colorg: 0.5333
                 ns_colorb: 0.851
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 shot:
@@ -172,7 +174,7 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.25
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -185,6 +187,7 @@ workspace:
                 # "\n" = '\n', '\n'= '\\n'
                 ns_text: "<...label>\nobj_type: NetworkMaterialCreate"
                 ns_fontScale: 3.0
+                ns_stickyLock: 1
     # y=0.5
     geometry_switch:
         label: <..key>
@@ -262,7 +265,7 @@ workspace:
                 - <.path>.<option.look_pass>
         backdrop:
             variable: True
-            path: <option.root>/<option.look_pass>__<..label>_backgrop
+            path: <option.root>/<option.look_pass>__<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -274,6 +277,7 @@ workspace:
                 ns_colorb: =<option.look_pass_color.b>
                 ns_text: "<...label> for <option.look_pass>\nobj_type: MaterialAssign"
                 ns_fontScale: 3.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 definition:
@@ -334,7 +338,7 @@ workspace:
                 - <.path>.<option.look_pass>
         backdrop:
             variable: True
-            path: <option.root>/<option.look_pass>__<..label>_backgrop
+            path: <option.root>/<option.look_pass>__<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -346,6 +350,7 @@ workspace:
                 ns_colorb: =<option.look_pass_color.b>
                 ns_text: "<...label> for <option.look_pass>\nobj_type: ArnoldObjectSettings"
                 ns_fontScale: 3.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 # groups
@@ -500,7 +505,7 @@ workspace:
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -512,6 +517,7 @@ workspace:
                 ns_colorb: 0.5
                 ns_text: 'look-pass(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 look_pass:
@@ -641,7 +647,7 @@ workspace:
                 - <...look_pass_switch.main.output>
                 - <.path>.cameras
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -653,6 +659,7 @@ workspace:
                 ns_colorb: 0.5
                 ns_text: 'cameras(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 cameras:
@@ -714,7 +721,7 @@ workspace:
                 - <...cameras.main.path>.out
                 - <.path>.<option.light_pass>
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -726,6 +733,7 @@ workspace:
                 ns_colorb: 0.5
                 ns_text: 'light(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 all:
@@ -837,7 +845,7 @@ workspace:
                 - <...light_pass_switch.main.output>
                 - <.path>.<option.quality>
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -849,6 +857,7 @@ workspace:
                 ns_colorb: 0.5
                 ns_text: 'quality(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 low:
@@ -958,7 +967,7 @@ workspace:
                 - <...quality_switch.main.output>
                 - <.path>.<option.layer>
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -970,6 +979,7 @@ workspace:
                 ns_colorb: 0.5
                 ns_text: 'layer(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
         node_graph:
             nodes:
                 master:
@@ -1066,7 +1076,7 @@ workspace:
                 - <...render_settings.main.output>
                 - <.input>
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -1078,6 +1088,7 @@ workspace:
                 ns_colorb: 0.8196
                 ns_text: 'render output(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
     # look outputs
     # y=-6.0
     look_outputs:
@@ -1108,7 +1119,7 @@ workspace:
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
         backdrop:
-            path: <option.root>/<..label>_backgrop
+            path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
             attributes:
                 x: =<...geometry.x>
@@ -1120,6 +1131,7 @@ workspace:
                 ns_colorb: 0.8196
                 ns_text: 'look output(s)'
                 ns_fontScale: 6.0
+                ns_stickyLock: 1
 #
 node:
     geometry_abc:

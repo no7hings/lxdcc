@@ -137,7 +137,7 @@ def get_option_hook_args(option):
                     option=option_opt.to_string()
                 )
             elif type_name == 'method':
-                session = ssn_objects.OptionMethodSession(
+                session = ssn_objects.SsnOptionMethod(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,

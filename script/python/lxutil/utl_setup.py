@@ -5,6 +5,8 @@ import lxbasic.objects as bsc_objects
 
 from lxutil import utl_configure
 
+from lxutil import utl_abstract
+
 
 class HoudiniXml(object):
     XML_HEAD = 'subMenu'
@@ -267,3 +269,13 @@ class HoudiniSetupCreator(object):
     def set_file_write(cls, file_path, raw):
         with open(file_path, 'w') as f:
             f.write(raw)
+
+
+class OcioSetup(utl_abstract.AbsSetup):
+    def __init__(self, root):
+        super(OcioSetup, self).__init__(root)
+
+    def set_run(self):
+        self._set_environ_(
+            'OCIO', '{}/config.ocio'.format(self._root)
+        )

@@ -55,7 +55,15 @@ from lxbasic import bsc_configure
 
 import shutil
 
+import multiprocessing
+
 THREAD_MAXIMUM = threading.Semaphore(1024)
+
+SP_THREAD_MAXIMUM = threading.Semaphore(
+    multiprocessing.cpu_count()-4
+)
+
+CPU_COUNT = multiprocessing.cpu_count()
 
 
 class PyThread(threading.Thread):
@@ -69,6 +77,117 @@ class PyThread(threading.Thread):
         THREAD_MAXIMUM.acquire()
         self._fnc(*self._args, **self._kwargs)
         THREAD_MAXIMUM.release()
+
+
+class CmdSubProcessSignal(object):
+    def __init__(self, *args, **kwargs):
+        self.fncs = []
+
+    def set_connect_to(self, fnc):
+        self.fncs.append(fnc)
+
+    def set_emit_send(self, *args, **kwargs):
+        if self.fncs:
+            ts = [threading.Thread(target=i, args=args, kwargs=kwargs) for i in self.fncs]
+            for t in ts:
+                t.start()
+            for t in ts:
+                t.join()
+
+
+class CmdSubProcessThread(threading.Thread):
+    STACK = []
+    MAXIMUM = int(CPU_COUNT*.75)
+    EVENT = threading.Event()
+    LOCK = threading.Lock()
+    #
+    Status = bsc_configure.Status
+    def __init__(self, cmd, index=0):
+        threading.Thread.__init__(self)
+        self._cmd = cmd
+        self._index = index
+
+        self._status = self.Status.Started
+
+        self._status_changed_signal = CmdSubProcessSignal(int, int)
+        self._completed_signal = CmdSubProcessSignal(int, list)
+        self._failed_signal = CmdSubProcessSignal(int, list)
+        self._finished_signal = CmdSubProcessSignal(int, int)
+    @property
+    def status_changed(self):
+        return self._status_changed_signal
+    @property
+    def completed(self):
+        return self._completed_signal
+    @property
+    def failed(self):
+        return self._failed_signal
+    @property
+    def finished(self):
+        return self._finished_signal
+
+    def run(self):
+        self.__set_status_update(self.Status.Running)
+        try:
+            results = SubProcessMtd.set_run_as_block(
+                self._cmd
+            )
+            self.__set_status_update(self.Status.Completed)
+            self.__set_completed(results)
+        except subprocess.CalledProcessError:
+            self.__set_status_update(self.Status.Failed)
+            self.__set_failed([])
+        finally:
+            self.__set_finished(self._status)
+            #
+            CmdSubProcessThread.LOCK.acquire()
+            CmdSubProcessThread.STACK.remove(self)
+
+            if len(CmdSubProcessThread.STACK) == CmdSubProcessThread.MAXIMUM-1:
+                CmdSubProcessThread.EVENT.set()
+                CmdSubProcessThread.EVENT.clear()
+
+            CmdSubProcessThread.LOCK.release()
+    @staticmethod
+    def set_wait():
+        CmdSubProcessThread.LOCK.acquire()
+        if len(CmdSubProcessThread.STACK) >= CmdSubProcessThread.MAXIMUM:
+            CmdSubProcessThread.LOCK.release()
+            CmdSubProcessThread.EVENT.wait()
+        else:
+            CmdSubProcessThread.LOCK.release()
+    @staticmethod
+    def set_start(cmd, index=0):
+        CmdSubProcessThread.LOCK.acquire()
+        t = CmdSubProcessThread(cmd, index)
+        CmdSubProcessThread.STACK.append(t)
+        CmdSubProcessThread.LOCK.release()
+        t.start()
+        return t
+
+    def __set_completed(self, results):
+        self._completed_signal.set_emit_send(
+            self._index, results
+        )
+
+    def __set_failed(self, results):
+        self._failed_signal.set_emit_send(
+            self._index, results
+        )
+
+    def __set_finished(self, status):
+        self._finished_signal.set_emit_send(
+            self._index, status
+        )
+
+    def __set_status_update(self, status):
+        self._status = status
+        self._status_changed_signal.set_emit_send(
+            self._index, status
+        )
+
+    def get_status(self):
+        return self._status
 
 
 class OrderedYamlMtd(object):
@@ -588,6 +707,12 @@ class StoragePathOpt(object):
             return False
         return False
 
+    def get_is_readable(self):
+        return os.access(self._path, os.R_OK)
+
+    def get_is_writeable(self):
+        return os.access(self._path, os.W_OK)
+
     def __str__(self):
         return self._path
 
@@ -702,29 +827,94 @@ class MultiplyFileNameMtd(object):
 
 class DirectoryMtd(object):
     @classmethod
-    def get_all_file_paths(cls, directory_path):
-        def rcs_glob_fnc_(path_):
-            _results = glob.glob(u'{}/*'.format(path_)) or []
-            _results.sort()
-            for _i_path in _results:
-                if os.path.isfile(_i_path):
-                    lis.append(_i_path)
-                elif os.path.isdir(_i_path):
-                    rcs_glob_fnc_(_i_path)
-        #
+    def get_all_file_paths(cls, directory_path, include_exts=None):
         def rcs_os_fnc_(path_):
             _results = os.listdir(path_) or []
             _results.sort()
             for _i_name in _results:
                 _i_path = '{}/{}'.format(path_, _i_name)
                 if os.path.isfile(_i_path):
-                    lis.append(_i_path)
+                    if isinstance(include_exts, (tuple, list)):
+                        _i_name_base, _i_ext = os.path.splitext(_i_name)
+                        if _i_ext not in include_exts:
+                            continue
+                    #
+                    list_.append(_i_path)
                 elif os.path.isdir(_i_path):
                     rcs_os_fnc_(_i_path)
 
-        lis = []
+        list_ = []
         rcs_os_fnc_(directory_path)
+        return list_
+    @classmethod
+    def get_file_paths(cls, directory_path, include_exts=None):
+        list_ = []
+        results = os.listdir(directory_path) or []
+        results.sort()
+        for i_name in results:
+            i_path = '{}/{}'.format(directory_path, i_name)
+            if os.path.isfile(i_path):
+                if isinstance(include_exts, (tuple, list)):
+                    i_name_base, i_ext = os.path.splitext(i_name)
+                    if i_ext not in include_exts:
+                        continue
+                #
+                list_.append(i_path)
+        return list_
+    @classmethod
+    def get_all_directory_paths(cls, directory_path):
+        def rcs_os_fnc_(path_):
+            _results = os.listdir(path_) or []
+            _results.sort()
+            for _i_name in _results:
+                _i_path = '{}/{}'.format(path_, _i_name)
+                if os.path.isdir(_i_path):
+                    list_.append(_i_path)
+                    rcs_os_fnc_(_i_path)
+
+        list_ = []
+        rcs_os_fnc_(directory_path)
+        return list_
+    @classmethod
+    def get_all_directory_paths_(cls, directory_path):
+        lis = []
+        for i_root, i_dirs, _ in os.walk(directory_path):
+            for j_dir in i_dirs:
+                lis.append(
+                    '{}/{}'.format(i_root, j_dir)
+                )
         return lis
+    @classmethod
+    def get_all_directory_path__(cls, directory_path):
+        def rcs_fnc_(d_):
+            for _i in scandir.scandir(d_):
+                if _i.is_dir():
+                    list_.append(_i.path)
+                    rcs_fnc_(_i.path)
+        # noinspection PyUnresolvedReferences
+        import scandir
+
+        list_ = []
+
+        rcs_fnc_(directory_path)
+        return list_
+    @classmethod
+    def get_file_paths__(cls, directory_path, include_exts=None):
+        # noinspection PyUnresolvedReferences
+        import scandir
+
+        list_ = []
+
+        for i in scandir.scandir(directory_path):
+            if i.is_file():
+                i_path = i.path
+                if isinstance(include_exts, (tuple, list)):
+                    i_base, i_ext = os.path.splitext(i_path)
+                    if i_ext not in include_exts:
+                        continue
+                #
+                list_.append(i_path)
+        return list_
     @classmethod
     def get_file_relative_path(cls, directory_path, file_path):
         return os.path.relpath(file_path, directory_path)
@@ -1097,14 +1287,18 @@ class SubProcessMtd(object):
             except:
                 pass
         #
-        return_code = s_p.wait()
-        if return_code:
-            ExceptionMtd.set_print()
-            ExceptionMtd.set_stack_print()
-            #
-            raise subprocess.CalledProcessError(
-                return_code, s_p
-            )
+        retcode = s_p.poll()
+        if retcode:
+            raise subprocess.CalledProcessError(retcode, cmd)
+        #
+        # return_code = s_p.wait()
+        # if return_code:
+        #     ExceptionMtd.set_print()
+        #     ExceptionMtd.set_stack_print()
+        #     #
+        #     raise subprocess.CalledProcessError(
+        #         return_code, s_p
+        #     )
         #
         s_p.stdout.close()
     @classmethod
@@ -1152,14 +1346,18 @@ class SubProcessMtd(object):
             except:
                 pass
         #
-        return_code = s_p.wait()
-        if return_code:
-            ExceptionMtd.set_print()
-            ExceptionMtd.set_stack_print()
-            #
-            raise subprocess.CalledProcessError(
-                return_code, s_p
-            )
+        retcode = s_p.poll()
+        if retcode:
+            raise subprocess.CalledProcessError(retcode, cmd)
+        #
+        # return_code = s_p.wait()
+        # if return_code:
+        #     ExceptionMtd.set_print()
+        #     ExceptionMtd.set_stack_print()
+        #     #
+        #     raise subprocess.CalledProcessError(
+        #         return_code, s_p
+        #     )
         #
         s_p.stdout.close()
     @classmethod
@@ -1189,6 +1387,23 @@ class SubProcessMtd(object):
         )
         t_0.start()
         # t_0.join()
+    @classmethod
+    def set_run_as_block(cls, cmd):
+        process = subprocess.Popen(
+            cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=cls.NO_WINDOW
+        )
+        output, unused_err = process.communicate()
+        #
+        retcode = process.poll()
+        if retcode:
+            raise subprocess.CalledProcessError(retcode, cmd)
+        return output.decode().splitlines()
 
 
 class MultiProcessMtd(object):
@@ -3579,7 +3794,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print StoragePathMtd.set_map_to_platform(
-        'L:\prod\cgm\work\assets\chr\nn_4y\rig\rigging\maya\scenes\nn_4y.rig.rigging.v019.ma'
+    print DirectoryMtd.get_all_file_paths__(
+        '/l/temp/td/dongchangbao/tx_convert_test/exr'
     )
 

@@ -811,51 +811,39 @@ class AndTextureOpt_(AndImageOpt):
         else:
             return bsc_configure.ColorSpace.LINEAR
 
-    def get_tx_file_path(self):
-        name = os.path.basename(self._file_path)
+    def get_tx_file_path(self, directory_path_tgt=None):
+        file_path_src = self._file_path
+        #
+        name = os.path.basename(file_path_src)
         name_base, ext = os.path.splitext(name)
-        directory_path = os.path.dirname(self._file_path)
+        directory_path = os.path.dirname(file_path_src)
+        if directory_path_tgt:
+            return '{}/{}{}'.format(directory_path_tgt, name_base, self.TX_EXT)
         return '{}/{}{}'.format(directory_path, name_base, self.TX_EXT)
 
-    def _set_unit_tx_create_(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, block=False):
-        cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
-        if use_aces is True:
-            utl_core.Log.set_module_result_trace(
-                'texture-tx create',
-                'color-space convert "{}" to "{}"'.format(color_space, aces_render_color_space)
-            )
-            # print color_space, aces_render_color_space
-            if color_space in aces_color_spaces:
-                if color_space != aces_render_color_space:
-                    cmd_args += [
-                        '--colorengine ocio',
-                        '--colorconfig "{}"'.format(aces_file),
-                        '--colorconvert "{}" "{}"'.format(color_space, aces_render_color_space),
-                    ]
-            else:
-                raise TypeError(u'file="{}", color-space="{}" is Non-valid'.format(self._file_path, color_space))
-        #
-        if self.get_is_srgb() and self.get_is_8_bit():
-            cmd_args += [
-                '--format exr',
-                '-d half',
-                '--compression dwaa'
-            ]
-        #
-        cmd_args += [self._file_path]
+    def set_unit_tx_create(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, directory_path_tgt=None, block=False):
+        cmd = self.get_unit_tx_create_cmd(
+            color_space,
+            use_aces,
+            aces_file,
+            aces_color_spaces,
+            aces_render_color_space,
+            directory_path_tgt
+        )
         #
         if block is True:
             bsc_core.SubProcessMtd.set_run_with_result(
-                ' '.join(cmd_args)
+                cmd
             )
             return True
         else:
             return bsc_core.SubProcessMtd.set_run(
-                ' '.join(cmd_args)
+                cmd
             )
 
-    def set_tx_create(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, with_result=False):
-        cmd_args = ['maketx', '-v', '-u', '--unpremult', '--oiio']
+    def get_unit_tx_create_cmd(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, directory_path_tgt=None):
+        file_path_src = self._file_path
+        cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
         if use_aces is True:
             if color_space in aces_color_spaces:
                 if color_space != aces_render_color_space:
@@ -865,11 +853,19 @@ class AndTextureOpt_(AndImageOpt):
                         '--colorconvert "{}" "{}"'.format(color_space, aces_render_color_space),
                     ]
             else:
-                result = utl_core.Log.set_module_warning_trace(
-                    'texture-tx create',
-                    u'file="{}", color-space="{}" is Non-valid'.format(self._file_path, color_space)
+                raise TypeError(
+                    u'file="{}", aces color-space="{}" is not available'.format(
+                        file_path_src, color_space
+                    )
                 )
-                raise TypeError(result)
+        #
+        if directory_path_tgt:
+            file_path_src_tgt = self.get_tx_file_path(
+                directory_path_tgt
+            )
+            cmd_args += [
+                u'-o "{}"'.format(file_path_src_tgt)
+            ]
         #
         if self.get_is_srgb() and self.get_is_8_bit():
             cmd_args += [
@@ -878,21 +874,11 @@ class AndTextureOpt_(AndImageOpt):
                 '--compression dwaa'
             ]
         #
-        cmd_args += [self._file_path]
+        cmd_args += [
+            u'"{}"'.format(file_path_src)
+        ]
         #
-        if with_result is True:
-            utl_core.SubProcessRunner.set_run_with_result(
-                ' '.join(cmd_args)
-            )
-        else:
-            utl_core.SubProcessRunner.set_run(
-                ' '.join(cmd_args)
-            )
-        #
-        utl_core.Log.set_module_result_trace(
-            'texture-tx create',
-            u'file="{}" >> "{}"'.format(self._file_path, self.get_tx_file_path())
-        )
+        return ' '.join(cmd_args)
 
 
 class AndOslShaderMtd(object):

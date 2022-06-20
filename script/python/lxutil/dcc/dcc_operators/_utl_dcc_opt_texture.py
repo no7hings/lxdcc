@@ -148,8 +148,9 @@ class DccTexturesOpt(object):
                         i_texture_tiles = i_texture.get_exists_files()
                         if i_texture_tiles:
                             for j_texture_tile in i_texture_tiles:
-                                utl_dcc_objects.OsTexture._set_unit_tx_create_(
-                                    j_texture_tile.path, block=True
+                                utl_dcc_objects.OsTexture._set_unit_tx_create_by_src_(
+                                    j_texture_tile.path,
+                                    block=True
                                 )
     @classmethod
     def _get_tx_create_process_(cls, queue, use_deferred):
@@ -191,17 +192,17 @@ class DccTexturesOpt(object):
         jpg_create_queue = []
         jpg_repath_queue = []
         #
-        tgt_ext = '.jpg'
+        ext_tgt = '.jpg'
         #
         if objs:
             for obj in objs:
                 for i_port_path, i_file_path in obj.reference_raw.items():
                     i_texture = utl_dcc_objects.OsTexture(i_file_path)
-                    if i_texture.get_is_tgt_ext(tgt_ext) is True:
-                        i_tgt_ext_texture_orig = i_texture.get_orig_as_tgt_ext(tgt_ext)
+                    if i_texture.get_is_tgt_ext(ext_tgt) is True:
+                        i_tgt_ext_texture_orig = i_texture.get_orig_as_tgt_ext(ext_tgt)
                         i_tgt_ext_texture = i_texture
                     else:
-                        i_tgt_ext_texture = i_texture.get_as_tgt_ext(tgt_ext)
+                        i_tgt_ext_texture = i_texture.get_as_tgt_ext(ext_tgt)
                         #
                         i_port = obj.get_port(i_port_path)
                         if check_exists is True:
@@ -244,17 +245,17 @@ class DccTexturesOpt(object):
         jpg_create_queue = []
         repath_queue = []
         #
-        tgt_ext = '.jpg'
+        ext_tgt = '.jpg'
         #
         if objs:
             for obj in objs:
                 for i_port_path, i_file_path in obj.reference_raw.items():
                     i_texture = utl_dcc_objects.OsTexture(i_file_path)
-                    if i_texture.get_is_tgt_ext(tgt_ext) is True:
-                        i_tgt_ext_texture_orig = i_texture.get_orig_as_tgt_ext(tgt_ext)
+                    if i_texture.get_is_tgt_ext(ext_tgt) is True:
+                        i_tgt_ext_texture_orig = i_texture.get_orig_as_tgt_ext(ext_tgt)
                         i_tgt_ext_texture = i_texture
                     else:
-                        i_tgt_ext_texture = i_texture.get_as_tgt_ext(tgt_ext)
+                        i_tgt_ext_texture = i_texture.get_as_tgt_ext(ext_tgt)
                         #
                         i_port = obj.get_port(i_port_path)
                         repath_queue.append(
@@ -318,14 +319,14 @@ class DccTexturesOpt(object):
             'start'
         )
         if queue:
-            tgt_ext = '.jpg'
+            ext_tgt = '.jpg'
             g_p = utl_core.GuiProgressesRunner(
                 maximum=len(queue)
             )
             #
             for i_texture in queue:
                 g_p.set_update()
-                if i_texture.get_is_exists_as_tgt_ext(tgt_ext) is False:
+                if i_texture.get_is_exists_as_tgt_ext(ext_tgt) is False:
                     i_texture_tiles = i_texture.get_exists_files()
                     if i_texture_tiles:
                         for j_texture_tile in i_texture_tiles:
@@ -499,9 +500,9 @@ class DccTexturesOpt(object):
                         #
                         matches = [i for search_ext in search_ext_keys for i in ext_search_dict.get(search_ext, [])]
                         if matches:
-                            tgt_directory_path, tgt_name_base, tgt_ext = matches[0]
+                            tgt_directory_path, tgt_name_base, ext_tgt = matches[0]
                             tgt_name_base = src_name_base
-                            target_file_path = u'{}/{}{}'.format(tgt_directory_path, tgt_name_base, tgt_ext)
+                            target_file_path = u'{}/{}{}'.format(tgt_directory_path, tgt_name_base, ext_tgt)
                             port = obj.get_port(i_port_path)
                             tgt_texture_file_obj = utl_dcc_objects.OsTexture(target_file_path)
                             #
@@ -620,7 +621,7 @@ class DccTexturesOpt(object):
         #
         self._set_repath_queue_run_(repath_queue)
 
-    def set_repath_to_orig_as_tgt_ext(self, tgt_ext):
+    def set_repath_to_orig_as_tgt_ext(self, ext_tgt):
         objs = self._objs
         #
         repath_queue = []
@@ -630,8 +631,8 @@ class DccTexturesOpt(object):
                 for i_port_path, i_file_path in obj.reference_raw.items():
                     port = obj.get_port(i_port_path)
                     i_texture = utl_dcc_objects.OsTexture(i_file_path)
-                    if i_texture.get_is_tgt_ext(tgt_ext):
-                        o = i_texture.get_orig_as_tgt_ext(tgt_ext)
+                    if i_texture.get_is_tgt_ext(ext_tgt):
+                        o = i_texture.get_orig_as_tgt_ext(ext_tgt)
                         if o is not None:
                             repath_queue.append(
                                 (port, o)
@@ -673,7 +674,9 @@ class TextureTxSubProcess(bsc_obj_abs.AbsProcess):
         pre_count = TextureTxMainProcess.PROCESS_COUNT
         maximum = TextureTxMainProcess.PROCESS_COUNT_MAXIMUM
         if pre_count < maximum:
-            result = self._f._set_unit_tx_create_(self._file_path)
+            result = self._f._set_unit_tx_create_by_src_(
+                self._file_path
+            )
             TextureTxMainProcess.PROCESS_COUNT = pre_count + 1
         else:
             result = None

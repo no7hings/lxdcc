@@ -167,6 +167,7 @@ class RsvPermissionMtd(object):
             cls.set_nas_cmd_run(cmd)
     @classmethod
     def set_crate_by_step(cls, step, path):
+        path = bsc_core.StoragePathMtd.set_map_to_nas(path)
         group = '{}_grp'.format(step)
         group_id = cls.GROUP_ID_DICT[group]
         kwargs = dict(
@@ -179,12 +180,24 @@ class RsvPermissionMtd(object):
         cls.set_nas_cmd_run(cmd)
     @classmethod
     def set_crate_by_group(cls, group, path):
+        path = bsc_core.StoragePathMtd.set_map_to_nas(path)
         group_id = cls.GROUP_ID_DICT[group]
         kwargs = dict(
             group_id=group_id,
             path=path
         )
         cmd = 'chmod -R +a group {group_id} allow dir_gen_all,object_inherit,container_inherit "{path}"'.format(
+            **kwargs
+        )
+        cls.set_nas_cmd_run(cmd)
+    @classmethod
+    def set_test(cls, path):
+        path = bsc_core.StoragePathMtd.set_map_to_nas(path)
+        kwargs = dict(
+            group_id='srf_grp',
+            path=path
+        )
+        cmd = 'chmod -R +a group {group_id} "{path}"'.format(
             **kwargs
         )
         cls.set_nas_cmd_run(cmd)

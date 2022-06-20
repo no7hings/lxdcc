@@ -15,4 +15,8 @@ f = '/l/temp/td/dongchangbao/tx_test/new/grandma.z_disp.1026.exr'
 
 t = and_core.AndTextureOpt_(f)
 
-utl_dcc_objects.OsTexture._set_unit_tx_create_(f)
+utl_dcc_objects.OsTexture._set_unit_tx_create_by_src_(
+    f,
+    directory_path='/l/temp/td/dongchangbao/tx_test/new/tx',
+    block=True
+)

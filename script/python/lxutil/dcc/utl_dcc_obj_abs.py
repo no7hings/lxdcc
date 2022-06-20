@@ -510,7 +510,7 @@ class AbsOsTexture(AbsOsFile):
                 if with_tx is True:
                     tx_list = []
                     for i in list_:
-                        tx_file_path = self._get_tgt_ext_path_(i, tgt_ext=self.TX_EXT)
+                        tx_file_path = self._get_tgt_ext_path_(i, ext_tgt=self.TX_EXT)
                         if os.path.isfile(tx_file_path):
                             tx_list.append(tx_file_path)
                         else:
@@ -546,6 +546,12 @@ class AbsOsTexture(AbsOsFile):
 
     def get_exists_files(self, with_tx=True):
         return [self.__class__(i) for i in self.get_exists_file_paths(with_tx)]
+
+    def get_exists_file_paths_(self):
+        return self._get_exists_file_paths_(self.path)
+
+    def get_exists_files_(self):
+        return [self.__class__(i) for i in self.get_exists_file_paths_()]
     @classmethod
     def _get_exists_files_(cls, file_path):
         return [cls(i) for i in cls._get_exists_file_paths_(file_path)]
@@ -554,25 +560,25 @@ class AbsOsTexture(AbsOsFile):
         return [bsc_core.StoragePathMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
     # tx
     @classmethod
-    def _get_unit_tgt_ext_is_exists_(cls, any_file_path, tgt_ext):
-        tgt_ext_orig_path = cls._get_unit_tgt_ext_orig_path_(any_file_path, tgt_ext)
-        tgt_ext_path = cls._get_tgt_ext_path_(any_file_path, tgt_ext)
+    def _get_unit_tgt_ext_is_exists_(cls, any_file_path, ext_tgt):
+        tgt_ext_orig_path = cls._get_unit_tgt_ext_orig_path_(any_file_path, ext_tgt)
+        tgt_ext_path = cls._get_tgt_ext_path_(any_file_path, ext_tgt)
         tgt_ext_orig_timestamp = cls(tgt_ext_orig_path).get_modify_timestamp() or 0
         tgt_ext_timestamp = cls(tgt_ext_path).get_modify_timestamp() or 0
         return int(tgt_ext_orig_timestamp) == int(tgt_ext_timestamp)
     @classmethod
-    def _get_tgt_ext_path_(cls, file_path, tgt_ext):
+    def _get_tgt_ext_path_(cls, file_path, ext_tgt):
         path_base, ext = os.path.splitext(file_path)
-        if ext != tgt_ext:
-            return u'{}{}'.format(path_base, tgt_ext)
+        if ext != ext_tgt:
+            return u'{}{}'.format(path_base, ext_tgt)
         return file_path
     @classmethod
     def _get_unit_tx_(cls, file_path):
-        return cls(cls._get_tgt_ext_path_(file_path, tgt_ext=cls.TX_EXT))
+        return cls(cls._get_tgt_ext_path_(file_path, ext_tgt=cls.TX_EXT))
     @classmethod
-    def _get_unit_tgt_ext_orig_ext_(cls, file_path, tgt_ext):
+    def _get_unit_tgt_ext_orig_ext_(cls, file_path, ext_tgt):
         path_base, ext = os.path.splitext(file_path)
-        if ext == tgt_ext:
+        if ext == ext_tgt:
             glob_pattern = u'{}.*'.format(path_base)
             #
             ext_ = cls._get_unit_name_base_same_ext_(
@@ -582,11 +588,11 @@ class AbsOsTexture(AbsOsFile):
                 return ext_
         return ext
     @classmethod
-    def _get_unit_tgt_ext_orig_path_(cls, file_path, tgt_ext):
+    def _get_unit_tgt_ext_orig_path_(cls, file_path, ext_tgt):
         path_base, ext = os.path.splitext(file_path)
         # etc ext=".tx"
-        if ext == tgt_ext:
-            ext_ = cls._get_unit_tgt_ext_orig_ext_(file_path, tgt_ext)
+        if ext == ext_tgt:
+            ext_ = cls._get_unit_tgt_ext_orig_ext_(file_path, ext_tgt)
             if ext_ is not None:
                 return '{}{}'.format(path_base, ext_)
         return file_path
@@ -600,7 +606,7 @@ class AbsOsTexture(AbsOsFile):
                     return i_ext
 
     def get_tx_file_path(self):
-        return self._get_tgt_ext_path_(self.path, tgt_ext=self.TX_EXT)
+        return self._get_tgt_ext_path_(self.path, ext_tgt=self.TX_EXT)
 
     def get_tx(self):
         return self.__class__(
@@ -610,7 +616,7 @@ class AbsOsTexture(AbsOsFile):
     def get_tx_is_exists(self):
         return self.get_is_exists_as_tgt_ext(self.TX_EXT)
 
-    def _get_tgt_ext_is_exists_(self, tgt_ext):
+    def _get_tgt_ext_is_exists_(self, ext_tgt):
         # TODO: if ext is ".tx", "*.1001.exr" is exists and "*.1001.tx" is lost
         _ = self._get_exists_files_(self.path)
         if _:
@@ -618,23 +624,23 @@ class AbsOsTexture(AbsOsFile):
             orig_ext = None
             for i in _:
                 if orig_ext is None:
-                    i_orig_ext = self._get_unit_tgt_ext_orig_ext_(i.path, tgt_ext)
-                    if i_orig_ext != tgt_ext:
+                    i_orig_ext = self._get_unit_tgt_ext_orig_ext_(i.path, ext_tgt)
+                    if i_orig_ext != ext_tgt:
                         orig_ext = i_orig_ext
                 #
                 orig_file_path = self._get_tgt_ext_path_(i.path, orig_ext)
                 if os.path.isfile(orig_file_path):
-                    if i._get_unit_tgt_ext_is_exists_(orig_file_path, tgt_ext) is False:
+                    if i._get_unit_tgt_ext_is_exists_(orig_file_path, ext_tgt) is False:
                         return False
             return True
 
-    def _get_tgt_ext_orig_path_(self, tgt_ext):
+    def _get_tgt_ext_orig_path_(self, ext_tgt):
         ext = self.ext
-        if ext == tgt_ext:
+        if ext == ext_tgt:
             _ = self._get_exists_files_(self.path)
             for i in _:
-                print self._get_unit_tgt_ext_orig_ext_(i.path, tgt_ext), 'AAA'
-        return tgt_ext
+                print self._get_unit_tgt_ext_orig_ext_(i.path, ext_tgt), 'AAA'
+        return ext_tgt
 
     def get_tx_orig_path(self):
         _ = self._get_exists_file_paths_(self.path)
@@ -649,24 +655,24 @@ class AbsOsTexture(AbsOsFile):
         if _ is not None:
             return self.__class__(_)
 
-    def get_tgt_ext_orig_path(self, tgt_ext):
+    def get_tgt_ext_orig_path(self, ext_tgt):
         _ = self._get_exists_file_paths_(self.path)
         if _:
             path_base, ext = os.path.splitext(self.path)
-            ext_ = self._get_unit_tgt_ext_orig_ext_(_[0], tgt_ext)
+            ext_ = self._get_unit_tgt_ext_orig_ext_(_[0], ext_tgt)
             if ext_ is not None:
                 return '{}{}'.format(path_base, ext_)
 
-    def get_path_as_tgt_ext(self, tgt_ext):
-        return self._get_tgt_ext_path_(self.path, tgt_ext)
+    def get_path_as_tgt_ext(self, ext_tgt):
+        return self._get_tgt_ext_path_(self.path, ext_tgt)
 
-    def get_as_tgt_ext(self, tgt_ext):
+    def get_as_tgt_ext(self, ext_tgt):
         return self.__class__(
-            self.get_path_as_tgt_ext(tgt_ext)
+            self.get_path_as_tgt_ext(ext_tgt)
         )
 
-    def get_orig_as_tgt_ext(self, tgt_ext):
-        _ = self.get_tgt_ext_orig_path(tgt_ext)
+    def get_orig_as_tgt_ext(self, ext_tgt):
+        _ = self.get_tgt_ext_orig_path(ext_tgt)
         if _ is not None:
             return self.__class__(_)
 
@@ -682,8 +688,8 @@ class AbsOsTexture(AbsOsFile):
     def get_is_tgt_ext(self, ext):
         return self.ext == ext
 
-    def get_is_exists_as_tgt_ext(self, tgt_ext):
-        return self._get_tgt_ext_is_exists_(tgt_ext)
+    def get_is_exists_as_tgt_ext(self, ext_tgt):
+        return self._get_tgt_ext_is_exists_(ext_tgt)
 
     def get_is_exr(self):
         return self.ext == self.EXR_EXT
@@ -725,52 +731,87 @@ class AbsOsTexture(AbsOsFile):
 
     def get_purpose(self):
         return self.TEXTURE_CFG.get_purpose(self.path)
-
-    def set_tx_create(self, force=False):
-        lis = []
-        if self.get_is_tx_ext() is False:
-            from lxarnold import and_core
-            #
-            color_space = self.get_used_color_space()
-            #
-            use_aces = self.COLOR_SPACE_CFG.get_is_use_aces()
-            aces_color_spaces = self.COLOR_SPACE_CFG.get_aces_color_spaces()
-            aces_render_color_space = self.COLOR_SPACE_CFG.get_aces_render_color_space()
-            aces_file = self.COLOR_SPACE_CFG.get_aces_file()
-            exists_files = self.get_exists_files()
-            if exists_files:
-                for i_tile in exists_files:
-                    if i_tile.get_tx_is_exists() is False or force is True:
-                        and_core.AndTextureOpt_(i_tile.path).set_tx_create(
-                            color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space
-                        )
-                        lis.append(i_tile.path)
-        return lis
     @classmethod
     def _get_unit_jpg_is_exists_(cls, file_path):
         pass
     @classmethod
-    def _set_unit_tx_create_(cls, file_path, block=False):
-        path_base, ext = os.path.splitext(file_path)
+    def _get_unit_is_exists_as_tgt_ext_by_src_(cls, file_path_src, directory_path_tgt, ext_tgt):
+        name = os.path.basename(file_path_src)
+        name_base, ext = os.path.splitext(name)
+        directory_path = os.path.dirname(file_path_src)
+        if directory_path_tgt:
+            tgt_ext_path = '{}/{}{}'.format(directory_path_tgt, name_base, ext_tgt)
+        else:
+            tgt_ext_path = '{}/{}{}'.format(directory_path, name_base, ext_tgt)
+        #
+        tgt_ext_orig_path = file_path_src
+        tgt_ext_orig_timestamp = cls(tgt_ext_orig_path).get_modify_timestamp() or 0
+        tgt_ext_timestamp = cls(tgt_ext_path).get_modify_timestamp() or 0
+        return int(tgt_ext_orig_timestamp) == int(tgt_ext_timestamp)
+    @classmethod
+    def _get_is_exists_as_tgt_ext_by_src_(cls, file_path_src, directory_path_tgt, ext_tgt):
+        file_paths_src = cls._get_exists_file_paths_(file_path_src)
+        for i_file_path_src in file_paths_src:
+            if cls._get_unit_is_exists_as_tgt_ext_by_src_(i_file_path_src, directory_path_tgt, ext_tgt) is False:
+                return False
+        return True
+    @classmethod
+    def _set_unit_tx_create_by_src_(cls, file_path_src, directory_path_tgt=None, block=False):
+        path_base, ext = os.path.splitext(file_path_src)
         if ext != cls.TX_EXT:
             from lxarnold import and_core
             #
-            color_space = cls._get_unit_used_color_space_(file_path)
+            color_space = cls._get_unit_used_color_space_(file_path_src)
             #
             use_aces = cls.COLOR_SPACE_CFG.get_is_use_aces()
             aces_color_spaces = cls.COLOR_SPACE_CFG.get_aces_color_spaces()
             aces_render_color_space = cls.COLOR_SPACE_CFG.get_aces_render_color_space()
             aces_file = cls.COLOR_SPACE_CFG.get_aces_file()
-            if cls._get_unit_tgt_ext_is_exists_(file_path, tgt_ext=cls.TX_EXT) is False:
-                return and_core.AndTextureOpt_(file_path)._set_unit_tx_create_(
-                    color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, block
+            if cls._get_unit_is_exists_as_tgt_ext_by_src_(
+                    file_path_src,
+                    directory_path_tgt=directory_path_tgt,
+                    ext_tgt=cls.TX_EXT
+            ) is False:
+                return and_core.AndTextureOpt_(file_path_src).set_unit_tx_create(
+                    color_space=color_space,
+                    use_aces=use_aces,
+                    aces_file=aces_file,
+                    aces_color_spaces=aces_color_spaces,
+                    aces_render_color_space=aces_render_color_space,
+                    directory_path_tgt=directory_path_tgt,
+                    block=block
                 )
         return True
+    @classmethod
+    def _get_unit_tx_create_cmd_by_src_(cls, file_path_src, directory_path_tgt=None):
+        path_base, ext = os.path.splitext(file_path_src)
+        if ext != cls.TX_EXT:
+            from lxarnold import and_core
+            #
+            color_space = cls._get_unit_used_color_space_(file_path_src)
+            #
+            use_aces = cls.COLOR_SPACE_CFG.get_is_use_aces()
+            aces_color_spaces = cls.COLOR_SPACE_CFG.get_aces_color_spaces()
+            aces_render_color_space = cls.COLOR_SPACE_CFG.get_aces_render_color_space()
+            aces_file = cls.COLOR_SPACE_CFG.get_aces_file()
+            if cls._get_unit_is_exists_as_tgt_ext_by_src_(
+                    file_path_src,
+                    directory_path_tgt=directory_path_tgt,
+                    ext_tgt=cls.TX_EXT
+            ) is False:
+                return and_core.AndTextureOpt_(file_path_src).get_unit_tx_create_cmd(
+                    color_space=color_space,
+                    use_aces=use_aces,
+                    aces_file=aces_file,
+                    aces_color_spaces=aces_color_spaces,
+                    aces_render_color_space=aces_render_color_space,
+                    directory_path_tgt=directory_path_tgt,
+                )
     @classmethod
     def _set_unit_jpg_create_(cls, file_path, block=False):
         path_base, ext = os.path.splitext(file_path)
         if ext != cls.JPG_EXT:
-            if cls._get_unit_tgt_ext_is_exists_(file_path, tgt_ext=cls.JPG_EXT) is False:
+            if cls._get_unit_tgt_ext_is_exists_(file_path, ext_tgt=cls.JPG_EXT) is False:
                 return bsc_core.ImageOpt(file_path).get_jpg(width=2048, block=block)
         return True
     #

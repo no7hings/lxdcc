@@ -32,13 +32,13 @@ class OptionToolPanelSession(ssn_obj_abs.AbsSsnOptionToolPanel):
         super(OptionToolPanelSession, self).__init__(*args, **kwargs)
 
 
-class OptionMethodSession(ssn_obj_abs.AbsOptionMethodSession):
+class SsnOptionMethod(ssn_obj_abs.AbsSsnOptionMethod):
     EXECUTOR = _ssn_obj_executor.HookExecutor
     def __init__(self, *args, **kwargs):
-        super(OptionMethodSession, self).__init__(*args, **kwargs)
+        super(SsnOptionMethod, self).__init__(*args, **kwargs)
 
 
-class RsvOptionHookMethodSession(ssn_obj_abs.AbsOptionRsvTaskMethodSession):
+class RsvOptionHookMethodSession(ssn_obj_abs.AbsSsnRsvTaskOptionMethod):
     EXECUTOR = _ssn_obj_executor.RsvTaskHookExecutor
     def __init__(self, *args, **kwargs):
         super(RsvOptionHookMethodSession, self).__init__(*args, **kwargs)

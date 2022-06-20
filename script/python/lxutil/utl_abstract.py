@@ -698,6 +698,13 @@ class AbsSetup(object):
     def __init__(self, root):
         self._root = root
     @classmethod
+    def _set_environ_(cls, key, value):
+        os.environ[key] = value
+        utl_core.Log.set_module_result_trace(
+            'environ set',
+            u'key="{}", value="{}"'.format(key, value)
+        )
+    @classmethod
     def _set_environ_add_(cls, key, value):
         if key in os.environ:
             v = os.environ[key]

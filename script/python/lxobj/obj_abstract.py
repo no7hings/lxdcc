@@ -3230,9 +3230,14 @@ class AbsOsDirectory(
                 self.path, tgt_directory_path
             )
 
-    def get_all_file_paths(self):
+    def get_file_paths(self, include_exts=None):
+        return bsc_core.DirectoryMtd.get_file_paths(
+            self.path, include_exts
+        )
+
+    def get_all_file_paths(self, include_exts=None):
         return bsc_core.DirectoryMtd.get_all_file_paths(
-            self.path
+            self.path, include_exts
         )
 
     def set_copy_to_directory(self, tgt_directory_path):

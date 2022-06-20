@@ -10,10 +10,25 @@ option:
     #
     extra:
         platform: ''
+        application: ''
+        #
+        project: ''
+        #
+        root: ''
+        workspace: ''
+        role: ''
+        asset: ''
+        #
+        sequence: ''
+        shot: ''
+        #
+        step: ''
+        task: ''
+        version: ''
     #
     deadline:
-        batch_name: '[<option.type>][<option.time_tag>]'
-        job_name: '[<option.type>][<option.engine>][<option.hook>]'
+        batch_name: '[<option.group>][<option.extra.workspace>][<option.type>][<option.time_tag>]'
+        job_name: '[<option.name>][<option.extra.workspace>][<option.engine>][<option.hook>]'
         #
         output_directory: ''
         output_file: ''
@@ -33,7 +48,7 @@ output:
         Name: <option.deadline.job_name>
         #
         Frame: "0"
-        Department: ''
+        Department: <option.extra.step>
         ChunkSize: "1"
         Priority: 50
         Pool: <option.deadline.pool>
@@ -41,7 +56,7 @@ output:
         #
         Group: <option.deadline.group>
         #
-        Project: ''
+        Project: <option.extra.project>
         #
         OutputDirectory0: <option.deadline.output_directory>
         OutputFilename0: <option.deadline.output_file>
@@ -73,13 +88,13 @@ output:
         FailureDetectionTaskErrors: 2
         #
         ExtraInfo0: <option.extra.platform>
-        ExtraInfo1: ''
-        ExtraInfo2: ''
-        ExtraInfo3: ''
-        ExtraInfo4: ''
-        ExtraInfo5: ''
-        ExtraInfo6: ''
-        ExtraInfo7: ''
+        ExtraInfo1: <option.extra.project>
+        ExtraInfo2: <option.extra.workspace>
+        ExtraInfo3: <option.extra.asset | option.extra.shot>
+        ExtraInfo4: <option.extra.step>
+        ExtraInfo5: <option.extra.task>
+        ExtraInfo6: <option.extra.version>
+        ExtraInfo7: <option.extra.application>
     plug:
         Arguments: <option.deadline.command>
         Shell: "default"

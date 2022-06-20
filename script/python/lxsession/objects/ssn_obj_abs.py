@@ -119,7 +119,9 @@ class AbsSsnObj(
     type = property(get_type)
 
     def get_name(self):
-        return self._name
+        if self._name:
+            return self._name
+        return self._hook
     name = property(get_name)
 
     def get_hook(self):
@@ -127,11 +129,17 @@ class AbsSsnObj(
     hook = property(get_hook)
 
     def get_group(self):
-        pass
+        return self.get_type()
 
     def get_configure(self):
         return self._configure
     configure = property(get_configure)
+
+    def set_configure_reload(self):
+        self._configure.set_reload()
+    @property
+    def gui_configure(self):
+        return self._configure.get_content('option.gui')
     @property
     def utl_gui_configure(self):
         return self._configure.get_content('option.gui')
@@ -378,7 +386,7 @@ class AbsSsnRsvUnitAction(
         return False
 
 
-class AbsSsnRsvOptionExecuteDef(object):
+class AbsSsnOptionExecuteDef(object):
     EXECUTOR = None
     @classmethod
     def _get_rsv_task_version_(cls, rsv_scene_properties):
@@ -389,7 +397,7 @@ class AbsSsnRsvOptionExecuteDef(object):
         else:
             raise TypeError()
     #
-    def _set_hook_execute_def_init_(self, ddl_configure):
+    def _set_option_execute_def_init_(self, ddl_configure):
         self._ddl_configure = ddl_configure
         self._ddl_job_id = None
 
@@ -406,7 +414,7 @@ class AbsSsnRsvOptionExecuteDef(object):
 
     def set_execute_by_deadline(self):
         executor = self.get_executor()
-        executor.set_run_with_deadline()
+        return executor.set_run_with_deadline()
 
     def set_ddl_job_id(self, ddl_job_id):
         self._ddl_job_id = ddl_job_id
@@ -426,7 +434,7 @@ class AbsToolPanelSession(AbsSsnObj):
 
 class AbsSsnOptionGui(
     AbsSsnObj,
-    AbsSsnRsvOptionExecuteDef
+    AbsSsnOptionExecuteDef
 ):
     def __init__(self, *args, **kwargs):
         if 'option' in kwargs:
@@ -441,7 +449,7 @@ class AbsSsnOptionGui(
         if self._option_opt is not None:
             self.__set_option_completion_()
             #
-            self._set_hook_execute_def_init_(
+            self._set_option_execute_def_init_(
                 self._configure.get_content('hook_option.deadline')
             )
 
@@ -588,20 +596,20 @@ class AbsSsnOptionToolPanel(
 
 
 # session for deadline job
-class AbsOptionMethodSession(
+class AbsSsnOptionMethod(
     AbsSsnOptionObj,
-    AbsSsnRsvOptionExecuteDef
+    AbsSsnOptionExecuteDef
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsOptionMethodSession, self).__init__(*args, **kwargs)
+        super(AbsSsnOptionMethod, self).__init__(*args, **kwargs)
+        self._set_system_option_completion_()
+        self._set_option_completion_()
         #
-        self.__set_option_completion_()
-        #
-        self._set_hook_execute_def_init_(
+        self._set_option_execute_def_init_(
             self._configure.get_content('hook_option.deadline')
         )
 
-    def __set_option_completion_(self):
+    def _set_option_completion_(self):
         option_opt = self.get_option_opt()
         #
         hook_engine = self._configure.get('hook_option.engine')
@@ -611,8 +619,91 @@ class AbsOptionMethodSession(
         if rez_extend_packages:
             option_opt.set('rez_extend_packages', rez_extend_packages)
 
-    def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
-        return
+    def _set_system_option_completion_(self):
+        option_opt = self.get_option_opt()
+        for i_key in ['user', 'time_tag']:
+            if option_opt.get(i_key) is None:
+                option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
+
+    def get_batch_file_path(self):
+        option_opt = self.get_option_opt()
+        file_path = bsc_core.SessionYamlMtd.get_file_path(
+            user=option_opt.get('user'),
+            time_tag=option_opt.get('time_tag'),
+        )
+        if bsc_core.StoragePathMtd.get_path_is_exists(file_path) is False:
+            raw = dict(
+                user=option_opt.get('user'),
+                time_tag=option_opt.get('time_tag'),
+            )
+            utl_core.File.set_write(file_path, raw)
+        return file_path
+
+    def set_ddl_dependent_job_ids_find(self, hook_option):
+        lis = []
+        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+            hook_option
+        )
+        main_key = hook_option_opt.get('option_hook_key')
+        f = self.get_batch_file_path()
+        c = bsc_objects.Configure(value=f)
+        #
+        dependent_option_hook_keys = hook_option_opt.get(
+            'dependencies', as_array=True
+        ) or []
+        for i_key in dependent_option_hook_keys:
+            i_option_hook_key = bsc_core.SessionMtd.get_hook_abs_path(
+                main_key, i_key
+            )
+            i_ddl_job_id = c.get(
+                'deadline.{}.job_id'.format(i_option_hook_key)
+            )
+            if i_ddl_job_id:
+                lis.append(i_ddl_job_id)
+        return lis
+
+    def set_ddl_job_id_find(self, hook_option):
+        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+            hook_option
+        )
+        option_hook_key = hook_option_opt.get('option_hook_key')
+        f = self.get_batch_file_path()
+        c = bsc_objects.Configure(value=f)
+        #
+        keys = [option_hook_key]
+        option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
+        if option_hook_key_extend:
+            keys.extend(option_hook_key_extend)
+        #
+        key = '/'.join(keys)
+        #
+        return c.get(
+            'deadline.{}.job_id'.format(key)
+        )
+
+    def set_ddl_result_update(self, hook_option, ddl_job_id):
+        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+            hook_option
+        )
+        option_hook_key = hook_option_opt.get('option_hook_key')
+        f = self.get_batch_file_path()
+        c = bsc_objects.Configure(value=f)
+        #
+        keys = [option_hook_key]
+        option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
+        if option_hook_key_extend:
+            keys.extend(option_hook_key_extend)
+        #
+        key = '/'.join(keys)
+        c.set(
+            'deadline.{}.job_id'.format(key), ddl_job_id
+        )
+        c.set(
+            'deadline.{}.option'.format(key), hook_option
+        )
+        c.set_save_to(
+            f
+        )
 
 
 class AbsSsnRsvDef(object):
@@ -625,15 +716,13 @@ class AbsSsnRsvDef(object):
 
 
 # session for rsv task deadline job
-class AbsOptionRsvTaskMethodSession(
-    AbsOptionMethodSession,
+class AbsSsnRsvTaskOptionMethod(
+    AbsSsnOptionMethod,
     AbsSsnRsvDef
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsOptionRsvTaskMethodSession, self).__init__(*args, **kwargs)
+        super(AbsSsnRsvTaskOptionMethod, self).__init__(*args, **kwargs)
         self._set_rsv_def_init_()
-        #
-        self.__set_system_option_completion_()
         #
         self._rsv_scene_properties = None
         self._rsv_task = None
@@ -663,7 +752,7 @@ class AbsOptionRsvTaskMethodSession(
         # print self.get_option_opt()
         # print self.get_option()
 
-    def __set_system_option_completion_(self):
+    def _set_system_option_completion_(self):
         option_opt = self.get_option_opt()
         for i_key in ['user', 'time_tag']:
             if option_opt.get(i_key) is None:
@@ -808,7 +897,7 @@ class AbsOptionRsvTaskMethodSession(
 
 
 class AbsOptionRsvTaskBatcherSession(
-    AbsOptionRsvTaskMethodSession
+    AbsSsnRsvTaskOptionMethod
 ):
     def __init__(self, *args, **kwargs):
         super(AbsOptionRsvTaskBatcherSession, self).__init__(*args, **kwargs)

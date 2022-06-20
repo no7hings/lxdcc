@@ -424,6 +424,13 @@ class DdlSubmiter(ddl_obj_abs.AbsDdlSubmiter):
         super(DdlSubmiter, self).__init__(*args, **kwargs)
 
 
+class DdlRsvTaskSubmiter(ddl_obj_abs.AbsDdlSubmiter):
+    CON = CON
+    CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file('deadline/rsv-task-submiter')
+    def __init__(self, *args, **kwargs):
+        super(DdlRsvTaskSubmiter, self).__init__(*args, **kwargs)
+
+
 class Signal(object):
     def __init__(self, *args, **kwargs):
         pass
@@ -485,7 +492,7 @@ class DdlJobProcess(object):
         #
         self._timer = None
         self._status = self.Status.Stopped
-        self._element_statuses = [self.Status.Stopped]*len(self._task_queries)
+        self._rate_statuses = [self.Status.Stopped]*len(self._task_queries)
         #
         self.logging = SignalInstance(str)
         self.status_changed = SignalInstance(int)
@@ -563,13 +570,13 @@ class DdlJobProcess(object):
         self.__set_running_time_update_()
     #
     def __set_elements_running_(self):
-        pre_element_status = str(self._element_statuses)
+        pre_element_status = str(self._rate_statuses)
         for index, i_task_query in enumerate(self._task_queries):
             i_task_status = self.TASK_STATUS[i_task_query.get_status()]
             if i_task_status is self.Status.Error:
                 pass
-            self._element_statuses[index] = i_task_status
-        if pre_element_status != str(self._element_statuses):
+            self._rate_statuses[index] = i_task_status
+        if pre_element_status != str(self._rate_statuses):
             self.__set_element_statuses_changed_()
     #
     def __set_logging_(self, text):
@@ -580,7 +587,7 @@ class DdlJobProcess(object):
         self.__set_emit_send_(self.status_changed, self._status)
 
     def __set_element_statuses_changed_(self):
-        self.__set_emit_send_(self.element_statuses_changed, self._element_statuses)
+        self.__set_emit_send_(self.element_statuses_changed, self._rate_statuses)
 
     def __set_suspended_(self):
         self._status = self.Status.Suspended
@@ -621,7 +628,7 @@ class DdlJobProcess(object):
         self._is_disable = True
         #
         self._status = self.Status.Stopped
-        self._element_statuses = [self.Status.Stopped]*len(self._task_queries)
+        self._rate_statuses = [self.Status.Stopped]*len(self._task_queries)
         #
         self.__set_emit_send_(self.stopped)
         #
@@ -724,7 +731,7 @@ class DdlJobProcess(object):
         return self._status
 
     def get_element_statuses(self):
-        return self._element_statuses
+        return self._rate_statuses
 
 
 class DdlMethodQuery(ddl_obj_abs.AbsDdlMethodQuery):

@@ -279,6 +279,7 @@ class LogProgressRunner(object):
         self._label = label
         self._use_as_progress_bar = use_as_progress_bar
         #
+        self._start_timestamp = bsc_core.SystemMtd.get_timestamp()
         self._pre_timestamp = bsc_core.SystemMtd.get_timestamp()
         #
         Log.set_module_result_trace(
@@ -325,9 +326,12 @@ class LogProgressRunner(object):
         self._value = 0
         self._maximum = 0
         #
+        cost_timestamp = bsc_core.SystemMtd.get_timestamp() - self._start_timestamp
         Log.set_module_result_trace(
             self._label,
-            'is completed'
+            'is completed, cost time {}'.format(
+                bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+            )
         )
 
     def __enter__(self):

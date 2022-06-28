@@ -172,7 +172,11 @@ asset-work-look-mtlx-file: <asset-work-look-dir>/all.mtlx
 asset-work-look-klf-file: <asset-work-look-dir>/all.klf
 asset-work-look-yml-file: <asset-work-look-dir>/all.yml
 #
-asset-work-texture-dir: <asset-task-dir>/texture/scene/<version-name>
+asset-work-texture-workspace-file: <asset-task-dir>/texture/workspace.yml
+#
+asset-work-texture-base-dir: <asset-task-dir>/textue-base
+asset-work-texture-dir: <asset-task-dir>/texture/<layer>/<version-name>
+asset-work-texture-src-dir: <asset-work-texture-dir>/src
 asset-work-texture-tx-dir: <asset-work-texture-dir>/tx
 #
 asset-work-set-dir: <asset-task-dir>/set/scene/<version-name>

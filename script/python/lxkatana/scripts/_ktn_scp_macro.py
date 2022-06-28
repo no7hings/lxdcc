@@ -245,7 +245,7 @@ class LxAsset(object):
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -491,7 +491,7 @@ class LxAsset(object):
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -545,7 +545,7 @@ class LxAsset(object):
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -630,7 +630,7 @@ class LxCamera(object):
                 utl_core.DialogWindow.set_create(
                     'Asset Camera Loader',
                     content=content,
-                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -949,7 +949,7 @@ class LxLight(object):
                     utl_core.DialogWindow.set_create(
                         'Light-rig Refresh',
                         content=u'\n'.join(contents),
-                        status=utl_core.DialogWindow.GuiStatus.Error,
+                        status=utl_core.DialogWindow.ValidatorStatus.Error,
                         #
                         yes_label='Close',
                         #
@@ -1015,7 +1015,7 @@ class LxLight(object):
                 utl_core.DialogWindow.set_create(
                     'Load Light-rig',
                     content=u'\n'.join(contents),
-                    status=utl_core.DialogWindow.GuiStatus.Warning,
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
                     yes_label='Close',
                     #

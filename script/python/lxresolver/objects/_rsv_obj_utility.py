@@ -115,6 +115,8 @@ class RsvRoot(rsv_abstract.AbsRsvRoot):
     #
     RSV_PROJECT_STACK_CLASS = _rsv_obj_stack.ProjectStack
     RSV_PROJECT_CLASS = RsvProject
+
+    RSV_VERSION_KEY_CLASS = RsvVersionKey
     def __init__(self):
         super(RsvRoot, self).__init__()
 

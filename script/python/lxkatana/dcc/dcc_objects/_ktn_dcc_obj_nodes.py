@@ -159,13 +159,6 @@ class AbsTextureReferences(object):
         'osl_window_box_s': _ktn_dcc_obj_node.TextureReference,
         'custom': _ktn_dcc_obj_node.FileReference,
     }
-    CUSTOM_SEARCH_KEYS = [
-        'image.parameters.filename',
-        'osl_file_path.parameters.filename',
-        'osl_window_box.parameters.filename',
-        'osl_window_box_s.parameters.filename',
-    ]
-    #
     PORT_PATHSEP = ktn_configure.Util.PORT_PATHSEP
     OPTION = dict(
         with_reference=True
@@ -178,6 +171,9 @@ class AbsTextureReferences(object):
             'parameters.filename'
         ],
         'osl_window_box': [
+            'parameters.filename'
+        ],
+        'osl_window_box_s': [
             'parameters.filename'
         ]
     }
@@ -192,7 +188,7 @@ class AbsTextureReferences(object):
                     if k in self.OPTION:
                         self._option[k] = v
 
-    def _get_obj_type_is_available_(self, search_key):
+    def _get_obj_type_is_available_(self, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
     def _get_real_file_path_(cls, port):
@@ -229,14 +225,14 @@ class AbsTextureReferences(object):
         file_path = str(file_path)
         parse_pattern = '\'{file}\'%{argument}'
         ktn_port = port.ktn_port
-        e = ktn_port.getExpression()
-        if e:
-            p = parse.parse(parse_pattern, e)
+        old_expression = ktn_port.getExpression()
+        if old_expression:
+            p = parse.parse(parse_pattern, old_expression)
             if p:
                 new_expression = parse_pattern.format(
                     **dict(file=file_path, argument=p.named.get('argument'))
                 )
-                if not e == new_expression:
+                if not old_expression == new_expression:
                     ktn_port.setExpression(new_expression)
                     utl_core.Log.set_module_result_trace(
                         'texture repath',
@@ -257,62 +253,68 @@ class AbsTextureReferences(object):
             return cls.OBJ_CLASS_DICT[shader_type_name]
         return cls.OBJ_CLASS_DICT['custom']
 
-    def _set_customize_update_(self, exclude_paths):
-        for search_key in self.CUSTOM_SEARCH_KEYS:
-            if self._get_obj_type_is_available_(search_key) is False:
+    def _set_customize_update_(self, exclude_paths=None, include_paths=None):
+        objs = AndShaders.get_objs()
+        for i_obj in objs:
+            i_obj_path = i_obj.path
+            i_obj_type_name = i_obj.get_port('nodeType').get()
+            if self._get_obj_type_is_available_(i_obj_type_name) is False:
+                continue
+
+            if isinstance(exclude_paths, (tuple, list)):
+                if i_obj_path in exclude_paths:
+                    continue
+
+            if isinstance(include_paths, (tuple, list)):
+                if i_obj_path not in include_paths:
+                    continue
+            #
+            i_ktn_obj = i_obj.ktn_obj
+            if i_ktn_obj.isBypassed() is True:
                 continue
             #
-            _ = search_key.split(self.PORT_PATHSEP)
-            shader_type_name = _[0]
-            port_key = self.PORT_PATHSEP.join(_[1:])
-            #
-            _ = AndShaders.get_objs()
-            for obj in _:
-                obj_path = obj.path
-                if isinstance(exclude_paths, (tuple, list)):
-                    if obj_path in exclude_paths:
-                        continue
-                #
-                ktn_obj = obj.ktn_obj
-                if ktn_obj.isBypassed() is True:
-                    continue
-                #
-                if obj.get_port('nodeType').get() == shader_type_name:
-                    # if not enable ignore
-                    # if use "NetworkMaterialEdit" enable is 0 if value is not override
-                    enable = obj.get_port('{}.enable'.format(port_key)).get()
-                    if enable:
-                        if obj_path in self._raw:
-                            file_reference_obj = self._raw[obj_path]
+            if i_obj_type_name in self.PORT_QUERY_DICT:
+                i_port_paths = self.PORT_QUERY_DICT[i_obj_type_name]
+                for j_port_path in i_port_paths:
+                    j_enable = i_obj.get_port('{}.enable'.format(j_port_path)).get()
+                    if j_enable:
+                        if i_obj_path in self._raw:
+                            j_file_reference_obj = self._raw[i_obj_path]
                         else:
-                            obj_cls = self._get_obj_cls_(shader_type_name)
-                            file_reference_obj = obj_cls(obj_path)
-                            self._raw[obj_path] = file_reference_obj
+                            j_obj_cls = self._get_obj_cls_(i_obj_type_name)
+                            j_file_reference_obj = j_obj_cls(i_obj_path)
+                            self._raw[i_obj_path] = j_file_reference_obj
                         #
-                        port_path = '{}.value'.format(port_key)
+                        j_value_port_path = '{}.value'.format(j_port_path)
                         #
-                        port = file_reference_obj.get_port(port_path)
-                        value = self._get_real_file_path_(port)
-                        file_reference_obj.set_file_port_raw_add(
-                            port_path, value
+                        j_value_port = j_file_reference_obj.get_port(j_value_port_path)
+                        j_value = self._get_real_file_path_(j_value_port)
+                        j_file_reference_obj.set_file_port_raw_add(
+                            j_value_port_path, j_value
                         )
 
-    def get_objs(self, exclude_paths=None):
-        self._set_customize_update_(exclude_paths=exclude_paths)
+    def get_objs(self, exclude_paths=None, include_paths=None):
+        self._set_customize_update_(exclude_paths=exclude_paths, include_paths=include_paths)
         return self._raw.values()
+    @classmethod
+    def set_obj_repath_to(cls, obj, port_path, file_path_new):
+        cls._set_real_file_path_(
+            obj.get_port(port_path), file_path_new
+        )
 
 
 class TextureReferences(AbsTextureReferences):
-    INCLUDE_SEARCH_KEYS = [
-        'image.parameters.filename',
-        'osl_file_path.parameters.filename',
-        'osl_window_box.parameters.filename',
+    INCLUDE_TYPES = [
+        'image',
+        'osl_file_path',
+        'osl_window_box',
+        'osl_window_box_s'
     ]
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)
 
-    def _get_obj_type_is_available_(self, search_key):
-        return search_key in self.INCLUDE_SEARCH_KEYS
+    def _get_obj_type_is_available_(self, obj_type_name):
+        return obj_type_name in self.INCLUDE_TYPES
     @classmethod
     def _set_obj_reference_update_(cls, obj):
         ktn_obj_opt = ktn_core.NGObjOpt(bsc_core.DccPathDagOpt(obj.path).name)
@@ -325,6 +327,7 @@ class TextureReferences(AbsTextureReferences):
                 #
                 i_port = obj.get_port(i_port_path)
                 i_value = cls._get_real_file_path_(i_port)
+                #
                 obj.set_file_port_raw_add(
                     i_port_path, i_value
                 )

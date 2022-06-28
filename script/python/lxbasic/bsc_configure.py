@@ -82,11 +82,13 @@ class ShowStatus(enum.IntEnum):
     Stopped = 6
 
 
-class GuiStatus(enum.IntEnum):
+class ValidatorStatus(enum.IntEnum):
     Normal = 0x20
     Warning = 0x21
     Error = 0x22
     Correct = 0x23
+    Ignore = 0x24
+    Locked = 0x25
 
 
 class SubProcessStatus(enum.EnumMeta):

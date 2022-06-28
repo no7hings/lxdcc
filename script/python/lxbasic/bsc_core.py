@@ -51,6 +51,8 @@ import functools
 
 import urllib
 
+import scandir
+
 from lxbasic import bsc_configure
 
 import shutil
@@ -469,6 +471,10 @@ class SystemMtd(object):
         }
         if key in dic:
             return dic[key]()
+    @classmethod
+    def get_group_id(cls, group_name):
+        import grp
+        return grp.getgrnam(group_name).gr_gid
 
 
 class StoragePathMtd(object):
@@ -593,15 +599,15 @@ class StoragePathMtd(object):
                     return 'unknown'
         return 'unknown'
     @classmethod
-    def get_group(cls, path):
+    def get_group_name(cls, path):
         # noinspection PyBroadException
         if os.path.exists(path) is True:
             stat_info = os.stat(path)
             gid = stat_info.st_gid
             if SystemMtd.get_is_linux():
                 import grp
-                group = grp.getgrgid(gid)[0]
-                return group
+                group_name = grp.getgrgid(gid)[0]
+                return group_name
         return None
     @classmethod
     def set_directory_create(cls, directory_path):
@@ -617,6 +623,12 @@ class StoragePathMtd(object):
     def get_file_realpath(cls, file_path_src, file_path_tgt):
         directory_path_src = os.path.dirname(file_path_src)
         return os.path.relpath(file_path_tgt, directory_path_src)
+    @classmethod
+    def get_is_readable(cls, path):
+        return os.access(path, os.R_OK)
+    @classmethod
+    def get_is_writeable(cls, path):
+        return os.access(path, os.W_OK)
 
 
 class StorageLinkMtd(object):
@@ -713,13 +725,125 @@ class StoragePathOpt(object):
     def get_is_writeable(self):
         return os.access(self._path, os.W_OK)
 
+    def set_map_to_platform(self):
+        self._path = StoragePathMtd.set_map_to_platform(self._path)
+
     def __str__(self):
         return self._path
+
+
+class StorageDirectoryOpt(StoragePathOpt):
+    def __init__(self, path):
+        super(StorageDirectoryOpt, self).__init__(path)
+
+
+class StorageFileOpt(StoragePathOpt):
+    def __init__(self, file_path, file_type=None):
+        super(StorageFileOpt, self).__init__(file_path)
+        self._file_type = file_type
+
+    def get_directory_path(self):
+        return os.path.dirname(self.path)
+    directory_path = property(get_directory_path)
+
+    def get_type(self):
+        return self.ext
+    type = property(get_type)
+
+    def get_path_base(self):
+        return os.path.splitext(self.path)[0]
+    @property
+    def path_base(self):
+        return os.path.splitext(self.path)[0]
+
+    def get_name(self):
+        return os.path.basename(self.path)
+    name = property(get_name)
+    @property
+    def name_base(self):
+        return os.path.splitext(os.path.basename(self.path))[0]
+
+    def get_ext(self):
+        if self._file_type is not None:
+            return self._file_type
+        return os.path.splitext(self.path)[-1]
+    ext = property(get_ext)
+
+    def get_is_match_name_pattern(self, name_pattern):
+        _ = fnmatch.filter([self.name], name_pattern)
+        if _:
+            return True
+        return False
+
+    def set_write(self, raw):
+        directory = os.path.dirname(self.path)
+        if os.path.isdir(directory) is False:
+            # noinspection PyBroadException
+            try:
+                os.makedirs(directory)
+            except:
+                pass
+        if self.ext in ['.json']:
+            with open(self.path, 'w') as j:
+                json.dump(
+                    raw,
+                    j,
+                    indent=4
+                )
+        elif self.ext in ['.yml']:
+            with open(self.path, 'w') as y:
+                _OrderedYaml.set_dump(
+                    raw,
+                    y,
+                    indent=4,
+                    default_flow_style=False,
+                )
+        else:
+            with open(self.path, 'w') as f:
+                f.write(raw)
+
+    def set_read(self):
+        if os.path.exists(self.path):
+            if self.get_ext() in ['.json']:
+                with open(self.path) as j:
+                    raw = json.load(j, object_pairs_hook=collections.OrderedDict)
+                    j.close()
+                    return raw
+            elif self.get_ext() in ['.yml']:
+                with open(self.path) as y:
+                    raw = _OrderedYaml.set_load(y)
+                    y.close()
+                    return raw
+            else:
+                with open(self.path) as f:
+                    raw = f.read()
+                    f.close()
+                    return raw
+
+    def set_directory_create(self):
+        StoragePathMtd.set_directory_create(
+            self.get_directory_path()
+        )
+
+    def set_directory_repath_to(self, directory_path_tgt):
+        return self.__class__(
+            u'{}/{}'.format(
+                directory_path_tgt, self.get_name()
+            )
+        )
+
+    def set_ext_repath_to(self, ext_tgt):
+        return self.__class__(
+            u'{}{}'.format(
+                self.get_path_base(), ext_tgt
+            )
+        )
 
 
 class MultiplyPatternMtd(object):
     RE_UDIM_KEYS = [
         (r'<udim>', r'{}', 4),
+        (r'<f>', r'{}', 4),
     ]
     #
     RE_SEQUENCE_KEYS = [
@@ -745,16 +869,15 @@ class MultiplyPatternMtd(object):
         #
         new_name_base = pattern
         for i_k, i_f, i_c in re_keys:
-            results = re.findall(i_f.format(i_k), pattern, re.IGNORECASE) or []
-            if results:
+            r = re.finditer(i_k, pattern, re.IGNORECASE) or []
+            for i in r:
+                start, end = i.span()
                 if i_c == -1:
-                    i_count = len(results)
-                    i_key = i_count * i_k
+                    s = '[0-9]'
+                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
                 else:
-                    i_count = i_c
-                    i_key = i_k
-                #
-                new_name_base = new_name_base.replace(i_key, '[0-9]'*i_count, 1)
+                    s = '[0-9]' * i_c
+                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
         return new_name_base
     @classmethod
     def get_args(cls, pattern):
@@ -827,26 +950,6 @@ class MultiplyFileNameMtd(object):
 
 class DirectoryMtd(object):
     @classmethod
-    def get_all_file_paths(cls, directory_path, include_exts=None):
-        def rcs_os_fnc_(path_):
-            _results = os.listdir(path_) or []
-            _results.sort()
-            for _i_name in _results:
-                _i_path = '{}/{}'.format(path_, _i_name)
-                if os.path.isfile(_i_path):
-                    if isinstance(include_exts, (tuple, list)):
-                        _i_name_base, _i_ext = os.path.splitext(_i_name)
-                        if _i_ext not in include_exts:
-                            continue
-                    #
-                    list_.append(_i_path)
-                elif os.path.isdir(_i_path):
-                    rcs_os_fnc_(_i_path)
-
-        list_ = []
-        rcs_os_fnc_(directory_path)
-        return list_
-    @classmethod
     def get_file_paths(cls, directory_path, include_exts=None):
         list_ = []
         results = os.listdir(directory_path) or []
@@ -862,58 +965,104 @@ class DirectoryMtd(object):
                 list_.append(i_path)
         return list_
     @classmethod
-    def get_all_directory_paths(cls, directory_path):
-        def rcs_os_fnc_(path_):
+    def get_file_paths__(cls, directory_path, include_exts=None):
+        list_ = []
+        if os.path.isdir(directory_path):
+            for i in scandir.scandir(directory_path):
+                if i.is_file():
+                    i_path = i.path
+                    if isinstance(include_exts, (tuple, list)):
+                        i_base, i_ext = os.path.splitext(i_path)
+                        if i_ext not in include_exts:
+                            continue
+                    #
+                    list_.append(i_path)
+        return list_
+    @classmethod
+    def get_all_file_paths(cls, directory_path, include_exts=None):
+        def rcs_fnc_(path_):
             _results = os.listdir(path_) or []
             _results.sort()
             for _i_name in _results:
                 _i_path = '{}/{}'.format(path_, _i_name)
-                if os.path.isdir(_i_path):
+                if os.path.isfile(_i_path):
+                    if isinstance(include_exts, (tuple, list)):
+                        _i_name_base, _i_ext = os.path.splitext(_i_name)
+                        if _i_ext not in include_exts:
+                            continue
+                    #
                     list_.append(_i_path)
-                    rcs_os_fnc_(_i_path)
+                elif os.path.isdir(_i_path):
+                    rcs_fnc_(_i_path)
 
         list_ = []
-        rcs_os_fnc_(directory_path)
-        return list_
-    @classmethod
-    def get_all_directory_paths_(cls, directory_path):
-        lis = []
-        for i_root, i_dirs, _ in os.walk(directory_path):
-            for j_dir in i_dirs:
-                lis.append(
-                    '{}/{}'.format(i_root, j_dir)
-                )
-        return lis
-    @classmethod
-    def get_all_directory_path__(cls, directory_path):
-        def rcs_fnc_(d_):
-            for _i in scandir.scandir(d_):
-                if _i.is_dir():
-                    list_.append(_i.path)
-                    rcs_fnc_(_i.path)
-        # noinspection PyUnresolvedReferences
-        import scandir
-
-        list_ = []
-
         rcs_fnc_(directory_path)
         return list_
     @classmethod
-    def get_file_paths__(cls, directory_path, include_exts=None):
+    def get_all_file_paths__(cls, directory_path, include_exts=None):
+        def rcs_fnc_(path_):
+            for _i in scandir.scandir(path_):
+                _i_path = _i.path
+                if _i.is_file():
+                    if isinstance(include_exts, (tuple, list)):
+                        _i_base, _i_ext = os.path.splitext(_i_path)
+                        if _i_ext not in include_exts:
+                            continue
+                    #
+                    list_.append(_i_path)
+                elif _i.is_dir():
+                    rcs_fnc_(_i_path)
+
+        list_ = []
+        if os.path.isdir(directory_path):
+            rcs_fnc_(directory_path)
+        return list_
+    @classmethod
+    def get_directory_paths(cls, directory_path):
+        list_ = []
+        results = os.listdir(directory_path) or []
+        results.sort()
+        for i_name in results:
+            i_path = '{}/{}'.format(directory_path, i_name)
+            if os.path.isdir(i_path):
+                list_.append(i_path)
+        return list_
+    @classmethod
+    def get_directory_paths__(cls, directory_path):
+        list_ = []
+        if os.path.isdir(directory_path):
+            for i in scandir.scandir(directory_path):
+                if i.is_dir():
+                    list_.append(i.path)
+        return list_
+    @classmethod
+    def get_all_directory_paths(cls, directory_path):
+        def rcs_fnc_(path_):
+            _results = os.listdir(path_) or []
+            # _results.sort()
+            for _i_name in _results:
+                _i_path = '{}/{}'.format(path_, _i_name)
+                if os.path.isdir(_i_path):
+                    list_.append(_i_path)
+                    rcs_fnc_(_i_path)
+
+        list_ = []
+        rcs_fnc_(directory_path)
+        return list_
+    @classmethod
+    def get_all_directory_paths__(cls, directory_path):
+        def rcs_fnc_(d_):
+            for _i in scandir.scandir(d_):
+                if _i.is_dir():
+                    _i_path = _i.path
+                    list_.append(_i_path)
+                    rcs_fnc_(_i_path)
         # noinspection PyUnresolvedReferences
         import scandir
 
         list_ = []
-
-        for i in scandir.scandir(directory_path):
-            if i.is_file():
-                i_path = i.path
-                if isinstance(include_exts, (tuple, list)):
-                    i_base, i_ext = os.path.splitext(i_path)
-                    if i_ext not in include_exts:
-                        continue
-                #
-                list_.append(i_path)
+        if os.path.isdir(directory_path):
+            rcs_fnc_(directory_path)
         return list_
     @classmethod
     def get_file_relative_path(cls, directory_path, file_path):
@@ -924,7 +1073,7 @@ class DirectoryMtd(object):
             shutil.copy2(src_file_path_, tgt_file_path_)
         #
         src_directory_path = src_directory_path
-        file_paths = cls.get_all_file_paths(src_directory_path)
+        file_paths = cls.get_all_file_paths__(src_directory_path)
         #
         threads = []
         for i_src_file_path in file_paths:
@@ -944,13 +1093,24 @@ class DirectoryMtd(object):
                 # i_thread.join()
         #
         [i.join() for i in threads]
+    @classmethod
+    def get_file_paths_by_pattern__(cls, directory_path, name_pattern):
+        path_pattern = '{}/{}'.format(directory_path, name_pattern)
+        return fnmatch.filter(
+            cls.get_file_paths__(directory_path), path_pattern
+        )
+    @classmethod
+    def get_file_paths_by_glob_pattern__(cls, glob_pattern):
+        return fnmatch.filter(
+            cls.get_file_paths__(os.path.dirname(glob_pattern)), glob_pattern
+        )
 
 
 class MultiplyDirectoryMtd(object):
     @classmethod
     def get_all_multiply_file_dict(cls, directory_path, name_pattern):
         dic = collections.OrderedDict()
-        _ = DirectoryMtd.get_all_file_paths(directory_path)
+        _ = DirectoryMtd.get_all_file_paths__(directory_path)
         for i_file_path in _:
             i_opt = StorageFileOpt(i_file_path)
             i_match_args = MultiplyFileNameMtd.get_match_args(
@@ -1614,92 +1774,6 @@ class _OrderedYaml(object):
         return yaml.load(stream, _Cls)
 
 
-class StorageFileOpt(StoragePathOpt):
-    def __init__(self, file_path, file_type=None):
-        super(StorageFileOpt, self).__init__(file_path)
-        self._file_type = file_type
-
-    def get_directory_path(self):
-        return os.path.dirname(self.path)
-    directory_path = property(get_directory_path)
-
-    def get_type(self):
-        return self.ext
-    type = property(get_type)
-    @property
-    def path_base(self):
-        return os.path.splitext(self.path)[0]
-
-    def get_name(self):
-        return os.path.basename(self.path)
-    name = property(get_name)
-    @property
-    def name_base(self):
-        return os.path.splitext(os.path.basename(self.path))[0]
-
-    def get_ext(self):
-        if self._file_type is not None:
-            return self._file_type
-        return os.path.splitext(self.path)[-1]
-    ext = property(get_ext)
-
-    def get_is_match_name_pattern(self, name_pattern):
-        _ = fnmatch.filter([self.name], name_pattern)
-        if _:
-            return True
-        return False
-
-    def set_write(self, raw):
-        directory = os.path.dirname(self.path)
-        if os.path.isdir(directory) is False:
-            # noinspection PyBroadException
-            try:
-                os.makedirs(directory)
-            except:
-                pass
-        if self.ext in ['.json']:
-            with open(self.path, 'w') as j:
-                json.dump(
-                    raw,
-                    j,
-                    indent=4
-                )
-        elif self.ext in ['.yml']:
-            with open(self.path, 'w') as y:
-                _OrderedYaml.set_dump(
-                    raw,
-                    y,
-                    indent=4,
-                    default_flow_style=False,
-                )
-        else:
-            with open(self.path, 'w') as f:
-                f.write(raw)
-
-    def set_read(self):
-        if os.path.exists(self.path):
-            if self.get_ext() in ['.json']:
-                with open(self.path) as j:
-                    raw = json.load(j, object_pairs_hook=collections.OrderedDict)
-                    j.close()
-                    return raw
-            elif self.get_ext() in ['.yml']:
-                with open(self.path) as y:
-                    raw = _OrderedYaml.set_load(y)
-                    y.close()
-                    return raw
-            else:
-                with open(self.path) as f:
-                    raw = f.read()
-                    f.close()
-                    return raw
-
-    def set_directory_create(self):
-        StoragePathMtd.set_directory_create(
-            self.get_directory_path()
-        )
-
-
 class GzipStorageFileOpt(StorageFileOpt):
     def __init__(self, *args, **kwargs):
         super(GzipStorageFileOpt, self).__init__(*args, **kwargs)
@@ -1756,6 +1830,11 @@ class DirectoryOpt(object):
 
     def get_is_exists(self):
         return os.path.exists(self.path)
+
+    def get_all_file_path(self, include_exts=None):
+        return DirectoryMtd.get_all_file_paths__(
+            self.path, include_exts
+        )
 
 
 class ZipFileOpt(StorageFileOpt):
@@ -2130,7 +2209,7 @@ class DccPathDagOpt(object):
     def get_ancestor_paths(self):
         return self.get_component_paths()[1:]
 
-    def  get_ancestors(self):
+    def get_ancestors(self):
         return [self.__class__(i) for i in self.get_ancestor_paths()]
 
     def get_parent(self):
@@ -2236,6 +2315,16 @@ class ParsePatternMtd(object):
                         v = kwargs[i_key]
                         if v is not None and v != '*':
                             s = s.replace('{{{}}}'.format(i_key), kwargs[i_key])
+            return s
+        return pattern
+    @classmethod
+    def get_as_fnmatch(cls, pattern):
+        if pattern is not None:
+            keys = re.findall(re.compile(r'[{](.*?)[}]', re.S), pattern)
+            s = pattern
+            if keys:
+                for i_key in keys:
+                    s = s.replace('{{{}}}'.format(i_key), '*')
             return s
         return pattern
 
@@ -3616,26 +3705,63 @@ class FramesMtd(object):
 
 class ParsePatternOpt(object):
     def __init__(self, pattern):
+        self._variants = {}
         self._pattern = pattern
-        self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
-    @classmethod
-    def _get_fnmatch_pattern_(cls, variant):
-        if variant is not None:
-            re_pattern = re.compile(r'[{](.*?)[}]', re.S)
-            #
-            keys = re.findall(re_pattern, variant)
-            s = variant
-            if keys:
-                for key in keys:
-                    s = s.replace('{{{}}}'.format(key), '*')
-            return s
-        return variant
+        self._fnmatch_pattern = ParsePatternMtd.get_as_fnmatch(
+            self._pattern
+        )
     @property
     def pattern(self):
         return self._pattern
     @property
     def fnmatch_pattern(self):
         return self._fnmatch_pattern
+
+    def get_keys(self):
+        return ParsePatternMtd.get_keys(
+            self._pattern
+        )
+    keys = property(get_keys)
+
+    def set_update(self, **kwargs):
+        keys = self.get_keys()
+        for k, v in kwargs.items():
+            if k in keys:
+                self._variants[k] = v
+        #
+        self._pattern = ParsePatternMtd.set_update(
+            self._pattern, **kwargs
+        )
+        self._fnmatch_pattern = ParsePatternMtd.get_as_fnmatch(
+            self._pattern
+        )
+
+    def set_update_to(self, **kwargs):
+        return self.__class__(
+            ParsePatternMtd.set_update(
+                self._pattern, **kwargs
+            )
+        )
+
+    def get_results(self):
+        list_ = []
+        paths = glob.glob(
+            self._fnmatch_pattern
+        ) or []
+        for i_path in paths:
+            i_p = parse.parse(
+                self._pattern, i_path
+            )
+            if i_p:
+                i_r = i_p.named
+                if i_r:
+                    i_r.update(self._variants)
+                    i_r['result'] = i_path
+                    list_.append(i_r)
+        return list_
+
+    def __str__(self):
+        return self._pattern
 
 
 class TimeMtd(object):
@@ -3794,7 +3920,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print DirectoryMtd.get_all_file_paths__(
-        '/l/temp/td/dongchangbao/tx_convert_test/exr'
+    print StoragePathMtd.get_is_writeable(
+        '/l/prod/cgm/work/assets/chr/bl_xiz_f/srf/surfacing/texture/main/v006/src'
     )
 

@@ -1099,6 +1099,9 @@ class AbsObjGuiDef(object):
     def icon(self):
         return self.get_gui_attribute('icon')
     @property
+    def icon_file(self):
+        return self.icon
+    @property
     def pathsep(self):
         raise NotImplementedError()
     @property
@@ -1276,6 +1279,9 @@ class AbsObjOsDef(object):
 
     def get_permission(self):
         return bsc_core.StoragePathMtd.get_permission(self.path)
+
+    def get_is_writeable(self):
+        return bsc_core.StoragePathMtd.get_is_writeable(self.path)
 
     def set_link_to(self, tgt_path, force=False):
         pass
@@ -3171,15 +3177,9 @@ class AbsOsDirectory(
         return self.__class__(path)
 
     def _get_child_paths_(self, path, includes=None):
-        lis = []
-        glob_pattern = '{}{}*'.format(path, self.PATHSEP)
-        _ = glob.glob(glob_pattern)
-        if _:
-            _.sort()
-            for i in _:
-                if os.path.isdir(i):
-                    lis.append(i)
-        return lis
+        return bsc_core.DirectoryMtd.get_directory_paths__(
+            path
+        )
 
     def _set_child_create_(self, path):
         return self.__class__(path)
@@ -3210,19 +3210,10 @@ class AbsOsDirectory(
     def set_create(self):
         raise NotImplementedError()
 
-    def _get_child_file_paths_(self, path):
-        lis = []
-        glob_pattern = '{}{}*'.format(path, self.PATHSEP)
-        _ = glob.glob(glob_pattern) or []
-        if _:
-            _.sort()
-            for i in _:
-                if os.path.isfile(i):
-                    lis.append(i)
-        return lis
-
     def get_child_file_paths(self):
-        return self._get_child_file_paths_(self.path)
+        return bsc_core.DirectoryMtd.get_file_paths__(
+            self.path
+        )
 
     def set_copy_to(self, tgt_directory_path):
         if os.path.exists(tgt_directory_path) is False:
@@ -3231,12 +3222,12 @@ class AbsOsDirectory(
             )
 
     def get_file_paths(self, include_exts=None):
-        return bsc_core.DirectoryMtd.get_file_paths(
+        return bsc_core.DirectoryMtd.get_file_paths__(
             self.path, include_exts
         )
 
     def get_all_file_paths(self, include_exts=None):
-        return bsc_core.DirectoryMtd.get_all_file_paths(
+        return bsc_core.DirectoryMtd.get_all_file_paths__(
             self.path, include_exts
         )
 
@@ -3454,7 +3445,9 @@ class AbsOsFile(
         if self.ext == ext:
             base, ext = os.path.splitext(self.path)
             glob_pattern = u'{}.*'.format(base)
-            _ = glob.glob(glob_pattern)
+            _ = bsc_core.DirectoryMtd.get_file_paths_by_glob_pattern__(
+                glob_pattern
+            )
             lis = []
             if _:
                 for i in _:

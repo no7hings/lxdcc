@@ -42,17 +42,17 @@ class TextureExporter(object):
                         j_texture_path_tgt = j_file_src.get_target_file_path(tgt_dir_path, fix_name_blank=fix_name_blank)
                         if j_texture_path_src != j_texture_path_tgt:
                             # copy
-                            j_file_tiles = j_file_src.get_exists_files()
+                            j_file_tiles = j_file_src.get_exists_files_()
                             for k_file_tile in j_file_tiles:
                                 k_file_tile_path = k_file_tile.path
                                 if k_file_tile_path not in copy_cache:
                                     copy_cache.append(k_file_tile_path)
                                     #
-                                    k_file_tile.set_copy_as_src(
-                                        tgt_dir_path,
-                                        src_dir_path,
+                                    k_file_tile.set_unit_copy_as_src(
+                                        directory_path_src=src_dir_path,
+                                        directory_path_tgt=tgt_dir_path,
                                         fix_name_blank=fix_name_blank,
-                                        force=True,
+                                        replace=True,
                                     )
                             # override to tx
                             if use_tx is True:

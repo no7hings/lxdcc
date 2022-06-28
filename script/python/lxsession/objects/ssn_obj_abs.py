@@ -514,14 +514,11 @@ class AbsSsnOptionObj(AbsSsnObj):
         extra_dict = self.configure.get('hook_option.extra') or {}
         for k, v in extra_dict.items():
             i_script_dict = v['script']
-            i_dict = {}
             for i_k, i_v in script_dict.items():
-                if i_k in i_script_dict:
-                    i_dict[i_k] = i_script_dict[i_k]
-                else:
-                    i_dict[i_k] = [i_v]
+                if i_k not in i_script_dict:
+                    i_script_dict[i_k] = i_v
             #
-            i_hook_option_opt = bsc_core.KeywordArgumentsOpt(v['script'])
+            i_hook_option_opt = bsc_core.KeywordArgumentsOpt(i_script_dict)
             i_hook_option_opt.set(
                 'option_hook_key', self.option_opt.get('option_hook_key')
             )

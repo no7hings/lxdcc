@@ -92,6 +92,21 @@ class SceneGraphOpt(object):
         if port is not None:
             return port.getData()
 
+    def get_material_paths(self):
+        root = '/root/materials'
+        tvl = self._get_traversal_(
+            root
+        )
+        list_ = []
+        while tvl.valid():
+            i_obj_path = tvl.getLocationPath()
+            if not i_obj_path == root:
+                i_obj_type_name = tvl.getLocationData().getAttrs().getChildByName('type').getData()[0]
+                if i_obj_type_name == 'material':
+                    list_.append(i_obj_path)
+            tvl.next()
+        return list_
+
     def __str__(self):
         return '{}(node="{}")'.format(
             self.__class__.__name__,
@@ -1108,6 +1123,9 @@ class NGObjCustomizePortOpt(object):
             self._set_type_port_add_(
                 i_ktn_group_port, scheme=scheme, name=i_p, value=v, default=v
             )
+
+    def set_port_add(self, key, value):
+        pass
     @classmethod
     def _set_port_add_as_enable_(cls):
         pass
@@ -1413,3 +1431,26 @@ class VariablesSetting(object):
             ).get()
             dic[i_key] = i_values
         return dic
+
+
+class WorkspaceSettings(object):
+    def __init__(self):
+        self._ktn_obj = NodegraphAPI.GetNode('rootNode')
+
+    def set(self, key, value):
+        ktn_port = self._ktn_obj.getParameter(key)
+        if ktn_port is None:
+            port_raw = {}
+            if isinstance(value, (str, unicode)):
+                port_raw['widget'] = 'string'
+                port_raw['value'] = value
+            NGMacro(self._ktn_obj).set_parameter_create(
+                key, port_raw
+            )
+        else:
+            NGPortOpt(ktn_port).set(value)
+
+    def get(self, key):
+        ktn_port = self._ktn_obj.getParameter(key)
+        if ktn_port is not None:
+            return NGPortOpt(ktn_port).get()

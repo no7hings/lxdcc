@@ -62,6 +62,39 @@ class AssetWorkspace(object):
             if input_port.get_is_exists() is True:
                 return input_port.get_source_obj()
 
+    def get_all_pass_source_obj(self):
+        list_ = []
+        pass_names = self.get_look_pass_names()
+        for i in pass_names:
+            list_.append(
+                self.get_pass_source_obj(i)
+            )
+        return list_
+
+    def get_all_dcc_materials(self):
+        list_ = []
+        query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
+        dcc_objs = self.get_all_pass_source_obj()
+        for i_dcc_obj in dcc_objs:
+            i_material_paths = ktn_core.SceneGraphOpt(i_dcc_obj.ktn_obj).get_material_paths()
+            for j_material_path in i_material_paths:
+                if j_material_path in query_dict:
+                    j_material_dcc_path = query_dict[j_material_path]
+                    if j_material_dcc_path not in list_:
+                        list_.append(
+                            j_material_dcc_path
+                        )
+        return list_
+
+    def get_all_dcc_shaders(self):
+        list_ = []
+        dcc_objs = self.get_all_dcc_materials()
+        for i_dcc_obj in dcc_objs:
+            list_.extend(
+                i_dcc_obj.get_all_source_objs()
+            )
+        return list_
+
     def get_look_pass_color(self, pass_name):
         pass_index = self.get_look_pass_index(pass_name)
         return self._get_look_pass_rgb_(
@@ -71,8 +104,8 @@ class AssetWorkspace(object):
     def _get_look_pass_rgb_(cls, pass_index):
         h, s, v = 63 + pass_index * 15, .5, .5
         return bsc_core.ColorMtd.hsv2rgb(
-                h, s, v, maximum=1
-            )
+            h, s, v, maximum=1
+        )
 
     def get_look_pass_index(self, pass_name):
         look_passes = self.get_look_pass_names()

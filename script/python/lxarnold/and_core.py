@@ -641,14 +641,14 @@ class AndTextureOpt(object):
     def get_is_16_bit(self):
         return self.get_bit_depth() <= 16
 
-    def get_tx_file_path(self):
+    def get_path_as_tx(self):
         name = os.path.basename(self._file_path)
         name_base, ext = os.path.splitext(name)
         directory_path = os.path.dirname(self._file_path)
         return '{}/{}{}'.format(directory_path, name_base, self.TX_EXT)
 
-    def get_tx_is_exists(self):
-        tx_file_path = self.get_tx_file_path()
+    def get_is_exists_as_tx(self):
+        tx_file_path = self.get_path_as_tx()
         if os.path.exists(tx_file_path) is True:
             timestamp = self.get_modify_timestamp()
             tx_timestamp = self.__class__(tx_file_path).get_modify_timestamp() or 0
@@ -811,24 +811,24 @@ class AndTextureOpt_(AndImageOpt):
         else:
             return bsc_configure.ColorSpace.LINEAR
 
-    def get_tx_file_path(self, directory_path_tgt=None):
+    def get_path_as_tx(self, search_directory_path=None):
         file_path_src = self._file_path
         #
         name = os.path.basename(file_path_src)
         name_base, ext = os.path.splitext(name)
         directory_path = os.path.dirname(file_path_src)
-        if directory_path_tgt:
-            return '{}/{}{}'.format(directory_path_tgt, name_base, self.TX_EXT)
+        if search_directory_path:
+            return '{}/{}{}'.format(search_directory_path, name_base, self.TX_EXT)
         return '{}/{}{}'.format(directory_path, name_base, self.TX_EXT)
 
-    def set_unit_tx_create(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, directory_path_tgt=None, block=False):
+    def set_unit_tx_create(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, search_directory_path=None, block=False):
         cmd = self.get_unit_tx_create_cmd(
             color_space,
             use_aces,
             aces_file,
             aces_color_spaces,
             aces_render_color_space,
-            directory_path_tgt
+            search_directory_path
         )
         #
         if block is True:
@@ -841,7 +841,7 @@ class AndTextureOpt_(AndImageOpt):
                 cmd
             )
 
-    def get_unit_tx_create_cmd(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, directory_path_tgt=None):
+    def get_unit_tx_create_cmd(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, search_directory_path=None):
         file_path_src = self._file_path
         cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
         if use_aces is True:
@@ -859,9 +859,9 @@ class AndTextureOpt_(AndImageOpt):
                     )
                 )
         #
-        if directory_path_tgt:
-            file_path_src_tgt = self.get_tx_file_path(
-                directory_path_tgt
+        if search_directory_path:
+            file_path_src_tgt = self.get_path_as_tx(
+                search_directory_path
             )
             cmd_args += [
                 u'-o "{}"'.format(file_path_src_tgt)

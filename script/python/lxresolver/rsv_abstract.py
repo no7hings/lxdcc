@@ -796,9 +796,9 @@ class AbsRsvDef(object):
     def get_include_steps(self, key):
         return self._include_steps_dict.get(key, [])
 
-    def _get_rsv_obj_create_kwargs_(self, obj_path, input_variants, extend_keys=None):
-        keyword = input_variants['keyword']
-        output_variants = collections.OrderedDict()
+    def _get_rsv_obj_create_kwargs_(self, obj_path, kwargs_src, extend_keys=None):
+        keyword = kwargs_src['keyword']
+        kwargs_tgt = collections.OrderedDict()
         pattern = self.get_pattern(keyword)
         keys = MtdBasic._get_keys_by_parse_pattern_(pattern)
         #
@@ -806,13 +806,13 @@ class AbsRsvDef(object):
             keys.extend(list(extend_keys))
         #
         for key in keys:
-            if key in input_variants:
-                output_variants[key] = input_variants[key]
+            if key in kwargs_src:
+                kwargs_tgt[key] = kwargs_src[key]
         #
-        output_variants['path'] = obj_path
-        output_variants['keyword'] = keyword
-        output_variants['pattern'] = pattern
-        return output_variants
+        kwargs_tgt['path'] = obj_path
+        kwargs_tgt['keyword'] = keyword
+        kwargs_tgt['pattern'] = pattern
+        return kwargs_tgt
 
     def _get_rsv_obj_path_(self, variants):
         keyword = variants['keyword']
@@ -1612,9 +1612,9 @@ class AbsRsvProject(
         # find-order
         keys = MtdBasic._get_keys_by_parse_pattern_(pattern)
         main_keys = self.get_include(u'include-key-main')
-        for key in keys:
-            if key in main_keys and key not in kwargs:
-                raise KeyError(u'keyword: "{}" is Non-assigned'.format(key))
+        for i_key in keys:
+            if i_key in main_keys and i_key not in kwargs:
+                raise KeyError(u'keyword: "{}" is Non-assigned'.format(i_key))
         _ = u''.join([MtdBasic.URL_PARAMETERS_PATTERN.format(**dict(key=key, value=kwargs[key])) for key in keys if key in kwargs])
         return MtdBasic.URL_PATTERN.format(**dict(keyword=keyword, parameters=_))
     #
@@ -2182,6 +2182,7 @@ class AbsRsvProject(
         obj_path = '{}/{}'.format(obj_path, keyword)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
+        #
         variants = self._get_rsv_obj_create_kwargs_(
             obj_path,
             kwargs_,
@@ -2435,6 +2436,8 @@ class AbsRsvRoot(
     #
     RSV_PROJECT_STACK_CLASS = None
     RSV_PROJECT_CLASS = None
+
+    RSV_VERSION_KEY_CLASS = None
     def __init__(self):
         self._set_rsv_def_init_()
         self._set_obj_dag_def_init_('/')
@@ -2713,6 +2716,13 @@ class AbsRsvRoot(
             if rsv_project:
                 return rsv_project.get_rsv_unit(**kwargs_)
     #
+    def get_result(self, **kwargs):
+        rsv_unit = self.get_rsv_unit(**kwargs)
+        return rsv_unit.get_result(
+            version=kwargs['version'],
+            extend_variants=kwargs
+        )
+    #
     def _resolver__get_rsv_project_use_default_(self, file_path):
         rsv_project = self.get_rsv_project(project='default')
         for i_platform in rsv_configure.Platform.ALL:
@@ -2939,6 +2949,11 @@ class AbsRsvRoot(
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
             return rsv_task.get_rsv_scene_properties_by_any_scene_file_path(file_path)
+
+    def get_new_version_key(self, version):
+        version_key = self.RSV_VERSION_KEY_CLASS(version)
+        version_key += 1
+        return version_key
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(

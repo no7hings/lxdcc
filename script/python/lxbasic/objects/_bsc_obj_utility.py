@@ -85,7 +85,7 @@ class ProcessMonitor(object):
         #
         self._timer = None
         self._status = self.Status.Stopped
-        self._rate_statuses = [self.Status.Stopped]*len(self._elements)
+        self._sub_process_statuses = [self.Status.Stopped]*len(self._elements)
         #
         self.logging = SignalInstance(str)
         self.status_changed = SignalInstance(int)
@@ -167,13 +167,13 @@ class ProcessMonitor(object):
         self.__set_running_time_update_()
     #
     def __set_elements_running_(self):
-        pre_element_status = str(self._rate_statuses)
+        pre_element_status = str(self._sub_process_statuses)
         for index, i_element in enumerate(self._elements):
             i_element_status = i_element.get_status()
             if i_element_status is self.Status.Error:
                 pass
-            self._rate_statuses[index] = i_element_status
-        if pre_element_status != str(self._rate_statuses):
+            self._sub_process_statuses[index] = i_element_status
+        if pre_element_status != str(self._sub_process_statuses):
             self.__set_element_statuses_changed_()
     #
     def __set_logging_(self, text):
@@ -184,7 +184,7 @@ class ProcessMonitor(object):
         self.__set_emit_send_(self.status_changed, self._status)
 
     def __set_element_statuses_changed_(self):
-        self.__set_emit_send_(self.element_statuses_changed, self._rate_statuses)
+        self.__set_emit_send_(self.element_statuses_changed, self._sub_process_statuses)
 
     def __set_suspended_(self):
         self._status = self.Status.Suspended
@@ -225,7 +225,7 @@ class ProcessMonitor(object):
         self._is_disable = True
         #
         self._status = self.Status.Stopped
-        self._rate_statuses = [self.Status.Stopped]*len(self._elements)
+        self._sub_process_statuses = [self.Status.Stopped]*len(self._elements)
         #
         self.__set_emit_send_(self.stopped)
         #
@@ -328,7 +328,7 @@ class ProcessMonitor(object):
         return self._status
 
     def get_element_statuses(self):
-        return self._rate_statuses
+        return self._sub_process_statuses
 
 
 class SubProcess(object):

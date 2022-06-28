@@ -203,16 +203,28 @@ class AbsFileReferences(object):
     def _set_file_gain_value_convert_(cls, obj, file_path):
         if obj.type == 'file':
             file_name = os.path.splitext(os.path.basename(file_path))[0]
-            re_pattern = re.compile(r'.*?(<udim>).*?', re.IGNORECASE)
-            results = re.findall(re_pattern, file_name)
-            if results:
+            # udim
+            udim_pattern = re.compile(r'.*?(<udim>).*?', re.IGNORECASE)
+            udim_results = re.findall(udim_pattern, file_name)
+            if udim_results:
                 return file_path
             #
-            mode = obj.get_port('uvTilingMode').get()
-            if mode == 3:
+            tile_mode = obj.get('uvTilingMode')
+            if tile_mode == 3:
                 results = re.findall(r'[0-9][0-9][0-9][0-9]', file_name)
                 if results:
-                    return file_path.replace(results[-1], '<UDIM>')
+                    return file_path.replace(results[-1], '<udim>')
+            # sequence
+            sequence_pattern = re.compile(r'.*?(<f>).*?', re.IGNORECASE)
+            sequence_results = re.findall(sequence_pattern, file_name)
+            if sequence_results:
+                return file_path
+            #
+            sequence_enable = obj.get('useFrameExtension')
+            if sequence_enable:
+                results = re.findall(r'[0-9]{3,4}', file_name)
+                if results:
+                    return file_path.replace(results[-1], '<f>')
             return file_path
         else:
             return file_path
@@ -236,8 +248,16 @@ class AbsFileReferences(object):
             file_path = port.get()
             if file_path is not None:
                 file_ = utl_dcc_objects.OsFile(file_path)
+                # sequence
+                if obj.get('useFrameExtension'):
+                    exists_file_paths = file_.get_exists_file_paths()
+                    if port.get_is_locked():
+                        port.set_unlock()
+                    #
+                    port.set(exists_file_paths[0])
+                #
                 if file_.get_is_udim():
-                    if obj.get_port('uvTilingMode').get() == 3:
+                    if obj.get('uvTilingMode') == 3:
                         exists_file_paths = file_.get_exists_file_paths()
                         if port.get_is_locked():
                             port.set_unlock()
@@ -360,7 +380,7 @@ class AbsFileReferences(object):
         path_dict = {}
         for n in self.get_objs():
             for f in n.get_file_plf_objs():
-                sub_files = f.get_exists_files()
+                sub_files = f.get_exists_files_()
                 for sf in sub_files:
                     normcase_file_path = sf.normcase_path
                     if normcase_file_path in path_dict:
@@ -401,7 +421,9 @@ class TextureReferences(AbsFileReferences):
     INCLUDE_TYPES = [
         'file',
         'aiImage',
-        'osl_file_path'
+        'osl_file_path',
+        'osl_window_box',
+        'osl_window_box_s'
     ]
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)

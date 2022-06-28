@@ -492,7 +492,7 @@ class DdlJobProcess(object):
         #
         self._timer = None
         self._status = self.Status.Stopped
-        self._rate_statuses = [self.Status.Stopped]*len(self._task_queries)
+        self._sub_process_statuses = [self.Status.Stopped]*len(self._task_queries)
         #
         self.logging = SignalInstance(str)
         self.status_changed = SignalInstance(int)
@@ -570,13 +570,13 @@ class DdlJobProcess(object):
         self.__set_running_time_update_()
     #
     def __set_elements_running_(self):
-        pre_element_status = str(self._rate_statuses)
+        pre_element_status = str(self._sub_process_statuses)
         for index, i_task_query in enumerate(self._task_queries):
             i_task_status = self.TASK_STATUS[i_task_query.get_status()]
             if i_task_status is self.Status.Error:
                 pass
-            self._rate_statuses[index] = i_task_status
-        if pre_element_status != str(self._rate_statuses):
+            self._sub_process_statuses[index] = i_task_status
+        if pre_element_status != str(self._sub_process_statuses):
             self.__set_element_statuses_changed_()
     #
     def __set_logging_(self, text):
@@ -587,7 +587,7 @@ class DdlJobProcess(object):
         self.__set_emit_send_(self.status_changed, self._status)
 
     def __set_element_statuses_changed_(self):
-        self.__set_emit_send_(self.element_statuses_changed, self._rate_statuses)
+        self.__set_emit_send_(self.element_statuses_changed, self._sub_process_statuses)
 
     def __set_suspended_(self):
         self._status = self.Status.Suspended
@@ -628,7 +628,7 @@ class DdlJobProcess(object):
         self._is_disable = True
         #
         self._status = self.Status.Stopped
-        self._rate_statuses = [self.Status.Stopped]*len(self._task_queries)
+        self._sub_process_statuses = [self.Status.Stopped]*len(self._task_queries)
         #
         self.__set_emit_send_(self.stopped)
         #
@@ -731,7 +731,7 @@ class DdlJobProcess(object):
         return self._status
 
     def get_element_statuses(self):
-        return self._rate_statuses
+        return self._sub_process_statuses
 
 
 class DdlMethodQuery(ddl_obj_abs.AbsDdlMethodQuery):

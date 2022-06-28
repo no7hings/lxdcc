@@ -350,7 +350,7 @@ def log_progress_bar(maximum, label, use_as_progress_bar=True):
 
 
 class DialogWindow(object):
-    GuiStatus = bsc_configure.GuiStatus
+    ValidatorStatus = bsc_configure.ValidatorStatus
     @classmethod
     def set_create(
         cls,
@@ -427,7 +427,7 @@ class WaitWindow(object):
 
 
 class ExceptionCatcher(object):
-    GuiStatus = bsc_configure.GuiStatus
+    ValidatorStatus = bsc_configure.ValidatorStatus
     @classmethod
     def _get_window_(cls):
         from lxutil_gui.proxy import utl_gui_prx_core
@@ -465,7 +465,7 @@ class ExceptionCatcher(object):
             if use_window is True:
                 w = cls._get_window_()
                 #
-                w.set_status(cls.GuiStatus.Error)
+                w.set_status(cls.ValidatorStatus.Error)
                 w.set_content_add('*'*72)
                 label = '{}'.format(exc_type.__name__)
                 w.set_content_add('traceback:')

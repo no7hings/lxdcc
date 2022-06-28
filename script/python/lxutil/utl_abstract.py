@@ -62,6 +62,9 @@ class AbsDccObjDef(object):
     @property
     def icon(self):
         raise NotImplementedError()
+    @property
+    def icon_file(self):
+        return self.icon
 
     def get_is_naming_match(self, pattern):
         return fnmatch.filter(
@@ -595,6 +598,9 @@ class AbsFileReferenceDef(object):
     def reference_raw(self):
         return self._reference_raw
 
+    def get_reference_raw(self):
+        return self._reference_raw
+
     def set_file_path(self, file_path):
         if file_path is not None:
             self._file = self.OS_FILE_CLASS(file_path)
@@ -666,7 +672,7 @@ class AbsFileReferenceDef(object):
 
     def _set_file_create_(self, file_plf_path, port_dcc_path=None):
         os_file = self.OS_FILE_CLASS(file_plf_path)
-        os_file.set_dcc_attribute_name(port_dcc_path)
+        os_file.set_relevant_dcc_port_path(port_dcc_path)
         return os_file
 
 

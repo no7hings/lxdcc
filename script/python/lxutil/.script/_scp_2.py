@@ -36,7 +36,10 @@ class FileCollection(object):
 
 
 if __name__ == '__main__':
-    FileCollection(
-        source_path='/data/package_temporary_bsnw_1',
-        target_path='/data/package_temporary_bsnw_1_0',
-    )
+    print utl_dcc_objects.OsFile(
+        '/l/temp/td/dongchangbao/tx_convert_test/exr_1/jiguang_cloth_mask.1001.1001.tx'
+    ).get_orig_file('.tx')
+    # FileCollection(
+    #     source_path='/data/package_temporary_bsnw_1',
+    #     target_path='/data/package_temporary_bsnw_1_0',
+    # )

@@ -99,7 +99,7 @@ class Selection(object):
         return cmds.ls(selection=1, long=1, dag=1, noIntermediate=1)
 
 
-class Workspace(object):
+class TextureWorkspace(object):
     pass
 
 

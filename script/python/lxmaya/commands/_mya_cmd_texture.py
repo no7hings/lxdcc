@@ -18,7 +18,7 @@ def set_convert_tx_texture_to_origin():
         for port in i.get_file_ports():
             fph = port.get()
             f = utl_dcc_objects.OsTexture(fph)
-            if f.get_is_tx_ext():
+            if f.get_ext_is_tx():
                 org_fph = f.get_tx_orig_path()
                 if org_fph is not None:
                     port.set(org_fph)

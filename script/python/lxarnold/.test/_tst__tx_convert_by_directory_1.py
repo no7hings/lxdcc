@@ -47,7 +47,7 @@ with utl_core.log_progress_bar(maximum=len(file_paths), label='test') as l_p:
         l_p.set_update()
         i_cmd = utl_dcc_objects.OsTexture._get_unit_tx_create_cmd_by_src_(
             i_file_path,
-            directory_path_tgt=output_directory_path,
+            search_directory_path=output_directory_path,
         )
         if i_cmd:
             bsc_core.CmdSubProcessThread.set_wait()

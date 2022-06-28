@@ -552,24 +552,44 @@ class DotMaFileReader(bsc_obj_abs.AbsFileReader):
         lis = []
         obj_raws = self._get_obj_raws_()
         print 'start file-path: "{}"'.format(self.file_path)
-        for obj_raw in obj_raws:
-            line, variants = obj_raw
-            obj_type = variants['obj_type']
-            obj_name = variants['obj_name']
-            if obj_type in self.FILE_REFERENCE_DICT:
-                port_name = self.FILE_REFERENCE_DICT[obj_type]
-                if port_name is not None:
+        for i_obj_raw in obj_raws:
+            i_line, i_variants = i_obj_raw
+            i_obj_type = i_variants['obj_type']
+            i_obj_name = i_variants['obj_name']
+            if i_obj_type in self.FILE_REFERENCE_DICT:
+                i_port_name = self.FILE_REFERENCE_DICT[i_obj_type]
+                if i_port_name is not None:
                     # print 'start obj: "{}"'.format(obj_name)
-                    port_raws = self._get_obj_port_raws_(line)
-                    if port_name in port_raws:
-                        port_type, port_raw = port_raws[port_name]
+                    port_raws = self._get_obj_port_raws_(i_line)
+                    if i_port_name in port_raws:
+                        i_port_type, i_port_raw = port_raws[i_port_name]
                         raw = dict(
-                            obj_type=obj_type,
-                            obj_name=obj_name,
-                            port_name=port_name,
-                            port_type=port_type,
-                            port_raw=port_raw
+                            obj_type=i_obj_type,
+                            obj_name=i_obj_name,
+                            port_name=i_port_name,
+                            port_type=i_port_type,
+                            port_raw=i_port_raw
                         )
+                        if i_obj_type == 'file':
+                            i_file_path = i_port_raw
+                            i_file_base = os.path.basename(i_file_path)
+                            # sequence
+                            if 'ufe' in port_raws:
+                                _, i_sequence = port_raws['ufe']
+                                if i_sequence == 'yes':
+                                    i_results = re.findall(r'[0-9]{3,4}', i_file_base)
+                                    if i_results:
+                                        i_file_path = i_file_path.replace(i_results[-1], '<f>')
+                                        raw['port_raw'] = i_file_path
+                            # udim
+                            if 'uvt' in port_raws:
+                                _, is_udim = port_raws['uvt']
+                                if is_udim == '3':
+                                    i_results = re.findall(r'[0-9][0-9][0-9][0-9]', i_file_base)
+                                    if i_results:
+                                        i_file_path = i_file_path.replace(i_results[-1], '<udim>')
+                                        raw['port_raw'] = i_file_path
+                        #
                         lis.append(raw)
                     # print 'end obj: "{}"'.format(obj_name)
         print 'end file-path: "{}"'.format(self.file_path)
@@ -743,8 +763,8 @@ class DotUsdaFile(object):
 
 
 if __name__ == '__main__':
-    d = DotXgenFileReader(
-        file_path='/l/prod/cgm/output/assets/chr/nn_4y_test/grm/groom/nn_4y_test.grm.groom.v002/scene/nn_4y_test__nn_4y_test_hair_collection.xgen'
+    d = DotMaFileReader(
+        '/data/f/test_sequence/butterfly_a.ma'
     )
-    d.set_repair()
-    d.set_save()
+    print re.findall(r'[0-9]{3,4}', 'test.1.exr')
+    print d.get_file_paths()

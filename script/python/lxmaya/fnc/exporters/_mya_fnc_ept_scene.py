@@ -323,7 +323,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         )
         jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
         if self._option.get('convert_to_dot_mov') is True:
-            if jpg_seq_file.get_exists_files():
+            if jpg_seq_file.get_exists_files_():
                 bsc_core.VedioOpt(
                     mov_file_path
                 ).set_create_from(
@@ -334,9 +334,9 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
                 # ).set_convert_to(mov_file_path)
         else:
             jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
-            exist_files = jpg_seq_file.get_exists_files()
+            exist_files = jpg_seq_file.get_exists_files_()
             if exist_files:
-                jpg_seq_file.get_exists_files()[0].set_copy_to_file(
+                jpg_seq_file.get_exists_files_()[0].set_copy_to_file(
                     self._file_path
                 )
         #
@@ -356,7 +356,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         )
         jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
         if self._option.get('convert_to_dot_mov') is True:
-            if jpg_seq_file.get_exists_files():
+            if jpg_seq_file.get_exists_files_():
                 bsc_core.VedioOpt(
                     mov_file_path
                 ).set_create_from(

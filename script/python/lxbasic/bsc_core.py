@@ -51,7 +51,7 @@ import functools
 
 import urllib
 
-import scandir
+# import scandir
 
 from lxbasic import bsc_configure
 
@@ -114,7 +114,7 @@ class CmdSubProcessThread(threading.Thread):
         self._status_changed_signal = CmdSubProcessSignal(int, int)
         self._completed_signal = CmdSubProcessSignal(int, list)
         self._failed_signal = CmdSubProcessSignal(int, list)
-        self._finished_signal = CmdSubProcessSignal(int, int)
+        self._finished_signal = CmdSubProcessSignal(int, int, list)
     @property
     def status_changed(self):
         return self._status_changed_signal
@@ -130,29 +130,37 @@ class CmdSubProcessThread(threading.Thread):
 
     def run(self):
         self.__set_status_update(self.Status.Running)
+        results = []
         try:
             results = SubProcessMtd.set_run_as_block(
                 self._cmd
             )
             self.__set_status_update(self.Status.Completed)
             self.__set_completed(results)
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as exc:
+            # o = exc.output
+            # s = exc.returncode
+            results = []
             self.__set_status_update(self.Status.Failed)
-            self.__set_failed([])
+            self.__set_failed(results)
         finally:
-            self.__set_finished(self._status)
-            #
             CmdSubProcessThread.LOCK.acquire()
             CmdSubProcessThread.STACK.remove(self)
-
-            if len(CmdSubProcessThread.STACK) == CmdSubProcessThread.MAXIMUM-1:
+            # unlock
+            if len(CmdSubProcessThread.STACK) < CmdSubProcessThread.MAXIMUM:
                 CmdSubProcessThread.EVENT.set()
                 CmdSubProcessThread.EVENT.clear()
 
             CmdSubProcessThread.LOCK.release()
+
+            self.__set_finished(self._status, results)
+    @staticmethod
+    def get_is_busy():
+        return len(CmdSubProcessThread.STACK) >= CmdSubProcessThread.MAXIMUM
     @staticmethod
     def set_wait():
         CmdSubProcessThread.LOCK.acquire()
+        # lock
         if len(CmdSubProcessThread.STACK) >= CmdSubProcessThread.MAXIMUM:
             CmdSubProcessThread.LOCK.release()
             CmdSubProcessThread.EVENT.wait()
@@ -177,9 +185,9 @@ class CmdSubProcessThread(threading.Thread):
             self._index, results
         )
 
-    def __set_finished(self, status):
+    def __set_finished(self, status, results):
         self._finished_signal.set_emit_send(
-            self._index, status
+            self._index, status, results
         )
 
     def __set_status_update(self, status):
@@ -953,7 +961,7 @@ class DirectoryMtd(object):
     def get_file_paths(cls, directory_path, include_exts=None):
         list_ = []
         results = os.listdir(directory_path) or []
-        results.sort()
+        # results.sort()
         for i_name in results:
             i_path = '{}/{}'.format(directory_path, i_name)
             if os.path.isfile(i_path):
@@ -965,7 +973,9 @@ class DirectoryMtd(object):
                 list_.append(i_path)
         return list_
     @classmethod
-    def get_file_paths__(cls, directory_path, include_exts=None):
+    def _get_file_paths(cls, directory_path, include_exts=None):
+        import scandir
+
         list_ = []
         if os.path.isdir(directory_path):
             for i in scandir.scandir(directory_path):
@@ -979,10 +989,16 @@ class DirectoryMtd(object):
                     list_.append(i_path)
         return list_
     @classmethod
+    def get_file_paths__(cls, directory_path, include_exts=None):
+        if SystemMtd.get_is_linux():
+            return cls._get_file_paths(directory_path, include_exts)
+        else:
+            return cls.get_file_paths(directory_path, include_exts)
+    @classmethod
     def get_all_file_paths(cls, directory_path, include_exts=None):
         def rcs_fnc_(path_):
             _results = os.listdir(path_) or []
-            _results.sort()
+            # _results.sort()
             for _i_name in _results:
                 _i_path = '{}/{}'.format(path_, _i_name)
                 if os.path.isfile(_i_path):
@@ -999,7 +1015,7 @@ class DirectoryMtd(object):
         rcs_fnc_(directory_path)
         return list_
     @classmethod
-    def get_all_file_paths__(cls, directory_path, include_exts=None):
+    def _get_all_file_paths(cls, directory_path, include_exts=None):
         def rcs_fnc_(path_):
             for _i in scandir.scandir(path_):
                 _i_path = _i.path
@@ -1013,28 +1029,44 @@ class DirectoryMtd(object):
                 elif _i.is_dir():
                     rcs_fnc_(_i_path)
 
+        import scandir
+
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
         return list_
     @classmethod
+    def get_all_file_paths__(cls, directory_path, include_exts=None):
+        if SystemMtd.get_is_linux():
+            return cls._get_all_file_paths(directory_path, include_exts)
+        else:
+            return cls.get_all_file_paths(directory_path, include_exts)
+    @classmethod
     def get_directory_paths(cls, directory_path):
         list_ = []
         results = os.listdir(directory_path) or []
-        results.sort()
+        # results.sort()
         for i_name in results:
             i_path = '{}/{}'.format(directory_path, i_name)
             if os.path.isdir(i_path):
                 list_.append(i_path)
         return list_
     @classmethod
-    def get_directory_paths__(cls, directory_path):
+    def _get_directory_paths(cls, directory_path):
+        import scandir
+
         list_ = []
         if os.path.isdir(directory_path):
             for i in scandir.scandir(directory_path):
                 if i.is_dir():
                     list_.append(i.path)
         return list_
+    @classmethod
+    def get_directory_paths__(cls, directory_path):
+        if SystemMtd.get_is_linux():
+            return cls._get_directory_paths(directory_path)
+        else:
+            return cls.get_directory_paths(directory_path)
     @classmethod
     def get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(path_):
@@ -1050,7 +1082,7 @@ class DirectoryMtd(object):
         rcs_fnc_(directory_path)
         return list_
     @classmethod
-    def get_all_directory_paths__(cls, directory_path):
+    def _get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(d_):
             for _i in scandir.scandir(d_):
                 if _i.is_dir():
@@ -1064,6 +1096,12 @@ class DirectoryMtd(object):
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
         return list_
+    @classmethod
+    def get_all_directory_paths__(cls, directory_path):
+        if SystemMtd.get_is_linux():
+            return cls._get_all_directory_paths(directory_path)
+        else:
+            return cls.get_all_directory_paths(directory_path)
     @classmethod
     def get_file_relative_path(cls, directory_path, file_path):
         return os.path.relpath(file_path, directory_path)
@@ -1560,9 +1598,8 @@ class SubProcessMtd(object):
         )
         output, unused_err = process.communicate()
         #
-        retcode = process.poll()
-        if retcode:
-            raise subprocess.CalledProcessError(retcode, cmd)
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode, cmd)
         return output.decode().splitlines()
 
 
@@ -2161,6 +2198,11 @@ class DccPathDagMtd(object):
                 if _.group() == i_path:
                     lis.append(i_path)
         return lis
+    @classmethod
+    def set_dag_path_cleanup(cls, path, pathsep='/'):
+        return re.sub(
+            ur'[^\u4e00-\u9fa5a-zA-Z0-9{}]'.format(pathsep), '_', path
+        )
 
 
 class DccPathDagOpt(object):
@@ -3279,6 +3321,7 @@ class OslShaderMtd(object):
 class ImageOpt(object):
     def __init__(self, file_path):
         self._file_path = file_path
+        self._file_path_opt = StorageFileOpt(self._file_path)
 
     def get_thumbnail_file_path(self):
         return TemporaryThumbnailMtd.get_file_path(self._file_path)
@@ -3315,14 +3358,14 @@ class ImageOpt(object):
             if os.path.exists(directory_path) is False:
                 os.makedirs(directory_path)
             #
-            data_time = TimestampMtd.to_string(
+            time_mark = TimestampMtd.to_string(
                 '%Y:%m:%d %H:%M:%S', StorageFileOpt(file_path).get_modify_timestamp()
             )
             cmd_args = [
                 Bin.get_oiiotool(),
                 u'-i "{}"'.format(file_path),
                 '--resize {}x0'.format(width),
-                '--attrib:type=string DateTime "{}"'.format(data_time),
+                '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
                 '--threads 1',
                 u'-o "{}"'.format(jpg_file_path),
@@ -3338,18 +3381,48 @@ class ImageOpt(object):
                 )
                 return s_p
 
+    def get_create_cmd_as_ext_tgt(self, ext, directory_path=None, width=None):
+        file_path_src_opt = self._file_path_opt
+        file_path_tgt_opt = StorageFileOpt(self._file_path).set_ext_repath_to(ext)
+        if file_path_src_opt.get_is_file() is True:
+            file_path_tgt_opt.set_directory_create()
+        #
+        if directory_path is not None:
+            file_path_tgt_opt = file_path_tgt_opt.set_directory_repath_to(directory_path)
+        #
+        time_mark = TimestampMtd.to_string(
+            '%Y:%m:%d %H:%M:%S', file_path_src_opt.get_modify_timestamp()
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'-i "{}"'.format(file_path_src_opt.path),
+            '--attrib:type=string DateTime "{}"'.format(time_mark),
+            '--adjust-time ',
+            '--threads 1',
+        ]
+        if isinstance(width, (int, float)):
+            cmd_args += [
+                '--resize {}x0'.format(width),
+            ]
+
+        cmd_args += [
+            u'-o "{}"'.format(file_path_tgt_opt.path),
+        ]
+
+        return u' '.join(cmd_args)
+
     def set_convert_to(self, file_path_tgt):
         file_opt = StorageFileOpt(self._file_path)
         if file_opt.get_is_file() is True:
             file_opt_tgt = StorageFileOpt(file_path_tgt)
             ext_tgt = file_opt_tgt.get_ext()
-            data_time = TimestampMtd.to_string(
+            time_mark = TimestampMtd.to_string(
                 '%Y:%m:%d %H:%M:%S', file_opt.get_modify_timestamp()
             )
             cmd_args = [
                 Bin.get_oiiotool(),
                 u'-i "{}"'.format(file_opt.path),
-                '--attrib:type=string DateTime "{}"'.format(data_time),
+                '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
                 '--threads 1',
                 u'-o "{}"'.format(file_opt_tgt.path),
@@ -3920,7 +3993,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print StoragePathMtd.get_is_writeable(
-        '/l/prod/cgm/work/assets/chr/bl_xiz_f/srf/surfacing/texture/main/v006/src'
+    print DccPathDagMtd.set_dag_path_cleanup_to(
+        '/master/shape/group/pasted__camera1/pasted__cameraShape1->/pasted__imagePlane1'
     )
 

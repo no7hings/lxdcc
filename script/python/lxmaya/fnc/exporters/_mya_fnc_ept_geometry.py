@@ -407,17 +407,21 @@ class GeometryUsdExporter_(object):
                     i_mya_obj_type = i_mya_obj.type
                     i_mya_obj_path = i_mya_obj.path
                     #
-                    i_usd_obj_path = obj_core.DccPathDagMtd.get_dag_pathsep_replace(
+                    i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
                         i_mya_obj_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
                     )
-                    i_usd_obj_path = obj_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
+                    i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
                     # clean namespace
                     if ':' in i_usd_obj_path:
                         utl_core.Log.set_module_warning_trace(
                             'usd-mesh export',
                             'obj="{}" has namespace'.format(i_usd_obj_path)
                         )
-                    i_usd_obj_path = obj_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
+                    #
+                    i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
+                        i_usd_obj_path
+                    )
+                    i_usd_obj_path = bsc_core.DccPathDagMtd.set_dag_path_cleanup(
                         i_usd_obj_path
                     )
                     if i_mya_obj_type == ma_configure.Util.TRANSFORM_TYPE:

@@ -34,7 +34,7 @@ if output_directory_path:
     ).set_create()
 
 
-def finished_fnc_(index, status):
+def finished_fnc_(index, status, results):
     print index, status
 
 

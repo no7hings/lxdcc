@@ -174,6 +174,8 @@ asset-work-look-yml-file: <asset-work-look-dir>/all.yml
 #
 asset-work-texture-workspace-file: <asset-task-dir>/texture/workspace.yml
 #
+asset-work-outsource-texture-dir: <asset-task-dir>/outsource/texture/<version-name>
+#
 asset-work-texture-base-dir: <asset-task-dir>/textue-base
 asset-work-texture-dir: <asset-task-dir>/texture/<layer>/<version-name>
 asset-work-texture-src-dir: <asset-work-texture-dir>/src

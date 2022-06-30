@@ -212,4 +212,4 @@ class Aces(object):
 
 
 if __name__ == '__main__':
-    print UtilityProductData.get_as_configure('texture-tx-convert')
+    pass

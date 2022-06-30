@@ -719,7 +719,7 @@ class AbsOsTexture(AbsOsFile):
                     search_directory_path=search_directory_path,
                 )
     @classmethod
-    def _get_unit_tx_create_cmd_by_src__(cls, file_path_src, search_directory_path=None):
+    def _get_unit_tx_create_cmd_by_src_force_(cls, file_path_src, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
             from lxarnold import and_core
@@ -738,6 +738,22 @@ class AbsOsTexture(AbsOsFile):
                 aces_render_color_space=aces_render_color_space,
                 search_directory_path=search_directory_path,
             )
+    @classmethod
+    def _get_unit_create_cmd_as_ext_tgt_by_src_force_(cls, file_path_src, ext_tgt, search_directory_path=None, width=None):
+        path_base, ext_any = os.path.splitext(file_path_src)
+        if ext_any != ext_tgt:
+            if ext_tgt == cls.TX_EXT:
+                return cls._get_unit_tx_create_cmd_by_src_force_(
+                    file_path_src, search_directory_path
+                )
+            else:
+                return bsc_core.ImageOpt(
+                    file_path_src
+                ).get_create_cmd_as_ext_tgt(
+                    ext_tgt,
+                    search_directory_path,
+                    width
+                )
     @classmethod
     def _set_unit_jpg_create_(cls, file_path, block=False):
         path_base, ext_any = os.path.splitext(file_path)

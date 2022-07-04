@@ -851,20 +851,27 @@ class AbsOsTexture(AbsOsFile):
         results = re.findall(re_pattern, path)
         if results:
             glob_pattern = path.replace(results[0], '*')
+            #
             list_ = glob.glob(glob_pattern)
             if list_:
                 if with_tx is True:
                     tx_list = []
                     for i in list_:
-                        tx_file_path = self._get_path_tgt_as_ext_tgt_(i, ext_tgt=self.TX_EXT)
-                        if os.path.isfile(tx_file_path):
-                            tx_list.append(tx_file_path)
+                        i_tx_file_path = self._get_path_tgt_as_ext_tgt_(i, ext_tgt=self.TX_EXT)
+                        if os.path.isfile(i_tx_file_path):
+                            tx_list.append(i_tx_file_path)
                         else:
-                            utl_core.Log.set_warning_trace('texture-tx: "{}" is Non-exists.'.format(tx_file_path))
+                            utl_core.Log.set_warning_trace(
+                                u'texture-tx: "{}" is non-exists.'.format(i_tx_file_path)
+                            )
+                    #
                     if tx_list:
                         list_.extend(tx_list)
             else:
-                utl_core.Log.set_warning_trace(u'Udim-texture: "{}" is Non-exists.'.format(self.path))
+                utl_core.Log.set_warning_trace(
+                    u'texture-udim: "{}" is non-exists.'.format(self.path)
+                )
+        #
         if list_:
             list_.sort()
         return list_

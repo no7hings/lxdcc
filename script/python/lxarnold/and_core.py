@@ -843,7 +843,14 @@ class AndTextureOpt_(AndImageOpt):
 
     def get_unit_tx_create_cmd(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, search_directory_path=None):
         file_path_src = self._file_path
-        cmd_args = ['maketx', '-v', '-u', '--unpremult', '--threads 1', '--oiio']
+        cmd_args = [
+            'maketx',
+            '-v',
+            '-u',
+            '--unpremult',
+            '--threads 2',
+            '--oiio'
+        ]
         if use_aces is True:
             if color_space in aces_color_spaces:
                 if color_space != aces_render_color_space:

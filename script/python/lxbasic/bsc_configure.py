@@ -91,6 +91,14 @@ class ValidatorStatus(enum.IntEnum):
     Locked = 0x25
 
 
+class ActionState(enum.IntEnum):
+    Normal = 0x30
+    Enable = 0x31
+    Disable = 0x32
+    PressEnable = 0x41
+    PressDisable = 0x42
+
+
 class SubProcessStatus(enum.EnumMeta):
     """
     0 正常结束

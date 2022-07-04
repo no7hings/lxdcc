@@ -1514,6 +1514,7 @@ class KatanaLauncher(object):
             '"{}"'.format(file_path)
         ]
         cmd = ' '.join(args)
+        #
         AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
             cmd
         )

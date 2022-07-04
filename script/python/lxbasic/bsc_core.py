@@ -1600,6 +1600,7 @@ class SubProcessMtd(object):
         #
         if process.returncode != 0:
             raise subprocess.CalledProcessError(process.returncode, cmd)
+        process.wait()
         return output.decode().splitlines()
 
 
@@ -3367,7 +3368,7 @@ class ImageOpt(object):
                 '--resize {}x0'.format(width),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
-                '--threads 1',
+                '--threads 2',
                 u'-o "{}"'.format(jpg_file_path),
             ]
             if block is True:

@@ -744,6 +744,11 @@ class StorageDirectoryOpt(StoragePathOpt):
     def __init__(self, path):
         super(StorageDirectoryOpt, self).__init__(path)
 
+    def set_create(self):
+        StoragePathMtd.set_directory_create(
+            self.path
+        )
+
 
 class StorageFileOpt(StoragePathOpt):
     def __init__(self, file_path, file_type=None):
@@ -1873,6 +1878,9 @@ class DirectoryOpt(object):
         return DirectoryMtd.get_all_file_paths__(
             self.path, include_exts
         )
+
+    def set_create(self):
+        pass
 
 
 class ZipFileOpt(StorageFileOpt):

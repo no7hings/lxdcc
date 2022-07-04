@@ -1006,10 +1006,14 @@ class AbsRsvUnit(
         # old method , do not delete or rename
         return self.get_properties_by_result(file_path, override_variants)
 
-    def get_latest_version(self):
+    def get_latest_version(self, extend_variants=None):
         kwargs = copy.copy(self.properties.value)
         kwargs['version'] = '*'
         kwargs['workspace'] = MtdBasic._get_rsv_workspace_(**kwargs)
+        #
+        if extend_variants is not None:
+            kwargs.update(extend_variants)
+        #
         rsv_matcher = self.rsv_project._set_rsv_matcher_create_(
             self._pattern,
             kwargs
@@ -1020,13 +1024,33 @@ class AbsRsvUnit(
             version = variants['version']
             return version
 
-    def get_new_version(self):
-        version = self.get_latest_version()
+    def get_new_version(self, extend_variants=None):
+        version = self.get_latest_version(extend_variants)
         if version is not None:
             rsv_version_key = self._rsv_matcher._set_rsv_version_key_create_(version)
             rsv_version_key += 1
             return str(rsv_version_key)
         return 'v001'
+
+    def get_all_versions(self, extend_variants=None):
+        kwargs = copy.copy(self.properties.value)
+        kwargs['version'] = '*'
+        kwargs['workspace'] = MtdBasic._get_rsv_workspace_(**kwargs)
+        #
+        if extend_variants is not None:
+            kwargs.update(extend_variants)
+        #
+        rsv_matcher = self.rsv_project._set_rsv_matcher_create_(
+            self._pattern,
+            kwargs
+        )
+        matches = rsv_matcher.get_matches()
+        list_ = []
+        if matches:
+            for i in matches:
+                i_result, i_variants = i
+                list_.append(i_variants['version'])
+        return list_
 
     def get_rsv_version(self, **kwargs):
         rsv_version = self.rsv_project._project__get_rsv_unit_version_(

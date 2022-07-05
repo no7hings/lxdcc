@@ -132,10 +132,15 @@ asset-work-katana-scene-tmp-file: <asset-work-katana-tmp-dir>/<asset-version-nam
 asset-work-nuke-dir: <asset-task-dir>/nuke
 asset-work-nuke-tmp-dir: <asset-work-nuke-dir>/temporary/<user-name>
 # <asset-work-nuke-scene>
-asset-work-nuke-scene-src-dir: <asset-work-nuke-dir>/scenes
+asset-work-nuke-scene-src-dir: <asset-work-nuke-dir>
 asset-work-nuke-scene-src-file: <asset-work-nuke-scene-src-dir>/<asset-version-name>.nk
 asset-work-nuke-user-scene-src-file: <asset-work-nuke-scene-src-dir>/<user-name>/<asset-version-name>.nk
 asset-work-nuke-scene-tmp-file: <asset-work-nuke-tmp-dir>/<asset-version-name>.nk
+#
+asset-work-sp-dir: <asset-task-dir>/sp
+#
+asset-work-sp-scene-src-dir: <asset-work-sp-dir>
+asset-work-sp-scene-src-file: <asset-work-sp-scene-src-dir>/<asset-version-name>.spp
 # <asset-work-geometry>
 asset-work-geometry-dir: <asset-task-dir>/geometry/scene/<version-name>
 asset-work-geometry-abc-var-file: <asset-work-geometry-dir>/<var-name>.abc

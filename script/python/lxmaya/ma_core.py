@@ -2482,3 +2482,7 @@ class QtControlOpt(object):
 
 def undo_stack(key=None):
     return CmdUndoStack(key)
+
+
+def set_stack_trace_enable(boolean):
+    cmds.stackTrace(state=boolean)

@@ -749,6 +749,34 @@ class StorageDirectoryOpt(StoragePathOpt):
             self.path
         )
 
+    def get_all_file_paths(self, include_exts=None):
+        return DirectoryMtd.get_all_file_paths__(
+            self.path, include_exts
+        )
+
+    def set_copy_to_directory(self, directory_path_tgt, replace=False):
+        def copy_fnc_(file_path_src_, file_path_tgt_):
+            StorageFileOpt(file_path_src_).set_copy_to_file(
+                file_path_tgt_, replace
+            )
+        #
+        directory_path_src = self.path
+        file_paths_src = self.get_all_file_paths()
+        #
+        threads = []
+        for i_file_path_src in file_paths_src:
+            i_relative_file_path = i_file_path_src[len(directory_path_src):]
+            #
+            i_file_path_tgt = directory_path_tgt + i_relative_file_path
+            if os.path.exists(i_file_path_tgt) is False:
+                i_thread = PyThread(
+                    copy_fnc_, i_file_path_src, i_file_path_tgt
+                )
+                threads.append(i_thread)
+        #
+        [i.start() for i in threads]
+        [i.join() for i in threads]
+
 
 class StorageFileOpt(StoragePathOpt):
     def __init__(self, file_path, file_type=None):
@@ -851,6 +879,23 @@ class StorageFileOpt(StoragePathOpt):
                 self.get_path_base(), ext_tgt
             )
         )
+
+    def set_copy_to_file(self, file_path_tgt, replace=False):
+        if replace is True:
+            if os.path.exists(file_path_tgt):
+                os.remove(file_path_tgt)
+        #
+        file_path_src = self.path
+        #
+        if os.path.exists(file_path_tgt) is False:
+            directory_path_tgt = os.path.dirname(file_path_tgt)
+            if os.path.exists(directory_path_tgt) is False:
+                os.makedirs(directory_path_tgt)
+            # noinspection PyBroadException
+            try:
+                shutil.copy2(file_path_src, file_path_tgt)
+            except:
+                ExceptionMtd.set_print()
 
 
 class MultiplyPatternMtd(object):

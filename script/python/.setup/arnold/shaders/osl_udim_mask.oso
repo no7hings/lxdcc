@@ -1,0 +1,163 @@
+OpenShadingLanguage 1.00
+# Compiled by oslc 1.11.6
+# options: -o /home/dongchangbao/packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.oso.7cdd-da81-7d15-5272.tmp -I/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include
+shader jiUdimMask
+param	string	UDIMs	"1001"		%meta{string,help,"Comma-separated UDIMs. You can also specify ranges. Example: 1001,1003,1011-1014"}  %read{10,50} %write{2147483647,-1}
+param	int	raw_UDIM_output	0		%meta{string,help,"Enable Total Internal Reflection"} %meta{string,widget,"checkBox"}  %read{7,7} %write{2147483647,-1}
+oparam	float	out	0		%read{2147483647,-1} %write{9,51}
+global	float	u	%read{0,0} %write{2147483647,-1}
+global	float	v	%read{3,3} %write{2147483647,-1}
+local	int	udim	%read{8,45} %write{6,6}
+local	int	___338_udim_validator	%read{11,11} %write{10,10}
+local	string[10]	___339_udim_array	%read{17,45} %write{13,13}
+local	int	___339_udim_result	%read{17,47} %write{14,45}
+local	int	___339_start_index	%read{17,45} %write{17,45}
+local	int	___339_end_index	%read{17,45} %write{17,45}
+local	string[2]	___339_cur_range	%read{17,45} %write{17,45}
+local	int	___340_i	%read{17,45} %write{16,45}
+local	int	___343_d	%read{17,45} %write{17,45}
+local	int	___346_cur_udim	%read{17,45} %write{17,45}
+temp	float	$tmp1	%read{1,1} %write{0,0}
+const	int	$const2	1		%read{11,47} %write{2147483647,-1}
+temp	float	$tmp2	%read{2,2} %write{1,1}
+const	float	$const3	1		%read{1,1} %write{2147483647,-1}
+temp	float	$tmp3	%read{5,5} %write{2,2}
+const	float	$const4	1000		%read{2,2} %write{2147483647,-1}
+temp	float	$tmp4	%read{4,4} %write{3,3}
+const	int	$const5	10		%read{17,17} %write{2147483647,-1}
+temp	float	$tmp5	%read{5,5} %write{4,4}
+const	float	$const6	10		%read{4,4} %write{2147483647,-1}
+temp	float	$tmp6	%read{6,6} %write{5,5}
+temp	float	$tmp7	%read{9,9} %write{8,8}
+const	string	$const7	"[0-9]{4}([,-][0-9]{4})*"		%read{10,10} %write{2147483647,-1}
+temp	int	$tmp8	%read{12,12} %write{11,11}
+temp	int	$tmp9	%read{2147483647,-1} %write{13,13}
+const	string	$const8	","		%read{13,13} %write{2147483647,-1}
+const	int	$const9	0		%read{14,51} %write{2147483647,-1}
+temp	int	$tmp10	%read{17,45} %write{17,45}
+temp	int	$tmp11	%read{15,45} %write{16,45}
+temp	int	$tmp12	%read{17,45} %write{17,45}
+temp	string	$tmp13	%read{17,45} %write{17,45}
+const	string	$const10	"-"		%read{20,24} %write{2147483647,-1}
+temp	int	$tmp14	%read{17,45} %write{17,45}
+temp	int	$tmp15	%read{2147483647,-1} %write{17,45}
+temp	string	$tmp16	%read{17,45} %write{17,45}
+temp	string	$tmp17	%read{17,45} %write{17,45}
+temp	string	$tmp18	%read{17,45} %write{17,45}
+temp	int	$tmp19	%read{17,45} %write{17,45}
+temp	int	$tmp20	%read{17,45} %write{17,45}
+temp	int	$tmp21	%read{17,45} %write{17,45}
+temp	int	$tmp22	%read{17,45} %write{17,45}
+temp	int	$tmp23	%read{2147483647,-1} %write{17,45}
+temp	string	$tmp24	%read{17,45} %write{17,45}
+temp	int	$tmp25	%read{17,45} %write{17,45}
+temp	int	$tmp26	%read{2147483647,-1} %write{17,45}
+temp	int	$tmp27	%read{49,49} %write{48,48}
+const	string	$const11	"clamp"		%read{46,46} %write{2147483647,-1}
+temp	int	$tmp28	%read{48,48} %write{47,47}
+const	string	$const12	"%s%s"		%read{50,50} %write{2147483647,-1}
+const	string	$const13	" is not a valid input. Use a comma-separated list of UDIMs. Ranges can be specified with '-'. Eg: 1001,1003-1005,1012"		%read{50,50} %write{2147483647,-1}
+code ___main___
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:16
+# 
+	floor		$tmp1 u 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl"} %line{16} %argrw{"wr"}
+	add		$tmp2 $tmp1 $const3 	%argrw{"wrr"}
+	add		$tmp3 $const4 $tmp2 	%argrw{"wrr"}
+	floor		$tmp4 v 	%argrw{"wr"}
+	mul		$tmp5 $tmp4 $const6 	%argrw{"wrr"}
+	add		$tmp6 $tmp3 $tmp5 	%argrw{"wrr"}
+	assign		udim $tmp6 	%argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:19
+# 		out = float(udim);
+	if		raw_UDIM_output 10 52 	%line{19} %argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:20
+# 
+	assign		$tmp7 udim 	%line{20} %argrw{"wr"}
+	assign		out $tmp7 	%argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:25
+# 
+	regex_match	___338_udim_validator UDIMs $const7 	%line{25} %argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:27
+# 			// Split elements by comma into udim_array
+	eq		$tmp8 ___338_udim_validator $const2 	%line{27} %argrw{"wrr"}
+	if		$tmp8 50 52 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:30
+# 
+	split		$tmp9 UDIMs ___339_udim_array $const8 	%line{30} %argrw{"wrwr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:33
+# 			int start_index;
+	assign		___339_udim_result $const9 	%line{33} %argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:40
+# 				// iteration works by default because "null" is silently ignored
+	for		$tmp11 17 19 44 46 	%line{40} %argrw{"r"}
+	assign		___340_i $const9 	%argrw{"wr"}
+	lt		$tmp10 ___340_i $const5 	%argrw{"wrr"}
+	neq		$tmp11 $tmp10 $const9 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:44
+# 					split(udim_array[i], cur_range, "-");
+	aref		$tmp13 ___339_udim_array ___340_i 	%line{44} %argrw{"wrr"}
+	regex_search	$tmp12 $tmp13 $const10 	%argrw{"wrr"}
+	eq		$tmp14 $tmp12 $const2 	%argrw{"wrr"}
+	if		$tmp14 39 44 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:45
+# 					start_index = stoi(cur_range[0]);
+	aref		$tmp16 ___339_udim_array ___340_i 	%line{45} %argrw{"wrr"}
+	split		$tmp15 $tmp16 ___339_cur_range $const10 	%argrw{"wrwr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:46
+# 					end_index = stoi(cur_range[1]);
+	aref		$tmp17 ___339_cur_range $const9 	%line{46} %argrw{"wrr"}
+	stoi		___339_start_index $tmp17 	%argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:47
+# 
+	aref		$tmp18 ___339_cur_range $const2 	%line{47} %argrw{"wrr"}
+	stoi		___339_end_index $tmp18 	%argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:49
+# 						if (d == udim){
+	for		$tmp21 31 34 37 39 	%line{49} %argrw{"r"}
+	assign		___343_d ___339_start_index 	%argrw{"wr"}
+	add		$tmp19 ___339_end_index $const2 	%argrw{"wrr"}
+	lt		$tmp20 ___343_d $tmp19 	%argrw{"wrr"}
+	neq		$tmp21 $tmp20 $const9 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:50
+# 							udim_result += 1;
+	eq		$tmp22 ___343_d udim 	%line{50} %argrw{"wrr"}
+	if		$tmp22 37 37 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:51
+# 						}
+	add		___339_udim_result ___339_udim_result $const2 	%line{51} %argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:49
+# 						if (d == udim){
+	assign		$tmp23 ___343_d 	%line{49} %argrw{"wr"}
+	add		___343_d ___343_d $const2 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:57
+# 					if (cur_udim == udim){
+	aref		$tmp24 ___339_udim_array ___340_i 	%line{57} %argrw{"wrr"}
+	stoi		___346_cur_udim $tmp24 	%argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:58
+# 						udim_result += 1;
+	eq		$tmp25 ___346_cur_udim udim 	%line{58} %argrw{"wrr"}
+	if		$tmp25 44 44 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:59
+# 					}
+	add		___339_udim_result ___339_udim_result $const2 	%line{59} %argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:40
+# 				// iteration works by default because "null" is silently ignored
+	assign		$tmp26 ___340_i 	%line{40} %argrw{"wr"}
+	add		___340_i ___340_i $const2 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:64
+# 
+	functioncall	$const11 49 	%line{64} %argrw{"r"}
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:142
+# int    clamp (int x, int minval, int maxval) { return max(min(x,maxval),minval); }
+	min		$tmp28 ___339_udim_result $const2 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{142} %argrw{"wrr"}
+	max		$tmp27 $tmp28 $const9 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:64
+# 
+	assign		out $tmp27 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl"} %line{64} %argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:68
+# 			out = 0;
+	warning		$const12 UDIMs $const13 	%line{68} %argrw{"rrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_udim_mask.osl:69
+# 		}
+	assign		out $const9 	%line{69} %argrw{"wr"}
+	end

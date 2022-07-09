@@ -694,11 +694,11 @@ class AbsRsvObj(
 
     def _get_work_directory_is_enable_(self):
         directory_path = self.__get_src_directory_path_()
-        return bsc_core.DirectoryOpt(directory_path).get_is_exists()
+        return bsc_core.StorageDirectoryOpt(directory_path).get_is_exists()
 
     def _set_work_directory_open_(self):
         directory_path = self.__get_src_directory_path_()
-        bsc_core.DirectoryOpt(directory_path).set_open()
+        bsc_core.StorageDirectoryOpt(directory_path).set_open_in_system()
 
     def _get_publish_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
@@ -712,19 +712,19 @@ class AbsRsvObj(
 
     def _get_publish_directory_is_enable_(self):
         directory_path = self._get_publish_directory_path_()
-        return bsc_core.DirectoryOpt(directory_path).get_is_exists()
+        return bsc_core.StorageDirectoryOpt(directory_path).get_is_exists()
 
     def _set_publish_directory_open_(self):
         directory_path = self._get_publish_directory_path_()
-        bsc_core.DirectoryOpt(directory_path).set_open()
+        bsc_core.StorageDirectoryOpt(directory_path).set_open_in_system()
 
     def _get_output_directory_is_enable_(self):
         directory_path = self._get_output_directory_path_()
-        return bsc_core.DirectoryOpt(directory_path).get_is_exists()
+        return bsc_core.StorageDirectoryOpt(directory_path).get_is_exists()
 
     def _set_output_directory_open_(self):
         directory_path = self._get_output_directory_path_()
-        bsc_core.DirectoryOpt(directory_path).set_open()
+        bsc_core.StorageDirectoryOpt(directory_path).set_open_in_system()
     @property
     def rsv_project(self):
         return self._rsv_project
@@ -1132,10 +1132,10 @@ class AbsRsvTask(
     def get_work_scene_src_directory_open_menu_raw(self):
         def add_fnc_(application_):
             def get_directory_is_exists_fnc_():
-                return bsc_core.DirectoryOpt(_directory_path).get_is_exists()
+                return bsc_core.StorageDirectoryOpt(_directory_path).get_is_exists()
 
             def set_directory_open_fnc_():
-                bsc_core.DirectoryOpt(_directory_path).set_open()
+                bsc_core.StorageDirectoryOpt(_directory_path).set_open_in_system()
             #
             _branch = self.properties.get('branch')
             _keyword = '{}-work-{}-scene-src-dir'.format(_branch, application_)

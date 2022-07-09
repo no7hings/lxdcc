@@ -1283,7 +1283,7 @@ class AbsObjOsDef(object):
     def get_is_writeable(self):
         return bsc_core.StoragePathMtd.get_is_writeable(self.path)
 
-    def set_link_to(self, tgt_path, force=False):
+    def set_link_to(self, *args, **kwargs):
         pass
 
 

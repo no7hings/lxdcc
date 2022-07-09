@@ -39,6 +39,8 @@ look-pass: '{look_pass}'
 quality: '{quality}'
 render-pass: '{render_pass}'
 #
+variant: '{variant}'
+#
 asset-shot-name: '{asset_shot}'
 shot-asset-name: '{shot_asset}'
 #
@@ -182,7 +184,7 @@ asset-work-texture-workspace-file: <asset-task-dir>/texture/workspace.yml
 asset-work-outsource-texture-dir: <asset-task-dir>/outsource/texture/<version-name>
 #
 asset-work-texture-base-dir: <asset-task-dir>/textue-base
-asset-work-texture-dir: <asset-task-dir>/texture/<layer>/<version-name>
+asset-work-texture-dir: <asset-task-dir>/texture/<variant>/<version-name>
 asset-work-texture-src-dir: <asset-work-texture-dir>/src
 asset-work-texture-tx-dir: <asset-work-texture-dir>/tx
 #

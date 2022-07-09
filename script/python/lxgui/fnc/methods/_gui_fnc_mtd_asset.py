@@ -313,7 +313,7 @@ class AbsLibMethodFileDef(object):
         file_path_tgt = rsv_unit_file_tgt.get_result(version='v001')
         if file_path_src:
             utl_dcc_objects.OsFile(file_path_src).set_link_to(
-                file_path_tgt, force=True
+                file_path_tgt, replace=True
             )
 
 

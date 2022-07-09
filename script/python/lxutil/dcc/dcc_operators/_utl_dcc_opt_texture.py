@@ -482,13 +482,13 @@ class DccTexturesOpt(object):
                 for i_port_path, i_file_path in obj.reference_raw.items():
                     i_texture = utl_dcc_objects.OsTexture(i_file_path)
                     #
-                    src_name_base = i_texture.name_base
-                    src_ext = i_texture.ext
+                    i_name_base_src = i_texture.name_base
+                    i_ext_src = i_texture.ext
                     #
-                    src_ext_key = src_ext.lower()
+                    i_ext_key_src = i_ext_src.lower()
                     #
                     search_name_bases = search_dict.keys()
-                    name_base_fnmatch_pattern = bsc_core.MultiplyPatternMtd.to_fnmatch_style(src_name_base)
+                    name_base_fnmatch_pattern = bsc_core.MultiplyPatternMtd.to_fnmatch_style(i_name_base_src)
                     #
                     match_name_base_keys = fnmatch.filter(search_name_bases, name_base_fnmatch_pattern)
                     if match_name_base_keys:
@@ -496,14 +496,15 @@ class DccTexturesOpt(object):
                         ext_search_dict = search_dict[tgt_name_base]
                         #
                         search_ext_keys = ext_search_dict.keys()
-                        if src_ext_key in search_ext_keys:
-                            search_ext_keys.remove(src_ext_key)
-                            search_ext_keys.insert(0, src_ext_key)
+                        if i_ext_key_src in search_ext_keys:
+                            search_ext_keys.remove(i_ext_key_src)
+                            search_ext_keys.insert(0, i_ext_key_src)
                         #
                         matches = [i for search_ext in search_ext_keys for i in ext_search_dict.get(search_ext, [])]
                         if matches:
                             tgt_directory_path, tgt_name_base, ext_tgt = matches[0]
-                            tgt_name_base = src_name_base
+                            #
+                            tgt_name_base = i_name_base_src
                             target_file_path = u'{}/{}{}'.format(tgt_directory_path, tgt_name_base, ext_tgt)
                             port = obj.get_port(i_port_path)
                             tgt_texture_file_obj = utl_dcc_objects.OsTexture(target_file_path)

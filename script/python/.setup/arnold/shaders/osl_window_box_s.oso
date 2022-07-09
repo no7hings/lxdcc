@@ -1,792 +1,812 @@
 OpenShadingLanguage 1.00
 # Compiled by oslc 1.11.6
-# options: -o /home/dongchangbao/packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.oso.9350-669e-d9a1-28d7.tmp -I/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include
+# options: -o /home/dongchangbao/packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.oso.cf4d-4361-b3ac-9a9d.tmp -I/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include
 shader osl_window_box_s
-param	int	space	0		%meta{string,widget,"enumerate"} %meta{string,options,"x|-x|y|-y|z|-z"}  %read{28,77} %write{2147483647,-1}
-param	string	filename	""		%meta{string,widget,"filename"}  %read{298,310} %write{2147483647,-1}
-param	int	texture_flip	1		%meta{string,widget,"boolean"}  %read{15,282} %write{2147483647,-1} %derivs
-param	int	texture_flop	0		%meta{string,widget,"boolean"}  %read{20,269} %write{2147483647,-1} %derivs
+param	int	space	0		%meta{string,widget,"enumerate"} %meta{string,options,"x|-x|y|-y|z|-z"}  %read{29,75} %write{2147483647,-1}
+param	string	filename	""		%meta{string,widget,"filename"}  %read{306,318} %write{2147483647,-1}
+param	int	texture_flip	0		%meta{string,widget,"boolean"}  %read{21,265} %write{2147483647,-1} %derivs
+param	int	texture_flop	1		%meta{string,widget,"boolean"}  %read{15,286} %write{2147483647,-1} %derivs
 param	float	room_depth	1		%meta{float,min,0.100000001} %meta{float,max,100}  %read{1,1} %write{2147483647,-1} %derivs
 param	float	width_overscan	0		%meta{float,min,0} %meta{float,max,0.899999976}  %read{8,8} %write{2147483647,-1} %derivs
 param	float	height_overscan	0		%meta{float,min,0} %meta{float,max,0.899999976}  %read{4,4} %write{2147483647,-1} %derivs
-param	int	midground_enable	0		%meta{string,widget,"boolean"}  %read{299,299} %write{2147483647,-1}
 param	float	midground_depth	0.5		%meta{float,min,0.0500000007} %meta{float,max,99}  %read{13,13} %write{2147483647,-1} %derivs
-param	float	midground_offset_x	0		%read{23,23} %write{2147483647,-1} %derivs
-param	float	midground_offset_y	0		%read{18,18} %write{2147483647,-1} %derivs
-param	vector	add	0 0 0		%read{99,99} %write{2147483647,-1} %derivs
-param	vector	multiply	1 1 1		%read{98,98} %write{2147483647,-1} %derivs
-param	int	curtains_enable	0		%meta{string,widget,"boolean"}  %read{306,306} %write{2147483647,-1}
-oparam	color	out_rgb	0 0 0		%read{2147483647,-1} %write{312,312}
-global	vector	I	%read{25,25} %write{2147483647,-1} %derivs
-global	float	u	%read{100,105} %write{2147483647,-1} %derivs
-global	float	v	%read{100,105} %write{2147483647,-1} %derivs
-local	float	room_depthMult	%read{11,215} %write{2,2} %derivs
-local	float	height_overscanMult	%read{36,108} %write{6,6} %derivs
-local	float	width_overscanMult	%read{36,108} %write{10,10} %derivs
-local	float	midground_depthMult	%read{120,233} %write{14,14} %derivs
-local	float	midgroundOffY	%read{251,251} %write{19,19} %derivs
-local	float	midgroundOffX	%read{251,251} %write{24,24} %derivs
-local	vector	objI	%read{30,229} %write{27,99} %derivs
-local	color	objPOrig	%read{260,260} %write{104,104} %derivs
-local	color	objP	%read{114,231} %write{111,111} %derivs
-local	vector	sections	%read{114,206} %write{113,113} %derivs
-local	color	baseDepth	%read{125,130} %write{117,117} %derivs
-local	color	mgDepth	%read{2147483647,-1} %write{121,121}
-local	color	baseBack	%read{210,228} %write{124,124} %derivs
-local	color	baseWidth	%read{134,138} %write{125,125} %derivs
-local	color	baseDepthX	%read{148,148} %write{129,129} %derivs
-local	color	baseDepthY	%read{142,142} %write{133,133} %derivs
-local	color	baseWidthX	%read{144,144} %write{137,137} %derivs
-local	color	baseWidthY	%read{146,146} %write{141,141} %derivs
-local	float	horizU	%read{150,222} %write{143,143} %derivs
-local	float	vertU	%read{181,186} %write{145,145} %derivs
-local	float	horizV	%read{151,156} %write{147,147} %derivs
-local	float	vertV	%read{180,223} %write{149,149} %derivs
-local	float	sideWallsMask	%read{162,175} %write{155,155} %derivs
-local	color	sideWallsUV	%read{161,167} %write{157,157} %derivs
-local	color	rWallUV	%read{266,266} %write{164,164} %derivs
-local	color	lWallUV	%read{173,267} %write{171,179} %derivs
-local	float	FloorCeilMask	%read{192,205} %write{185,185} %derivs
-local	color	FloorCeilUV	%read{191,197} %write{187,187} %derivs
-local	color	ceilUV	%read{265,265} %write{194,194} %derivs
-local	color	floorUV	%read{203,265} %write{201,209} %derivs
-local	color	backWallUV	%read{268,268} %write{226,226} %derivs
-local	color	midgroundUV	%read{237,302} %write{236,291} %derivs
-local	float	midgroundMask	%read{253,253} %write{250,250} %derivs
-local	color	curtainsUV	%read{262,309} %write{260,295} %derivs
-local	color	finalUV	%read{279,297} %write{268,286} %derivs
-local	color	roomRGB	%read{304,305} %write{298,298}
-local	color	finalRGB	%read{311,312} %write{304,311}
-local	float	___346_midgroundA	%read{304,304} %write{303,303}
-local	color	___346_midgroundRGB	%read{304,304} %write{303,303}
-local	float	___348_curtainsA	%read{311,311} %write{310,310}
-local	color	___348_curtainsRGB	%read{311,311} %write{310,310}
-const	float	$const1	0.100000001		%read{2,24} %write{2147483647,-1}
+param	float	midground_offset_x	0		%read{19,19} %write{2147483647,-1} %derivs
+param	float	midground_offset_y	0		%read{25,25} %write{2147483647,-1} %derivs
+param	vector	add	0 0 0		%read{97,97} %write{2147483647,-1} %derivs
+param	vector	multiply	1 1 1		%read{96,96} %write{2147483647,-1} %derivs
+param	int	curtains_enable	1		%meta{string,widget,"boolean"}  %read{314,314} %write{2147483647,-1}
+param	int	midground_enable	1		%meta{string,widget,"boolean"}  %read{307,307} %write{2147483647,-1}
+oparam	color	out_rgb	0 0 0		%read{2147483647,-1} %write{320,320}
+global	vector	I	%read{28,28} %write{2147483647,-1} %derivs
+global	float	u	%read{98,103} %write{2147483647,-1} %derivs
+global	float	v	%read{98,103} %write{2147483647,-1} %derivs
+local	float	room_depthMult	%read{11,213} %write{2,2} %derivs
+local	float	height_overscanMult	%read{36,106} %write{6,6} %derivs
+local	float	width_overscanMult	%read{36,106} %write{10,10} %derivs
+local	float	mid_ground_depth_mult	%read{118,231} %write{14,14} %derivs
+local	float	mid_ground_off_x	%read{249,249} %write{20,20} %derivs
+local	float	mid_ground_off_y	%read{249,249} %write{26,26} %derivs
+local	vector	objI	%read{31,227} %write{28,97} %derivs
+local	color	objPOrig	%read{258,258} %write{102,102} %derivs
+local	color	objP	%read{112,229} %write{109,109} %derivs
+local	vector	sections	%read{112,204} %write{111,111} %derivs
+local	color	baseDepth	%read{123,128} %write{115,115} %derivs
+local	color	mgDepth	%read{2147483647,-1} %write{119,119}
+local	color	baseBack	%read{208,226} %write{122,122} %derivs
+local	color	baseWidth	%read{132,136} %write{123,123} %derivs
+local	color	baseDepthX	%read{146,146} %write{127,127} %derivs
+local	color	baseDepthY	%read{140,140} %write{131,131} %derivs
+local	color	baseWidthX	%read{142,142} %write{135,135} %derivs
+local	color	baseWidthY	%read{144,144} %write{139,139} %derivs
+local	float	horizU	%read{148,220} %write{141,141} %derivs
+local	float	vertU	%read{179,184} %write{143,143} %derivs
+local	float	horizV	%read{149,154} %write{145,145} %derivs
+local	float	vertV	%read{178,221} %write{147,147} %derivs
+local	float	sideWallsMask	%read{160,173} %write{153,153} %derivs
+local	color	sideWallsUV	%read{159,165} %write{155,155} %derivs
+local	color	rWallUV	%read{262,262} %write{162,162} %derivs
+local	color	lWallUV	%read{171,263} %write{169,177} %derivs
+local	float	FloorCeilMask	%read{190,203} %write{183,183} %derivs
+local	color	FloorCeilUV	%read{189,195} %write{185,185} %derivs
+local	color	ceilUV	%read{261,261} %write{192,192} %derivs
+local	color	floorUV	%read{201,261} %write{199,207} %derivs
+local	color	backWallUV	%read{264,264} %write{224,224} %derivs
+local	color	mid_ground_uv	%read{235,310} %write{234,301} %derivs
+local	float	mid_ground_mask	%read{251,251} %write{248,248} %derivs
+local	color	curtains_uv	%read{259,317} %write{258,303} %derivs
+local	color	finalUV	%read{277,305} %write{264,290} %derivs
+local	color	room_rgb	%read{312,313} %write{306,306}
+local	color	final_rgb	%read{319,320} %write{312,319}
+local	float	___346_mid_ground_a	%read{312,312} %write{311,311}
+local	color	___346_mid_ground_rgb	%read{312,312} %write{311,311}
+local	float	___348_curtains_a	%read{319,319} %write{318,318}
+local	color	___348_curtains_rgb	%read{319,319} %write{318,318}
+const	float	$const1	0.100000001		%read{2,26} %write{2147483647,-1}
 const	float	$const3	100		%read{1,1} %write{2147483647,-1}
 const	string	$const4	"clamp"		%read{0,12} %write{2147483647,-1}
 temp	float	$tmp1	%read{2,2} %write{1,1} %derivs
-const	int	$const5	1		%read{16,309} %write{2147483647,-1}
+const	int	$const5	1		%read{16,317} %write{2147483647,-1}
 temp	float	$tmp2	%read{6,6} %write{5,5} %derivs
-const	int	$const6	0		%read{28,308} %write{2147483647,-1}
-const	float	$const7	0		%read{5,251} %write{2147483647,-1}
+const	int	$const6	0		%read{29,316} %write{2147483647,-1}
+const	float	$const7	0		%read{5,249} %write{2147483647,-1}
 const	float	$const8	0.899999976		%read{4,8} %write{2147483647,-1}
 temp	float	$tmp3	%read{5,5} %write{4,4} %derivs
-const	float	$const9	1		%read{6,292} %write{2147483647,-1}
+const	float	$const9	1		%read{6,298} %write{2147483647,-1}
 temp	float	$tmp4	%read{10,10} %write{9,9} %derivs
 temp	float	$tmp5	%read{9,9} %write{8,8} %derivs
 const	float	$const10	0.0500000007		%read{14,14} %write{2147483647,-1}
 const	float	$const11	0.00999999978		%read{11,11} %write{2147483647,-1}
 temp	float	$tmp6	%read{13,13} %write{11,11} %derivs
 temp	float	$tmp7	%read{14,14} %write{13,13} %derivs
-const	int	$const12	2		%read{15,228} %write{2147483647,-1}
+const	int	$const12	2		%read{15,226} %write{2147483647,-1}
 temp	int	$tmp8	%read{16,16} %write{15,15} %derivs
 temp	int	$tmp9	%read{17,17} %write{16,16} %derivs
-temp	float	$tmp10	%read{19,19} %write{18,18} %derivs
-temp	float	$tmp11	%read{18,18} %write{17,17} %derivs
-temp	int	$tmp12	%read{21,21} %write{20,20} %derivs
+temp	int	$tmp10	%read{18,18} %write{17,17} %derivs
+temp	float	$tmp11	%read{20,20} %write{19,19} %derivs
+temp	float	$tmp12	%read{19,19} %write{18,18} %derivs
 temp	int	$tmp13	%read{22,22} %write{21,21} %derivs
-temp	float	$tmp14	%read{24,24} %write{23,23} %derivs
-temp	float	$tmp15	%read{23,23} %write{22,22} %derivs
-const	string	$const13	"object"		%read{27,27} %write{2147483647,-1}
-temp	vector	$tmp16	%read{27,27} %write{25,25} %derivs
-const	string	$const14	"transform"		%read{26,26} %write{2147483647,-1}
-const	string	$const15	"common"		%read{27,27} %write{2147483647,-1}
-temp	int	$tmp17	%read{29,29} %write{28,28}
-temp	vector	$tmp18	%read{37,37} %write{35,35} %derivs
-temp	float	$tmp19	%read{35,35} %write{30,30} %derivs
+temp	int	$tmp14	%read{23,23} %write{22,22} %derivs
+temp	int	$tmp15	%read{24,24} %write{23,23} %derivs
+temp	float	$tmp16	%read{26,26} %write{25,25} %derivs
+temp	float	$tmp17	%read{25,25} %write{24,24} %derivs
+const	string	$const13	"object"		%read{28,28} %write{2147483647,-1}
+const	string	$const14	"transform"		%read{27,27} %write{2147483647,-1}
+const	string	$const15	"common"		%read{28,28} %write{2147483647,-1}
+temp	int	$tmp18	%read{30,30} %write{29,29}
+temp	vector	$tmp19	%read{37,37} %write{35,35} %derivs
 temp	float	$tmp20	%read{32,32} %write{31,31} %derivs
 temp	float	$tmp21	%read{35,35} %write{32,32} %derivs
-temp	float	$tmp22	%read{34,34} %write{33,33} %derivs
+temp	float	$tmp22	%read{35,35} %write{33,33} %derivs
 temp	float	$tmp23	%read{35,35} %write{34,34} %derivs
 temp	color	$tmp24	%read{37,37} %write{36,36} %derivs
 temp	int	$tmp25	%read{39,39} %write{38,38}
-temp	vector	$tmp26	%read{47,47} %write{45,45} %derivs
-temp	float	$tmp27	%read{41,41} %write{40,40} %derivs
-temp	float	$tmp28	%read{45,45} %write{41,41} %derivs
+temp	vector	$tmp26	%read{46,46} %write{44,44} %derivs
+temp	float	$tmp27	%read{44,44} %write{40,40} %derivs
+temp	float	$tmp28	%read{44,44} %write{41,41} %derivs
 temp	float	$tmp29	%read{43,43} %write{42,42} %derivs
-temp	float	$tmp30	%read{45,45} %write{43,43} %derivs
-temp	float	$tmp31	%read{45,45} %write{44,44} %derivs
-temp	color	$tmp32	%read{47,47} %write{46,46} %derivs
-temp	int	$tmp33	%read{49,49} %write{48,48}
-temp	vector	$tmp34	%read{57,57} %write{55,55} %derivs
-temp	float	$tmp35	%read{55,55} %write{50,50} %derivs
-temp	float	$tmp36	%read{52,52} %write{51,51} %derivs
-temp	float	$tmp37	%read{55,55} %write{52,52} %derivs
-temp	float	$tmp38	%read{54,54} %write{53,53} %derivs
-temp	float	$tmp39	%read{55,55} %write{54,54} %derivs
-temp	color	$tmp40	%read{57,57} %write{56,56} %derivs
-const	int	$const16	3		%read{58,58} %write{2147483647,-1}
-temp	int	$tmp41	%read{59,59} %write{58,58}
-temp	vector	$tmp42	%read{65,65} %write{63,63} %derivs
-temp	float	$tmp43	%read{63,63} %write{60,60} %derivs
-temp	float	$tmp44	%read{63,63} %write{61,61} %derivs
+temp	float	$tmp30	%read{44,44} %write{43,43} %derivs
+temp	color	$tmp31	%read{46,46} %write{45,45} %derivs
+temp	int	$tmp32	%read{48,48} %write{47,47}
+temp	vector	$tmp33	%read{55,55} %write{53,53} %derivs
+temp	float	$tmp34	%read{50,50} %write{49,49} %derivs
+temp	float	$tmp35	%read{53,53} %write{50,50} %derivs
+temp	float	$tmp36	%read{53,53} %write{51,51} %derivs
+temp	float	$tmp37	%read{53,53} %write{52,52} %derivs
+temp	color	$tmp38	%read{55,55} %write{54,54} %derivs
+const	int	$const16	3		%read{56,56} %write{2147483647,-1}
+temp	int	$tmp39	%read{57,57} %write{56,56}
+temp	vector	$tmp40	%read{66,66} %write{64,64} %derivs
+temp	float	$tmp41	%read{59,59} %write{58,58} %derivs
+temp	float	$tmp42	%read{64,64} %write{59,59} %derivs
+temp	float	$tmp43	%read{61,61} %write{60,60} %derivs
+temp	float	$tmp44	%read{64,64} %write{61,61} %derivs
 temp	float	$tmp45	%read{63,63} %write{62,62} %derivs
-temp	color	$tmp46	%read{65,65} %write{64,64} %derivs
-const	int	$const17	4		%read{66,66} %write{2147483647,-1}
-temp	int	$tmp47	%read{67,67} %write{66,66}
-temp	vector	$tmp48	%read{76,76} %write{74,74} %derivs
-temp	float	$tmp49	%read{69,69} %write{68,68} %derivs
-temp	float	$tmp50	%read{74,74} %write{69,69} %derivs
-temp	float	$tmp51	%read{71,71} %write{70,70} %derivs
-temp	float	$tmp52	%read{74,74} %write{71,71} %derivs
-temp	float	$tmp53	%read{73,73} %write{72,72} %derivs
-temp	float	$tmp54	%read{74,74} %write{73,73} %derivs
-temp	color	$tmp55	%read{76,76} %write{75,75} %derivs
-const	int	$const18	5		%read{77,77} %write{2147483647,-1}
-temp	int	$tmp56	%read{78,78} %write{77,77}
-temp	vector	$tmp57	%read{85,85} %write{83,83} %derivs
-temp	float	$tmp58	%read{83,83} %write{79,79} %derivs
+temp	float	$tmp46	%read{64,64} %write{63,63} %derivs
+temp	color	$tmp47	%read{66,66} %write{65,65} %derivs
+const	int	$const17	4		%read{67,67} %write{2147483647,-1}
+temp	int	$tmp48	%read{68,68} %write{67,67}
+temp	vector	$tmp49	%read{74,74} %write{72,72} %derivs
+temp	float	$tmp50	%read{72,72} %write{69,69} %derivs
+temp	float	$tmp51	%read{72,72} %write{70,70} %derivs
+temp	float	$tmp52	%read{72,72} %write{71,71} %derivs
+temp	color	$tmp53	%read{74,74} %write{73,73} %derivs
+const	int	$const18	5		%read{75,75} %write{2147483647,-1}
+temp	int	$tmp54	%read{76,76} %write{75,75}
+temp	vector	$tmp55	%read{84,84} %write{82,82} %derivs
+temp	float	$tmp56	%read{78,78} %write{77,77} %derivs
+temp	float	$tmp57	%read{82,82} %write{78,78} %derivs
+temp	float	$tmp58	%read{82,82} %write{79,79} %derivs
 temp	float	$tmp59	%read{81,81} %write{80,80} %derivs
-temp	float	$tmp60	%read{83,83} %write{81,81} %derivs
-temp	float	$tmp61	%read{83,83} %write{82,82} %derivs
-temp	color	$tmp62	%read{85,85} %write{84,84} %derivs
-temp	vector	$tmp63	%read{93,93} %write{91,91} %derivs
+temp	float	$tmp60	%read{82,82} %write{81,81} %derivs
+temp	color	$tmp61	%read{84,84} %write{83,83} %derivs
+temp	vector	$tmp62	%read{91,91} %write{89,89} %derivs
+temp	float	$tmp63	%read{89,89} %write{85,85} %derivs
 temp	float	$tmp64	%read{87,87} %write{86,86} %derivs
-temp	float	$tmp65	%read{91,91} %write{87,87} %derivs
-temp	float	$tmp66	%read{91,91} %write{88,88} %derivs
-temp	float	$tmp67	%read{90,90} %write{89,89} %derivs
-temp	float	$tmp68	%read{91,91} %write{90,90} %derivs
-temp	color	$tmp69	%read{93,93} %write{92,92} %derivs
-temp	vector	$tmp70	%read{98,98} %write{97,97} %derivs
-temp	float	$tmp71	%read{97,97} %write{94,94} %derivs
-temp	float	$tmp72	%read{97,97} %write{95,95} %derivs
-temp	float	$tmp73	%read{97,97} %write{96,96} %derivs
-temp	vector	$tmp74	%read{99,99} %write{98,98} %derivs
+temp	float	$tmp65	%read{89,89} %write{87,87} %derivs
+temp	float	$tmp66	%read{89,89} %write{88,88} %derivs
+temp	color	$tmp67	%read{91,91} %write{90,90} %derivs
+temp	vector	$tmp68	%read{96,96} %write{95,95} %derivs
+temp	float	$tmp69	%read{95,95} %write{92,92} %derivs
+temp	float	$tmp70	%read{95,95} %write{93,93} %derivs
+temp	float	$tmp71	%read{95,95} %write{94,94} %derivs
+temp	vector	$tmp72	%read{97,97} %write{96,96} %derivs
+temp	color	$tmp73	%read{99,99} %write{98,98} %derivs
+const	float	$const19	0.5		%read{98,147} %write{2147483647,-1}
+temp	color	$tmp74	%read{100,100} %write{99,99} %derivs
+const	float	$const20	2		%read{99,269} %write{2147483647,-1}
 temp	color	$tmp75	%read{101,101} %write{100,100} %derivs
-const	float	$const19	0.5		%read{100,149} %write{2147483647,-1}
 temp	color	$tmp76	%read{102,102} %write{101,101} %derivs
-const	float	$const20	2		%read{101,289} %write{2147483647,-1}
-temp	color	$tmp77	%read{103,103} %write{102,102} %derivs
-temp	color	$tmp78	%read{104,104} %write{103,103} %derivs
-temp	color	$tmp79	%read{106,106} %write{105,105} %derivs
+temp	color	$tmp77	%read{104,104} %write{103,103} %derivs
+temp	color	$tmp78	%read{105,105} %write{104,104} %derivs
+temp	color	$tmp79	%read{107,107} %write{105,105} %derivs
 temp	color	$tmp80	%read{107,107} %write{106,106} %derivs
-temp	color	$tmp81	%read{109,109} %write{107,107} %derivs
+temp	color	$tmp81	%read{108,108} %write{107,107} %derivs
 temp	color	$tmp82	%read{109,109} %write{108,108} %derivs
-temp	color	$tmp83	%read{110,110} %write{109,109} %derivs
-temp	color	$tmp84	%read{111,111} %write{110,110} %derivs
-temp	vector	$tmp85	%read{113,113} %write{112,112} %derivs
-temp	color	$tmp86	%read{117,117} %write{114,114} %derivs
-temp	vector	$tmp87	%read{116,116} %write{115,115} %derivs
-temp	vector	$tmp88	%read{117,117} %write{116,116} %derivs
-temp	color	$tmp89	%read{121,121} %write{118,118}
-temp	vector	$tmp90	%read{120,120} %write{119,119}
-temp	vector	$tmp91	%read{121,121} %write{120,120}
-temp	color	$tmp92	%read{124,124} %write{122,122} %derivs
-temp	vector	$tmp93	%read{124,124} %write{123,123} %derivs
-temp	float	$tmp94	%read{127,127} %write{126,126} %derivs
-temp	vector	$tmp95	%read{128,128} %write{127,127} %derivs
-temp	vector	$tmp96	%read{129,129} %write{128,128} %derivs
-temp	float	$tmp97	%read{131,131} %write{130,130} %derivs
-temp	vector	$tmp98	%read{132,132} %write{131,131} %derivs
-temp	vector	$tmp99	%read{133,133} %write{132,132} %derivs
-temp	float	$tmp100	%read{135,135} %write{134,134} %derivs
-temp	vector	$tmp101	%read{136,136} %write{135,135} %derivs
-temp	vector	$tmp102	%read{137,137} %write{136,136} %derivs
-temp	float	$tmp103	%read{139,139} %write{138,138} %derivs
-temp	vector	$tmp104	%read{140,140} %write{139,139} %derivs
-temp	vector	$tmp105	%read{141,141} %write{140,140} %derivs
-temp	float	$tmp106	%read{143,143} %write{142,142} %derivs
-temp	float	$tmp107	%read{145,145} %write{144,144} %derivs
-temp	float	$tmp108	%read{147,147} %write{146,146} %derivs
-temp	float	$tmp109	%read{149,149} %write{148,148} %derivs
-temp	float	$tmp110	%read{155,155} %write{150,150} %derivs
-temp	float	$tmp111	%read{155,155} %write{154,154} %derivs
-temp	float	$tmp112	%read{153,153} %write{152,152} %derivs
-temp	float	$tmp113	%read{152,152} %write{151,151} %derivs
-temp	float	$tmp114	%read{154,154} %write{153,153} %derivs
-temp	color	$tmp115	%read{157,157} %write{156,156} %derivs
-const	float	$const21	3		%read{157,292} %write{2147483647,-1}
-temp	color	$tmp116	%read{161,161} %write{160,160} %derivs
-temp	float	$tmp117	%read{160,160} %write{158,158} %derivs
-temp	float	$tmp118	%read{160,160} %write{159,159} %derivs
-temp	color	$tmp119	%read{162,162} %write{161,161} %derivs
-temp	color	$tmp120	%read{164,164} %write{162,162} %derivs
+temp	vector	$tmp83	%read{111,111} %write{110,110} %derivs
+temp	color	$tmp84	%read{115,115} %write{112,112} %derivs
+temp	vector	$tmp85	%read{114,114} %write{113,113} %derivs
+temp	vector	$tmp86	%read{115,115} %write{114,114} %derivs
+temp	color	$tmp87	%read{119,119} %write{116,116}
+temp	vector	$tmp88	%read{118,118} %write{117,117}
+temp	vector	$tmp89	%read{119,119} %write{118,118}
+temp	color	$tmp90	%read{122,122} %write{120,120} %derivs
+temp	vector	$tmp91	%read{122,122} %write{121,121} %derivs
+temp	float	$tmp92	%read{125,125} %write{124,124} %derivs
+temp	vector	$tmp93	%read{126,126} %write{125,125} %derivs
+temp	vector	$tmp94	%read{127,127} %write{126,126} %derivs
+temp	float	$tmp95	%read{129,129} %write{128,128} %derivs
+temp	vector	$tmp96	%read{130,130} %write{129,129} %derivs
+temp	vector	$tmp97	%read{131,131} %write{130,130} %derivs
+temp	float	$tmp98	%read{133,133} %write{132,132} %derivs
+temp	vector	$tmp99	%read{134,134} %write{133,133} %derivs
+temp	vector	$tmp100	%read{135,135} %write{134,134} %derivs
+temp	float	$tmp101	%read{137,137} %write{136,136} %derivs
+temp	vector	$tmp102	%read{138,138} %write{137,137} %derivs
+temp	vector	$tmp103	%read{139,139} %write{138,138} %derivs
+temp	float	$tmp104	%read{141,141} %write{140,140} %derivs
+temp	float	$tmp105	%read{143,143} %write{142,142} %derivs
+temp	float	$tmp106	%read{145,145} %write{144,144} %derivs
+temp	float	$tmp107	%read{147,147} %write{146,146} %derivs
+temp	float	$tmp108	%read{153,153} %write{148,148} %derivs
+temp	float	$tmp109	%read{153,153} %write{152,152} %derivs
+temp	float	$tmp110	%read{151,151} %write{150,150} %derivs
+temp	float	$tmp111	%read{150,150} %write{149,149} %derivs
+temp	float	$tmp112	%read{152,152} %write{151,151} %derivs
+temp	color	$tmp113	%read{155,155} %write{154,154} %derivs
+const	float	$const21	3		%read{155,298} %write{2147483647,-1}
+temp	color	$tmp114	%read{159,159} %write{158,158} %derivs
+temp	float	$tmp115	%read{158,158} %write{156,156} %derivs
+temp	float	$tmp116	%read{158,158} %write{157,157} %derivs
+temp	color	$tmp117	%read{160,160} %write{159,159} %derivs
+temp	color	$tmp118	%read{162,162} %write{160,160} %derivs
+temp	float	$tmp119	%read{162,162} %write{161,161} %derivs
+temp	color	$tmp120	%read{165,165} %write{164,164} %derivs
 temp	float	$tmp121	%read{164,164} %write{163,163} %derivs
-temp	color	$tmp122	%read{167,167} %write{166,166} %derivs
-temp	float	$tmp123	%read{166,166} %write{165,165} %derivs
-temp	color	$tmp124	%read{168,168} %write{167,167} %derivs
-temp	color	$tmp125	%read{171,171} %write{168,168} %derivs
-temp	float	$tmp126	%read{170,170} %write{169,169} %derivs
-temp	float	$tmp127	%read{171,171} %write{170,170} %derivs
-temp	float	$tmp128	%read{174,174} %write{172,172} %derivs
-temp	float	$tmp129	%read{174,174} %write{173,173} %derivs
+temp	color	$tmp122	%read{166,166} %write{165,165} %derivs
+temp	color	$tmp123	%read{169,169} %write{166,166} %derivs
+temp	float	$tmp124	%read{168,168} %write{167,167} %derivs
+temp	float	$tmp125	%read{169,169} %write{168,168} %derivs
+temp	float	$tmp126	%read{172,172} %write{170,170} %derivs
+temp	float	$tmp127	%read{172,172} %write{171,171} %derivs
+temp	float	$tmp128	%read{173,173} %write{172,172} %derivs
+temp	float	$tmp129	%read{176,176} %write{173,173} %derivs
 temp	float	$tmp130	%read{175,175} %write{174,174} %derivs
-temp	float	$tmp131	%read{178,178} %write{175,175} %derivs
+temp	float	$tmp131	%read{176,176} %write{175,175} %derivs
 temp	float	$tmp132	%read{177,177} %write{176,176} %derivs
-temp	float	$tmp133	%read{178,178} %write{177,177} %derivs
-temp	float	$tmp134	%read{179,179} %write{178,178} %derivs
-temp	float	$tmp135	%read{185,185} %write{180,180} %derivs
-temp	float	$tmp136	%read{185,185} %write{184,184} %derivs
-temp	float	$tmp137	%read{183,183} %write{182,182} %derivs
-temp	float	$tmp138	%read{182,182} %write{181,181} %derivs
-temp	float	$tmp139	%read{184,184} %write{183,183} %derivs
-temp	color	$tmp140	%read{187,187} %write{186,186} %derivs
-temp	color	$tmp141	%read{191,191} %write{190,190} %derivs
-temp	float	$tmp142	%read{190,190} %write{188,188} %derivs
-temp	float	$tmp143	%read{190,190} %write{189,189} %derivs
-temp	color	$tmp144	%read{192,192} %write{191,191} %derivs
-temp	color	$tmp145	%read{194,194} %write{192,192} %derivs
+temp	float	$tmp133	%read{183,183} %write{178,178} %derivs
+temp	float	$tmp134	%read{183,183} %write{182,182} %derivs
+temp	float	$tmp135	%read{181,181} %write{180,180} %derivs
+temp	float	$tmp136	%read{180,180} %write{179,179} %derivs
+temp	float	$tmp137	%read{182,182} %write{181,181} %derivs
+temp	color	$tmp138	%read{185,185} %write{184,184} %derivs
+temp	color	$tmp139	%read{189,189} %write{188,188} %derivs
+temp	float	$tmp140	%read{188,188} %write{186,186} %derivs
+temp	float	$tmp141	%read{188,188} %write{187,187} %derivs
+temp	color	$tmp142	%read{190,190} %write{189,189} %derivs
+temp	color	$tmp143	%read{192,192} %write{190,190} %derivs
+temp	float	$tmp144	%read{192,192} %write{191,191} %derivs
+temp	color	$tmp145	%read{195,195} %write{194,194} %derivs
 temp	float	$tmp146	%read{194,194} %write{193,193} %derivs
-temp	color	$tmp147	%read{197,197} %write{196,196} %derivs
-temp	float	$tmp148	%read{196,196} %write{195,195} %derivs
-temp	color	$tmp149	%read{198,198} %write{197,197} %derivs
-temp	color	$tmp150	%read{201,201} %write{198,198} %derivs
-temp	float	$tmp151	%read{200,200} %write{199,199} %derivs
-temp	float	$tmp152	%read{201,201} %write{200,200} %derivs
-temp	float	$tmp153	%read{204,204} %write{202,202} %derivs
-temp	float	$tmp154	%read{204,204} %write{203,203} %derivs
+temp	color	$tmp147	%read{196,196} %write{195,195} %derivs
+temp	color	$tmp148	%read{199,199} %write{196,196} %derivs
+temp	float	$tmp149	%read{198,198} %write{197,197} %derivs
+temp	float	$tmp150	%read{199,199} %write{198,198} %derivs
+temp	float	$tmp151	%read{202,202} %write{200,200} %derivs
+temp	float	$tmp152	%read{202,202} %write{201,201} %derivs
+temp	float	$tmp153	%read{203,203} %write{202,202} %derivs
+temp	float	$tmp154	%read{206,206} %write{203,203} %derivs
 temp	float	$tmp155	%read{205,205} %write{204,204} %derivs
-temp	float	$tmp156	%read{208,208} %write{205,205} %derivs
+temp	float	$tmp156	%read{206,206} %write{205,205} %derivs
 temp	float	$tmp157	%read{207,207} %write{206,206} %derivs
-temp	float	$tmp158	%read{208,208} %write{207,207} %derivs
-temp	float	$tmp159	%read{209,209} %write{208,208} %derivs
-temp	float	$tmp160	%read{211,211} %write{210,210} %derivs
-temp	vector	$tmp161	%read{214,214} %write{211,211} %derivs
-temp	color	$tmp162	%read{213,213} %write{212,212} %derivs
-temp	color	$tmp163	%read{214,214} %write{213,213} %derivs
-temp	vector	$tmp164	%read{216,216} %write{214,214} %derivs
-temp	float	$tmp165	%read{216,216} %write{215,215} %derivs
-temp	vector	$tmp166	%read{217,217} %write{216,216} %derivs
-temp	vector	$tmp167	%read{221,221} %write{217,217} %derivs
-temp	color	$tmp168	%read{221,221} %write{220,220} %derivs
-temp	float	$tmp169	%read{220,220} %write{218,218} %derivs
-temp	float	$tmp170	%read{220,220} %write{219,219} %derivs
-temp	vector	$tmp171	%read{226,226} %write{221,221} %derivs
-temp	float	$tmp172	%read{225,225} %write{224,224} %derivs
-temp	float	$tmp173	%read{224,224} %write{222,222} %derivs
-temp	float	$tmp174	%read{224,224} %write{223,223} %derivs
-temp	float	$tmp175	%read{226,226} %write{225,225} %derivs
-temp	float	$tmp176	%read{236,236} %write{227,227} %derivs
+temp	float	$tmp158	%read{209,209} %write{208,208} %derivs
+temp	vector	$tmp159	%read{212,212} %write{209,209} %derivs
+temp	color	$tmp160	%read{211,211} %write{210,210} %derivs
+temp	color	$tmp161	%read{212,212} %write{211,211} %derivs
+temp	vector	$tmp162	%read{214,214} %write{212,212} %derivs
+temp	float	$tmp163	%read{214,214} %write{213,213} %derivs
+temp	vector	$tmp164	%read{215,215} %write{214,214} %derivs
+temp	vector	$tmp165	%read{219,219} %write{215,215} %derivs
+temp	color	$tmp166	%read{219,219} %write{218,218} %derivs
+temp	float	$tmp167	%read{218,218} %write{216,216} %derivs
+temp	float	$tmp168	%read{218,218} %write{217,217} %derivs
+temp	vector	$tmp169	%read{224,224} %write{219,219} %derivs
+temp	float	$tmp170	%read{223,223} %write{222,222} %derivs
+temp	float	$tmp171	%read{222,222} %write{220,220} %derivs
+temp	float	$tmp172	%read{222,222} %write{221,221} %derivs
+temp	float	$tmp173	%read{224,224} %write{223,223} %derivs
+temp	float	$tmp174	%read{234,234} %write{225,225} %derivs
+temp	float	$tmp175	%read{227,227} %write{226,226} %derivs
+temp	vector	$tmp176	%read{230,230} %write{227,227} %derivs
 temp	float	$tmp177	%read{229,229} %write{228,228} %derivs
-temp	vector	$tmp178	%read{232,232} %write{229,229} %derivs
-temp	float	$tmp179	%read{231,231} %write{230,230} %derivs
-temp	color	$tmp180	%read{232,232} %write{231,231} %derivs
-temp	vector	$tmp181	%read{234,234} %write{232,232} %derivs
-temp	float	$tmp182	%read{234,234} %write{233,233} %derivs
-temp	vector	$tmp183	%read{235,235} %write{234,234} %derivs
-temp	vector	$tmp184	%read{236,236} %write{235,235} %derivs
-temp	float	$tmp185	%read{250,250} %write{243,243} %derivs
+temp	color	$tmp178	%read{230,230} %write{229,229} %derivs
+temp	vector	$tmp179	%read{232,232} %write{230,230} %derivs
+temp	float	$tmp180	%read{232,232} %write{231,231} %derivs
+temp	vector	$tmp181	%read{233,233} %write{232,232} %derivs
+temp	vector	$tmp182	%read{234,234} %write{233,233} %derivs
+temp	float	$tmp183	%read{248,248} %write{241,241} %derivs
+temp	float	$tmp184	%read{236,236} %write{235,235} %derivs
+temp	float	$tmp185	%read{240,240} %write{236,236} %derivs
 temp	float	$tmp186	%read{238,238} %write{237,237} %derivs
-temp	float	$tmp187	%read{242,242} %write{238,238} %derivs
+temp	float	$tmp187	%read{239,239} %write{238,238} %derivs
 temp	float	$tmp188	%read{240,240} %write{239,239} %derivs
 temp	float	$tmp189	%read{241,241} %write{240,240} %derivs
-temp	float	$tmp190	%read{242,242} %write{241,241} %derivs
-temp	float	$tmp191	%read{243,243} %write{242,242} %derivs
-temp	float	$tmp192	%read{250,250} %write{249,249} %derivs
-temp	float	$tmp193	%read{248,248} %write{244,244} %derivs
-temp	float	$tmp194	%read{247,247} %write{245,245} %derivs
+temp	float	$tmp190	%read{248,248} %write{247,247} %derivs
+temp	float	$tmp191	%read{246,246} %write{242,242} %derivs
+temp	float	$tmp192	%read{245,245} %write{243,243} %derivs
+temp	float	$tmp193	%read{245,245} %write{244,244} %derivs
+temp	float	$tmp194	%read{246,246} %write{245,245} %derivs
 temp	float	$tmp195	%read{247,247} %write{246,246} %derivs
-temp	float	$tmp196	%read{248,248} %write{247,247} %derivs
-temp	float	$tmp197	%read{249,249} %write{248,248} %derivs
-temp	color	$tmp198	%read{252,252} %write{251,251} %derivs
-temp	color	$tmp199	%read{253,253} %write{252,252} %derivs
-temp	float	$tmp200	%read{255,255} %write{254,254} %derivs
-temp	float	$tmp201	%read{256,256} %write{255,255} %derivs
-temp	color	$tmp202	%read{260,260} %write{259,259} %derivs
-temp	float	$tmp203	%read{259,259} %write{257,257} %derivs
-temp	float	$tmp204	%read{259,259} %write{258,258} %derivs
-temp	float	$tmp205	%read{263,263} %write{261,261} %derivs
-temp	float	$tmp206	%read{263,263} %write{262,262} %derivs
-temp	float	$tmp207	%read{264,264} %write{263,263} %derivs
-temp	color	$tmp208	%read{266,266} %write{265,265} %derivs
-temp	color	$tmp209	%read{267,267} %write{266,266} %derivs
-temp	color	$tmp210	%read{268,268} %write{267,267} %derivs
-temp	int	$tmp211	%read{270,270} %write{269,269}
-temp	float	$tmp212	%read{273,273} %write{271,271} %derivs
-temp	float	$tmp213	%read{273,273} %write{272,272} %derivs
-temp	float	$tmp214	%read{274,274} %write{273,273} %derivs
-temp	float	$tmp215	%read{277,277} %write{275,275} %derivs
-temp	float	$tmp216	%read{277,277} %write{276,276} %derivs
-temp	float	$tmp217	%read{278,278} %write{277,277} %derivs
-temp	float	$tmp218	%read{280,280} %write{279,279} %derivs
-temp	float	$tmp219	%read{281,281} %write{280,280} %derivs
-temp	int	$tmp220	%read{283,283} %write{282,282}
+temp	color	$tmp196	%read{250,250} %write{249,249} %derivs
+temp	color	$tmp197	%read{251,251} %write{250,250} %derivs
+temp	float	$tmp198	%read{253,253} %write{252,252} %derivs
+temp	float	$tmp199	%read{254,254} %write{253,253} %derivs
+temp	color	$tmp200	%read{258,258} %write{257,257} %derivs
+temp	float	$tmp201	%read{257,257} %write{255,255} %derivs
+temp	float	$tmp202	%read{257,257} %write{256,256} %derivs
+temp	float	$tmp203	%read{260,260} %write{259,259} %derivs
+temp	color	$tmp204	%read{262,262} %write{261,261} %derivs
+temp	color	$tmp205	%read{263,263} %write{262,262} %derivs
+temp	color	$tmp206	%read{264,264} %write{263,263} %derivs
+temp	int	$tmp207	%read{266,266} %write{265,265}
+temp	float	$tmp208	%read{268,268} %write{267,267} %derivs
+temp	float	$tmp209	%read{270,270} %write{268,268} %derivs
+temp	float	$tmp210	%read{270,270} %write{269,269} %derivs
+temp	float	$tmp211	%read{271,271} %write{270,270} %derivs
+temp	float	$tmp212	%read{273,273} %write{272,272} %derivs
+temp	float	$tmp213	%read{275,275} %write{273,273} %derivs
+temp	float	$tmp214	%read{275,275} %write{274,274} %derivs
+temp	float	$tmp215	%read{276,276} %write{275,275} %derivs
+temp	float	$tmp216	%read{278,278} %write{277,277} %derivs
+temp	float	$tmp217	%read{279,279} %write{278,278} %derivs
+temp	float	$tmp218	%read{281,281} %write{280,280} %derivs
+temp	float	$tmp219	%read{282,282} %write{281,281} %derivs
+temp	float	$tmp220	%read{284,284} %write{283,283} %derivs
 temp	float	$tmp221	%read{285,285} %write{284,284} %derivs
-temp	float	$tmp222	%read{286,286} %write{285,285} %derivs
-temp	float	$tmp223	%read{288,288} %write{287,287} %derivs
-temp	float	$tmp224	%read{290,290} %write{288,288} %derivs
-temp	float	$tmp225	%read{290,290} %write{289,289} %derivs
-temp	float	$tmp226	%read{291,291} %write{290,290} %derivs
-temp	float	$tmp227	%read{294,294} %write{292,292} %derivs
-temp	float	$tmp228	%read{294,294} %write{293,293} %derivs
-temp	float	$tmp229	%read{295,295} %write{294,294} %derivs
-temp	float	$tmp230	%read{298,298} %write{296,296} %derivs
-temp	float	$tmp231	%read{298,298} %write{297,297} %derivs
-temp	int	$tmp232	%read{300,300} %write{299,299}
-temp	float	$tmp233	%read{303,303} %write{301,301} %derivs
-temp	float	$tmp234	%read{303,303} %write{302,302} %derivs
-const	string	$const22	"alpha"		%read{303,310} %write{2147483647,-1}
-temp	int	$tmp235	%read{307,307} %write{306,306}
-temp	float	$tmp236	%read{310,310} %write{308,308} %derivs
-temp	float	$tmp237	%read{310,310} %write{309,309} %derivs
+temp	int	$tmp222	%read{287,287} %write{286,286}
+temp	float	$tmp223	%read{289,289} %write{288,288} %derivs
+temp	float	$tmp224	%read{290,290} %write{289,289} %derivs
+temp	float	$tmp225	%read{292,292} %write{291,291} %derivs
+temp	float	$tmp226	%read{294,294} %write{293,293} %derivs
+temp	float	$tmp227	%read{296,296} %write{294,294} %derivs
+temp	float	$tmp228	%read{296,296} %write{295,295} %derivs
+temp	float	$tmp229	%read{297,297} %write{296,296} %derivs
+temp	float	$tmp230	%read{300,300} %write{298,298} %derivs
+temp	float	$tmp231	%read{300,300} %write{299,299} %derivs
+temp	float	$tmp232	%read{301,301} %write{300,300} %derivs
+temp	float	$tmp233	%read{303,303} %write{302,302} %derivs
+temp	float	$tmp234	%read{306,306} %write{304,304} %derivs
+temp	float	$tmp235	%read{306,306} %write{305,305} %derivs
+temp	int	$tmp236	%read{308,308} %write{307,307}
+temp	float	$tmp237	%read{311,311} %write{309,309} %derivs
+temp	float	$tmp238	%read{311,311} %write{310,310} %derivs
+const	string	$const22	"alpha"		%read{311,318} %write{2147483647,-1}
+temp	int	$tmp239	%read{315,315} %write{314,314}
+temp	float	$tmp240	%read{318,318} %write{316,316} %derivs
+temp	float	$tmp241	%read{318,318} %write{317,317} %derivs
 code ___main___
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:27
-#     float height_overscanMult = 1 - clamp(height_overscan,0,0.9);
+#     float height_overscanMult = 1 - clamp(height_overscan, 0, 0.9);
 	functioncall	$const4 3 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{27} %argrw{"r"}
 # /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
 	min		$tmp1 room_depth $const3 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		room_depthMult $tmp1 $const1 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:28
-#     float width_overscanMult = 1 - clamp(width_overscan,0,0.9);
+#     float width_overscanMult = 1 - clamp(width_overscan, 0, 0.9);
 	functioncall	$const4 6 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{28} %argrw{"r"}
 # /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
 	min		$tmp3 height_overscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp2 $tmp3 $const7 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:28
-#     float width_overscanMult = 1 - clamp(width_overscan,0,0.9);
+#     float width_overscanMult = 1 - clamp(width_overscan, 0, 0.9);
 	sub		height_overscanMult $const9 $tmp2 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{28} %argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:29
-#     float midground_depthMult = clamp(midground_depth,0.05,room_depthMult-0.01);
+#     float mid_ground_depth_mult = clamp(midground_depth, 0.05, room_depthMult - 0.01);
 	functioncall	$const4 10 	%line{29} %argrw{"r"}
 # /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
 	min		$tmp5 width_overscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp4 $tmp5 $const7 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:29
-#     float midground_depthMult = clamp(midground_depth,0.05,room_depthMult-0.01);
+#     float mid_ground_depth_mult = clamp(midground_depth, 0.05, room_depthMult - 0.01);
 	sub		width_overscanMult $const9 $tmp4 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{29} %argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:30
-#     float midgroundOffY = midground_offset_y * (texture_flip*2-1) * 0.1;
+#     // 0=1, 1=-1
 	sub		$tmp6 room_depthMult $const11 	%line{30} %argrw{"wrr"}
 	functioncall	$const4 15 	%argrw{"r"}
 # /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
 	min		$tmp7 midground_depth $tmp6 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
-	max		midground_depthMult $tmp7 $const10 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:31
-#     float midgroundOffX = midground_offset_x * (texture_flop*2-1) * 0.1;
-	mul		$tmp8 texture_flip $const12 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{31} %argrw{"wrr"}
-	sub		$tmp9 $tmp8 $const5 	%argrw{"wrr"}
-	assign		$tmp11 $tmp9 	%argrw{"wr"}
-	mul		$tmp10 midground_offset_y $tmp11 	%argrw{"wrr"}
-	mul		midgroundOffY $tmp10 $const1 	%argrw{"wrr"}
+	max		mid_ground_depth_mult $tmp7 $const10 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:32
+#     float mid_ground_off_y = midground_offset_y * -(texture_flip*2-1) * 0.1;
+	mul		$tmp8 texture_flop $const12 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{32} %argrw{"wrr"}
+	sub		$tmp9 $tmp8 $const5 	%argrw{"wrr"}
+	neg		$tmp10 $tmp9 	%argrw{"wr"}
+	assign		$tmp12 $tmp10 	%argrw{"wr"}
+	mul		$tmp11 midground_offset_x $tmp12 	%argrw{"wrr"}
+	mul		mid_ground_off_x $tmp11 $const1 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:33
 #     //global variables & remapping
-	mul		$tmp12 texture_flop $const12 	%line{32} %argrw{"wrr"}
-	sub		$tmp13 $tmp12 $const5 	%argrw{"wrr"}
-	assign		$tmp15 $tmp13 	%argrw{"wr"}
-	mul		$tmp14 midground_offset_x $tmp15 	%argrw{"wrr"}
-	mul		midgroundOffX $tmp14 $const1 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:35
+	mul		$tmp13 texture_flip $const12 	%line{33} %argrw{"wrr"}
+	sub		$tmp14 $tmp13 $const5 	%argrw{"wrr"}
+	neg		$tmp15 $tmp14 	%argrw{"wr"}
+	assign		$tmp17 $tmp15 	%argrw{"wr"}
+	mul		$tmp16 midground_offset_y $tmp17 	%argrw{"wrr"}
+	mul		mid_ground_off_y $tmp16 $const1 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:36
 #     // x
-	neg		$tmp16 I 	%line{35} %argrw{"wr"}
-	functioncall	$const14 28 	%argrw{"r"}
+	functioncall	$const14 29 	%line{36} %argrw{"r"}
 # /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:262
 # vector transform (string to, vector p) { return transform("common",to,p); }
-	transformv	objI $const15 $const13 $tmp16 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:37
-#       objI = vector(objI[2],-objI[1],-objI[0])*color(width_overscanMult, height_overscanMult, 1);
-	eq		$tmp17 space $const6 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{37} %argrw{"wrr"}
-	if		$tmp17 38 94 	%argrw{"r"}
+	transformv	objI $const15 $const13 I 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:38
+#       objI = vector(-objI[2],objI[1],objI[0])*color(width_overscanMult, height_overscanMult, 1);
+	eq		$tmp18 space $const6 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{38} %argrw{"wrr"}
+	if		$tmp18 38 92 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:39
 #     }
-	compref		$tmp19 objI $const12 	%line{38} %argrw{"wrr"}
-	compref		$tmp20 objI $const5 	%argrw{"wrr"}
+	compref		$tmp20 objI $const12 	%line{39} %argrw{"wrr"}
 	neg		$tmp21 $tmp20 	%argrw{"wr"}
-	compref		$tmp22 objI $const6 	%argrw{"wrr"}
-	neg		$tmp23 $tmp22 	%argrw{"wr"}
-	vector		$tmp18 $tmp19 $tmp21 $tmp23 	%argrw{"wrrr"}
+	compref		$tmp22 objI $const5 	%argrw{"wrr"}
+	compref		$tmp23 objI $const6 	%argrw{"wrr"}
+	vector		$tmp19 $tmp21 $tmp22 $tmp23 	%argrw{"wrrr"}
 	color		$tmp24 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp18 $tmp24 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:41
-#       objI = vector(-objI[2],-objI[1],objI[0])*color(width_overscanMult, height_overscanMult, 1);
-	eq		$tmp25 space $const5 	%line{41} %argrw{"wrr"}
-	if		$tmp25 48 94 	%argrw{"r"}
+	mul		objI $tmp19 $tmp24 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:42
+#       objI = vector(objI[2],objI[1],-objI[0])*color(width_overscanMult, height_overscanMult, 1);
+	eq		$tmp25 space $const5 	%line{42} %argrw{"wrr"}
+	if		$tmp25 47 92 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:43
 #     }
-	compref		$tmp27 objI $const12 	%line{42} %argrw{"wrr"}
-	neg		$tmp28 $tmp27 	%argrw{"wr"}
-	compref		$tmp29 objI $const5 	%argrw{"wrr"}
+	compref		$tmp27 objI $const12 	%line{43} %argrw{"wrr"}
+	compref		$tmp28 objI $const5 	%argrw{"wrr"}
+	compref		$tmp29 objI $const6 	%argrw{"wrr"}
 	neg		$tmp30 $tmp29 	%argrw{"wr"}
-	compref		$tmp31 objI $const6 	%argrw{"wrr"}
-	vector		$tmp26 $tmp28 $tmp30 $tmp31 	%argrw{"wrrr"}
-	color		$tmp32 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp26 $tmp32 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:45
-#       objI = vector(objI[0],-objI[2],-objI[1])*color(width_overscanMult, height_overscanMult, 1);
-	eq		$tmp33 space $const12 	%line{45} %argrw{"wrr"}
-	if		$tmp33 58 94 	%argrw{"r"}
+	vector		$tmp26 $tmp27 $tmp28 $tmp30 	%argrw{"wrrr"}
+	color		$tmp31 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp26 $tmp31 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:46
+#       objI = vector(-objI[0],objI[2],objI[1])*color(width_overscanMult, height_overscanMult, 1);
+	eq		$tmp32 space $const12 	%line{46} %argrw{"wrr"}
+	if		$tmp32 56 92 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:47
 #     }
-	compref		$tmp35 objI $const6 	%line{46} %argrw{"wrr"}
+	compref		$tmp34 objI $const6 	%line{47} %argrw{"wrr"}
+	neg		$tmp35 $tmp34 	%argrw{"wr"}
 	compref		$tmp36 objI $const12 	%argrw{"wrr"}
-	neg		$tmp37 $tmp36 	%argrw{"wr"}
-	compref		$tmp38 objI $const5 	%argrw{"wrr"}
-	neg		$tmp39 $tmp38 	%argrw{"wr"}
-	vector		$tmp34 $tmp35 $tmp37 $tmp39 	%argrw{"wrrr"}
-	color		$tmp40 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp34 $tmp40 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:49
-#       objI = vector(objI[0],objI[2],objI[1])*color(width_overscanMult, height_overscanMult, 1);
-	eq		$tmp41 space $const16 	%line{49} %argrw{"wrr"}
-	if		$tmp41 66 94 	%argrw{"r"}
+	compref		$tmp37 objI $const5 	%argrw{"wrr"}
+	vector		$tmp33 $tmp35 $tmp36 $tmp37 	%argrw{"wrrr"}
+	color		$tmp38 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp33 $tmp38 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:50
+#       objI = vector(-objI[0],-objI[2],-objI[1])*color(width_overscanMult, height_overscanMult, 1);
+	eq		$tmp39 space $const16 	%line{50} %argrw{"wrr"}
+	if		$tmp39 67 92 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:51
 #     }
-	compref		$tmp43 objI $const6 	%line{50} %argrw{"wrr"}
-	compref		$tmp44 objI $const12 	%argrw{"wrr"}
+	compref		$tmp41 objI $const6 	%line{51} %argrw{"wrr"}
+	neg		$tmp42 $tmp41 	%argrw{"wr"}
+	compref		$tmp43 objI $const12 	%argrw{"wrr"}
+	neg		$tmp44 $tmp43 	%argrw{"wr"}
 	compref		$tmp45 objI $const5 	%argrw{"wrr"}
-	vector		$tmp42 $tmp43 $tmp44 $tmp45 	%argrw{"wrrr"}
-	color		$tmp46 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp42 $tmp46 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:53
-#       objI = vector(-objI[0],-objI[1],-objI[2])*color(width_overscanMult, height_overscanMult, 1);
-	eq		$tmp47 space $const17 	%line{53} %argrw{"wrr"}
-	if		$tmp47 77 94 	%argrw{"r"}
+	neg		$tmp46 $tmp45 	%argrw{"wr"}
+	vector		$tmp40 $tmp42 $tmp44 $tmp46 	%argrw{"wrrr"}
+	color		$tmp47 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp40 $tmp47 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:54
+#       // -x, -y, -z
+	eq		$tmp48 space $const17 	%line{54} %argrw{"wrr"}
+	if		$tmp48 75 92 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:56
 #     }
-	compref		$tmp49 objI $const6 	%line{54} %argrw{"wrr"}
-	neg		$tmp50 $tmp49 	%argrw{"wr"}
+	compref		$tmp50 objI $const6 	%line{56} %argrw{"wrr"}
 	compref		$tmp51 objI $const5 	%argrw{"wrr"}
-	neg		$tmp52 $tmp51 	%argrw{"wr"}
-	compref		$tmp53 objI $const12 	%argrw{"wrr"}
-	neg		$tmp54 $tmp53 	%argrw{"wr"}
-	vector		$tmp48 $tmp50 $tmp52 $tmp54 	%argrw{"wrrr"}
-	color		$tmp55 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp48 $tmp55 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:57
-#       objI = vector(objI[0],-objI[1],objI[2])*color(width_overscanMult, height_overscanMult, 1);
-	eq		$tmp56 space $const18 	%line{57} %argrw{"wrr"}
-	if		$tmp56 86 94 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:58
-#     }
-	compref		$tmp58 objI $const6 	%line{58} %argrw{"wrr"}
-	compref		$tmp59 objI $const5 	%argrw{"wrr"}
-	neg		$tmp60 $tmp59 	%argrw{"wr"}
-	compref		$tmp61 objI $const12 	%argrw{"wrr"}
-	vector		$tmp57 $tmp58 $tmp60 $tmp61 	%argrw{"wrrr"}
-	color		$tmp62 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp57 $tmp62 	%argrw{"wrr"}
+	compref		$tmp52 objI $const12 	%argrw{"wrr"}
+	vector		$tmp49 $tmp50 $tmp51 $tmp52 	%argrw{"wrrr"}
+	color		$tmp53 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp49 $tmp53 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:59
+#       // x, -y, z
+	eq		$tmp54 space $const18 	%line{59} %argrw{"wrr"}
+	if		$tmp54 85 92 	%argrw{"r"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:61
 #     }
-	compref		$tmp64 objI $const6 	%line{61} %argrw{"wrr"}
+	compref		$tmp56 objI $const6 	%line{61} %argrw{"wrr"}
+	neg		$tmp57 $tmp56 	%argrw{"wr"}
+	compref		$tmp58 objI $const5 	%argrw{"wrr"}
+	compref		$tmp59 objI $const12 	%argrw{"wrr"}
+	neg		$tmp60 $tmp59 	%argrw{"wr"}
+	vector		$tmp55 $tmp57 $tmp58 $tmp60 	%argrw{"wrrr"}
+	color		$tmp61 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp55 $tmp61 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:64
+#     }
+	compref		$tmp63 objI $const6 	%line{64} %argrw{"wrr"}
+	compref		$tmp64 objI $const12 	%argrw{"wrr"}
 	neg		$tmp65 $tmp64 	%argrw{"wr"}
-	compref		$tmp66 objI $const12 	%argrw{"wrr"}
-	compref		$tmp67 objI $const5 	%argrw{"wrr"}
-	neg		$tmp68 $tmp67 	%argrw{"wr"}
-	vector		$tmp63 $tmp65 $tmp66 $tmp68 	%argrw{"wrrr"}
-	color		$tmp69 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		objI $tmp63 $tmp69 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:63
-# 
-	compref		$tmp71 objI $const6 	%line{63} %argrw{"wrr"}
-	compref		$tmp72 objI $const5 	%argrw{"wrr"}
-	compref		$tmp73 objI $const12 	%argrw{"wrr"}
-	vector		$tmp70 $tmp71 $tmp72 $tmp73 	%argrw{"wrrr"}
-	mul		$tmp74 $tmp70 multiply 	%argrw{"wrr"}
-	add		objI $tmp74 add 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:65
-#     color objP = (color(u,v,0.5)*2-1)*color(width_overscanMult, height_overscanMult, 1) *0.5+0.5; 	//UV seems to be the better approach
-	color		$tmp75 u v $const19 	%line{65} %argrw{"wrrr"}
-	mul		$tmp76 $tmp75 $const20 	%argrw{"wrr"}
-	sub		$tmp77 $tmp76 $const9 	%argrw{"wrr"}
-	mul		$tmp78 $tmp77 $const19 	%argrw{"wrr"}
-	add		objPOrig $tmp78 $const19 	%argrw{"wrr"}
+	compref		$tmp66 objI $const5 	%argrw{"wrr"}
+	vector		$tmp62 $tmp63 $tmp65 $tmp66 	%argrw{"wrrr"}
+	color		$tmp67 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp62 $tmp67 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:66
-#     //bases for width/height/depth
-	color		$tmp79 u v $const19 	%line{66} %argrw{"wrrr"}
-	mul		$tmp80 $tmp79 $const20 	%argrw{"wrr"}
-	sub		$tmp81 $tmp80 $const9 	%argrw{"wrr"}
-	color		$tmp82 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
-	mul		$tmp83 $tmp81 $tmp82 	%argrw{"wrr"}
-	mul		$tmp84 $tmp83 $const19 	%argrw{"wrr"}
-	add		objP $tmp84 $const19 	%argrw{"wrr"}
+# 
+	compref		$tmp69 objI $const6 	%line{66} %argrw{"wrr"}
+	compref		$tmp70 objI $const5 	%argrw{"wrr"}
+	compref		$tmp71 objI $const12 	%argrw{"wrr"}
+	vector		$tmp68 $tmp69 $tmp70 $tmp71 	%argrw{"wrrr"}
+	mul		$tmp72 $tmp68 multiply 	%argrw{"wrr"}
+	add		objI $tmp72 add 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:68
-#     color baseDepth = (objP-sections)/(-objI * room_depthMult);
-	assign		$tmp85 $const7 	%line{68} %argrw{"wr"}
-	step		sections $tmp85 objI 	%argrw{"wrr"}
+#     color objP = (color(u,v,0.5)*2-1)*color(width_overscanMult, height_overscanMult, 1) *0.5+0.5; 	//UV seems to be the better approach
+	color		$tmp73 u v $const19 	%line{68} %argrw{"wrrr"}
+	mul		$tmp74 $tmp73 $const20 	%argrw{"wrr"}
+	sub		$tmp75 $tmp74 $const9 	%argrw{"wrr"}
+	mul		$tmp76 $tmp75 $const19 	%argrw{"wrr"}
+	add		objPOrig $tmp76 $const19 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:69
-#     color mgDepth = (objP-sections)/(-objI * midground_depthMult);
-	sub		$tmp86 objP sections 	%line{69} %argrw{"wrr"}
-	neg		$tmp87 objI 	%argrw{"wr"}
-	mul		$tmp88 $tmp87 room_depthMult 	%argrw{"wrr"}
-	div		baseDepth $tmp86 $tmp88 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:70
-#     color baseBack = (objP-sections)/(-objI);
-	sub		$tmp89 objP sections 	%line{70} %argrw{"wrr"}
-	neg		$tmp90 objI 	%argrw{"wr"}
-	mul		$tmp91 $tmp90 midground_depthMult 	%argrw{"wrr"}
-	div		mgDepth $tmp89 $tmp91 	%argrw{"wrr"}
+#     //bases for width/height/depth
+	color		$tmp77 u v $const19 	%line{69} %argrw{"wrrr"}
+	mul		$tmp78 $tmp77 $const20 	%argrw{"wrr"}
+	sub		$tmp79 $tmp78 $const9 	%argrw{"wrr"}
+	color		$tmp80 width_overscanMult height_overscanMult $const9 	%argrw{"wrrr"}
+	mul		$tmp81 $tmp79 $tmp80 	%argrw{"wrr"}
+	mul		$tmp82 $tmp81 $const19 	%argrw{"wrr"}
+	add		objP $tmp82 $const19 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:71
-#     color baseWidth = baseDepth * room_depthMult;
-	sub		$tmp92 objP sections 	%line{71} %argrw{"wrr"}
-	neg		$tmp93 objI 	%argrw{"wr"}
-	div		baseBack $tmp92 $tmp93 	%argrw{"wrr"}
+#     color baseDepth = (objP-sections)/(-objI * room_depthMult);
+	assign		$tmp83 $const7 	%line{71} %argrw{"wr"}
+	step		sections $tmp83 objI 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:72
-# 
-	mul		baseWidth baseDepth room_depthMult 	%line{72} %argrw{"wrr"}
+#     color mgDepth = (objP-sections)/(-objI * mid_ground_depth_mult);
+	sub		$tmp84 objP sections 	%line{72} %argrw{"wrr"}
+	neg		$tmp85 objI 	%argrw{"wr"}
+	mul		$tmp86 $tmp85 room_depthMult 	%argrw{"wrr"}
+	div		baseDepth $tmp84 $tmp86 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:73
+#     color baseBack = (objP-sections)/(-objI);
+	sub		$tmp87 objP sections 	%line{73} %argrw{"wrr"}
+	neg		$tmp88 objI 	%argrw{"wr"}
+	mul		$tmp89 $tmp88 mid_ground_depth_mult 	%argrw{"wrr"}
+	div		mgDepth $tmp87 $tmp89 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:74
+#     color baseWidth = baseDepth * room_depthMult;
+	sub		$tmp90 objP sections 	%line{74} %argrw{"wrr"}
+	neg		$tmp91 objI 	%argrw{"wr"}
+	div		baseBack $tmp90 $tmp91 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:75
-#     color baseDepthY = (baseDepth[0]*objI+objP + 1);
-	compref		$tmp94 baseDepth $const5 	%line{75} %argrw{"wrr"}
-	mul		$tmp95 $tmp94 objI 	%argrw{"wrr"}
-	add		$tmp96 $tmp95 objP 	%argrw{"wrr"}
-	add		baseDepthX $tmp96 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:76
-#     color baseWidthX = (baseWidth[1]*objI+objP + 1);
-	compref		$tmp97 baseDepth $const6 	%line{76} %argrw{"wrr"}
-	mul		$tmp98 $tmp97 objI 	%argrw{"wrr"}
-	add		$tmp99 $tmp98 objP 	%argrw{"wrr"}
-	add		baseDepthY $tmp99 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:77
-#     color baseWidthY = (baseWidth[0]*objI+objP + 1);
-	compref		$tmp100 baseWidth $const5 	%line{77} %argrw{"wrr"}
-	mul		$tmp101 $tmp100 objI 	%argrw{"wrr"}
-	add		$tmp102 $tmp101 objP 	%argrw{"wrr"}
-	add		baseWidthX $tmp102 $const9 	%argrw{"wrr"}
+# 
+	mul		baseWidth baseDepth room_depthMult 	%line{75} %argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:78
-# 
-	compref		$tmp103 baseWidth $const6 	%line{78} %argrw{"wrr"}
-	mul		$tmp104 $tmp103 objI 	%argrw{"wrr"}
-	add		$tmp105 $tmp104 objP 	%argrw{"wrr"}
-	add		baseWidthY $tmp105 $const9 	%argrw{"wrr"}
+#     color baseDepthY = (baseDepth[0]*objI+objP + 1);
+	compref		$tmp92 baseDepth $const5 	%line{78} %argrw{"wrr"}
+	mul		$tmp93 $tmp92 objI 	%argrw{"wrr"}
+	add		$tmp94 $tmp93 objP 	%argrw{"wrr"}
+	add		baseDepthX $tmp94 $const9 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:79
+#     color baseWidthX = (baseWidth[1]*objI+objP + 1);
+	compref		$tmp95 baseDepth $const6 	%line{79} %argrw{"wrr"}
+	mul		$tmp96 $tmp95 objI 	%argrw{"wrr"}
+	add		$tmp97 $tmp96 objP 	%argrw{"wrr"}
+	add		baseDepthY $tmp97 $const9 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:80
-#     float vertU = baseWidthX[0] - 1;
-	compref		$tmp106 baseDepthY $const12 	%line{80} %argrw{"wrr"}
-	sub		horizU $tmp106 $const19 	%argrw{"wrr"}
+#     color baseWidthY = (baseWidth[0]*objI+objP + 1);
+	compref		$tmp98 baseWidth $const5 	%line{80} %argrw{"wrr"}
+	mul		$tmp99 $tmp98 objI 	%argrw{"wrr"}
+	add		$tmp100 $tmp99 objP 	%argrw{"wrr"}
+	add		baseWidthX $tmp100 $const9 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:81
-#     float horizV = baseWidthY[1] - 1;
-	compref		$tmp107 baseWidthX $const6 	%line{81} %argrw{"wrr"}
-	sub		vertU $tmp107 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:82
-#     float vertV = baseDepthX[2] - 0.5;
-	compref		$tmp108 baseWidthY $const5 	%line{82} %argrw{"wrr"}
-	sub		horizV $tmp108 $const9 	%argrw{"wrr"}
+# 
+	compref		$tmp101 baseWidth $const6 	%line{81} %argrw{"wrr"}
+	mul		$tmp102 $tmp101 objI 	%argrw{"wrr"}
+	add		$tmp103 $tmp102 objP 	%argrw{"wrr"}
+	add		baseWidthY $tmp103 $const9 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:83
-# 
-	compref		$tmp109 baseDepthX $const12 	%line{83} %argrw{"wrr"}
-	sub		vertV $tmp109 $const19 	%argrw{"wrr"}
+#     float vertU = baseWidthX[0] - 1;
+	compref		$tmp104 baseDepthY $const12 	%line{83} %argrw{"wrr"}
+	sub		horizU $tmp104 $const19 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:84
+#     float horizV = baseWidthY[1] - 1;
+	compref		$tmp105 baseWidthX $const6 	%line{84} %argrw{"wrr"}
+	sub		vertU $tmp105 $const9 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:85
+#     float vertV = baseDepthX[2] - 0.5;
+	compref		$tmp106 baseWidthY $const5 	%line{85} %argrw{"wrr"}
+	sub		horizV $tmp106 $const9 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:86
-#     color sideWallsUV = color(horizU, horizV, 0) / 3;
-	step		$tmp110 $const7 horizU 	%line{86} %argrw{"wrr"}
-	sub		$tmp113 $const9 horizV 	%argrw{"wrr"}
-	max		$tmp112 horizV $tmp113 	%argrw{"wrr"}
-	sub		$tmp114 $const9 $tmp112 	%argrw{"wrr"}
-	step		$tmp111 $const7 $tmp114 	%argrw{"wrr"}
-	mul		sideWallsMask $tmp110 $tmp111 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:87
-#     color rWallUV = (sideWallsUV + color(2.0/3.0, 1.0/3.0, 0)) * sideWallsMask * sections[0];
-	color		$tmp115 horizU horizV $const7 	%line{87} %argrw{"wrrr"}
-	div		sideWallsUV $tmp115 $const21 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:88
-#     color lWallUV = (sideWallsUV + color(0.0, 1.0/3.0, 0)) * sideWallsMask * (1-sections[0]);
-	div		$tmp117 $const20 $const21 	%line{88} %argrw{"wrr"}
-	div		$tmp118 $const9 $const21 	%argrw{"wrr"}
-	color		$tmp116 $tmp117 $tmp118 $const7 	%argrw{"wrrr"}
-	add		$tmp119 sideWallsUV $tmp116 	%argrw{"wrr"}
-	mul		$tmp120 $tmp119 sideWallsMask 	%argrw{"wrr"}
-	compref		$tmp121 sections $const6 	%argrw{"wrr"}
-	mul		rWallUV $tmp120 $tmp121 	%argrw{"wrr"}
+# 
+	compref		$tmp107 baseDepthX $const12 	%line{86} %argrw{"wrr"}
+	sub		vertV $tmp107 $const19 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:89
-#     lWallUV[0] = (1.0/3.0 - lWallUV[0]) * sideWallsMask * (1-sections[0]);
-	div		$tmp123 $const9 $const21 	%line{89} %argrw{"wrr"}
-	color		$tmp122 $const7 $tmp123 $const7 	%argrw{"wrrr"}
-	add		$tmp124 sideWallsUV $tmp122 	%argrw{"wrr"}
-	mul		$tmp125 $tmp124 sideWallsMask 	%argrw{"wrr"}
-	compref		$tmp126 sections $const6 	%argrw{"wrr"}
-	sub		$tmp127 $const9 $tmp126 	%argrw{"wrr"}
-	mul		lWallUV $tmp125 $tmp127 	%argrw{"wrr"}
+#     color sideWallsUV = color(horizU, horizV, 0) / 3;
+	step		$tmp108 $const7 horizU 	%line{89} %argrw{"wrr"}
+	sub		$tmp111 $const9 horizV 	%argrw{"wrr"}
+	max		$tmp110 horizV $tmp111 	%argrw{"wrr"}
+	sub		$tmp112 $const9 $tmp110 	%argrw{"wrr"}
+	step		$tmp109 $const7 $tmp112 	%argrw{"wrr"}
+	mul		sideWallsMask $tmp108 $tmp109 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:90
-# 
-	div		$tmp128 $const9 $const21 	%line{90} %argrw{"wrr"}
-	compref		$tmp129 lWallUV $const6 	%argrw{"wrr"}
-	sub		$tmp130 $tmp128 $tmp129 	%argrw{"wrr"}
-	mul		$tmp131 $tmp130 sideWallsMask 	%argrw{"wrr"}
-	compref		$tmp132 sections $const6 	%argrw{"wrr"}
-	sub		$tmp133 $const9 $tmp132 	%argrw{"wrr"}
-	mul		$tmp134 $tmp131 $tmp133 	%argrw{"wrr"}
-	compassign	lWallUV $const6 $tmp134 	%argrw{"wrr"}
+#     color rWallUV = (sideWallsUV + color(2.0/3.0, 1.0/3.0, 0)) * sideWallsMask * sections[0];
+	color		$tmp113 horizU horizV $const7 	%line{90} %argrw{"wrrr"}
+	div		sideWallsUV $tmp113 $const21 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:91
+#     color lWallUV = (sideWallsUV + color(0.0, 1.0/3.0, 0)) * sideWallsMask * (1-sections[0]);
+	div		$tmp115 $const20 $const21 	%line{91} %argrw{"wrr"}
+	div		$tmp116 $const9 $const21 	%argrw{"wrr"}
+	color		$tmp114 $tmp115 $tmp116 $const7 	%argrw{"wrrr"}
+	add		$tmp117 sideWallsUV $tmp114 	%argrw{"wrr"}
+	mul		$tmp118 $tmp117 sideWallsMask 	%argrw{"wrr"}
+	compref		$tmp119 sections $const6 	%argrw{"wrr"}
+	mul		rWallUV $tmp118 $tmp119 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:92
-#     color FloorCeilUV = color(vertU, vertV, 0) / 3;
-	step		$tmp135 $const7 vertV 	%line{92} %argrw{"wrr"}
-	sub		$tmp138 $const9 vertU 	%argrw{"wrr"}
-	max		$tmp137 vertU $tmp138 	%argrw{"wrr"}
-	sub		$tmp139 $const9 $tmp137 	%argrw{"wrr"}
-	step		$tmp136 $const7 $tmp139 	%argrw{"wrr"}
-	mul		FloorCeilMask $tmp135 $tmp136 	%argrw{"wrr"}
+#     lWallUV[0] = (1.0/3.0 - lWallUV[0]) * sideWallsMask * (1-sections[0]);
+	div		$tmp121 $const9 $const21 	%line{92} %argrw{"wrr"}
+	color		$tmp120 $const7 $tmp121 $const7 	%argrw{"wrrr"}
+	add		$tmp122 sideWallsUV $tmp120 	%argrw{"wrr"}
+	mul		$tmp123 $tmp122 sideWallsMask 	%argrw{"wrr"}
+	compref		$tmp124 sections $const6 	%argrw{"wrr"}
+	sub		$tmp125 $const9 $tmp124 	%argrw{"wrr"}
+	mul		lWallUV $tmp123 $tmp125 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:93
-#     color ceilUV = (FloorCeilUV + color(1.0/3.0, 2.0/3.0, 0)) * FloorCeilMask * sections[1];
-	color		$tmp140 vertU vertV $const7 	%line{93} %argrw{"wrrr"}
-	div		FloorCeilUV $tmp140 $const21 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:94
-#     color floorUV = (FloorCeilUV + color(1.0/3.0, 0, 0)) * FloorCeilMask * (1-sections[1]);
-	div		$tmp142 $const9 $const21 	%line{94} %argrw{"wrr"}
-	div		$tmp143 $const20 $const21 	%argrw{"wrr"}
-	color		$tmp141 $tmp142 $tmp143 $const7 	%argrw{"wrrr"}
-	add		$tmp144 FloorCeilUV $tmp141 	%argrw{"wrr"}
-	mul		$tmp145 $tmp144 FloorCeilMask 	%argrw{"wrr"}
-	compref		$tmp146 sections $const5 	%argrw{"wrr"}
-	mul		ceilUV $tmp145 $tmp146 	%argrw{"wrr"}
+# 
+	div		$tmp126 $const9 $const21 	%line{93} %argrw{"wrr"}
+	compref		$tmp127 lWallUV $const6 	%argrw{"wrr"}
+	sub		$tmp128 $tmp126 $tmp127 	%argrw{"wrr"}
+	mul		$tmp129 $tmp128 sideWallsMask 	%argrw{"wrr"}
+	compref		$tmp130 sections $const6 	%argrw{"wrr"}
+	sub		$tmp131 $const9 $tmp130 	%argrw{"wrr"}
+	mul		$tmp132 $tmp129 $tmp131 	%argrw{"wrr"}
+	compassign	lWallUV $const6 $tmp132 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:95
-#     floorUV[1] = (1.0/3.0 - floorUV[1]) * FloorCeilMask * (1-sections[1]);
-	div		$tmp148 $const9 $const21 	%line{95} %argrw{"wrr"}
-	color		$tmp147 $tmp148 $const7 $const7 	%argrw{"wrrr"}
-	add		$tmp149 FloorCeilUV $tmp147 	%argrw{"wrr"}
-	mul		$tmp150 $tmp149 FloorCeilMask 	%argrw{"wrr"}
-	compref		$tmp151 sections $const5 	%argrw{"wrr"}
-	sub		$tmp152 $const9 $tmp151 	%argrw{"wrr"}
-	mul		floorUV $tmp150 $tmp152 	%argrw{"wrr"}
+#     color FloorCeilUV = color(vertU, vertV, 0) / 3;
+	step		$tmp133 $const7 vertV 	%line{95} %argrw{"wrr"}
+	sub		$tmp136 $const9 vertU 	%argrw{"wrr"}
+	max		$tmp135 vertU $tmp136 	%argrw{"wrr"}
+	sub		$tmp137 $const9 $tmp135 	%argrw{"wrr"}
+	step		$tmp134 $const7 $tmp137 	%argrw{"wrr"}
+	mul		FloorCeilMask $tmp133 $tmp134 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:96
-# 
-	div		$tmp153 $const9 $const21 	%line{96} %argrw{"wrr"}
-	compref		$tmp154 floorUV $const5 	%argrw{"wrr"}
-	sub		$tmp155 $tmp153 $tmp154 	%argrw{"wrr"}
-	mul		$tmp156 $tmp155 FloorCeilMask 	%argrw{"wrr"}
-	compref		$tmp157 sections $const5 	%argrw{"wrr"}
-	sub		$tmp158 $const9 $tmp157 	%argrw{"wrr"}
-	mul		$tmp159 $tmp156 $tmp158 	%argrw{"wrr"}
-	compassign	floorUV $const5 $tmp159 	%argrw{"wrr"}
+#     color ceilUV = (FloorCeilUV + color(1.0/3.0, 2.0/3.0, 0)) * FloorCeilMask * sections[1];
+	color		$tmp138 vertU vertV $const7 	%line{96} %argrw{"wrrr"}
+	div		FloorCeilUV $tmp138 $const21 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:97
+#     color floorUV = (FloorCeilUV + color(1.0/3.0, 0, 0)) * FloorCeilMask * (1-sections[1]);
+	div		$tmp140 $const9 $const21 	%line{97} %argrw{"wrr"}
+	div		$tmp141 $const20 $const21 	%argrw{"wrr"}
+	color		$tmp139 $tmp140 $tmp141 $const7 	%argrw{"wrrr"}
+	add		$tmp142 FloorCeilUV $tmp139 	%argrw{"wrr"}
+	mul		$tmp143 $tmp142 FloorCeilMask 	%argrw{"wrr"}
+	compref		$tmp144 sections $const5 	%argrw{"wrr"}
+	mul		ceilUV $tmp143 $tmp144 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:98
+#     floorUV[1] = (1.0/3.0 - floorUV[1]) * FloorCeilMask * (1-sections[1]);
+	div		$tmp146 $const9 $const21 	%line{98} %argrw{"wrr"}
+	color		$tmp145 $tmp146 $const7 $const7 	%argrw{"wrrr"}
+	add		$tmp147 FloorCeilUV $tmp145 	%argrw{"wrr"}
+	mul		$tmp148 $tmp147 FloorCeilMask 	%argrw{"wrr"}
+	compref		$tmp149 sections $const5 	%argrw{"wrr"}
+	sub		$tmp150 $const9 $tmp149 	%argrw{"wrr"}
+	mul		floorUV $tmp148 $tmp150 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:99
 # 
-	compref		$tmp160 baseBack $const12 	%line{98} %argrw{"wrr"}
-	mul		$tmp161 $tmp160 objI 	%argrw{"wrr"}
-	div		$tmp162 objP $const20 	%argrw{"wrr"}
-	div		$tmp163 $tmp162 room_depthMult 	%argrw{"wrr"}
-	add		$tmp164 $tmp161 $tmp163 	%argrw{"wrr"}
-	mul		$tmp165 room_depthMult $const20 	%argrw{"wrr"}
-	mul		$tmp166 $tmp164 $tmp165 	%argrw{"wrr"}
-	div		$tmp167 $tmp166 $const21 	%argrw{"wrr"}
-	div		$tmp169 $const9 $const21 	%argrw{"wrr"}
-	div		$tmp170 $const9 $const21 	%argrw{"wrr"}
-	color		$tmp168 $tmp169 $tmp170 $const7 	%argrw{"wrrr"}
-	add		$tmp171 $tmp167 $tmp168 	%argrw{"wrr"}
-	step		$tmp173 $const7 horizU 	%argrw{"wrr"}
-	step		$tmp174 $const7 vertV 	%argrw{"wrr"}
-	max		$tmp172 $tmp173 $tmp174 	%argrw{"wrr"}
-	sub		$tmp175 $const9 $tmp172 	%argrw{"wrr"}
-	mul		backWallUV $tmp171 $tmp175 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:100
-#     float midgroundMask = step( 0, midgroundUV[1] * 3 * (1-midgroundUV[1]*3) ) * step( 0, midgroundUV[0] * (1.0/3.0-midgroundUV[0]) );
-	div		$tmp176 $const9 $const21 	%line{100} %argrw{"wrr"}
-	compref		$tmp177 baseBack $const12 	%argrw{"wrr"}
-	mul		$tmp178 $tmp177 objI 	%argrw{"wrr"}
-	mul		$tmp179 midground_depthMult $const20 	%argrw{"wrr"}
-	div		$tmp180 objP $tmp179 	%argrw{"wrr"}
-	add		$tmp181 $tmp178 $tmp180 	%argrw{"wrr"}
-	mul		$tmp182 midground_depthMult $const20 	%argrw{"wrr"}
-	mul		$tmp183 $tmp181 $tmp182 	%argrw{"wrr"}
-	div		$tmp184 $tmp183 $const21 	%argrw{"wrr"}
-	sub		midgroundUV $tmp176 $tmp184 	%argrw{"wrr"}
+	div		$tmp151 $const9 $const21 	%line{99} %argrw{"wrr"}
+	compref		$tmp152 floorUV $const5 	%argrw{"wrr"}
+	sub		$tmp153 $tmp151 $tmp152 	%argrw{"wrr"}
+	mul		$tmp154 $tmp153 FloorCeilMask 	%argrw{"wrr"}
+	compref		$tmp155 sections $const5 	%argrw{"wrr"}
+	sub		$tmp156 $const9 $tmp155 	%argrw{"wrr"}
+	mul		$tmp157 $tmp154 $tmp156 	%argrw{"wrr"}
+	compassign	floorUV $const5 $tmp157 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:101
-#     midgroundUV = (color(midgroundOffX, midgroundOffY, 0) + midgroundUV) * midgroundMask;
-	compref		$tmp186 midgroundUV $const5 	%line{101} %argrw{"wrr"}
-	mul		$tmp187 $tmp186 $const21 	%argrw{"wrr"}
-	compref		$tmp188 midgroundUV $const5 	%argrw{"wrr"}
-	mul		$tmp189 $tmp188 $const21 	%argrw{"wrr"}
-	sub		$tmp190 $const9 $tmp189 	%argrw{"wrr"}
-	mul		$tmp191 $tmp187 $tmp190 	%argrw{"wrr"}
-	step		$tmp185 $const7 $tmp191 	%argrw{"wrr"}
-	compref		$tmp193 midgroundUV $const6 	%argrw{"wrr"}
-	div		$tmp194 $const9 $const21 	%argrw{"wrr"}
-	compref		$tmp195 midgroundUV $const6 	%argrw{"wrr"}
-	sub		$tmp196 $tmp194 $tmp195 	%argrw{"wrr"}
-	mul		$tmp197 $tmp193 $tmp196 	%argrw{"wrr"}
-	step		$tmp192 $const7 $tmp197 	%argrw{"wrr"}
-	mul		midgroundMask $tmp185 $tmp192 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:102
-#     midgroundUV[1] = 1-midgroundUV[1];
-	color		$tmp198 midgroundOffX midgroundOffY $const7 	%line{102} %argrw{"wrrr"}
-	add		$tmp199 $tmp198 midgroundUV 	%argrw{"wrr"}
-	mul		midgroundUV $tmp199 midgroundMask 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:103
 # 
-	compref		$tmp200 midgroundUV $const5 	%line{103} %argrw{"wrr"}
-	sub		$tmp201 $const9 $tmp200 	%argrw{"wrr"}
-	compassign	midgroundUV $const5 $tmp201 	%argrw{"wrr"}
+	compref		$tmp158 baseBack $const12 	%line{101} %argrw{"wrr"}
+	mul		$tmp159 $tmp158 objI 	%argrw{"wrr"}
+	div		$tmp160 objP $const20 	%argrw{"wrr"}
+	div		$tmp161 $tmp160 room_depthMult 	%argrw{"wrr"}
+	add		$tmp162 $tmp159 $tmp161 	%argrw{"wrr"}
+	mul		$tmp163 room_depthMult $const20 	%argrw{"wrr"}
+	mul		$tmp164 $tmp162 $tmp163 	%argrw{"wrr"}
+	div		$tmp165 $tmp164 $const21 	%argrw{"wrr"}
+	div		$tmp167 $const9 $const21 	%argrw{"wrr"}
+	div		$tmp168 $const9 $const21 	%argrw{"wrr"}
+	color		$tmp166 $tmp167 $tmp168 $const7 	%argrw{"wrrr"}
+	add		$tmp169 $tmp165 $tmp166 	%argrw{"wrr"}
+	step		$tmp171 $const7 horizU 	%argrw{"wrr"}
+	step		$tmp172 $const7 vertV 	%argrw{"wrr"}
+	max		$tmp170 $tmp171 $tmp172 	%argrw{"wrr"}
+	sub		$tmp173 $const9 $tmp170 	%argrw{"wrr"}
+	mul		backWallUV $tmp169 $tmp173 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:103
+#     float mid_ground_mask = step( 0, mid_ground_uv[1] * 3 * (1-mid_ground_uv[1]*3) ) * step( 0, mid_ground_uv[0] * (1.0/3.0-mid_ground_uv[0]) );
+	div		$tmp174 $const9 $const21 	%line{103} %argrw{"wrr"}
+	compref		$tmp175 baseBack $const12 	%argrw{"wrr"}
+	mul		$tmp176 $tmp175 objI 	%argrw{"wrr"}
+	mul		$tmp177 mid_ground_depth_mult $const20 	%argrw{"wrr"}
+	div		$tmp178 objP $tmp177 	%argrw{"wrr"}
+	add		$tmp179 $tmp176 $tmp178 	%argrw{"wrr"}
+	mul		$tmp180 mid_ground_depth_mult $const20 	%argrw{"wrr"}
+	mul		$tmp181 $tmp179 $tmp180 	%argrw{"wrr"}
+	div		$tmp182 $tmp181 $const21 	%argrw{"wrr"}
+	sub		mid_ground_uv $tmp174 $tmp182 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:104
+#     mid_ground_uv = (color(mid_ground_off_x, mid_ground_off_y, 0) + mid_ground_uv) * mid_ground_mask;
+	compref		$tmp184 mid_ground_uv $const5 	%line{104} %argrw{"wrr"}
+	mul		$tmp185 $tmp184 $const21 	%argrw{"wrr"}
+	compref		$tmp186 mid_ground_uv $const5 	%argrw{"wrr"}
+	mul		$tmp187 $tmp186 $const21 	%argrw{"wrr"}
+	sub		$tmp188 $const9 $tmp187 	%argrw{"wrr"}
+	mul		$tmp189 $tmp185 $tmp188 	%argrw{"wrr"}
+	step		$tmp183 $const7 $tmp189 	%argrw{"wrr"}
+	compref		$tmp191 mid_ground_uv $const6 	%argrw{"wrr"}
+	div		$tmp192 $const9 $const21 	%argrw{"wrr"}
+	compref		$tmp193 mid_ground_uv $const6 	%argrw{"wrr"}
+	sub		$tmp194 $tmp192 $tmp193 	%argrw{"wrr"}
+	mul		$tmp195 $tmp191 $tmp194 	%argrw{"wrr"}
+	step		$tmp190 $const7 $tmp195 	%argrw{"wrr"}
+	mul		mid_ground_mask $tmp183 $tmp190 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:105
-#     curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
-	div		$tmp203 $const9 $const21 	%line{105} %argrw{"wrr"}
-	div		$tmp204 $const9 $const21 	%argrw{"wrr"}
-	color		$tmp202 $tmp203 $tmp204 $const9 	%argrw{"wrrr"}
-	mul		curtainsUV objPOrig $tmp202 	%argrw{"wrr"}
+#     mid_ground_uv[1] = 1-mid_ground_uv[1];
+	color		$tmp196 mid_ground_off_x mid_ground_off_y $const7 	%line{105} %argrw{"wrrr"}
+	add		$tmp197 $tmp196 mid_ground_uv 	%argrw{"wrr"}
+	mul		mid_ground_uv $tmp197 mid_ground_mask 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:106
 # 
-	div		$tmp205 $const9 $const21 	%line{106} %argrw{"wrr"}
-	compref		$tmp206 curtainsUV $const6 	%argrw{"wrr"}
-	sub		$tmp207 $tmp205 $tmp206 	%argrw{"wrr"}
-	compassign	curtainsUV $const6 $tmp207 	%argrw{"wrr"}
+	compref		$tmp198 mid_ground_uv $const5 	%line{106} %argrw{"wrr"}
+	sub		$tmp199 $const9 $tmp198 	%argrw{"wrr"}
+	compassign	mid_ground_uv $const5 $tmp199 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:108
+#     curtains_uv[0] = curtains_uv[0];
+	div		$tmp201 $const9 $const21 	%line{108} %argrw{"wrr"}
+	div		$tmp202 $const9 $const21 	%argrw{"wrr"}
+	color		$tmp200 $tmp201 $tmp202 $const9 	%argrw{"wrrr"}
+	mul		curtains_uv objPOrig $tmp200 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:109
 # 
-	add		$tmp208 ceilUV floorUV 	%line{108} %argrw{"wrr"}
-	add		$tmp209 $tmp208 rWallUV 	%argrw{"wrr"}
-	add		$tmp210 $tmp209 lWallUV 	%argrw{"wrr"}
-	add		finalUV $tmp210 backWallUV 	%argrw{"wrr"}
+	compref		$tmp203 curtains_uv $const6 	%line{109} %argrw{"wrr"}
+	compassign	curtains_uv $const6 $tmp203 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:111
-#         midgroundUV[0] = 1.0/3.0 - midgroundUV[0];
-	gt		$tmp211 texture_flop $const6 	%line{111} %argrw{"wrr"}
-	if		$tmp211 279 282 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:112
-#         curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
-	div		$tmp212 $const9 $const21 	%line{112} %argrw{"wrr"}
-	compref		$tmp213 midgroundUV $const6 	%argrw{"wrr"}
-	sub		$tmp214 $tmp212 $tmp213 	%argrw{"wrr"}
-	compassign	midgroundUV $const6 $tmp214 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:113
-#     }else
-	div		$tmp215 $const9 $const21 	%line{113} %argrw{"wrr"}
-	compref		$tmp216 curtainsUV $const6 	%argrw{"wrr"}
-	sub		$tmp217 $tmp215 $tmp216 	%argrw{"wrr"}
-	compassign	curtainsUV $const6 $tmp217 	%argrw{"wrr"}
+# 
+	add		$tmp204 ceilUV floorUV 	%line{111} %argrw{"wrr"}
+	add		$tmp205 $tmp204 rWallUV 	%argrw{"wrr"}
+	add		$tmp206 $tmp205 lWallUV 	%argrw{"wrr"}
+	add		finalUV $tmp206 backWallUV 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:114
+#         mid_ground_uv[1] = 1 - mid_ground_uv[1] + 2.0/3.0;
+	gt		$tmp207 texture_flip $const6 	%line{114} %argrw{"wrr"}
+	if		$tmp207 277 280 	%argrw{"r"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:115
-#     if (texture_flip > 0){
-	compref		$tmp218 finalUV $const6 	%line{115} %argrw{"wrr"}
-	sub		$tmp219 $const9 $tmp218 	%argrw{"wrr"}
-	compassign	finalUV $const6 $tmp219 	%argrw{"wrr"}
+#         curtains_uv[1] = - curtains_uv[1] + 1.0/3.0;
+	compref		$tmp208 mid_ground_uv $const5 	%line{115} %argrw{"wrr"}
+	sub		$tmp209 $const9 $tmp208 	%argrw{"wrr"}
+	div		$tmp210 $const20 $const21 	%argrw{"wrr"}
+	add		$tmp211 $tmp209 $tmp210 	%argrw{"wrr"}
+	compassign	mid_ground_uv $const5 $tmp211 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:116
-#         finalUV[1] = 1-finalUV[1];
-	gt		$tmp220 texture_flip $const6 	%line{116} %argrw{"wrr"}
-	if		$tmp220 296 296 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:117
-#         midgroundUV[1] = 1 - midgroundUV[1] + 2.0/3.0;
-	compref		$tmp221 finalUV $const5 	%line{117} %argrw{"wrr"}
-	sub		$tmp222 $const9 $tmp221 	%argrw{"wrr"}
-	compassign	finalUV $const5 $tmp222 	%argrw{"wrr"}
+#     }else
+	compref		$tmp212 curtains_uv $const5 	%line{116} %argrw{"wrr"}
+	neg		$tmp213 $tmp212 	%argrw{"wr"}
+	div		$tmp214 $const9 $const21 	%argrw{"wrr"}
+	add		$tmp215 $tmp213 $tmp214 	%argrw{"wrr"}
+	compassign	curtains_uv $const5 $tmp215 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:118
-#         curtainsUV[1] = 1.0/3.0 - curtainsUV[1];
-	compref		$tmp223 midgroundUV $const5 	%line{118} %argrw{"wrr"}
-	sub		$tmp224 $const9 $tmp223 	%argrw{"wrr"}
-	div		$tmp225 $const20 $const21 	%argrw{"wrr"}
-	add		$tmp226 $tmp224 $tmp225 	%argrw{"wrr"}
-	compassign	midgroundUV $const5 $tmp226 	%argrw{"wrr"}
+#         mid_ground_uv[1] = 1 - mid_ground_uv[1];
+	compref		$tmp216 finalUV $const5 	%line{118} %argrw{"wrr"}
+	sub		$tmp217 $const9 $tmp216 	%argrw{"wrr"}
+	compassign	finalUV $const5 $tmp217 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:119
-#     }
-	div		$tmp227 $const9 $const21 	%line{119} %argrw{"wrr"}
-	compref		$tmp228 curtainsUV $const5 	%argrw{"wrr"}
-	sub		$tmp229 $tmp227 $tmp228 	%argrw{"wrr"}
-	compassign	curtainsUV $const5 $tmp229 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:122
+#         curtains_uv[1] = 1 - curtains_uv[1];
+	compref		$tmp218 mid_ground_uv $const5 	%line{119} %argrw{"wrr"}
+	sub		$tmp219 $const9 $tmp218 	%argrw{"wrr"}
+	compassign	mid_ground_uv $const5 $tmp219 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:120
 # 
-	compref		$tmp230 finalUV $const6 	%line{122} %argrw{"wrr"}
-	compref		$tmp231 finalUV $const5 	%argrw{"wrr"}
-	texture		roomRGB filename $tmp230 $tmp231 	%argrw{"wrrr"} %argderivs{2,3}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:127
-#         float midgroundA;
-	gt		$tmp232 midground_enable $const6 	%line{127} %argrw{"wrr"}
-	if		$tmp232 305 306 	%argrw{"r"}
+	compref		$tmp220 curtains_uv $const5 	%line{120} %argrw{"wrr"}
+	sub		$tmp221 $const9 $tmp220 	%argrw{"wrr"}
+	compassign	curtains_uv $const5 $tmp221 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:123
+#         finalUV[0] = 1-finalUV[0];
+	gt		$tmp222 texture_flop $const6 	%line{123} %argrw{"wrr"}
+	if		$tmp222 298 302 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:124
+#         mid_ground_uv[0] = mid_ground_uv[0];
+	compref		$tmp223 finalUV $const6 	%line{124} %argrw{"wrr"}
+	sub		$tmp224 $const9 $tmp223 	%argrw{"wrr"}
+	compassign	finalUV $const6 $tmp224 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:125
+#         curtains_uv[0] = - curtains_uv[0] + 1.0/3.0;
+	compref		$tmp225 mid_ground_uv $const6 	%line{125} %argrw{"wrr"}
+	compassign	mid_ground_uv $const6 $tmp225 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:126
+#     }else
+	compref		$tmp226 curtains_uv $const6 	%line{126} %argrw{"wrr"}
+	neg		$tmp227 $tmp226 	%argrw{"wr"}
+	div		$tmp228 $const9 $const21 	%argrw{"wrr"}
+	add		$tmp229 $tmp227 $tmp228 	%argrw{"wrr"}
+	compassign	curtains_uv $const6 $tmp229 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:128
+#         curtains_uv[0] = curtains_uv[0];
+	div		$tmp230 $const9 $const21 	%line{128} %argrw{"wrr"}
+	compref		$tmp231 mid_ground_uv $const6 	%argrw{"wrr"}
+	sub		$tmp232 $tmp230 $tmp231 	%argrw{"wrr"}
+	compassign	mid_ground_uv $const6 $tmp232 	%argrw{"wrr"}
 # packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:129
-#         finalRGB = mix(roomRGB,midgroundRGB,midgroundA);
-	compref		$tmp233 midgroundUV $const6 	%line{129} %argrw{"wrr"}
-	compref		$tmp234 midgroundUV $const5 	%argrw{"wrr"}
-	texture		___346_midgroundRGB filename $tmp233 $tmp234 $const22 ___346_midgroundA 	%argrw{"wrrrrw"} %argderivs{2,3}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:130
-#     }
-	mix		finalRGB roomRGB ___346_midgroundRGB ___346_midgroundA 	%line{130} %argrw{"wrrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:133
-#     }
-	assign		finalRGB roomRGB 	%line{133} %argrw{"wr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:137
-#         float curtainsA;
-	gt		$tmp235 curtains_enable $const6 	%line{137} %argrw{"wrr"}
-	if		$tmp235 312 312 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:139
-#         finalRGB = mix(finalRGB,curtainsRGB,curtainsA);
-	compref		$tmp236 curtainsUV $const6 	%line{139} %argrw{"wrr"}
-	compref		$tmp237 curtainsUV $const5 	%argrw{"wrr"}
-	texture		___348_curtainsRGB filename $tmp236 $tmp237 $const22 ___348_curtainsA 	%argrw{"wrrrrw"} %argderivs{2,3}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:140
-#     }
-	mix		finalRGB finalRGB ___348_curtainsRGB ___348_curtainsA 	%line{140} %argrw{"wrrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:143
 # 
-	assign		out_rgb finalRGB 	%line{143} %argrw{"wr"}
+	compref		$tmp233 curtains_uv $const6 	%line{129} %argrw{"wrr"}
+	compassign	curtains_uv $const6 $tmp233 	%argrw{"wrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:131
+# 
+	compref		$tmp234 finalUV $const6 	%line{131} %argrw{"wrr"}
+	compref		$tmp235 finalUV $const5 	%argrw{"wrr"}
+	texture		room_rgb filename $tmp234 $tmp235 	%argrw{"wrrr"} %argderivs{2,3}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:136
+#         float mid_ground_a;
+	gt		$tmp236 midground_enable $const6 	%line{136} %argrw{"wrr"}
+	if		$tmp236 313 314 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:138
+#         final_rgb = mix(room_rgb, mid_ground_rgb, mid_ground_a);
+	compref		$tmp237 mid_ground_uv $const6 	%line{138} %argrw{"wrr"}
+	compref		$tmp238 mid_ground_uv $const5 	%argrw{"wrr"}
+	texture		___346_mid_ground_rgb filename $tmp237 $tmp238 $const22 ___346_mid_ground_a 	%argrw{"wrrrrw"} %argderivs{2,3}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:139
+#     }
+	mix		final_rgb room_rgb ___346_mid_ground_rgb ___346_mid_ground_a 	%line{139} %argrw{"wrrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:142
+#     }
+	assign		final_rgb room_rgb 	%line{142} %argrw{"wr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:146
+#         float curtains_a;
+	gt		$tmp239 curtains_enable $const6 	%line{146} %argrw{"wrr"}
+	if		$tmp239 320 320 	%argrw{"r"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:148
+#         final_rgb = mix(final_rgb, curtains_rgb, curtains_a);
+	compref		$tmp240 curtains_uv $const6 	%line{148} %argrw{"wrr"}
+	compref		$tmp241 curtains_uv $const5 	%argrw{"wrr"}
+	texture		___348_curtains_rgb filename $tmp240 $tmp241 $const22 ___348_curtains_a 	%argrw{"wrrrrw"} %argderivs{2,3}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:149
+#     }
+	mix		final_rgb final_rgb ___348_curtains_rgb ___348_curtains_a 	%line{149} %argrw{"wrrr"}
+# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/osl_window_box_s.osl:152
+# 
+	assign		out_rgb final_rgb 	%line{152} %argrw{"wr"}
 	end

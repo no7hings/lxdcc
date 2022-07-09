@@ -637,6 +637,99 @@ class StoragePathMtd(object):
     @classmethod
     def get_is_writeable(cls, path):
         return os.access(path, os.W_OK)
+    @classmethod
+    def get_file_name_search_dict(cls, directory_paths):
+        def rcs_fnc_(path_):
+            _results = glob.glob(u'{}/*'.format(path_)) or []
+            # _results.sort()
+            for _i_path in _results:
+                if os.path.isfile(_i_path):
+                    _i_directory_path = os.path.dirname(_i_path)
+                    _i_name = os.path.basename(_i_path)
+                    _i_name_base, _i_ext = os.path.splitext(_i_name)
+                    #
+                    _i_name_base_key = _i_name_base
+                    _i_ext_key = _i_ext
+                    #
+                    if _i_name_base_key in dict_:
+                        _i_ext_search_dict = dict_[_i_name_base_key]
+                    else:
+                        _i_ext_search_dict = {}
+                        dict_[_i_name_base_key] = _i_ext_search_dict
+                    #
+                    if _i_ext_key in _i_ext_search_dict:
+                        _i_matches = _i_ext_search_dict[_i_ext_key]
+                    else:
+                        _i_matches = []
+                        _i_ext_search_dict[_i_ext_key] = _i_matches
+                    #
+                    _i_matches.append(
+                        (_i_directory_path, _i_name_base, _i_ext)
+                    )
+                elif os.path.isdir(_i_path):
+                    rcs_fnc_(_i_path)
+
+        dict_ = {}
+        [rcs_fnc_(i) for i in directory_paths]
+        return dict_
+    @classmethod
+    def get_file_args(cls, file_path):
+        directory_path = os.path.dirname(file_path)
+        base = os.path.basename(file_path)
+        name_base, ext = os.path.splitext(base)
+        return directory_path, name_base, ext
+
+
+class StgFileSearchOpt(object):
+    def __init__(self, ignore_name_case=False, ignore_ext_case=False, ignore_ext=False):
+        self._ignore_name_case = ignore_name_case
+        self._ignore_ext_case = ignore_ext_case
+        self._ignore_ext = ignore_ext
+        self._search_dict = {}
+
+    def set_search_directories(self, directory_paths):
+        self._search_dict = collections.OrderedDict()
+        for i in directory_paths:
+            for j in DirectoryMtd.get_all_file_paths__(i):
+                j_directory_path, j_name_base, j_ext = StoragePathMtd.get_file_args(j)
+                if self._ignore_name_case is True:
+                    j_name_base = j_name_base.lower()
+                if self._ignore_ext_case is True:
+                    j_ext = j_ext.lower()
+
+                self._search_dict[u'{}/{}{}'.format(j_directory_path, j_name_base, j_ext)] = j
+
+    def get_result(self, file_path_src):
+        name_src = os.path.basename(file_path_src)
+        name_base_src, ext_src = os.path.splitext(name_src)
+        name_base_pattern = MultiplyPatternMtd.to_fnmatch_style(name_base_src)
+
+        if self._ignore_name_case is True:
+            name_base_pattern = name_base_pattern.lower()
+
+        if self._ignore_ext_case is True:
+            ext_src = ext_src.lower()
+
+        file_path_keys = self._search_dict.keys()
+
+        match_pattern_0 = u'*/{}{}'.format(name_base_pattern, ext_src)
+        matches_0 = fnmatch.filter(
+            file_path_keys, match_pattern_0
+        )
+        if matches_0:
+            file_path_tgt = self._search_dict[matches_0[0]]
+            directory_path_tgt, name_base_tgt, ext_tgt = StoragePathMtd.get_file_args(file_path_tgt)
+            return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
+        #
+        if self._ignore_ext is True:
+            match_pattern_1 = u'*/{}.*'.format(name_base_pattern)
+            matches_1 = fnmatch.filter(
+                file_path_keys, match_pattern_1
+            )
+            if matches_1:
+                file_path_tgt = self._search_dict[matches_1[0]]
+                directory_path_tgt, name_base_tgt, ext_tgt = StoragePathMtd.get_file_args(file_path_tgt)
+                return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
 
 
 class StorageLinkMtd(object):
@@ -658,6 +751,9 @@ class StorageLinkMtd(object):
     def get_rel_path(cls, src_path, tgt_path):
         tgt_dir_path = os.path.dirname(tgt_path)
         return os.path.relpath(src_path, tgt_dir_path)
+    @classmethod
+    def get_is_link(cls, path):
+        return os.path.islink(path)
 
 
 class StoragePathOpt(object):
@@ -901,12 +997,15 @@ class StorageFileOpt(StoragePathOpt):
 class MultiplyPatternMtd(object):
     RE_UDIM_KEYS = [
         (r'<udim>', r'{}', 4),
-        (r'<f>', r'{}', 4),
     ]
     #
     RE_SEQUENCE_KEYS = [
         (r'#', r'{}', -1),
-        # houdini
+        # maya
+        (r'<f>', r'{}', 4),
+        # katana, etc, "test.(0001-0600)%04d.exr"
+        (r'(\()[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9](\))(%04d)', r'{}', 4),
+        # houdini, etc, "test.$F.exr"
         (r'$F', r'\{}[^\d]', 4),
     ]
     # houdini
@@ -927,16 +1026,35 @@ class MultiplyPatternMtd(object):
         #
         new_name_base = pattern
         for i_k, i_f, i_c in re_keys:
-            r = re.finditer(i_k, pattern, re.IGNORECASE) or []
-            for i in r:
-                start, end = i.span()
+            i_r = re.finditer(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            for j in i_r:
+                j_start, j_end = j.span()
                 if i_c == -1:
                     s = '[0-9]'
-                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
+                    new_name_base = new_name_base.replace(pattern[j_start:j_end], s, 1)
                 else:
-                    s = '[0-9]' * i_c
-                    new_name_base = new_name_base.replace(pattern[start:end], s, 1)
+                    s = '[0-9]'*i_c
+                    new_name_base = new_name_base.replace(pattern[j_start:j_end], s, 1)
         return new_name_base
+    @classmethod
+    def get_args_(cls, pattern):
+        re_keys = cls.RE_MULTIPLY_KEYS
+        #
+        key_args = []
+        for i_k, i_f, i_c in re_keys:
+            i_r = re.finditer(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            ss = list(i_r)
+            if ss:
+                if i_c == -1:
+                    i_count = len(ss)
+                    i_key = i_count * i_k
+                else:
+                    i_count = i_c
+                    i_key = i_k
+                key_args.append(
+                    (i_key, i_count)
+                )
+        return key_args
     @classmethod
     def get_args(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -1010,17 +1128,18 @@ class DirectoryMtd(object):
     @classmethod
     def get_file_paths(cls, directory_path, include_exts=None):
         list_ = []
-        results = os.listdir(directory_path) or []
-        # results.sort()
-        for i_name in results:
-            i_path = '{}/{}'.format(directory_path, i_name)
-            if os.path.isfile(i_path):
-                if isinstance(include_exts, (tuple, list)):
-                    i_name_base, i_ext = os.path.splitext(i_name)
-                    if i_ext not in include_exts:
-                        continue
-                #
-                list_.append(i_path)
+        if os.path.isdir(directory_path):
+            results = os.listdir(directory_path) or []
+            # results.sort()
+            for i_name in results:
+                i_path = '{}/{}'.format(directory_path, i_name)
+                if os.path.isfile(i_path):
+                    if isinstance(include_exts, (tuple, list)):
+                        i_name_base, i_ext = os.path.splitext(i_name)
+                        if i_ext not in include_exts:
+                            continue
+                    #
+                    list_.append(i_path)
         return list_
     @classmethod
     def _get_file_paths(cls, directory_path, include_exts=None):
@@ -1062,7 +1181,8 @@ class DirectoryMtd(object):
                     rcs_fnc_(_i_path)
 
         list_ = []
-        rcs_fnc_(directory_path)
+        if os.path.isdir(directory_path):
+            rcs_fnc_(directory_path)
         return list_
     @classmethod
     def _get_all_file_paths(cls, directory_path, include_exts=None):
@@ -1094,12 +1214,13 @@ class DirectoryMtd(object):
     @classmethod
     def get_directory_paths(cls, directory_path):
         list_ = []
-        results = os.listdir(directory_path) or []
-        # results.sort()
-        for i_name in results:
-            i_path = '{}/{}'.format(directory_path, i_name)
-            if os.path.isdir(i_path):
-                list_.append(i_path)
+        if os.path.isdir(directory_path):
+            results = os.listdir(directory_path) or []
+            # results.sort()
+            for i_name in results:
+                i_path = '{}/{}'.format(directory_path, i_name)
+                if os.path.isdir(i_path):
+                    list_.append(i_path)
         return list_
     @classmethod
     def _get_directory_paths(cls, directory_path):
@@ -1129,7 +1250,8 @@ class DirectoryMtd(object):
                     rcs_fnc_(_i_path)
 
         list_ = []
-        rcs_fnc_(directory_path)
+        if os.path.isdir(directory_path):
+            rcs_fnc_(directory_path)
         return list_
     @classmethod
     def _get_all_directory_paths(cls, directory_path):
@@ -4047,7 +4169,9 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print DccPathDagMtd.set_dag_path_cleanup_to(
-        '/master/shape/group/pasted__camera1/pasted__cameraShape1->/pasted__imagePlane1'
+    import grp
+    print StorageLinkMtd.get_is_link(
+        '/l/prod/cgm/work/assets/chr/nn_4y_test/srf/surfacing/texture/main/v002/src/eye.diff_clr.1001.exr'
     )
+    # print StoragePathMtd.get_group_name('/l/prod/cgm/work/assets/chr/nn_4y_test/srf/surfacing/texture/main/v001')
 

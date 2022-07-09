@@ -256,6 +256,11 @@ class PathGroupPermission(AbsPermission):
         self._path = path
         self._nas_path = bsc_core.StoragePathMtd.set_map_to_nas(path)
 
+    def get_all_group_data(self):
+        return self._get_all_group_data_(
+            self._nas_path
+        )
+
     def get_is_read_only(self, group_name):
         group_data = self._get_all_group_data_(self._nas_path)
         if group_name in group_data:
@@ -284,6 +289,28 @@ class PathGroupPermission(AbsPermission):
             )
             return self._set_nas_cmd_run_(cmd)
 
+    def set_all_read_only(self):
+        group_data = self._get_all_group_data_(self._nas_path)
+        for k, v in group_data.items():
+            if k in self.GROUP_ID_QUERY:
+                i_group_name = k
+                i_index, i_content = v
+                i_group_id = self.GROUP_ID_QUERY[i_group_name]
+                i_kwargs = dict(
+                    group_id=i_group_id,
+                    path=self._nas_path,
+                    index=i_index
+                )
+                i_cmd = self.CMD_QUERY['remove_grp'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
+                i_cmd = self.CMD_QUERY['read_only'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
     def get_is_allow(self, group_name):
         group_data = self._get_all_group_data_(self._nas_path)
         if group_name in group_data:
@@ -302,31 +329,6 @@ class PathGroupPermission(AbsPermission):
 
 
 if __name__ == '__main__':
-    # print bsc_core.StoragePathMtd.get_group_name(
-    #     '/l/prod/cgm/work/assets/chr/bl_xiz_f/srf'
-    # )
-    # RsvPermissionMtd.set_group_read_only(
-    #     'set_test'
-    # )
-    print bsc_core.StoragePathMtd.get_is_writeable('/l/prod/cgm/work/assets/chr/bl_xiz_f/srf/surfacing/texture/main/v001')
-    p = PathGroupPermission('/l/prod/cgm/work/assets/chr/bl_xiz_f/srf/surfacing/texture/main/v001')
-
-    # p.set_allow(
-    #     'td_grp'
-    # )
-    # p.set_read_only(
-    #     'td_grp'
-    # )
-    p.set_read_only(
-        'td_grp'
-    )
-    # p.set_allow(
-    #     'td_grp'
-    # )
-    print p.get_is_read_only(
-        'td_grp'
-    )
-    # print RsvPermissionMtd.set_group_read_only(
-    #     'td_grp',
-    #     '/l/prod/cgm/work/assets/chr/bl_xiz_f/srf/surfacing/texture/main/v001'
-    # )
+    print PathGroupPermission(
+        '/l/prod/cgm/work/assets/chr/nn_4y_test/srf/surfacing/texture/main/v001'
+    ).set_all_read_only()

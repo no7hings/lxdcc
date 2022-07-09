@@ -90,7 +90,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         )
 
         utl_dcc_objects.OsDirectory_(version_directory_path).set_link_to(
-            no_version_directory_path, force=True
+            no_version_directory_path, replace=True
         )
 
     def set_publish_file_export(self):

@@ -60,7 +60,12 @@ class Transform(_mya_dcc_obj_obj.Node):
         self.get_port('visibility').set(boolean)
 
     def get_matrix(self):
-        return cmds.xform(self.path, query=1, matrix=1, worldSpace=1)
+        return cmds.xform(
+            self.path,
+            query=1,
+            matrix=1,
+            worldSpace=1
+        )
 
     def get_matrix_is_changed(self):
         return self.get_matrix() != self.DEFAULT_MATRIX

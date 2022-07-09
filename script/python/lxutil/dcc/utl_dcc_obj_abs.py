@@ -191,8 +191,8 @@ class AbsOsFile(
     def _get_is_udim_(cls, file_path):
         path_base = os.path.basename(file_path)
         for k, c in cls.RE_UDIM_KEYS:
-            r = re.finditer(k, path_base, re.IGNORECASE) or []
-            if r:
+            i_r = re.finditer(k, path_base, re.IGNORECASE) or []
+            if i_r:
                 return True
         return False
 
@@ -202,8 +202,8 @@ class AbsOsFile(
     def _get_is_sequence_(cls, file_path):
         path_base = os.path.basename(file_path)
         for k, c in cls.RE_SEQUENCE_KEYS:
-            r = re.finditer(k, path_base, re.IGNORECASE) or []
-            if r:
+            i_r = re.finditer(k, path_base, re.IGNORECASE) or []
+            if i_r:
                 return True
         return False
 
@@ -234,8 +234,8 @@ class AbsOsFile(
     def _get_has_elements_(cls, file_path):
         path_base = os.path.basename(file_path)
         for k, c in cls.RE_MULTIPLY_KEYS:
-            r = re.finditer(k, path_base, re.IGNORECASE) or []
-            if r:
+            i_r = re.finditer(k, path_base, re.IGNORECASE) or []
+            if i_r:
                 return True
         return False
     @classmethod
@@ -271,9 +271,9 @@ class AbsOsFile(
         name_base_new = name_base
         ext = os.path.splitext(name_base)[-1]
         for k, c in re_keys:
-            r = re.finditer(k, name_base, re.IGNORECASE) or []
-            for i in r:
-                start, end = i.span()
+            i_r = re.finditer(k, name_base, re.IGNORECASE) or []
+            for j in i_r:
+                start, end = j.span()
                 if c == -1:
                     s = '[0-9]'
                     name_base_new = name_base_new.replace(name_base[start:end], s, 1)
@@ -319,8 +319,8 @@ class AbsOsFile(
         name_base_new = name_base
         ext = os.path.splitext(name_base)[-1]
         for k, c in re_keys:
-            r = re.finditer(k, name_base, re.IGNORECASE) or []
-            for i in r:
+            i_r = re.finditer(k, name_base, re.IGNORECASE) or []
+            for i in i_r:
                 start, end = i.span()
                 if c == -1:
                     s = '[0-9]'
@@ -354,8 +354,8 @@ class AbsOsFile(
         name_base = os.path.basename(file_path)
         name_base_new = name_base
         for k, c in re_keys:
-            r = re.finditer(k, name_base, re.IGNORECASE) or []
-            for i in r:
+            i_r = re.finditer(k, name_base, re.IGNORECASE) or []
+            for i in i_r:
                 start, end = i.span()
                 if c == -1:
                     s = '[0-9]'
@@ -550,35 +550,63 @@ class AbsOsFile(
     def get_is_link_source_to(self, file_path):
         pass
 
-    def set_link_to(self, tgt_file_path, force=False):
-        tgt_file = self.__class__(tgt_file_path)
+    def set_link_to(self, tgt_file_path, replace=False):
+        file_tgt = self.__class__(tgt_file_path)
+        file_path_src = self.path
+        file_path_tgt = file_tgt.path
         if self.get_is_exists() is True:
-            if tgt_file.get_is_exists():
-                if force is False:
+            if file_tgt.get_is_exists():
+                if replace is True:
+                    if bsc_core.StorageLinkMtd.get_is_link(file_path_tgt) is False:
+                        os.remove(file_path_tgt)
+                        bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_path_tgt)
+                        utl_core.Log.set_module_result_trace(
+                            'link replace',
+                            u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
+                        )
+                        return
+                    else:
+                        if bsc_core.StorageLinkMtd.get_is_link_source_to(
+                            file_path_src, file_path_tgt,
+                        ) is False:
+                            os.remove(file_path_tgt)
+                            bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_path_tgt)
+                            utl_core.Log.set_module_result_trace(
+                                'link replace',
+                                u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
+                            )
+                            return
+                else:
                     utl_core.Log.set_module_warning_trace(
                         'link create',
-                        u'path="{}" is exists'.format(tgt_file.path)
+                        u'file="{}" is exists'.format(file_path_tgt)
                     )
                     return
-                else:
-                    if os.path.islink(tgt_file.path) is True:
-                        os.remove(tgt_file.path)
-                        utl_core.Log.set_module_result_trace(
-                            'path-link-remove',
-                            u'path="{}"'.format(tgt_file.path)
-                        )
             #
-            if tgt_file.get_is_exists() is False:
-                tgt_file.set_directory_create()
+            if file_tgt.get_is_exists() is False:
+                file_tgt.set_directory_create()
                 #
                 bsc_core.StorageLinkMtd.set_link_to(
-                    self.path, tgt_file.path
+                    self.path, file_tgt.path
                 )
                 #
                 utl_core.Log.set_module_result_trace(
                     'link create',
-                    u'link="{} >> {}"'.format(self.path, tgt_file.path)
+                    u'link="{} >> {}"'.format(self.path, file_tgt.path)
                 )
+
+    def set_link_to_file(self, file_path_tgt, replace=False):
+        self.set_link_to(
+            file_path_tgt, replace
+        )
+
+    def set_link_to_directory(self, directory_path_tgt, replace=False):
+        file_path_tgt = u'{}/{}'.format(
+            directory_path_tgt, self.name
+        )
+        self.set_link_to(
+            file_path_tgt, replace
+        )
 
 
 class AbsOsTexture(AbsOsFile):

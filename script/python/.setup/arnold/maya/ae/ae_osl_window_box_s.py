@@ -20,13 +20,13 @@ class osl_window_box_s(ma_ae.AbsNodeTemplate):
                 self.addControl('room_depth')
                 self.addControl('width_overscan')
                 self.addControl('height_overscan')
-                self.addControl('midground_enable')
                 self.addControl('midground_depth')
                 self.addControl('midground_offset_x')
                 self.addControl('midground_offset_y')
                 self.addControl('add')
                 self.addControl('multiply')
                 self.addControl('curtains_enable')
+                self.addControl('midground_enable')
 
             #
             self.addExtraControls()

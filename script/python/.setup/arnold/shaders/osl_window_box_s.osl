@@ -5,12 +5,11 @@ shader osl_window_box_s(
     int space = 0 [[ string widget = "enumerate", string options = "x|-x|y|-y|z|-z" ]],
     //
     string filename = "" [[ string widget = "filename" ]],
-    int texture_flip = 1 [[ string widget = "boolean" ]],
-    int texture_flop = 0 [[ string widget = "boolean" ]],
+    int texture_flip = 0 [[ string widget = "boolean" ]],
+    int texture_flop = 1 [[ string widget = "boolean" ]],
     float room_depth = 1 [[ float min = 0.1, float max = 100 ]],
     float width_overscan = 0 [[ float min = 0.0, float max = 0.9 ]],
     float height_overscan = 0 [[ float min = 0.0, float max = 0.9 ]],
-    int midground_enable = 0 [[ string widget = "boolean" ]],
     float midground_depth = 0.5 [[ float min = 0.05, float max = 99 ]],
     float midground_offset_x = 0,
     float midground_offset_y = 0,
@@ -18,46 +17,50 @@ shader osl_window_box_s(
     vector add = 0.0,
     vector multiply = 1.0,
     //
-    int curtains_enable = 0 [[ string widget = "boolean" ]],
+    int curtains_enable = 1 [[ string widget = "boolean" ]],
+    int midground_enable = 1 [[ string widget = "boolean" ]],
     output color out_rgb = 0.0,
 )
 {
     //user controls remapping
     float room_depthMult = clamp(room_depth,0.1,100);
-    float height_overscanMult = 1 - clamp(height_overscan,0,0.9);
-    float width_overscanMult = 1 - clamp(width_overscan,0,0.9);
-    float midground_depthMult = clamp(midground_depth,0.05,room_depthMult-0.01);
-    float midgroundOffY = midground_offset_y * (texture_flip*2-1) * 0.1;
-    float midgroundOffX = midground_offset_x * (texture_flop*2-1) * 0.1;
+    float height_overscanMult = 1 - clamp(height_overscan, 0, 0.9);
+    float width_overscanMult = 1 - clamp(width_overscan, 0, 0.9);
+    float mid_ground_depth_mult = clamp(midground_depth, 0.05, room_depthMult - 0.01);
+    // 0=1, 1=-1
+    float mid_ground_off_x = midground_offset_x * -(texture_flop*2-1) * 0.1;
+    float mid_ground_off_y = midground_offset_y * -(texture_flip*2-1) * 0.1;
     //global variables & remapping
     // x, z, y
-    vector objI = transform("object", -I);
+    vector objI = transform("object", I);
     // x
     if (space == 0){
-      objI = vector(objI[2],-objI[1],-objI[0])*color(width_overscanMult, height_overscanMult, 1);
+      objI = vector(-objI[2],objI[1],objI[0])*color(width_overscanMult, height_overscanMult, 1);
     }
     // -x
     else if (space == 1){
-      objI = vector(-objI[2],-objI[1],objI[0])*color(width_overscanMult, height_overscanMult, 1);
+      objI = vector(objI[2],objI[1],-objI[0])*color(width_overscanMult, height_overscanMult, 1);
     }
     // y
     else if (space == 2){
-      objI = vector(objI[0],-objI[2],-objI[1])*color(width_overscanMult, height_overscanMult, 1);
+      objI = vector(-objI[0],objI[2],objI[1])*color(width_overscanMult, height_overscanMult, 1);
     }
     // -y
     else if (space == 3){
-      objI = vector(objI[0],objI[2],objI[1])*color(width_overscanMult, height_overscanMult, 1);
+      objI = vector(-objI[0],-objI[2],-objI[1])*color(width_overscanMult, height_overscanMult, 1);
     }
     // z
     else if (space == 4){
-      objI = vector(-objI[0],-objI[1],-objI[2])*color(width_overscanMult, height_overscanMult, 1);
+      // -x, -y, -z
+      objI = vector(objI[0],objI[1],objI[2])*color(width_overscanMult, height_overscanMult, 1);
     }
     // -z
     else if (space == 5){
-      objI = vector(objI[0],-objI[1],objI[2])*color(width_overscanMult, height_overscanMult, 1);
+      // x, -y, z
+      objI = vector(-objI[0],objI[1],-objI[2])*color(width_overscanMult, height_overscanMult, 1);
     }
     else {
-      objI = vector(-objI[0],objI[2],-objI[1])*color(width_overscanMult, height_overscanMult, 1);
+      objI = vector(objI[0],-objI[2],objI[1])*color(width_overscanMult, height_overscanMult, 1);
     }
     objI = vector(objI[0],objI[1],objI[2])*multiply+add;
 
@@ -66,7 +69,7 @@ shader osl_window_box_s(
     //bases for width/height/depth
     vector sections = step(0, objI);
     color baseDepth = (objP-sections)/(-objI * room_depthMult);
-    color mgDepth = (objP-sections)/(-objI * midground_depthMult);
+    color mgDepth = (objP-sections)/(-objI * mid_ground_depth_mult);
     color baseBack = (objP-sections)/(-objI);
     color baseWidth = baseDepth * room_depthMult;
 
@@ -96,49 +99,55 @@ shader osl_window_box_s(
 
     color backWallUV = ((baseBack[2]*objI + (objP/2)/(room_depthMult)) * (room_depthMult*2) / 3 + color(1.0/3.0, 1.0/3.0, 0) ) * (1 - max(step(0,horizU), step(0,vertV)));
 
-    color midgroundUV = (1.0/3.0 - (baseBack[2]*objI + (objP)/(midground_depthMult*2)) * (midground_depthMult*2) / 3);
-    float midgroundMask = step( 0, midgroundUV[1] * 3 * (1-midgroundUV[1]*3) ) * step( 0, midgroundUV[0] * (1.0/3.0-midgroundUV[0]) );
-    midgroundUV = (color(midgroundOffX, midgroundOffY, 0) + midgroundUV) * midgroundMask;
-    midgroundUV[1] = 1-midgroundUV[1];
+    color mid_ground_uv = (1.0/3.0 - (baseBack[2]*objI + (objP)/(mid_ground_depth_mult*2)) * (mid_ground_depth_mult*2) / 3);
+    float mid_ground_mask = step( 0, mid_ground_uv[1] * 3 * (1-mid_ground_uv[1]*3) ) * step( 0, mid_ground_uv[0] * (1.0/3.0-mid_ground_uv[0]) );
+    mid_ground_uv = (color(mid_ground_off_x, mid_ground_off_y, 0) + mid_ground_uv) * mid_ground_mask;
+    mid_ground_uv[1] = 1-mid_ground_uv[1];
 
-    color curtainsUV = objPOrig * color(1.0/3.0, 1.0/3.0, 1);
-    curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
+    color curtains_uv = objPOrig * color(1.0/3.0, 1.0/3.0, 1);
+    curtains_uv[0] = curtains_uv[0];
 
     color finalUV = ceilUV + floorUV + rWallUV + lWallUV + backWallUV;
 
-    //flipping ctrl
-    if (texture_flop > 0){
-        midgroundUV[0] = 1.0/3.0 - midgroundUV[0];
-        curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
-    }else
-        finalUV[0] = 1-finalUV[0];
+    // flip
     if (texture_flip > 0){
+        mid_ground_uv[1] = 1 - mid_ground_uv[1] + 2.0/3.0;
+        curtains_uv[1] = - curtains_uv[1] + 1.0/3.0;
+    }else
         finalUV[1] = 1-finalUV[1];
-        midgroundUV[1] = 1 - midgroundUV[1] + 2.0/3.0;
-        curtainsUV[1] = 1.0/3.0 - curtainsUV[1];
-    }
+        mid_ground_uv[1] = 1 - mid_ground_uv[1];
+        curtains_uv[1] = 1 - curtains_uv[1];
 
-    color roomRGB = texture(filename, finalUV[0], finalUV[1]);
+    // flop
+    if (texture_flop > 0){
+        finalUV[0] = 1-finalUV[0];
+        mid_ground_uv[0] = mid_ground_uv[0];
+        curtains_uv[0] = - curtains_uv[0] + 1.0/3.0;
+    }else
+        mid_ground_uv[0] = 1.0/3.0 - mid_ground_uv[0];
+        curtains_uv[0] = curtains_uv[0];
 
-    color finalRGB;
+    color room_rgb = texture(filename, finalUV[0], finalUV[1]);
 
-    //midground switch
+    color final_rgb;
+
+    //mid ground switch
     if (midground_enable > 0){
-        float midgroundA;
-        color midgroundRGB = texture(filename, midgroundUV[0], midgroundUV[1], "alpha", midgroundA);
-        finalRGB = mix(roomRGB,midgroundRGB,midgroundA);
+        float mid_ground_a;
+        color mid_ground_rgb = texture(filename, mid_ground_uv[0], mid_ground_uv[1], "alpha", mid_ground_a);
+        final_rgb = mix(room_rgb, mid_ground_rgb, mid_ground_a);
     }
     else{
-        finalRGB = roomRGB;
+        final_rgb = room_rgb;
     }
 
     //curtains switch
     if (curtains_enable > 0){
-        float curtainsA;
-        color curtainsRGB = texture(filename, curtainsUV[0], curtainsUV[1], "alpha", curtainsA);
-        finalRGB = mix(finalRGB,curtainsRGB,curtainsA);
+        float curtains_a;
+        color curtains_rgb = texture(filename, curtains_uv[0], curtains_uv[1], "alpha", curtains_a);
+        final_rgb = mix(final_rgb, curtains_rgb, curtains_a);
     }
 
-    out_rgb = finalRGB;
+    out_rgb = final_rgb;
 
 }

@@ -38,19 +38,15 @@
         <help>
         </help>
     </param>
-    <param name="midground_enable" constant="True" widget="checkBox">
+    <param name="midground_depth" constant="True" slider="True" slidermin="0" slidermax="1">
         <help>
         </help>
     </param>
-    <param name="midground_depth" constant="True" slider="True" slidermin="0.05" slidermax="99">
+    <param name="midground_offset_x" constant="True" slider="True" slidermin="0" slidermax="1">
         <help>
         </help>
     </param>
-    <param name="midground_offset_x" constant="True">
-        <help>
-        </help>
-    </param>
-    <param name="midground_offset_y" constant="True">
+    <param name="midground_offset_y" constant="True" slider="True" slidermin="0" slidermax="1">
         <help>
         </help>
     </param>
@@ -63,6 +59,10 @@
         </help>
     </param>
     <param name="curtains_enable" constant="True" widget="checkBox">
+        <help>
+        </help>
+    </param>
+    <param name="midground_enable" constant="True" widget="checkBox">
         <help>
         </help>
     </param>

@@ -10,7 +10,7 @@ class Content(bsc_obj_abs.AbsContent):
         super(Content, self).__init__(key, value)
 
 
-class Configure(bsc_obj_abs.AbsConfigure):
+class Configure(bsc_obj_abs.AbsContent):
     PATHSEP = '.'
     def __init__(self, key=None, value=None):
         super(Configure, self).__init__(key, value)

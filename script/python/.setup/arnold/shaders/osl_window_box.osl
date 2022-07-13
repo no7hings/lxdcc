@@ -92,7 +92,7 @@ shader osl_window_box(
     if (texture_flop > 0){
         midgroundUV[0] = 1.0/3.0 - midgroundUV[0];
         curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
-    }else
+    } else
         finalUV[0] = 1-finalUV[0];
     if (texture_flip > 0){
         finalUV[1] = 1-finalUV[1];

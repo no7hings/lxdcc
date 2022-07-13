@@ -7,12 +7,12 @@ import maya.mel as mel
 from lxmaya import ma_ae
 
 
+# build by lynxi
 class osl_window_box(ma_ae.AbsNodeTemplate):
     def setup(self):
         self._create_dict = {}
-        #
         with self.scroll_layout():
-            with self.layout('Attribute(s)', collapse=False):
+            with self.layout('osl window box', collapse=False):
                 self.addControl('up_use_z_axis')
                 self.addControl('filename', useAsFileName=True)
                 self.addControl('texture_flip')
@@ -26,5 +26,4 @@ class osl_window_box(ma_ae.AbsNodeTemplate):
                 self.addControl('midground_offset_y')
                 self.addControl('curtains_enable')
 
-            #
             self.addExtraControls()

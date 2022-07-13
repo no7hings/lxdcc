@@ -187,7 +187,6 @@ class AbsFileReferences(object):
         with_reference=True,
         includes=[]
     )
-
     def __init__(self, *args, **kwargs):
         self._raw = {}
         #
@@ -406,6 +405,11 @@ class AbsFileReferences(object):
                 #
                 lis.append(file_path)
         return lis
+    @classmethod
+    def set_obj_repath_to(cls, obj, port_path, file_path_new):
+        cls._set_real_file_path_(
+            obj.get_port(port_path), file_path_new
+        )
 
 
 class FileReferences(AbsFileReferences):

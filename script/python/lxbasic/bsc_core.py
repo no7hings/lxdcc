@@ -622,10 +622,10 @@ class StoragePathMtd(object):
         if os.path.isdir(directory_path) is False:
             os.makedirs(directory_path)
     @classmethod
-    def get_relpath(cls, src_path, tgt_path):
-        return os.path.relpath(src_path, tgt_path)
+    def get_relpath(cls, path_src, path_tgt):
+        return os.path.relpath(path_src, path_tgt)
     @classmethod
-    def get_path_is_exists(cls, path):
+    def get_is_exists(cls, path):
         return os.path.exists(path)
     @classmethod
     def get_file_realpath(cls, file_path_src, file_path_tgt):
@@ -685,7 +685,7 @@ class StgFileSearchOpt(object):
         self._ignore_name_case = ignore_name_case
         self._ignore_ext_case = ignore_ext_case
         self._ignore_ext = ignore_ext
-        self._search_dict = {}
+        self._search_dict = collections.OrderedDict()
 
     def set_search_directories(self, directory_paths):
         self._search_dict = collections.OrderedDict()
@@ -698,6 +698,20 @@ class StgFileSearchOpt(object):
                     j_ext = j_ext.lower()
 
                 self._search_dict[u'{}/{}{}'.format(j_directory_path, j_name_base, j_ext)] = j
+
+    def set_search_directory_append(self, directory_path, below_enable=False):
+        if below_enable is True:
+            _ = DirectoryMtd.get_all_file_paths__(directory_path)
+        else:
+            _ = DirectoryMtd.get_file_paths__(directory_path)
+
+        for i in _:
+            i_directory_path, i_name_base, i_ext = StoragePathMtd.get_file_args(i)
+            if self._ignore_name_case is True:
+                i_name_base = i_name_base.lower()
+            if self._ignore_ext_case is True:
+                i_ext = i_ext.lower()
+            self._search_dict[u'{}/{}{}'.format(i_directory_path, i_name_base, i_ext)] = i
 
     def get_result(self, file_path_src):
         name_src = os.path.basename(file_path_src)
@@ -734,26 +748,50 @@ class StgFileSearchOpt(object):
 
 class StorageLinkMtd(object):
     @classmethod
-    def set_link_to(cls, src_path, tgt_path):
-        if os.path.exists(tgt_path) is False:
-            tgt_dir_path = os.path.dirname(tgt_path)
-            src_rel_path = os.path.relpath(src_path, tgt_dir_path)
-            os.symlink(src_rel_path, tgt_path)
+    def set_link_to(cls, path_src, path_tgt):
+        if os.path.exists(path_tgt) is False:
+            tgt_dir_path = os.path.dirname(path_tgt)
+            src_rel_path = os.path.relpath(path_src, tgt_dir_path)
+            os.symlink(src_rel_path, path_tgt)
     @classmethod
-    def get_is_link_source_to(cls, src_path, tgt_path):
-        tgt_dir_path = os.path.dirname(tgt_path)
-        src_rel_path = os.path.relpath(src_path, tgt_dir_path)
-        if os.path.islink(tgt_path):
-            orig_src_rel_path = os.readlink(tgt_path)
+    def get_is_link_source_to(cls, path_src, path_tgt):
+        tgt_dir_path = os.path.dirname(path_tgt)
+        src_rel_path = os.path.relpath(path_src, tgt_dir_path)
+        if os.path.islink(path_tgt):
+            orig_src_rel_path = os.readlink(path_tgt)
             return src_rel_path == orig_src_rel_path
         return False
     @classmethod
-    def get_rel_path(cls, src_path, tgt_path):
-        tgt_dir_path = os.path.dirname(tgt_path)
-        return os.path.relpath(src_path, tgt_dir_path)
+    def get_rel_path(cls, path_src, path_tgt):
+        tgt_dir_path = os.path.dirname(path_tgt)
+        return os.path.relpath(path_src, tgt_dir_path)
     @classmethod
     def get_is_link(cls, path):
         return os.path.islink(path)
+    @classmethod
+    def get_link_source(cls, path_tgt):
+        cur_path = path_tgt
+        while True:
+            if os.path.exists(cur_path):
+                if os.path.islink(cur_path) is True:
+                    cur_directory_path = os.path.dirname(cur_path)
+                    os.chdir(cur_directory_path)
+                    cur_path = os.path.abspath(os.readlink(cur_path))
+                else:
+                    break
+            else:
+                break
+        return cur_path
+    @classmethod
+    def set_file_link_to(cls, path_src, path_tgt):
+        if os.path.isfile(path_src):
+            if os.path.islink(path_src):
+                path_src = cls.get_link_source(path_src)
+            #
+            if os.path.exists(path_tgt) is False:
+                tgt_dir_path = os.path.dirname(path_tgt)
+                src_rel_path = os.path.relpath(path_src, tgt_dir_path)
+                os.symlink(src_rel_path, path_tgt)
 
 
 class StoragePathOpt(object):
@@ -816,7 +854,7 @@ class StoragePathOpt(object):
     def get_access_timestamp(self):
         return os.stat(self._path).st_atime
 
-    def get_is_same_timestamp_to(self, file_path):
+    def get_timestamp_is_same_to(self, file_path):
         if file_path is not None:
             if self.get_is_exists() is True and self.__class__(file_path).get_is_exists() is True:
                 return str(self.get_modify_timestamp()) == str(self.__class__(file_path).get_modify_timestamp())
@@ -3521,6 +3559,23 @@ class ImageOpt(object):
                 )
         return thumbnail_file_path
 
+    def get_thumbnail_create_args(self, width=128):
+        thumbnail_file_path = self.get_thumbnail_file_path()
+        if os.path.exists(thumbnail_file_path) is False:
+            if os.path.exists(self._file_path):
+                directory_path = os.path.dirname(thumbnail_file_path)
+                if os.path.exists(directory_path) is False:
+                    os.makedirs(directory_path)
+                #
+                cmd_args = [
+                    Bin.get_oiiotool(),
+                    u'-i "{}"'.format(self._file_path),
+                    '--resize {}x0'.format(width),
+                    '-o "{}"'.format(thumbnail_file_path)
+                ]
+                return thumbnail_file_path, ' '.join(cmd_args)
+        return thumbnail_file_path, None
+
     def get_jpg_file_path(self):
         path_base, ext = os.path.splitext(self._file_path)
         return '{}{}'.format(path_base, '.jpg')
@@ -4169,9 +4224,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    import grp
-    print StorageLinkMtd.get_is_link(
-        '/l/prod/cgm/work/assets/chr/nn_4y_test/srf/surfacing/texture/main/v002/src/eye.diff_clr.1001.exr'
+    print StoragePathMtd.get_is_readable(
+        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1002.png'
     )
-    # print StoragePathMtd.get_group_name('/l/prod/cgm/work/assets/chr/nn_4y_test/srf/surfacing/texture/main/v001')
 

@@ -370,6 +370,8 @@ class DialogWindow(object):
         cancel_label=None,
         cancel_visible=True,
         #
+        tip_visible=True,
+        #
         button_size=160,
         status=None,
         use_as_error=False,
@@ -377,14 +379,15 @@ class DialogWindow(object):
         show=True,
         use_exec=True,
         options_configure=None,
-        use_thread=True
+        use_thread=True,
+        parent=None,
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
         if use_exec is True:
-            w = prx_widgets.PrxDialogWindow1()
+            w = prx_widgets.PrxDialogWindow1(parent=parent)
         else:
-            w = prx_widgets.PrxDialogWindow0()
+            w = prx_widgets.PrxDialogWindow0(parent=parent)
         #
         w.set_use_thread(use_thread)
         w.set_window_title(label)
@@ -416,6 +419,8 @@ class DialogWindow(object):
         if options_configure is not None:
             w.set_options_group_enable()
             w.set_options_create_by_configure(options_configure)
+        #
+        w.set_tip_visible(tip_visible)
         #
         if show is True:
             w.set_window_show()
@@ -1744,11 +1749,16 @@ class SchemeHistories(object):
 
 class OslShaderMtd(object):
     @classmethod
+    def set_test(cls, dict_, j2_template):
+        pass
+    @classmethod
     def set_katana_ui_template_create(cls, file_path, output_file_path):
         output_file_opt = bsc_core.StorageFileOpt(output_file_path)
+        output_file_opt.set_directory_create()
         info = bsc_core.OslShaderMtd.get_info(file_path)
         if info:
-            j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template.j2')
+            # print(info)
+            j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template-v002.j2')
             raw = j2_template.render(
                 **info
             )
@@ -1757,12 +1767,14 @@ class OslShaderMtd(object):
     @classmethod
     def set_maya_ui_template_create(cls, file_path, output_file_path):
         output_file_opt = bsc_core.StorageFileOpt(output_file_path)
+        output_file_opt.set_directory_create()
         info = bsc_core.OslShaderMtd.get_info(file_path)
         if info:
-            j2_template = utl_configure.Jinja.ARNOLD.get_template('maya-ui-template.j2')
+            j2_template = utl_configure.Jinja.ARNOLD.get_template('maya-ui-template-v002.j2')
             raw = j2_template.render(
                 **info
             )
+            # print(raw)
             output_file_opt.set_write(raw)
 
 
@@ -1978,6 +1990,7 @@ class Resources(object):
 
 
 if __name__ == '__main__':
-    KatanaLauncher(project='cgm').set_file_new(
-        '/l/prod/cgm/work/assets/prp/car_b/mod/modeling/katana/car_b.mod.modeling.v001.katana'
+    OslShaderMtd.set_katana_ui_template_create(
+        '/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_file.osl',
+        '/data/f/jinja_test/test.py'
     )

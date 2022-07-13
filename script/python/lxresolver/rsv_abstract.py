@@ -916,7 +916,7 @@ class AbsRsvUnit(
         result = self.get_result(*args, **kwargs)
         if result:
             if isinstance(result, (str, unicode)):
-                if bsc_core.StoragePathMtd.get_path_is_exists(result):
+                if bsc_core.StoragePathMtd.get_is_exists(result):
                     return result
             elif isinstance(result, (tuple, list)):
                 return result
@@ -1032,7 +1032,7 @@ class AbsRsvUnit(
             return str(rsv_version_key)
         return 'v001'
 
-    def get_all_versions(self, extend_variants=None):
+    def get_all_exists_matches(self, extend_variants=None):
         kwargs = copy.copy(self.properties.value)
         kwargs['version'] = '*'
         kwargs['workspace'] = MtdBasic._get_rsv_workspace_(**kwargs)
@@ -1044,7 +1044,19 @@ class AbsRsvUnit(
             self._pattern,
             kwargs
         )
-        matches = rsv_matcher.get_matches()
+        return rsv_matcher.get_matches()
+
+    def get_all_exists_results(self, extend_variants=None):
+        matches = self.get_all_exists_matches(extend_variants)
+        list_ = []
+        if matches:
+            for i in matches:
+                i_result, i_variants = i
+                list_.append(i_result)
+        return list_
+
+    def get_all_exists_versions(self, extend_variants=None):
+        matches = self.get_all_exists_matches(extend_variants)
         list_ = []
         if matches:
             for i in matches:

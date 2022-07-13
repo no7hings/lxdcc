@@ -7,12 +7,12 @@ import maya.mel as mel
 from lxmaya import ma_ae
 
 
+# build by lynxi
 class osl_noise_fractal(ma_ae.AbsNodeTemplate):
     def setup(self):
         self._create_dict = {}
-        #
         with self.scroll_layout():
-            with self.layout('Attribute(s)', collapse=False):
+            with self.layout('osl noise fractal', collapse=False):
                 self.addControl('octaves')
                 self.addControl('distortion')
                 self.addControl('value')
@@ -30,5 +30,4 @@ class osl_noise_fractal(ma_ae.AbsNodeTemplate):
                 self.addControl('turbulent_enable')
                 self.addControl('clamp_enable')
 
-            #
             self.addExtraControls()

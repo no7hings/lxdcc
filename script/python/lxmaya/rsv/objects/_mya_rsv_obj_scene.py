@@ -112,7 +112,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         scene_src_file_path = scene_src_file_rsv_unit.get_result(version=version)
         orig_file = utl_dcc_objects.OsFile(orig_file_path)
         if orig_file.get_is_exists() is True:
-            orig_file.set_copy_to_file(scene_src_file_path, force=True)
+            orig_file.set_copy_to_file(scene_src_file_path, replace=True)
             #
             scene_src_file = utl_dcc_objects.OsFile(scene_src_file_path)
             if scene_src_file.get_is_exists() is True:

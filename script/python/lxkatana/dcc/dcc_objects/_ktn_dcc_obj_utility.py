@@ -77,7 +77,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         src_file_path = cls.get_current_file_path()
         src_file_obj = utl_dcc_objects.OsFile(src_file_path)
         src_file_obj.set_copy_to_file(
-            file_path, force=True
+            file_path, replace=True
         )
     @classmethod
     def get_scene_is_dirty(cls):

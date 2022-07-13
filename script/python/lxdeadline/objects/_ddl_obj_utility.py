@@ -734,6 +734,8 @@ class DdlJobProcess(object):
         return self._sub_process_statuses
 
 
+class DdlJob
+
 class DdlMethodQuery(ddl_obj_abs.AbsDdlMethodQuery):
     CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file(
         'deadline/query/method'

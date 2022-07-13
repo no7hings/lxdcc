@@ -87,7 +87,9 @@ class AbsDccObjDef(object):
         return self.__str__()
 
     def __eq__(self, other):
-        return self.path == other.path
+        if other is not None:
+            return self._path == other._path
+        return False
 
     def __ne__(self, other):
         return self.path != self.path

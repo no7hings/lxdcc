@@ -725,6 +725,11 @@ class AbsObjDef(object):
             [self.name], pattern
         ) != []
 
+    def get_name_is_matched(self, p):
+        return fnmatch.filter(
+            [self.name], p
+        ) != []
+
 
 # obj/type/def
 class AbsObjTypeDef(object):
@@ -968,8 +973,22 @@ class AbsObjDagDef(object):
         """
         return [self._set_child_create_(i) for i in self.get_descendant_paths()]
 
+    def get_path_is_matched(self, p):
+        return fnmatch.filter(
+            [self.path], p
+        ) != []
+
+    def get_as_new_name(self, new_name):
+        return self.__class__(
+            '{}/{}'.format(
+                self.get_parent_path(), new_name
+            )
+        )
+
     def __eq__(self, other):
-        return self._path == other._path
+        if other is not None:
+            return self._path == other._path
+        return False
 
     def __ne__(self, other):
         return self.path != self.path
@@ -1282,6 +1301,9 @@ class AbsObjOsDef(object):
 
     def get_is_writeable(self):
         return bsc_core.StoragePathMtd.get_is_writeable(self.path)
+
+    def get_is_readable(self):
+        return bsc_core.StoragePathMtd.get_is_readable(self.path)
 
     def set_link_to(self, *args, **kwargs):
         pass
@@ -3192,6 +3214,9 @@ class AbsOsDirectory(
     @property
     def type_name(self):
         return 'directory'
+
+    def get_is_root(self):
+        return self._path == self._root
     #
     def get_root(self):
         return self._set_dag_create_(self._root)
@@ -3323,6 +3348,9 @@ class AbsOsFile(
         if self.ext:
             return self.ext[1:]
         return '*'
+
+    def get_is_root(self):
+        return self._path == self._root
     #
     def get_root(self):
         return self._set_dag_create_(self._root)
@@ -3417,29 +3445,66 @@ class AbsOsFile(
     def set_directory_create(self):
         self.directory.set_create()
 
-    def set_copy_to_file(self, target_file_path, force=False):
-        if force is True:
-            if os.path.exists(target_file_path):
-                os.remove(target_file_path)
-        #
-        if os.path.exists(target_file_path) is False:
-            target_directory = os.path.dirname(target_file_path)
-            if os.path.exists(target_directory) is False:
-                os.makedirs(target_directory)
+    def set_delete(self):
+        if self.get_is_exists() is True:
+            if self.get_is_writeable() is True:
+                os.remove(self.path)
                 self.LOG.set_module_result_trace(
-                    'directory create',
-                    u'directory="{}"'.format(target_directory)
+                    'file delete',
+                    u'file="{}"'.format(self.path)
                 )
-            # noinspection PyBroadException
-            try:
-                shutil.copy2(self.path, target_file_path)
-                self.LOG.set_module_result_trace(
-                    'file copy',
-                    u'file="{}" >> "{}"'.format(self.path, target_file_path)
+            else:
+                self.LOG.set_module_error_trace(
+                    'file delete',
+                    u'file="{}" is not writeable'.format(self.path)
                 )
-            except:
-                bsc_core.ExceptionMtd.set_print()
-                return self.path
+
+    def set_copy_to_file(self, file_path_tgt, replace=False):
+        if self.get_is_exists() is True:
+            file_tgt = self.__class__(file_path_tgt)
+            if replace is True:
+                if bsc_core.StoragePathMtd.get_is_exists(file_path_tgt) is True:
+                    if bsc_core.StoragePathMtd.get_is_writeable(file_path_tgt) is True:
+                        os.remove(file_tgt.path)
+                        shutil.copy2(self.path, file_tgt.path)
+                        self.LOG.set_module_result_trace(
+                            'file copy replace',
+                            u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
+                        )
+                        return
+                    #
+                    self.LOG.set_module_error_trace(
+                        'file copy replace',
+                        u'file="{}" is not writeable'.format(file_tgt.path)
+                    )
+                    return
+            #
+            if file_tgt.get_is_exists() is False:
+                file_tgt.set_directory_create()
+                # noinspection PyBroadException
+                try:
+                    if self.get_is_readable() is True:
+                        shutil.copy2(self.path, file_path_tgt)
+                        self.LOG.set_module_result_trace(
+                            'file copy',
+                            u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
+                        )
+                    else:
+                        self.LOG.set_module_error_trace(
+                            'file copy',
+                            u'file="{}" is not readable'.format(self.path)
+                        )
+                except:
+                    bsc_core.ExceptionMtd.set_print()
+                    return self.path
+
+    def set_copy_to_directory(self, directory_path_tgt, replace=False):
+        file_path_tgt = u'{}/{}'.format(
+            directory_path_tgt, self.name
+        )
+        self.set_copy_to_file(
+            file_path_tgt, replace=replace
+        )
 
     def get_orig_file(self, ext):
         if self.ext == ext:
@@ -3456,6 +3521,9 @@ class AbsOsFile(
                     lis.append(i)
             if lis:
                 return lis[0]
+
+    def get_ext_is(self, ext):
+        return self.ext == ext
 
     def __str__(self):
         return u'{}(path="{}")'.format(
@@ -3574,7 +3642,9 @@ class AbsValue(object):
         return self.__str__()
 
     def __eq__(self, other):
-        return self.get() == other.get()
+        if other is not None:
+            return self.get() == other.get()
+        return False
 
     def __ne__(self, other):
         return self.get() != other.get()

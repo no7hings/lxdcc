@@ -80,7 +80,8 @@ class AbsPermission(object):
         'allow': 'chmod -R +a group {group_id} allow dir_gen_all,object_inherit,container_inherit "{path}"',
         'read_only': 'chmod -R +a group {group_id} allow dir_gen_read,dir_gen_execute,object_inherit,container_inherit "{path}"',
         'show_grp': 'ls -led "{path}"',
-        'remove_grp': 'chmod -R -a# {index} "{path}"'
+        'remove_grp': 'chmod -R -a# {index} "{path}"',
+        'file_allow': 'chmod -R +a group {group_id} allow file_gen_all,object_inherit,container_inherit "{path}"',
     }
     @classmethod
     def _set_nas_cmd_run_(cls, cmd):
@@ -327,8 +328,66 @@ class PathGroupPermission(AbsPermission):
         )
         return self._set_nas_cmd_run_(cmd)
 
+    def set_file_allow(self, group_name):
+        group_id = self.GROUP_ID_QUERY[group_name]
+        group_data = self._get_all_group_data_(self._nas_path)
+        if group_name in group_data:
+            index, content = group_data[group_name]
+            kwargs = dict(
+                group_id=group_id,
+                path=self._nas_path,
+                index=index
+            )
+            i_cmd = self.CMD_QUERY['remove_grp'].format(
+                **kwargs
+            )
+            self._set_nas_cmd_run_(i_cmd)
+
+        kwargs = dict(
+            group_id=group_id,
+            path=self._nas_path
+        )
+        cmd = self.CMD_QUERY['file_allow'].format(
+            **kwargs
+        )
+        return self._set_nas_cmd_run_(cmd)
+
+    def set_file_all_allow(self):
+        group_data = self._get_all_group_data_(self._nas_path)
+        if 'cg_grp' not in group_data:
+            return self.set_file_allow('cg_grp')
+
+        for k, v in group_data.items():
+            if k in self.GROUP_ID_QUERY:
+                i_group_name = k
+                i_index, i_content = v
+                i_group_id = self.GROUP_ID_QUERY[i_group_name]
+                i_kwargs = dict(
+                    group_id=i_group_id,
+                    path=self._nas_path,
+                    index=i_index
+                )
+                i_cmd = self.CMD_QUERY['remove_grp'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
+                i_cmd = self.CMD_QUERY['file_allow'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
 
 if __name__ == '__main__':
     print PathGroupPermission(
-        '/l/prod/cgm/work/assets/chr/nn_4y_test/srf/surfacing/texture/main/v001'
-    ).set_all_read_only()
+        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1001.png'
+    ).get_all_group_data()
+    PathGroupPermission(
+        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1001.png'
+    ).set_file_allow('td_grp')
+    print PathGroupPermission(
+        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-4.png'
+    ).get_all_group_data()
+    # PathGroupPermission(
+    #     '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1001.png'
+    # ).set_file_all_allow()

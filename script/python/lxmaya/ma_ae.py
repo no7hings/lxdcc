@@ -16,6 +16,8 @@ import maya.cmds as cmds
 from maya import OpenMayaUI
 #
 from PySide2 import QtCore, QtGui, QtWidgets
+
+import functools
 #
 import shiboken2
 #
@@ -278,6 +280,97 @@ def swatchDisplayReplace(plugName):
     cmds.text('swatchLabel', edit=True, label=swatchLabel(node))
 
 
+def file_button_fnc(*args):
+    _atr_path = args[0]
+    _file_path = cmds.getAttr(_atr_path)
+    #
+    _directory_path = os.path.dirname(_file_path)
+    #
+    __file_paths = cmds.fileDialog2(
+        fileFilter='All Files (*.*)',
+        cap='Load File',
+        okc='Load',
+        fm=4,
+        dir=_directory_path
+    ) or []
+    if __file_paths:
+        __file_path = __file_paths[0]
+        cmds.setAttr(_atr_path, __file_path, type="string")
+
+
+def file_new_fnc(atr_path):
+    def edit_fnc_(new_file_path_):
+        cmds.setAttr(atr_path, new_file_path_, type="string")
+    #
+    _ = atr_path.split('.')
+    obj_name = _[0]
+    port_name = _[-1]
+    node_type_name = cmds.nodeType(obj_name)
+    gui_name_0 = '{}_{}_entry'.format(node_type_name, port_name)
+    gui_name_1 = '{}_{}_button'.format(node_type_name, port_name)
+    label = get_name_prettify(port_name)
+    #
+    cmds.rowLayout(
+        nc=2,
+        cw2=(360, 30),
+        cl2=('left', 'left'),
+        adjustableColumn=1,
+        columnAttach=[(1, 'left', -4), (2, 'left', 0)]
+    )
+    cmds.textFieldGrp(
+        gui_name_0,
+        label=label,
+        changeCommand=edit_fnc_
+    )
+    cmds.textFieldGrp(
+        gui_name_0,
+        edit=True,
+        text=cmds.getAttr(atr_path)
+    )
+    cmds.symbolButton(
+        gui_name_1,
+        image='folder-closed.png',
+        command=lambda arg=None, x=atr_path: file_button_fnc(x)
+    )
+    cmds.scriptJob(
+        parent=gui_name_0,
+        replacePrevious=True,
+        attributeChange=[
+            atr_path,
+            lambda: cmds.textFieldGrp(gui_name_0, edit=True, text=cmds.getAttr(atr_path))
+        ]
+    )
+
+
+def file_replace_fnc(atr_path):
+    _ = atr_path.split('.')
+    obj_name = _[0]
+    port_name = _[-1]
+    node_type_name = cmds.nodeType(obj_name)
+    gui_name_0 = '{}_{}_entry'.format(node_type_name, port_name)
+    gui_name_1 = '{}_{}_button'.format(node_type_name, port_name)
+    #
+    cmds.textFieldGrp(
+        gui_name_0,
+        edit=True,
+        text=cmds.getAttr(atr_path)
+    )
+    cmds.symbolButton(
+        gui_name_1,
+        edit=True,
+        image='folder-closed.png',
+        command=lambda arg=None, x=atr_path: file_button_fnc(x)
+    )
+    cmds.scriptJob(
+        parent=gui_name_0,
+        replacePrevious=True,
+        attributeChange=[
+            atr_path,
+            lambda: cmds.textFieldGrp(gui_name_0, edit=True, text=cmds.getAttr(atr_path))
+        ]
+    )
+
+
 class baseMode(object):
     def __init__(self, template):
         self.template = template
@@ -495,86 +588,9 @@ class rootMode(baseMode):
         cls.addCustom(port_path, new_fnc_, replace_fnc_)
     @classmethod
     def _set_file_name_control_add_(cls, port_path):
-        def new_fnc_(atr_path_):
-            def edit_fnc_(new_file_path_):
-                cmds.setAttr(atr_path_, new_file_path_, type="string")
-            #
-            def button_fnc_(*args):
-                _file_path = cmds.getAttr(atr_path_)
-                #
-                _directory_path = os.path.dirname(_file_path)
-                #
-                __file_paths = cmds.fileDialog2(
-                    fileFilter='All Files (*.*)',
-                    cap='Load File',
-                    okc='Load',
-                    fm=4,
-                    dir=_directory_path
-                ) or []
-                if __file_paths:
-                    __file_path = __file_paths[0]
-                    edit_fnc_(__file_path)
-            #
-            _ = atr_path_.split('.')
-            _obj_name = _[0]
-            _port_name = _[-1]
-            _node_type_name = cmds.nodeType(_obj_name)
-            _gui_name = '{}_{}'.format(_node_type_name, _port_name)
-            #
-            cmds.rowLayout(
-                nc=2,
-                cw2=(360, 30),
-                cl2=('left', 'left'),
-                adjustableColumn=1,
-                columnAttach=[(1, 'left', -4), (2, 'left', 0)]
-            )
-            cmds.textFieldGrp(
-                _gui_name,
-                label=label,
-                changeCommand=edit_fnc_
-            )
-            cmds.textFieldGrp(
-                _gui_name,
-                edit=True,
-                text=cmds.getAttr(atr_path_)
-            )
-            cmds.symbolButton(
-                image='folder-closed.png',
-                command=button_fnc_
-            )
-            cmds.scriptJob(
-                parent=_gui_name,
-                replacePrevious=True,
-                attributeChange=[
-                    atr_path_,
-                    lambda: cmds.textFieldGrp(_gui_name, edit=True, text=cmds.getAttr(atr_path_))
-                ]
-            )
-        #
-        def replace_fnc_(atr_path_):
-            _ = atr_path_.split('.')
-            _obj_name = _[0]
-            _port_name = _[-1]
-            _node_type_name = cmds.nodeType(_obj_name)
-            _gui_name = '{}_{}'.format(_node_type_name, _port_name)
-            #
-            cmds.textFieldGrp(
-                _gui_name,
-                edit=True,
-                text=cmds.getAttr(atr_path_)
-            )
-            cmds.scriptJob(
-                parent=_gui_name,
-                replacePrevious=True,
-                attributeChange=[
-                    atr_path_,
-                    lambda: cmds.textFieldGrp(_gui_name, edit=True, text=cmds.getAttr(atr_path_))
-                ]
-            )
-        #
-        label = get_name_prettify(port_path)
-        #
-        cls.addCustom(port_path, new_fnc_, replace_fnc_)
+        cls.addCustom(
+            port_path, file_new_fnc, file_replace_fnc
+        )
     @classmethod
     def addControl(cls, attr, label=None, changeCommand=None, annotation=None, preventOverride=False, dynamic=False, useAsFileName=False, enumerateOption=None):
         if enumerateOption is not None:

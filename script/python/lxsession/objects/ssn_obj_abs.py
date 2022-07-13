@@ -628,7 +628,7 @@ class AbsSsnOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StoragePathMtd.get_path_is_exists(file_path) is False:
+        if bsc_core.StoragePathMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
@@ -779,7 +779,7 @@ class AbsSsnRsvTaskOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StoragePathMtd.get_path_is_exists(file_path) is False:
+        if bsc_core.StoragePathMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),

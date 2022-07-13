@@ -107,7 +107,9 @@ class PyModule(object):
         return self.__str__()
 
     def __eq__(self, other):
-        return self.name == other.name
+        if other is not None:
+            return self.name == other.name
+        return False
 
     def __ne__(self, other):
         return self.name != other.name

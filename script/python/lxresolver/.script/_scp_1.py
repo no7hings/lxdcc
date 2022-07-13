@@ -21,6 +21,6 @@ if __name__ == '__main__':
                 if tgt_exists_scene_file_path is not None:
                     tgt_file_obj = utl_dcc_objects.OsFile(tgt_exists_scene_file_path)
 
-                    if src_file_obj.get_is_same_timestamp_to(tgt_file_obj) is False:
+                    if src_file_obj.get_timestamp_is_same_to(tgt_file_obj) is False:
                         print src_file_obj, tgt_file_obj
 

@@ -2,16 +2,18 @@
     <help>
     build by lynxi
     </help>
-    <param name="filename" constant="True" widget="fileInput">
-        <help>
-        </help>
-    </param>
-    <param name="udim_enable" constant="True" widget="checkBox">
-        <help>
-        </help>
-    </param>
-    <param name="sequence_enable" constant="True" widget="checkBox">
-        <help>
-        </help>
-    </param>
+    <page name="osl file path">
+        <param name="filename" constant="True" widget="fileInput">
+            <help>
+            </help>
+        </param>
+        <param name="udim_enable" constant="True" widget="checkBox">
+            <help>
+            </help>
+        </param>
+        <param name="sequence_enable" constant="True" widget="checkBox">
+            <help>
+            </help>
+        </param>
+    </page>
 </args>

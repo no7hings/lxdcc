@@ -49,10 +49,10 @@ class AbsOsDirectory(
         self.set_gui_attribute(
             'gui_menu',
             [
-                ('Open Folder', 'file/folder', self.set_open),
+                ('open folder', 'file/folder', self.set_open),
                 (),
-                ('Copy Path', None, self.set_copy_path_to_clipboard),
-                ('Copy Name', None, self.set_copy_name_to_clipboard),
+                ('copy path', None, self.set_copy_path_to_clipboard),
+                ('copy name', None, self.set_copy_name_to_clipboard),
             ]
         )
     @property
@@ -145,10 +145,10 @@ class AbsOsFile(
         self.set_gui_attribute(
             'gui_menu',
             [
-                ('Open Folder', 'file/folder', self.set_directory_open),
+                ('open folder', 'file/folder', self.set_directory_open),
                 (),
-                ('Copy Path', None, self.set_copy_path_to_clipboard),
-                ('Copy Name', None, self.set_copy_name_to_clipboard),
+                ('copy path', None, self.set_copy_path_to_clipboard),
+                ('copy name', None, self.set_copy_name_to_clipboard),
             ]
         )
         # file reference node
@@ -242,9 +242,10 @@ class AbsOsFile(
     def _set_file_path_ext_replace_to_(cls, file_path, ext):
         return os.path.splitext(file_path)[0] + ext
 
-    def get_ext_replace(self, ext):
-        file_path = self._set_file_path_ext_replace_to_(self.path, ext)
-        return self.__class__(file_path)
+    def get_as_new_ext(self, ext):
+        return self.__class__(
+            '{}{}'.format(self.path_base, ext)
+        )
 
     def get_has_elements(self):
         return self._get_has_elements_(self.path)
@@ -406,8 +407,14 @@ class AbsOsFile(
         timestamp = self.get_modify_timestamp()
         return bsc_core.TimestampOpt(timestamp).get_as_tag()
 
-    def get_is_same_timestamp_to(self, file_obj):
-        return str(self.get_modify_timestamp()) == str(file_obj.get_modify_timestamp())
+    def get_timestamp_is_same_to(self, file_tgt):
+        for i_src in self.get_exists_files_():
+            i_tgt = self.__class__(
+                '{}/{}{}'.format(file_tgt.directory.path, i_src.name_base, file_tgt.ext)
+            )
+            if str(i_src.get_modify_timestamp()) != str(i_tgt.get_modify_timestamp()):
+                return False
+        return True
 
     def get_group(self):
         # noinspection PyBroadException
@@ -538,17 +545,19 @@ class AbsOsFile(
         return self.__class__(path_base+ext)
 
     def set_delete(self):
-        exists_file_paths = self._get_exists_file_paths_(self._path)
+        exists_file_paths = self._get_exists_file_paths__(self._path)
         if exists_file_paths:
             for i in exists_file_paths:
                 os.remove(i)
-                utl_core.Log.set_module_result_trace(
+                self.LOG.set_module_result_trace(
                     'file-delete',
                     u'"{}"'.format(i)
                 )
 
-    def get_is_link_source_to(self, file_path):
-        pass
+    def get_is_link_source_to(self, file_path_tgt):
+        return bsc_core.StorageLinkMtd.get_is_link_source_to(
+            self.path, file_path_tgt,
+        )
 
     def set_link_to(self, tgt_file_path, replace=False):
         file_tgt = self.__class__(tgt_file_path)
@@ -557,28 +566,41 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             if file_tgt.get_is_exists():
                 if replace is True:
-                    if bsc_core.StorageLinkMtd.get_is_link(file_path_tgt) is False:
-                        os.remove(file_path_tgt)
-                        bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_path_tgt)
-                        utl_core.Log.set_module_result_trace(
-                            'link replace',
-                            u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
-                        )
-                        return
-                    else:
-                        if bsc_core.StorageLinkMtd.get_is_link_source_to(
-                            file_path_src, file_path_tgt,
-                        ) is False:
+                    if bsc_core.StoragePathMtd.get_is_writeable(file_path_tgt) is True:
+                        if bsc_core.StorageLinkMtd.get_is_link(file_path_tgt) is True:
+                            if bsc_core.StorageLinkMtd.get_is_link_source_to(
+                                file_path_src, file_path_tgt,
+                            ) is True:
+                                utl_core.Log.set_module_warning_trace(
+                                    'file link replace',
+                                    u'relation="{} >> {}" is non-changed'.format(file_path_src, file_path_tgt)
+                                )
+                                return
+                            #
                             os.remove(file_path_tgt)
-                            bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_path_tgt)
+                            bsc_core.StorageLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
                             utl_core.Log.set_module_result_trace(
-                                'link replace',
-                                u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
+                                'file link replace',
+                                u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
                             )
                             return
+                        #
+                        os.remove(file_path_tgt)
+                        bsc_core.StorageLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
+                        utl_core.Log.set_module_result_trace(
+                            'file link replace',
+                            u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
+                        )
+                        return
+                    self.LOG.set_module_error_trace(
+                        'file link replace',
+                        u'file="{}" is locked'.format(file_tgt.path)
+                    )
+                    return
+
                 else:
                     utl_core.Log.set_module_warning_trace(
-                        'link create',
+                        'file link',
                         u'file="{}" is exists'.format(file_path_tgt)
                     )
                     return
@@ -586,13 +608,13 @@ class AbsOsFile(
             if file_tgt.get_is_exists() is False:
                 file_tgt.set_directory_create()
                 #
-                bsc_core.StorageLinkMtd.set_link_to(
+                bsc_core.StorageLinkMtd.set_file_link_to(
                     self.path, file_tgt.path
                 )
                 #
                 utl_core.Log.set_module_result_trace(
-                    'link create',
-                    u'link="{} >> {}"'.format(self.path, file_tgt.path)
+                    'file link',
+                    u'relation="{} >> {}"'.format(self.path, file_tgt.path)
                 )
 
     def set_link_to_file(self, file_path_tgt, replace=False):
@@ -607,6 +629,18 @@ class AbsOsFile(
         self.set_link_to(
             file_path_tgt, replace
         )
+
+    def get_is_writeable(self):
+        for i in self.get_exists_file_paths_():
+            if bsc_core.StoragePathMtd.get_is_writeable(i) is False:
+                return False
+        return True
+
+    def get_is_readable(self):
+        for i in self.get_exists_file_paths_():
+            if bsc_core.StoragePathMtd.get_is_readable(i) is False:
+                return False
+        return True
 
 
 class AbsOsTexture(AbsOsFile):
@@ -1033,9 +1067,6 @@ class AbsOsTexture(AbsOsFile):
     def get_ext_is_exr(self):
         return self.ext == self.EXR_EXT
 
-    def get_ext_is(self, ext):
-        return self.ext == ext
-
     def get_color_space(self):
         _ = self._get_exists_file_paths_(self._path)
         if _:
@@ -1066,6 +1097,9 @@ class AbsOsTexture(AbsOsFile):
             return bsc_core.ImageOpt(
                 file_path
             ).get_thumbnail()
+
+    def get_thumbnail_create_args(self):
+        pass
 
 
 class AbsObjScene(obj_abstract.AbsObjScene):

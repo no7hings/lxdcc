@@ -4,7 +4,7 @@ from .. import utl_core
 
 def get_validation_window():
     if utl_core._app__get_is_maya_():
-        from lxmaya_gui.panel.pnl_widgets import _mya_pnl_wdt_checker
+        from lxmaya_gui.panel.pnl_widgets import _mya_pnl_wgt_checker
         return _mya_pnl_wdt_checker.SceneCheckerToolPanel()
     elif utl_core._app__get_is_houdini_():
         from lxhoudini_gui.panel.hou_pnl_widgets import _hou_pnl_wdt_checker

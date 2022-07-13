@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxmaya_gui.panel.pnl_widgets import _mya_pnl_wdt_checker
+from lxmaya_gui.panel.pnl_widgets import _mya_pnl_wgt_checker
 
 from lxmaya.dcc.dcc_objects import _mya_dcc_obj_utility
 

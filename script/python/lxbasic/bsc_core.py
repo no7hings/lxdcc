@@ -81,6 +81,24 @@ class PyThread(threading.Thread):
         THREAD_MAXIMUM.release()
 
 
+class LogMtd(object):
+    @classmethod
+    def get_time(cls):
+        return time.strftime(u'%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    @classmethod
+    def get(cls, text):
+        return u'{} {}'.format(cls.get_time(), text)
+    @classmethod
+    def get_result(cls, text):
+        return cls.get(u'''        | {}'''.format(text))
+    @classmethod
+    def get_warning(cls, text):
+        return cls.get(u'''warning | {}'''.format(text))
+    @classmethod
+    def get_error(cls, text):
+        return cls.get(u''' error  | {}'''.format(text))
+
+
 class CmdSubProcessSignal(object):
     def __init__(self, *args, **kwargs):
         self.fncs = []

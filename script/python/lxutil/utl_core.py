@@ -391,7 +391,8 @@ class DialogWindow(object):
         #
         w.set_use_thread(use_thread)
         w.set_window_title(label)
-        w.set_content(content)
+        if content is not None:
+            w.set_content(content)
         w.set_content_font_size(content_text_size)
         w.set_definition_window_size(window_size)
         if yes_label is not None:
@@ -551,6 +552,33 @@ class SubProcessRunner(object):
     @classmethod
     def set_run_with_result_use_log(cls):
         pass
+
+
+class DDlMonitor(object):
+    @classmethod
+    def set_create(cls, label, job_id):
+        import lxutil_gui.proxy.widgets as prx_widgets
+
+        import lxdeadline.objects as ddl_objects
+
+        w = prx_widgets.PrxDdlMonitorWindow()
+        w.set_window_title(
+            '{}({})'.format(
+                label, job_id
+            )
+        )
+
+        j_m = ddl_objects.DdlJobMonitor(job_id)
+        w.get_status_button().set_statuses(j_m.get_task_statues())
+        w.get_status_button().set_initialization(j_m.get_task_count())
+        j_m.logging.set_connect_to(w.set_logging)
+        j_m.task_status_changed_at.set_connect_to(w.set_status_at)
+        j_m.task_finished_at.set_connect_to(w.set_finished_at)
+        j_m.set_start()
+
+        w.set_window_close_connect_to(j_m.set_stop)
+
+        w.set_window_show(size=(480, 240))
 
 
 class Icon(object):
@@ -1757,7 +1785,6 @@ class OslShaderMtd(object):
         output_file_opt.set_directory_create()
         info = bsc_core.OslShaderMtd.get_info(file_path)
         if info:
-            # print(info)
             j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template-v002.j2')
             raw = j2_template.render(
                 **info
@@ -1967,30 +1994,23 @@ class Resources(object):
             cls.ENVIRON_KEY
         )
     @classmethod
-    def get(cls, sub_key):
+    def get(cls, key):
         for i_path in cls.get_search_paths():
             i_path_opt = bsc_core.StoragePathOpt(i_path)
             if i_path_opt.get_is_exists() is True:
-                i_glob_pattern = '{}/{}'.format(i_path_opt.path, sub_key)
+                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
                 i_results = Path._get_stg_paths_by_parse_pattern_(
                     i_glob_pattern
                 )
                 if i_results:
                     return i_results[0]
     @classmethod
-    def get_all(cls, sub_key):
+    def get_all(cls, key):
         for i_path in cls.get_search_paths():
             i_path_opt = bsc_core.StoragePathOpt(i_path)
             if i_path_opt.get_is_exists() is True:
-                i_glob_pattern = '{}/{}'.format(i_path_opt.path, sub_key)
+                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
                 i_results = Path._get_stg_paths_by_parse_pattern_(
                     i_glob_pattern
                 )
                 return i_results
-
-
-if __name__ == '__main__':
-    OslShaderMtd.set_katana_ui_template_create(
-        '/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_file.osl',
-        '/data/f/jinja_test/test.py'
-    )

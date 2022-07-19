@@ -1,7 +1,7 @@
 # coding:utf-8
 from Deadline import DeadlineConnect
 
-from lxbasic import bsc_configure
+from lxbasic import bsc_configure, bsc_core
 
 import lxbasic.objects as bsc_objects
 
@@ -130,6 +130,9 @@ class DdlTaskQuery(AbsDdlObj):
 
     def get_status(self):
         return self.get('Stat')
+
+    def get_progress(self):
+        return self.get('Prog')
 
     def get(self, key):
         _ = CON.Tasks.connectionProperties.__get__(
@@ -436,27 +439,38 @@ class Signal(object):
         pass
 
 
+class SignalThread(threading.Thread):
+    def __init__(self, target, args, kwargs):
+        threading.Thread.__init__(self)
+        self._fnc = target
+        self._args = args
+        self._kwargs = kwargs
+    #
+    def run(self):
+        THREAD_MAXIMUM.acquire()
+        self._fnc(*self._args, **self._kwargs)
+        THREAD_MAXIMUM.release()
+
+
 class SignalInstance(object):
     def __init__(self, *args, **kwargs):
-        self._methods = []
+        self._fncs = []
+        self.__is_active = True
+
+    def set_cancel(self):
+        self.__is_active = False
 
     def set_connect_to(self, method):
-        self._methods.append(method)
+        self._fncs.append(method)
 
     def set_emit_send(self, *args, **kwargs):
-        if self._methods:
-            THREAD_MAXIMUM.acquire()
-            #
-            ts = [threading.Thread(target=i_method, args=args, kwargs=kwargs) for i_method in self._methods]
-            for t in ts:
-                t.start()
-            for t in ts:
-                t.join()
-            #
-            THREAD_MAXIMUM.release()
-
-    def get_methods(self):
-        return self._methods
+        if self.__is_active is True:
+            if self._fncs:
+                ts = [SignalThread(target=i_method, args=args, kwargs=kwargs) for i_method in self._fncs]
+                for t in ts:
+                    t.start()
+                for t in ts:
+                    t.join()
 
 
 class DdlJobProcess(object):
@@ -736,7 +750,29 @@ class DdlJobProcess(object):
 
 class DdlJobMonitor(object):
     Status = bsc_configure.Status
-    #
+    # Unknown = 0
+    # Active = 1
+    # Suspended = 2
+    # Completed = 3
+    # Failed = 4
+    # Pending = 6
+    JOB_STATUS = [
+        Status.Unknown,
+        Status.Started,
+        Status.Suspended,
+        Status.Completed,
+        Status.Failed,
+        Status.Unknown,
+        Status.Waiting,
+    ]
+    # Unknown = 1
+    # Queued = 2
+    # Suspended = 3
+    # Rendering = 4
+    # Completed = 5
+    # Failed = 6
+    # 7
+    # Pending = 8
     TASK_STATUS = [
         Status.Unknown,
         Status.Unknown,
@@ -754,6 +790,130 @@ class DdlJobMonitor(object):
         self._job_id = self._job_query.get_id()
         self._job_name = self._job_query.get_name()
         self._task_queries = self._job_query.get_tasks()
+
+        self._timestamp_start = 0
+
+        self.__is_active = True
+
+        c = len(self._task_queries)
+        self._job_status = self.Status.Started
+        self._task_statuses = [self.Status.Started]*c
+        self._task_progress = ['0 %']*c
+
+        self.__timer = None
+        self._timer_interval = 1
+
+        self.running = SignalInstance(int)
+        self.job_status_changed = SignalInstance(int)
+        self.job_finished = SignalInstance(int)
+        self.task_status_changed_at = SignalInstance(int, int)
+        self.task_progress_changed_at = SignalInstance(int, str)
+        self.task_finished_at = SignalInstance(int, int)
+        self.logging = SignalInstance(str)
+
+    def __set_loop_running_(self):
+        if self.__is_active is True:
+            # job
+            pre_job_status = self._job_status
+            self._job_status = self.JOB_STATUS[self._job_query.get_status()]
+            if pre_job_status != self._job_status:
+                self.__set_job_status_changed_(self._job_status)
+            # task
+            for index, i_task_query in enumerate(self._task_queries):
+                # progress
+                i_task_progress_pre = self._task_progress[index]
+                i_task_progress = i_task_query.get_progress()
+                if i_task_progress != i_task_progress_pre:
+                    self._task_progress[index] = i_task_progress
+                    self.__set_task_progress_at_(index, i_task_progress)
+                # status
+                i_task_status_pre = self._task_statuses[index]
+                i_task_status = self.TASK_STATUS[i_task_query.get_status()]
+                if i_task_status != i_task_status_pre:
+                    self._task_statuses[index] = i_task_status
+                    self.__set_task_status_changed_at_(index, i_task_status)
+                    if i_task_status in [
+                        self.Status.Completed,
+                        self.Status.Failed,
+                    ]:
+                        self.__set_task_finished_at_(index, i_task_status)
+            # check is finished
+            if self._job_status not in [
+                self.Status.Completed,
+                self.Status.Failed,
+            ]:
+                self.__set_running_()
+            else:
+                self.__set_job_finished_(self._job_status)
+
+    def __set_running_(self):
+        self.__timer = threading.Timer(self._timer_interval, self.__set_loop_running_)
+        self.__timer.setDaemon(True)
+        self.__timer.start()
+
+    def __set_logging_(self, text):
+        result = bsc_core.LogMtd.get_result(text)
+        self.logging.set_emit_send(
+            result
+        )
+        print result
+
+    def __set_job_status_changed_(self, status):
+        if self.__is_active is True:
+            self.job_status_changed.set_emit_send(status)
+            self.__set_logging_(u'job status is change to "{}"'.format(str(status)))
+
+    def __set_task_status_changed_at_(self, index, status):
+        if self.__is_active is True:
+            self.task_status_changed_at.set_emit_send(index, status)
+            self.__set_logging_(u'task {} status is change to "{}"'.format(index, str(status)))
+
+    def __set_task_progress_at_(self, index, progress):
+        if self.__is_active is True:
+            self.task_progress_changed_at.set_emit_send(index, progress)
+            self.__set_logging_(u'task {} progress is changed to "{}"'.format(index, str(progress)))
+
+    def __set_job_finished_(self, status):
+        self.__is_active = False
+        self.job_finished.set_emit_send(status)
+        self.__set_logging_(u'job is finished')
+
+    def __set_task_finished_at_(self, index, status):
+        if self.__is_active is True:
+            self.task_finished_at.set_emit_send(index, status)
+            self.__set_logging_(u'task {} is finished'.format(index))
+
+    def get_task_count(self):
+        return len(self._task_queries)
+
+    def get_task_statues(self):
+        return self._task_statuses
+
+    def get_job_status(self):
+        return self._job_status
+
+    def set_start(self):
+        self.__set_logging_(u'job id is "{}"'.format(self._job_id))
+        self.__set_logging_(u'job is started')
+        #
+        self.__set_running_()
+
+    def set_stop(self):
+        if self.__is_active is True:
+            self.__set_logging_(u'job is stopped')
+            #
+            if self.__timer is not None:
+                self.__timer.cancel()
+            #
+            self.__is_active = False
+            #
+            self.running.set_cancel()
+            self.job_status_changed.set_cancel()
+            self.job_finished.set_cancel()
+            self.task_status_changed_at.set_cancel()
+            self.task_progress_changed_at.set_cancel()
+            self.task_finished_at.set_cancel()
+            self.logging.set_cancel()
 
 
 class DdlMethodQuery(ddl_obj_abs.AbsDdlMethodQuery):
@@ -785,6 +945,6 @@ if __name__ == '__main__':
 
     m.set_start()
 
-    m.processing.set_connect_to(test_0)
+    m.running.set_connect_to(test_0)
 
-    m.status_changed.set_connect_to(test_1)
+    m.job_status_changed.set_connect_to(test_1)

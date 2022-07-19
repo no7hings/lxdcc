@@ -7,6 +7,8 @@ def get_hook_args(key):
             python_file_path, dict(session=session)
         )
     #
+    from lxbasic import bsc_core
+    #
     import lxbasic.objects as bsc_objects
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects

@@ -883,8 +883,8 @@ class AbsOsTexture(AbsOsFile):
     def get_args_as_ext_tgt(self, ext_tgt):
         path_src, path_tgt = self._get_path_args_as_ext_tgt_(self.path, ext_tgt)
         src, tgt = self.__class__(path_src), self.__class__(path_tgt)
-        if src.ext == ext_tgt:
-            src = None
+        # if src.ext == ext_tgt:
+        #     src = None
         # if not self._get_unit_file_paths__(path_tgt):
         #     tgt = None
         return src, tgt
@@ -895,8 +895,8 @@ class AbsOsTexture(AbsOsFile):
     def get_args_as_ext_tgt_by_directory_args(self, ext_tgt, directory_path_args):
         path_src, path_tgt = self._get_path_args_as_ext_tgt_by_directory_args_(self.path, ext_tgt, directory_path_args)
         src, tgt = self.__class__(path_src), self.__class__(path_tgt)
-        if src.ext == ext_tgt:
-            src = None
+        # if src.ext == ext_tgt:
+        #     src = None
         # if not self._get_unit_file_paths__(path_tgt):
         #     tgt = None
         return src, tgt
@@ -1100,6 +1100,9 @@ class AbsOsTexture(AbsOsFile):
 
     def get_thumbnail_create_args(self):
         pass
+
+    def get_info(self):
+        return bsc_core.OiioImageOpt(self.path).info
 
 
 class AbsObjScene(obj_abstract.AbsObjScene):

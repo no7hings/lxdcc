@@ -33,6 +33,9 @@ class RscHookFile(object):
         return utl_core.Resources.get(
             '{}/{}.yml'.format(cls.BRANCH, key)
         )
+    @classmethod
+    def get_full_key(cls, key):
+        return
 
 
 class RscOptionHookFile(RscHookFile):
@@ -40,6 +43,4 @@ class RscOptionHookFile(RscHookFile):
 
 
 if __name__ == '__main__':
-    print HookEngineMtd.get_command(
-        'python'
-    )
+    pass

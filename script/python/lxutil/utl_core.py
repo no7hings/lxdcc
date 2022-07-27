@@ -33,6 +33,8 @@ import functools
 
 import copy
 
+import locale
+
 from lxscheme.scm_objects import _scm_obj_utility
 
 from lxutil import utl_configure
@@ -510,7 +512,7 @@ class SubProcessRunner(object):
     def set_run_with_result(cls, cmd, clear_environ=False):
         Log.set_module_result_trace(
             'sub-progress run with result',
-            u'command=`{}` is started'.format(cmd)
+            u'command=`{}` is started'.format(cmd.decode('utf-8'))
         )
         bsc_core.SubProcessMtd.set_run_with_result(
             cmd, clear_environ

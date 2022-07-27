@@ -1,4 +1,6 @@
 # coding:utf-8
+import locale
+
 from lxbasic import bsc_core
 
 from lxutil import utl_core
@@ -95,6 +97,8 @@ class AbsHookExecutor(object):
             'Comment', hook_option
         )
         ddl_command = self.get_deadline_command()
+        if bsc_core.TextOpt(ddl_command).get_is_contain_chinese():
+            ddl_command = ddl_command.encode(locale.getdefaultlocale()[1])
         #
         self._ddl_submiter.option.set(
             'deadline.command',

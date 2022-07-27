@@ -4268,7 +4268,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print StorageFileOpt('/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1002.png').set_directory_repath_to_join_uuid(
-        '/l/temp/td/dongchangbao/tx_convert_test/window_box_2'
-    )
+    print TextOpt(
+        u'rez-env lxdcc -c "lxhook-command -o \\"option_hook_key=rsv-task-batchers/asset/gen-rig-export&choice_scheme=asset-maya-publish&file=/l/prod/cgm/work/assets/chr/ext_woodpecker/rig/rigging/maya/scenes/ext_woodpecker.rig.rigging.v001.ma&user=dongchangbao&description=\u6d4b\u8bd5&td_enable=True\\""'
+    ).get_is_contain_chinese()
 

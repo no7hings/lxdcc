@@ -1,5 +1,9 @@
 # coding:utf-8
+from urllib import quote, unquote
+
 from lxbasic import bsc_core
+
+from lxutil import utl_core
 
 import lxshotgun.objects as stg_objects
 
@@ -92,9 +96,15 @@ class RsvStgTaskOpt(object):
             movie_file_opt = bsc_core.StorageFileOpt(movie_file)
             if movie_file_opt.get_is_exists() is True:
                 stg_version_opt.set_movie_upload(movie_file)
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'upload movie',
+                    u'file="{}" is non-exists'.format(movie_file)
+                )
 
         if description:
-            stg_version_opt.set_description(description)
+            # need unquote
+            stg_version_opt.set_description(unquote(description))
 
         stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
         #

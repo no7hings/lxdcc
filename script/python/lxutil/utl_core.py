@@ -1987,6 +1987,8 @@ def _print_fnc_completion_with_result_(fnc):
 
 
 class Resources(object):
+    CACHE = {}
+    CACHE_ALL = {}
     ENVIRON_KEY = 'LYNXI_RESOURCES'
     @classmethod
     def get_search_paths(cls):
@@ -1995,15 +1997,20 @@ class Resources(object):
         )
     @classmethod
     def get(cls, key):
-        for i_path in cls.get_search_paths():
-            i_path_opt = bsc_core.StoragePathOpt(i_path)
-            if i_path_opt.get_is_exists() is True:
-                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
-                i_results = Path._get_stg_paths_by_parse_pattern_(
-                    i_glob_pattern
-                )
-                if i_results:
-                    return i_results[0]
+        if key in cls.CACHE:
+            return cls.CACHE[key]
+        else:
+            for i_path in cls.get_search_paths():
+                i_path_opt = bsc_core.StoragePathOpt(i_path)
+                if i_path_opt.get_is_exists() is True:
+                    i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
+                    i_results = Path._get_stg_paths_by_parse_pattern_(
+                        i_glob_pattern
+                    )
+                    if i_results:
+                        value = i_results[0]
+                        cls.CACHE[key] = value
+                        return value
     @classmethod
     def get_all(cls, key):
         for i_path in cls.get_search_paths():

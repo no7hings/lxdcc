@@ -411,14 +411,17 @@ class SystemMtd(object):
             return os.environ.get('HOME')
         else:
             raise SystemError()
-    #
     @classmethod
     def get_temporary_directory_path(cls, create=False):
         date_tag = cls.get_date_tag()
         if cls.get_is_windows():
-            _ = '{}/temporary/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
+            _ = '{}/temporary/{}'.format(
+                bsc_configure.UserDirectory.WINDOWS, date_tag
+            )
         elif cls.get_is_linux():
-            _ = '{}/temporary/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)
+            _ = '{}/temporary/{}'.format(
+                bsc_configure.UserDirectory.LINUX, date_tag
+            )
         else:
             raise SystemError()
         if create:
@@ -1022,6 +1025,15 @@ class StorageFileOpt(StoragePathOpt):
         return self.__class__(
             u'{}/{}'.format(
                 directory_path_tgt, self.get_name()
+            )
+        )
+
+    def set_directory_repath_to_join_uuid(self, directory_path_tgt):
+        directory_path_src = self.get_directory_path()
+        uuid_key = UuidMtd.get_by_string(directory_path_src)
+        return self.__class__(
+            u'{}/{}/{}'.format(
+                directory_path_tgt, uuid_key, self.get_name()
             )
         )
 
@@ -1636,6 +1648,20 @@ class TemporaryYamlMtd(object):
         region = UuidMtd.get_save_region(key)
         return '{}/.yml/{}/{}/{}{}'.format(
             directory_path, tag, region, key, '.yml'
+        )
+
+
+class TmpTextMtd(object):
+    @classmethod
+    def get_key(cls, file_path):
+        return UuidMtd.get_by_file(file_path)
+    @classmethod
+    def get_file_path(cls, file_path, tag):
+        directory_path = EnvironMtd.get_temporary_root()
+        key = cls.get_key(file_path)
+        region = UuidMtd.get_save_region(key)
+        return '{}/.txt/{}/{}/{}{}'.format(
+            directory_path, tag, region, key, '.txt'
         )
 
 
@@ -4242,7 +4268,7 @@ class MeshFaceVertexIndicesOpt(object):
 
 
 if __name__ == '__main__':
-    print StoragePathMtd.get_is_readable(
-        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1002.png'
+    print StorageFileOpt('/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1002.png').set_directory_repath_to_join_uuid(
+        '/l/temp/td/dongchangbao/tx_convert_test/window_box_2'
     )
 

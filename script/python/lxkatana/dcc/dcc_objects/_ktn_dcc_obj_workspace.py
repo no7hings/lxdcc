@@ -1,4 +1,6 @@
 # coding:utf-8
+import re
+
 import types
 # noinspection PyUnresolvedReferences
 from Katana import CacheManager, NodegraphAPI
@@ -14,6 +16,8 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 from lxkatana import ktn_configure, ktn_core
 
 from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node, _ktn_dcc_obj_nodes
+
+from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
 
 from lxkatana.modifiers import _ktn_mdf_utility
 
@@ -32,6 +36,14 @@ class AssetWorkspace(object):
             self._default_configure.set('option.y', y-h/2)
         #
         self._default_configure.set_flatten()
+
+        self._material_group_hash_stack = {}
+        self._material_hash_stack = {}
+        self._material_assign_hash_stack = {}
+        self._property_assign_hash_stack = {}
+
+        self._ng_material_assign_query_cache = {}
+        self._ng_property_assign_query_cache = {}
 
     def get_configure(self, pass_name='default'):
         if pass_name in self._look_configure_dict:
@@ -89,6 +101,30 @@ class AssetWorkspace(object):
     def get_all_dcc_shaders(self):
         list_ = []
         dcc_objs = self.get_all_dcc_materials()
+        for i_dcc_obj in dcc_objs:
+            list_.extend(
+                i_dcc_obj.get_all_source_objs()
+            )
+        return list_
+
+    def get_all_dcc_geometry_material_by_location(self, location):
+        list_ = []
+        query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
+        dcc_objs = self.get_all_pass_source_obj()
+        for i_dcc_obj in dcc_objs:
+            i_material_paths = ktn_core.SceneGraphOpt(i_dcc_obj.ktn_obj).get_geometry_material_paths_by_location(location)
+            for j_material_path in i_material_paths:
+                if j_material_path in query_dict:
+                    j_material_dcc_path = query_dict[j_material_path]
+                    if j_material_dcc_path not in list_:
+                        list_.append(
+                            j_material_dcc_path
+                        )
+        return list_
+
+    def get_all_dcc_geometry_shader_by_location(self, location):
+        list_ = []
+        dcc_objs = self.get_all_dcc_geometry_material_by_location(location)
         for i_dcc_obj in dcc_objs:
             list_.extend(
                 i_dcc_obj.get_all_source_objs()
@@ -428,10 +464,10 @@ class AssetWorkspace(object):
             dcc_node.get_port(i_port_path).set(i_value)
     # geometry properties
     @classmethod
-    def _set_arnold_geometry_properties_(cls, dcc_node, properties_dict):
+    def _set_arnold_geometry_properties_(cls, dcc_property_assign, properties_dict):
         for i_port_path, i_value in properties_dict.items():
             i_port_path = i_port_path.replace('/', '.')
-            cls._set_arnold_geometry_property_(dcc_node, i_port_path, i_value)
+            cls._set_arnold_geometry_property_(dcc_property_assign, i_port_path, i_value)
     @classmethod
     def _set_arnold_geometry_property_(cls, dcc_node, parameter_port_name, parameter_value):
         convert_dict = dict(
@@ -849,8 +885,40 @@ class AssetWorkspace(object):
             for i_input_port in input_ports:
                 lis.append(i_input_port.obj)
         return lis
-    #
-    def set_ng_material_group_create(self, name, pass_name='default'):
+
+    def get_ng_shader_name(self, name, pass_name='default'):
+        configure = self.get_configure(pass_name)
+        key = 'shader'
+        dcc_name_format = configure.get('node.{}.main.name'.format(key))
+        dcc_name = dcc_name_format.format(name=name)
+        return dcc_name
+    # material group
+    def get_ng_material_group_path(self, name, pass_name='default'):
+        configure = self.get_configure(pass_name)
+        key = 'material_group'
+        dcc_path_format = configure.get('node.{}.main.path'.format(key))
+        dcc_path = dcc_path_format.format(name=name)
+        return dcc_path
+
+    def get_ng_material_group_path_use_hash(self, and_geometry_opt, pass_name='default'):
+        materials = and_geometry_opt.get_material_assigns()
+        hash_key = bsc_core.HashMtd.get_hash_value(
+            materials, as_unique_id=True
+        )
+        if hash_key in self._material_group_hash_stack:
+            return self._material_group_hash_stack[hash_key]
+        #
+        name = and_geometry_opt.obj.name
+        #
+        configure = self.get_configure(pass_name)
+        key = 'material_group'
+        #
+        dcc_path_format = configure.get('node.{}.main.path'.format(key))
+        dcc_path = dcc_path_format.format(name=name)
+        self._material_group_hash_stack[hash_key] = dcc_path
+        return dcc_path
+
+    def get_ng_material_group_force(self, dcc_path, pass_name='default'):
         configure = self.get_configure(pass_name)
         w, h = configure.get('option.w'), configure.get('option.h')
         key = 'material_group'
@@ -859,25 +927,20 @@ class AssetWorkspace(object):
             node_key,
             pass_name=pass_name
         )
-        #
-        dcc_path_format = configure.get('node.{}.main.path'.format(key))
-        dcc_format = dcc_path_format.format(name=name)
         dcc_type_name = configure.get('node.{}.main.obj_type'.format(key))
         #
-        dcc_obj = _ktn_dcc_obj_node.Node(dcc_format)
-        if dcc_obj.get_is_exists() is True:
-            dcc_obj.set_delete()
+        dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
         #
         ktn_obj, is_create = dcc_obj.get_dcc_instance(dcc_type_name)
         target_port_name = dcc_obj.name
-        #
-        index = self._get_merge_index_(dcc_materials_merge, target_port_name)
-        d = 8
         if is_create is True:
+            index = self._get_merge_index_(dcc_materials_merge, target_port_name)
+            d = 8
+            #
             _x = index % d
             _y = int(index / d)
             r, g, b = self.get_look_pass_color(pass_name)
-            x, y = x + _x * w / 2, y + h + _y * h / 2
+            x, y = x+_x*w, y + h + _y*h/2
             node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
             if node_attributes:
                 node_attributes.set('x', x)
@@ -892,53 +955,72 @@ class AssetWorkspace(object):
         dcc_obj.get_output_port('out').set_target(
             dcc_materials_merge.get_input_port(target_port_name)
         )
-        return dcc_obj, ktn_obj
-    #
-    def get_ng_material_group(self, name, pass_name='default'):
+        return is_create, dcc_obj
+    # material
+    def get_ng_material_path_use_hash(self, and_geometry_opt, pass_name='default'):
+        materials = and_geometry_opt.get_material_assigns()
+        hash_key = bsc_core.HashMtd.get_hash_value(
+            materials, as_unique_id=True
+        )
+        if hash_key in self._material_hash_stack:
+            return self._material_hash_stack[hash_key]
+        #
+        name = and_geometry_opt.obj.name
+        #
         configure = self.get_configure(pass_name)
-        key = 'material_group'
+        key = 'material'
+        #
         dcc_path_format = configure.get('node.{}.main.path'.format(key))
         dcc_path = dcc_path_format.format(name=name)
-        dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
-        return dcc_obj, dcc_obj.ktn_obj
-    #
-    def set_ng_material_create(self, name, pass_name='default'):
+        self._material_hash_stack[hash_key] = dcc_path
+        return dcc_path
+
+    def get_ng_material_force(self, dcc_path, pass_name='default'):
         configure = self.get_configure(pass_name)
-        dcc_material_group, ktn_material_group = self.set_ng_material_group_create(
-            name=name,
+        key = 'material'
+        dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
+        dcc_parent = dcc_obj.get_parent()
+        _ktn_dcc_obj_node.Node('{}/NetworkMaterial'.format(dcc_parent.path)).set_rename(dcc_obj.name)
+        ktn_obj, is_create = dcc_obj.get_dcc_instance('NetworkMaterial')
+        if is_create is True:
+            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            if node_attributes:
+                ktn_obj.setAttributes(node_attributes.value)
+        return is_create, dcc_obj
+
+    def get_ng_material_path(self, name, pass_name='default'):
+        configure = self.get_configure(pass_name)
+        group_dcc_path = self.get_ng_material_group_path(name, pass_name)
+        #
+        key = 'material'
+        dcc_name_format = configure.get('node.{}.main.name'.format(key))
+        dcc_name = dcc_name_format.format(name=name)
+        #
+        dcc_path = '{}/{}'.format(group_dcc_path, dcc_name)
+        return dcc_path
+    # material assign
+    def set_ng_material_assigns_cache_update(self, pass_name='default'):
+        self._ng_material_assign_query_cache = {}
+        configure = self.get_configure(pass_name)
+        key = 'material_assign'
+        node_key = configure.get('node.{}.keyword'.format(key))
+        dcc_group, ktn_group, (x, y) = self.get_group_args(
+            node_key,
+            group_key='definition',
             pass_name=pass_name
         )
-        #
-        key = 'material'
-        dcc_name_format = configure.get('node.{}.main.name'.format(key))
-        dcc_name = dcc_name_format.format(name=name)
-        #
-        dcc_path = '{}/{}'.format(dcc_material_group.path, dcc_name)
-        #
-        _ktn_dcc_obj_node.Node('{}/NetworkMaterial'.format(dcc_material_group.path)).set_rename(dcc_name)
-        #
-        dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
-        ktn_obj, is_create = dcc_obj.get_dcc_instance('NetworkMaterial')
-        return dcc_obj, ktn_obj
-    #
-    def get_ng_material_name(self, name, pass_name='default'):
-        configure = self.get_configure(pass_name)
-        key = 'material'
-        dcc_name_format = configure.get('node.{}.main.name'.format(key))
-        dcc_name = dcc_name_format.format(name=name)
-        return dcc_name
+        if dcc_group.get_is_exists() is True:
+            material_assigns = dcc_group.get_children()
+            for i_material_assign in material_assigns:
+                i_material_assign_opt = _ktn_dcc_opt_look.MaterialAssignOpt(i_material_assign)
+                i_geometry_paths = i_material_assign_opt.get_geometry_paths()
+                for j_geometry_path in i_geometry_paths:
+                    self._ng_material_assign_query_cache[j_geometry_path] = i_material_assign
 
-    def get_ng_shader_name(self, name, pass_name='default'):
-        configure = self.get_configure(pass_name)
-        key = 'shader'
-        dcc_name_format = configure.get('node.{}.main.name'.format(key))
-        dcc_name = dcc_name_format.format(name=name)
-        return dcc_name
-
-    def get_ng_shader_name_0(self):
-        pass
+    def get_ng_material_assign_from_cache(self, sg_geometry):
+        return self._ng_material_assign_query_cache.get(sg_geometry.path)
     #
-    def set_ng_geometry_material_assign_create(self, name, assign=None, pass_name='default'):
+    def get_ng_material_assign_path(self, name, pass_name='default'):
         configure = self.get_configure(pass_name)
         key = 'material_assign'
         node_key = configure.get('node.{}.keyword'.format(key))
@@ -950,7 +1032,18 @@ class AssetWorkspace(object):
         #
         dcc_path_format = configure.get('node.{}.main.path'.format(key))
         dcc_path = dcc_path_format.format(name=name)
-        #
+        return dcc_path
+
+    def get_ng_material_assign_force(self, dcc_path, pass_name='default'):
+        configure = self.get_configure(pass_name)
+        key = 'material_assign'
+        node_key = configure.get('node.{}.keyword'.format(key))
+        dcc_group, ktn_group, (x, y) = self.get_group_args(
+            node_key,
+            group_key='definition',
+            pass_name=pass_name
+        )
+
         dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
         ktn_obj, is_create = ktn_core.NGGroupStackOpt(ktn_group).set_child_create(
             dcc_obj.name
@@ -964,34 +1057,31 @@ class AssetWorkspace(object):
                 node_attributes.set('ns_colorg', g)
                 node_attributes.set('ns_colorb', b)
                 ktn_obj.setAttributes(node_attributes.value)
+        return is_create, dcc_obj
+    #
+    def get_ng_material_assign_path_use_hash(self, and_geometry_opt, pass_name='default'):
+        materials = and_geometry_opt.get_material_assigns()
+        hash_key = bsc_core.HashMtd.get_hash_value(
+            materials, as_unique_id=True
+        )
+        if hash_key in self._material_assign_hash_stack:
+            return self._material_assign_hash_stack[hash_key]
         #
-        if isinstance(assign, tuple):
-            geometry_path, material_path = assign
-            dcc_obj.get_port('CEL').set(geometry_path)
-            dcc_obj.get_port('args.materialAssign.value').set(material_path)
-        return dcc_obj, ktn_obj
-
-    def get_ng_geometry_material_assign(self, name, pass_name='default'):
+        name = and_geometry_opt.obj.name
+        #
         configure = self.get_configure(pass_name)
         key = 'material_assign'
+        #
         dcc_path_format = configure.get('node.{}.main.path'.format(key))
         dcc_path = dcc_path_format.format(name=name)
-        dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
-        return dcc_obj, dcc_obj.ktn_obj
-
-    def get_ng_geometry_property_assign(self, name, pass_name='default'):
-        configure = self.get_configure(pass_name)
-        key = 'property_assign'
-        dcc_path_format = configure.get('node.{}.main.path'.format(key))
-        dcc_path = dcc_path_format.format(name=name)
-        dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
-        return dcc_obj, dcc_obj.ktn_obj
-
-    def set_ng_geometry_properties_create(self, name, pass_name='default'):
+        self._material_assign_hash_stack[hash_key] = dcc_path
+        return dcc_path
+    # property assign
+    def set_ng_property_assign_create(self, name, pass_name='default'):
         configure = self.get_configure(pass_name)
         key = 'property_assign'
         node_key = configure.get('node.{}.keyword'.format(key))
-        dcc_properties_group, ktn_properties_group, (x, y) = self.get_group_args(
+        dcc_group, ktn_group, (x, y) = self.get_group_args(
             node_key,
             group_key='definition',
             pass_name=pass_name
@@ -1001,7 +1091,7 @@ class AssetWorkspace(object):
         properties_path = properties_path_format.format(name=name)
         #
         dcc_properties = _ktn_dcc_obj_node.Node(properties_path)
-        ktn_properties, is_create = ktn_core.NGGroupStackOpt(ktn_properties_group).set_child_create(
+        ktn_properties, is_create = ktn_core.NGGroupStackOpt(ktn_group).set_child_create(
             dcc_properties.name
         )
         if is_create is True:
@@ -1013,7 +1103,102 @@ class AssetWorkspace(object):
                 node_attributes.set('ns_colorg', g)
                 node_attributes.set('ns_colorb', b)
                 ktn_properties.setAttributes(node_attributes.value)
-        return dcc_properties, ktn_properties
+        return is_create, dcc_properties, ktn_properties
+
+    def set_ng_property_assigns_cache_update(self, pass_name='default'):
+        self._ng_property_assign_query_cache = {}
+        configure = self.get_configure(pass_name)
+        key = 'property_assign'
+        node_key = configure.get('node.{}.keyword'.format(key))
+        dcc_group, ktn_group, (x, y) = self.get_group_args(
+            node_key,
+            group_key='definition',
+            pass_name=pass_name
+        )
+        if dcc_group.get_is_exists() is True:
+            material_assigns = dcc_group.get_children()
+            for i_material_assign in material_assigns:
+                i_material_assign_opt = _ktn_dcc_opt_look.MaterialAssignOpt(i_material_assign)
+                i_geometry_paths = i_material_assign_opt.get_geometry_paths()
+                for j_geometry_path in i_geometry_paths:
+                    self._ng_property_assign_query_cache[j_geometry_path] = i_material_assign
+
+    def get_ng_property_assign_from_cache(self, sg_geometry):
+        return self._ng_property_assign_query_cache.get(sg_geometry.path)
+
+    def get_ng_property_assign_path(self, name, pass_name='default'):
+        #
+        configure = self.get_configure(pass_name)
+        key = 'property_assign'
+        node_key = configure.get('node.{}.keyword'.format(key))
+        dcc_group, ktn_group, (x, y) = self.get_group_args(
+            node_key,
+            group_key='definition',
+            pass_name=pass_name
+        )
+        #
+        dcc_path_format = configure.get('node.{}.main.path'.format(key))
+        dcc_path = dcc_path_format.format(name=name)
+        return dcc_path
+
+    def get_ng_property_assign_force(self, dcc_path, pass_name='default'):
+        configure = self.get_configure(pass_name)
+        key = 'property_assign'
+        node_key = configure.get('node.{}.keyword'.format(key))
+        dcc_group, ktn_group, (x, y) = self.get_group_args(
+            node_key,
+            group_key='definition',
+            pass_name=pass_name
+        )
+        #
+        dcc_properties = _ktn_dcc_obj_node.Node(dcc_path)
+        ktn_properties, is_create = ktn_core.NGGroupStackOpt(ktn_group).set_child_create(
+            dcc_properties.name
+        )
+        if is_create is True:
+            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            if node_attributes:
+                node_attributes.set_update(ktn_properties.getAttributes())
+                r, g, b = self.get_look_pass_color(pass_name)
+                node_attributes.set('ns_colorr', r)
+                node_attributes.set('ns_colorg', g)
+                node_attributes.set('ns_colorb', b)
+                ktn_properties.setAttributes(node_attributes.value)
+        return is_create, dcc_properties, ktn_properties
+
+    def get_ng_properties_assign_path_use_hash(self, and_geometry_opt, pass_name='default'):
+        properties = and_geometry_opt.get_properties()
+        visibilities = and_geometry_opt.get_visibilities()
+        properties.update(visibilities)
+        hash_key = bsc_core.HashMtd.get_hash_value(
+            properties, as_unique_id=True
+        )
+        if hash_key in self._property_assign_hash_stack:
+            return self._property_assign_hash_stack[hash_key]
+        #
+        name = and_geometry_opt.obj.name
+        #
+        configure = self.get_configure(pass_name)
+        key = 'property_assign'
+        #
+        dcc_path_format = configure.get('node.{}.main.path'.format(key))
+        dcc_path = dcc_path_format.format(name=name)
+        self._property_assign_hash_stack[hash_key] = dcc_path
+        return dcc_path
+    @classmethod
+    def _set_assign_cel_value_update_(cls, dcc_node, shape_path):
+        p = '[(](.*?)[)]'
+        cel_port = dcc_node.get_port('CEL')
+        exists_value = cel_port.get()
+        if exists_value:
+            _ = re.findall(p, exists_value)
+            if _:
+                cel_value = '({} {})'.format(_[0], shape_path)
+            else:
+                cel_value = '({} {})'.format(exists_value, shape_path)
+        else:
+            cel_value = shape_path
+        cel_port.set(cel_value)
 
     def get_ng_look_pass(self, pass_name='default'):
         _ = '{}__look'.format(pass_name)

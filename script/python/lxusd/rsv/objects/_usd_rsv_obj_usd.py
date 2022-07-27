@@ -227,7 +227,8 @@ class RsvUsdAssetSetCreator(object):
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-work-asset-set-usd-file'
                 )
-                usd_file_path = usd_file_rsv_unit.get_result(version=version)
+                # debug for usd update error, auto update version
+                usd_file_path = usd_file_rsv_unit.get_result(version='new')
             elif workspace in ['publish']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-asset-set-usd-file'
@@ -257,7 +258,7 @@ class RsvUsdAssetSetCreator(object):
                     keyword='asset-work-shot-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
-                    version=version,
+                    version='new',
                     extend_variants=dict(
                         asset_shot=rsv_shot.get('shot')
                     )

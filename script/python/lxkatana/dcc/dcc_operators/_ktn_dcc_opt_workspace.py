@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_node
 
 from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
 
@@ -47,53 +47,64 @@ class AssetWorkspaceOpt(object):
         # geometry_root = configure.get('option.geometry_root')
         material_root = configure.get('option.material_root')
         geometries = self._workspace.get_sg_geometries(pass_name)
+        # update assign cache first
+        self._workspace.set_ng_material_assigns_cache_update()
         for i_geometry in geometries:
-            i_geometry_type_name = i_geometry.type_name
-            i_dcc_material_assign, i_ktn_material_assign = self._workspace.get_ng_geometry_material_assign(
-                name=i_geometry.name,
-                pass_name=pass_name
+            self._set_ambocc_assign_(i_geometry, pass_name)
+
+    def _set_ambocc_assign_(self, geometry, pass_name):
+        geometry_type_name = geometry.type_name
+        dcc_material_assign = self._workspace.get_ng_material_assign_from_cache(
+            geometry
+        )
+        if dcc_material_assign is None:
+            name = '{}__override'.format(geometry.name)
+            material_group_dcc_path = self._workspace.get_ng_material_group_path(
+                name, pass_name
             )
-            if i_ktn_material_assign is None:
-                i_name = '{}__{}'.format(
-                    pass_name, i_geometry.name
+            material_group_is_create, dcc_material_group = self._workspace.get_ng_material_group_force(
+                material_group_dcc_path, pass_name
+            )
+            material_dcc_path = self._workspace.get_ng_material_path(
+                name, pass_name
+            )
+            material_is_create, dcc_material = self._workspace.get_ng_material_force(
+                material_dcc_path, pass_name
+            )
+            material_assign_dcc_path = self._workspace.get_ng_material_assign_path(
+                name, pass_name
+            )
+            material_assign_is_create, dcc_material_assign = self._workspace.get_ng_material_assign_force(
+                material_assign_dcc_path, pass_name
+            )
+            material_assign_dcc_opt = _ktn_dcc_opt_look.MaterialAssignOpt(dcc_material_assign)
+            material_assign_dcc_opt.set_material(dcc_material)
+            material_assign_dcc_opt.set_geometry_path_append(geometry.path)
+
+            shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
+            shader_dcc_path = '{}/{}'.format(dcc_material.get_parent().path, shader_dcc_name)
+            if geometry_type_name in ['renderer procedural']:
+                color = (0.37, 0.08, 0.37)
+                self._set_ambocc_create_(
+                    dcc_material,
+                    shader_dcc_path,
+                    color
                 )
-                i_dcc_material, i_ktn_material = self._workspace.set_ng_material_create(
-                    name=i_name,
-                    pass_name=pass_name
+            elif geometry_type_name in ['subdmesh']:
+                self._set_opacity_lambert_create_(
+                    dcc_material,
+                    shader_dcc_path,
                 )
-                self._workspace.set_ng_geometry_material_assign_create(
-                    name=i_name,
-                    assign=(
-                        i_geometry.path,
-                        '{}/{}'.format(material_root, i_dcc_material.name)
-                    ),
-                    pass_name=pass_name
-                )
-                i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
-                i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
-                if i_geometry_type_name in ['renderer procedural']:
-                    i_color = (0.37, 0.08, 0.37)
-                    # h, s, v = bsc_core.ColorMtd.hsv2rgb(r, g, b, maximum=1)
-                    self._set_ambocc_create_(
-                        i_dcc_material,
-                        i_dcc_shader_path,
-                        i_color
-                    )
-                elif i_geometry_type_name in ['subdmesh']:
-                    self._set_opacity_lambert_create_(
-                        i_dcc_material,
-                        i_dcc_shader_path,
-                    )
-            else:
-                i_sg_material_path = i_dcc_material_assign.get_port(
-                    'args.materialAssign.value'
-                ).get()
-                if i_sg_material_path:
-                    i_material_name = bsc_core.DccPathDagOpt(i_sg_material_path).name
-                    i_dcc_material = ktn_dcc_objects.Node(i_material_name)
-                    i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
-                    i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
-                    self._set_convert_to_occ_(i_dcc_material, i_dcc_shader_path)
+        else:
+            material_sg_path = dcc_material_assign.get_port(
+                'args.materialAssign.value'
+            ).get()
+            if material_sg_path:
+                material_dcc_name = bsc_core.DccPathDagOpt(material_sg_path).name
+                dcc_material = _ktn_dcc_obj_node.Node(material_dcc_name)
+                shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
+                shader_dcc_path = '{}/{}'.format(dcc_material.get_parent().path, shader_dcc_name)
+                self._set_convert_to_occ_(dcc_material, shader_dcc_path)
     #
     @classmethod
     def _set_convert_to_occ_(cls, dcc_material, dcc_shader_path):
@@ -105,6 +116,8 @@ class AssetWorkspaceOpt(object):
                 cls._set_lambert_convert_to_occ_(dcc_shader_opt, dcc_shader_path)
             elif shader_type_name == 'standard_surface':
                 cls._set_standard_surface_convert_to_occ_(dcc_shader_opt, dcc_shader_path)
+            elif shader_type_name == 'standard_hair':
+                cls._set_standard_hair_convert_to_occ_(dcc_shader_opt, dcc_shader_path)
     @classmethod
     def _set_lambert_convert_to_occ_(cls, dcc_shader_opt, dcc_shader_path):
         opacity_value = dcc_shader_opt.get('opacity')
@@ -115,13 +128,14 @@ class AssetWorkspaceOpt(object):
                 dcc_source = dcc_shader_opt.get_port_source('Kd_color')
                 dcc_targets = dcc_shader_opt.get_port_targets('out')
                 #
-                dcc_occ = ktn_dcc_objects.Node(dcc_shader_path)
+                dcc_occ = _ktn_dcc_obj_node.Node(dcc_shader_path)
                 dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_occ)
                 dcc_occ_opt.set_create('ambient_occlusion')
                 dcc_occ_opt.set('white', value)
                 dcc_occ_opt.set('far_clip', 10)
                 if dcc_source is not None:
                     dcc_occ_opt.set_port_source('white', dcc_source, validation=True)
+                    dcc_occ_opt.set_port_source('black', dcc_source, validation=True)
                 if dcc_targets:
                     for i_dcc_target in dcc_targets:
                         dcc_occ_opt.set_port_target('out', i_dcc_target, validation=True)
@@ -135,20 +149,42 @@ class AssetWorkspaceOpt(object):
                 dcc_source = dcc_shader_opt.get_port_source('base_color')
                 dcc_targets = dcc_shader_opt.get_port_targets('out')
                 #
-                dcc_occ = ktn_dcc_objects.Node(dcc_shader_path)
+                dcc_occ = _ktn_dcc_obj_node.Node(dcc_shader_path)
                 dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_occ)
                 dcc_occ_opt.set_create('ambient_occlusion')
                 dcc_occ_opt.set('white', value)
                 dcc_occ_opt.set('far_clip', 10)
                 if dcc_source is not None:
                     dcc_occ_opt.set_port_source('white', dcc_source, validation=True)
+                    dcc_occ_opt.set_port_source('black', dcc_source, validation=True)
+                if dcc_targets:
+                    for i_dcc_target in dcc_targets:
+                        dcc_occ_opt.set_port_target('out', i_dcc_target, validation=True)
+    @classmethod
+    def _set_standard_hair_convert_to_occ_(cls, dcc_shader_opt, dcc_shader_path):
+        opacity_value = dcc_shader_opt.get('opacity')
+        opacity_source = dcc_shader_opt.get_port_source('opacity')
+        if opacity_source is None:
+            if opacity_value == [1.0, 1.0, 1.0]:
+                value = dcc_shader_opt.get('base_color')
+                dcc_source = dcc_shader_opt.get_port_source('base_color')
+                dcc_targets = dcc_shader_opt.get_port_targets('out')
+                #
+                dcc_occ = _ktn_dcc_obj_node.Node(dcc_shader_path)
+                dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(dcc_occ)
+                dcc_occ_opt.set_create('ambient_occlusion')
+                dcc_occ_opt.set('white', value)
+                dcc_occ_opt.set('far_clip', 10)
+                if dcc_source is not None:
+                    dcc_occ_opt.set_port_source('white', dcc_source, validation=True)
+                    dcc_occ_opt.set_port_source('black', dcc_source, validation=True)
                 if dcc_targets:
                     for i_dcc_target in dcc_targets:
                         dcc_occ_opt.set_port_target('out', i_dcc_target, validation=True)
     @classmethod
     def _set_occ_create_(cls, dcc_material, dcc_path, color):
         dcc_occ_opt = _ktn_dcc_opt_look.AndShaderOpt(
-            ktn_dcc_objects.Node(dcc_path)
+            _ktn_dcc_obj_node.Node(dcc_path)
         )
         dcc_occ_opt.set_create('ambient_occlusion')
         dcc_occ_opt.set_port_target(
@@ -160,7 +196,7 @@ class AssetWorkspaceOpt(object):
     @classmethod
     def _set_opacity_lambert_create_(cls, dcc_material, dcc_path):
         dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
-            ktn_dcc_objects.Node(dcc_path)
+            _ktn_dcc_obj_node.Node(dcc_path)
         )
         dcc_shader_opt.set_create('lambert')
         dcc_shader_opt.set_port_target(
@@ -175,65 +211,77 @@ class AssetWorkspaceOpt(object):
         # geometry_root = configure.get('option.geometry_root')
         material_root = configure.get('option.material_root')
         geometries = self._workspace.get_sg_geometries(pass_name)
+        # update assign cache first
+        self._workspace.set_ng_material_assigns_cache_update()
         for i_geometry in geometries:
-            i_geometry_type_name = i_geometry.type_name
-            i_dcc_material_assign, i_ktn_material_assign = self._workspace.get_ng_geometry_material_assign(
-                name=i_geometry.name,
-                pass_name=pass_name
-            )
-            if i_ktn_material_assign is None:
-                i_name = '{}__{}'.format(
-                    pass_name, i_geometry.name
-                )
-                i_dcc_material, i_ktn_material = self._workspace.set_ng_material_create(
-                    name=i_name,
-                    pass_name=pass_name
-                )
-                self._workspace.set_ng_geometry_material_assign_create(
-                    name=i_name,
-                    assign=(
-                        i_geometry.path,
-                        '{}/{}'.format(material_root, i_dcc_material.name)
-                    ),
-                    pass_name=pass_name
-                )
-                i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
-                i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
-                if i_geometry_type_name in ['renderer procedural']:
-                    i_color = (1,  0.955,  0.905)
-                    self._set_plastic_create_(
-                        i_dcc_material,
-                        i_dcc_shader_path,
-                        i_color
-                    )
-                elif i_geometry_type_name in ['subdmesh']:
-                    self._set_white_create_(
-                        i_dcc_material,
-                        i_dcc_shader_path,
-                    )
-            else:
-                i_material_path = i_dcc_material_assign.get_port(
-                    'args.materialAssign.value'
-                ).get()
-                if i_material_path:
-                    i_material_name = bsc_core.DccPathDagOpt(i_material_path).name
-                    i_dcc_material = ktn_dcc_objects.Node(i_material_name)
-                    i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
-                    i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
-                    if i_geometry_type_name in ['renderer procedural']:
-                        self._set_convert_to_plastic_(i_dcc_material, i_dcc_shader_path, (1,  0.955,  0.905))
-                    elif i_geometry_type_name in ['subdmesh']:
-                        self._set_convert_to_white_disp_(i_dcc_material, i_dcc_shader_path)
+            self._set_white_disp_assign_(i_geometry, pass_name)
 
         dcc_look_pass, ktn_look_pass = self._workspace.get_ng_look_pass(pass_name)
         if ktn_look_pass is not None:
             dcc_look_pass.set(
                 'look_pass.scheme', pass_name
             )
+
+    def _set_white_disp_assign_(self, geometry, pass_name):
+        geometry_type_name = geometry.type_name
+        dcc_material_assign = self._workspace.get_ng_material_assign_from_cache(
+            geometry
+        )
+        if dcc_material_assign is None:
+            name = '{}__override'.format(geometry.name)
+            material_group_dcc_path = self._workspace.get_ng_material_group_path(
+                name, pass_name
+            )
+            material_group_is_create, dcc_material_group = self._workspace.get_ng_material_group_force(
+                material_group_dcc_path, pass_name
+            )
+            material_dcc_path = self._workspace.get_ng_material_path(
+                name, pass_name
+            )
+            material_is_create, dcc_material = self._workspace.get_ng_material_force(
+                material_dcc_path, pass_name
+            )
+            material_assign_dcc_path = self._workspace.get_ng_material_assign_path(
+                name, pass_name
+            )
+            material_assign_is_create, dcc_material_assign = self._workspace.get_ng_material_assign_force(
+                material_assign_dcc_path, pass_name
+            )
+            material_assign_dcc_opt = _ktn_dcc_opt_look.MaterialAssignOpt(dcc_material_assign)
+            material_assign_dcc_opt.set_material(dcc_material)
+            material_assign_dcc_opt.set_geometry_path_append(geometry.path)
+
+            shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
+            shader_dcc_path = '{}/{}'.format(dcc_material.get_parent().path, shader_dcc_name)
+            if geometry_type_name in ['renderer procedural']:
+                color = (1, 0.955, 0.905)
+                self._set_plastic_create_(
+                    dcc_material,
+                    shader_dcc_path,
+                    color
+                )
+            elif geometry_type_name in ['subdmesh']:
+                self._set_white_create_(
+                    dcc_material,
+                    shader_dcc_path,
+                )
+        else:
+            material_sg_path = dcc_material_assign.get_port(
+                'args.materialAssign.value'
+            ).get()
+            if material_sg_path:
+                material_dcc_name = bsc_core.DccPathDagOpt(material_sg_path).name
+                dcc_material = _ktn_dcc_obj_node.Node(material_dcc_name)
+                shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
+                shader_dcc_path = '{}/{}'.format(dcc_material.get_parent().path, shader_dcc_name)
+                if geometry_type_name in ['renderer procedural']:
+                    self._set_convert_to_plastic_(dcc_material, shader_dcc_path, (1, 0.955, 0.905))
+                elif geometry_type_name in ['subdmesh']:
+                    self._set_convert_to_white_disp_(dcc_material, shader_dcc_path)
     @classmethod
     def _set_plastic_create_(cls, dcc_material, dcc_path, color):
         dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
-            ktn_dcc_objects.Node(dcc_path)
+            _ktn_dcc_obj_node.Node(dcc_path)
         )
         is_create = dcc_shader_opt.set_create('utility')
         if is_create is True:
@@ -257,7 +305,7 @@ class AssetWorkspaceOpt(object):
     @classmethod
     def _set_ambocc_create_(cls, dcc_material, dcc_path, color):
         dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
-            ktn_dcc_objects.Node(dcc_path)
+            _ktn_dcc_obj_node.Node(dcc_path)
         )
         dcc_shader_opt.set_create('utility')
         dcc_shader_opt.set_port_target(
@@ -269,7 +317,7 @@ class AssetWorkspaceOpt(object):
     @classmethod
     def _set_white_create_(cls, dcc_material, dcc_path):
         dcc_shader_opt = _ktn_dcc_opt_look.AndShaderOpt(
-            ktn_dcc_objects.Node(dcc_path)
+            _ktn_dcc_obj_node.Node(dcc_path)
         )
         is_create = dcc_shader_opt.set_create('standard_surface')
         if is_create is True:
@@ -307,74 +355,84 @@ class AssetWorkspaceOpt(object):
         # geometry_root = configure.get('option.geometry_root')
         material_root = configure.get('option.material_root')
         geometries = self._workspace.get_sg_geometries(pass_name)
+        # update assign cache first
+        self._workspace.set_ng_material_assigns_cache_update()
         for i_geometry in geometries:
-            i_geometry_type_name = i_geometry.type_name
-            i_dcc_material_assign, i_ktn_material_assign = self._workspace.get_ng_geometry_material_assign(
-                name=i_geometry.name,
-                pass_name=pass_name
-            )
-            if i_ktn_material_assign is None:
-                i_name = '{}__{}'.format(
-                    pass_name, i_geometry.name
-                )
-                i_dcc_material, i_ktn_material = self._workspace.set_ng_material_create(
-                    name=i_name,
-                    pass_name=pass_name
-                )
-                self._workspace.set_ng_geometry_material_assign_create(
-                    name=i_name,
-                    assign=(
-                        i_geometry.path,
-                        '{}/{}'.format(material_root, i_dcc_material.name)
-                    ),
-                    pass_name=pass_name
-                )
-                i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
-                i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
-                if i_geometry_type_name in ['renderer procedural']:
-                    i_color = (1,  0.955,  0.905)
-                    self._set_plastic_create_(
-                        i_dcc_material,
-                        i_dcc_shader_path,
-                        i_color
-                    )
-                elif i_geometry_type_name in ['subdmesh']:
-                    self._set_white_create_(
-                        i_dcc_material,
-                        i_dcc_shader_path,
-                    )
-            else:
-                i_material_path = i_dcc_material_assign.get_port(
-                    'args.materialAssign.value'
-                ).get()
-                if i_material_path:
-                    i_material_name = bsc_core.DccPathDagOpt(i_material_path).name
-                    i_dcc_material = ktn_dcc_objects.Node(i_material_name)
-                    i_dcc_shader_name = '{}__surface__override'.format(i_dcc_material.name)
-                    i_dcc_shader_path = '{}/{}'.format(i_dcc_material.get_parent().path, i_dcc_shader_name)
-                    if i_geometry_type_name in ['renderer procedural']:
-                        self._set_convert_to_plastic_(i_dcc_material, i_dcc_shader_path, (1,  0.955,  0.905))
-                    elif i_geometry_type_name in ['subdmesh']:
-                        self._set_convert_to_white_zbrush_(i_dcc_material, i_dcc_shader_path)
+            self._set_white_zbrush_assign_(i_geometry, pass_name)
 
         dcc_look_pass, ktn_look_pass = self._workspace.get_ng_look_pass(pass_name)
         if ktn_look_pass is not None:
             dcc_look_pass.set(
                 'look_pass.scheme', pass_name
             )
+
+    def _set_white_zbrush_assign_(self, geometry, pass_name):
+        geometry_type_name = geometry.type_name
+        dcc_material_assign = self._workspace.get_ng_material_assign_from_cache(
+            geometry
+        )
+        if dcc_material_assign is None:
+            name = '{}__override'.format(geometry.name)
+            material_group_dcc_path = self._workspace.get_ng_material_group_path(
+                name, pass_name
+            )
+            material_group_is_create, dcc_material_group = self._workspace.get_ng_material_group_force(
+                material_group_dcc_path, pass_name
+            )
+            material_dcc_path = self._workspace.get_ng_material_path(
+                name, pass_name
+            )
+            material_is_create, dcc_material = self._workspace.get_ng_material_force(
+                material_dcc_path, pass_name
+            )
+            material_assign_dcc_path = self._workspace.get_ng_material_assign_path(
+                name, pass_name
+            )
+            material_assign_is_create, dcc_material_assign = self._workspace.get_ng_material_assign_force(
+                material_assign_dcc_path, pass_name
+            )
+            material_assign_dcc_opt = _ktn_dcc_opt_look.MaterialAssignOpt(dcc_material_assign)
+            material_assign_dcc_opt.set_material(dcc_material)
+            material_assign_dcc_opt.set_geometry_path_append(geometry.path)
+
+            shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
+            shader_dcc_path = '{}/{}'.format(dcc_material.get_parent().path, shader_dcc_name)
+            if geometry_type_name in ['renderer procedural']:
+                color = (1, 0.955, 0.905)
+                self._set_plastic_create_(
+                    dcc_material,
+                    shader_dcc_path,
+                    color
+                )
+            elif geometry_type_name in ['subdmesh']:
+                self._set_white_create_(
+                    dcc_material,
+                    shader_dcc_path,
+                )
+        else:
+            i_sg_material_path = dcc_material_assign.get_port(
+                'args.materialAssign.value'
+            ).get()
+            if i_sg_material_path:
+                material_dcc_name = bsc_core.DccPathDagOpt(i_sg_material_path).name
+                dcc_material = _ktn_dcc_obj_node.Node(material_dcc_name)
+                shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
+                shader_dcc_path = '{}/{}'.format(dcc_material.get_parent().path, shader_dcc_name)
+                if geometry_type_name in ['renderer procedural']:
+                    self._set_convert_to_plastic_(dcc_material, shader_dcc_path, (1, 0.955, 0.905))
+                elif geometry_type_name in ['subdmesh']:
+                    self._set_convert_to_white_zbrush_(dcc_material, shader_dcc_path)
     #
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_auto_geometry_properties_assign(self, pass_name='default', geometry_properties=None):
         geometries = self._workspace.get_sg_geometries(pass_name)
+        self._workspace.set_ng_property_assigns_cache_update()
         for i_geometry in geometries:
             i_geometry_type_name = i_geometry.type_name
-            i_dcc_material_assign, i_ktn_material_assign = self._workspace.get_ng_geometry_property_assign(
-                name=i_geometry.name,
-                pass_name=pass_name
-            )
-            if i_ktn_material_assign is not None:
+            i_dcc_property_assign = self._workspace.get_ng_property_assign_from_cache(i_geometry)
+            if i_dcc_property_assign is not None:
                 if i_geometry_type_name in ['subdmesh']:
                     self._workspace._set_arnold_geometry_properties_(
-                        i_dcc_material_assign,
+                        i_dcc_property_assign,
                         geometry_properties
                     )

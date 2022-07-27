@@ -55,7 +55,8 @@ class MakePassword(object):
 
 class AbsPermission(object):
     GROUP_ID_QUERY = {
-        'cg_grp': 20002,
+        'cg_group': 20002,
+        # 'cg_grp': 20002,
         'ani_grp': 20017,
         'rlo_grp': 20025,
         'flo_grp': 20026,
@@ -79,6 +80,7 @@ class AbsPermission(object):
         'deny': 'chmod -R +a group {group_id} deny dir_gen_write,std_delete,delete_child,object_inherit,container_inherit "{path}"',
         'allow': 'chmod -R +a group {group_id} allow dir_gen_all,object_inherit,container_inherit "{path}"',
         'read_only': 'chmod -R +a group {group_id} allow dir_gen_read,dir_gen_execute,object_inherit,container_inherit "{path}"',
+        'read_only-0': 'chmod -R +a group {group_id} allow dir_gen_read,dir_gen_execute,object_inherit,container_inherit "{path}"',
         'show_grp': 'ls -led "{path}"',
         'remove_grp': 'chmod -R -a# {index} "{path}"',
         'file_allow': 'chmod -R +a group {group_id} allow file_gen_all,object_inherit,container_inherit "{path}"',
@@ -289,6 +291,33 @@ class PathGroupPermission(AbsPermission):
                 **kwargs
             )
             return self._set_nas_cmd_run_(cmd)
+        else:
+            group_id = self.GROUP_ID_QUERY[group_name]
+            kwargs = dict(
+                group_id=group_id,
+                path=self._nas_path,
+            )
+            cmd = self.CMD_QUERY['read_only'].format(
+                **kwargs
+            )
+            return self._set_nas_cmd_run_(cmd)
+
+    def set_all_remove(self):
+        group_data = self._get_all_group_data_(self._nas_path)
+        for k, v in group_data.items():
+            if k in self.GROUP_ID_QUERY:
+                i_group_name = k
+                i_index, i_content = v
+                i_group_id = self.GROUP_ID_QUERY[i_group_name]
+                i_kwargs = dict(
+                    group_id=i_group_id,
+                    path=self._nas_path,
+                    index=i_index
+                )
+                i_cmd = self.CMD_QUERY['remove_grp'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
 
     def set_all_read_only(self):
         group_data = self._get_all_group_data_(self._nas_path)
@@ -380,14 +409,13 @@ class PathGroupPermission(AbsPermission):
 
 if __name__ == '__main__':
     print PathGroupPermission(
-        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1001.png'
-    ).get_all_group_data()
-    PathGroupPermission(
-        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1001.png'
-    ).set_file_allow('td_grp')
+        '/l/prod/lib/AnimLib'
+    ).set_all_read_only()
+
     print PathGroupPermission(
-        '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-4.png'
-    ).get_all_group_data()
-    # PathGroupPermission(
-    #     '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/test-wb.1001.png'
-    # ).set_file_all_allow()
+        '/l/prod/lib/AnimLib'
+    ).set_allow('td_grp')
+
+    # print PathGroupPermission(
+    #     '/l/prod/lib/AnimLib'
+    # ).get_all_group_data()

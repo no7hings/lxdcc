@@ -79,19 +79,6 @@ def set_obj_source_layout(name):
             i_ktn_obj.setAttributes(i_atr)
 
 
-class MaterialAssign(ktn_dcc_obj_abs.AbsKtnObj):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
-    def __init__(self, path):
-        super(MaterialAssign, self).__init__(path)
-
-    def get_geometry_paths(self):
-        return self.get_port('CEL').get()
-
-    def set_geometry_paths(self):
-        pass
-
-
 class FileReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
     PORT_CLASS = Port
     CONNECTION_CLASS = Connection

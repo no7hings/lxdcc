@@ -1,6 +1,9 @@
 # coding:utf-8
+import re
 # noinspection PyUnresolvedReferences
 from Katana import CacheManager, NodegraphAPI, KatanaFile
+
+from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
@@ -33,6 +36,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         material_root='/root/materials',
         frame=None,
         #
+        with_materials=True,
         with_properties=True,
         with_visibilities=True,
         # if set shader is not in includes create is ignore
@@ -63,9 +67,12 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 a._set_ramp_dict_read_()
     @classmethod
     def _set_geometry_property_ports_(cls, and_geometry_opt, dcc_geometry):
-        convert_dict = dict(
+        port_name_convert_dict = dict(
             subdiv_iterations='iterations',
             disp_zero_value='zero_value'
+        )
+        value_type_convert_dict = dict(
+            trace_sets=lambda x: ' '.join(x)
         )
         #
         and_geometry = and_geometry_opt.obj
@@ -74,9 +81,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             i_and_port = and_geometry.get_input_port(i_and_port_name)
             #
             i_dcc_port_name = i_and_port_name
-            if i_and_port_name in convert_dict:
-                i_dcc_port_name = convert_dict[i_and_port_name]
-            #
+            if i_and_port_name in port_name_convert_dict:
+                i_dcc_port_name = port_name_convert_dict[i_and_port_name]
+            # do not ignore value changed
             if i_and_port.get_is_value_changed() is False:
                 pass
             #
@@ -93,18 +100,21 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             i_value_dcc_port = dcc_geometry.get_port(i_value_ktn_port_name)
             if i_value_dcc_port.get_is_exists() is True:
                 i_raw = i_and_port.get()
-                if i_value_dcc_port.type == 'number':
-                    if i_and_port.get_is_enumerate():
-                        i_raw = i_and_port.get_as_index()
+                if i_dcc_port_name in value_type_convert_dict:
+                    i_raw = value_type_convert_dict[i_dcc_port_name](i_raw)
+                else:
+                    if i_value_dcc_port.type == 'number':
+                        if i_and_port.get_is_enumerate():
+                            i_raw = i_and_port.get_as_index()
                 #
                 if i_raw is not None:
                     i_value_dcc_port.set(i_raw)
     @classmethod
     def _set_geometry_visibility_ports_(cls, and_geometry_opt, dcc_geometry):
-        # convert_dict = dict()
+        # port_name_convert_dict = dict()
         and_geometry = and_geometry_opt.obj
-        properties = and_geometry_opt.get_visibilities()
-        for i_and_port_name, v in properties.items():
+        visibilities = and_geometry_opt.get_visibilities()
+        for i_and_port_name, v in visibilities.items():
             i_and_port = and_geometry.get_input_port(i_and_port_name)
             #
             i_dcc_port_name = 'AI_RAY_{}'.format(i_and_port_name.upper())
@@ -151,6 +161,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._workspace = ktn_dcc_objects.AssetWorkspace()
         self._configure = self._workspace.get_configure()
 
+        self._material_assign_hash_stack = {}
+        self._property_assign_hash_stack = {}
+
     def __set_obj_universe_create_(self):
         obj_scene = and_dcc_objects.Scene(
             option=dict(
@@ -186,7 +199,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         and_materials = material_and_type.get_objs()
         #
         method_args = [
-            (self.__set_look_materials_create_, (and_materials, )),
+            (self.__set_look_materials_create_, (and_geometries, )),
             (self.__set_look_assigns_create_, (and_geometries, ))
         ]
         if method_args:
@@ -202,37 +215,6 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         for i in self._ramp_dcc_objs:
             i._set_ramp_dict_write0_()
             i._set_ramp_dict_read_()
-    # material
-    def __set_look_materials_create_(self, and_materials):
-        if and_materials:
-            pass_name = self._pass_name
-            key = 'material_group'
-            node_key = self._configure.get('node.{}.keyword'.format(key))
-            # noinspection PyUnusedLocal
-            materials_merge_dcc_obj, materials_merge_ktn_obj, (x, y) = self._workspace.get_main_args(node_key, pass_name)
-            #
-            with utl_core.gui_progress(maximum=len(and_materials)) as g_p:
-                for i_and_material in and_materials:
-                    g_p.set_update()
-                    self.__set_look_material_create_(i_and_material)
-
-    def __set_look_material_create_(self, and_material):
-        pass_name = self._pass_name
-        #
-        dcc_material, ktn_material = self._workspace.set_ng_material_create(
-            name=and_material.name,
-            pass_name=pass_name
-        )
-        dcc_material_group = dcc_material.get_parent()
-        dcc_material_group_path = dcc_material_group.path
-        #
-        self.__set_material_shaders_create_(and_material, dcc_material, ktn_material, dcc_material_group_path)
-        #
-        dcc_material.set_source_objs_layout()
-        #
-        show_obj = [i for i in dcc_material_group.get_children() if i.type_name == 'Material'][0]
-        #
-        self.__set_tags_add_(show_obj, and_material.path, parent_port_path='shaders.parameters')
 
     def __set_tags_add_(self, dcc_obj, and_path, parent_port_path=None):
         pass_name = self._pass_name
@@ -250,6 +232,33 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             else:
                 port_path = k
             dcc_obj.get_port(port_path).set_create('string', v)
+
+    def __set_look_materials_create_(self, and_geometries):
+        if and_geometries:
+            pass_name = self._pass_name
+            with utl_core.gui_progress(maximum=len(and_geometries)) as g_p:
+                for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
+                    g_p.set_update()
+                    self.__set_look_material_create_(i_and_geometry, pass_name)
+
+    def __set_look_material_create_(self, and_geometry, pass_name):
+        and_geometry_opt = and_dcc_operators.ShapeLookOpt(and_geometry)
+        #
+        and_material_paths = and_geometry.get_input_port('material').get()
+        if and_material_paths:
+            and_material = self._and_obj_universe.get_obj(and_material_paths[0])
+            material_group_dcc_path = self._workspace.get_ng_material_group_path_use_hash(and_geometry_opt, pass_name)
+            is_material_group_create, dcc_material_group = self._workspace.get_ng_material_group_force(material_group_dcc_path, pass_name)
+            if is_material_group_create is True:
+                show_obj = [i for i in dcc_material_group.get_children() if i.type_name == 'Material'][0]
+                self.__set_tags_add_(show_obj, and_material.path, parent_port_path='shaders.parameters')
+            #
+            material_dcc_path = self._workspace.get_ng_material_path_use_hash(and_geometry_opt, pass_name)
+            is_material_create, dcc_material = self._workspace.get_ng_material_force(material_dcc_path, pass_name)
+
+            self.__set_material_shaders_create_(and_material, dcc_material, dcc_material.ktn_obj, material_group_dcc_path)
+            #
+            dcc_material.set_source_objs_layout()
 
     def __set_material_shaders_create_(self, and_material, dcc_material, ktn_material, dcc_material_group_path):
         convert_dict = {
@@ -279,19 +288,6 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_ktn_shader.checkDynamicParameters()
                     #
                     self.__set_shader_ports_(i_and_shader, i_dcc_shader)
-                    #
-                    # i_ktn_source_node, i_ktn_target_node = (
-                    #     i_ktn_shader, ktn_material
-                    # )
-                    # i_ktn_source_port_name, i_ktn_target_port_name = (
-                    #     'out',
-                    #     convert_dict.get(i_and_bind_name)
-                    # )
-                    # i_ktn_source_port, i_ktn_target_port = (
-                    #     i_ktn_source_node.getOutputPort(i_ktn_source_port_name),
-                    #     i_ktn_target_node.getInputPort(i_ktn_target_port_name)
-                    # )
-                    # i_ktn_source_port.connect(i_ktn_target_port)
                     #
                     dcc_material.get_input_port(
                         convert_dict.get(i_and_bind_name)
@@ -445,9 +441,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
             dcc_group.set_children_clear()
             with utl_core.gui_progress(maximum=len(and_geometries)) as g_p:
-                for i_gmt_seq, i_and_gmt in enumerate(and_geometries):
+                for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
-                    self.__set_look_geometry_material_assign_create_(i_and_gmt)
+                    self.__set_look_geometry_material_assign_create_(i_and_geometry)
             #
             key = 'property_assign'
             node_key = self._configure.get('node.{}.keyword'.format(key))
@@ -455,59 +451,63 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             dcc_group.set_children_clear()
             #
             with utl_core.gui_progress(maximum=len(and_geometries)) as g_p:
-                for i_gmt_seq, i_and_gmt in enumerate(and_geometries):
+                for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
-                    self.__set_look_geometry_properties_create_(i_and_gmt)
+                    self.__set_look_geometry_properties_create_(i_and_geometry)
     # assign
-    def __set_look_geometry_material_assign_create_(self, and_geometry, geometry_seq=None):
+    def __set_look_geometry_material_assign_create_(self, and_geometry):
         pass_name = self._pass_name
+        asset_root = self._configure.get('option.asset_root')
         #
         geometry_root = self._configure.get('option.geometry_root')
         material_root = self._configure.get('option.material_root')
         #
-        material_paths = and_geometry.get_input_port('material').get()
-        if material_paths:
-            and_material = self._and_obj_universe.get_obj(material_paths[0])
-            dcc_material_name = self._workspace.get_ng_material_name(and_material.name, pass_name)
-            assign_name = and_geometry.name
-            if geometry_seq is not None:
-                assign_name = '{}__{}'.format(and_geometry.name, geometry_seq)
-            #
-            dcc_material_assign, ktn_material_assign = self._workspace.set_ng_geometry_material_assign_create(
-                name=assign_name,
-                assign=(
-                    '{}{}'.format(geometry_root, and_geometry.path),
-                    '{}/{}'.format(material_root, dcc_material_name)
-                ),
-                pass_name=pass_name
-            )
-            #
-            self.__set_tags_add_(dcc_material_assign, and_geometry.path)
-    #
-    def __set_look_geometry_properties_create_(self, and_geometry, geometry_seq=None):
-        pass_name = self._pass_name
-        asset_root = self._configure.get('option.asset_root')
-        assign_name = and_geometry.name
-        if geometry_seq is not None:
-            assign_name = '{}__{}'.format(and_geometry.name, geometry_seq)
-        #
-        dcc_properties, ktn_properties = self._workspace.set_ng_geometry_properties_create(
-            name=assign_name,
-            pass_name=pass_name
-        )
-        #
-        shape_path = '{}'.format('/'.join([asset_root] + and_geometry.path.split('/')[2:]))
-        dcc_properties.get_port('CEL').set(shape_path)
-        #
         and_geometry_opt = and_dcc_operators.ShapeLookOpt(and_geometry)
         #
-        if self._with_properties is True:
-            self._set_geometry_property_ports_(and_geometry_opt, dcc_properties)
+        and_material_paths = and_geometry.get_input_port('material').get()
+        if and_material_paths:
+            dcc_material_assign_path = self._workspace.get_ng_material_assign_path_use_hash(and_geometry_opt, pass_name)
+
+            material_dcc_path = self._workspace.get_ng_material_path_use_hash(and_geometry_opt, pass_name)
+            dcc_material = ktn_dcc_objects.Node(material_dcc_path)
+            #
+            is_create, dcc_material_assign = self._workspace.get_ng_material_assign_force(
+                dcc_material_assign_path,
+                pass_name=pass_name
+            )
+            # cel
+            material_assign_dcc_opt = ktn_dcc_operators.MaterialAssignOpt(dcc_material_assign)
+            shape_path = '{}'.format('/'.join([asset_root]+and_geometry.path.split('/')[2:]))
+            material_assign_dcc_opt.set_geometry_path_append(shape_path)
+            if is_create is True:
+                # value
+                material_assign_dcc_opt.set_material(dcc_material)
+                #
+                self.__set_tags_add_(dcc_material_assign, and_geometry.path)
+    #
+    def __set_look_geometry_properties_create_(self, and_geometry):
+        pass_name = self._pass_name
+        asset_root = self._configure.get('option.asset_root')
+
+        and_geometry_opt = and_dcc_operators.ShapeLookOpt(and_geometry)
+        dcc_path = self._workspace.get_ng_properties_assign_path_use_hash(and_geometry_opt, pass_name)
         #
-        if self._with_visibilities is True:
-            self._set_geometry_visibility_ports_(and_geometry_opt, dcc_properties)
-        #
-        self.__set_tags_add_(dcc_properties, and_geometry.path)
+        is_create, dcc_properties_assign, ktn_properties_assign = self._workspace.get_ng_property_assign_force(
+            dcc_path,
+            pass_name=pass_name
+        )
+        # cel
+        shape_path = '{}'.format('/'.join([asset_root]+and_geometry.path.split('/')[2:]))
+        dcc_properties_assign_opt = ktn_dcc_operators.PropertiesAssignOpt(dcc_properties_assign)
+        dcc_properties_assign_opt.set_geometry_path_append(shape_path)
+        if is_create is True:
+            if self._with_properties is True:
+                self._set_geometry_property_ports_(and_geometry_opt, dcc_properties_assign)
+            #
+            if self._with_visibilities is True:
+                self._set_geometry_visibility_ports_(and_geometry_opt, dcc_properties_assign)
+            #
+            self.__set_tags_add_(dcc_properties_assign, and_geometry.path)
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_run(self):
         self.__set_obj_universe_create_()

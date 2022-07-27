@@ -67,10 +67,10 @@ class AbsOsDirectory(
                 u'directory-path="{}"'.format(self.path)
             )
 
-    def set_link_to(self, tgt_directory_path, force=False):
+    def set_link_to(self, tgt_directory_path, replace=False):
         tgt_directory = self.__class__(tgt_directory_path)
         if tgt_directory.get_is_exists():
-            if force is False:
+            if replace is False:
                 utl_core.Log.set_module_warning_trace(
                     'link create',
                     u'path="{}" is exists'.format(tgt_directory.path)

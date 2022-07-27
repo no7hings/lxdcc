@@ -1150,6 +1150,7 @@ node:
             connections:
                 - <.path>.out
                 - <workspace.asset_geometries.main.path>.<..label>
+    #
     geometry_xgen:
         keyword: asset_geometries
         label: <..key>
@@ -1169,6 +1170,7 @@ node:
             connections:
                 - <.output>
                 - '<workspace.asset_geometries.main.path>.<.name>'
+    #
     geometry_usd:
         keyword: asset_geometries
         label: <..key>
@@ -1236,6 +1238,7 @@ node:
             connections:
                 - <.path>.o0
                 - <workspace.asset_geometries.main.path>.<..label>
+    #
     set_usd:
         keyword: asset_geometries
         label: <..key>
@@ -1257,34 +1260,38 @@ node:
         keyword: materials
         label: mtl_grp
         main:
-            path: <option.root>/<..label>__{name}
+            path: '<option.root>/<.name>'
+            name: '<option.look_pass>__<..label>__{name}'
             obj_type: NetworkMaterialCreate
             attributes:
                 ns_colorr: 0.75
                 ns_colorg: 0.5
                 ns_colorb: 0.25
+
     material:
         keyword: materials
         label: mtl
         main:
-            path: ''
-            name: <..label>__{name}
+            path: '<node.material_group.main.path>/<.name>'
+            name: '<..label>__{name}'
             obj_type: NetworkMaterialCreate
             attributes:
                 ns_colorr: 0.75
                 ns_colorg: 0.5
                 ns_colorb: 0.25
+
     shader:
         keyword: materials
         label: sdr
         main:
             path: ''
-            name: <..label>__{name}
+            name: '<..label>__{name}'
             obj_type: ArnoldShadingNode
             attributes:
                 ns_colorr: 0.75
                 ns_colorg: 0.5
                 ns_colorb: 0.25
+
     material_assign:
         keyword: material_assigns
         label: mtl_asn
@@ -1295,6 +1302,7 @@ node:
                 ns_colorr: 0.75
                 ns_colorg: 0.5
                 ns_colorb: 0.25
+
     property_assign:
         keyword: property_assigns
         label: prt_asn

@@ -104,25 +104,17 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
     def set(self, value, time=0):
         ktn_port = self._get_ktn_port_()
         if ktn_port is not None:
-            if isinstance(value, (tuple, list)):
-                self._set_array_value_(ktn_port, value, time=time)
-                # utl_core.Log.set_module_result_trace(
-                #     'array-port set',
-                #     u'atr-path="{}" value="{}"'.format(self.path, value)
-                # )
-            else:
-                _value = value
-                if isinstance(value, unicode):
-                    _value = str(value)
-                #
-                ktn_port.setValue(_value, time)
-                # utl_core.Log.set_module_result_trace(
-                #     'constant-port set',
-                #     u'atr-path="{}" value="{}"'.format(self.path, _value)
-                # )
+            ktn_core.NGPortOpt(ktn_port).set(value, time)
 
     def set_expression(self, expression):
         self.ktn_port.setExpression(expression)
+    @classmethod
+    def _set_constant_value_(cls, ktn_port, value, time=0):
+        _value = value
+        if isinstance(value, unicode):
+            _value = str(value)
+        #
+        ktn_port.setValue(_value, time)
     @classmethod
     def _set_array_value_(cls, ktn_port, value, time=0):
         size = len(value)

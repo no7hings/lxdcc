@@ -2264,76 +2264,79 @@ class CmdMeshesOpt(object):
         kwargs = dict(
             vertex='vertex'
         )
-        keys = [
-            'vertex',
-            'edge',
-            'face',
-            'triangle',
-            'uvcoord',
-            'area',
-            'worldArea',
-            'shell',
-            'boundingBox'
-        ]
         dic = {}
-        dic_0 = {}
-        for i in keys:
-            v = cmds.polyEvaluate(
-                self._mesh_paths, **{i: True}
-            )
-            dic_0[i] = v
-        count = len(self._mesh_paths)
-        b_box = dic_0['boundingBox']
-        #
-        dic['geometry'] = count
-        dic['vertex'] = dic_0['vertex']
-        dic['edge'] = dic_0['edge']
-        dic['face'] = dic_0['face']
-        dic['triangle'] = dic_0['triangle']
-        dic['uv-map'] = dic_0['uvcoord']
-        dic['area'] = dic_0['area']
-        dic['world-area'] = dic_0['worldArea']
-        dic['shell'] = dic_0['shell']
-        dic['center-x'] = b_box[0][0]+b_box[0][1]
-        dic['center-y'] = b_box[1][0]+b_box[1][1]
-        dic['center-z'] = b_box[2][0]+b_box[2][1]
-        dic['clip-x'] = b_box[0][0]
-        dic['clip-y'] = b_box[1][0]
-        dic['clip-z'] = b_box[2][0]
-        dic['width'] = b_box[0][1]-b_box[0][0]
-        dic['height'] = b_box[1][1]-b_box[1][0]
-        dic['depth'] = b_box[2][1]-b_box[2][0]
+        if self._mesh_paths:
+            keys = [
+                'vertex',
+                'edge',
+                'face',
+                'triangle',
+                'uvcoord',
+                'area',
+                'worldArea',
+                'shell',
+                'boundingBox'
+            ]
+            dic_0 = {}
+            for i in keys:
+                v = cmds.polyEvaluate(
+                    self._mesh_paths, **{i: True}
+                )
+                dic_0[i] = v
+            #
+            count = len(self._mesh_paths)
+            b_box = dic_0['boundingBox']
+            #
+            dic['geometry'] = count
+            dic['vertex'] = dic_0['vertex']
+            dic['edge'] = dic_0['edge']
+            dic['face'] = dic_0['face']
+            dic['triangle'] = dic_0['triangle']
+            dic['uv-map'] = dic_0['uvcoord']
+            dic['area'] = dic_0['area']
+            dic['world-area'] = dic_0['worldArea']
+            dic['shell'] = dic_0['shell']
+            dic['center-x'] = b_box[0][0]+b_box[0][1]
+            dic['center-y'] = b_box[1][0]+b_box[1][1]
+            dic['center-z'] = b_box[2][0]+b_box[2][1]
+            dic['clip-x'] = b_box[0][0]
+            dic['clip-y'] = b_box[1][0]
+            dic['clip-z'] = b_box[2][0]
+            dic['width'] = b_box[0][1]-b_box[0][0]
+            dic['height'] = b_box[1][1]-b_box[1][0]
+            dic['depth'] = b_box[2][1]-b_box[2][0]
         #
         return dic
 
     def get_radar_chart_data(self):
         evaluate = self.get_evaluate()
         radar_chart_data = []
-        tgt_keys = [
-            'face',
-            'edge',
-            'vertex',
-        ]
-        for key in [
-            'geometry',
-            'shell',
-            'area',
-            'face',
-            'edge',
-            'vertex',
-        ]:
-            if key in tgt_keys:
-                a_0 = self.EVALUATE_A['area']
-                a_1 = evaluate['area']
-                v_0 = self.EVALUATE_A[key]
-                src_value = (a_1/a_0)*v_0
-            else:
-                src_value = evaluate[key]
-            #
-            tgt_value = evaluate[key]
-            radar_chart_data.append(
-                (key, src_value, tgt_value)
-            )
+        if evaluate:
+            tgt_keys = [
+                'face',
+                'edge',
+                'vertex',
+            ]
+            for key in [
+                'geometry',
+                'shell',
+                'area',
+                'face',
+                'edge',
+                'vertex',
+            ]:
+                if key in tgt_keys:
+                    a_0 = self.EVALUATE_A['area']
+                    a_1 = evaluate['area']
+                    v_0 = self.EVALUATE_A[key]
+                    src_value = (a_1/a_0)*v_0
+                else:
+                    src_value = evaluate[key]
+                #
+                tgt_value = evaluate[key]
+                radar_chart_data.append(
+                    (key, src_value, tgt_value)
+                )
         return radar_chart_data
 
     def set_reduce_by(self, percent):

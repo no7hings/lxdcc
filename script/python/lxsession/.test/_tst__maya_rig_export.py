@@ -24,16 +24,20 @@ for i_file_path in [
     # '/l/prod/cgm/work/assets/chr/ext_owl_a/rig/rigging/maya/scenes/ext_owl_a.rig.rigging.v001.ma',
     # '/l/prod/cgm/work/assets/chr/ext_proketeriat/rig/rigging/maya/scenes/ext_proketeriat.rig.rigging.v001.ma',
     # '/l/prod/cgm/work/assets/chr/ext_suraj/rig/rigging/maya/scenes/ext_suraj.rig.rigging.v001.ma',
-    # '/l/prod/cgm/work/assets/chr/ext_woodpecker/rig/rigging/maya/scenes/ext_woodpecker.rig.rigging.v001.ma',
-    '/l/prod/cgm_dev/work/assets/chr/nn_14y_test/rig/rigging/maya/scenes/nn_14y_test.rig.rigging.v001.ma'
+    '/l/prod/cgm/work/assets/chr/ext_woodpecker/rig/rigging/maya/scenes/ext_woodpecker.rig.rigging.v001.ma',
+    # '/l/prod/cgm_dev/work/assets/chr/nn_14y_test/rig/rigging/maya/scenes/nn_14y_test.rig.rigging.v001.ma'
 ]:
     j_option_opt = bsc_core.KeywordArgumentsOpt(
         option=dict(
             option_hook_key='rsv-task-batchers/asset/gen-rig-export',
             #
-            choice_scheme='asset-maya-output',
+            choice_scheme='asset-maya-publish',
             #
             file=i_file_path,
+            #
+            description='td_test',
+            movie_file='/l/prod/cgm/publish/assets/chr/bl_xiz_f/rig/rigging/bl_xiz_f.rig.rigging.v014/review/bl_xiz_f.rig.rigging.v014.mov',
+            #
             user=bsc_core.SystemMtd.get_user_name(),
             #
             td_enable=True,

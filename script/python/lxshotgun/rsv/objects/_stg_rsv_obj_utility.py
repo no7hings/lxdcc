@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 import lxshotgun.objects as stg_objects
 
 import lxshotgun.operators as stg_operators
@@ -86,13 +88,13 @@ class RsvStgTaskOpt(object):
             stg_user = self._stg_connector.get_stg_user(user=user)
             stg_version_opt.set_stg_user(stg_user)
 
+        if movie_file:
+            movie_file_opt = bsc_core.StorageFileOpt(movie_file)
+            if movie_file_opt.get_is_exists() is True:
+                stg_version_opt.set_movie_upload(movie_file)
+
         if description:
             stg_version_opt.set_description(description)
-
-        if movie_file:
-            stg_version_opt.set_movie_upload(
-                movie_file
-            )
 
         stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
         #
@@ -100,3 +102,6 @@ class RsvStgTaskOpt(object):
         stg_version_opt.set_stg_tags_append(
             stg_tag
         )
+
+    def set_stg_description_update(self):
+        pass

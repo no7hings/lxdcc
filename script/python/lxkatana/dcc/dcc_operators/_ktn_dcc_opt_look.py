@@ -1,4 +1,6 @@
 # coding:utf-8
+import re
+
 from lxbasic import bsc_core
 
 from lxutil.dcc import utl_dcc_opt_abs
@@ -112,3 +114,90 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
 
     def set_port_targets_disconnect(self, and_port_path):
         self._obj.get_output_port(and_port_path).set_disconnect()
+
+
+class MaterialOpt(utl_dcc_opt_abs.AbsObjOpt):
+    def __init__(self, *args, **kwargs):
+        super(MaterialOpt, self).__init__(*args, **kwargs)
+
+    def get_sg_path(self):
+        location = self.obj.get_parent().get_port('rootLocation').get()
+        name = self.obj.name
+        return '{}/{}'.format(location.rstrip('/'), name)
+
+
+class MaterialAssignOpt(utl_dcc_opt_abs.AbsObjOpt):
+    def __init__(self, *args, **kwargs):
+        super(MaterialAssignOpt, self).__init__(*args, **kwargs)
+
+    def get_material_path(self):
+        return self.obj.get('args.materialAssign.value')
+
+    def set_material_path(self, path):
+        self.obj.set('args.materialAssign.value', path)
+
+    def set_material(self, material):
+        self.set_material_path(
+            MaterialOpt(material).get_sg_path()
+        )
+
+    def get_geometry_paths(self):
+        dcc_node = self.obj
+        p = '[(](.*?)[)]'
+        cel_port = dcc_node.get_port('CEL')
+        value = cel_port.get()
+        if value:
+            _ = re.findall(p, value)
+            if _:
+                return _[0].split(' ')
+            else:
+                return [value]
+        return []
+
+    def set_geometry_paths(self, paths):
+        pass
+
+    def set_geometry_path_append(self, path):
+        dcc_node = self.obj
+        p = '[(](.*?)[)]'
+        cel_port = dcc_node.get_port('CEL')
+        value = cel_port.get()
+        if value:
+            _ = re.findall(p, value)
+            if _:
+                cel_value = '({} {})'.format(_[0], path)
+            else:
+                cel_value = '({} {})'.format(value, path)
+        else:
+            cel_value = path
+        cel_port.set(cel_value)
+
+
+class PropertiesAssignOpt(utl_dcc_opt_abs.AbsObjOpt):
+    def __init__(self, *args, **kwargs):
+        super(PropertiesAssignOpt, self).__init__(*args, **kwargs)
+
+    def get_geometry_paths(self):
+        dcc_node = self.obj
+        p = '[(](.*?)[)]'
+        cel_port = dcc_node.get_port('CEL')
+        value = cel_port.get()
+        if value:
+            _ = re.findall(p, value)
+            if _:
+                return _[0].split(' ')
+            else:
+                return [value]
+        return MaterialAssignOpt(self.obj).get_geometry_paths()
+
+    def set_geometry_paths(self, paths):
+        pass
+
+    def set_geometry_path_append(self, path):
+        MaterialAssignOpt(self.obj).set_geometry_path_append(path)
+
+    def set_properties(self, properties):
+        pass
+
+    def set_visibilities(self, visibilities):
+        pass

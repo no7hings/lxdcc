@@ -331,12 +331,3 @@ class TextureReferences(AbsTextureReferences):
                 obj.set_file_port_raw_add(
                     i_port_path, i_value
                 )
-
-
-class MaterialAssigns(ktn_dcc_obj_abs.AbsKtnObjs):
-    INCLUDE_DCC_TYPES = [
-        'MaterialAssign'
-    ]
-    DCC_OBJ_CLASS = _ktn_dcc_obj_node.MaterialAssign
-    def __init__(self, *args):
-        super(MaterialAssigns, self).__init__(*args)

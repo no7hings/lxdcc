@@ -107,6 +107,21 @@ class SceneGraphOpt(object):
             tvl.next()
         return list_
 
+    def get_geometry_material_paths_by_location(self, location):
+        lis = []
+        tvl = self._get_traversal_(self.GEOMETRY_ROOT+location)
+        while tvl.valid():
+            i_path = tvl.getLocationPath()
+            i_attrs = tvl.getLocationData().getAttrs()
+            i_type_name = i_attrs.getChildByName('type').getData()[0]
+            if i_type_name in ['subdmesh', 'renderer procedural']:
+                i_attr = i_attrs.getChildByName('materialAssign')
+                if i_attr is not None:
+                    i_material_path = i_attrs.getChildByName('materialAssign').getData()[0]
+                    lis.append(i_material_path)
+            tvl.next()
+        return lis
+
     def __str__(self):
         return '{}(node="{}")'.format(
             self.__class__.__name__,
@@ -580,7 +595,7 @@ class NGPortOpt(object):
                     strings = self.get_enumerate_strings()
                     index = max(min(value, len(strings)-1), 0)
                     _value = strings[index]
-
+            #
             self.ktn_port.setValue(_value, frame)
 
     def set_help_string(self, value):

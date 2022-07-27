@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil.rsv import utl_rsv_obj_abstract
 
 from lxshotgun.rsv.objects import _stg_rsv_obj_utility
@@ -57,8 +59,12 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
 
     def set_version_export(self):
         version = self._rsv_scene_properties.get('version')
+        movie_file = self._hook_option_opt.get('movie_file')
+        description = self._hook_option_opt.get('description')
         _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).set_stg_version_create(
-            version=version
+            version=version,
+            movie_file=movie_file,
+            description=description
         )
 
     def set_link_export(self):
@@ -164,3 +170,31 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         #
         stg_connector = stg_objects.StgConnector()
         print stg_connector.get_stg_entity()
+
+    def set_review_mov_export(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword = 'asset-review-mov-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-review-mov-file'
+        else:
+            raise TypeError()
+        #
+        movie_file_path = self._hook_option_opt.get('movie_file')
+        #
+        review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        review_mov_file_path = review_mov_file_rsv_unit.get_result(
+            version=version
+        )
+        if movie_file_path:
+            movie_file_opt = bsc_core.StorageFileOpt(movie_file_path)
+            if movie_file_opt.get_is_exists() is True:
+                movie_file_opt.set_copy_to_file(
+                    review_mov_file_path
+                )
+
+

@@ -116,7 +116,11 @@ asset-work-maya-user-scene-src-file: <asset-work-maya-scene-src-dir>/<user-name>
 asset-work-maya-scene-tmp-file: <asset-work-maya-tmp-dir>/<asset-version-name>.<time-tag>.ma
 #
 asset-work-maya-xgen-cache-dir: <asset-work-maya-dir>/<variant>/<version-name>/xgen
+#
 asset-work-maya-xgen-file: <asset-work-maya-dir>/<asset-version-name>__<xgen-name>.xgen
+#
+asset-work-maya-ass-dir: <asset-work-maya-dir>/<variant>/<version-name>/ass
+asset-work-maya-ass-file: <asset-work-maya-ass-dir>/all.ass
 # <asset-work-houdini>
 asset-work-houdini-dir: <asset-task-dir>/houdini
 asset-work-houdini-tmp-dir: <asset-work-houdini-dir>/temporary/<user-name>

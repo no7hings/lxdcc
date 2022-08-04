@@ -5,7 +5,7 @@ from lxutil.rsv import utl_rsv_obj_abstract
 class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvRecyclerHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
-
+    #
     def set_texture_recycles(self):
         from lxbasic import bsc_core
 
@@ -99,6 +99,10 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 repath_maya_xgen_enable = self._hook_option_opt.get_as_boolean('repath_maya_xgen_enable')
                 if repath_maya_xgen_enable is True:
                     self.set_maya_xgen_repath()
+                #
+                convert_maya_to_katana_enable = self._hook_option_opt.get_as_boolean('convert_maya_to_katana_enable')
+                if convert_maya_to_katana_enable is True:
+                    self.set_maya_ass_export()
             else:
                 utl_core.Log.set_module_warning_trace(
                     'asset maya recycles',
@@ -227,7 +231,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                             i_file_path_src
                         )
                     )
-
+    # maya
     def set_maya_xgen_repath(self):
         import lxutil.dcc.dcc_operators as utl_dcc_operators
 
@@ -253,7 +257,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         xgen_collection_directory_rsv_unit_tgt = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )
-        xgen_collection_directory_path_tgt = xgen_collection_directory_rsv_unit_tgt.get_result(
+        xgen_directory_path_tgt = xgen_collection_directory_rsv_unit_tgt.get_result(
             version=version, extend_variants=dict(variant=variant)
         )
 
@@ -271,18 +275,18 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             version=version
         )
 
-        if bsc_core.StorageDirectoryOpt(xgen_collection_directory_path_tgt).get_is_exists() is False:
+        if bsc_core.StorageDirectoryOpt(xgen_directory_path_tgt).get_is_exists() is False:
             directory_path_0 = xgen_collection_directory_rsv_unit_tgt.get_exists_result(
                 version='latest', extend_variants=dict(variant=variant)
             )
             utl_core.Log.set_module_warning_trace(
                 'asset xgen repath',
                 u'directory="{}" is not found, use "{}" instance'.format(
-                    xgen_collection_directory_path_tgt, directory_path_0
+                    xgen_directory_path_tgt, directory_path_0
 
                 )
             )
-            xgen_collection_directory_path_tgt = directory_path_0
+            xgen_directory_path_tgt = directory_path_0
 
         e = utl_fnc_exporters.DotXgenExporter
 
@@ -295,7 +299,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             e._set_xgen_collection_file_repath_(
                 i_xgen_collection_file_path,
                 xgen_project_directory_path_tgt,
-                '{}/collections'.format(xgen_collection_directory_path_tgt),
+                xgen_directory_path_tgt,
                 i_xgen_collection_name,
             )
 
@@ -356,3 +360,109 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 )
             )
         ).set_tx_repath_to_orig()
+
+    def set_maya_ass_export(self):
+        import lxmaya.fnc.exporters as mya_fnc_exporters
+
+        keyword = 'asset-work-maya-ass-file'
+
+        variant = 'outsource'
+        version = self._rsv_scene_properties.get('version')
+
+        root = self._rsv_scene_properties.get('dcc.root')
+
+        ass_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+
+        ass_file_path = ass_file_rsv_unit.get_result(
+            version=version, extend_variants=dict(variant=variant)
+        )
+
+        mya_fnc_exporters.LookAssExporter(
+            file_path=ass_file_path,
+            root=root
+        ).set_run()
+    # katana
+    def set_katana_create(self):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        keyword = 'asset-work-katana-scene-src-file'
+
+        version = self._rsv_scene_properties.get('version')
+
+        katana_scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        katana_scene_src_file_path = katana_scene_src_file_rsv_unit.get_result(
+            version='{}__outsource'.format(version)
+        )
+        # save first
+        ktn_dcc_objects.Scene.set_file_save_to(katana_scene_src_file_path)
+
+        self.set_katana_load_workspace()
+
+        self.set_katana_import_ass()
+
+        ktn_dcc_objects.Scene.set_file_save_to(katana_scene_src_file_path)
+
+    def set_katana_load_workspace(self):
+        from lxutil import utl_core
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        r = self._resolver
+
+        project = self._rsv_scene_properties.get('project')
+
+        rsv_task = r.get_rsv_task(
+            project=project,
+            asset='surface_workspace',
+            step='srf',
+            task='surfacing'
+        )
+
+        if rsv_task:
+            rsv_unit = rsv_task.get_rsv_unit(
+                keyword='asset-work-katana-scene-src-file'
+            )
+            file_path = rsv_unit.get_result(
+                version='latest'
+            )
+
+            ms = [
+                (ktn_dcc_objects.Scene.set_file_import, (file_path,)),
+                (ktn_dcc_objects.AssetWorkspace().set_all_executes_run, ()),
+                (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
+            ]
+
+            with utl_core.gui_progress(maximum=len(ms)) as g_p:
+                for i_m, i_as in ms:
+                    g_p.set_update()
+                    if i_as:
+                        i_m(*i_as)
+                    else:
+                        i_m()
+
+    def set_katana_import_ass(self):
+        import lxkatana.fnc.importers as ktn_fnc_importers
+
+        keyword = 'asset-work-maya-ass-file'
+
+        variant = 'outsource'
+        version = self._rsv_scene_properties.get('version')
+
+        ass_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        ass_file_path = ass_file_rsv_unit.get_result(
+            version=version, extend_variants=dict(variant=variant)
+        )
+
+        ktn_fnc_importers.LookAssImporter(
+            option=dict(
+                file=ass_file_path,
+                location='/root/materials',
+                look_pass='default'
+            )
+        ).set_run()

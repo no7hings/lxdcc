@@ -366,6 +366,9 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
             )
 
     def set_rename(self, new_name):
+        if isinstance(new_name, unicode):
+            new_name = str(new_name)
+        #
         ktn_obj = NodegraphAPI.GetNode(self.name)
         if ktn_obj is not None:
             name_ktn_port = ktn_obj.getParameter('name')

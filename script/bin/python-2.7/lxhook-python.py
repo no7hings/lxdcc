@@ -56,19 +56,27 @@ def __set_run_by_option(option):
     # do not use thread, there will be run with subprocess use thread by lxhook-command
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
-        __set_option_hook_run(hook_option=option)
+        deadline_enable = option_opt.get_as_boolean('deadline_enable')
+        if deadline_enable is True:
+            __set_option_hook_execute_by_deadline(hook_option=option)
+        else:
+            __set_option_hook_execute(hook_option=option)
     else:
         hook_key = option_opt.get('hook_key')
         if hook_key:
-            __set_hook_run(hook_key)
+            __set_hook_execute(hook_key)
 
 
-def __set_hook_run(hook_key):
+def __set_hook_execute(hook_key):
     import lxsession.commands as ssn_commands; ssn_commands.set_hook_execute(hook_key)
 
 
-def __set_option_hook_run(hook_option):
+def __set_option_hook_execute(hook_option):
     import lxsession.commands as ssn_commands; ssn_commands.set_option_hook_execute(hook_option)
+
+
+def __set_option_hook_execute_by_deadline(hook_option):
+    import lxsession.commands as ssn_commands; ssn_commands.set_option_hook_execute_by_deadline(hook_option)
 
 
 if __name__ == '__main__':

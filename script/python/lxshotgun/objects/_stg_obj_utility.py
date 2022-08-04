@@ -5,6 +5,8 @@ from lxutil import utl_core
 
 from lxshotgun import stg_configure, stg_core
 
+import lxbasic.objects as bsc_objects
+
 
 class StgObjQuery(object):
     def __init__(self, stg_connector, stg_obj):
@@ -137,10 +139,12 @@ class StgConnector(object):
                 ['tags', 'in', [self.get_stg_tag(i) for i in kwargs['tags']]]
             )
 
-    def get_stg_scheme(self, stg_type):
-        return self.shotgun.schema_field_read(
-            stg_type
+    def get_stg_entity_scheme(self, stg_type, key):
+        _ = self.shotgun.schema_field_read(
+            entity_type=stg_type, field_name=key
         )
+        if isinstance(_, dict):
+            return bsc_objects.Configure(value=_)
 
     def get_stg_projects(self):
         return self._shotgun.find(
@@ -684,11 +688,13 @@ class StgConnector(object):
                 stg_entity_query = self.STG_OBJ_QUERY_CLS(self, stg_entity)
                 return stg_entity_query
 
+    def get_stg_all_version_types(self):
+        c = self.get_stg_entity_scheme(
+            'Version', 'sg_version_type'
+        )
+        if c is not None:
+            return c.get('sg_version_type.properties.valid_values.value')
+
 
 if __name__ == '__main__':
-    import lxshotgun.objects as stg_objects
-    _ss = stg_objects.StgConnector().get_stg_entity_queries(
-        project='cgm', role='lig', tags=['DefaultRig']
-    )
-    for _i in _ss:
-        print _i.get('code')
+    pass

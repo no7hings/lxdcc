@@ -13,25 +13,100 @@ parameters:
 
     layer/scheme:
         widget: enumerate
-        value: ['master', 'no_hair']
+        value: ['master', 'no_hair', 'high', 'hair', 'rig', 'shape', 'hair_shape', 'cloth_shape', 'effect_shape', 'rig_shape']
         tool_tip: '...'
 
-    locations/hi:
+    layers/master/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/master/location:
+        widget: path
+        value: '/root/world/geo/master'
+        tool_tip: '...'
+
+    layers/high/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/high/location:
         widget: path
         value: '/root/world/geo/master/hi'
         tool_tip: '...'
-    #
-    locations/shape:
+
+    layers/shape/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    layers/shape/location:
         widget: path
         value: '/root/world/geo/master/shape'
         tool_tip: '...'
-    #
-    locations/hair:
+
+    layers/hair_shape/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/hair_shape/location:
+        widget: path
+        value: '/root/world/geo/master/shape/grm_shapegrp'
+        tool_tip: '...'
+
+    layers/cloth_shape/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/cloth_shape/location:
+        widget: path
+        value: '/root/world/geo/master/shape/cfx_shapegrp'
+        tool_tip: '...'
+
+    layers/effect_shape/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/effect_shape/location:
+        widget: path
+        value: '/root/world/geo/master/shape/efx_shapegrp'
+        tool_tip: '...'
+
+    layers/rig_shape/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/rig_shape/location:
+        widget: path
+        value: '/root/world/geo/master/shape/rig_shapegrp'
+        tool_tip: '...'
+
+    layers/hair/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/hair/location:
         widget: path
         value: '/root/world/geo/master/hair'
         tool_tip: '...'
 
-    locations/aux:
+    layers/rig/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    layers/rig/location:
         widget: path
-        value: '/root/world/geo/master/aux'
+        value: '/root/world/geo/master/rig'
+        tool_tip: '...'
+    #
+    lynxi_info/type:
+        widget: string
+        value: 'lx_layer'
         tool_tip: '...'

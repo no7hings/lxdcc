@@ -636,6 +636,11 @@ class AbsDotXgenDef(object):
         return file_name_base.split('__')[-1]
     @classmethod
     def _set_xgen_collection_files_copy_(cls, file_path_src, file_path_tgt):
+        """
+        :param file_path_src: str("maya_scene_file_path")
+        :param file_path_tgt:
+        :return:
+        """
         file_paths_src = cls._get_xgen_collection_file_paths_(file_path_src)
         file_opt_tgt = bsc_core.StorageFileOpt(file_path_tgt)
         file_name_base_tgt = file_opt_tgt.name_base

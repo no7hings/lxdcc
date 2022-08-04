@@ -161,6 +161,9 @@ class Scene(utl_abstract.AbsDccScene):
     @classmethod
     def get_is_default(cls):
         return cls.get_current_file_path() == cls.get_default_file_path()
+    @classmethod
+    def set_file_open(cls, file_path):
+        hou.hipFile.load(file_path)
 
 
 class Selection(object):

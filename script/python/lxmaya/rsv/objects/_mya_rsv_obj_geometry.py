@@ -10,6 +10,32 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 import lxmaya.fnc.exporters as mya_fnc_exporters
 
 
+class UsdCmdBasic(object):
+    @classmethod
+    def _set_usd_export_(cls, root, location, file_path, start_frame, end_frame):
+        # noinspection PyUnresolvedReferences
+        import maya.mel as mel
+        cmd_str = u'paMaUsdExport "{}" "{}" "{}" {} {}'.format(
+            root, location, file_path, start_frame, end_frame
+        )
+        cmd_str += u' {} 1 0'
+        utl_core.Log.set_module_result_trace(
+            'usd export',
+            u'file="{}", location="{}", frames="{}-{}" is started'.format(
+                file_path, location, start_frame, end_frame
+            )
+        )
+        #
+        mel.eval(cmd_str)
+        #
+        utl_core.Log.set_module_result_trace(
+            'usd export',
+            u'file="{}", location="{}", frames="{}-{}" is completed'.format(
+                file_path, location, start_frame, end_frame
+            )
+        )
+
+
 class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
@@ -33,10 +59,10 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
             pathsep=pathsep
         )
-        mya_group = mya_dcc_objects.Group(
+        dcc_root = mya_dcc_objects.Group(
             mya_root_dag_opt.get_value()
         )
-        if mya_group.get_is_exists() is True:
+        if dcc_root.get_is_exists() is True:
             if workspace == 'work':
                 keyword = 'asset-work-geometry-usd-var-file'
             elif workspace == 'publish':
@@ -45,7 +71,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 keyword = 'asset-output-geometry-usd-var-file'
             else:
                 raise TypeError()
-            # location_names = [i.name for i in mya_group.get_children()]
+            # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
             with utl_core.gui_progress(maximum=len(location_names)) as g_p:
@@ -81,7 +107,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         else:
             raise RuntimeError()
 
-    def set_asset_geometry_uv_map_usd_export(self):
+    def set_asset_geometry_uv_map_usd_export(self, version_scheme='match'):
         import lxusd.fnc.exporters as usd_fnc_exporters
         #
         step = self._rsv_scene_properties.get('step')
@@ -138,10 +164,10 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
             pathsep=pathsep
         )
-        mya_group = mya_dcc_objects.Group(
+        dcc_root = mya_dcc_objects.Group(
             mya_root_dag_opt.get_value()
         )
-        if mya_group.get_is_exists() is True:
+        if dcc_root.get_is_exists() is True:
             if workspace == 'work':
                 keyword = 'asset-work-geometry-abc-var-file'
             elif workspace == 'publish':
@@ -150,7 +176,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 keyword = 'asset-output-geometry-abc-var-file'
             else:
                 raise TypeError()
-            # location_names = [i.name for i in mya_group.get_children()]
+            # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
             with utl_core.gui_progress(maximum=len(location_names)) as g_p:
@@ -182,7 +208,66 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             raise RuntimeError()
 
 
-class RsvDccShotGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccGeometryExtraHookOpt(
+    utl_rsv_obj_abstract.AbsRsvOHookOpt,
+    UsdCmdBasic
+):
+    def __init__(self, rsv_scene_properties, hook_option_opt=None):
+        super(RsvDccGeometryExtraHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
+
+    def set_asset_geometry_usd_export(self, version_scheme='match'):
+        """
+        :param version_scheme:
+        :return:
+        """
+        #
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        root = self._rsv_scene_properties.get('dcc.root')
+        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        #
+        if version_scheme == 'match':
+            version = self._rsv_scene_properties.get('version')
+        elif version_scheme == 'new':
+            version = version_scheme
+        #
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+            pathsep=pathsep
+        )
+        dcc_root = mya_dcc_objects.Group(
+            mya_root_dag_opt.get_value()
+        )
+        if dcc_root.get_is_exists() is True:
+            if workspace == 'work':
+                keyword = 'asset-work-geometry-usd-var-file'
+            elif workspace == 'publish':
+                keyword = 'asset-geometry-usd-var-file'
+            elif workspace == 'output':
+                keyword = 'asset-output-geometry-usd-var-file'
+            else:
+                raise TypeError()
+            #
+            start_frame, end_frame = dcc_root.get('pg_start_frame'), dcc_root.get('pg_end_frame')
+            # location_names = [i.name for i in dcc_root.get_children()]
+            # use white list
+            location_names = ['hi', 'shape', 'hair', 'aux']
+            with utl_core.gui_progress(maximum=len(location_names)) as g_p:
+                for i_location_name in location_names:
+                    g_p.set_update()
+                    #
+                    if start_frame is not None and end_frame is not None:
+                        pass
+                    else:
+                        pass
+
+    def set_asset_geometry_proxy_usd_export(self):
+        pass
+
+
+class RsvDccShotGeometryHookOpt(
+    utl_rsv_obj_abstract.AbsRsvOHookOpt,
+    UsdCmdBasic
+):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccShotGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -219,29 +304,6 @@ class RsvDccShotGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
 
     def set_asset_shot_geometry_abc_export(self):
         pass
-    @classmethod
-    def _set_usd_export_(cls, root, location, file_path, start_frame, end_frame):
-        # noinspection PyUnresolvedReferences
-        import maya.mel as mel
-        cmd_str = u'paMaUsdExport "{}" "{}" "{}" {} {}'.format(
-            root, location, file_path, start_frame, end_frame
-        )
-        cmd_str += ' {} 1 0'
-        utl_core.Log.set_module_result_trace(
-            'usd export',
-            u'file="{}", location="{}", frames="{}-{}" is started'.format(
-                file_path, location, start_frame, end_frame
-            )
-        )
-        #
-        mel.eval(cmd_str)
-        #
-        utl_core.Log.set_module_result_trace(
-            'usd export',
-            u'file="{}", location="{}", frames="{}-{}" is completed'.format(
-                file_path, location, start_frame, end_frame
-            )
-        )
     @classmethod
     def _set_shot_geometry_usd_export_(cls, shot_asset, directory_path, start_frame, end_frame):
         location_names = [

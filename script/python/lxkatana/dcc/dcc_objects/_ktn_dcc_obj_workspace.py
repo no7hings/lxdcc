@@ -320,9 +320,9 @@ class AssetWorkspace(object):
     def _set_node_graph_nodes_create_(cls, nodes_dict, pass_name='default'):
         if nodes_dict:
             for seq, (k, i_node_dict) in enumerate(nodes_dict.items()):
-                cls._set_node_graph_node_create_(i_node_dict, pass_name)
+                cls._set_node_graph_node_create_(i_node_dict, seq, pass_name)
     @classmethod
-    def _set_node_graph_node_create_(cls, node_dict, pass_name='default'):
+    def _set_node_graph_node_create_(cls, node_dict, index, pass_name='default'):
         variable = node_dict.get('variable')
         if pass_name != 'default':
             if not variable:
@@ -352,7 +352,7 @@ class AssetWorkspace(object):
             split_connections = node_dict.get('split_connections')
             if split_connections:
                 cls._set_node_spit_connections_create_(split_connections)
-
+            #
             connections = node_dict.get('connections')
             if connections:
                 cls._set_node_connections_create_(connections)
@@ -360,7 +360,7 @@ class AssetWorkspace(object):
             parameters = node_dict.get('parameters')
             if parameters:
                 cls._set_node_parameters_(dcc_node, parameters)
-
+            #
             arnold_geometry_properties = node_dict.get('arnold_geometry_properties')
             if arnold_geometry_properties:
                 cls._set_arnold_geometry_properties_(dcc_node, arnold_geometry_properties)

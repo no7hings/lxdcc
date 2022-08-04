@@ -568,7 +568,7 @@ class LxCamera(object):
             'alembic.file', ''
         )
         obj_opt.set_port_raw(
-            'alembic.location', ''
+            'alembic.location', '/root/world/cam/cameras/main'
         )
 
     def set_load(self):

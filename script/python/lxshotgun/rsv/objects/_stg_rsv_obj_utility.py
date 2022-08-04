@@ -104,6 +104,7 @@ class RsvStgTaskOpt(object):
 
         if description:
             # need unquote
+            description = description.replace('///', '%')
             stg_version_opt.set_description(unquote(description))
 
         stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)

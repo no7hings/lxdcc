@@ -563,6 +563,7 @@ workspace:
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
+                #
                 ambocc:
                     path: <option.root>/<..key>__look
                     obj_category: node
@@ -583,6 +584,7 @@ workspace:
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
+                #
                 wire:
                     path: <option.root>/<..key>__look
                     obj_category: node
@@ -603,6 +605,7 @@ workspace:
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
+                #
                 white:
                     path: <option.root>/<..key>__look
                     obj_category: node
@@ -618,6 +621,27 @@ workspace:
                         ns_colorb: 0.75
                     parameters:
                         look_pass/scheme: white
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <....main.path>.<..key>
+                #
+                assess:
+                    path: <option.root>/<..key>__look
+                    obj_category: node
+                    obj_type: lx_look_pass
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*5
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        look_pass/scheme: assess
                     connections:
                         - <.....geometry_switch.main.output>
                         - <.input>
@@ -1000,6 +1024,7 @@ workspace:
                         - <.path>.input
                         - <.path>.output
                         - <....main.path>.<..key>
+                #
                 no_hair:
                     path: <option.root>/<..key>__layer
                     obj_category: node
@@ -1018,6 +1043,83 @@ workspace:
                         - <.path>.input
                         - <.path>.output
                         - <....main.path>.<..key>
+                #
+                high:
+                    path: <option.root>/<..key>__layer
+                    obj_category: node
+                    obj_type: lx_layer
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*2
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        layer/scheme: high
+                    connections:
+                        - <.....quality_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                #
+                shape:
+                    path: <option.root>/<..key>__layer
+                    obj_category: node
+                    obj_type: lx_layer
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*3
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        layer/scheme: shape
+                    connections:
+                        - <.....quality_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                #
+                hair_shape:
+                    path: <option.root>/<..key>__layer
+                    obj_category: node
+                    obj_type: lx_layer
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*4
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        layer/scheme: hair_shape
+                    connections:
+                        - <.....quality_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+                #
+                cloth_shape:
+                    path: <option.root>/<..key>__layer
+                    obj_category: node
+                    obj_type: lx_layer
+                    base_obj_type: Group
+                    attributes:
+                        x: =<.....geometry.x>-<option.w>/2*5
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.25
+                        ns_colorg: 0.5
+                        ns_colorb: 0.75
+                    parameters:
+                        layer/scheme: cloth_shape
+                    connections:
+                        - <.....quality_switch.main.output>
+                        - <.path>.input
+                        - <.path>.output
+                        - <....main.path>.<..key>
+
     # render settings
     # y=-5.5
     render_settings:

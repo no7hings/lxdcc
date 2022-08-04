@@ -218,6 +218,110 @@ class CmdSubProcessThread(threading.Thread):
         return self._status
 
 
+class FncThread(threading.Thread):
+    STACK = []
+    MAXIMUM = 256
+    EVENT = threading.Event()
+    LOCK = threading.Lock()
+    #
+    Status = bsc_configure.Status
+    def __init__(self, fnc, index, *args, **kwargs):
+        threading.Thread.__init__(self)
+        self._fnc = fnc
+        self._args = args
+        self._kwargs = kwargs
+        #
+        self._index = index
+
+        self._status = self.Status.Started
+
+        self._status_changed_signal = CmdSubProcessSignal(int, int)
+        self._completed_signal = CmdSubProcessSignal(int, list)
+        self._failed_signal = CmdSubProcessSignal(int, list)
+        self._finished_signal = CmdSubProcessSignal(int, int, list)
+    @property
+    def status_changed(self):
+        return self._status_changed_signal
+    @property
+    def completed(self):
+        return self._completed_signal
+    @property
+    def failed(self):
+        return self._failed_signal
+    @property
+    def finished(self):
+        return self._finished_signal
+
+    def run(self):
+        self.__set_status_update(self.Status.Running)
+        results = []
+        try:
+            results = self._fnc(*self._args, **self._kwargs) or []
+            self.__set_status_update(self.Status.Completed)
+            self.__set_completed(results)
+        except subprocess.CalledProcessError as exc:
+            # o = exc.output
+            # s = exc.returncode
+            results = []
+            self.__set_status_update(self.Status.Failed)
+            self.__set_failed(results)
+        finally:
+            FncThread.LOCK.acquire()
+            FncThread.STACK.remove(self)
+            # unlock
+            if len(FncThread.STACK) < FncThread.MAXIMUM:
+                FncThread.EVENT.set()
+                FncThread.EVENT.clear()
+
+            FncThread.LOCK.release()
+
+            self.__set_finished(self._status, results)
+    @staticmethod
+    def get_is_busy():
+        return len(FncThread.STACK) >= FncThread.MAXIMUM
+    @staticmethod
+    def set_wait():
+        FncThread.LOCK.acquire()
+        # lock
+        if len(FncThread.STACK) >= FncThread.MAXIMUM:
+            FncThread.LOCK.release()
+            FncThread.EVENT.wait()
+        else:
+            FncThread.LOCK.release()
+    @staticmethod
+    def set_start(fnc, index, *args, **kwargs):
+        FncThread.LOCK.acquire()
+        t = FncThread(fnc, index, *args, **kwargs)
+        FncThread.STACK.append(t)
+        FncThread.LOCK.release()
+        t.start()
+        return t
+
+    def __set_completed(self, results):
+        self._completed_signal.set_emit_send(
+            self._index, results
+        )
+
+    def __set_failed(self, results):
+        self._failed_signal.set_emit_send(
+            self._index, results
+        )
+
+    def __set_finished(self, status, results):
+        self._finished_signal.set_emit_send(
+            self._index, status, results
+        )
+
+    def __set_status_update(self, status):
+        self._status = status
+        self._status_changed_signal.set_emit_send(
+            self._index, status
+        )
+
+    def get_status(self):
+        return self._status
+
+
 class OrderedYamlMtd(object):
     @classmethod
     def set_dump(cls, raw, stream=None, Dumper=yaml.SafeDumper, object_pairs_hook=collections.OrderedDict, **kwargs):
@@ -910,27 +1014,24 @@ class StorageDirectoryOpt(StoragePathOpt):
         )
 
     def set_copy_to_directory(self, directory_path_tgt, replace=False):
-        def copy_fnc_(file_path_src_, file_path_tgt_):
-            StorageFileOpt(file_path_src_).set_copy_to_file(
-                file_path_tgt_, replace
-            )
-        #
         directory_path_src = self.path
         file_paths_src = self.get_all_file_paths()
         #
-        threads = []
-        for i_file_path_src in file_paths_src:
+        for index, i_file_path_src in enumerate(file_paths_src):
             i_relative_file_path = i_file_path_src[len(directory_path_src):]
-            #
             i_file_path_tgt = directory_path_tgt + i_relative_file_path
-            if os.path.exists(i_file_path_tgt) is False:
-                i_thread = PyThread(
-                    copy_fnc_, i_file_path_src, i_file_path_tgt
+            #
+            i_file_opt_src = StorageFileOpt(i_file_path_src)
+            i_file_opt_tgt = StorageFileOpt(i_file_path_tgt)
+            if i_file_opt_tgt.get_is_exists() is False:
+                # create target directory first
+                i_file_opt_tgt.set_directory_create()
+                #
+                FncThread.set_wait()
+                FncThread.set_start(
+                    i_file_opt_src.set_copy_to_file, index,
+                    i_file_path_tgt, replace=replace
                 )
-                threads.append(i_thread)
-        #
-        [i.start() for i in threads]
-        [i.join() for i in threads]
 
 
 class StorageFileOpt(StoragePathOpt):
@@ -1060,6 +1161,14 @@ class StorageFileOpt(StoragePathOpt):
                 shutil.copy2(file_path_src, file_path_tgt)
             except:
                 ExceptionMtd.set_print()
+
+    def set_copy_to_directory(self, directory_path_tgt, replace=False):
+        file_path_tgt = u'{}/{}'.format(
+            directory_path_tgt, self.name
+        )
+        self.set_copy_to_file(
+            file_path_tgt, replace=replace
+        )
 
 
 class MultiplyPatternMtd(object):
@@ -4091,7 +4200,7 @@ class ParsePatternOpt(object):
             )
         )
 
-    def get_results(self):
+    def get_matches(self):
         list_ = []
         paths = glob.glob(
             self._fnmatch_pattern
@@ -4107,6 +4216,17 @@ class ParsePatternOpt(object):
                     i_r['result'] = i_path
                     list_.append(i_r)
         return list_
+
+    def _get_exists_results_(self):
+        return glob.glob(
+            self._fnmatch_pattern
+        ) or []
+
+    def get_exists_results(self, **kwargs):
+        p = self.set_update_to(**kwargs)
+        return glob.glob(
+            p._fnmatch_pattern
+        ) or []
 
     def __str__(self):
         return self._pattern
@@ -4216,15 +4336,16 @@ class BBoxMtd(object):
 
 class CameraMtd(object):
     @classmethod
-    def get_front_transformation(cls, geometry_args, angle):
+    def get_front_transformation(cls, geometry_args, angle, mode=0):
         _, (c_x, c_y, c_z), (w, h, d) = geometry_args
 
-        r = max(w, h)
-        print r
+        if mode == 1:
+            r = max(w, h)
+        else:
+            r = max(w, h, d)
+
         z_1 = r / math.tan(math.radians(angle))
         t_x, t_y, t_z = (c_x, c_y, z_1 - c_z)
-
-        print z_1
 
         r_x, r_y, r_z = 0, 0, 0
         s_x, s_y, s_z = 1, 1, 1
@@ -4267,8 +4388,548 @@ class MeshFaceVertexIndicesOpt(object):
         return lis
 
 
+class OiioMtd(object):
+    @classmethod
+    def set_fit_to(cls, file_path_src, file_path_tgt, size):
+        option = dict(
+            input=file_path_src,
+            output=file_path_tgt,
+            size='{}x{}'.format(*size)
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'-i "{input}"',
+            '--fit {size}',
+            u'-o "{output}"',
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def set_create_as_flat_color(cls, file_path_tgt, size, rgba):
+        option = dict(
+            size='{}x{}'.format(*size),
+            color='{},{},{},{}'.format(*rgba),
+            output=file_path_tgt
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            '--create {size} 4',
+            '--fill:color={color} {size}',
+            # u'-i "{}"'.format(file_path_src),
+            u'-o "{output}"',
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def set_over_by(cls, file_path_fgd, file_path_bgd, file_path_tgt, offset_fgd):
+        option = dict(
+            foreground=file_path_fgd,
+            background=file_path_bgd,
+            output=file_path_tgt,
+            offset_foreground='-{}-{}'.format(*offset_fgd)
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'"{foreground}" --originoffset {offset_foreground}',
+            u'"{background}"',
+            '--over',
+            u'-o "{output}"',
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def set_guide_create(cls):
+        file_path_tgt = '/data/f/test_rvio/test_6.exr'
+        guide_data = [
+            ('primary', 8),
+            ('object-color', 8),
+            ('wire', 8),
+            ('density', 8)
+        ]
+        size = 2048, 2048
+        w, h = size
+        g_w, g_h = w, 48
+        rgba = .18, .18, .18, 1
+        option = dict(
+            size='{}x{}'.format(*size),
+            color='{},{},{},{}'.format(*rgba),
+            output=file_path_tgt,
+        )
+        box_args = []
+        border_rgb = 1, 1, 1
+        max_c = sum([i[1] for i in guide_data])
+        i_x_0, i_y_0 = 0, h - g_h
+        for i in guide_data:
+            i_text, i_c = i
+            i_background_rgb = TextOpt(i_text).to_rgb(maximum=1)
+            # background
+            box_args.append(
+                '--box:color={},{},{},1:fill=1'.format(*i_background_rgb)
+            )
+            i_p = i_c / float(max_c)
+            i_x_1, i_y_1 = int(i_x_0 + i_p * w), h - 1
+            box_args.append(
+                '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
+            )
+            # border
+            box_args.append(
+                '--box:color={},{},{},1'.format(*border_rgb)
+            )
+            i_p = i_c / float(max_c)
+            i_x_1, i_y_1 = int(i_x_0 + i_p * w), h - 1
+            box_args.append(
+                '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
+            )
+            i_x_0 = i_x_1
+
+        option['box'] = ' '.join(box_args)
+        cmd_args = [
+            Bin.get_oiiotool(),
+            '--create {size} 4',
+            '--fill:color={color} {size}',
+            '{box}',
+            # '--text:x=100:y=200:font="Arial":color=1,0,0:size=60 "Go Big Red!"',
+            u'-o "{output}"',
+        ]
+        print ' '.join(cmd_args).format(**option)
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def test(cls):
+        file_path_tgt = '/data/f/test_rvio/test_6.exr'
+        guide_data = [
+            ('primary', 8),
+            ('object-color', 8),
+            ('wire', 8),
+            ('density', 8)
+        ]
+        size = 2048, 2048
+        w, h = size
+        g_w, g_h = w, 48
+        rgba = .18, .18, .18, 1
+        option = dict(
+            size='{}x{}'.format(*size),
+            color='{},{},{},{}'.format(*rgba),
+            output=file_path_tgt,
+        )
+        box_args = []
+        border_rgb = 1, 1, 1
+        max_c = sum([i[1] for i in guide_data])
+        i_x_0, i_y_0 = 0, h-g_h
+        for i in guide_data:
+            i_text, i_c = i
+            i_background_rgb = TextOpt(i_text).to_rgb(maximum=1)
+            # background
+            box_args.append(
+                '--box:color={},{},{},1:fill=1'.format(*i_background_rgb)
+            )
+            i_p = i_c/float(max_c)
+            i_x_1, i_y_1 = int(i_x_0+i_p*w), h-1
+            box_args.append(
+                '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
+            )
+            # border
+            box_args.append(
+                '--box:color={},{},{},1'.format(*border_rgb)
+            )
+            i_p = i_c / float(max_c)
+            i_x_1, i_y_1 = int(i_x_0 + i_p * w), h - 1
+            box_args.append(
+                '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
+            )
+            i_x_0 = i_x_1
+
+        option['box'] = ' '.join(box_args)
+        cmd_args = [
+            Bin.get_oiiotool(),
+            '--create {size} 4',
+            '--fill:color={color} {size}',
+            '{box}',
+            # '--text:x=100:y=200:font="Arial":color=1,0,0:size=60 "Go Big Red!"',
+            u'-o "{output}"',
+        ]
+        print ' '.join(cmd_args).format(**option)
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def set_convert_to(cls, file_path_src, file_path_tgt):
+        option = dict(
+            input=file_path_src,
+            output=file_path_tgt,
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'-i "{input}"',
+            '--ch R,G,B,A=1.0',
+            u'-o "{output}"',
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+
+
+class RvioOpt(object):
+    """
+    Usage: RVIO (hardware version) movie and image sequence conversion and creation
+      Make Movie:           rvio in.#.tif -o out.mov
+      Convert Image:        rvio in.tif -o out.jpg
+      Convert Image Seq.:   rvio in.#.tif -o out.#.jpg
+      Movie With Audio:     rvio [ in.#.tif in.wav ] -o out.mov
+      Movie With LUT:       rvio [ -llut log2film.csp in.#.dpx ] -o out.mov
+      Rip Movie Range #1:   rvio in.mov -t 1000-1200 -o out.mov
+      Rip Movie Range #2:   rvio in.mov -t 1000-1200 -o out.#.jpg
+      Rip Movie Audio:      rvio in.mov -o out.wav
+      Conform Image:        rvio in.tif -outres 512 512 -o out.tif
+      Resize Image:         rvio in.#.tif -scale 0.25 -o out.#.jpg
+      Resize/Stretch:       rvio in.#.tif -resize 640 480 -o out.#.jpg
+      Resize Keep Aspect:   rvio in.#.tif -resize 1920 0 -o out.#.jpg
+      Resize Keep Aspt #2:  rvio in.#.tif -resize 0 1080 -o out.#.jpg
+      Sequence:             rvio cut1.#.tif cut2.mov cut3.1-100#.dpx -o out.mov
+      Per-Source Arg:       rvio [ -pa 2.0 -fps 30 cut1.#.dpx ] cut2.mov -o out.mov
+      Stereo Movie File:    rvio [ left.mov right.mov ] -outstereo separate -o out.mov
+      Stereo Anaglyph:      rvio [ left.mov right.mov ] -outstereo anaglyph -o out.mov
+      Log Cin/DPX to Movie: rvio -inlog -outsrgb in.#.cin -o out.mov
+      Output Log Cin/DPX:   rvio -outlog in.#.exr -o out.#.dpx
+      OpenEXR 16 Bit Out:   rvio in.#.dpx -outhalf -o out.#.exr
+      OpenEXR to 8 Bit:     rvio in.#.exr -out8 -o out.#.tif
+      OpenEXR B44 4:2:0:    rvio in.#.exr -outhalf -yryby 1 2 2 -codec B44 -o out.#.exr
+      OpenEXR B44A 4:2:0:   rvio in.#.exr -outhalf -yrybya 1 2 2 1 -codec B44A -o out.#.exr
+      OpenEXR DWAA 4:2:0:   rvio in.#.exr -outhalf -yryby 1 2 2 -quality 45 -codec DWAA -o out.#.exr
+      OpenEXR DWAB 4:2:0:   rvio in.#.exr -outhalf -yrybya 1 2 2 1 -quality 45 -codec DWAB -o out.#.exr
+      ACES from PD DPX:     rvio in.#.dpx -inlog -outhalf -outaces out.#.aces
+      ACES from JPEG:       rvio in.#.jpg -insrgb -outhalf -outaces out.#.aces
+      Chng White to D75:    rvio in.#.exr -outillum D75 -outhalf -o out.#.exr
+      Chng White to D75 #2: rvio in.#.exr -outwhite 0.29902 0.31485 -outhalf -o out.#.exr
+      TIFF 32 Bit Float:    rvio in.#.tif -outformat 32 float -o out.#.tif
+      Anamorphic Unsqueeze: rvio [ -pa 2.0 in_2k_full_ap.#.dpx ] -outres 2048 1556/2 -o out_2k.mov
+      Camera JPEG to EXR:   rvio -insrgb IMG1234.jpg -o out.exr
+      Letterbox HD in 1.33: rvio [ -uncrop 1920 1444 0 182 in1080.#.dpx ] -outres 640 480 -o out.mov
+      Crop 2.35 of Full Ap: rvio [ -crop 0 342 2047 1213 inFullAp.#.dpx ] -o out.mov
+      Multiple CPUs:        rvio -v -rthreads 3 in.#.dpx -o out.mov
+      Test Throughput:      rvio -v in.#.dpx -o out.null
+
+    Advanced EXR/ACES Header Attributes Usage:
+      Multiple -outparam values can be used.
+      Type names: f, i, s, sv        -- float, int, string, string vector [N values]
+                  v2i, v2f, v3i, v3f -- 2D and 3D int and float vectors [2 or 3 values required]
+                  b2i, b2f           -- 2D box float and int [4 values required]
+                  c                  -- chromaticities [8 values required]
+      Passthrough syntax:   -outparams passthrough=REGEX
+      Attr creation syntax: -outparams NAME:TYPE=VALUE0[,VALUE1,...]"
+      EXIF attrs:           rvio exif.jpg -insrgb -o out.exr -outparams "passthrough=.*EXIF.*"
+      Create float attr:    rvio in.exr -o out.exr -outparams pi:f=3.14
+      Create v2i attr:      rvio in.exr -o out.exr -outparams myV2iAttr:v2i=1,2
+      Create string attr:   rvio in.exr -o out.exr -outparams "myAttr:s=HELLO WORLD"
+      Chromaticies (XYZ):   rvio XYZ.tiff -o out.exr -outparams chromaticities:c=1,0,0,1,0,0,.333333,.3333333
+      No Color Adaptation:  rvio in.exr -o out.aces -outaces -outillum D65REC709
+
+    Example Leader/Overlay Usage:
+              simpleslate: side-text Field1=Value1 Field2=Value2 ...
+              watermark: text opacity
+              frameburn: opacity grey font-point-size
+              bug: file.tif opacity height
+              matte: aspect-ratio opacity
+
+      Movie w/Slate:        rvio in.#.jpg -o out.mov -leader simpleslate "FilmCo" \
+                                 "Artist=Jane Q. Artiste" "Shot=S01" "Show=BlockBuster" \
+                                 "Comments=You said it was too blue so I made it red"
+      Movie w/Watermark:    rvio in.#.jpg -o out.mov -overlay watermark "FilmCo Eyes Only" .25
+      Movie w/Frame Burn:   rvio in.#.jpg -o out.mov -overlay frameburn .4 1.0 30.0
+      Movie w/Bug:          rvio in.#.jpg -o out.mov -overlay bug logo.tif 0.4 128 15 100
+      Movie w/Matte:        rvio in.#.jpg -o out.mov -overlay matte 2.35 0.8
+      Multiple:             rvio ... -leader ... -overlay ... -overlay ...
+
+    Image Sequence Numbering
+
+      Frames 1 to 100 no padding:     image.1-100@.jpg
+      Frames 1 to 100 padding 4:      image.1-100#.jpg -or- image.1-100@@@@.jpg
+      Frames 1 to 100 padding 5:      image.1-100@@@@@.jpg
+      Frames -100 to -200 padding 4:  image.-100--200#jpg
+      printf style padding 4:         image.%04d.jpg
+      printf style w/range:           image.%04d.jpg 1-100
+      printf no padding w/range:      image.%d.jpg 1-100
+      Complicated no pad 1 to 100:    image_887f1-100@_982.tif
+      Stereo pair (left,right):       image.#.%V.tif
+      Stereo pair (L,R):              image.#.%v.tif
+      All Frames, padding 4:          image.#.jpg
+      All Frames in Sequence:         image.*.jpg
+      All Frames in Directory:        /path/to/directory
+      All Frames in current dir:      .
+
+    Per-source arguments (inside [ and ] restricts to that source only)
+
+    -pa %f                  Per-source pixel aspect ratio
+    -ro %d                  Per-source range offset
+    -rs %d                  Per-source range start
+    -fps %f                 Per-source or global fps
+    -ao %f                  Per-source audio offset in seconds
+    -so %f                  Per-source stereo relative eye offset
+    -rso %f                 Per-source stereo right eye offset
+    -volume %f              Per-source or global audio volume (default=1)
+    -fcdl %S                Per-source file CDL
+    -lcdl %S                Per-source look CDL
+    -flut %S                Per-source file LUT
+    -llut %S                Per-source look LUT
+    -pclut %S               Per-source pre-cache software LUT
+    -cmap %S                Per-source channel mapping (channel names, separated by ',')
+    -select %S %S           Per-source view/layer/channel selection
+    -crop %d %d %d %d       Per-source crop (xmin, ymin, xmax, ymax)
+    -uncrop %d %d %d %d     Per-source uncrop (width, height, xoffset, yoffset)
+    -in %d                  Per-source cut-in frame
+    -out %d                 Per-source cut-out frame
+    -noMovieAudio           Disable source movie's baked-in audio
+    -inparams ...           Source specific input parameters
+
+    Global arguments
+
+     ...                    Input sequence patterns, images, movies, or directories
+    -o %S                   Output sequence or image
+    -t %S                   Output time range (default=input time range)
+    -tio                    Output time range from view's in/out points
+    -v                      Verbose messages
+    -vv                     Really Verbose messages
+    -q                      Best quality color conversions (not necessary, slower)
+    -ns                     Nuke-style sequences (deprecated and ignored -- no longer needed)
+    -noRanges               No separate frame ranges (i.e. 1-10 will be considered a file)
+    -rthreads %d            Number of reader/render threads (default=1)
+    -wthreads %d            Number of writer threads (limited support for this)
+    -view %S                View to render (default=defaultSequence or current view in rv file)
+    -noSequence             Don't contract files into sequences
+    -formats                Show all supported image and movie formats
+    -leader ...             Insert leader/slate (can use multiple time)
+    -leaderframes %d        Number of leader frames (default=1)
+    -overlay ...            Visual overlay(s) (can use multiple times)
+    -inlog                  Convert input to linear space via Cineon Log->Lin
+    -inlogc                 Convert input to linear space via ARRI LogC->Lin
+    -inredlog               Convert input to linear space via Red Log->Lin
+    -inredlogfilm           Convert input to linear space via Red Log Film->Lin
+    -insrgb                 Convert input to linear space from sRGB space
+    -in709                  Convert input to linear space from Rec-709 space
+    -ingamma %f             Convert input using gamma correction
+    -filegamma %f           Convert input using gamma correction to linear space
+    -inchannelmap ...       map input channels
+    -inpremult              premultiply alpha and color
+    -inunpremult            un-premultiply alpha and color
+    -exposure %f            Apply relative exposure change (in stops)
+    -scale %f               Scale input image geometry
+    -resize %d [%d]         Resize input image geometry to exact size on input
+    -dlut %S                Apply display LUT
+    -flip                   Flip image (flip vertical) (keep orientation flags the same)
+    -flop                   Flop image (flip horizontal) (keep orientation flags the same)
+    -yryby %d %d %d         Y RY BY sub-sampled planar output
+    -yrybya %d %d %d %d     Y RY BY A sub-sampled planar output
+    -yuv %d %d %d           Y U V sub-sampled planar output
+    -outparams ...          Codec specific output parameters
+    -outchannelmap ...      map output channels
+    -outrgb                 same as -outchannelmap R G B
+    -outpremult             premultiply alpha and color
+    -outunpremult           un-premultiply alpha and color
+    -outlog                 Convert output to log space via Cineon Lin->Log
+    -outsrgb                Convert output to sRGB ColorSpace
+    -out709                 Convert output to Rec-709 ColorSpace
+    -outlogc                Convert output to Arri LogC ColorSpace
+    -outlogcEI %d           Use Arri LogC curve values for this Exposure Index value (default 800)
+    -outredlog              Convert output to Red Log ColorSpace
+    -outredlogfilm          Convert output to Red Log Film ColorSpace
+    -outgamma %f            Apply gamma to output
+    -outstereo ...          Output stereo (checker, scanline, anaglyph, left, right, pair, mirror, hsqueezed, vsqueezed, default=separate)
+    -outformat %d %S        Output bits and format (e.g. 16 float -or- 8 int)
+    -outhalf                Same as -outformat 16 float
+    -out8                   Same as -outformat 8 int
+    -outres %d %d           Output resolution
+    -outfps %f              Output FPS
+    -outaces                Output ACES gamut (converts pixels to ACES)
+    -outwhite %f %f         Output white CIE 1931 chromaticity x, y
+    -outillum %S            Output standard illuminant name (A-C, D50, D55, D65, D65REC709, D75 E, F[1-12])
+    -codec %S               Output codec (varies with file format)
+    -audiocodec %S          Output audio codec (varies with file format)
+    -audiorate %f           Output audio sample rate (default 48000)
+    -audiochannels %d       Output audio channels (default 2)
+    -quality %f             Output codec quality 0.0 -> 1.0 (100000 for DWAA/DWAB) (varies w/format and codec default=0.9)
+    -outpa %S               Output pixel aspect ratio (e.g. 1.33 or 16:9, etc. metadata only) default=1:1
+    -comment %S             Ouput comment (movie files, default="")
+    -copyright %S           Ouput copyright (movie files, default="")
+    -lic %S                 Use specific license file
+    -debug ...              Debug category
+    -version                Show RVIO version number
+    -iomethod %d [%d]       I/O Method (overrides all) (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=-1) and optional chunk size (default=61440)
+    -exrcpus %d             EXR thread count (default=12)
+    -exrRGBA                EXR Always read as RGBA (default=false)
+    -exrInherit             EXR guess channel inheritance (default=false)
+    -exrNoOneChannel        EXR never use one channel planar images (default=false)
+    -exrIOMethod %d [%d]    EXR I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=2) and optional chunk size (default=61440)
+    -exrReadWindowIsDisplayWindow
+                            EXR read window is display window (default=false)
+    -exrReadWindow %d       EXR Read Window Method (0=Data, 1=Display, 2=Union, 3=Data inside Display, default=1)
+    -jpegRGBA               Make JPEG four channel RGBA on read (default=no, use RGB or YUV)
+    -jpegIOMethod %d [%d]   JPEG I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=2) and optional chunk size (default=61440)
+    -cinpixel %S            Cineon pixel storage (default=A2_BGR10)
+    -cinchroma              Use Cineon chromaticity values (for default reader only)
+    -cinIOMethod %d [%d]    Cineon I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=2) and optional chunk size (default=61440)
+    -dpxpixel %S            DPX pixel storage (default=A2_BGR10)
+    -dpxchroma              Use DPX chromaticity values (for default reader only)
+    -dpxIOMethod %d [%d]    DPX I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=2) and optional chunk size (default=61440)
+    -tgaIOMethod %d [%d]    TARGA I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=2) and optional chunk size (default=61440)
+    -tiffIOMethod %d [%d]   TIFF I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=2) and optional chunk size (default=61440)
+    -init %S                Override init script
+    -err-to-out             Output errors to standard output (instead of standard error)
+    -strictlicense          Exit rather than consume an rv license if no rvio licenses are available
+    -flags ...              Arbitrary flags (flag, or 'name=value') for Mu
+    """
+    OPTION = dict(
+        quality=1.0,
+        width=2048,
+        lut_directory='/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp',
+        comment='test',
+        start_frame=1001
+    )
+    def __init__(self, option):
+        self._option = {}
+        self._option.update(self.OPTION)
+        self._option.update(option)
+
+    def test(self):
+        cmd_args = [
+            '/opt/rv/bin/rvio',
+            '{image_file}',
+            '-vv',
+            '-overlay frameburn .4 1.0 30.0',
+            '-dlut "{lut_directory}"',
+            '-o "{movie_file}"',
+            '-comment "{comment}"',
+            '-outparams timecode={start_frame}',
+            '-quality {quality}',
+            # maximum = 2048?
+            # '-resize {width}x0'
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**self._option)
+        )
+
+    def set_convert_to_vedio(self):
+        cmd_args = [
+            '/opt/rv/bin/rvio',
+            '{image_file}',
+            '-vv',
+            '-overlay frameburn .4 1.0 30.0',
+            '-dlut "{lut_directory}"',
+            '-o "{movie_file}"',
+            '-comment "{comment}"',
+            '-outparams timecode={start_frame}',
+            '-quality {quality}',
+            # maximum = 2048?
+            # '-resize {width}x0'
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**self._option)
+        )
+
+
 if __name__ == '__main__':
-    print TextOpt(
-        u'rez-env lxdcc -c "lxhook-command -o \\"option_hook_key=rsv-task-batchers/asset/gen-rig-export&choice_scheme=asset-maya-publish&file=/l/prod/cgm/work/assets/chr/ext_woodpecker/rig/rigging/maya/scenes/ext_woodpecker.rig.rigging.v001.ma&user=dongchangbao&description=\u6d4b\u8bd5&td_enable=True\\""'
-    ).get_is_contain_chinese()
+    var = 'shape'
+    # dir_src = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.{}.all.assess.custom'.format(var)
+    # dir_tgt = '/data/f/test_rvio/{}_resize'.format(var)
+    # StorageDirectoryOpt(dir_tgt).set_create()
+    # for i in [
+    #     'beauty',
+    #     'ass_object_color',
+    #     'ass_wire',
+    #     'ass_density'
+    # ]:
+    #     i_src = '{}/{}.%04d.exr'.format(dir_src, i)
+    #     i_tgt = '{}/{}.%04d.exr'.format(dir_tgt, i)
+    #     OiioMtd.set_fit_to(
+    #         i_src, i_tgt, (2048, 2000)
+    #     )
+
+    # dir_src = '/data/f/test_rvio/{}_resize'.format(var)
+    # dir_tgt = '/data/f/test_rvio/{}_over'.format(var)
+    # StorageDirectoryOpt(dir_tgt).set_create()
+    # for i in [
+    #     'beauty',
+    #     'ass_object_color',
+    #     'ass_wire',
+    #     'ass_density'
+    # ]:
+    #     i_src = '{}/{}.%04d.exr'.format(dir_src, i)
+    #     i_tgt = '{}/{}.%04d.exr'.format(dir_tgt, i)
+    #     print i_src, i_tgt
+    #     OiioMtd.set_over_by(
+    #         i_src,
+    #         '/data/f/test_rvio/background-guide-0.exr',
+    #         i_tgt,
+    #         (0, 0)
+    #     )
+
+    # dir_src = '/data/f/test_rvio/{}_over'.format(var)
+    # dir_tgt = '/data/f/test_rvio/{}_mov'.format(var)
+    # StorageDirectoryOpt(dir_tgt).set_create()
+    # for i in [
+    #     'beauty',
+    #     'ass_object_color',
+    #     'ass_wire',
+    #     'ass_density'
+    # ]:
+    #     i_src = '{}/{}.%04d.exr'.format(dir_src, i)
+    #     i_tgt = '{}/{}.mov'.format(dir_tgt, i)
+    #     print i_src, i_tgt
+    #     RvioOpt(
+    #         option=dict(
+    #             image_file=i_src,
+    #             movie_file=i_tgt,
+    #             start_frame=1001,
+    #             comment='test'
+    #         ),
+    #     ).set_convert_to_vedio()
+
+    o = dict(
+        vedio_files='/data/f/test_rvio/shape_mov/beauty.mov /data/f/test_rvio/shape_mov/ass_object_color.mov /data/f/test_rvio/shape_mov/ass_wire.mov /data/f/test_rvio/shape_mov/ass_density.mov',
+        output='/data/f/test_rvio/shape_mov/test.mov',
+        lut_directory='/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp',
+        quality=1.0
+    )
+
+    cmd_args = [
+        '/opt/rv/bin/rvio',
+        '{vedio_files}',
+        '-vv',
+        # '-overlay frameburn .4 1.0 30.0',
+        # '-dlut "{lut_directory}"',
+        '-o "{output}"',
+        # '-outparams timecode={start_frame}',
+        # '-quality {quality}',
+        # maximum = 2048?
+        # '-resize {width}x0'
+    ]
+    SubProcessMtd.set_run_with_result(
+        ' '.join(cmd_args).format(**o)
+    )
+
+
+    # dir_tgt = '/data/f/test_rvio'
+    # for i in [
+    #     '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/beauty.####.exr',
+    #     # '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/ass_object_color.####.exr',
+    #     # '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/ass_wire.####.exr',
+    #     # '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/ass_density.####.exr'
+    # ]:
+    #     i_opt = StorageFileOpt(i)
+    #
+    #     i_tgt = '{}/{}.mov'.format(dir_tgt, i_opt.name.split('.')[0])
+    #
+    #     print i, i_tgt
+    #
+    #     RvioOpt(
+    #         option=dict(
+    #             image_file=i,
+    #             movie_file=i_tgt,
+    #             start_frame=1001,
+    #             comment='test'
+    #         ),
+    #     ).test()
 

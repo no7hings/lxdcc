@@ -72,6 +72,12 @@ class AbsSsnRsvApplication(object):
                     raise ValueError()
 
     def get_publish_scene_src_file(self, version_scheme='match', ext_extras=None):
+        """
+        copy scene file to publish workspace, ignore when target is exists
+        :param version_scheme: str(<version-scheme>), "match" or "new"
+        :param ext_extras: list(<ext>)
+        :return: str(<file-path>)
+        """
         cur_workspace = 'publish'
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is not None:
@@ -131,6 +137,12 @@ class AbsSsnRsvApplication(object):
                 raise RuntimeError()
 
     def get_output_scene_src_file(self, version_scheme='match', ext_extras=None):
+        """
+        copy scene file to output workspace, ignore when target is exists
+        :param version_scheme: str(<version-scheme>), "match" or "new"
+        :param ext_extras: list(<ext>)
+        :return: str(<file-path>)
+        """
         cur_workspace = 'output'
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is not None:

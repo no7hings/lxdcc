@@ -12,10 +12,6 @@ if __name__ == '__main__':
 
     rsv_task = rsv_project.get_rsv_task(asset='nn_14y_test', step='srf', task='surfacing')
 
-    rsv_unit = rsv_task.get_rsv_unit(keyword='asset-work-maya-scene-src-file')
+    rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-usd-var-file')
 
-    print rsv_unit.get_result(version='all')
-
-    for i in rsv_unit.get_rsv_versions():
-        print i.get('result')
-
+    print rsv_unit.get_result(version='v001')

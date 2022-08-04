@@ -502,6 +502,18 @@ class AbsRsvMatcher(
 
     def __get_path_by_local_variants_(self, format_dict):
         pattern = self._orig_pattern
+        keys = MtdBasic._get_keys_by_parse_pattern_(pattern)
+        for i in keys:
+            if i not in format_dict:
+                raise RuntimeError(
+                    utl_core.Log.set_module_error_trace(
+                        'path resolver',
+                        'key "{}" in pattern "{}" is not value assigned'.format(
+                            i,
+                            pattern
+                        )
+                    )
+                )
         # new_root = self._rsv_project._root_dict[self._match_variants['platform']]
         # format_dict['root'] = new_root
         # new_effect_root = self._rsv_project._root_effect_dict[self._match_variants['platform']]

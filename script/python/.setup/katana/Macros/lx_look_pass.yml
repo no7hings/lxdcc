@@ -13,7 +13,7 @@ parameters:
     #
     look_pass/scheme:
         widget: enumerate
-        value: ['passthrough', 'lambert', 'plastic', 'metal', 'ambocc', 'wire', 'white', 'white_disp', 'white_zbrush']
+        value: ['passthrough', 'lambert', 'plastic', 'metal', 'ambocc', 'wire', 'white', 'white_disp', 'white_zbrush', 'assess']
         tool_tip: '...'
     #
     lynxi_info/type:

@@ -72,6 +72,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         else:
             raise RuntimeError()
 
+        # self.set_front_camera_for_assess()
+
         ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
         return scene_src_file_path
 
@@ -115,6 +117,25 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             version=version
         )
         return scene_src_file_path
+
+    def get_asset_render_output_directory(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword_0 = 'asset-katana-render-output-dir'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-katana-render-output-dir'
+        else:
+            raise TypeError()
+
+        render_output_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        rsv_render_output_directory_path = render_output_directory_rsv_unit.get_result(
+            version=version
+        )
+        return rsv_render_output_directory_path
     # for render
     def set_asset_scene_create(self):
         import fnmatch
@@ -180,11 +201,17 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 i_geometry_dcc_node.set(
                     'usd.debuggers.reverse_face_vertex_enable', usd_reverse_face_vertex_enable
                 )
+        #
+        front_camera_scheme = self._hook_option_opt.get('front_camera_scheme')
         # camera
         cameras = self._hook_option_opt.get_as_array('cameras')
         for i_camera in cameras:
             if i_camera == 'front':
-                self.set_front_camera()
+                if front_camera_scheme is not None:
+                    if front_camera_scheme == 'lineup':
+                        self.set_front_camera()
+                    elif front_camera_scheme == 'assess':
+                        self.set_front_camera_for_assess()
         #
         light_pass_all = self._hook_option_opt.get('light_pass_all')
         if light_pass_all:
@@ -222,7 +249,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 if i_light_pass_dcc_node.get_is_exists() is True:
                     i_light_pass_dcc_node.set('options.scheme', light_pass_override_scheme)
         # quality
-        render_arnold_aov_enable = self._hook_option_opt.get('render_arnold_aov_enable')
+        render_arnold_aov_enable = self._hook_option_opt.get_as_boolean('render_arnold_aov_enable')
         qualities = self._hook_option_opt.get_as_array('qualities')
         for i_quality in qualities:
             i_quality_dcc_node = ktn_dcc_objects.Node('{}__quality'.format(i_quality))
@@ -249,16 +276,18 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                 #
                 i_quality_dcc_node.set('lynxi_variants.arnold_override_enable', True)
                 i_quality_dcc_node.set('lynxi_variants.arnold_override.aa_sample', render_arnold_override_aa_sample)
-        #
+        # render output directory
         render_settings_node_opt = ktn_core.NGObjOpt('render_settings')
         render_output_directory_path = self._hook_option_opt.get('render_output_directory')
-        if render_output_directory_path is not None:
-            render_output_file_path = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr'.format(
-                render_output_directory_path
-            )
-            render_settings_node_opt.set(
-                'lynxi_settings.render_output', render_output_file_path
-            )
+        if render_output_directory_path is None:
+            render_output_directory_path = self.get_asset_render_output_directory()
+        #
+        render_output_file_path = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr'.format(
+            render_output_directory_path
+        )
+        render_settings_node_opt.set(
+            'lynxi_settings.render_output', render_output_file_path
+        )
         #
         renderer_node_opt = ktn_core.NGObjOpt('render_outputs')
         #
@@ -399,7 +428,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         c_y += .1
         #
         (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z) = bsc_core.CameraMtd.get_front_transformation(
-            ((x, y, z), (c_x, c_y, c_z), (w, h, d)), 1
+            geometry_args=((x, y, z), (c_x, c_y, c_z), (w, h, d)),
+            angle=1,
         )
         #
         dcc_camera = ktn_dcc_objects.Node('cameras')
@@ -409,6 +439,63 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         dcc_camera.set('cameras.front.scale', (s_x, s_y, s_z))
         #
         width, height = int(w*50), int(h*50)
+        #
+        dcc_camera.set(
+            'cameras.front.render_resolution', '{}x{}'.format(width, height)
+        )
+
+    def set_front_camera_for_assess(self):
+        from lxbasic import bsc_core
+
+        from lxutil import utl_core
+
+        from lxusd import usd_core
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        s = usd_core.UsdStageOpt()
+        geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword='asset-geometry-usd-var-file'
+        )
+        #
+        for i_var in ['hi', 'shape']:
+            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_result(
+                version='latest',
+                extend_variants=dict(var=i_var)
+            )
+            if i_geometry_usd_var_file_path is not None:
+                s.set_sublayer_append(i_geometry_usd_var_file_path)
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'file resolver',
+                    u'var="{}", usd file is non-exists'.format(i_var)
+                )
+        #
+        s.set_flatten()
+        #
+        g = s.get_geometry_args('/master')
+        #
+        (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
+        #
+        w += .1
+        h += .2
+        c_y += .1
+        #
+        (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z) = bsc_core.CameraMtd.get_front_transformation(
+            geometry_args=((x, y, z), (c_x, c_y, c_z), (w, h, d)),
+            angle=1,
+            mode=1
+        )
+        #
+        dcc_camera = ktn_dcc_objects.Node('cameras')
+        #
+        dcc_camera.set('cameras.front.translate', (t_x, t_y, t_z))
+        dcc_camera.set('cameras.front.rotate', (r_x, r_y, r_z))
+        dcc_camera.set('cameras.front.scale', (s_x, s_y, s_z))
+        #
+        multipy = 4
+        #
+        width, height = int(w*50*multipy), int(h*50*multipy)
         #
         dcc_camera.set(
             'cameras.front.render_resolution', '{}x{}'.format(width, height)

@@ -1189,7 +1189,7 @@ class MayaLauncher(object):
         args = [
             '-- maya',
         ]
-        cmd = r' '.join(args)
+        cmd = ' '.join(args)
         #
         AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
             cmd
@@ -1428,6 +1428,21 @@ class HoudiniLauncher(object):
             cmd
         )
 
+    def set_run(self):
+        args = [
+            '-- houdini',
+        ]
+        cmd = ' '.join(args)
+        #
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+            cmd
+        )
+
+    def get_rez_packages(self):
+        return AppLauncher(
+            **self._kwargs
+        ).get_rez_packages()
+
 
 class KatanaLauncher(object):
     """
@@ -1558,7 +1573,7 @@ class KatanaLauncher(object):
         args = [
             '-- katana',
         ]
-        cmd = r' '.join(args)
+        cmd = ' '.join(args)
         #
         AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
             cmd

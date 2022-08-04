@@ -191,6 +191,7 @@ shaders:
         ramp_rgb: aiRampRgb
         random: aiRandom
         range: aiRange
+        ray_switch_rgba: aiRaySwitch
         ray_switch_shader: aiRaySwitch
         reciprocal: aiReciprocal
         rgb_to_float: aiColorToFloat

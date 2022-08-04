@@ -638,6 +638,42 @@ class Om2MeshOpt(object):
         else:
             self._set_morph_by_uv_map_0_(uv_map_name)
 
+    def get_color_map_names(self):
+        return self._om2_obj_fnc.getColorSetNames()
+
+    def get_color_map(self, color_map_name):
+        return self._om2_obj_fnc.getFaceVertexColors(color_map_name)
+
+    def set_face_vertex_color(self, rgbs, alpha=1):
+        color_map_name = 'test'
+        color_map_names = self.get_color_map_names()
+        if color_map_name not in color_map_names:
+            self._om2_obj_fnc.createColorSet(
+                color_map_name, True
+            )
+        self._om2_obj_fnc.setCurrentColorSetName(
+            color_map_name
+        )
+        cmds.polyColorPerVertex(self.path, cdo=1)
+        idx = 0
+        colors = om2.MColorArray()
+        face_indices = []
+        for i_face_index in xrange(self._om2_obj_fnc.numPolygons):
+            face_indices.append(i_face_index)
+            count = self._om2_obj_fnc.polygonVertexCount(i_face_index)
+            j_om2_color = om2.MColor()
+            for j in range(count):
+                j_om2_color = om2.MColor()
+                j_r, j_g, j_b = rgbs[idx], rgbs[idx+1], rgbs[idx+2]
+                j_om2_color.r, j_om2_color.g, j_om2_color.b, j_om2_color.a = (j_r, j_g, j_b, alpha)
+                idx += 3
+            colors.append(j_om2_color)
+
+        self._om2_obj_fnc.setFaceColors(
+            colors, face_indices
+        )
+        self._om2_obj_fnc.updateSurface()
+
     def _test_(self):
         vertex_index = 11144
         om2_vertex_itr = om2.MItMeshVertex(self._om2_obj_fnc.object())

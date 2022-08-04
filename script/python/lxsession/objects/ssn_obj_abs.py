@@ -475,6 +475,15 @@ class AbsSsnGui(
         super(AbsSsnGui, self).__init__(*args, **kwargs)
 
 
+class AbsSsnRsvGui(
+    AbsSsnObj,
+    AbsSsnShotgunDef,
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnRsvGui, self).__init__(*args, **kwargs)
+        self._set_shotgun_def_init_()
+
+
 class AbsSsnOptionObj(AbsSsnObj):
     def __init__(self, *args, **kwargs):
         super(AbsSsnOptionObj, self).__init__(*args, **kwargs)
@@ -590,6 +599,16 @@ class AbsSsnOptionToolPanel(
         super(AbsSsnOptionToolPanel, self).__init__(*args, **kwargs)
         #
         self._set_shell_execute_def_init_(self._configure)
+
+
+class AbsSsnRsvOptionToolPanel(
+    AbsSsnOptionObj,
+    AbsSsnShotgunDef,
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnRsvOptionToolPanel, self).__init__(*args, **kwargs)
+        #
+        self._set_shotgun_def_init_()
 
 
 # session for deadline job

@@ -68,9 +68,13 @@ class DotXgenExporter(
     utl_fnc_obj_abs.AbsDotXgenDef
 ):
     OPTION = dict(
+        # etc. {directory}/{scene}__{xgen}.xgen
         xgen_collection_file='',
+        # etc. {directory}/scenes
         xgen_project_directory='',
+        # etc. {directory}/xgen/collections
         xgen_collection_directory='',
+        # etc. {xgen}_description
         xgen_collection_name='',
     )
     def __init__(self, option):

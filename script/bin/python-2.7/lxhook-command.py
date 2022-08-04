@@ -90,13 +90,21 @@ def __set_hook_run(option):
 
 # option hook
 def __set_option_hook_run(option):
+    from lxbasic import bsc_core
+
     import lxsession.commands as ssn_commands
+
+    option_opt = bsc_core.KeywordArgumentsOpt(option)
     #
     hook_args = ssn_commands.get_option_hook_args(option)
     if hook_args:
         session, fnc = hook_args
-        #
-        session.set_execute_by_shell()
+
+        deadline_enable = option_opt.get_as_boolean('deadline_enable')
+        if deadline_enable is True:
+            session.set_execute_by_deadline()
+        else:
+            session.set_execute_by_shell()
 
 
 if __name__ == '__main__':

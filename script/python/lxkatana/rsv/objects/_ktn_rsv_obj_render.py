@@ -60,6 +60,8 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         from lxbasic import bsc_core
         #
         from lxutil import utl_core
+
+        from lxkatana import ktn_core
         #
         import lxsession.commands as ssn_commands
         #
@@ -77,12 +79,13 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         rez_beta = self._hook_option_opt.get_as_boolean('rez_beta')
         #
         render_file_path = self.get_asset_render_file()
-        render_output_directory_path = self.get_asset_render_output_directory()
+
+        render_settings_node_opt = ktn_core.NGObjOpt('render_settings')
+        render_output_directory_path = render_settings_node_opt.get('lynxi_settings.render_output')
         #
         with_convert_movie = self._hook_option_opt.get_as_boolean('with_convert_movie')
         with_convert_image = self._hook_option_opt.get_as_boolean('with_convert_image')
         convert_extra_aovs = self._hook_option_opt.get_as_array('convert_extra_aovs')
-
         #
         variable_keys = [
             'camera',

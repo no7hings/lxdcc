@@ -114,6 +114,9 @@ asset-work-maya-scene-src-dir: <asset-work-maya-dir>/scenes
 asset-work-maya-scene-src-file: <asset-work-maya-scene-src-dir>/<asset-version-name>.ma
 asset-work-maya-user-scene-src-file: <asset-work-maya-scene-src-dir>/<user-name>/<asset-version-name>.ma
 asset-work-maya-scene-tmp-file: <asset-work-maya-tmp-dir>/<asset-version-name>.<time-tag>.ma
+#
+asset-work-maya-xgen-cache-dir: <asset-work-maya-dir>/<variant>/<version-name>/xgen
+asset-work-maya-xgen-file: <asset-work-maya-dir>/<asset-version-name>__<xgen-name>.xgen
 # <asset-work-houdini>
 asset-work-houdini-dir: <asset-task-dir>/houdini
 asset-work-houdini-tmp-dir: <asset-work-houdini-dir>/temporary/<user-name>
@@ -138,11 +141,14 @@ asset-work-nuke-scene-src-dir: <asset-work-nuke-dir>
 asset-work-nuke-scene-src-file: <asset-work-nuke-scene-src-dir>/<asset-version-name>.nk
 asset-work-nuke-user-scene-src-file: <asset-work-nuke-scene-src-dir>/<user-name>/<asset-version-name>.nk
 asset-work-nuke-scene-tmp-file: <asset-work-nuke-tmp-dir>/<asset-version-name>.nk
-#
+# sp
 asset-work-sp-dir: <asset-task-dir>/sp
-#
-asset-work-sp-scene-src-dir: <asset-work-sp-dir>
+asset-work-sp-scene-src-dir: <asset-work-sp-dir>/<variant>/<version-name>
 asset-work-sp-scene-src-file: <asset-work-sp-scene-src-dir>/<asset-version-name>.spp
+# zb
+asset-work-zb-dir: <asset-task-dir>/zb
+asset-work-zb-scene-src-dir: <asset-work-zb-dir>/<variant>/<version-name>
+asset-work-zb-scene-src-file: <asset-work-zb-scene-src-dir>/<asset-version-name>.spp
 # <asset-work-geometry>
 asset-work-geometry-dir: <asset-task-dir>/geometry/scene/<version-name>
 asset-work-geometry-abc-var-file: <asset-work-geometry-dir>/<var-name>.abc
@@ -180,8 +186,6 @@ asset-work-look-klf-file: <asset-work-look-dir>/all.klf
 asset-work-look-yml-file: <asset-work-look-dir>/all.yml
 #
 asset-work-texture-workspace-file: <asset-task-dir>/texture/workspace.yml
-#
-asset-work-outsource-texture-dir: <asset-task-dir>/outsource/texture/<version-name>
 #
 asset-work-texture-base-dir: <asset-task-dir>/textue-base
 asset-work-texture-dir: <asset-task-dir>/texture/<variant>/<version-name>
@@ -278,9 +282,12 @@ asset-cache-dir: <asset-version-dir>/cache
 asset-geometry-dir: <asset-version-dir>/cache
 # <asset-geometry-abc>
 asset-geometry-abc-dir: <asset-geometry-dir>/abc
-asset-geometry-abc-var-file: <asset-geometry-abc-dir>/<var-name>.abc
-asset-geometry-abc-hi-file: <asset-geometry-abc-dir>/hi.abc
-asset-geometry-abc-lo-file: <asset-geometry-abc-dir>/lo.abc
+asset-geometry-abc-var-dir: <asset-geometry-abc-dir>/geo
+asset-geometry-abc-var-file: <asset-geometry-abc-var-dir>/<var-name>.abc
+asset-geometry-abc-hi-file: <asset-geometry-abc-var-dir>/hi.abc
+asset-geometry-abc-lo-file: <asset-geometry-abc-var-dir>/lo.abc
+#
+asset-geometry-proxy-abc-var-file: <asset-geometry-abc-var-dir>/proxy_<var-name>.abc
 # <asset-proxy>
 asset-proxy-dir: <asset-version-dir>/proxy
 # <asset-proxy-gpu>
@@ -308,6 +315,8 @@ asset-geometry-usd-hi-file: <asset-geometry-usd-var-dir>/hi.usd
 asset-geometry-usd-lo-file: <asset-geometry-usd-var-dir>/lo.usd
 asset-geometry-usd-shape-file: <asset-geometry-usd-var-dir>/shape.usd
 asset-geometry-usd-temp-file: <asset-geometry-usd-var-dir>/temp.usd
+#
+asset-geometry-proxy-usd-var-file: <asset-geometry-usd-var-dir>/proxy_<var-name>.usd
 #
 asset-geometry-uv_map-usd-file: <asset-geometry-usd-dir>/uv_map.usd
 asset-geometry-uv_map-usd-var-file: <asset-geometry-usd-dir>/uv_map.<var-name>.usd
@@ -478,11 +487,16 @@ asset-output-shot-set-usd-file: <asset-output-set-dir>/usd/<asset-shot-name>.usd
 asset-output-geometry-dir: <asset-output-version-dir>/cache
 # geometry usd
 asset-output-geometry-usd-dir: <asset-output-geometry-dir>/usd
-asset-output-geometry-usd-var-dir: <asset-output-geometry-dir>/usd/geo
+asset-output-geometry-usd-var-dir: <asset-output-geometry-usd-dir>/geo
 asset-output-geometry-usd-var-file: <asset-output-geometry-usd-var-dir>/<var-name>.usd
+#
+asset-output-geometry-proxy-usd-var-file: <asset-output-geometry-usd-var-dir>/proxy_<var-name>.usd
 # geometry abc
 asset-output-geometry-abc-dir: <asset-output-geometry-dir>/abc
-asset-output-geometry-abc-var-file: <asset-geometry-abc-dir>/<var-name>.abc
+asset-output-geometry-abc-var-dir: <asset-output-geometry-abc-dir>/geo
+asset-output-geometry-abc-var-file: <asset-output-geometry-abc-var-dir>/<var-name>.abc
+#
+asset-output-geometry-proxy-abc-var-file: <asset-output-geometry-abc-var-dir>/proxy_<var-name>.abc
 #
 asset-output-xgen-usd-dir: <asset-output-version-dir>/cache/usd
 asset-output-xgen-usd-file: <asset-output-xgen-usd-dir>/xgen.usda

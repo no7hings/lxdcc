@@ -1,4 +1,6 @@
 # coding:utf-8
+import os
+
 from urllib import quote, unquote
 
 import platform
@@ -12,12 +14,19 @@ import getpass
 
 def main(file, movie_file, description):
     user = getpass.getuser()
-    cmd = r'rez-env lxdcc -c "lxhook-command -o \"option_hook_key=rsv-task-batchers/asset/gen-rig-export&choice_scheme=asset-maya-publish&file={file}&movie_file={movie_file}&user={user}&description={description}&td_enable={td_enable}\""'.format(
+    os.environ['REZ_BETA'] = '1'
+
+    description = quote(description.encode('utf-8'))
+    description = description.replace('%', r'///')
+
+    cmd = r'rez-env lxdcc -c "lxhook-command -o \"option_hook_key=rsv-task-batchers/asset/gen-rig-export&choice_scheme=asset-maya-publish&file={file}&movie_file={movie_file}&user={user}&description={description}&td_enable={td_enable}&rez_beta={rez_beta}&deadline_enable={deadline_enable}\""'.format(
         file=file,
-        description=quote(description.encode(locale.getdefaultlocale()[1])),
+        description=description,
         user=user,
         movie_file=movie_file,
-        td_enable=True
+        td_enable=False,
+        rez_beta=True,
+        deadline_enable=True
     )
 
     cmd = cmd.decode(locale.getdefaultlocale()[1])

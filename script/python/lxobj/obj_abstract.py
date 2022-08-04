@@ -3285,8 +3285,8 @@ class AbsOsDirectory(
                     copy_fnc_, i_src_file_path, i_tgt_file_path
                 )
                 threads.append(i_thread)
-                i_thread.start()
         #
+        [i.start() for i in threads]
         [i.join() for i in threads]
 
     def set_open(self):

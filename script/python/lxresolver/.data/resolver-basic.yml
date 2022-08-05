@@ -114,6 +114,8 @@ asset-work-maya-scene-src-dir: <asset-work-maya-dir>/scenes
 asset-work-maya-scene-src-file: <asset-work-maya-scene-src-dir>/<asset-version-name>.ma
 asset-work-maya-user-scene-src-file: <asset-work-maya-scene-src-dir>/<user-name>/<asset-version-name>.ma
 asset-work-maya-scene-tmp-file: <asset-work-maya-tmp-dir>/<asset-version-name>.<time-tag>.ma
+# main
+asset-work-maya-xgen-cache-main-dir: <asset-work-maya-dir>/xgen
 #
 asset-work-maya-xgen-cache-dir: <asset-work-maya-dir>/<variant>/<version-name>/xgen
 #

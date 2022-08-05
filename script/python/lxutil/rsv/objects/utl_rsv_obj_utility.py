@@ -233,10 +233,6 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                     )
     # maya
     def set_maya_xgen_repath(self):
-        import lxutil.dcc.dcc_operators as utl_dcc_operators
-
-        import lxmaya.dcc.dcc_objects as mya_dcc_objects
-
         import lxutil.fnc.exporters as utl_fnc_exporters
 
         from lxbasic import bsc_core
@@ -247,17 +243,20 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
 
         ma_core.set_stack_trace_enable(True)
 
-        keyword_0 = 'asset-work-maya-xgen-cache-dir'
+        variant = 'outsource'
+        version = self._rsv_scene_properties.get('version')
+        step = self._rsv_scene_properties.get('step')
+        if step == 'grm':
+            keyword_0 = 'asset-work-maya-xgen-cache-main-dir'
+        else:
+            keyword_0 = 'asset-work-maya-xgen-cache-dir'
         keyword_1 = 'asset-work-maya-scene-src-dir'
         keyword_2 = 'asset-work-maya-scene-src-file'
 
-        variant = 'outsource'
-        version = self._rsv_scene_properties.get('version')
-
-        xgen_collection_directory_rsv_unit_tgt = self._rsv_task.get_rsv_unit(
+        xgen_main_directory_rsv_unit_tgt = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )
-        xgen_directory_path_tgt = xgen_collection_directory_rsv_unit_tgt.get_result(
+        xgen_main_directory_path_tgt = xgen_main_directory_rsv_unit_tgt.get_result(
             version=version, extend_variants=dict(variant=variant)
         )
 
@@ -275,18 +274,18 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             version=version
         )
 
-        if bsc_core.StorageDirectoryOpt(xgen_directory_path_tgt).get_is_exists() is False:
-            directory_path_0 = xgen_collection_directory_rsv_unit_tgt.get_exists_result(
+        if bsc_core.StorageDirectoryOpt(xgen_main_directory_path_tgt).get_is_exists() is False:
+            directory_path_0 = xgen_main_directory_rsv_unit_tgt.get_exists_result(
                 version='latest', extend_variants=dict(variant=variant)
             )
             utl_core.Log.set_module_warning_trace(
                 'asset xgen repath',
                 u'directory="{}" is not found, use "{}" instance'.format(
-                    xgen_directory_path_tgt, directory_path_0
+                    xgen_main_directory_path_tgt, directory_path_0
 
                 )
             )
-            xgen_directory_path_tgt = directory_path_0
+            xgen_main_directory_path_tgt = directory_path_0
 
         e = utl_fnc_exporters.DotXgenExporter
 
@@ -299,7 +298,8 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             e._set_xgen_collection_file_repath_(
                 i_xgen_collection_file_path,
                 xgen_project_directory_path_tgt,
-                xgen_directory_path_tgt,
+                # convert to collection directory
+                '{}/collections'.format(xgen_main_directory_path_tgt),
                 i_xgen_collection_name,
             )
 

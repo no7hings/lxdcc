@@ -60,8 +60,6 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         from lxbasic import bsc_core
         #
         from lxutil import utl_core
-
-        from lxkatana import ktn_core
         #
         import lxsession.commands as ssn_commands
         #
@@ -69,6 +67,8 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         katana_render_hook_key = 'rsv-task-methods/asset/render/katana-render'
         movie_convert_hook_key = 'rsv-task-methods/asset/rv/movie-convert'
         image_convert_hook_key = 'rsv-task-methods/oiio/image-convert'
+        #
+        movie_composite_hook_key = 'rsv-task-methods/python/movie-composite'
         #
         batch_file_path = self._hook_option_opt.get('batch_file')
         file_path = self._hook_option_opt.get('file')
@@ -80,11 +80,12 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         #
         render_file_path = self.get_asset_render_file()
 
-        render_settings_node_opt = ktn_core.NGObjOpt('render_settings')
-        render_output_directory_path = render_settings_node_opt.get('lynxi_settings.render_output')
+        render_output_directory_path = self.get_asset_render_output_directory()
         #
-        with_convert_movie = self._hook_option_opt.get_as_boolean('with_convert_movie')
-        with_convert_image = self._hook_option_opt.get_as_boolean('with_convert_image')
+        with_movie_convert = self._hook_option_opt.get_as_boolean('with_movie_convert')
+        with_image_convert = self._hook_option_opt.get_as_boolean('with_image_convert')
+        with_movie_composite = self._hook_option_opt.get_as_boolean('with_movie_composite')
+
         convert_extra_aovs = self._hook_option_opt.get_as_array('convert_extra_aovs')
         #
         variable_keys = [
@@ -111,6 +112,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         combinations = bsc_core.VariablesMtd.get_all_combinations(
             variants_dic
         )
+        render_ddl_job_ids = []
         with utl_core.log_progress(maximum=len(combinations), label='cmb-render-create') as l_p:
             for i_seq, i_variants in enumerate(combinations):
                 l_p.set_update()
@@ -170,9 +172,10 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                     i_katana_render_hook_option_opt.to_string()
                 )
                 #
-                i_katana_render_ddl_job_id = i_katana_render_session.get_ddl_job_id()
-                if i_katana_render_ddl_job_id:
-                    if with_convert_movie is True:
+                i_render_ddl_job_id = i_katana_render_session.get_ddl_job_id()
+                if i_render_ddl_job_id:
+                    render_ddl_job_ids.append(i_render_ddl_job_id)
+                    if with_movie_convert is True:
                         i_image_file_path_src = '{}/main/{}/beauty.####.exr'.format(
                             render_output_directory_path, i_variable_name
                         )
@@ -180,7 +183,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                             render_output_directory_path,
                             i_variable_name
                         )
-                        i_rv_movie_convert_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                        i_movie_convert_hook_option_opt = bsc_core.KeywordArgumentsOpt(
                             option=dict(
                                 option_hook_key=movie_convert_hook_key,
                                 #
@@ -197,14 +200,14 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                                 #
                                 option_hook_key_extend=[i_key_extend],
                                 dependencies=[option_hook_key],
-                                dependent_ddl_job_id_extend=[i_katana_render_ddl_job_id],
+                                dependent_ddl_job_id_extend=[i_render_ddl_job_id],
                             )
                         )
                         ssn_commands.set_option_hook_execute_by_deadline(
-                            i_rv_movie_convert_hook_option_opt.to_string()
+                            i_movie_convert_hook_option_opt.to_string()
                         )
                     #
-                    if with_convert_image is True:
+                    if with_image_convert is True:
                         i_image_file_path_src = '{}/main/{}/beauty.{}.exr'.format(
                             render_output_directory_path,
                             i_variable_name,
@@ -213,7 +216,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                         i_image_file_path_tgt = '{}/main/{}.png'.format(
                             render_output_directory_path, i_variable_name
                         )
-                        i_rv_movie_convert_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                        i_movie_convert_hook_option_opt = bsc_core.KeywordArgumentsOpt(
                             option=dict(
                                 option_hook_key=image_convert_hook_key,
                                 #
@@ -227,9 +230,27 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                                 #
                                 option_hook_key_extend=[i_key_extend],
                                 dependencies=[option_hook_key],
-                                dependent_ddl_job_id_extend=[i_katana_render_ddl_job_id],
+                                dependent_ddl_job_id_extend=[i_render_ddl_job_id],
                             )
                         )
                         ssn_commands.set_option_hook_execute_by_deadline(
-                            i_rv_movie_convert_hook_option_opt.to_string()
+                            i_movie_convert_hook_option_opt.to_string()
                         )
+
+        if with_movie_composite is True:
+            movie_composite_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                option=dict(
+                    option_hook_key=movie_composite_hook_key,
+                    #
+                    file=file_path,
+                    #
+                    user=user, time_tag=time_tag,
+                    td_enable=td_enable, rez_beta=rez_beta,
+                    #
+                    dependencies=[option_hook_key],
+                    dependent_ddl_job_id_extend=render_ddl_job_ids,
+                )
+            )
+            ssn_commands.set_option_hook_execute_by_deadline(
+                movie_composite_hook_option_opt.to_string()
+            )

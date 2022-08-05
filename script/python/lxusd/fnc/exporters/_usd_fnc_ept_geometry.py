@@ -152,10 +152,13 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
 
 class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     OPTION = dict(
-
+        scheme='object-color'
     )
     def __init__(self, option):
         super(GeometryDisplayColorExporter, self).__init__(option)
+
+    def set_run(self):
+        pass
 
 
 class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):

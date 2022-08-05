@@ -2706,10 +2706,10 @@ class TextsMtd(object):
 
 
 class ParsePatternMtd(object):
-    RE_PATTERN = r'[{](.*?)[}]'
+    RE_KEY_PATTERN = r'[{](.*?)[}]'
     @classmethod
     def get_keys(cls, pattern):
-        lis_0 = re.findall(re.compile(cls.RE_PATTERN, re.S), pattern)
+        lis_0 = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
         lis_1 = list(set(lis_0))
         lis_1.sort(key=lis_0.index)
         return lis_1
@@ -2729,7 +2729,7 @@ class ParsePatternMtd(object):
     @classmethod
     def get_as_fnmatch(cls, pattern):
         if pattern is not None:
-            keys = re.findall(re.compile(r'[{](.*?)[}]', re.S), pattern)
+            keys = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
             s = pattern
             if keys:
                 for i_key in keys:

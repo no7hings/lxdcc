@@ -408,32 +408,19 @@ class PathGroupPermission(AbsPermission):
 
 
 if __name__ == '__main__':
-    print PathGroupPermission(
-        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture/eye.diff_clr.1001.tx/V-R8J11X-5R5O7.eye.diff_clr.1001.tx'
-    ).get_all_group_data()
-    #
-    # PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture/eye.normal.1001.tx/V-R8J11Y-29MFN.eye.normal.1001.tx'
-    # ).set_allow(
-    #     'cg_group'
-    # )
     # print PathGroupPermission(
-    #     '/l/prod/lib/AnimLib'
-    # ).set_all_read_only()
-    #
-    # print PathGroupPermission(
-    #     '/l/prod/lib/AnimLib'
-    # ).set_allow('td_grp')
+    #     '/l/prod/cgm/publish/shots/z86/z86010/cam/camera/z86010.cam.camera.v008'
+    # ).get_all_group_data()
 
-    # files = bsc_core.DirectoryMtd.get_all_file_paths(
-    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
-    # )
-    # for i in files:
-    #     if not PathGroupPermission(
-    #         i
-    #     ).get_all_group_data():
-    #         PathGroupPermission(
-    #             i
-    #         ).set_allow(
-    #             'cg_group'
-    #         )
+    files = bsc_core.DirectoryMtd.get_all_file_paths(
+        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
+    )
+    for i in files:
+        if not PathGroupPermission(
+            i
+        ).get_all_group_data():
+            PathGroupPermission(
+                i
+            ).set_allow(
+                'cg_group'
+            )

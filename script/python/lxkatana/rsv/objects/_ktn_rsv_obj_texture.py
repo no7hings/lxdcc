@@ -2,7 +2,7 @@
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
-class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 

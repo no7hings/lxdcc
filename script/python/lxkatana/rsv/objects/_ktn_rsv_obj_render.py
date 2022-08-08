@@ -2,7 +2,7 @@
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
-class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccRenderHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -68,7 +68,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         movie_convert_hook_key = 'rsv-task-methods/asset/rv/movie-convert'
         image_convert_hook_key = 'rsv-task-methods/oiio/image-convert'
         #
-        movie_composite_hook_key = 'rsv-task-methods/python/movie-composite'
+        movie_composite_hook_key = 'rsv-task-methods/python/video-composite'
         #
         batch_file_path = self._hook_option_opt.get('batch_file')
         file_path = self._hook_option_opt.get('file')
@@ -79,14 +79,12 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
         rez_beta = self._hook_option_opt.get_as_boolean('rez_beta')
         #
         render_file_path = self.get_asset_render_file()
-
+        #
         render_output_directory_path = self.get_asset_render_output_directory()
         #
         with_movie_convert = self._hook_option_opt.get_as_boolean('with_movie_convert')
         with_image_convert = self._hook_option_opt.get_as_boolean('with_image_convert')
         with_movie_composite = self._hook_option_opt.get_as_boolean('with_movie_composite')
-
-        convert_extra_aovs = self._hook_option_opt.get_as_array('convert_extra_aovs')
         #
         variable_keys = [
             'camera',
@@ -236,8 +234,11 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                         ssn_commands.set_option_hook_execute_by_deadline(
                             i_movie_convert_hook_option_opt.to_string()
                         )
-
+        #
         if with_movie_composite is True:
+            layers = self._hook_option_opt.get_as_array('layers')
+            render_passes = self._hook_option_opt.get_as_array('render_passes')
+            #
             movie_composite_hook_option_opt = bsc_core.KeywordArgumentsOpt(
                 option=dict(
                     option_hook_key=movie_composite_hook_key,
@@ -249,6 +250,11 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
                     #
                     dependencies=[option_hook_key],
                     dependent_ddl_job_id_extend=render_ddl_job_ids,
+                    #
+                    with_video_mov=True,
+                    #
+                    layers=layers,
+                    render_passes=render_passes
                 )
             )
             ssn_commands.set_option_hook_execute_by_deadline(

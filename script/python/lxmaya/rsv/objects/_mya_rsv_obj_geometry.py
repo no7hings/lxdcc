@@ -36,7 +36,7 @@ class UsdCmdBasic(object):
         )
 
 
-class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -209,7 +209,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
 
 
 class RsvDccGeometryExtraHookOpt(
-    utl_rsv_obj_abstract.AbsRsvOHookOpt,
+    utl_rsv_obj_abstract.AbsRsvObjHookOpt,
     UsdCmdBasic
 ):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
@@ -265,7 +265,7 @@ class RsvDccGeometryExtraHookOpt(
 
 
 class RsvDccShotGeometryHookOpt(
-    utl_rsv_obj_abstract.AbsRsvOHookOpt,
+    utl_rsv_obj_abstract.AbsRsvObjHookOpt,
     UsdCmdBasic
 ):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
@@ -335,7 +335,7 @@ class RsvDccShotGeometryHookOpt(
             )
 
 
-class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccShotHairHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 

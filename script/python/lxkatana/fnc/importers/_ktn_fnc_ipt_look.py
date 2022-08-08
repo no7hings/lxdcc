@@ -195,8 +195,8 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         and_geometries = mesh_and_objs + curve_and_objs + xgen_and_objs
         # material
-        material_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
-        and_materials = material_and_type.get_objs()
+        # material_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
+        # and_materials = material_and_type.get_objs()
         #
         method_args = [
             (self.__set_look_materials_create_, (and_geometries, )),

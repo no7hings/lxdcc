@@ -1,4 +1,6 @@
 # coding:utf-8
+import itertools
+
 import collections
 
 from lxbasic import bsc_core
@@ -10,27 +12,34 @@ p = bsc_core.ParsePatternOpt(render_output_file_path_pattern)
 p.set_update(directory=render_output_directory_path)
 matchers = p.get_matches()
 
+layers = [
+    'high', 'shape'
+]
+
 render_passes = [
     'primary', 'ass_object_color', 'ass_wire', 'ass_density'
 ]
 
 dict_ = collections.OrderedDict()
-for i in matchers:
-    i_layer = i['layer']
-    i_render_pass = i['render_pass']
-    if i_render_pass in render_passes:
-        i_v = {}
-        i_f = i['result']
-        i_f_opt = bsc_core.StorageFileOpt(i_f)
+for i_layer, i_render_pass in itertools.product(layers, render_passes):
+    i_p = p.set_update_to(
+        layer=i_layer, render_pass=i_render_pass
+    )
+    i_matchers = i_p.get_matches()
+    for j_match in i_matchers:
+        j_option = {}
+        j_file_path = j_match['result']
+        j_file_opt = bsc_core.StorageFileOpt(j_file_path)
         i_f_name_new, i_frame = bsc_core.MultiplyFileNameMtd.get_match_args(
-            i_f_opt.name, '*.%04d.exr'
+            j_file_opt.name, '*.%04d.exr'
         )
-        i_f_new = '{}/{}'.format(i_f_opt.directory_path, i_f_name_new)
-        i_v['name'] = i_render_pass
-        i_v['image_foreground'] = '/l/resource/td/asset/image/foreground/{}-{}.png'.format(
+        i_f_new = '{}/{}'.format(j_file_opt.directory_path, i_f_name_new)
+        j_option['name'] = i_render_pass
+        j_option['image_foreground'] = '/l/resource/td/asset/image/foreground/{}-{}.png'.format(
             i_layer, i_render_pass
         )
-        dict_[i_f_new] = i_v
+        dict_[i_f_new] = j_option
+
 # resize
 for k, i_v in dict_.items():
     i_f_src = k
@@ -67,12 +76,19 @@ for k, i_v in dict_.items():
     i_f_opt_src = bsc_core.StorageFileOpt(k)
     i_f_tgt = '{}/final/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
     i_f_opt_tgt = bsc_core.StorageFileOpt(i_f_tgt)
+    i_v['image_final'] = i_f_tgt
     i_base = i_v['image_base']
     i_foreground = i_v['image_foreground']
     i_f_opt_tgt.set_directory_create()
     # bsc_core.OiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
 
-vedio_path = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v025/render/katana-images/main/'
+vedio_path = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v025/render/katana-images/main/all.mov'
 
-for k, i_v in dict_.items():
-    pass
+images_final = [v['image_final'] for k, v in dict_.items()]
+
+bsc_core.RvioOpt(
+    option=dict(
+        input=' '.join(['"{}"'.format(i) for i in images_final]),
+        output=vedio_path
+    )
+).set_convert_to_vedio()

@@ -73,7 +73,10 @@ class AbsSsnRsvApplication(object):
 
     def get_publish_scene_src_file(self, version_scheme='match', ext_extras=None):
         """
-        copy scene file to publish workspace, ignore when target is exists
+        copy scene file to publish workspace:
+            when target is exists, ignore;
+            when file's workspace is "publish" return current file
+
         :param version_scheme: str(<version-scheme>), "match" or "new"
         :param ext_extras: list(<ext>)
         :return: str(<file-path>)
@@ -138,7 +141,10 @@ class AbsSsnRsvApplication(object):
 
     def get_output_scene_src_file(self, version_scheme='match', ext_extras=None):
         """
-        copy scene file to output workspace, ignore when target is exists
+        copy scene file to output workspace:
+            when target is exists, ignore;
+            when file's workspace is "output" return current file
+
         :param version_scheme: str(<version-scheme>), "match" or "new"
         :param ext_extras: list(<ext>)
         :return: str(<file-path>)

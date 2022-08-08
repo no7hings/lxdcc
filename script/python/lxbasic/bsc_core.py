@@ -4117,8 +4117,7 @@ class VariablesMtd(object):
 class FrameRangeMtd(object):
     @classmethod
     def get(cls, frame_range, frame_step):
-        start_frame, end_frame = frame_range
-        start_frame, end_frame = int(start_frame), int(end_frame)
+        start_frame, end_frame = map(int, frame_range)
         frame_step = int(frame_step)
         # (1001, 1001), 1
         if start_frame == end_frame:
@@ -4132,7 +4131,9 @@ class FrameRangeMtd(object):
                 return [start_frame, end_frame]
             # (1001, 1010), 4
             elif count > frame_step:
-                _ = [i for i in frames if not (i-1) % frame_step]
+                # add frame offset
+                frame_offset = 1-start_frame
+                _ = [i for i in frames if not (i+frame_offset-1) % frame_step]
                 if start_frame not in _:
                     _.insert(0, start_frame)
                 if end_frame not in _:
@@ -4782,11 +4783,13 @@ class RvioOpt(object):
     -flags ...              Arbitrary flags (flag, or 'name=value') for Mu
     """
     OPTION = dict(
+        input='',
+        output='',
         quality=1.0,
         width=2048,
         lut_directory='/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp',
         comment='test',
-        start_frame=1001
+        start_frame=1001,
     )
     def __init__(self, option):
         self._option = {}
@@ -4814,16 +4817,14 @@ class RvioOpt(object):
     def set_convert_to_vedio(self):
         cmd_args = [
             '/opt/rv/bin/rvio',
-            '{image_file}',
+            '{input}',
             '-vv',
             '-overlay frameburn .4 1.0 30.0',
             '-dlut "{lut_directory}"',
-            '-o "{movie_file}"',
+            '-o "{output}"',
             '-comment "{comment}"',
             '-outparams timecode={start_frame}',
             '-quality {quality}',
-            # maximum = 2048?
-            # '-resize {width}x0'
         ]
         SubProcessMtd.set_run_with_result(
             ' '.join(cmd_args).format(**self._option)
@@ -4831,105 +4832,7 @@ class RvioOpt(object):
 
 
 if __name__ == '__main__':
-    var = 'shape'
-    # dir_src = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.{}.all.assess.custom'.format(var)
-    # dir_tgt = '/data/f/test_rvio/{}_resize'.format(var)
-    # StorageDirectoryOpt(dir_tgt).set_create()
-    # for i in [
-    #     'beauty',
-    #     'ass_object_color',
-    #     'ass_wire',
-    #     'ass_density'
-    # ]:
-    #     i_src = '{}/{}.%04d.exr'.format(dir_src, i)
-    #     i_tgt = '{}/{}.%04d.exr'.format(dir_tgt, i)
-    #     OiioMtd.set_fit_to(
-    #         i_src, i_tgt, (2048, 2000)
-    #     )
-
-    # dir_src = '/data/f/test_rvio/{}_resize'.format(var)
-    # dir_tgt = '/data/f/test_rvio/{}_over'.format(var)
-    # StorageDirectoryOpt(dir_tgt).set_create()
-    # for i in [
-    #     'beauty',
-    #     'ass_object_color',
-    #     'ass_wire',
-    #     'ass_density'
-    # ]:
-    #     i_src = '{}/{}.%04d.exr'.format(dir_src, i)
-    #     i_tgt = '{}/{}.%04d.exr'.format(dir_tgt, i)
-    #     print i_src, i_tgt
-    #     OiioMtd.set_over_by(
-    #         i_src,
-    #         '/data/f/test_rvio/background-guide-0.exr',
-    #         i_tgt,
-    #         (0, 0)
-    #     )
-
-    # dir_src = '/data/f/test_rvio/{}_over'.format(var)
-    # dir_tgt = '/data/f/test_rvio/{}_mov'.format(var)
-    # StorageDirectoryOpt(dir_tgt).set_create()
-    # for i in [
-    #     'beauty',
-    #     'ass_object_color',
-    #     'ass_wire',
-    #     'ass_density'
-    # ]:
-    #     i_src = '{}/{}.%04d.exr'.format(dir_src, i)
-    #     i_tgt = '{}/{}.mov'.format(dir_tgt, i)
-    #     print i_src, i_tgt
-    #     RvioOpt(
-    #         option=dict(
-    #             image_file=i_src,
-    #             movie_file=i_tgt,
-    #             start_frame=1001,
-    #             comment='test'
-    #         ),
-    #     ).set_convert_to_vedio()
-
-    o = dict(
-        vedio_files='/data/f/test_rvio/shape_mov/beauty.mov /data/f/test_rvio/shape_mov/ass_object_color.mov /data/f/test_rvio/shape_mov/ass_wire.mov /data/f/test_rvio/shape_mov/ass_density.mov',
-        output='/data/f/test_rvio/shape_mov/test.mov',
-        lut_directory='/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp',
-        quality=1.0
+    print FrameRangeMtd.get(
+        (1001, 1120), 15
     )
-
-    cmd_args = [
-        '/opt/rv/bin/rvio',
-        '{vedio_files}',
-        '-vv',
-        # '-overlay frameburn .4 1.0 30.0',
-        # '-dlut "{lut_directory}"',
-        '-o "{output}"',
-        # '-outparams timecode={start_frame}',
-        # '-quality {quality}',
-        # maximum = 2048?
-        # '-resize {width}x0'
-    ]
-    SubProcessMtd.set_run_with_result(
-        ' '.join(cmd_args).format(**o)
-    )
-
-
-    # dir_tgt = '/data/f/test_rvio'
-    # for i in [
-    #     '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/beauty.####.exr',
-    #     # '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/ass_object_color.####.exr',
-    #     # '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/ass_wire.####.exr',
-    #     # '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v024/render/katana-images/main/front.shape.all.assess.custom/ass_density.####.exr'
-    # ]:
-    #     i_opt = StorageFileOpt(i)
-    #
-    #     i_tgt = '{}/{}.mov'.format(dir_tgt, i_opt.name.split('.')[0])
-    #
-    #     print i, i_tgt
-    #
-    #     RvioOpt(
-    #         option=dict(
-    #             image_file=i,
-    #             movie_file=i_tgt,
-    #             start_frame=1001,
-    #             comment='test'
-    #         ),
-    #     ).test()
 

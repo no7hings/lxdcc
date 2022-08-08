@@ -649,7 +649,7 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         pass
 
 
-class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 

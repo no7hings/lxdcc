@@ -10,7 +10,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 import lxmaya.fnc.exporters as mya_fnc_exporters
 
 
-class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccCameraHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 

@@ -252,6 +252,8 @@ asset-katana-render-image-file: <asset-katana-render-output-dir>/main/<camera>.<
 asset-katana-render-video-mov-file: <asset-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
 asset-katana-render-image-png-file: <asset-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.png
 #
+asset-katana-render-video-all-mov-file: <asset-katana-render-output-dir>/main/all.mov
+#
 asset-nuke-scene-dir: <asset-version-dir>/nuke
 asset-nuke-scene-file: <asset-nuke-scene-dir>/<asset-name>.nk
 #
@@ -480,6 +482,8 @@ asset-output-katana-render-output-dir: <asset-output-render-dir>/katana-images
 asset-output-katana-render-image-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr
 asset-output-katana-render-video-mov-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.mov
 asset-output-katana-render-video-png-file: <asset-output-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>.png
+#
+asset-output-katana-render-video-all-mov-file: <asset-output-katana-render-output-dir>/main/all.mov
 #
 asset-output-nuke-scene-src-dir: <asset-output-version-dir>/scene
 asset-output-nuke-scene-src-file: <asset-output-maya-scene-src-dir>/<asset-name>.nk

@@ -16,7 +16,7 @@ import lxmaya.fnc.exporters as mya_fnc_exporters
 import lxmaya.fnc.builders as mya_fnc_builders
 
 
-class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -500,7 +500,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
             ).set_link_to(new_work_scene_src_file_path)
 
 
-class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvOHookOpt):
+class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccShotSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 

@@ -5,7 +5,7 @@ from lxutil.rsv import utl_rsv_obj_abstract
 class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccRenderHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
-
+    
     def set_asset_katana_render_create(self):
         import collections
         #
@@ -206,6 +206,8 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     with_video_mov=True,
                     #
+                    composite_use_katana_video_all_mov=True,
+                    #
                     layers=layers,
                     render_passes=render_passes
                 )
@@ -231,8 +233,13 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             #
                             create_shotgun_qc_task=True,
                             create_shotgun_qc_version=True,
+                            #
                             with_qc_review_mov=True,
                             #
-                            movie_file=''
+                            review_use_katana_video_all_mov=True,
                         )
+                    )
+
+                    ssn_commands.set_option_hook_execute_by_deadline(
+                        shotgun_qc_export_hook_option_opt.to_string()
                     )

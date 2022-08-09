@@ -409,11 +409,11 @@ class PathGroupPermission(AbsPermission):
 
 if __name__ == '__main__':
     # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/shots/z86/z86010/cam/camera/z86010.cam.camera.v008'
+    #     '/l/prod/cgm/publish/assets/env/mk_guizi/srf/surfacing/texture'
     # ).get_all_group_data()
 
     files = bsc_core.DirectoryMtd.get_all_file_paths(
-        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
+        '/l/prod/cgm/publish/assets/env/mk_guizi/srf/surfacing/texture'
     )
     for i in files:
         if not PathGroupPermission(

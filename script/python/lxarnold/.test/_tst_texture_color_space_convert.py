@@ -1,18 +1,19 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxarnold import and_setup
 
 and_setup.MtoaSetup('/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019').set_run()
 
-import os
+bsc_core.EnvironMtd.set(
+    'OCIO', '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
+)
 
-os.environ['OCIO'] = '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
-
-from lxarnold import and_core
-
-
-f = '/data/f/tx_test/Old_Wood_v2_Diffuse-6.jpg'
-
-i_0 = and_core.AndImageOpt('/data/f/tx-convert-test/Old_Wood_v2_Diffuse.exr')
-
-print i_0._info
-
+if __name__ == '__main__':
+    from lxarnold import and_core
+    and_core.AndTextureOpt_.set_color_space_convert_to(
+        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/bl_duanf_f_body.normal.1001.exr',
+        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/aces/bl_duanf_f_body.normal.1001.exr',
+        'Utility - Raw',
+        'ACES - ACEScg'
+    )

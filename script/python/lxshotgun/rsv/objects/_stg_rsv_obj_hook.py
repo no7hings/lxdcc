@@ -51,11 +51,17 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
 
+    def set_qc_task_create(self):
+        pass
+
     def set_version_create(self):
         version = self._rsv_scene_properties.get('version')
         _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).set_stg_version_create(
             version=version
         )
+
+    def set_qc_version_create(self):
+        pass
 
     def set_version_export(self):
         version = self._rsv_scene_properties.get('version')
@@ -197,4 +203,5 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     review_mov_file_path
                 )
 
-
+    def set_qc_review_mov_export(self):
+        pass

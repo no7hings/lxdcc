@@ -117,25 +117,6 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
         return scene_src_file_path
-
-    def get_asset_render_output_directory(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        #
-        if workspace == 'publish':
-            keyword_0 = 'asset-katana-render-output-dir'
-        elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-render-output-dir'
-        else:
-            raise TypeError()
-
-        render_output_directory_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword_0
-        )
-        rsv_render_output_directory_path = render_output_directory_rsv_unit.get_result(
-            version=version
-        )
-        return rsv_render_output_directory_path
     # for render
     def set_asset_scene_create(self):
         import fnmatch
@@ -280,7 +261,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         render_settings_node_opt = ktn_core.NGObjOpt('render_settings')
         render_output_directory_path = self._hook_option_opt.get('render_output_directory')
         if render_output_directory_path is None:
-            render_output_directory_path = self.get_asset_render_output_directory()
+            render_output_directory_path = self.get_asset_katana_render_output_directory()
         #
         render_output_file_path = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr'.format(
             render_output_directory_path

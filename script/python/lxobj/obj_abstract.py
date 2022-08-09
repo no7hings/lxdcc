@@ -716,6 +716,9 @@ class AbsObjDef(object):
         :return: None
         """
         self._name = name
+
+    def get_name(self):
+        return self._name
     @property
     def name(self):
         return self._name
@@ -988,10 +991,10 @@ class AbsObjDagDef(object):
     def __eq__(self, other):
         if other is not None:
             return self._path == other._path
-        return False
 
     def __ne__(self, other):
-        return self.path != self.path
+        if other is not None:
+            return self._path != self._path
 
 
 class AbsObjDagPath(object):

@@ -857,6 +857,7 @@ class AndTextureOpt_(AndImageOpt):
                     cmd_args += [
                         '--colorengine ocio',
                         '--colorconfig "{}"'.format(aces_file),
+                        #
                         '--colorconvert "{}" "{}"'.format(color_space, aces_render_color_space),
                     ]
             else:
@@ -886,6 +887,36 @@ class AndTextureOpt_(AndImageOpt):
         ]
         #
         return ' '.join(cmd_args)
+    @classmethod
+    def get_color_space_convert_cmd(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+        option = dict(
+            input=file_path_src,
+            output=file_path_tgt,
+            from_color_space=color_space_src,
+            to_color_space=color_space_tgt,
+        )
+        cmd_args = [
+            'maketx',
+            '-v',
+            '-u',
+            '--unpremult',
+            '--threads 2',
+            '--oiio',
+            '--colorengine ocio',
+            # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
+            '--colorconvert "{from_color_space}" "{to_color_space}"',
+            '--format exr',
+            '"{input}"',
+            '-o "{output}"'
+        ]
+        cmd = ' '.join(cmd_args).format(**option)
+        return cmd
+    @classmethod
+    def set_color_space_convert_to(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+        cmd = cls.get_color_space_convert_cmd(file_path_src, file_path_tgt, color_space_src, color_space_tgt)
+        bsc_core.SubProcessMtd.set_run_with_result(
+            cmd
+        )
 
 
 class AndOslShaderMtd(object):

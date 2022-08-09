@@ -491,7 +491,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             raise TypeError()
 
-        render_output_directory_path = self.get_asset_render_output_directory()
+        render_output_directory_path = self.get_asset_katana_render_output_directory()
         video_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )

@@ -702,6 +702,7 @@ class AbsOsTexture(AbsOsFile):
     @classmethod
     def _get_unit_used_color_space_(cls, file_path_any):
         path_base, ext_any = os.path.splitext(file_path_any)
+        #
         if ext_any.lower() == '.tx':
             return cls.COLOR_SPACE_CFG.get_aces_render_color_space()
         elif ext_any.lower() == '.exr':
@@ -711,6 +712,7 @@ class AbsOsTexture(AbsOsFile):
                     cls.TEXTURE_CFG.get_used_color_space(file_path_any)
                 )
             return cls.COLOR_SPACE_CFG.get_aces_render_color_space()
+        # not "exr"
         return cls.COLOR_SPACE_CFG.get_aces_color_space(
             cls.TEXTURE_CFG.get_used_color_space(file_path_any)
         )
@@ -1027,6 +1029,12 @@ class AbsOsTexture(AbsOsFile):
         return self.__class__(
             self.get_path_as_tgt_ext(ext_tgt, search_directory_path)
         )
+    def set_directory_repath_to(self, directory_path_tgt):
+        return self.__class__(
+            u'{}/{}'.format(
+                directory_path_tgt, self.get_name()
+            )
+        )
     # tx
     def get_path_as_tx(self, search_directory_path=None):
         return self.get_path_as_tgt_ext(
@@ -1083,6 +1091,14 @@ class AbsOsTexture(AbsOsFile):
                 return self.COLOR_SPACE_CFG.get_aces_render_color_space()
             elif self.get_ext_is_exr():
                 return self.COLOR_SPACE_CFG.get_aces_render_color_space()
+            return self.COLOR_SPACE_CFG.get_aces_color_space(
+                self.TEXTURE_CFG.get_used_color_space(file_path)
+            )
+
+    def get_best_color_space(self):
+        _ = self._get_exists_file_paths_(self._path)
+        if _:
+            file_path = _[0]
             return self.COLOR_SPACE_CFG.get_aces_color_space(
                 self.TEXTURE_CFG.get_used_color_space(file_path)
             )

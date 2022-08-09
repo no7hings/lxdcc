@@ -117,7 +117,8 @@ class CmdSubProcessSignal(object):
 
 class CmdSubProcessThread(threading.Thread):
     STACK = []
-    MAXIMUM = int(CPU_COUNT*.75)
+    # MAXIMUM = int(CPU_COUNT*.75)
+    MAXIMUM = 6
     EVENT = threading.Event()
     LOCK = threading.Lock()
     #
@@ -4218,6 +4219,17 @@ class ParsePatternOpt(object):
                     list_.append(i_r)
         return list_
 
+    def get_variants(self, result):
+        i_p = parse.parse(
+            self._pattern, result
+        )
+        if i_p:
+            i_r = i_p.named
+            if i_r:
+                i_r.update(self._variants)
+                i_r['result'] = result
+                return i_r
+
     def _get_exists_results_(self):
         return glob.glob(
             self._fnmatch_pattern
@@ -4572,6 +4584,26 @@ class OiioMtd(object):
         SubProcessMtd.set_run_with_result(
             ' '.join(cmd_args).format(**option)
         )
+    @classmethod
+    def set_color_space_convert_to(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+        option = dict(
+            input=file_path_src,
+            output=file_path_tgt,
+            from_color_space=color_space_src,
+            to_color_space=color_space_tgt,
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'-i "{input}"',
+            # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
+            # '--iscolorspace "{from_color_space}"',
+            # '--tocolorspace "{to_color_space}"',
+            '--colorconvert "{from_color_space}" "{to_color_space}"',
+            u'-o "{output}"',
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
 
 
 class RvioOpt(object):
@@ -4832,7 +4864,13 @@ class RvioOpt(object):
 
 
 if __name__ == '__main__':
-    print FrameRangeMtd.get(
-        (1001, 1120), 15
+    EnvironMtd.set(
+        'OCIO', '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
+    )
+    OiioMtd.set_color_space_convert_to(
+        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/bl_duanf_f_body.diff_clr.1001.exr',
+        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/aces/bl_duanf_f_body.diff_clr.1001.exr',
+        'Utility - Linear - sRGB',
+        'ACES - ACEScg'
     )
 

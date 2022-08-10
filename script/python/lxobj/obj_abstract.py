@@ -3378,6 +3378,9 @@ class AbsOsFile(
     @property
     def name_base(self):
         return os.path.splitext(self.name)[0]
+
+    def get_path_base(self):
+        return os.path.splitext(self.path)[0]
     @property
     def path_base(self):
         return os.path.splitext(self.path)[0]

@@ -13,7 +13,7 @@ if __name__ == '__main__':
     from lxarnold import and_core
     and_core.AndTextureOpt_.set_color_space_convert_to(
         '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/bl_duanf_f_body.normal.1001.exr',
-        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/aces/bl_duanf_f_body.normal.1001.exr',
+        '/data/f/test_maketx/aces/test_0.exr',
         'Utility - Raw',
         'ACES - ACEScg'
     )

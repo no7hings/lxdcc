@@ -1029,10 +1029,18 @@ class AbsOsTexture(AbsOsFile):
         return self.__class__(
             self.get_path_as_tgt_ext(ext_tgt, search_directory_path)
         )
+
     def set_directory_repath_to(self, directory_path_tgt):
         return self.__class__(
             u'{}/{}'.format(
                 directory_path_tgt, self.get_name()
+            )
+        )
+
+    def set_ext_rename_to(self, ext_tgt):
+        return self.__class__(
+            u'{}{}'.format(
+                self.get_path_base(), ext_tgt
             )
         )
     # tx

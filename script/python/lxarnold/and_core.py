@@ -894,18 +894,21 @@ class AndTextureOpt_(AndImageOpt):
             output=file_path_tgt,
             from_color_space=color_space_src,
             to_color_space=color_space_tgt,
+            format=os.path.splitext(file_path_tgt)[-1][1:]
         )
         cmd_args = [
             'maketx',
+            #
             '-v',
             '-u',
             '--unpremult',
             '--threads 2',
             '--oiio',
             '--colorengine ocio',
+            '--nomipmap',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
             '--colorconvert "{from_color_space}" "{to_color_space}"',
-            '--format exr',
+            '--format {format}',
             '"{input}"',
             '-o "{output}"'
         ]

@@ -77,6 +77,24 @@ class AbsRsvObjHookOpt(object):
             keyword=keyword_0
         )
         rsv_render_output_directory_path = render_output_directory_rsv_unit.get_result(
-            version=version
+            version=version, extend_variants=dict(variant='main')
         )
         return rsv_render_output_directory_path
+
+    def get_asset_review_mov_file(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword = 'asset-review-mov-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-review-mov-file'
+        else:
+            raise TypeError()
+        #
+        review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        return review_mov_file_rsv_unit.get_result(
+            version=version
+        )

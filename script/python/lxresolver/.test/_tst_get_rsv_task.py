@@ -7,10 +7,12 @@ if __name__ == '__main__':
 
     # rsv_project = r.get_rsv_project(project='cjd')
 
-    rsv_task = r.get_rsv_task(project='cgm', asset='nn_4y_test', task='modeling')
-    print rsv_task
-    print r.get_rsv_step(project='cgm', asset='nn_4y_test', step='mod_qc')
-    print r.get_rsv_task(project='cgm', asset='nn_4y_test', task='modeling_qc')
+    rsv_task = r.get_rsv_task(project='cgm', asset='td_test', step='mod_qc', task='modeling_qc')
+    version_rsv_unit = rsv_task.get_rsv_unit(
+        keyword='asset-version-dir'
+    )
+
+    print version_rsv_unit.get_new_version()
 
     # print rsv_task
     # rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-usd-hi-file')

@@ -58,6 +58,43 @@ class RsvStgTaskOpt(object):
         self._rsv_task = rsv_task
         self._stg_connector = stg_objects.StgConnector()
 
+    def set_stg_task_create(self):
+        from lxutil import utl_core
+        #
+        kwargs = self._rsv_task.properties.value
+        #
+        stg_project = self._stg_connector.get_stg_project(
+            **kwargs
+        )
+        if stg_project is not None:
+            stg_entity = self._stg_connector.get_stg_entity(
+                **kwargs
+            )
+            if stg_entity is None:
+                self._stg_connector.set_stg_entity_create(**kwargs)
+            #
+            stg_step = self._stg_connector.get_stg_step(
+                **kwargs
+            )
+            if stg_step is not None:
+                stg_task = self._stg_connector.get_stg_task(
+                    **kwargs
+                )
+                if stg_task is None:
+                    self._stg_connector.set_stg_task_create(
+                        **kwargs
+                    )
+            else:
+                utl_core.Log.set_module_error_trace(
+                    'shotgun-entity create',
+                    'step="{}" is non-exists.'.format(kwargs['step'])
+                )
+        else:
+            utl_core.Log.set_module_error_trace(
+                'shotgun-entity create',
+                'project="{}" is non-exists.'.format(kwargs['project'])
+            )
+
     def set_stg_version_create(self, version, version_type=None, movie_file=None, user=None, description=None):
         branch = self._rsv_task.get('branch')
         stg_version_kwargs = self._rsv_task.properties.copy_value

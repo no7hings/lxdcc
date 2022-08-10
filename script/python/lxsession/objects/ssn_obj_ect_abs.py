@@ -136,25 +136,26 @@ class AbsHookExecutor(object):
                 'Whitelist', bsc_core.SystemMtd.get_host()
             )
         #
-        exists_result = session.set_ddl_job_id_find(hook_option)
-        if exists_result:
+        exists_ddl_job_id = session.set_ddl_job_id_find(hook_option)
+        if exists_ddl_job_id:
+            session._ddl_job_id = exists_ddl_job_id
             utl_core.Log.set_module_warning_trace(
-                'option-hook execute by deadline', 'option-hook="{}" is exists, job-id="{}"'.format(
-                    option_hook_key, exists_result
+                'option-hook execute by deadline', 'option-hook="{}", job-id="{}" is exists'.format(
+                    option_hook_key, exists_ddl_job_id
                 )
             )
         else:
             ddl_job_id = self._ddl_submiter.set_job_submit()
             if ddl_job_id is not None:
-                utl_core.Log.set_module_result_trace(
-                    'option-hook execute by deadline', 'option-hook="{}", job-id="{}"'.format(
-                        option_hook_key, ddl_job_id
-                    )
-                )
                 session._ddl_job_id = ddl_job_id
                 #
                 session.set_ddl_result_update(
                     hook_option, ddl_job_id
+                )
+                utl_core.Log.set_module_result_trace(
+                    'option-hook execute by deadline', 'option-hook="{}", job-id="{}"'.format(
+                        option_hook_key, ddl_job_id
+                    )
                 )
         return self._ddl_submiter.get_job_result()
 

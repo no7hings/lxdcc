@@ -2014,6 +2014,10 @@ class Resources(object):
         )
     @classmethod
     def get(cls, key):
+        """
+        :param key: str, etc. "rsv-task-batchers/asset/gen-model-export-extra" or "*/gen-model-export-extra"
+        :return: str(path)
+        """
         if key in cls.CACHE:
             return cls.CACHE[key]
         else:
@@ -2025,6 +2029,7 @@ class Resources(object):
                         i_glob_pattern
                     )
                     if i_results:
+                        # use first result
                         value = i_results[0]
                         cls.CACHE[key] = value
                         return value

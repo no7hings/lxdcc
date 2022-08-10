@@ -385,17 +385,27 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             keyword='asset-geometry-usd-var-file'
         )
         #
-        for i_var in ['hi', 'shape']:
-            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_result(
-                version='latest',
-                extend_variants=dict(var=i_var)
+        geometry_usd_var_file_path_hi = geometry_usd_var_file_rsv_unit.get_result(
+            version='latest',
+            extend_variants=dict(var='hi')
+        )
+        if geometry_usd_var_file_path_hi:
+            s.set_sublayer_append(geometry_usd_var_file_path_hi)
+            #
+            file_properties = geometry_usd_var_file_rsv_unit.get_properties_by_result(
+                geometry_usd_var_file_path_hi
             )
-            if i_geometry_usd_var_file_path is not None:
-                s.set_sublayer_append(i_geometry_usd_var_file_path)
+            version_hi = file_properties.get('version')
+            geometry_usd_var_file_path_shape = geometry_usd_var_file_rsv_unit.get_exists_result(
+                version=version_hi,
+                extend_variants=dict(var='shape')
+            )
+            if geometry_usd_var_file_path_shape:
+                s.set_sublayer_append(geometry_usd_var_file_path_shape)
             else:
                 utl_core.Log.set_module_warning_trace(
-                    'file resolver',
-                    u'var="{}", usd file is non-exists'.format(i_var)
+                    u'front camera setup',
+                    u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )
         #
         s.set_flatten()
@@ -438,18 +448,28 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='asset-geometry-usd-var-file'
         )
-        #
-        for i_var in ['hi', 'shape']:
-            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_result(
-                version='latest',
-                extend_variants=dict(var=i_var)
+        # ensure all usd file use same version
+        geometry_usd_var_file_path_hi = geometry_usd_var_file_rsv_unit.get_result(
+            version='latest',
+            extend_variants=dict(var='hi')
+        )
+        if geometry_usd_var_file_path_hi:
+            s.set_sublayer_append(geometry_usd_var_file_path_hi)
+            #
+            file_properties = geometry_usd_var_file_rsv_unit.get_properties_by_result(
+                geometry_usd_var_file_path_hi
             )
-            if i_geometry_usd_var_file_path is not None:
-                s.set_sublayer_append(i_geometry_usd_var_file_path)
+            version_hi = file_properties.get('version')
+            geometry_usd_var_file_path_shape = geometry_usd_var_file_rsv_unit.get_exists_result(
+                version=version_hi,
+                extend_variants=dict(var='shape')
+            )
+            if geometry_usd_var_file_path_shape:
+                s.set_sublayer_append(geometry_usd_var_file_path_shape)
             else:
                 utl_core.Log.set_module_warning_trace(
-                    'file resolver',
-                    u'var="{}", usd file is non-exists'.format(i_var)
+                    u'front camera setup',
+                    u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )
         #
         s.set_flatten()

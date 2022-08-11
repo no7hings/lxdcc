@@ -2,6 +2,11 @@
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
+class RsvUtilityOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
+    def __init__(self, rsv_scene_properties, hook_option_opt=None):
+        super(RsvUtilityOpt, self).__init__(rsv_scene_properties, hook_option_opt)
+
+
 class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvRecyclerHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)

@@ -81,13 +81,15 @@ class AbsSsnRsvApplication(object):
         :param ext_extras: list(<ext>)
         :return: str(<file-path>)
         """
+        # current workspace
         cur_workspace = 'publish'
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is not None:
             workspace = rsv_scene_properties.get('workspace')
             if workspace == cur_workspace:
                 return self._any_scene_file_path
-            elif workspace == 'work':
+            # copy to current workspace
+            elif workspace in ['work', 'output']:
                 rsv_task = self.get_rsv_task()
                 scene_src_file_path_src = self._any_scene_file_path
                 branch = rsv_scene_properties.get('branch')
@@ -149,13 +151,15 @@ class AbsSsnRsvApplication(object):
         :param ext_extras: list(<ext>)
         :return: str(<file-path>)
         """
+        # current workspace
         cur_workspace = 'output'
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is not None:
             workspace = rsv_scene_properties.get('workspace')
             if workspace == cur_workspace:
                 return self._any_scene_file_path
-            elif workspace == 'work':
+            # copy to current workspace
+            elif workspace in ['work', 'publish']:
                 rsv_task = self.get_rsv_task()
                 scene_src_file_path_src = self._any_scene_file_path
                 branch = rsv_scene_properties.get('branch')

@@ -98,3 +98,27 @@ class AbsRsvObjHookOpt(object):
         return review_mov_file_rsv_unit.get_result(
             version=version
         )
+
+    def get_dcc_scene_src_file_path(self, application):
+        if self._rsv_scene_properties.get('application') == application:
+            return self._rsv_scene_properties.get('file')
+        #
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword = 'asset-{application}-scene-src-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-{application}-scene-src-file'
+        else:
+            raise TypeError()
+
+        keyword = keyword.format(**dict(application=application))
+
+        scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        return scene_src_file_rsv_unit.get_result(
+            version=version
+        )
+

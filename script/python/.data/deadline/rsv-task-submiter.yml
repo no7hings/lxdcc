@@ -1,6 +1,7 @@
 option:
     type: ''
     name: ''
+    # use version name
     group: ''
     engine: ''
     hook: ''
@@ -27,7 +28,8 @@ option:
         version: ''
     #
     deadline:
-        batch_name: '[<option.group>][<option.extra.workspace>][<option.type>][<option.time_tag>]'
+#        batch_name: '[<option.group>][<option.extra.workspace>][<option.type>][<option.time_tag>]'
+        batch_name: '[<option.group>][<option.extra.workspace>][<option.time_tag>]'
         job_name: '[<option.name>][<option.extra.workspace>][<option.engine>][<option.hook>]'
         #
         output_directory: ''

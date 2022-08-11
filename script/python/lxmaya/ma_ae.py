@@ -464,7 +464,7 @@ class rootMode(baseMode):
             _obj_name = _[0]
             _port_name = _[-1]
             _node_type_name = cmds.nodeType(_obj_name)
-            _gui_name = '{}__{}'.format(_node_type_name, _port_name)
+            _gui_name = '{}__{}__button'.format(_node_type_name, _port_name)
             #
             _enumerate_items = [
                 (_seq, _i) for _seq, _i in enumerate(enumerate_option.split('|'))
@@ -486,101 +486,12 @@ class rootMode(baseMode):
             _obj_name = _[0]
             _port_name = _[-1]
             _node_type_name = cmds.nodeType(_obj_name)
-            _gui_name = '{}__{}'.format(_node_type_name, _port_name)
+            _gui_name = '{}__{}__button'.format(_node_type_name, _port_name)
             #
             cmds.attrEnumOptionMenuGrp(
                 _gui_name,
                 edit=True,
                 attribute=atr_path_
-            )
-        #
-        label = get_name_prettify(port_path)
-        #
-        cls.addCustom(port_path, new_fnc_, replace_fnc_)
-    @classmethod
-    def _set_file_name_control_add__(cls, port_path):
-        def new_fnc_(atr_path_):
-            def edit_fnc_(new_file_path_):
-                cmds.setAttr(atr_path_, new_file_path_, type="string")
-            #
-            def button_fnc_(*args):
-                _file_path = cmds.getAttr(atr_path_)
-                #
-                _directory_path = os.path.dirname(_file_path)
-                #
-                __file_paths = cmds.fileDialog2(
-                    fileFilter='All Files (*.*)',
-                    cap='Load File',
-                    okc='Load',
-                    fm=4,
-                    dir=_directory_path
-                ) or []
-                if __file_paths:
-                    __file_path = __file_paths[0]
-                    edit_fnc_(__file_path)
-                    cmds.textField(
-                        _gui_name,
-                        edit=True,
-                        text=__file_path
-                    )
-            #
-            _ = atr_path_.split('.')
-            _obj_name = _[0]
-            _port_name = _[-1]
-            _node_type_name = cmds.nodeType(_obj_name)
-            _gui_name = '{}__{}'.format(_node_type_name, _port_name)
-            #
-            cmds.rowLayout(
-                numberOfColumns=3,
-                columnWidth3=(145, 400, 30),
-                columnAlign3=('right', 'center', 'left'),
-                adjustableColumn=2,
-                columnAttach=[(1, 'right', 0), (2, 'both', 0), (3, 'left', 0)],
-            )
-            cmds.text(label=label)
-            cmds.textField(
-                _gui_name,
-                # label=label,
-                changeCommand=edit_fnc_
-            )
-            cmds.textField(
-                _gui_name,
-                edit=True,
-                text=cmds.getAttr(atr_path_)
-            )
-            cmds.symbolButton(
-                image='folder-closed.png',
-                command=button_fnc_
-            )
-            cmds.scriptJob(
-                parent=_gui_name,
-                replacePrevious=True,
-                attributeChange=[
-                    atr_path_,
-                    lambda: cmds.textField(_gui_name, edit=True, text=cmds.getAttr(atr_path_))
-                ]
-            )
-        #
-        def replace_fnc_(atr_path_):
-            _ = atr_path_.split('.')
-            _obj_name = _[0]
-            _port_name = _[-1]
-            _node_type_name = cmds.nodeType(_obj_name)
-            _gui_name = '{}__{}'.format(_node_type_name, _port_name)
-            #
-            cmds.textField(
-                _gui_name,
-                edit=True,
-                text=cmds.getAttr(atr_path_)
-            )
-            #
-            cmds.scriptJob(
-                parent=_gui_name,
-                replacePrevious=True,
-                attributeChange=[
-                    atr_path_,
-                    lambda: cmds.textField(_gui_name, edit=True, text=cmds.getAttr(atr_path_))
-                ]
             )
         #
         label = get_name_prettify(port_path)

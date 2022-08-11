@@ -973,6 +973,7 @@ class Path(object):
 
 
 class AppLauncher(object):
+    # TODO fix 9.9.9
     LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_user_directory_path())
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
     #
@@ -998,6 +999,9 @@ class AppLauncher(object):
             project=kwargs['project'],
             application=kwargs['application']
         )
+    @classmethod
+    def get_server_root(cls):
+        pass
     @classmethod
     def _get_application_configure_file_path_(cls, **kwargs):
         kwargs_ = copy.copy(kwargs)

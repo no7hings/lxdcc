@@ -454,6 +454,12 @@ asset-output-task-dir: <asset-output-step-dir>/<task-name>
 asset-output-version-dir: <asset-output-task-dir>/<asset-version-name>
 asset-output-no-version-dir: <asset-output-task-dir>/<asset-no-version-name>
 #
+asset-output-review-dir: <asset-output-version-dir>/review
+asset-output-review-mov-file: <asset-output-review-dir>/<asset-version-name>.mov
+#
+asset-output-preview-dir: <asset-output-version-dir>/preview
+asset-output-preview-mov-file: <asset-output-preview-dir>/<asset-version-name>.mov
+#
 asset-output-render-dir: <asset-output-version-dir>/render
 asset-output-set-dir: <asset-output-version-dir>/set
 asset-output-metadata-dir: <asset-output-version-dir>/metadata

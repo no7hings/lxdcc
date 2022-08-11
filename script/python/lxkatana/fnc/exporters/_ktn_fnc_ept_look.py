@@ -151,6 +151,8 @@ class LookKlfExtraExporter(utl_fnc_obj_abs.AbsDccExporter):
         super(LookKlfExtraExporter, self).__init__(file_path, root, option)
 
     def set_run(self):
+        import parse
+
         texture_references = ktn_dcc_objects.TextureReferences()
         objs = texture_references.get_objs()
         dic = {}
@@ -160,8 +162,11 @@ class LookKlfExtraExporter(utl_fnc_obj_abs.AbsDccExporter):
                     port = obj.get_port(port_path)
                     expression = texture_references._get_expression_(port)
                     if expression is not None:
-                        key = u'{}.{}'.format(obj.name, port_path)
-                        dic[key] = expression
+                        parse_pattern = '\'{file}\'%{argument}'
+                        p = parse.parse(parse_pattern, expression)
+                        if p:
+                            key = u'{}.{}'.format(obj.name, port_path)
+                            dic[key] = expression
         #
         if dic:
             utl_dcc_objects.OsJsonFile(

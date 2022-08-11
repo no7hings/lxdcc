@@ -414,7 +414,7 @@ if __name__ == '__main__':
     # ).get_all_group_data()
 
     files = bsc_core.DirectoryMtd.get_all_file_paths(
-        '/l/prod/cgm/work/assets/env/san_yizi/srf/surfacing/texture/outsource/v001'
+        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
     )
     for i in files:
         if not PathGroupPermission(

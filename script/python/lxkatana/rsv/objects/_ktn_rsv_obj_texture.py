@@ -26,13 +26,14 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         if use_tx is True:
-            utl_dcc_operators.DccTexturesOpt(
-                ktn_dcc_objects.TextureReferences(
-                    option=dict(
-                        with_reference=False
-                    )
-                )
-            ).set_tx_create_and_repath()
+            pass
+            # utl_dcc_operators.DccTexturesOpt(
+            #     ktn_dcc_objects.TextureReferences(
+            #         option=dict(
+            #             with_reference=False
+            #         )
+            #     )
+            # ).set_tx_create_and_repath()
         else:
             utl_dcc_operators.DccTexturesOpt(
                 ktn_dcc_objects.TextureReferences(

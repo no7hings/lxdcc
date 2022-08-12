@@ -39,10 +39,16 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).set_stg_task_create()
 
     def set_version_create(self):
+        #
         rsv_task = self._rsv_task
         version = self._rsv_scene_properties.get('version')
+        #
+        user = self._hook_option_opt.get('user')
+        description = self._hook_option_opt.get('description')
         _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).set_stg_version_create(
-            version=version
+            version=version,
+            user=user,
+            description=description
         )
 
     def set_qc_version_create(self):
@@ -64,18 +70,18 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version_qc = version_rsv_unit_qc.get_new_version()
         #
         version_type = self._hook_option_opt.get('version_type')
-        #
         with_qc_review_mov = self._hook_option_opt.get_as_boolean('with_qc_review_mov')
+        user = self._hook_option_opt.get('user')
+        description = self._hook_option_opt.get('description')
         review_mov_file_path_qc = None
         if with_qc_review_mov is True:
             review_mov_file_path_qc = self.set_qc_review_mov_export(version_qc)
-        #
-        description = self._hook_option_opt.get('description')
         #
         _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).set_stg_version_create(
             version=version_qc,
             version_type=version_type,
             movie_file=review_mov_file_path_qc,
+            user=user,
             description=description
         )
 

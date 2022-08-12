@@ -416,14 +416,20 @@ class StgConnector(object):
         return _
     # user
     def get_stg_user(self, **kwargs):
-        user = kwargs['user']
-        _ = self._shotgun.find_one(
-            entity_type='HumanUser',
-            filters=[
-                ['login', 'is', user]
-            ]
-        )
-        return _
+        if 'id' in kwargs:
+            return self._shotgun.find_one(
+                entity_type='HumanUser',
+                filters=[
+                    ['id', 'is', kwargs['id']]
+                ]
+            )
+        elif 'user' in kwargs:
+            return self._shotgun.find_one(
+                entity_type='HumanUser',
+                filters=[
+                    ['login', 'is', kwargs['user']]
+                ]
+            )
 
     def get_stg_user_query(self, **kwargs):
         stg_obj = self.get_stg_user(**kwargs)
@@ -694,6 +700,13 @@ class StgConnector(object):
         )
         if c is not None:
             return c.get('sg_version_type.properties.valid_values.value')
+
+    def get_stg_all_version_status(self):
+        c = self.get_stg_entity_scheme(
+            'Version', 'sg_status_list'
+        )
+        if c is not None:
+            return c.get('sg_status_list.properties.valid_values.value')
 
 
 if __name__ == '__main__':

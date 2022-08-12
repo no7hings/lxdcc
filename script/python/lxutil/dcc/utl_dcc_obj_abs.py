@@ -500,7 +500,6 @@ class AbsOsFile(
                 fix_name_blank=fix_name_blank,
                 replace=replace
             )
-
     # file reference node ******************************************************************************************** #
     def set_node(self, node):
         self._obj = node

@@ -223,9 +223,22 @@ class MeshOpt(
 
     def set_uv_map_repair(self):
         # uv-map-name
+        uv_map_name_default = ma_core.Om2Method.DEFAULT_MAP_NAME
         uv_map_names = self.get_uv_map_names()
-        if ma_core.Om2Method.DEFAULT_MAP_NAME not in uv_map_names:
-            self.om2_obj.copyUVSet(uv_map_names[0], ma_core.Om2Method.DEFAULT_MAP_NAME)
+        if uv_map_name_default not in uv_map_names:
+            self.om2_obj.copyUVSet(uv_map_names[0], uv_map_name_default)
+
+        uv_map_names = self.get_uv_map_names()
+        if uv_map_name_default in uv_map_names:
+            index_default = uv_map_names.index(uv_map_name_default)
+            if index_default != 0:
+                name_0 = uv_map_names[0]
+                name_bck = '{}_bck'.format(uv_map_name_default)
+                self.om2_obj.copyUVSet(uv_map_name_default, name_0)
+                self.om2_obj.renameUVSet(uv_map_name_default, name_bck)
+                self.om2_obj.renameUVSet(name_0, uv_map_name_default)
+                self.om2_obj.deleteUVSet(name_bck)
+
     @mya_modifiers.set_undo_mark_mdf
     def _get_map_face_non_uv_comp_names_(self):
         path = self.obj.path

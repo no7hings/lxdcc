@@ -95,7 +95,7 @@ class RsvStgTaskOpt(object):
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
 
-    def set_stg_version_create(self, version, version_type=None, movie_file=None, user=None, description=None):
+    def set_stg_version_create(self, version, version_type=None, version_status=None, movie_file=None, user=None, description=None):
         branch = self._rsv_task.get('branch')
         stg_version_kwargs = self._rsv_task.properties.copy_value
         stg_version_kwargs['version'] = version
@@ -121,9 +121,12 @@ class RsvStgTaskOpt(object):
         stg_version_opt.set_folder(
             version_directory_path
         )
-
+        #
         if version_type:
             stg_version_opt.set_stg_type(version_type)
+        #
+        if version_status:
+            stg_version_opt.set_stg_status(version_status)
 
         if user:
             stg_user = self._stg_connector.get_stg_user(user=user)

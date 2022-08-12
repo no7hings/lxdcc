@@ -409,19 +409,19 @@ class PathGroupPermission(AbsPermission):
 
 
 if __name__ == '__main__':
-    # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/env/mk_guizi/srf/surfacing/texture'
-    # ).get_all_group_data()
+    print PathGroupPermission(
+        '/l/prod/cgm/work/assets/chr/nn_4y/srf/surfacing/texture/nn4y/v001/nn_4y.z_disp.1020.exr'
+    ).get_all_group_data()
 
-    files = bsc_core.DirectoryMtd.get_all_file_paths(
-        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
-    )
-    for i in files:
-        if not PathGroupPermission(
-            i
-        ).get_all_group_data():
-            PathGroupPermission(
-                i
-            ).set_allow(
-                'cg_group'
-            )
+    # files = bsc_core.DirectoryMtd.get_all_file_paths(
+    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
+    # )
+    # for i in files:
+    #     if not PathGroupPermission(
+    #         i
+    #     ).get_all_group_data():
+    #         PathGroupPermission(
+    #             i
+    #         ).set_allow(
+    #             'cg_group'
+    #         )

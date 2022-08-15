@@ -979,6 +979,10 @@ class AppLauncher(object):
     #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
     APP_CONFIGURE_FILE_PATTERN = '{root}/{project}_config/bin/config/{application}.yml'
+    APP_CONFIGURE_FILE_PATTERNS = [
+        '{root}/{project}_config/bin/config/{application}.yml',
+        '{root}/{project}_config/config/{application}.yml'
+    ]
     BIN_PATTERN = '{root}/{project}_config/bin/{application}'
     APP_CONFIGURE_MAP_DICT = {
         'usdview': 'usd_view'
@@ -1009,9 +1013,12 @@ class AppLauncher(object):
         if application in cls.APP_CONFIGURE_MAP_DICT:
             application_ = cls.APP_CONFIGURE_MAP_DICT[application]
             kwargs_['application'] = application_
-        return cls.APP_CONFIGURE_FILE_PATTERN.format(
-            **kwargs_
-        )
+        for i_p in cls.APP_CONFIGURE_FILE_PATTERNS:
+            i_file_path = i_p.format(
+                **kwargs_
+            )
+            if os.path.exists(i_file_path) is True:
+                return i_file_path
     @classmethod
     def _set_cmd_run_(cls, *args):
         SubProcessRunner.set_run(
@@ -1052,7 +1059,7 @@ class AppLauncher(object):
             return ['lxdcc']
         #
         configure_file_path = self._get_application_configure_file_path_(**kwargs)
-        if os.path.exists(configure_file_path):
+        if configure_file_path:
             Log.set_module_result_trace(
                 'launcher-configure search',
                 'project="{project}", application="{application}"'.format(

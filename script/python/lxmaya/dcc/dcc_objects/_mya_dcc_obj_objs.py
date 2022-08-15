@@ -229,7 +229,11 @@ class AbsFileReferences(object):
             return file_path
     @classmethod
     def _get_real_file_path_(cls, port):
-        pass
+        obj = port.obj
+        file_path = port.get()
+        return cls._set_file_gain_value_convert_(
+            obj, file_path
+        )
     @classmethod
     def _set_real_file_path_(cls, port, new_value):
         if port.get_is_locked():
@@ -407,9 +411,14 @@ class AbsFileReferences(object):
         return lis
     @classmethod
     def set_obj_repath_to(cls, obj, port_path, file_path_new):
-        cls._set_real_file_path_(
-            obj.get_port(port_path), file_path_new
+        port = obj.get_port(port_path)
+        file_path = cls._get_real_file_path_(
+            port
         )
+        if file_path != file_path_new:
+            cls._set_real_file_path_(
+                obj.get_port(port_path), file_path_new
+            )
 
 
 class FileReferences(AbsFileReferences):

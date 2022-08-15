@@ -691,3 +691,92 @@ class AbsDotXgenDef(object):
         i_dot_xgen_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
         i_dot_xgen_reader.set_repair()
         i_dot_xgen_reader.set_save()
+
+
+class AbsDccTextureExport(object):
+    @classmethod
+    def _set_copy_as_src_(cls, directory_path_dst, directory_path_base, dcc_objs, fix_name_blank, use_tx, with_reference=False, repath_fnc=None):
+        if dcc_objs:
+            copy_cache = []
+            index_mapper = {}
+            index_query = {}
+            with utl_core.log_progress_bar(maximum=len(dcc_objs), label='texture export') as l_p:
+                for i_dcc_obj in dcc_objs:
+                    l_p.set_update()
+                    for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
+                        # map path to current platform
+                        j_texture_path_dpt = utl_core.Path.set_map_to_platform(j_texture_path_dpt)
+                        j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
+                        # fix name overlay
+                        if j_texture_path_dpt in index_query:
+                            j_index = index_query[j_texture_path_dpt]
+                        else:
+                            j_key = j_texture_dpt.name
+                            if j_key in index_mapper:
+                                j_index = index_mapper[j_key] + 1
+                            else:
+                                j_index = 0
+                            #
+                            index_mapper[j_key] = j_index
+                            index_query[j_texture_path_dpt] = j_index
+                        #
+                        index_mapper[j_key] = j_index
+                        #
+                        j_directory_path_dst = '{}/v{}'.format(directory_path_dst, j_index)
+                        #
+                        j_texture_path_dst = j_texture_dpt.get_target_file_path(
+                            j_directory_path_dst,
+                            fix_name_blank=fix_name_blank
+                        )
+                        # ignore when departure same to destination
+                        # print j_texture_path_dpt, j_texture_path_dst
+                        if j_texture_path_dpt != j_texture_path_dst:
+                            # copy
+                            j_file_tiles = j_texture_dpt.get_exists_files_()
+                            if j_file_tiles:
+                                for k_file_tile in j_file_tiles:
+                                    k_file_tile_path = k_file_tile.path
+                                    if k_file_tile_path not in copy_cache:
+                                        copy_cache.append(k_file_tile_path)
+                                        #
+                                        k_file_tile.set_unit_copy_as_src(
+                                            directory_path_src=directory_path_base,
+                                            directory_path_tgt=j_directory_path_dst,
+                                            fix_name_blank=fix_name_blank,
+                                            replace=True
+                                        )
+                            else:
+                                utl_core.Log.set_module_warning_trace(
+                                    'texture search',
+                                    u'file="{}" is Non-exists'.format(j_texture_path_dpt)
+                                )
+                                continue
+                            # repath
+                            if use_tx is True:
+                                j_texture_tx_path_dst = j_texture_dpt.get_target_file_path(
+                                    j_directory_path_dst,
+                                    fix_name_blank=fix_name_blank,
+                                    ext_override='.tx'
+                                )
+                                if utl_dcc_objects.OsFile(j_texture_tx_path_dst).get_is_exists() is True:
+                                    j_texture_path_dst = j_texture_tx_path_dst
+                                else:
+                                    utl_core.Log.set_module_warning_trace(
+                                        'texture-tx search',
+                                        u'file="{}" is Non-exists'.format(j_texture_tx_path_dst)
+                                    )
+                            #
+                            j_texture_dst = utl_dcc_objects.OsFile(j_texture_path_dst)
+                            if j_texture_dst.get_exists_files_():
+                                repath_fnc(
+                                    i_dcc_obj, j_port_path, j_texture_path_dst
+                                )
+                                utl_core.Log.set_module_result_trace(
+                                    'texture repath',
+                                    u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
+                                )
+                            else:
+                                utl_core.Log.set_module_warning_trace(
+                                    'texture search',
+                                    u'file="{}" is Non-exists'.format(j_texture_path_dst)
+                                )

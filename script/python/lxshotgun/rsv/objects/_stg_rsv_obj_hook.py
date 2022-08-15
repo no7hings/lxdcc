@@ -87,7 +87,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def set_version_export(self):
         version = self._rsv_scene_properties.get('version')
-        movie_file = self._hook_option_opt.get('movie_file')
+        movie_file = self.get_exists_asset_review_mov_file()
         description = self._hook_option_opt.get('description')
         _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).set_stg_version_create(
             version=version,
@@ -211,14 +211,13 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         movie_file_path = self._hook_option_opt.get('movie_file')
-        #
-        review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword
-        )
-        review_mov_file_path = review_mov_file_rsv_unit.get_result(
-            version=version
-        )
         if movie_file_path:
+            review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                keyword=keyword
+            )
+            review_mov_file_path = review_mov_file_rsv_unit.get_result(
+                version=version
+            )
             movie_file_opt = bsc_core.StorageFileOpt(movie_file_path)
             if movie_file_opt.get_is_exists() is True:
                 movie_file_opt.set_copy_to_file(

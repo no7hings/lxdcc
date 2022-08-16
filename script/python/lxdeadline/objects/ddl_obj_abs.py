@@ -138,10 +138,7 @@ class AbsDdlSubmiter(object):
             if '_id' in self._result:
                 self._job_id = self._result['_id']
                 utl_core.Log.set_module_result_trace(
-                    'deadline-job submit', 'jon-id="{}"'.format(self._job_id)
-                )
-                utl_core.Log.set_module_result_trace(
-                    'deadline-job submit', 'is completed'
+                    'deadline-job submit', 'is completed, jon-id="{}"'.format(self._job_id)
                 )
                 return self._job_id
         #

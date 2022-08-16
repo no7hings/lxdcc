@@ -708,7 +708,7 @@ workspace:
                         settings/visible: 0
                         rotations/value_offset: 0.0
                         rotations/directions: '-1'
-                        rotations/frame_ranges: '1-60'
+                        rotations/frame_ranges: '1-120'
                         rotations/frame_offset: 1000.0
                     #
                     connections:
@@ -778,7 +778,7 @@ workspace:
                         rotations/enable: 1
                         rotations/value_offset: 0.0
                         rotations/directions: '-1,1'
-                        rotations/frame_ranges: '1-60,61-120'
+                        rotations/frame_ranges: '1-120,121-240'
                         rotations/frame_offset: 1000.0
                     connections:
                         - <.....cameras.main.path>.out

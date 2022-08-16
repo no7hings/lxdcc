@@ -5075,6 +5075,6 @@ if __name__ == '__main__':
     )
 
     print o.get_result(
-        'boli_all_.normal.exr'
+        'taixinban.diff_clr.<udim>.exr'
     )
 

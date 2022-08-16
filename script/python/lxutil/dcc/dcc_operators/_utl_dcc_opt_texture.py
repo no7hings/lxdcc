@@ -511,11 +511,11 @@ class DccTexturesOpt(object):
                             #
                             tgt_name_base = i_name_base_src
                             target_file_path = u'{}/{}{}'.format(tgt_directory_path, tgt_name_base, ext_tgt)
-                            port = i_obj.get_port(j_port_path)
+                            j_port = i_obj.get_port(j_port_path)
                             tgt_texture_file_obj = utl_dcc_objects.OsTexture(target_file_path)
                             #
                             repath_queue.append(
-                                (port, tgt_texture_file_obj)
+                                (j_port, tgt_texture_file_obj)
                             )
                             utl_core.Log.set_module_result_trace(
                                 'file-search',
@@ -531,6 +531,44 @@ class DccTexturesOpt(object):
         #
         self._set_repath_queue_run_(repath_queue)
 
+    def set_search_from_(self, directory_paths_tgt):
+        objs = self._objs
+
+        repath_queue = []
+
+        search_opt = bsc_core.StgFileSearchOpt()
+        search_opt.set_search_directories(directory_paths_tgt)
+        if objs:
+            g_p = utl_core.GuiProgressesRunner(
+                maximum=len(objs)
+            )
+            for i_obj in objs:
+                g_p.set_update()
+                for j_port_path, j_texture_path_tgt in i_obj.reference_raw.items():
+                    j_texture_src = utl_dcc_objects.OsTexture(j_texture_path_tgt)
+                    j_result = search_opt.get_result(j_texture_src.path)
+                    if j_result:
+                        j_port = i_obj.get_port(j_port_path)
+                        tgt_texture_tgt = utl_dcc_objects.OsTexture(j_result)
+                        #
+                        repath_queue.append(
+                            (j_port, tgt_texture_tgt)
+                        )
+                        utl_core.Log.set_module_result_trace(
+                            'file-search',
+                            u'file="{}" >> "{}"'.format(j_texture_src.path, tgt_texture_tgt.path)
+                        )
+                    else:
+                        utl_core.Log.set_module_warning_trace(
+                            'file-search',
+                            u'file="{}" target is not found'.format(j_texture_src.path)
+                        )
+
+            #
+            g_p.set_stop()
+
+            self._set_repath_queue_run_(repath_queue)
+
     def set_copy_and_repath_to(self, tgt_directory_path):
         objs = self._objs
         #
@@ -540,7 +578,7 @@ class DccTexturesOpt(object):
         if objs:
             for i_obj in objs:
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
-                    port = i_obj.get_port(j_port_path)
+                    j_port = i_obj.get_port(j_port_path)
                     src_texture_file_obj = utl_dcc_objects.OsTexture(j_file_path)
                     tgt_texture_file_obj = src_texture_file_obj.get_target_file(tgt_directory_path)
                     for src_texture_file_tile_obj in src_texture_file_obj.get_exists_files_():
@@ -552,7 +590,7 @@ class DccTexturesOpt(object):
                         )
                     #
                     repath_queue.append(
-                        (port, tgt_texture_file_obj)
+                        (j_port, tgt_texture_file_obj)
                     )
         #
         method_args = [
@@ -618,13 +656,13 @@ class DccTexturesOpt(object):
         if objs:
             for i_obj in objs:
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
-                    port = i_obj.get_port(j_port_path)
+                    j_port = i_obj.get_port(j_port_path)
                     stg_texture = utl_dcc_objects.OsTexture(j_file_path)
                     if stg_texture.get_ext_is_tx():
                         o = stg_texture.get_tx_orig()
                         if o is not None:
                             repath_queue.append(
-                                (port, o)
+                                (j_port, o)
                             )
         #
         self._set_repath_queue_run_(repath_queue)
@@ -637,13 +675,13 @@ class DccTexturesOpt(object):
         if objs:
             for i_obj in objs:
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
-                    port = i_obj.get_port(j_port_path)
+                    j_port = i_obj.get_port(j_port_path)
                     i_texture = utl_dcc_objects.OsTexture(j_file_path)
                     if i_texture.get_ext_is(ext_tgt):
                         o = i_texture.get_orig_as_tgt_ext(ext_tgt)
                         if o is not None:
                             repath_queue.append(
-                                (port, o)
+                                (j_port, o)
                             )
         #
         self._set_repath_queue_run_(repath_queue)
@@ -665,9 +703,9 @@ class DccTexturesOpt(object):
                         raise TypeError()
                     #
                     tgt_stg_texture = utl_dcc_objects.OsTexture(tgt_stg_texture_path)
-                    port = i_obj.get_port(j_port_path)
+                    j_port = i_obj.get_port(j_port_path)
                     #
-                    self._set_port_repath_(port, tgt_stg_texture)
+                    self._set_port_repath_(j_port, tgt_stg_texture)
 
 
 class TextureTxSubProcess(bsc_obj_abs.AbsProcess):

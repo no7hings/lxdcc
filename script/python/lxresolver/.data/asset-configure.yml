@@ -353,7 +353,7 @@ textures:
             keyword: asset-texture-tgt-dir
             workspace: publish
         work_dir:
-            keyword: asset-work-texture-dir
+            keyword: asset-work-texture-version-dir
 #
 usds:
     geometry:

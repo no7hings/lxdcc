@@ -18,7 +18,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         directory_paths_src = self._hook_option_opt.get_as_array('recycles_texture_directories')
         if directory_paths_src:
-            keyword = 'asset-work-texture-dir'
+            keyword = 'asset-work-texture-version-dir'
 
             variant = 'outsource'
             version = self._rsv_scene_properties.get('version')
@@ -352,7 +352,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     with_reference=False
                 )
             )
-        ).set_search_from(
+        ).set_search_from_(
             [
                 directory_path_tgt
             ]

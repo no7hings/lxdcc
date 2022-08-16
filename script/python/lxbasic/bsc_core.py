@@ -824,6 +824,8 @@ class StgFileSearchOpt(object):
                     j_ext = j_ext.lower()
 
                 self._search_dict[u'{}/{}{}'.format(j_directory_path, j_name_base, j_ext)] = j
+        #
+        self._set_key_sort_()
 
     def set_search_directory_append(self, directory_path, below_enable=False):
         if below_enable is True:
@@ -838,6 +840,11 @@ class StgFileSearchOpt(object):
             if self._ignore_ext_case is True:
                 i_ext = i_ext.lower()
             self._search_dict[u'{}/{}{}'.format(i_directory_path, i_name_base, i_ext)] = i
+        # sort
+        self._set_key_sort_()
+
+    def _set_key_sort_(self):
+        self._search_dict = DictMtd.set_string_key_sort_to(self._search_dict)
 
     def get_result(self, file_path_src):
         name_src = os.path.basename(file_path_src)
@@ -857,7 +864,7 @@ class StgFileSearchOpt(object):
             file_path_keys, match_pattern_0
         )
         if matches_0:
-            file_path_tgt = self._search_dict[matches_0[0]]
+            file_path_tgt = self._search_dict[matches_0[-1]]
             directory_path_tgt, name_base_tgt, ext_tgt = StoragePathMtd.get_file_args(file_path_tgt)
             return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
         #
@@ -867,7 +874,7 @@ class StgFileSearchOpt(object):
                 file_path_keys, match_pattern_1
             )
             if matches_1:
-                file_path_tgt = self._search_dict[matches_1[0]]
+                file_path_tgt = self._search_dict[matches_1[-1]]
                 directory_path_tgt, name_base_tgt, ext_tgt = StoragePathMtd.get_file_args(file_path_tgt)
                 return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
 
@@ -2444,6 +2451,14 @@ class DictMtd(object):
         dic = collections.OrderedDict()
         keys = dict_.keys()
         keys.sort()
+        for i_key in keys:
+            dic[i_key] = dict_[i_key]
+        return dic
+    @classmethod
+    def set_string_key_sort_to(cls, dict_):
+        dic = collections.OrderedDict()
+        keys = dict_.keys()
+        keys = TextsMtd.set_sort_to(keys)
         for i_key in keys:
             dic[i_key] = dict_[i_key]
         return dic
@@ -5054,13 +5069,12 @@ class RvioOpt(object):
 
 
 if __name__ == '__main__':
-    EnvironMtd.set(
-        'OCIO', '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
+    o = StgFileSearchOpt()
+    o.set_search_directories(
+        ['/l/prod/cgm/work/assets/env/builds_cc/srf/surfacing/texture/outsource']
     )
-    OiioMtd.set_color_space_convert_to(
-        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/bl_duanf_f_body.diff_clr.1001.exr',
-        '/l/prod/cgm/work/assets/chr/bl_duanf_f/srf/surfacing/texture/outsource/v005/aces/bl_duanf_f_body.diff_clr.1001.exr',
-        'Utility - Linear - sRGB',
-        'ACES - ACEScg'
+
+    print o.get_result(
+        'boli_all_.normal.exr'
     )
 

@@ -96,6 +96,11 @@ parameters:
         value: 0.0
         tool_tip: '...'
 
+    rotations/directions:
+        widget: string
+        value: '1,1'
+        tool_tip: '...'
+
     rotations/frame_ranges:
         widget: string
         value: '1-120,121-240'

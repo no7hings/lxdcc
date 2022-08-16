@@ -424,9 +424,12 @@ if __name__ == '__main__':
     # ).get_all_group_data()
     #
 
+    # print PathGroupPermission(
+    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/nn_4y.srf.surfacing.v051'
+    # ).get_all_group_data()
 
     print PathGroupPermission(
-        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/nn_4y.srf.surfacing.v051'
+        '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v023'
     ).get_all_group_data()
 
     # files = bsc_core.DirectoryMtd.get_all_file_paths(

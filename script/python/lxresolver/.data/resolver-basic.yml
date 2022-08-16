@@ -194,9 +194,10 @@ asset-work-look-yml-file: <asset-work-look-dir>/all.yml
 asset-work-texture-workspace-file: <asset-task-dir>/texture/workspace.yml
 #
 asset-work-texture-base-dir: <asset-task-dir>/textue-base
-asset-work-texture-dir: <asset-task-dir>/texture/<variant>/<version-name>
-asset-work-texture-src-dir: <asset-work-texture-dir>/src
-asset-work-texture-tx-dir: <asset-work-texture-dir>/tx
+asset-work-texture-dir: <asset-task-dir>/texture/<variant>
+asset-work-texture-version-dir: <asset-task-dir>/texture/<variant>/<version-name>
+asset-work-texture-src-dir: <asset-work-texture-version-dir>/src
+asset-work-texture-tx-dir: <asset-work-texture-version-dir>/tx
 #
 asset-work-set-dir: <asset-task-dir>/set/scene/<version-name>
 asset-work-set-usd-all-file: <asset-work-set-dir>/all.usda

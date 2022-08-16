@@ -1,8 +1,6 @@
 # coding:utf-8
 import os
 
-import copy
-
 from urllib import quote, unquote
 
 import platform
@@ -14,24 +12,24 @@ import subprocess
 import getpass
 
 
-def main(file, movie_file, description):
+def main(file, movie_file='', description=''):
     user = getpass.getuser()
 
-    env = os.environ
-    copy.copy(os.environ)
+    env = dict(os.environ)
+    env = {str(k): str(v) for k, v in env.items()}
     env['REZ_BETA'] = '1'
 
     description = quote(description.encode('utf-8'))
     description = description.replace('%', r'///')
 
-    cmd = r'rez-env lxdcc -c "lxhook-command -o \"option_hook_key=rsv-task-batchers/asset/gen-rig-export&choice_scheme=asset-maya-publish&file={file}&movie_file={movie_file}&user={user}&description={description}&td_enable={td_enable}&rez_beta={rez_beta}&deadline_enable={deadline_enable}\""'.format(
+    cmd = r'rez-env lxdcc -c "lxhook-command -o \"option_hook_key=rsv-task-batchers/asset/gen-model-export-extra&choice_scheme=asset-maya-publish&file={file}&movie_file={movie_file}&user={user}&description={description}&td_enable={td_enable}&rez_beta={rez_beta}&deadline_enable={deadline_enable}\""'.format(
         file=file,
         description=description,
         user=user,
         movie_file=movie_file,
         td_enable=False,
         rez_beta=True,
-        deadline_enable=True
+        deadline_enable=True,
     )
 
     cmd = cmd.decode(locale.getdefaultlocale()[1])
@@ -83,8 +81,5 @@ def main(file, movie_file, description):
 
 if __name__ == '__main__':
     main(
-        file='/l/prod/cgm/work/assets/chr/ext_woodpecker/rig/rigging/maya/scenes/ext_woodpecker.rig.rigging.v001.ma',
-        description=u'测试',
-        # description = 'td_test'
-        movie_file='/l/prod/cgm/publish/assets/chr/bl_xiz_f/rig/rigging/bl_xiz_f.rig.rigging.v014/review/bl_xiz_f.rig.rigging.v014.mov',
+        file='l:/prod/cgm/work/assets/chr/td_test/mod/modeling/maya/scenes/td_test.mod.modeling.v017.ma',
     )

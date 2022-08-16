@@ -158,15 +158,10 @@ class AbsFileReferences(object):
         'osl_file_path': _mya_dcc_obj_obj.TextureReference,
         'osl_window_box': _mya_dcc_obj_obj.TextureReference,
         'osl_window_box_s': _mya_dcc_obj_obj.TextureReference,
-
+        #
+        'aiJiWindowBoxArnold': _mya_dcc_obj_obj.TextureReference,
     }
     #
-    CUSTOM_SEARCH_KEYS = [
-        'gpuCache.cacheFileName',
-        'AlembicNode.abc_File',
-        'aiVolume.filename',
-        'aiMaterialx.filename'
-    ]
     PORT_QUERY_DICT = {
         'file': ['fileTextureName'],
         'aiImage': ['filename'],
@@ -179,8 +174,11 @@ class AbsFileReferences(object):
         #
         'osl_file_path': ['filename'],
         'osl_window_box': ['filename'],
-        'osl_window_box_s': ['filename']
+        'osl_window_box_s': ['filename'],
+        #
+        'aiJiWindowBoxArnold': ['filename'],
     }
+    #
     PORT_PATHSEP = ma_configure.Util.PORT_PATHSEP
     #
     OPTION = dict(
@@ -434,9 +432,12 @@ class TextureReferences(AbsFileReferences):
     INCLUDE_TYPES = [
         'file',
         'aiImage',
+        #
         'osl_file_path',
         'osl_window_box',
-        'osl_window_box_s'
+        'osl_window_box_s',
+        #
+        'aiJiWindowBoxArnold',
     ]
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)

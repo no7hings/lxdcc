@@ -159,12 +159,17 @@ class AbsHookExecutor(object):
                 )
         return self._ddl_submiter.get_job_result()
 
-    def set_run_with_shell(self):
+    def set_run_with_shell(self, block=False):
         cmd = self.get_shell_command()
         #
-        utl_core.SubProcessRunner.set_run_with_result_use_thread(
-            cmd
-        )
+        if block is True:
+            utl_core.SubProcessRunner.set_run_with_result(
+                cmd
+            )
+        else:
+            utl_core.SubProcessRunner.set_run_with_result_use_thread(
+                cmd
+            )
 
     def set_run(self):
         return self.set_run_with_deadline()

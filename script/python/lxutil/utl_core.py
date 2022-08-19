@@ -591,7 +591,6 @@ class Icon(object):
         glob_pattern = '{}/{}.*'.format(cls.ROOT_PATH, icon_name)
         results = glob.glob(glob_pattern) or []
         if results:
-
             return bsc_core.StoragePathOpt(results[-1]).get_path()
     @classmethod
     def get_katana_obj(cls):

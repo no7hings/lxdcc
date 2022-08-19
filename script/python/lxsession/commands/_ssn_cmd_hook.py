@@ -217,12 +217,13 @@ def set_option_hook_execute(option):
         return session
 
 
-def set_option_hook_execute_by_shell(option):
+def set_option_hook_execute_by_shell(option, block=False):
     hook_args = get_option_hook_args(option)
     if hook_args is not None:
         session, execute_fnc = hook_args
         #
-        session.set_execute_by_shell()
+        session.set_execute_by_shell(block)
+        return session
 
 
 def set_option_hook_execute_by_deadline(option):

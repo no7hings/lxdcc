@@ -9,13 +9,9 @@ from lxutil import utl_configure, utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxusd.fnc.exporters as usd_fnc_exporters
-
 from lxutil.fnc import utl_fnc_obj_abs
 
 import lxresolver.commands as rsv_commands
-
-from lxusd import usd_core
 
 from lxutil.rsv import utl_rsv_obj_abstract
 
@@ -106,6 +102,8 @@ class RsvUsdAssetSetCreator(object):
             return bsc_objects.Content(value={})
     @classmethod
     def _get_shot_asset_dict_(cls, rsv_asset, rsv_shot):
+        from lxusd import usd_core
+
         dict_ = collections.OrderedDict()
 
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
@@ -185,6 +183,8 @@ class RsvUsdAssetSetCreator(object):
         return lis
     @classmethod
     def _get_shot_frame_range_(cls, rsv_shot):
+        from lxusd import usd_core
+
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         if shot_set_dress_usd_file_path:
             return usd_core.UsdStageOpt(
@@ -315,6 +315,8 @@ class RsvUsdAssetSetCreator(object):
         return cls._get_usd_file_variant_dict_(usd_file_path)
     @classmethod
     def _get_usd_file_variant_dict_(cls, usd_file_path):
+        from lxusd import usd_core
+
         c = bsc_objects.Configure(value=collections.OrderedDict())
         usd_stage_opt = usd_core.UsdStageOpt(usd_file_path)
         usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
@@ -347,6 +349,8 @@ class RsvUsdAssetSetCreator(object):
         return c.value
     @classmethod
     def _get_usd_variant_dict_(cls, rsv_asset, rsv_scene_properties, asset_usd_file_path):
+        from lxusd import usd_core
+
         c = bsc_objects.Configure(value=collections.OrderedDict())
         cur_step = rsv_scene_properties.get('step')
         cur_key = cls.STEP_MAPPER[cur_step]
@@ -525,6 +529,8 @@ class RsvUsdAssetSetCreator(object):
         return asset_set_usd_file_path
     @classmethod
     def _set_asset_shot_usd_file_create_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
+        from lxusd import usd_core
+
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         if shot_set_dress_usd_file_path:
             asset_shot_set_usd_file_path = cls._get_asset_shot_usd_file_path_(
@@ -588,6 +594,8 @@ class RsvUsdShotSetCreator(object):
         self._rsv_shot = rsv_shot
     @classmethod
     def get_effect_component_paths(cls, usd_file_path):
+        from lxusd import usd_core
+
         paths = usd_core.UsdStageOpt(
             usd_file_path
         ).set_obj_paths_find(
@@ -612,6 +620,8 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._rsv_task = rsv_task
 
     def _set_geometry_uv_map_create_at_(self, var_name):
+        import lxusd.fnc.exporters as usd_fnc_exporters
+        #
         root = self.get('root')
         work_asset_geometry_var_file_unit = self._rsv_task.get_rsv_unit(
             keyword='asset-work-geometry-usd-var-file'

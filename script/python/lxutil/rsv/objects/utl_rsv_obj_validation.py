@@ -11,7 +11,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxshotgun.operators as stg_operators
         #
-        check_group = 'shotgun'
+        check_group = 'Shotgun'
         #
         root = self._rsv_scene_properties.get('dcc.root')
         geometry_location = '/root/world/geo'
@@ -45,7 +45,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxkatana.fnc.comparers as ktn_fnc_comparers
         #
-        check_group = 'geometry topology'
+        check_group = 'Geometry Topology'
         #
         root = self._rsv_scene_properties.get('dcc.root')
         sub_root = '{}/hi'.format(root)
@@ -130,7 +130,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-        check_group = 'geometry uv-map'
+        check_group = 'Geometry UV-map'
         #
         root = self._rsv_scene_properties.get('dcc.root')
         sub_root = '{}/hi'.format(root)
@@ -194,7 +194,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         root = self._rsv_scene_properties.get('dcc.root')
 
-        check_group = 'texture'
+        check_group = 'Texture'
         #
         dcc_texture_references = ktn_dcc_objects.TextureReferences()
         location = root
@@ -312,16 +312,16 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        check_group = 'scene'
+        check_group = 'Scene'
         #
         root = self._rsv_scene_properties.get('dcc.root')
         geometry_location = '/root/world/geo'
         #
         location = '{}{}'.format(geometry_location, root)
         #
-        file_path = ktn_dcc_objects.Scene.get_current_file_path()
-        if ktn_dcc_objects.Scene.get_scene_is_dirty():
-            if ktn_core._get_is_ui_mode_() is True:
+        if ktn_core._get_is_ui_mode_() is True:
+            file_path = ktn_dcc_objects.Scene.get_current_file_path()
+            if ktn_dcc_objects.Scene.get_scene_is_dirty():
                 w = utl_core.DialogWindow.set_create(
                     label='Save',
                     content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
@@ -337,10 +337,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     status=utl_core.DialogWindow.ValidatorStatus.Warning
                 )
                 #
-                result = w.get_result()
-                if result is True:
-                    pass
-                else:
+                if not w.get_result():
                     validator.set_obj_files_error_register(
                         location,
                         [file_path],
@@ -348,5 +345,3 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         check_group=check_group,
                         check_status='error',
                     )
-            else:
-                pass

@@ -23,8 +23,8 @@ class Obj(
         return 'tag'
     @property
     def icon(self):
-        from lxutil_gui.qt import utl_gui_qt_core
-        return utl_gui_qt_core.QtUtilMtd.get_qt_icon(self.type)
+        from lxutil_gui import utl_gui_core
+        return utl_gui_core.RscIconFile.get('node')
 
     def _set_dag_create_(self, path):
         pass

@@ -15,6 +15,8 @@ from lxobj import obj_abstract
 
 from lxutil import utl_core
 
+from lxutil_gui import utl_gui_core
+
 import lxutil.configures as utl_configures
 
 
@@ -157,7 +159,9 @@ class AbsOsFile(
     @property
     def icon(self):
         if self.ext:
-            return utl_core.FileIcon.get_by_file_ext(self.ext)
+            _ = utl_core.FileIcon.get_by_file_ext(self.ext)
+            if _:
+                return _
         return utl_core.FileIcon.get_default()
     @property
     def file_path(self):

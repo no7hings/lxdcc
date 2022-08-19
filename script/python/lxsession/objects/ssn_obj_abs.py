@@ -425,9 +425,9 @@ class AbsSsnOptionExecuteDef(object):
     def get_ddl_job_id(self):
         return self._ddl_job_id
 
-    def set_execute_by_shell(self):
+    def set_execute_by_shell(self, block=False):
         executor = self.get_executor()
-        executor.set_run_with_shell()
+        executor.set_run_with_shell(block)
 
 
 class AbsToolPanelSession(AbsSsnObj):
@@ -579,9 +579,9 @@ class AbsSsnShellExecuteDef(object):
             self
         )
 
-    def set_execute_by_shell(self):
+    def set_execute_by_shell(self, block=False):
         executor = self.get_executor()
-        executor.set_run_with_shell()
+        executor.set_run_with_shell(block)
 
     def __set_execute_option_completion_(self):
         hook_engine = self.configure.get('hook_option.engine')
@@ -735,53 +735,75 @@ class AbsSsnRsvDef(object):
 
 
 class Validator(object):
-    def __init__(self):
-        self._error_objs = []
-        self._content = bsc_objects.Content(
-            value=collections.OrderedDict()
-        )
+    def __init__(self, session):
+        self._session = session
+        self._results = []
 
     def set_obj_error_register(self, obj_path, description, check_group, check_status='error'):
-        self._content.set_element_add(
-            check_status,
+        self._results.append(
             dict(
                 type='node',
                 node=obj_path,
                 elements=[],
                 description=description,
                 group=check_group,
+                status=check_status,
             )
         )
 
     def set_obj_files_error_register(self, obj_path, file_paths, description, check_group, check_status='error'):
-        self._content.set_element_add(
-            check_status,
+        self._results.append(
             dict(
                 type='file',
                 node=obj_path,
                 elements=file_paths,
                 description=description,
                 group=check_group,
+                status=check_status,
             )
         )
 
     def set_obj_components_error_register(self, obj_path, components, description, check_group, check_status='error'):
-        self._content.set_element_add(
-            check_status,
+        self._results.append(
             dict(
                 type='component',
                 node=obj_path,
                 elements=components,
                 description=description,
                 group=check_group,
+                status=check_status,
             )
         )
 
-    def get_content(self):
-        return self._content
+    def get_results(self):
+        result_file_path = self.get_save_file()
+        return bsc_core.StorageFileOpt(
+            result_file_path
+        ).set_read()
 
-    def __str__(self):
-        return self._content.__str__()
+    def set_clear(self):
+        self._results = []
+
+    def get_save_file(self):
+        file_path = self._session.option_opt.get('file')
+        return bsc_core.TemporaryYamlMtd.get_file_path(
+            file_path, 'asset-validator'
+        )
+
+    def set_results_save(self):
+        result_file_path = self.get_save_file()
+        bsc_core.StorageFileOpt(
+            result_file_path
+        ).set_write(
+            self._results
+        )
+
+    def get_is_passed(self):
+        for i in self._results:
+            i_status = i['status']
+            if i_status == 'error':
+                return False
+        return True
 
 
 # session for rsv task deadline job
@@ -821,7 +843,7 @@ class AbsSsnRsvTaskOptionMethod(
         # print self.get_option_opt()
         # print self.get_option()
 
-        self._validator = Validator()
+        self._validator = Validator(self)
 
     def _set_system_option_completion_(self):
         option_opt = self.get_option_opt()

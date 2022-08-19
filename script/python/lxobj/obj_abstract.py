@@ -1129,6 +1129,9 @@ class AbsObjGuiDef(object):
     @property
     def path(self):
         raise NotImplementedError()
+    @property
+    def name(self):
+        raise NotImplementedError()
     #
     def get_path_prettify(self):
         p = self.path
@@ -1145,12 +1148,14 @@ class AbsObjGuiDef(object):
         else:
             return p
 
-    def get_path_prettify_(self, maximum=32):
+    def get_path_prettify_(self, maximum=18):
         p = self.path
+        n = self.name
         #
-        c = len(p)
+        d = p[:-len(n)-1]
+        c = len(d)
         if c > maximum:
-            return u'{}...{}'.format(p[:(int(maximum/2)-3)], p[-(int(maximum/2)):])
+            return u'{}...{}/{}'.format(d[:(int(maximum/2)-3)], d[-(int(maximum/2)):], n)
         return p
 
     def set_gui_attribute(self, key, value):

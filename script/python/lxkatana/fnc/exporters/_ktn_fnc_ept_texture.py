@@ -19,7 +19,8 @@ class TextureExporter(
     OPTION = {
         FIX_NAME_BLANK: False,
         USE_TX: False,
-        WITH_REFERENCE: True
+        WITH_REFERENCE: True,
+        'ignore_missing_texture': False,
     }
     def __init__(self, tgt_dir_path, src_dir_path, root=None, option=None):
         self._directory_path_dst = tgt_dir_path
@@ -95,5 +96,6 @@ class TextureExporter(
             fix_name_blank=fix_name_blank,
             use_tx=use_tx,
             with_reference=with_reference,
-            repath_fnc=texture_references.set_obj_repath_to
+            ignore_missing_texture=True,
+            repath_fnc=texture_references.set_obj_repath_to,
         )

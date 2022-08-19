@@ -976,16 +976,22 @@ class AssetWorkspace(object):
         return dcc_path
 
     def get_ng_material_force(self, dcc_path, pass_name='default'):
+        def get_exists_material():
+            pass
+        #
         configure = self.get_configure(pass_name)
         key = 'material'
         dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
-        dcc_parent = dcc_obj.get_parent()
-        _ktn_dcc_obj_node.Node('{}/NetworkMaterial'.format(dcc_parent.path)).set_rename(dcc_obj.name)
-        ktn_obj, is_create = dcc_obj.get_dcc_instance('NetworkMaterial')
-        if is_create is True:
+        #
+        dcc_nmc = dcc_obj.get_parent()
+        #
+        dcc_node = _ktn_dcc_obj_node.Node('{}/NetworkMaterial'.format(dcc_nmc.path)).set_rename(dcc_obj.name)
+        is_create = False
+        if dcc_node is not None:
+            is_create = True
             node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
             if node_attributes:
-                ktn_obj.setAttributes(node_attributes.value)
+                dcc_node.ktn_obj.setAttributes(node_attributes.value)
         return is_create, dcc_obj
 
     def get_ng_material_path(self, name, pass_name='default'):

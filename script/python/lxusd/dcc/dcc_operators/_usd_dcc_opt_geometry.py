@@ -226,15 +226,13 @@ class MeshOpt(
                 if i_uv_map_name != i_uv_map_name_new:
                     utl_core.Log.set_module_warning_trace(
                         'usd uv-map set',
-                        u'uv-map="{1}" in "{0}", auto convert to "{2}"'.format(
+                        u'uv-map="{1}" in "{0}" is not available, auto convert to "{2}"'.format(
                             self.path,
                             i_uv_map_name,
                             i_uv_map_name_new
                         )
                     )
                     i_uv_map_name = i_uv_map_name_new
-                #
-
                 #
                 i_uv_map_face_vertex_counts, i_uv_map_face_vertex_indices, i_uv_map_coords = v
                 if usd_mesh.HasPrimvar(i_uv_map_name) is False:

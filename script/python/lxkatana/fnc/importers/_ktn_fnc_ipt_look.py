@@ -257,7 +257,6 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             is_material_create, dcc_material = self._workspace.get_ng_material_force(material_dcc_path, pass_name)
             if is_material_create is True:
                 self.__set_material_shaders_create_(and_material, dcc_material, dcc_material.ktn_obj, material_group_dcc_path)
-                #
                 dcc_material.set_source_objs_layout()
 
     def __set_material_shaders_create_(self, and_material, dcc_material, ktn_material, dcc_material_group_path):
@@ -282,7 +281,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         self._workspace.get_ng_shader_name(name=i_and_shader.name, pass_name=pass_name)
                     )
                     i_dcc_shader = ktn_dcc_objects.Node(i_shader_dcc_path)
-                    i_ktn_shader, _ = i_dcc_shader.get_dcc_instance('ArnoldShadingNode')
+                    i_ktn_shader, is_create = i_dcc_shader.get_dcc_instance('ArnoldShadingNode')
                     #
                     i_dcc_shader.set_ktn_type(i_ktn_shader_type_name)
                     i_ktn_shader.checkDynamicParameters()
@@ -332,7 +331,12 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             i_ktn_node.checkDynamicParameters()
             #
             if i_and_node_type_name in ['image']:
-                i_dcc_node.set_expression('parameters.filename.value', '')
+                # remove katana event value
+                i_dcc_node.get_port(
+                    'parameters.filename.value'
+                ).ktn_port.setExpressionFlag(False)
+                #
+                i_dcc_node.set('parameters.ignore_missing_textures.value', 1)
             #
             self.__set_shader_ports_(i_and_source_node, i_dcc_node)
             #
@@ -340,7 +344,6 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         # connection
         and_connections = and_shader.get_all_source_connections()
         for i_and_connection in and_connections:
-            #
             i_and_source_node, i_and_target_node = (
                 i_and_connection.source_obj,
                 i_and_connection.target_obj

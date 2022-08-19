@@ -695,7 +695,7 @@ class AbsDotXgenDef(object):
 
 class AbsDccTextureExport(object):
     @classmethod
-    def _set_copy_as_src_(cls, directory_path_dst, directory_path_base, dcc_objs, fix_name_blank, use_tx, with_reference=False, repath_fnc=None):
+    def _set_copy_as_src_(cls, directory_path_dst, directory_path_base, dcc_objs, fix_name_blank, use_tx, with_reference=False, ignore_missing_texture=False, repath_fnc=None):
         if dcc_objs:
             copy_cache = []
             index_mapper = {}

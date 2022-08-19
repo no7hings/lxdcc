@@ -1,6 +1,7 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
 import collections
+
+import threading
 # noinspection PyUnresolvedReferences
 from Katana import NodegraphAPI, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration
 # noinspection PyUnresolvedReferences
@@ -372,6 +373,11 @@ class NGObjOpt(object):
     def get(self, key):
         return self.get_port_raw(key)
 
+    def set_expression(self, key, value):
+        port = self.ktn_obj.getParameter(key)
+        if port:
+            NGPortOpt(port).set_expression(value)
+
     def get_as_enumerate(self, key):
         port = self.ktn_obj.getParameter(key)
         if port:
@@ -486,6 +492,14 @@ class NGObjOpt(object):
         _ = self._ktn_obj.getOutputPort(port_path)
         if _ is None:
             self._ktn_obj.addOutputPort(port_path)
+
+    def get_parent(self):
+        return self._ktn_obj.getParent()
+
+    def get_parent_opt(self):
+        parent = self.get_parent()
+        if parent:
+            return self.__class__(parent)
 
 
 class NGGroupStackOpt(NGObjOpt):
@@ -696,6 +710,9 @@ class NGObjTypeOpt(object):
 
 
 class EventOpt(object):
+    class EventType(object):
+        NodeCreate = 'node_create'
+    #
     def __init__(self, handler, event_type):
         self._handler = handler
         self._event_type = event_type
@@ -786,10 +803,11 @@ class EventMethod(object):
         target = kwargs['portB']
         ktn_obj = target.getNode()
         ktn_obj_opt = NGObjOpt(ktn_obj)
-        if ktn_obj_opt.type == 'ArnoldShadingNode':
-            shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
-            if shader_type_name in ['ramp_rgb', 'ramp_float']:
-                cls.set_arnold_ramp_read(ktn_obj_opt)
+        if ktn_obj_opt:
+            if ktn_obj_opt.type == 'ArnoldShadingNode':
+                shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
+                if shader_type_name in ['ramp_rgb', 'ramp_float']:
+                    cls.set_arnold_ramp_read(ktn_obj_opt)
     @classmethod
     def set_port_disconnect(cls, *args, **kwargs):
         event_type, event_id = args
@@ -797,10 +815,11 @@ class EventMethod(object):
         target = kwargs['portB']
         ktn_obj = target.getNode()
         ktn_obj_opt = NGObjOpt(ktn_obj)
-        if ktn_obj_opt.type == 'ArnoldShadingNode':
-            shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
-            if shader_type_name in ['ramp_rgb', 'ramp_float']:
-                cls.set_arnold_ramp_read(ktn_obj_opt)
+        if ktn_obj_opt:
+            if ktn_obj_opt.type == 'ArnoldShadingNode':
+                shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
+                if shader_type_name in ['ramp_rgb', 'ramp_float']:
+                    cls.set_arnold_ramp_read(ktn_obj_opt)
     @classmethod
     def set_node_create(cls, *args, **kwargs):
         event_type, event_id = args
@@ -913,6 +932,131 @@ class EventMethod(object):
         for handler, event_type in ss:
             event_opt = EventOpt(handler=handler, event_type=event_type)
             event_opt.set_register()
+
+
+class ArnoldEventMtd(object):
+    N = 'texture_directory'
+    @classmethod
+    def set_material_create(cls, *args, **kwargs):
+        node_opt = NGObjOpt(kwargs['node'])
+        if node_opt.type == 'NetworkMaterialCreate':
+            cls._set_material_create_(node_opt)
+        elif node_opt.type == 'NetworkMaterial':
+            pass
+    @classmethod
+    def _set_material_create_(cls, node_opt):
+        """
+        # coding:utf-8
+        import lxkatana
+
+        lxkatana.set_reload()
+
+        from lxkatana import ktn_core
+
+        ktn_core.ArnoldEventMtd._set_material_create_(
+            ktn_core.NGObjOpt(
+                NodegraphAPI.GetNode('NetworkMaterialCreate')
+            )
+        )
+        :param node_opt:
+        :return:
+        """
+        def connect_fnc_():
+            _parent_opt = node_opt.get_parent_opt()
+            if _parent_opt:
+                if _parent_opt.get_port('user.Texture_Folder'):
+                    show_node_opt.set_expression('shaders.parameters.texture_directory', 'getParent().getParent().user.Texture_Folder')
+
+        show_node = cls._get_material_show_node_(node_opt)
+        show_node_opt = NGObjOpt(show_node)
+        p_ns = [
+            ('shaders.parameters.texture_directory', dict(widget='file', value='/texture_directory')),
+        ]
+        for i_p_n, i_p_r in p_ns:
+            if show_node_opt.get_port(i_p_n) is None:
+                NGMacro(show_node).set_parameter_create(
+                    i_p_n, i_p_r
+                )
+
+        connect_fnc_()
+    @classmethod
+    def _get_material_show_node_(cls, node_opt):
+        return [i for i in node_opt.get_children(['Material'])][0]
+    @classmethod
+    def set_image_create(cls, *args, **kwargs):
+        node_opt = NGObjOpt(kwargs['node'])
+        if node_opt.type == 'ArnoldShadingNode':
+            if node_opt.get('nodeType') in ['image']:
+                cls._set_image_create_(node_opt)
+    @classmethod
+    def _set_image_create_(cls, node_opt):
+        """
+        # coding:utf-8
+        import lxkatana
+
+        lxkatana.set_reload()
+
+        from lxkatana import ktn_core
+
+        ktn_core.ArnoldEventMtd._set_image_create_(
+            ktn_core.NGObjOpt(
+                NodegraphAPI.GetNode('image')
+            )
+        )
+        :param node_opt:
+        :return:
+        """
+        def connect_fnc_():
+            _parent_opt = node_opt.get_parent_opt()
+            if _parent_opt:
+                _show_node = cls._get_material_show_node_(_parent_opt)
+                _show_node_opt = NGObjOpt(_show_node)
+                if _parent_opt.get('shaders.parameters.texture_directory'):
+                    node_opt.set_expression(
+                        'extra.texture_directory', 'getNode(\'{}\').shaders.parameters.texture_directory'.format(
+                            _show_node_opt.name
+                        )
+                    )
+
+        def post_connect_fnc_():
+            if not node_opt.get('extra.texture_directory'):
+                return False
+            #
+            if not node_opt.get('parameters.filename.value'):
+                node_opt.set(
+                    'parameters.filename.enable', 1
+                )
+                node_opt.set_expression(
+                    'parameters.filename.value', 'extra.texture_directory+\'/texture_name.<udim>.exr\''
+                )
+                #
+                node_opt.set(
+                    'parameters.ignore_missing_textures.enable', 1
+                )
+                node_opt.set(
+                    'parameters.ignore_missing_textures.value', 1
+                )
+                #
+                node_opt.set(
+                    'parameters.missing_texture_color.enable', 1
+                )
+                node_opt.set(
+                    'parameters.missing_texture_color.value', [.875, .275, 1, 1]
+                )
+        #
+        p_ns = [
+            ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
+        ]
+        for i_p_n, i_p_r in p_ns:
+            if node_opt.get_port(i_p_n) is None:
+                NGMacro(node_opt.ktn_obj).set_parameter_create(
+                    i_p_n, i_p_r
+                )
+        #
+        connect_fnc_()
+        #
+        timer = threading.Timer(1, post_connect_fnc_)
+        timer.start()
 
 
 class CallbackMethod(object):

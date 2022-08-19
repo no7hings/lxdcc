@@ -255,10 +255,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             #
             material_dcc_path = self._workspace.get_ng_material_path_use_hash(and_geometry_opt, pass_name)
             is_material_create, dcc_material = self._workspace.get_ng_material_force(material_dcc_path, pass_name)
-
-            self.__set_material_shaders_create_(and_material, dcc_material, dcc_material.ktn_obj, material_group_dcc_path)
-            #
-            dcc_material.set_source_objs_layout()
+            if is_material_create is True:
+                self.__set_material_shaders_create_(and_material, dcc_material, dcc_material.ktn_obj, material_group_dcc_path)
+                #
+                dcc_material.set_source_objs_layout()
 
     def __set_material_shaders_create_(self, and_material, dcc_material, ktn_material, dcc_material_group_path):
         convert_dict = {
@@ -330,6 +330,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             i_dcc_node.set_ktn_type(i_dcc_node_type_name)
             #
             i_ktn_node.checkDynamicParameters()
+            #
+            if i_and_node_type_name in ['image']:
+                i_dcc_node.set_expression('parameters.filename.value', '')
             #
             self.__set_shader_ports_(i_and_source_node, i_dcc_node)
             #

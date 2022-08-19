@@ -1,4 +1,6 @@
 # coding:utf-8
+import collections
+
 from lxbasic import bsc_core
 
 from lxutil import utl_core
@@ -180,6 +182,19 @@ class StgConnector(object):
     # tag/role
     def get_stg_role(self, **kwargs):
         pass
+    #
+    def get_stg_entity_(self, **kwargs):
+        pass
+
+    def get_shotgun_entities(self, shotgun_entity_kwargs):
+        list_ = []
+        _ = self._shotgun.find(**shotgun_entity_kwargs) or []
+        key_pattern = ','.join(map(lambda x: '{{{}}}'.format(x), shotgun_entity_kwargs.get('fields')))
+        for i in _:
+            i = {k: (v if v else 'N/a') for k, v in i.items()}
+            i_key = key_pattern.format(**i)
+            list_.append(i_key)
+        return list_
     # entity
     def get_stg_entity(self, **kwargs):
         """

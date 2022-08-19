@@ -498,6 +498,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         width, height = int(w*50*multipy), int(h*50*multipy)
         #
+        p = float(height) / float(width)
+        width = max(min(width, 4096), 512)
+        height = int(p * width)
+        #
         dcc_camera.set(
             'cameras.front.render_resolution', '{}x{}'.format(width, height)
         )

@@ -446,10 +446,42 @@ class UsdTransformOpt(object):
         )
 
 
+class _Basic(object):
+    @classmethod
+    def _get_int_array_(cls, usd_int_array):
+        return list(usd_int_array)
+    @classmethod
+    def _get_point_array_(cls, usd_point_array):
+        return [tuple(i) for i in usd_point_array]
+    @classmethod
+    def _get_coord_array_(cls, usd_coord_array):
+        return [tuple(i) for i in usd_coord_array]
+    @classmethod
+    def _get_matrix_(cls, usd_matrix):
+        lis = []
+        for row in usd_matrix:
+            for column in row:
+                lis.append(column)
+        return lis
+    @classmethod
+    def _get_usd_matrix_(cls, matrix):
+        lis = []
+        for i in range(4):
+            rows = []
+            for j in range(4):
+                rows.append(matrix[i * 4 + j])
+            lis.append(rows)
+        #
+        return Gf.Matrix4d(lis)
+
+
 class UsdGeometryOpt(object):
     def __init__(self, usd_prim):
         self._usd_prim = usd_prim
         self._usd_geometry = UsdGeom.Imageable(self._usd_prim)
+
+    def get_path(self):
+        return self._usd_prim.GetPath().pathString
 
     def set_customize_port_create(self, port_path, dcc_type, dcc_value):
         usd_type, usd_value = UsdDataMapper(dcc_type, dcc_value).get_usd_args()
@@ -525,6 +557,57 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
 
     def get_bounding_box(self):
         b_box = self._usd_mesh.ComputeExtent()
+
+    def get_face_vertex_counts(self):
+        usd_mesh = self._usd_mesh
+        a = usd_mesh.GetFaceVertexCountsAttr()
+        if a.GetNumTimeSamples():
+            v = a.Get(0)
+        else:
+            v = a.Get()
+        if v:
+            return _Basic._get_int_array_(v)
+        return []
+
+    def get_face_vertex_indices(self):
+        a = self._usd_mesh.GetFaceVertexIndicesAttr()
+        if a.GetNumTimeSamples():
+            v = a.Get(0)
+        else:
+            v = a.Get()
+        if v:
+            return _Basic._get_int_array_(v)
+        return []
+    def get_uv_map_names(self):
+        lis = []
+        usd_mesh = self._usd_mesh
+        usd_primvars = usd_mesh.GetAuthoredPrimvars()
+        for i_primvar in usd_primvars:
+            i_name = i_primvar.GetPrimvarName()
+            if i_primvar.GetIndices():
+                lis.append(i_name)
+        return lis
+
+    def get_uv_map(self, uv_map_name):
+        a = self._usd_mesh.GetPrimvar(uv_map_name)
+        uv_map_face_vertex_counts = self.get_face_vertex_counts()
+        return uv_map_face_vertex_counts, _Basic._get_int_array_(a.GetIndices()), a.Get()
+
+    def get_uv_map_coords(self, uv_map_name):
+        a = self._usd_mesh.GetPrimvar(uv_map_name)
+        return a.Get()
+
+    def get_uv_map_indices(self, uv_map_name):
+        a = self._usd_mesh.GetPrimvar(uv_map_name)
+        return _Basic._get_int_array_(a.GetIndices())
+
+    def get_uv_maps(self):
+        dic = {}
+        uv_map_names = self.get_uv_map_names()
+        for i_uv_map_name in uv_map_names:
+            uv_map = self.get_uv_map(i_uv_map_name)
+            dic[i_uv_map_name] = uv_map
+        return dic
 
 
 class UsdMeshOpt(object):

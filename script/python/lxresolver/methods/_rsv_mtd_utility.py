@@ -410,30 +410,8 @@ class PathGroupPermission(AbsPermission):
 
 
 if __name__ == '__main__':
-    # print bsc_core.StoragePathMtd.get_group_name('/l/prod/cgm/publish/assets/prp/balloon/srf/surfacing/texture/eye.spec_clr.1001.tx/V-R8VE9R-3PKW7.eye.spec_clr.1001.tx')
-    # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v022'
-    # ).get_all_group_data()
-
-    # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture'
-    # ).get_all_group_data()
-    #
-    # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/srf_cfxshading/texture'
-    # ).get_all_group_data()
-    #
-
-    # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/nn_4y.srf.surfacing.v051'
-    # ).get_all_group_data()
-
     print PathGroupPermission(
-        '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v023/texture/eye.diff_clr.1001.tx'
-    ).get_all_group_data()
-
-    print PathGroupPermission(
-        '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v022/cache/usd/uv_map.usd'
+        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/nn_4y.srf.surfacing.v056/texture/nn_4y.z_disp.1011.tx'
     ).get_all_group_data()
 
     # files = bsc_core.DirectoryMtd.get_all_file_paths(

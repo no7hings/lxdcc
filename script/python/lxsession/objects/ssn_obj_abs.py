@@ -1,6 +1,9 @@
 # coding:utf-8
 import collections
+
 import fnmatch
+
+from urllib import quote, unquote
 
 from lxbasic import bsc_configure, bsc_core
 
@@ -731,6 +734,56 @@ class AbsSsnRsvDef(object):
     resolver = property(get_resolver)
 
 
+class Validator(object):
+    def __init__(self):
+        self._error_objs = []
+        self._content = bsc_objects.Content(
+            value=collections.OrderedDict()
+        )
+
+    def set_obj_error_register(self, obj_path, description, check_group, check_status='error'):
+        self._content.set_element_add(
+            check_status,
+            dict(
+                type='node',
+                node=obj_path,
+                elements=[],
+                description=description,
+                group=check_group,
+            )
+        )
+
+    def set_obj_files_error_register(self, obj_path, file_paths, description, check_group, check_status='error'):
+        self._content.set_element_add(
+            check_status,
+            dict(
+                type='file',
+                node=obj_path,
+                elements=file_paths,
+                description=description,
+                group=check_group,
+            )
+        )
+
+    def set_obj_components_error_register(self, obj_path, components, description, check_group, check_status='error'):
+        self._content.set_element_add(
+            check_status,
+            dict(
+                type='component',
+                node=obj_path,
+                elements=components,
+                description=description,
+                group=check_group,
+            )
+        )
+
+    def get_content(self):
+        return self._content
+
+    def __str__(self):
+        return self._content.__str__()
+
+
 # session for rsv task deadline job
 class AbsSsnRsvTaskOptionMethod(
     AbsSsnOptionMethod,
@@ -767,6 +820,8 @@ class AbsSsnRsvTaskOptionMethod(
         #
         # print self.get_option_opt()
         # print self.get_option()
+
+        self._validator = Validator()
 
     def _set_system_option_completion_(self):
         option_opt = self.get_option_opt()
@@ -910,6 +965,9 @@ class AbsSsnRsvTaskOptionMethod(
         return self.EXECUTOR(
             self
         )
+
+    def get_validator(self):
+        return self._validator
 
 
 class AbsOptionRsvTaskBatcherSession(

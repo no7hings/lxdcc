@@ -2428,6 +2428,11 @@ class TextMtd(object):
     @classmethod
     def to_glob_pattern(cls, string):
         return re.sub(r'(\d)', '[0-9]', string)
+    @classmethod
+    def set_clear_up_to(cls, text):
+        return re.sub(
+            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
+        )
 
 
 class DictMtd(object):
@@ -5069,12 +5074,7 @@ class RvioOpt(object):
 
 
 if __name__ == '__main__':
-    o = StgFileSearchOpt()
-    o.set_search_directories(
-        ['/l/prod/cgm/work/assets/env/builds_cc/srf/surfacing/texture/outsource']
-    )
-
-    print o.get_result(
-        'taixinban.diff_clr.<udim>.exr'
+    print TextMtd.set_clear_up_to(
+        'map1'
     )
 

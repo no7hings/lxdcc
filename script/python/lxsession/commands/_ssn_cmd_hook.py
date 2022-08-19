@@ -83,6 +83,7 @@ def set_hook_execute(key):
     if hook_args is not None:
         session, execute_fnc = hook_args
         execute_fnc()
+        return session
 
 
 def get_option_hook_args(option):
@@ -213,6 +214,7 @@ def set_option_hook_execute(option):
     if hook_args is not None:
         session, execute_fnc = hook_args
         execute_fnc()
+        return session
 
 
 def set_option_hook_execute_by_shell(option):

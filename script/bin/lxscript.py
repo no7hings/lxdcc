@@ -59,6 +59,15 @@ def main():
 
 def set_script_run(project, engine, script, option):
     from lxutil import utl_core
+
+    from lxbasic import bsc_core
+
+    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    rez_beta = option_opt.get_as_boolean('rez_beta')
+    if rez_beta is True:
+        bsc_core.EnvironMtd.set(
+            'REZ_BETA', '1'
+        )
     # use maya python
     if engine == 'python':
         cmd_args = [

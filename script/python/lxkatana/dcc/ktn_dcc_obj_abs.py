@@ -611,6 +611,9 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
         if _ is None:
             self.ktn_obj.addOutputPort(port_path)
 
+    def set_expression(self, key, value):
+        self.get_port(key).set_expression(value)
+
 
 class AbsKtnObjs(utl_abstract.AbsDccObjs):
     def __init__(self, *args):

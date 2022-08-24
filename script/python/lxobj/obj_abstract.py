@@ -3478,17 +3478,15 @@ class AbsOsFile(
                     if bsc_core.StoragePathMtd.get_is_writeable(file_path_tgt) is True:
                         os.remove(file_tgt.path)
                         shutil.copy2(self.path, file_tgt.path)
-                        self.LOG.set_module_result_trace(
+                        return True, self.LOG.set_module_result_trace(
                             'file copy replace',
                             u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
                         )
-                        return
                     #
-                    self.LOG.set_module_error_trace(
+                    return False, self.LOG.set_module_error_trace(
                         'file copy replace',
                         u'file="{}" is not writeable'.format(file_tgt.path)
                     )
-                    return
             #
             if file_tgt.get_is_exists() is False:
                 file_tgt.set_directory_create()
@@ -3496,18 +3494,22 @@ class AbsOsFile(
                 try:
                     if self.get_is_readable() is True:
                         shutil.copy2(self.path, file_path_tgt)
-                        self.LOG.set_module_result_trace(
+                        return True, self.LOG.set_module_result_trace(
                             'file copy',
                             u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
                         )
-                    else:
-                        self.LOG.set_module_error_trace(
-                            'file copy',
-                            u'file="{}" is not readable'.format(self.path)
-                        )
+
+                    return False, self.LOG.set_module_error_trace(
+                        'file copy',
+                        u'file="{}" is not readable'.format(self.path)
+                    )
                 except:
                     bsc_core.ExceptionMtd.set_print()
-                    return self.path
+                    return False, self.LOG.set_module_error_trace(
+                        'file copy',
+                        u'file="{}" is exception'.format(self.path)
+                    )
+        return False, None
 
     def set_copy_to_directory(self, directory_path_tgt, replace=False):
         file_path_tgt = u'{}/{}'.format(

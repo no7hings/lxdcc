@@ -250,6 +250,26 @@ class StgVersionOpt(AbsStgObjOpt):
             'sg_model_version', stg_version
         )
 
+    def set_stg_notice_users_extend(self, stg_users):
+        self._stg_obj_query.set_stg_obj_extend(
+            'sg_custom_notice', stg_users
+        )
+
+    def set_stg_playlists_extend(self, stg_playlists):
+        self._stg_obj_query.set_stg_obj_extend(
+            'playlists', stg_playlists
+        )
+
+    def set_stg_last_version_update(self):
+        stg_version = self._stg_obj_query._stg_obj
+        task_id = stg_version.get('sg_task').get('id')
+        stg_connector = self._stg_obj_query._stg_connector
+        # link to Last Version
+        stg_connector._shotgun.update(
+            'Task', task_id,
+            {'sg_last_version': stg_version}
+        )
+
 
 class StgLookPassOpt(AbsStgObjOpt):
     def __init__(self, stg_obj_query):

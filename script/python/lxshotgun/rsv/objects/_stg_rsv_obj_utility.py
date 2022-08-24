@@ -1,6 +1,10 @@
 # coding:utf-8
 from urllib import quote, unquote
 
+import datetime
+
+import parse
+
 from lxbasic import bsc_core
 
 from lxutil import utl_core
@@ -95,10 +99,26 @@ class RsvStgTaskOpt(object):
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
 
-    def set_stg_version_create(self, version, version_type=None, version_status=None, movie_file=None, user=None, description=None):
+    def set_stg_version_create(
+        self,
+        version,
+        version_type=None,
+        version_status=None,
+        movie_file=None,
+        user=None,
+        description=None,
+        todo=None,
+        notice=None,
+        create_shotgun_playlists=False
+    ):
         branch = self._rsv_task.get('branch')
         stg_version_kwargs = self._rsv_task.properties.copy_value
         stg_version_kwargs['version'] = version
+        #
+        stg_task_query = self._stg_connector.get_stg_task_query(
+            **stg_version_kwargs
+        )
+        stg_task_opt = stg_operators.StgTaskOpt(stg_task_query)
         #
         stg_version_query = self._stg_connector.get_stg_version_query(
             **stg_version_kwargs
@@ -110,14 +130,16 @@ class RsvStgTaskOpt(object):
             stg_version_query = self._stg_connector.get_stg_version_query(
                 **stg_version_kwargs
             )
-
+        # task set last version
+        stg_task_opt.set_stg_last_version(stg_version_query.stg_obj)
+        # version
         stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
         #
         version_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='{}-version-dir'.format(branch)
         )
         version_directory_path = version_rsv_unit.get_result(version=version)
-
+        #
         stg_version_opt.set_folder(
             version_directory_path
         )
@@ -127,11 +149,11 @@ class RsvStgTaskOpt(object):
         #
         if version_status:
             stg_version_opt.set_stg_status(version_status)
-
+        #
         if user:
             stg_user = self._stg_connector.get_stg_user(user=user)
             stg_version_opt.set_stg_user(stg_user)
-
+        #
         if movie_file:
             movie_file_opt = bsc_core.StorageFileOpt(movie_file)
             if movie_file_opt.get_is_exists() is True:
@@ -141,18 +163,54 @@ class RsvStgTaskOpt(object):
                     'upload movie',
                     u'file="{}" is non-exists'.format(movie_file)
                 )
-
+        #
+        if todo:
+            stg_version_opt.set_stg_todo(todo)
+        #
         if description:
             # need unquote
-            description = description.replace('///', '%')
-            stg_version_opt.set_description(unquote(description))
-
-        stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
+            if '///' in description:
+                description = description.replace('///', '%')
+                stg_version_opt.set_description(unquote(description))
+            else:
+                stg_version_opt.set_description(description)
         #
+        if notice is not None:
+            ptn = '{sg_nickname};{email};{name}'
+            ns = []
+            for i in notice:
+                p = parse.parse(ptn, i)
+                if p:
+                    ns.append(p.named['sg_nickname'])
+                else:
+                    utl_core.Log.set_module_warning_trace(
+                        'shotgun version update',
+                        '"{}" is not available'.format(i)
+                    )
+            #
+            stg_users = self._stg_connector.get_stg_users(
+                sg_nickname=ns
+            )
+            stg_version_opt.set_stg_notice_users_extend(
+                stg_users
+            )
+        # batch tag
         stg_tag = self._stg_connector.get_stg_tag_force('td-batch')
         stg_version_opt.set_stg_tags_append(
             stg_tag
         )
+        #
+        if create_shotgun_playlists is True:
+            date_tag = datetime.datetime.now().strftime('%Y-%m-%d')
+            playlist = '{}-{}-Review'.format(
+                date_tag, stg_version_kwargs['step'].upper()
+            )
+            stg_playlist = self._stg_connector.get_stg_playlist_force(
+                playlist=playlist, **stg_version_kwargs
+            )
+            stg_version_opt.set_stg_playlists_extend(
+                [stg_playlist]
+            )
 
     def set_stg_description_update(self):
         pass

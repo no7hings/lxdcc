@@ -55,21 +55,6 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 #     '.tx'
 # )
 #
-
-
-# utl_dcc_objects.OsTexture(
-#     '/l/temp/td/dongchangbao/texture_base_test/exr/jiguang_cloth_mask.1001.1001.exr'
-# ).set_unit_copy_as_src(
-#     directory_path_src='/l/temp/td/dongchangbao/texture_base_test/base',
-#     directory_path_tgt='/l/temp/td/dongchangbao/texture_base_test/tgt'
-# )
-
-# utl_dcc_objects.OsTexture(
-#     '/l/temp/td/dongchangbao/texture_base_test/exr_0/jiguang_cloth_mask.1001.1001.exr'
-# ).set_unit_copy_as_src(
-#     directory_path_src='/l/temp/td/dongchangbao/texture_base_test/base',
-#     directory_path_tgt='/l/temp/td/dongchangbao/texture_base_test/tgt'
-# )
 #
 # utl_dcc_objects.OsTexture(
 #     '/l/temp/td/dongchangbao/texture_base_test/exr/jiguang_cloth_mask.<udim>.####.exr'

@@ -39,16 +39,38 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).set_stg_task_create()
 
     def set_version_create(self):
-        #
         rsv_task = self._rsv_task
         version = self._rsv_scene_properties.get('version')
         #
+        movie_file = self.get_exists_asset_review_mov_file()
+        #
         user = self._hook_option_opt.get('user')
         description = self._hook_option_opt.get('description')
+        version_type = self._hook_option_opt.get('version_type')
+        notice = None
+        version_status = None
+        extra_key = self._hook_option_opt.get('extra_key')
+        create_shotgun_playlists = self._hook_option_opt.get_as_boolean('create_shotgun_playlists')
+        if extra_key is not None:
+            extra_data = bsc_core.SessionMtd.get_extra_data(extra_key)
+            if extra_data:
+                description = extra_data.get('description')
+                notice = extra_data.get('notice')
+                #
+                version_type = extra_data.get('version_type')
+                version_status = extra_data.get('version_status')
+        #
         _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).set_stg_version_create(
             version=version,
             user=user,
-            description=description
+            movie_file=movie_file,
+            description=description,
+            notice=notice,
+            #
+            version_type=version_type,
+            version_status=version_status,
+            #
+            create_shotgun_playlists=create_shotgun_playlists
         )
 
     def set_qc_version_create(self):

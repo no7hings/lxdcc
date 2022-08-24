@@ -1,6 +1,8 @@
 # coding:utf-8
 import collections
 
+import datetime
+
 from lxbasic import bsc_core
 
 from lxutil import utl_core
@@ -103,9 +105,12 @@ class StgObjQuery(object):
         if new_id not in ids:
             stg_objs.append(stg_obj)
             self.set(
-                'tags',
+                key,
                 stg_objs
             )
+
+    def set_stg_obj_extend(self, key, stg_objs):
+        [self.set_stg_obj_append(key, i) for i in stg_objs]
 
     def get_storage_name(self):
         return self.get('tank_name')
@@ -189,11 +194,11 @@ class StgConnector(object):
     def get_shotgun_entities(self, shotgun_entity_kwargs):
         list_ = []
         _ = self._shotgun.find(**shotgun_entity_kwargs) or []
-        key_pattern = ','.join(map(lambda x: '{{{}}}'.format(x), shotgun_entity_kwargs.get('fields')))
+        key_pattern = ';'.join(map(lambda x: '{{{}}}'.format(x), shotgun_entity_kwargs.get('fields')))
         for i in _:
             i = {k: (v if v else 'N/a') for k, v in i.items()}
             i_key = key_pattern.format(**i)
-            list_.append(i_key)
+            list_.append(i_key.decode('utf-8'))
         return list_
     # entity
     def get_stg_entity(self, **kwargs):
@@ -445,11 +450,41 @@ class StgConnector(object):
                     ['login', 'is', kwargs['user']]
                 ]
             )
+        elif 'sg_nickname' in kwargs:
+            return self._shotgun.find_one(
+                entity_type='HumanUser',
+                filters=[
+                    ['sg_nickname', 'is', kwargs['sg_nickname']]
+                ]
+            )
 
     def get_stg_user_query(self, **kwargs):
         stg_obj = self.get_stg_user(**kwargs)
         if stg_obj:
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
+
+    def get_stg_users(self, **kwargs):
+        if 'id' in kwargs:
+            return self._shotgun.find(
+                entity_type='HumanUser',
+                filters=[
+                    ['id', 'in', kwargs['id']]
+                ]
+            )
+        elif 'user' in kwargs:
+            return self._shotgun.find(
+                entity_type='HumanUser',
+                filters=[
+                    ['login', 'in', kwargs['user']]
+                ]
+            )
+        elif 'sg_nickname' in kwargs:
+            return self._shotgun.find(
+                entity_type='HumanUser',
+                filters=[
+                    ['sg_nickname', 'in', kwargs['sg_nickname']]
+                ]
+            )
 
     def get_stg_version(self, **kwargs):
         if 'asset' in kwargs:
@@ -620,6 +655,37 @@ class StgConnector(object):
         )
         return _
 
+    def get_stg_playlist(self, **kwargs):
+        _ = self._shotgun.find_one(
+            entity_type='Playlist',
+            filters=[
+                ['code', 'is', kwargs['playlist']],
+                ['project', 'is', self.get_stg_project(**kwargs)],
+            ]
+        )
+        return _
+
+    def get_stg_playlist_force(self, **kwargs):
+        stg_obj = self.get_stg_playlist(**kwargs)
+        if stg_obj:
+            return stg_obj
+        return self.set_stg_playlist_create(**kwargs)
+
+    def set_stg_playlist_create(self, **kwargs):
+        name = kwargs['playlist']
+        _ = self._shotgun.create(
+            'Playlist',
+            dict(
+                code=name,
+                project=self.get_stg_project(**kwargs)
+            )
+        )
+        utl_core.Log.set_module_result_trace(
+            'shotgun entity create',
+            u'stg-playlist="{}"'.format(name)
+        )
+        return _
+
     def set_stg_version_movie_update(self, stg_version, movie_file_path):
         task_id = stg_version.get('sg_task').get('id')
         #
@@ -725,4 +791,14 @@ class StgConnector(object):
 
 
 if __name__ == '__main__':
-    pass
+    c = StgConnector()
+    _ = c.get_stg_playlist(
+        playlist='2022-08-23-SRF-Review', project='cgm'
+    )
+    stg_version_query = c.get_stg_version_query(
+        project='cgm', asset='td_test', step='srf', task='surfacing', version='v028'
+    )
+
+    stg_version_query.set_stg_obj_extend(
+        'playlists', [_]
+    )

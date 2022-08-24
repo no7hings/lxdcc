@@ -221,7 +221,7 @@ class AbsTextureReferences(object):
         #
         cls._set_real_file_path_(port, file_path)
     @classmethod
-    def _set_real_file_path_(cls, port, file_path):
+    def _set_real_file_path_(cls, port, file_path, remove_expression=False):
         file_path = str(file_path)
         parse_pattern = '\'{file}\'%{argument}'
         ktn_port = port.ktn_port
@@ -238,10 +238,18 @@ class AbsTextureReferences(object):
                         'texture repath',
                         u'attribute="{}", expression="{}"'.format(port.path, new_expression)
                     )
+            else:
+                if remove_expression is True:
+                    ktn_port.setExpressionFlag(False)
+                    ktn_port.setValue(
+                        file_path, 0
+                    )
         else:
             v = ktn_port.getValue(0)
             if not v == file_path:
-                ktn_port.setValue(file_path, 0)
+                ktn_port.setValue(
+                    file_path, 0
+                )
                 #
                 utl_core.Log.set_module_result_trace(
                     'texture repath',
@@ -258,18 +266,20 @@ class AbsTextureReferences(object):
         for i_obj in objs:
             i_obj_path = i_obj.path
             i_obj_type_name = i_obj.get_port('nodeType').get()
+            # filter by include type
             if self._get_obj_type_is_available_(i_obj_type_name) is False:
                 continue
-
+            #
             if isinstance(exclude_paths, (tuple, list)):
                 if i_obj_path in exclude_paths:
                     continue
-
+            # filter by include
             if isinstance(include_paths, (tuple, list)):
                 if i_obj_path not in include_paths:
                     continue
             #
             i_ktn_obj = i_obj.ktn_obj
+            # filter by bypassed
             if i_ktn_obj.isBypassed() is True:
                 continue
             #
@@ -297,9 +307,9 @@ class AbsTextureReferences(object):
         self._set_customize_update_(exclude_paths=exclude_paths, include_paths=include_paths)
         return self._raw.values()
     @classmethod
-    def set_obj_repath_to(cls, obj, port_path, file_path_new):
+    def set_obj_repath_to(cls, obj, port_path, file_path_new, remove_expression=False):
         cls._set_real_file_path_(
-            obj.get_port(port_path), file_path_new
+            obj.get_port(port_path), file_path_new, remove_expression
         )
 
 

@@ -50,6 +50,12 @@ def get_hook_args(key):
                     hook=key,
                     configure=configure
                 )
+            elif type_name == 'rsv-publisher':
+                session = ssn_objects.GuiSession(
+                    type=type_name,
+                    hook=key,
+                    configure=configure
+                )
             elif type_name == 'rsv-loader-test':
                 session = ssn_objects.GuiSession(
                     type=type_name,

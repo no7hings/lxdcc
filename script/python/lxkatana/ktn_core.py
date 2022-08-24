@@ -1011,7 +1011,7 @@ class ArnoldEventMtd(object):
             if _parent_opt:
                 _show_node = cls._get_material_show_node_(_parent_opt)
                 _show_node_opt = NGObjOpt(_show_node)
-                if _parent_opt.get('shaders.parameters.texture_directory'):
+                if _show_node_opt.get('shaders.parameters.texture_directory'):
                     node_opt.set_expression(
                         'extra.texture_directory', 'getNode(\'{}\').shaders.parameters.texture_directory'.format(
                             _show_node_opt.name

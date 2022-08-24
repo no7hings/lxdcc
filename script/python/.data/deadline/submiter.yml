@@ -72,6 +72,8 @@ output:
         OverrideTaskFailureDetection: True
         FailureDetectionTaskErrors: 2
         #
+        EnableAutoTimeout: False
+        #
         ExtraInfo0: <option.extra.platform>
         ExtraInfo1: ''
         ExtraInfo2: ''

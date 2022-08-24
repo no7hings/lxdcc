@@ -89,6 +89,8 @@ output:
         OverrideTaskFailureDetection: True
         FailureDetectionTaskErrors: 2
         #
+        EnableAutoTimeout: False
+        #
         ExtraInfo0: <option.extra.platform>
         ExtraInfo1: <option.extra.project>
         ExtraInfo2: <option.extra.workspace>

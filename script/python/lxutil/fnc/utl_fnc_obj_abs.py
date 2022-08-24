@@ -694,8 +694,29 @@ class AbsDotXgenDef(object):
 
 
 class AbsDccTextureExport(object):
+    MAPPER_DICT = {
+        '/l/prod': '[PG_PROJ_ROOT]',
+        'l:/prod': '[PG_PROJ_ROOT]',
+    }
     @classmethod
-    def _set_copy_as_src_(cls, directory_path_dst, directory_path_base, dcc_objs, fix_name_blank, use_tx, with_reference=False, ignore_missing_texture=False, repath_fnc=None):
+    def _set_texture_environ_map_(cls, file_path):
+        for k, v in cls.MAPPER_DICT.items():
+            if file_path.lower().startswith(k.lower()):
+                return v + file_path[len(k):]
+        return file_path
+    @classmethod
+    def _set_copy_as_src_(
+        cls,
+        directory_path_dst, directory_path_base,
+        dcc_objs,
+        fix_name_blank,
+        use_tx,
+        with_reference=False,
+        ignore_missing_texture=False,
+        remove_expression=False,
+        use_environ_map=False,
+        repath_fnc=None
+    ):
         if dcc_objs:
             copy_cache = []
             index_mapper = {}
@@ -768,8 +789,19 @@ class AbsDccTextureExport(object):
                             #
                             j_texture_dst = utl_dcc_objects.OsFile(j_texture_path_dst)
                             if j_texture_dst.get_exists_files_():
+                                # environ map
+                                if use_environ_map is True:
+                                    j_texture_path_dst_new = cls._set_texture_environ_map_(
+                                        j_texture_path_dst
+                                    )
+                                    if j_texture_path_dst_new != j_texture_path_dst:
+                                        j_texture_path_dst = j_texture_path_dst_new
+                                #
                                 repath_fnc(
-                                    i_dcc_obj, j_port_path, j_texture_path_dst
+                                    i_dcc_obj,
+                                    j_port_path,
+                                    j_texture_path_dst,
+                                    remove_expression,
                                 )
                                 utl_core.Log.set_module_result_trace(
                                     'texture repath',
@@ -780,3 +812,7 @@ class AbsDccTextureExport(object):
                                     'texture search',
                                     u'file="{}" is Non-exists'.format(j_texture_path_dst)
                                 )
+
+
+if __name__ == '__main__':
+    pass

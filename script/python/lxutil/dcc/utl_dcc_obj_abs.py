@@ -458,9 +458,17 @@ class AbsOsFile(
             time_tag = bsc_core.IntegerOpt(int(timestamp)).set_encode_to_36()
             size_tag = bsc_core.IntegerOpt(int(size)).set_encode_to_36()
             file_path_tgt = u'{}/{}'.format(directory_path_tgt, name)
-            file_path_src = u'{}/{}/V-{}-{}.{}'.format(directory_path_src, name, time_tag, size_tag, name)
+            file_path_dir_src = u'{}/{}'.format(directory_path_src, name)
+            file_path_name_src = u'V-{}-{}.{}'.format(time_tag, size_tag, name)
+            file_path_src = u'{}/{}'.format(file_path_dir_src, file_path_name_src)
+            file_path_copy_log_src = u'{}/.copy.log'.format(file_path_dir_src)
+            file_path_link_log_src = u'{}/.link.log'.format(file_path_dir_src)
             # copy to src
-            self.set_copy_to_file(file_path_src)
+            result, copy_log = self.set_copy_to_file(file_path_src)
+            # write log
+            if copy_log is not None:
+                utl_core.Log.set_log_write(file_path_copy_log_src, copy_log)
+            #
             file_tgt = self.__class__(file_path_tgt)
             if file_tgt.get_is_exists_file() is True:
                 if replace is True:
@@ -468,32 +476,40 @@ class AbsOsFile(
                         file_path_src, file_path_tgt,
                     ) is False:
                         os.remove(file_tgt.path)
+                        #
                         bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_tgt.path)
-                        utl_core.Log.set_module_result_trace(
+                        link_log = utl_core.Log.set_module_result_trace(
                             'link replace',
                             u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
                         )
-                        return
+                        utl_core.Log.set_log_write(
+                            file_path_link_log_src, link_log
+                        )
+                        return True, link_log
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    return False, utl_core.Log.set_module_warning_trace(
                         'link create',
                         u'file="{}" is exists'.format(file_path_tgt)
                     )
-                    return
             #
             if file_tgt.get_is_exists() is False:
                 file_tgt.set_directory_create()
                 # link src to target
                 bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_path_tgt)
-                utl_core.Log.set_module_result_trace(
+                link_log = utl_core.Log.set_module_result_trace(
                     'link create',
                     u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
                 )
+                utl_core.Log.set_log_write(
+                    file_path_link_log_src, link_log
+                )
+                return True, link_log
         else:
             utl_core.Log.set_warning_trace(
                 'file-src-copy',
                 'file-path"{}" not available'.format(self.path)
             )
+        return False, None
 
     def set_copy_as_src(self, directory_path_src, directory_path_tgt, fix_name_blank=False, replace=True):
         files = self.get_exists_files_()

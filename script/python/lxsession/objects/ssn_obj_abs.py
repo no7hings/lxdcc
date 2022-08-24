@@ -735,6 +735,10 @@ class AbsSsnRsvDef(object):
 
 
 class Validator(object):
+    class CheckStatus(object):
+        Error = 'error'
+        Warning = 'warning'
+
     def __init__(self, session):
         self._session = session
         self._results = []
@@ -776,22 +780,32 @@ class Validator(object):
         )
 
     def get_results(self):
-        result_file_path = self.get_save_file()
+        result_file_path = self._get_result_yaml_file_()
         return bsc_core.StorageFileOpt(
             result_file_path
         ).set_read()
 
-    def set_clear(self):
-        self._results = []
+    def get_exists_results(self):
+        result_file_path = self._get_result_yaml_file_()
+        self._results = bsc_core.StorageFileOpt(
+            result_file_path
+        ).set_read()
+        return self._results
 
-    def get_save_file(self):
+    def _get_result_yaml_file_(self):
         file_path = self._session.option_opt.get('file')
         return bsc_core.TemporaryYamlMtd.get_file_path(
             file_path, 'asset-validator'
         )
 
-    def set_results_save(self):
-        result_file_path = self.get_save_file()
+    def get_has_history(self):
+        pass
+
+    def set_results_restore(self):
+        self._results = []
+
+    def set_results_accept(self):
+        result_file_path = self._get_result_yaml_file_()
         bsc_core.StorageFileOpt(
             result_file_path
         ).set_write(

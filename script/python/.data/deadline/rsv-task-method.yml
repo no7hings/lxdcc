@@ -88,6 +88,8 @@ job:
         OverrideTaskFailureDetection: True
         FailureDetectionTaskErrors: 2
         #
+        EnableAutoTimeout: False
+        #
         ExtraInfo0: <method.extra.platform>
         ExtraInfo1: <method.extra.project>
         ExtraInfo2: <method.extra.workspace>

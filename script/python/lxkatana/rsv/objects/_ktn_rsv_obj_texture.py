@@ -59,5 +59,9 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ktn_fnc_exporters.TextureExporter(
             src_dir_path=texture_src_directory_path,
             tgt_dir_path=texture_tgt_directory_path,
-            option=dict(fix_name_blank=True, use_tx=False, with_reference=False)
+            option=dict(
+                fix_name_blank=True,
+                use_tx=False,
+                with_reference=False
+            )
         ).set_run()

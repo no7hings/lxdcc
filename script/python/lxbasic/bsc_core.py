@@ -466,6 +466,9 @@ class SystemMtd(object):
     def get_time_tag(cls):
         return datetime.datetime.now().strftime(cls.TIME_TAG_FORMAT)
     @classmethod
+    def get_time_tag_36(cls):
+        return IntegerOpt(int(time.time())).set_encode_to_36()
+    @classmethod
     def get_batch_tag(cls):
         pass
     @classmethod
@@ -1107,6 +1110,10 @@ class StorageFileOpt(StoragePathOpt):
             with open(self.path, 'w') as f:
                 f.write(raw)
 
+    def set_append(self, raw):
+        with open(self.path, 'w') as f:
+            f.write(raw)
+
     def set_read(self):
         if os.path.exists(self.path):
             if self.get_ext() in ['.json']:
@@ -1307,6 +1314,43 @@ class MultiplyFileNameMtd(object):
                     numbers[i], i_key, 1
                 )
             return new_file_name, map(int, numbers)
+
+    @classmethod
+    def _set_file_args_update_0_(cls, file_dict, file_opt, name_patterns):
+        for i_name_pattern in name_patterns:
+            i_enable = cls._set_file_args_update_1_(file_dict, file_opt, i_name_pattern)
+            if i_enable is True:
+                break
+    @classmethod
+    def _set_file_args_update_1_(cls, file_dict, file_opt, name_pattern):
+        if MultiplyPatternMtd.get_is_valid(name_pattern):
+            match_args = MultiplyFileNameMtd.get_match_args(
+                file_opt.name, name_pattern
+            )
+            if match_args:
+                file_name_, numbers = match_args
+                #
+                file_path_ = '{}/{}'.format(file_opt.directory_path, file_name_)
+                file_dict.setdefault(
+                    file_path_, []
+                ).append(file_opt.path)
+                return True
+        else:
+            if file_opt.get_is_match_name_pattern(name_pattern):
+                file_dict.setdefault(
+                    file_opt.path, []
+                ).append(file_opt.path)
+                return True
+        return False
+    @classmethod
+    def set_file_path_merge_to(cls, file_paths, name_patterns):
+        dict_ = collections.OrderedDict()
+        for i_file_path in file_paths:
+            i_file_opt = StorageFileOpt(i_file_path)
+            cls._set_file_args_update_0_(
+                dict_, i_file_opt, name_patterns
+            )
+        return dict_.keys()
 
 
 class DirectoryMtd(object):
@@ -2306,6 +2350,11 @@ class TimestampOpt(object):
             self.TIME_TAG_FORMAT,
             time.localtime(self._timestamp)
         )
+
+    def get_as_tag_36(self):
+        return IntegerOpt(
+            int(self._timestamp)
+        ).set_encode_to_36()
 
     def to_prettify(self):
         print self._timestamp
@@ -4121,6 +4170,23 @@ class SessionMtd(object):
                     'count of sep "." out of range'
                 )
         return tgt_key
+    @classmethod
+    def get_extra_file(cls, key):
+        directory_path = EnvironMtd.get_session_root()
+        region = UuidMtd.get_save_region(key)
+        return '{}/.session/extra/{}/{}{}'.format(
+            directory_path, region, key, '.yml'
+        )
+    @classmethod
+    def set_extra_data_save(cls, raw):
+        key = UuidMtd.get_new()
+        file_path = cls.get_extra_file(key)
+        StorageFileOpt(file_path).set_write(raw)
+        return key
+    @classmethod
+    def get_extra_data(cls, key):
+        file_path = cls.get_extra_file(key)
+        return StorageFileOpt(file_path).set_read()
 
 
 class VariablesMtd(object):
@@ -4183,9 +4249,9 @@ class FramesMtd(object):
 
 
 class ParsePatternOpt(object):
-    def __init__(self, pattern):
+    def __init__(self, p):
         self._variants = {}
-        self._pattern = pattern
+        self._pattern = p
         self._fnmatch_pattern = ParsePatternMtd.get_as_fnmatch(
             self._pattern
         )
@@ -5058,7 +5124,7 @@ class RvioOpt(object):
 
     def set_convert_to_vedio(self):
         cmd_args = [
-            '/opt/rv/bin/rvio',
+            '/opt/rv/bin/rvio_hw',
             '{input}',
             '-vv',
             '-overlay frameburn .4 1.0 30.0',
@@ -5072,9 +5138,25 @@ class RvioOpt(object):
             ' '.join(cmd_args).format(**self._option)
         )
 
+    def set_image_convert_to_vedio(self):
+        cmd_args = [
+            '/opt/rv/bin/rvio_hw',
+            '{input}',
+            '-vv',
+            '-overlay frameburn .4 1.0 30.0',
+            # '-dlut "{lut_directory}"',
+            '-o "{output}"',
+            '-outparams comment="{comment}"',
+            '-quality {quality}',
+            '-copyright "©2013-2022 Papergames. All rights reserved."'
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**self._option)
+        )
+
 
 if __name__ == '__main__':
-    print TextMtd.set_clear_up_to(
-        'map1'
+    print MultiplyFileNameMtd.set_file_path_merge_to(
+        ['/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/beauty.1008.exr', '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/background.1082.exr'],
+        ['*.####.*']
     )
-

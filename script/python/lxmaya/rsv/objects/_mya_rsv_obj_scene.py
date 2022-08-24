@@ -633,7 +633,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def _set_shot_asset_rig_replace_(cls, namespace, file_path):
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if namespace in reference_dict:
-            root, obj = reference_dict[namespace]
+            namespace, root, obj = reference_dict[namespace]
             obj.set_replace(file_path)
         else:
             raise RuntimeError(

@@ -310,15 +310,15 @@ class RsvDccShotGeometryHookOpt(
             'hi',
             'shape',
             # 'hair',
-            'aux'
+            'aux',
         ]
         #
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if shot_asset in reference_dict:
-            root, obj = reference_dict[shot_asset]
+            namespace, root, obj = reference_dict[shot_asset]
             with utl_core.log_progress_bar(maximum=len(location_names), label='usd export') as l_p:
                 for i_location_name in location_names:
-                    i_location = '{}|{}:{}'.format(root, shot_asset, i_location_name)
+                    i_location = '{}|{}:{}'.format(root, namespace, i_location_name)
                     if mya_dcc_objects.Node(i_location).get_is_exists() is True:
                         i_file_path = '{}/{}.usd'.format(directory_path, i_location_name)
                         cls._set_usd_export_(
@@ -390,7 +390,7 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def _set_shot_xgen_export_(cls, shot_asset, directory_path, start_frame, end_frame):
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if shot_asset in reference_dict:
-            root, obj = reference_dict[shot_asset]
+            namespace, root, obj = reference_dict[shot_asset]
             cls._set_xgen_export_(root, directory_path, start_frame, end_frame)
         else:
             raise RuntimeError(

@@ -115,11 +115,13 @@ class References(mya_dcc_obj_abs.AbsMyaObjs):
     def get_reference_dict_(self):
         dict_ = {}
         for i_obj in self.get_custom_nodes():
-            i_obj_paths = i_obj.get_content_obj_paths()
-            if i_obj_paths:
-                i_root = i_obj_paths[0]
-                i_real_namespace = _mya_dcc_obj_obj.Node(i_root).get('pg_namespace')
-                dict_[i_real_namespace] = i_root, i_obj
+            if i_obj.get_is_loaded() is True:
+                i_obj_paths = i_obj.get_content_obj_paths()
+                if i_obj_paths:
+                    i_namespace = i_obj.get_namespace()
+                    i_root = i_obj_paths[0]
+                    i_shot_asset = _mya_dcc_obj_obj.Node(i_root).get('pg_namespace')
+                    dict_[i_shot_asset] = i_namespace, i_root, i_obj
         return dict_
 
 

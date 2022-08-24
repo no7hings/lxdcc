@@ -631,10 +631,18 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise RuntimeError()
     @classmethod
     def _set_shot_asset_rig_replace_(cls, namespace, file_path):
-        reference_dict = mya_dcc_objects.References().get_reference_dict()
+        reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if namespace in reference_dict:
-            obj = reference_dict[namespace][0]
+            root, obj = reference_dict[namespace]
             obj.set_replace(file_path)
+        else:
+            raise RuntimeError(
+                utl_core.Log.set_module_error_trace(
+                    'usd export',
+                    'namespace="{}" is non-exists'.format(namespace)
+                )
+            )
+    # TODO need support for pg_namespace
     @classmethod
     def get_shot_asset_dict(cls):
         dict_ = {}

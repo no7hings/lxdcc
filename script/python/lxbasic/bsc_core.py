@@ -642,8 +642,14 @@ class StoragePathMtd(object):
         path = cls.set_pathsep_cleanup(path)
         if StoragePathMtd.get_path_is_linux(path):
             src_root = path[:2]
-            _ = '/ifs/data/cgdata' + path[len(src_root):]
-            return _
+            if src_root == '/l':
+                _ = '/ifs/data/cgdata' + path[len(src_root):]
+                return _
+            elif src_root == '/t':
+                _ = '/hwshare001' + path[len(src_root):]
+                return _
+            else:
+                return path
     @classmethod
     def set_map_to_windows(cls, path):
         path = cls.set_pathsep_cleanup(path)

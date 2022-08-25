@@ -110,7 +110,7 @@ class SceneGraphOpt(object):
 
     def get_geometry_material_paths_by_location(self, location):
         lis = []
-        tvl = self._get_traversal_(self.GEOMETRY_ROOT+location)
+        tvl = self._get_traversal_(location)
         while tvl.valid():
             i_path = tvl.getLocationPath()
             i_attrs = tvl.getLocationData().getAttrs()
@@ -500,6 +500,11 @@ class NGObjOpt(object):
         parent = self.get_parent()
         if parent:
             return self.__class__(parent)
+
+    def set_attributes(self, attributes):
+        attributes_ = self._ktn_obj.getAttributes()
+        attributes_.update(attributes)
+        self._ktn_obj.setAttributes(attributes_)
 
 
 class NGGroupStackOpt(NGObjOpt):
@@ -1027,7 +1032,7 @@ class ArnoldEventMtd(object):
                     'parameters.filename.enable', 1
                 )
                 node_opt.set_expression(
-                    'parameters.filename.value', 'extra.texture_directory+\'/texture_name.<udim>.exr\''
+                    'parameters.filename.value', 'extra.texture_directory+\'/tx\'+\'/texture_name.<udim>.tx\''
                 )
                 #
                 node_opt.set(
@@ -1036,13 +1041,14 @@ class ArnoldEventMtd(object):
                 node_opt.set(
                     'parameters.ignore_missing_textures.value', 1
                 )
-                #
-                node_opt.set(
-                    'parameters.missing_texture_color.enable', 1
+            #
+            node_opt.set_attributes(
+                dict(
+                    ns_colorr=0.3199999928474426,
+                    ns_colorg=0.07999999821186066,
+                    ns_colorb=0.3199999928474426
                 )
-                node_opt.set(
-                    'parameters.missing_texture_color.value', [.875, .275, 1, 1]
-                )
+            )
         #
         p_ns = [
             ('extra.texture_directory', dict(widget='file', value='/texture_directory')),

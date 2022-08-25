@@ -743,7 +743,7 @@ class Validator(object):
         self._session = session
         self._results = []
 
-    def set_obj_error_register(self, obj_path, description, check_group, check_status='error'):
+    def set_node_result_register(self, obj_path, description, check_group, check_status='error'):
         self._results.append(
             dict(
                 type='node',
@@ -755,24 +755,24 @@ class Validator(object):
             )
         )
 
-    def set_obj_files_error_register(self, obj_path, file_paths, description, check_group, check_status='error'):
+    def set_node_components_result_register(self, obj_path, elements, description, check_group, check_status='error'):
         self._results.append(
             dict(
-                type='file',
+                type='component',
                 node=obj_path,
-                elements=file_paths,
+                elements=elements,
                 description=description,
                 group=check_group,
                 status=check_status,
             )
         )
 
-    def set_obj_components_error_register(self, obj_path, components, description, check_group, check_status='error'):
+    def set_node_files_result_register(self, obj_path, elements, description, check_group, check_status='error'):
         self._results.append(
             dict(
-                type='component',
+                type='file',
                 node=obj_path,
-                elements=components,
+                elements=elements,
                 description=description,
                 group=check_group,
                 status=check_status,

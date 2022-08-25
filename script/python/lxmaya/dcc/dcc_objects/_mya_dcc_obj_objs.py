@@ -113,6 +113,11 @@ class References(mya_dcc_obj_abs.AbsMyaObjs):
         return dict_
 
     def get_reference_dict_(self):
+        """
+        get dict for maya geometry export
+        use namespace of "pg_namespace" instance real namespace
+        :return:
+        """
         dict_ = {}
         for i_obj in self.get_custom_nodes():
             if i_obj.get_is_loaded() is True:

@@ -578,6 +578,7 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
         if v:
             return _Basic._get_int_array_(v)
         return []
+
     def get_uv_map_names(self):
         lis = []
         usd_mesh = self._usd_mesh
@@ -597,7 +598,10 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
         a = self._usd_mesh.GetPrimvar(uv_map_name)
         return a.Get()
 
-    def get_uv_map_indices(self, uv_map_name):
+    def get_uv_map_face_vertex_counts(self, uv_map_name):
+        return self.get_face_vertex_counts()
+
+    def get_uv_map_face_vertex_indices(self, uv_map_name):
         a = self._usd_mesh.GetPrimvar(uv_map_name)
         return _Basic._get_int_array_(a.GetIndices())
 

@@ -10,6 +10,8 @@ from lxmaya.dcc.dcc_objects import _mya_dcc_obj_utility, _mya_dcc_obj_dag
 
 from lxmaya.modifiers import _mya_mdf_utility
 
+from lxutil_gui import utl_gui_core
+
 
 class MeshComponent(utl_abstract.AbsObjGuiDef):
     PATHSEP = '.'
@@ -40,6 +42,42 @@ class MeshComponent(utl_abstract.AbsObjGuiDef):
     @property
     def icon(self):
         return utl_core.Icon.get('obj/{}'.format(self.type))
+
+    def __str__(self):
+        return '{}(type="{}", path="{}")'.format(
+            self.__class__.__name__,
+            self.type,
+            self.path
+        )
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class Component(utl_abstract.AbsObjGuiDef):
+    PATHSEP = '.'
+    TYPE_DICT = {
+        'f': 'face',
+        'e': 'edge',
+        'vtx': 'vertex'
+    }
+    def __init__(self, path):
+        self._path = path
+        self._name = self._path.split('.')[-1]
+        keyword = self.name.split('[')[0]
+        self._type = self.TYPE_DICT.get(keyword)
+    @property
+    def type(self):
+        return self._type
+    @property
+    def name(self):
+        return self._name
+    @property
+    def path(self):
+        return self._path
+    @property
+    def icon(self):
+        return utl_gui_core.RscIconFile.get('obj/{}'.format(self.type))
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(

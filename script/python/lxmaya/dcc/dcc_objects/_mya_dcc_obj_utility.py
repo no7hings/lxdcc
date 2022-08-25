@@ -53,14 +53,29 @@ class SceneFile(object):
         file_path = cls.get_current_file_path()
         return os.path.dirname(file_path)
     @classmethod
-    def set_open(cls, file_path=None):
-        cmds.file(
-            file_path,
-            open=1,
-            options='v=0',
-            force=1,
-            type=cls.get_type(file_path)
-        )
+    def set_open(cls, file_path=None, ignore_format=True):
+        """
+        :param file_path: str,
+        :param ignore_format: bool, etc. for save ".mb" but rename to ".ma"
+        :return:
+        """
+        if ignore_format is True:
+            cmds.file(
+                file_path,
+                open=1,
+                options='v=0',
+                force=1,
+                # type=cls.get_type(file_path)
+            )
+        else:
+            cmds.file(
+                file_path,
+                open=1,
+                options='v=0',
+                force=1,
+                type=cls.get_type(file_path)
+            )
+        #
         utl_core.Log.set_result_trace(
             u'open file: {}'.format(file_path)
         )

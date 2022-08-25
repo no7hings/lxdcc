@@ -410,28 +410,28 @@ class PathGroupPermission(AbsPermission):
 
 
 if __name__ == '__main__':
-    # print PathGroupPermission(
-    #     '/l/prod/cgm/publish/assets/prp/umbrella/srf/surfacing/umbrella.srf.surfacing.v048/cache/ass/umbrella.ass'
-    # ).get_all_group_data()
+    print PathGroupPermission(
+        '/t/prod/cgm/output/shots/x30/x30040/efx/efx_rnd/x30040.efx.efx_rnd.v000/cache/Release_BusBodyFragment/payload.usda'
+    ).get_all_group_data()
 
-    files = bsc_core.DirectoryMtd.get_all_file_paths(
-        '/l/prod/cgm/publish/assets/prp/umbrella/srf/surfacing/texture'
-    )
-    for i in files:
-        i_group_data = PathGroupPermission(
-            i
-        ).get_all_group_data()
-        #
-        if not 'eye.' in i:
-            if 'coop_grp' not in i_group_data:
-                PathGroupPermission(
-                    i
-                ).set_allow(
-                    'coop_grp'
-                )
-            if 'cg_group' not in i_group_data:
-                PathGroupPermission(
-                    i
-                ).set_allow(
-                    'cg_group'
-                )
+    # files = bsc_core.DirectoryMtd.get_all_file_paths(
+    #     '/l/prod/cgm/publish/assets/prp/umbrella/srf/surfacing/texture'
+    # )
+    # for i in files:
+    #     i_group_data = PathGroupPermission(
+    #         i
+    #     ).get_all_group_data()
+    #     #
+    #     if not 'eye.' in i:
+    #         if 'coop_grp' not in i_group_data:
+    #             PathGroupPermission(
+    #                 i
+    #             ).set_allow(
+    #                 'coop_grp'
+    #             )
+    #         if 'cg_group' not in i_group_data:
+    #             PathGroupPermission(
+    #                 i
+    #             ).set_allow(
+    #                 'cg_group'
+    #             )

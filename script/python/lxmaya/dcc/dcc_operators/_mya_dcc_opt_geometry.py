@@ -149,14 +149,18 @@ class MeshOpt(
         return [self.om2_obj.polygonVertexCount(i) for i in xrange(self.om2_obj.numPolygons)]
 
     def get_face_vertex_indices(self, reverse=False):
-        face_vertex_indices = []
-        for i_face_index in xrange(self.om2_obj.numPolygons):
-            om2_indices = self.om2_obj.getPolygonVertices(i_face_index)
-            indices = list(om2_indices)
-            if reverse is True:
-                indices.reverse()
-            face_vertex_indices.extend(indices)
-        return face_vertex_indices
+        om2_obj = self.om2_obj
+        if reverse is True:
+            face_vertex_indices = []
+            for i_face_index in xrange(om2_obj.numPolygons):
+                om2_indices = self.om2_obj.getPolygonVertices(i_face_index)
+                indices = list(om2_indices)
+                if reverse is True:
+                    indices.reverse()
+                face_vertex_indices.extend(indices)
+            return face_vertex_indices
+        face_vertex_counts, face_vertex_indices = om2_obj.getVertices()
+        return list(face_vertex_indices)
 
     def get_face_vertices(self, reverse=False):
         """
@@ -173,19 +177,22 @@ class MeshOpt(
                 )
             )
         """
-        face_vertex_counts = []
-        face_vertex_indices = []
         om2_obj = self.om2_obj
-        for i_face_index in xrange(om2_obj.numPolygons):
-            count = om2_obj.polygonVertexCount(i_face_index)
-            face_vertex_counts.append(count)
-            om2_indices = om2_obj.getPolygonVertices(i_face_index)
-            indices = list(om2_indices)
-            if reverse is True:
-                indices.reverse()
-            face_vertex_indices.extend(indices)
+        if reverse is True:
+            face_vertex_counts = []
+            face_vertex_indices = []
+            for i_face_index in xrange(om2_obj.numPolygons):
+                count = om2_obj.polygonVertexCount(i_face_index)
+                face_vertex_counts.append(count)
+                om2_indices = om2_obj.getPolygonVertices(i_face_index)
+                indices = list(om2_indices)
+                if reverse is True:
+                    indices.reverse()
+                face_vertex_indices.extend(indices)
 
-        return face_vertex_counts, face_vertex_indices
+            return face_vertex_counts, face_vertex_indices
+        face_vertex_counts, face_vertex_indices = om2_obj.getVertices()
+        return list(face_vertex_counts), list(face_vertex_indices)
 
     def set_vertex_delete(self, vertex_index):
         om2_obj = self.om2_obj
@@ -261,6 +268,19 @@ class MeshOpt(
             om2_obj = self.get_om2_obj()
             om2_obj.setCurrentUVSetName(ma_core.Om2Method.DEFAULT_MAP_NAME)
             return self._get_map_face_non_uv_comp_names_()
+
+    def get_uv_map_error_comp_names(self, uv_map_name):
+        om2_obj = self.get_om2_obj()
+        om2_obj.setCurrentUVSetName(uv_map_name)
+        return self._get_map_face_non_uv_comp_names_()
+
+    def get_uv_map_face_vertex_counts(self, uv_map_name):
+        uv_map_face_vertex_counts, uv_map_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
+        return list(uv_map_face_vertex_counts)
+
+    def get_uv_map_face_vertex_indices(self, uv_map_name):
+        uv_map_face_vertex_counts, uv_map_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
+        return list(uv_map_face_vertex_indices)
 
     def get_uv_map_coords(self, uv_map_name):
         """

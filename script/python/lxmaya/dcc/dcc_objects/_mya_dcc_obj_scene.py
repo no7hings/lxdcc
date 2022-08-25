@@ -309,18 +309,31 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         else:
             no_fnc_()
     @classmethod
-    def set_file_open(cls, file_path):
+    def set_file_open(cls, file_path, ignore_format=True):
+        """
+        :param file_path: str,
+        :param ignore_format: bool, etc. for save ".mb" but rename to ".ma"
+        :return:
+        """
         utl_core.Log.set_module_result_trace(
             'scene-file open',
             u'file="{}" is started'.format(file_path)
         )
-        cmds.file(
-            file_path,
-            open=1,
-            options='v=0;',
-            force=1,
-            type=cls._get_file_type_name_(file_path)
-        )
+        if ignore_format is True:
+            cmds.file(
+                file_path,
+                open=1,
+                options='v=0;',
+                force=1,
+            )
+        else:
+            cmds.file(
+                file_path,
+                open=1,
+                options='v=0;',
+                force=1,
+                type=cls._get_file_type_name_(file_path)
+            )
         utl_core.Log.set_module_result_trace(
             'scene-file open',
             u'file="{}" is completed'.format(file_path)

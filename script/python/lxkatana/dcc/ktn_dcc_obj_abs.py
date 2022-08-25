@@ -391,7 +391,8 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     lis.append((target_ktn_port, source_ktn_port))
         return lis
 
-    def _get_source_connection_raw_(self):
+    def _get_source_connection_raw_(self, **kwargs):
+        inward = kwargs.get('inward') or False
         lis = []
         ktn_obj = self._get_ktn_obj_()
         _ = ktn_obj.getInputPorts() or []

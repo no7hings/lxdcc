@@ -501,6 +501,9 @@ class NGObjOpt(object):
         if parent:
             return self.__class__(parent)
 
+    def get_attributes(self):
+        return self._ktn_obj.getAttributes()
+
     def set_attributes(self, attributes):
         attributes_ = self._ktn_obj.getAttributes()
         attributes_.update(attributes)
@@ -970,23 +973,38 @@ class ArnoldEventMtd(object):
             _parent_opt = node_opt.get_parent_opt()
             if _parent_opt:
                 if _parent_opt.get_port('user.Texture_Folder'):
-                    show_node_opt.set_expression('shaders.parameters.texture_directory', 'getParent().getParent().user.Texture_Folder')
+                    _parent_opt.set_expression('extra.texture_directory', 'getParent().user.Texture_Folder')
 
-        show_node = cls._get_material_show_node_(node_opt)
-        show_node_opt = NGObjOpt(show_node)
         p_ns = [
-            ('shaders.parameters.texture_directory', dict(widget='file', value='/texture_directory')),
+            ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
         ]
         for i_p_n, i_p_r in p_ns:
-            if show_node_opt.get_port(i_p_n) is None:
-                NGMacro(show_node).set_parameter_create(
+            if node_opt.get_port(i_p_n) is None:
+                NGMacro(node_opt.ktn_obj).set_parameter_create(
                     i_p_n, i_p_r
                 )
 
         connect_fnc_()
     @classmethod
     def _get_material_show_node_(cls, node_opt):
-        return [i for i in node_opt.get_children(['Material'])][0]
+        return [i for i in node_opt.get_children(['Merge'])][0]
+    #
+    @classmethod
+    def set_shader_group_create(cls, *args, **kwargs):
+        node_opt = NGObjOpt(kwargs['node'])
+        if node_opt.type == 'ShadingGroup':
+            cls._set_shader_group_create_(node_opt)
+    @classmethod
+    def _set_shader_group_create_(cls, node_opt):
+        p_ns = [
+            ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
+        ]
+        for i_p_n, i_p_r in p_ns:
+            if node_opt.get_port(i_p_n) is None:
+                NGMacro(node_opt.ktn_obj).set_parameter_create(
+                    i_p_n, i_p_r
+                )
+    #
     @classmethod
     def set_image_create(cls, *args, **kwargs):
         node_opt = NGObjOpt(kwargs['node'])
@@ -1014,13 +1032,9 @@ class ArnoldEventMtd(object):
         def connect_fnc_():
             _parent_opt = node_opt.get_parent_opt()
             if _parent_opt:
-                _show_node = cls._get_material_show_node_(_parent_opt)
-                _show_node_opt = NGObjOpt(_show_node)
-                if _show_node_opt.get('shaders.parameters.texture_directory'):
+                if _parent_opt.get('extra.texture_directory'):
                     node_opt.set_expression(
-                        'extra.texture_directory', 'getNode(\'{}\').shaders.parameters.texture_directory'.format(
-                            _show_node_opt.name
-                        )
+                        'extra.texture_directory', 'getParent().extra.texture_directory'
                     )
 
         def post_connect_fnc_():

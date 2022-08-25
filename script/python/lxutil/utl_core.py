@@ -1713,7 +1713,7 @@ class RvLauncher(object):
         cmd_args = [
             'rez-env pgrv',
             '--',
-            '/opt/rv/bin/rvio_hw',
+            '/opt/rv/bin/rvio',
             '{input}',
             '-vv',
             # '-overlay frameburn .4 1.0 30.0',

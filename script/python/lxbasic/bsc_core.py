@@ -5130,7 +5130,7 @@ class RvioOpt(object):
 
     def set_convert_to_vedio(self):
         cmd_args = [
-            '/opt/rv/bin/rvio_hw',
+            '/opt/rv/bin/rvio',
             '{input}',
             '-vv',
             '-overlay frameburn .4 1.0 30.0',
@@ -5146,7 +5146,7 @@ class RvioOpt(object):
 
     def set_image_convert_to_vedio(self):
         cmd_args = [
-            '/opt/rv/bin/rvio_hw',
+            '/opt/rv/bin/rvio',
             '{input}',
             '-vv',
             '-overlay frameburn .4 1.0 30.0',

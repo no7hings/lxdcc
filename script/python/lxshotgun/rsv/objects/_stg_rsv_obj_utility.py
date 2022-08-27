@@ -188,12 +188,14 @@ class RsvStgTaskOpt(object):
                         '"{}" is not available'.format(i)
                     )
             #
-            stg_users = self._stg_connector.get_stg_users(
-                sg_nickname=ns
-            )
-            stg_version_opt.set_stg_notice_users_extend(
-                stg_users
-            )
+            if ns:
+                stg_users = self._stg_connector.get_stg_users(
+                    sg_nickname=ns
+                )
+                if stg_users:
+                    stg_version_opt.set_stg_notice_users_extend(
+                        stg_users
+                    )
         # batch tag
         stg_tag = self._stg_connector.get_stg_tag_force('td-batch')
         stg_version_opt.set_stg_tags_append(

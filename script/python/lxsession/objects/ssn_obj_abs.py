@@ -580,8 +580,10 @@ class AbsSsnShellExecuteDef(object):
         )
 
     def set_execute_by_shell(self, block=False):
-        executor = self.get_executor()
-        executor.set_run_with_shell(block)
+        self.get_executor().set_run_with_shell(block)
+
+    def get_execute_shell_command(self):
+        return self.get_executor().get_shell_command()
 
     def __set_execute_option_completion_(self):
         hook_engine = self.configure.get('hook_option.engine')

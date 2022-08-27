@@ -411,27 +411,26 @@ class PathGroupPermission(AbsPermission):
 
 if __name__ == '__main__':
     print PathGroupPermission(
-        '/t/prod/cgm/output/shots/x30/x30040/efx/efx_rnd/x30040.efx.efx_rnd.v000/cache/Release_BusBodyFragment/payload.usda'
+        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/nn_4y.srf.surfacing.v062'
     ).get_all_group_data()
 
     # files = bsc_core.DirectoryMtd.get_all_file_paths(
-    #     '/l/prod/cgm/publish/assets/prp/umbrella/srf/surfacing/texture'
+    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture/eye.msk03.tx'
     # )
     # for i in files:
     #     i_group_data = PathGroupPermission(
     #         i
     #     ).get_all_group_data()
     #     #
-    #     if not 'eye.' in i:
-    #         if 'coop_grp' not in i_group_data:
-    #             PathGroupPermission(
-    #                 i
-    #             ).set_allow(
-    #                 'coop_grp'
-    #             )
-    #         if 'cg_group' not in i_group_data:
-    #             PathGroupPermission(
-    #                 i
-    #             ).set_allow(
-    #                 'cg_group'
-    #             )
+    #     if 'coop_grp' not in i_group_data:
+    #         PathGroupPermission(
+    #             i
+    #         ).set_allow(
+    #             'coop_grp'
+    #         )
+    #     if 'cg_group' not in i_group_data:
+    #         PathGroupPermission(
+    #             i
+    #         ).set_allow(
+    #             'cg_group'
+    #         )

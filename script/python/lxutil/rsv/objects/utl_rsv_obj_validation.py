@@ -513,7 +513,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     validator.set_node_files_result_register(
                         location,
                         [file_path],
-                        description=u'scene has modifier to save',
+                        description=u'scene has modifier to save...',
                         check_group=check_group,
                         check_status=validator.CheckStatus.Warning,
                     )
@@ -600,7 +600,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         description='"mesh" is "{}"'.format(i_description)
                     )
 
-    def set_maya_geometry_uv_map_check(self, validator):
+    def set_maya_geometry_check(self, validator):
         from lxbasic import bsc_core
 
         from lxutil import utl_core

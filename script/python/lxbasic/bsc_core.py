@@ -2488,6 +2488,17 @@ class TextMtd(object):
         return re.sub(
             ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
         )
+    @classmethod
+    def get_first_word(cls, text):
+        if text:
+            _ = re.findall(
+                # for unicode ur''
+                ur'[\u4e00-\u9fa5a-zA-Z0-9]', text
+            )
+            if _:
+                return _[0]
+            return text[0]
+        return ''
 
 
 class DictMtd(object):
@@ -5161,8 +5172,76 @@ class RvioOpt(object):
         )
 
 
-if __name__ == '__main__':
-    print MultiplyFileNameMtd.set_file_path_merge_to(
-        ['/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/beauty.1008.exr', '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/background.1082.exr'],
-        ['*.####.*']
+HEXDIG = '0123456789ABCDEFabcdef'
+HEXTOCHR = dict((a + b, chr(int(a + b, 16))) for a in HEXDIG for b in HEXDIG)
+
+
+class SPathMtd(object):
+    """
+    from urllib quote and unquote
+    """
+    ALWAYS_SAFE = (
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        'abcdefghijklmnopqrstuvwxyz'
+        '0123456789'
     )
+    SAFE_MAP = {}
+    SAFE_QUOTERS = {}
+    for i, c in zip(xrange(256), str(bytearray(xrange(256)))):
+        SAFE_MAP[c] = c if (i < 128 and c in ALWAYS_SAFE) else '%{:02X}'.format(i)
+    #
+    RE_ASCII = re.compile('([\x00-\x7f]+)')
+    @classmethod
+    def set_quote_to(cls, s, safe=''):
+        # fastpath
+        if not s:
+            if s is None:
+                raise TypeError('None object cannot be quoted')
+            return s
+        cache_key = (safe, cls.ALWAYS_SAFE)
+        try:
+            (quoter, safe) = cls.SAFE_QUOTERS[cache_key]
+        except KeyError:
+            safe_map = cls.SAFE_MAP.copy()
+            safe_map.update([(c, c) for c in safe])
+            quoter = safe_map.__getitem__
+            safe = cls.ALWAYS_SAFE + safe
+            cls.SAFE_QUOTERS[cache_key] = (quoter, safe)
+        if not s.rstrip(safe):
+            return s
+        return ''.join(map(quoter, s))
+    @classmethod
+    def _get_is_unicode(cls, x):
+        return isinstance(x, unicode)
+    @classmethod
+    def set_unquote_to(cls, s):
+        """unquote('abc%20def') -> 'abc def'."""
+        if cls._get_is_unicode(s):
+            if '%' not in s:
+                return s
+            bits = cls.RE_ASCII.split(s)
+            res = [bits[0]]
+            append = res.append
+            for i in range(1, len(bits), 2):
+                append(cls.set_unquote(str(bits[i])).decode('latin1'))
+                append(bits[i + 1])
+            return ''.join(res)
+
+        bits = s.split('%')
+        # fastpath
+        if len(bits) == 1:
+            return s
+        res = [bits[0]]
+        append = res.append
+        for item in bits[1:]:
+            try:
+                append(HEXTOCHR[item[:2]])
+                append(item[2:])
+            except KeyError:
+                append('%')
+                append(item)
+        return ''.join(res)
+
+
+if __name__ == '__main__':
+    SystemMtd.get_group_id('coop_grp')

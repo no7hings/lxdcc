@@ -485,6 +485,7 @@ class StgConnector(object):
                     ['sg_nickname', 'in', kwargs['sg_nickname']]
                 ]
             )
+        return []
 
     def get_stg_version(self, **kwargs):
         if 'asset' in kwargs:

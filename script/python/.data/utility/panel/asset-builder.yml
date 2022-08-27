@@ -18,13 +18,13 @@ build:
             project:
                 widget: project
                 value: ''
-                enable: False
+                enable: True
                 tool_tip: ['choose or enter a "project"']
 
             asset:
                 widget: rsv-obj
                 value: ''
-                enable: False
+                enable: True
                 tool_tip: ['choose or enter a "asset"']
 
             refresh:

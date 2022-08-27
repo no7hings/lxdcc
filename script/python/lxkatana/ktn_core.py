@@ -973,7 +973,9 @@ class ArnoldEventMtd(object):
             _parent_opt = node_opt.get_parent_opt()
             if _parent_opt:
                 if _parent_opt.get_port('user.Texture_Folder'):
-                    _parent_opt.set_expression('extra.texture_directory', 'getParent().user.Texture_Folder')
+                    _value = node_opt.get('extra.texture_directory')
+                    if _value == '/texture_directory':
+                        node_opt.set_expression('extra.texture_directory', 'getParent().user.Texture_Folder')
 
         p_ns = [
             ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
@@ -1032,10 +1034,18 @@ class ArnoldEventMtd(object):
         def connect_fnc_():
             _parent_opt = node_opt.get_parent_opt()
             if _parent_opt:
-                if _parent_opt.get('extra.texture_directory'):
-                    node_opt.set_expression(
-                        'extra.texture_directory', 'getParent().extra.texture_directory'
-                    )
+                if _parent_opt.get_type() == 'NetworkMaterialCreate':
+                    if _parent_opt.get('extra.texture_directory'):
+                        node_opt.set_expression(
+                            'extra.texture_directory', 'getParent().extra.texture_directory'
+                        )
+                elif _parent_opt.get_type() == 'ShadingGroup':
+                    ___parent_opt = _parent_opt.get_parent_opt()
+                    if ___parent_opt.get_type() == 'NetworkMaterialCreate':
+                        if ___parent_opt.get('extra.texture_directory'):
+                            node_opt.set_expression(
+                                'extra.texture_directory', 'getParent().getParent().extra.texture_directory'
+                            )
 
         def post_connect_fnc_():
             if not node_opt.get('extra.texture_directory'):

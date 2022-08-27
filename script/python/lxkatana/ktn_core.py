@@ -378,6 +378,12 @@ class NGObjOpt(object):
         if port:
             NGPortOpt(port).set_expression(value)
 
+    def get_is_expression(self, key):
+        port = self.ktn_obj.getParameter(key)
+        print port, 'AAA'
+        if port:
+            return NGPortOpt(port).get_is_expression()
+
     def get_as_enumerate(self, key):
         port = self.ktn_obj.getParameter(key)
         if port:
@@ -675,6 +681,9 @@ class NGPortOpt(object):
     def set_expression(self, raw):
         self._ktn_port.setExpression(raw)
 
+    def get_is_expression(self):
+        return self._ktn_port.isExpression()
+
     def get_children(self):
         return [self._ktn_port.getChildren()]
 
@@ -944,13 +953,13 @@ class EventMethod(object):
 
 class ArnoldEventMtd(object):
     N = 'texture_directory'
+    DIRECTORY_KEY = 'extra.texture_directory'
+    DIRECTORY_VALUE = '/texture_directory'
     @classmethod
     def set_material_create(cls, *args, **kwargs):
-        node_opt = NGObjOpt(kwargs['node'])
-        if node_opt.type == 'NetworkMaterialCreate':
+        if kwargs['nodeType'] == 'NetworkMaterialCreate':
+            node_opt = NGObjOpt(kwargs['node'])
             cls._set_material_create_(node_opt)
-        elif node_opt.type == 'NetworkMaterial':
-            pass
     @classmethod
     def _set_material_create_(cls, node_opt):
         """
@@ -970,15 +979,26 @@ class ArnoldEventMtd(object):
         :return:
         """
         def connect_fnc_():
+            _key = cls.DIRECTORY_KEY
+            # ignore when expression is enable
+            if node_opt.get_is_expression(_key) is True:
+                return False
+            # ignore when value is changed
+            if node_opt.get(_key) != cls.DIRECTORY_VALUE:
+                return False
+            # ignore parent is non-exists
             _parent_opt = node_opt.get_parent_opt()
-            if _parent_opt:
-                if _parent_opt.get_port('user.Texture_Folder'):
-                    _value = node_opt.get('extra.texture_directory')
-                    if _value == '/texture_directory':
-                        node_opt.set_expression('extra.texture_directory', 'getParent().user.Texture_Folder')
+            if not _parent_opt:
+                return False
+            # ignore parent has not directory
+            if not _parent_opt.get_port('user.Texture_Folder'):
+                return False
+            #
+            node_opt.set_expression(_key, 'getParent().user.Texture_Folder')
+            return True
 
         p_ns = [
-            ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
+            (cls.DIRECTORY_KEY, dict(widget='file', value=cls.DIRECTORY_VALUE)),
         ]
         for i_p_n, i_p_r in p_ns:
             if node_opt.get_port(i_p_n) is None:
@@ -992,25 +1012,9 @@ class ArnoldEventMtd(object):
         return [i for i in node_opt.get_children(['Merge'])][0]
     #
     @classmethod
-    def set_shader_group_create(cls, *args, **kwargs):
-        node_opt = NGObjOpt(kwargs['node'])
-        if node_opt.type == 'ShadingGroup':
-            cls._set_shader_group_create_(node_opt)
-    @classmethod
-    def _set_shader_group_create_(cls, node_opt):
-        p_ns = [
-            ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
-        ]
-        for i_p_n, i_p_r in p_ns:
-            if node_opt.get_port(i_p_n) is None:
-                NGMacro(node_opt.ktn_obj).set_parameter_create(
-                    i_p_n, i_p_r
-                )
-    #
-    @classmethod
     def set_image_create(cls, *args, **kwargs):
-        node_opt = NGObjOpt(kwargs['node'])
-        if node_opt.type == 'ArnoldShadingNode':
+        if kwargs['nodeType'] == 'ArnoldShadingNode':
+            node_opt = NGObjOpt(kwargs['node'])
             if node_opt.get('nodeType') in ['image']:
                 cls._set_image_create_(node_opt)
     @classmethod
@@ -1032,23 +1036,36 @@ class ArnoldEventMtd(object):
         :return:
         """
         def connect_fnc_():
+            _key = cls.DIRECTORY_KEY
             _parent_opt = node_opt.get_parent_opt()
             if _parent_opt:
-                if _parent_opt.get_type() == 'NetworkMaterialCreate':
-                    if _parent_opt.get('extra.texture_directory'):
-                        node_opt.set_expression(
-                            'extra.texture_directory', 'getParent().extra.texture_directory'
-                        )
-                elif _parent_opt.get_type() == 'ShadingGroup':
+                # ignore when expression is enable
+                if node_opt.get_is_expression(_key) is True:
+                    return False
+                if node_opt.get(_key) != cls.DIRECTORY_VALUE:
+                    return False
+                #
+                _parent_type = _parent_opt.get_type()
+                if _parent_type == 'NetworkMaterialCreate':
+                    if not _parent_opt.get(_key):
+                        return False
+                    node_opt.set_expression(
+                        _key, 'getParent().extra.texture_directory'
+                    )
+                    return True
+                elif _parent_type == 'ShadingGroup':
                     ___parent_opt = _parent_opt.get_parent_opt()
                     if ___parent_opt.get_type() == 'NetworkMaterialCreate':
-                        if ___parent_opt.get('extra.texture_directory'):
-                            node_opt.set_expression(
-                                'extra.texture_directory', 'getParent().getParent().extra.texture_directory'
-                            )
+                        if not ___parent_opt.get(_key):
+                            return False
+                        #
+                        node_opt.set_expression(
+                            _key, 'getParent().getParent().extra.texture_directory'
+                        )
+                        return True
 
         def post_connect_fnc_():
-            if not node_opt.get('extra.texture_directory'):
+            if not node_opt.get(cls.DIRECTORY_KEY):
                 return False
             #
             if not node_opt.get('parameters.filename.value'):
@@ -1075,7 +1092,7 @@ class ArnoldEventMtd(object):
             )
         #
         p_ns = [
-            ('extra.texture_directory', dict(widget='file', value='/texture_directory')),
+            (cls.DIRECTORY_KEY, dict(widget='file', value=cls.DIRECTORY_VALUE)),
         ]
         for i_p_n, i_p_r in p_ns:
             if node_opt.get_port(i_p_n) is None:

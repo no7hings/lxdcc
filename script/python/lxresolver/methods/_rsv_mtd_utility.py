@@ -67,12 +67,14 @@ class AbsPermission(object):
         'dmt_grp': 20020,
         'lgt_grp': 20018,
         'mod_grp': 20011,
-        'plt_grp': 20024,
         'grm_grp': 20012,
         'rig_grp': 20013,
         'srf_grp': 20014,
         'set_grp': 20023,
+        'plt_grp': 20024,
         'edt_grp': 20028,
+        #
+        'coop_grp': 20032,
         #
         'td_grp': 20004,
     }
@@ -89,7 +91,7 @@ class AbsPermission(object):
     def _set_nas_cmd_run_(cls, cmd):
         import paramiko
         #
-        utl_core.Log.set_module_result_trace(
+        run_log = utl_core.Log.set_module_result_trace(
             'nas-cmd-run',
             'command=`{}`'.format(cmd)
         )
@@ -256,6 +258,15 @@ class PathGroupPermission(AbsPermission):
                     if i_dict:
                         dict_[i_dict['group']] = (i_dict['index'], i_dict['context'])
         return dict_
+    @classmethod
+    def _get_result_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        return cls._set_nas_cmd_run_(cmd)
 
     def __init__(self, path):
         self._path = path
@@ -263,6 +274,11 @@ class PathGroupPermission(AbsPermission):
 
     def get_all_group_data(self):
         return self._get_all_group_data_(
+            self._nas_path
+        )
+
+    def get_result(self):
+        return self._get_result_(
             self._nas_path
         )
 
@@ -410,12 +426,16 @@ class PathGroupPermission(AbsPermission):
 
 
 if __name__ == '__main__':
-    print PathGroupPermission(
-        '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/nn_4y.srf.surfacing.v062'
-    ).get_all_group_data()
+    result = PathGroupPermission(
+        '/l/prod/cgm/publish/assets/env/land_b/srf/surfacing/texture/land_ba.diff_clr.1007.tx/V-RH1X1H-R51JX.land_ba.diff_clr.1007.tx'
+    ).get_result()
+    utl_core.Log.set_module_result_trace(
+        'permission gain',
+        result
+    )
 
     # files = bsc_core.DirectoryMtd.get_all_file_paths(
-    #     '/l/prod/cgm/publish/assets/chr/nn_4y/srf/surfacing/texture/eye.msk03.tx'
+    #     '/l/prod/cgm/publish/assets/chr/yingwu/srf/surfacing/texture'
     # )
     # for i in files:
     #     i_group_data = PathGroupPermission(

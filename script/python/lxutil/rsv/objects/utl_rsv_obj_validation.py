@@ -111,7 +111,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 if file_paths_5:
                     validator.set_node_files_result_register(
                         i_obj.path,
-                        file_paths_4,
+                        file_paths_5,
                         description='"texture-root" must be "/l" or "l:"',
                         check_group=check_group,
                         check_status=validator.CheckStatus.Error

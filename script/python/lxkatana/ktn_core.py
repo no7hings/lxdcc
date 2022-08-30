@@ -380,7 +380,6 @@ class NGObjOpt(object):
 
     def get_is_expression(self, key):
         port = self.ktn_obj.getParameter(key)
-        print port, 'AAA'
         if port:
             return NGPortOpt(port).get_is_expression()
 

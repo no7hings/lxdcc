@@ -104,33 +104,32 @@ shader jiWindowBox_Arnold(
     color roomRGB = texture(filename, finalUV[0], finalUV[1]);
         
     color finalRGB;
-    
-    
-    
-    
-    //midground switch
-    if (enableMidground > 0){
-        float midgroundA;
-        color midgroundRGB = texture(filename, midgroundUV[0], midgroundUV[1], "alpha", midgroundA);
-        finalRGB = mix(roomRGB,midgroundRGB,midgroundA);
-    }
-    else{
-        finalRGB = roomRGB;
-    }
-    
-    
-    
-    
-    //curtains switch
-    if (enableCurtains > 0){
-        float curtainsA;
-        color curtainsRGB = texture(filename, curtainsUV[0], curtainsUV[1], "alpha", curtainsA);
-        finalRGB = mix(finalRGB,curtainsRGB,curtainsA);
-    }
 
+    int e;
+    gettextureinfo(filename, "exists", e);
+    if (e > 0) {
+        //midground switch
+        if (enableMidground > 0){
+            float midgroundA;
+            color midgroundRGB = texture(filename, midgroundUV[0], midgroundUV[1], "alpha", midgroundA);
+            finalRGB = mix(roomRGB,midgroundRGB,midgroundA);
+        }
+        else{
+            finalRGB = roomRGB;
+        }
 
-    
-
-    outRGB = finalRGB;
+        //curtains switch
+        if (enableCurtains > 0){
+            float curtainsA;
+            color curtainsRGB = texture(filename, curtainsUV[0], curtainsUV[1], "alpha", curtainsA);
+            finalRGB = mix(finalRGB,curtainsRGB,curtainsA);
+        }
+        outRGB = finalRGB;
+    }
+    else {
+        warning(
+            "%s, is non-exists", filename
+        );
+    }
 
 }

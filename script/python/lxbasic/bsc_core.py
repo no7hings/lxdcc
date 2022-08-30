@@ -134,6 +134,27 @@ class CmdSubProcessThread(threading.Thread):
         self._completed_signal = CmdSubProcessSignal(int, list)
         self._failed_signal = CmdSubProcessSignal(int, list)
         self._finished_signal = CmdSubProcessSignal(int, int, list)
+
+    def __set_status_update(self, status):
+        self._status = status
+        self._status_changed_signal.set_emit_send(
+            self._index, status
+        )
+
+    def __set_completed(self, results):
+        self._completed_signal.set_emit_send(
+            self._index, results
+        )
+
+    def __set_failed(self, results):
+        self._failed_signal.set_emit_send(
+            self._index, results
+        )
+
+    def __set_finished(self, status, results):
+        self._finished_signal.set_emit_send(
+            self._index, status, results
+        )
     @property
     def status_changed(self):
         return self._status_changed_signal
@@ -194,29 +215,108 @@ class CmdSubProcessThread(threading.Thread):
         t.start()
         return t
 
-    def __set_completed(self, results):
-        self._completed_signal.set_emit_send(
-            self._index, results
-        )
+    def get_status(self):
+        return self._status
 
-    def __set_failed(self, results):
-        self._failed_signal.set_emit_send(
-            self._index, results
-        )
 
-    def __set_finished(self, status, results):
-        self._finished_signal.set_emit_send(
-            self._index, status, results
-        )
+class CmdThread(threading.Thread):
+    Status = bsc_configure.Status
+    def __init__(self, cmd):
+        threading.Thread.__init__(self)
+        self._cmd = cmd
+        #
+        self._status = self.Status.Started
+        #
+        self._status_changed_signal = CmdSubProcessSignal(int)
+        self._completed_signal = CmdSubProcessSignal(list)
+        self._failed_signal = CmdSubProcessSignal(int, str)
+        self._finished_signal = CmdSubProcessSignal(int, str)
+        self._logging_signal = CmdSubProcessSignal(str)
 
     def __set_status_update(self, status):
         self._status = status
         self._status_changed_signal.set_emit_send(
-            self._index, status
+            status
         )
+
+    def __set_completed(self, results):
+        self._completed_signal.set_emit_send(results)
+
+    def __set_failed(self, status):
+        self._failed_signal.set_emit_send(
+            status
+        )
+
+    def __set_finished(self, status):
+        self._finished_signal.set_emit_send(
+            status
+        )
+
+    def __set_logging(self, text):
+        self._logging_signal.set_emit_send(
+            text
+        )
+    @property
+    def status_changed(self):
+        return self._status_changed_signal
+    @property
+    def completed(self):
+        return self._completed_signal
+    @property
+    def failed(self):
+        return self._failed_signal
+    @property
+    def finished(self):
+        return self._finished_signal
+    @property
+    def logging(self):
+        return self._logging_signal
 
     def get_status(self):
         return self._status
+
+    def set_stop(self):
+        pass
+
+    def run(self):
+        self.__set_status_update(self.Status.Running)
+        results = []
+        s_p = subprocess.Popen(
+            self._cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=SubProcessMtd.NO_WINDOW
+        )
+        #
+        while True:
+            next_line = s_p.stdout.readline()
+            #
+            return_line = next_line
+            if return_line == '' and s_p.poll() is not None:
+                break
+            #
+            return_line = return_line.decode('utf-8', 'ignore')
+            return_line = return_line.replace(u'\u2018', "'").replace(u'\u2019', "'")
+            results.append(return_line)
+            #
+            self.__set_logging(
+                return_line.encode('utf-8')
+            )
+        #
+        retcode = s_p.poll()
+        if retcode:
+            self.__set_status_update(self.Status.Failed)
+        else:
+            self.__set_status_update(self.Status.Completed)
+            self.__set_completed(results)
+            s_p.stdout.close()
+
+        self.__set_finished(
+            self._status
+        )
 
 
 class FncThread(threading.Thread):
@@ -5223,7 +5323,7 @@ class SPathMtd(object):
             res = [bits[0]]
             append = res.append
             for i in range(1, len(bits), 2):
-                append(cls.set_unquote(str(bits[i])).decode('latin1'))
+                append(cls.set_unquote_to(str(bits[i])).decode('latin1'))
                 append(bits[i + 1])
             return ''.join(res)
 
@@ -5244,4 +5344,9 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    SystemMtd.get_group_id('coop_grp')
+    cmd = 'rez-env lxdcc -c "lxhook-engine -o \\\"application=maya&asset=td_test&file=/l/prod/cgm/work/assets/chr/td_test/srf/surfacing/maya/scenes/td_test.srf.surfacing.v006.ma&hook_engine=maya&open_file=True&option_hook_key=rsv-task-methods/asset/maya/gen-surface-validation&project=cgm&save_file=False&step=srf&task=surfacing&time_tag=2022_0829_1846_51_280277&user=dongchangbao&version=v006&with_geometry_check=True&with_geometry_topology_check=True&with_look_check=True&with_scene_check=True&with_shotgun_check=True&with_texture_check=True&with_texture_workspace_check=True&workspace=work\\\""'
+
+    t = CmdThread(cmd)
+
+    t.start()
+    t.join()

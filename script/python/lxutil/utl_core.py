@@ -563,22 +563,46 @@ class DDlMonitor(object):
 
         import lxdeadline.objects as ddl_objects
 
-        w = prx_widgets.PrxDdlMonitorWindow()
+        w = prx_widgets.PrxMonitorWindow()
         w.set_window_title(
             '{}({})'.format(
                 label, job_id
             )
         )
-
+        button = w.get_status_button()
         j_m = ddl_objects.DdlJobMonitor(job_id)
-        w.get_status_button().set_statuses(j_m.get_task_statues())
-        w.get_status_button().set_initialization(j_m.get_task_count())
+        button.set_statuses(j_m.get_task_statuses())
+        button.set_initialization(j_m.get_task_count())
         j_m.logging.set_connect_to(w.set_logging)
         j_m.task_status_changed_at.set_connect_to(w.set_status_at)
         j_m.task_finished_at.set_connect_to(w.set_finished_at)
         j_m.set_start()
 
         w.set_window_close_connect_to(j_m.set_stop)
+
+        w.set_window_show(size=(480, 240))
+
+
+class CmdMonitor(object):
+    @classmethod
+    def set_create(cls, label, cmd):
+        import lxutil_gui.proxy.widgets as prx_widgets
+
+        w = prx_widgets.PrxMonitorWindow()
+        w.set_window_title(
+            'Command Monitor for "{}"'.format(
+                label
+            )
+        )
+        #
+        button = w.get_status_button()
+        t = bsc_core.CmdThread(cmd)
+        button.set_statuses([t.get_status()])
+        button.set_initialization(1)
+        t.status_changed.set_connect_to(lambda x: w.set_status_at(0, x))
+        t.logging.set_connect_to(w.set_logging)
+        w.set_window_close_connect_to(t.set_stop)
+        t.start()
 
         w.set_window_show(size=(480, 240))
 

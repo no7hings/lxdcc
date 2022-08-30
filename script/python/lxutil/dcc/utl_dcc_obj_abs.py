@@ -447,6 +447,8 @@ class AbsOsFile(
         return None
 
     def set_unit_copy_as_src(self, directory_path_src, directory_path_tgt, fix_name_blank=False, replace=True):
+        import lxresolver.methods as rsv_methods
+
         if self.get_is_exists_file():
             timestamp = self.get_modify_timestamp()
             size = self.get_size()
@@ -485,6 +487,17 @@ class AbsOsFile(
                         utl_core.Log.set_log_write(
                             file_path_link_log_src, link_log
                         )
+                        # permission log record
+                        permission_result = rsv_methods.PathGroupPermission(
+                            file_path_src
+                        ).get_result()
+                        permission_log = utl_core.Log.set_module_result_trace(
+                            'permission gain',
+                            permission_result
+                        )
+                        utl_core.Log.set_log_write(
+                            file_path_link_log_src, permission_log
+                        )
                         return True, link_log
                 else:
                     return False, utl_core.Log.set_module_warning_trace(
@@ -502,6 +515,17 @@ class AbsOsFile(
                 )
                 utl_core.Log.set_log_write(
                     file_path_link_log_src, link_log
+                )
+                # permission log record
+                permission_result = rsv_methods.PathGroupPermission(
+                    file_path_src
+                ).get_result()
+                permission_log = utl_core.Log.set_module_result_trace(
+                    'permission gain',
+                    permission_result
+                )
+                utl_core.Log.set_log_write(
+                    file_path_link_log_src, permission_log
                 )
                 return True, link_log
         else:

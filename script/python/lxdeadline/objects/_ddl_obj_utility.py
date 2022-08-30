@@ -886,7 +886,7 @@ class DdlJobMonitor(object):
     def get_task_count(self):
         return len(self._task_queries)
 
-    def get_task_statues(self):
+    def get_task_statuses(self):
         return self._task_statuses
 
     def get_job_status(self):

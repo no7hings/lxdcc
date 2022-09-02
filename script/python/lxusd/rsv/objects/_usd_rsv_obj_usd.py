@@ -663,6 +663,37 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
+    def get_look_pass_names(self):
+        import os
+        #
+        import fnmatch
+        #
+        step = self._rsv_scene_properties.get('step')
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'work':
+            return ['default']
+        elif workspace == 'publish':
+            keyword = 'asset-look-klf-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-look-klf-file'
+        else:
+            raise TypeError()
+        #
+        file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        file_path = file_rsv_unit.get_exists_result(
+            version=version
+        )
+
+        if file_path:
+            element_names = bsc_core.ZipFileOpt(file_path).get_element_names()
+            look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
+            return look_pass_names
+        return ['default']
+
     def set_component_usd_create(self):
         step = self._rsv_scene_properties.get('step')
         workspace = self._rsv_scene_properties.get('workspace')
@@ -695,11 +726,17 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             key = step_mapper[step]
             #
             c = utl_configure.Jinja.get_configure(key)
+            #
             c.set_update(
                 self._rsv_scene_properties.value
             )
             #
             c.set_flatten()
+            #
+            look_pass_names = self.get_look_pass_names()
+            c.set(
+                'look.passes', look_pass_names
+            )
             #
             usda_dict = c.get('usdas')
             #

@@ -33,7 +33,7 @@ geometries:
     uv_map: 'uv_map.usd'
 #
 usdas:
-    material: 'shading.usda'
+    material-v002: 'shading.usda'
     #
     payload: 'payload.usda'
     registry: 'registry.usda'

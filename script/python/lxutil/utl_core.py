@@ -558,12 +558,12 @@ class SubProcessRunner(object):
 
 class DDlMonitor(object):
     @classmethod
-    def set_create(cls, label, job_id):
+    def set_create(cls, label, job_id, parent=None):
         import lxutil_gui.proxy.widgets as prx_widgets
 
         import lxdeadline.objects as ddl_objects
 
-        w = prx_widgets.PrxMonitorWindow()
+        w = prx_widgets.PrxMonitorWindow(parent=parent)
         w.set_window_title(
             '{}({})'.format(
                 label, job_id
@@ -583,28 +583,49 @@ class DDlMonitor(object):
         w.set_window_show(size=(480, 240))
 
 
-class CmdMonitor(object):
+class CommandMonitor(object):
     @classmethod
-    def set_create(cls, label, cmd):
+    def set_create(cls, label, command, parent=None):
+        def completed_fnc_(*args):
+            w.set_status(w.ValidatorStatus.Correct)
+            w.set_window_close_later()
+
+        def failed_fnc_(*args):
+            w.set_status(w.ValidatorStatus.Error)
+
+        def finished_fnc_(*args):
+            pass
+
+        from lxutil_gui.qt import utl_gui_qt_core
+
         import lxutil_gui.proxy.widgets as prx_widgets
 
-        w = prx_widgets.PrxMonitorWindow()
-        w.set_window_title(
-            'Command Monitor for "{}"'.format(
-                label
-            )
-        )
+        w = prx_widgets.PrxMonitorWindow(parent=parent)
+        w.set_window_title(label)
         #
-        button = w.get_status_button()
-        t = bsc_core.CmdThread(cmd)
-        button.set_statuses([t.get_status()])
-        button.set_initialization(1)
-        t.status_changed.set_connect_to(lambda x: w.set_status_at(0, x))
-        t.logging.set_connect_to(w.set_logging)
-        w.set_window_close_connect_to(t.set_stop)
-        t.start()
+        status_button = w.get_status_button()
+        c_t = bsc_core.CommandThread(command)
+        status_button.set_statuses([c_t.get_status()])
+        status_button.set_initialization(1)
+        c_t.status_changed.set_connect_to(lambda x: w.set_status_at(0, x))
+        # c_t.finished.set_connect_to(lambda x: w.set_finished_at(0, x))
+        c_t.logging.set_connect_to(w.set_logging)
+        w.set_window_close_connect_to(c_t.set_stopped)
+        #
+        q_c_s = utl_gui_qt_core.QtCommandSignals(w.widget)
+        #
+        c_t.completed.set_connect_to(q_c_s.completed.emit)
+        c_t.finished.set_connect_to(q_c_s.finished.emit)
+        c_t.failed.set_connect_to(q_c_s.failed.emit)
+        #
+        q_c_s.completed.connect(completed_fnc_)
+        q_c_s.failed.connect(failed_fnc_)
+        q_c_s.finished.connect(finished_fnc_)
+        #
+        c_t.start()
 
         w.set_window_show(size=(480, 240))
+        return q_c_s
 
 
 class Icon(object):

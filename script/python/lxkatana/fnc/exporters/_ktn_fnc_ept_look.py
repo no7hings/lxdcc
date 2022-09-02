@@ -48,7 +48,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
         return Configuration.get('KATANA_UI_MODE')
 
     def _set_dot_ass_export_(self, file_path, frame, root):
-        camera = '/root/world/cam/camera'
+        camera_location = '/root/world/cam/camera'
         file_obj = utl_dcc_objects.OsFile(file_path)
         #
         file_obj.set_directory_create()
@@ -67,10 +67,23 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
         if output_obj.get_is_exists() is True:
             camera_obj = ktn_dcc_objects.Node('/rootNode/look_ass_export__camera')
             merge_obj = ktn_dcc_objects.Node('/rootNode/look_ass_export__merge')
-            render_obj = ktn_dcc_objects.Node('/rootNode/look_ass_export__render')
-            merge_ktn_obj, is_create = merge_obj.get_dcc_instance('Merge')
-            camera_ktn_obj, is_create = camera_obj.get_dcc_instance('CameraCreate')
-            render_ktn_obj, is_create = render_obj.get_dcc_instance('ArnoldGlobalSettings')
+            render_settings_obj = ktn_dcc_objects.Node('/rootNode/look_ass_export__render_settings')
+            arnold_render_settings_obj = ktn_dcc_objects.Node('/rootNode/look_ass_export__arnold_render_settings')
+            #
+            merge_obj.get_dcc_instance('Merge')
+            camera_obj.get_dcc_instance('CameraCreate')
+            camera_obj.get_port('name').set(camera_location)
+            #
+            render_settings_obj.get_dcc_instance('RenderSettings')
+            render_settings_obj.set('args.renderSettings.sceneTraversal.cache.cacheSoftLimit.enable', True)
+            render_settings_obj.set('args.renderSettings.sceneTraversal.cache.cacheSoftLimit.value', 51200)
+            render_settings_obj.set('args.renderSettings.sceneTraversal.useCachePrepopulation.enable', True)
+            render_settings_obj.set('args.renderSettings.sceneTraversal.useCachePrepopulation.value', 0)
+            #
+            arnold_render_settings_obj.get_dcc_instance('ArnoldGlobalSettings')
+            arnold_render_settings_obj.set('args.arnoldGlobalStatements.assFileContents.enable', True)
+            arnold_render_settings_obj.set('args.arnoldGlobalStatements.assFileContents.value', 'geometry and materials')
+            arnold_render_settings_obj.set('args.arnoldGlobalStatements.assFile.enable', True)
             output_obj.get_output_port('out').set_target(
                 merge_obj.get_input_port('output'),
                 force=True
@@ -80,13 +93,11 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
                 force=True
             )
             merge_obj.get_output_port('out').set_target(
-                render_obj.get_input_port('input')
+                render_settings_obj.get_input_port('input')
             )
-            #
-            camera_obj.get_port('name').set(camera)
-            #
-            render_obj.get_port('args.arnoldGlobalStatements.assFileContents.enable').set(True)
-            render_obj.get_port('args.arnoldGlobalStatements.assFileContents.value').set('geometry and materials')
+            render_settings_obj.get_output_port('out').set_target(
+                arnold_render_settings_obj.get_input_port('input')
+            )
             #
             render_set = RenderManager.RenderingSettings()
             render_set.ignoreROI = True
@@ -97,18 +108,19 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
             if not self._get_katana_is_ui_mode_():
                 Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
             #
-            render_obj.get_port('args.arnoldGlobalStatements.assFile.enable').set(True)
+
             if frame[0] != frame[1]:
                 for i_current_frame in range(frame[0], frame[1] + 1):
                     i_output_file_path = u'{}.{}{}'.format(path_base, str(i_current_frame).zfill(4), ext)
-                    render_obj.get_port('args.arnoldGlobalStatements.assFile.value').set(i_output_file_path)
+                    arnold_render_settings_obj.set('args.arnoldGlobalStatements.assFile.value', i_output_file_path)
+                    #
                     NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(i_current_frame, 0)
                     ktn_dcc_objects.Scene.set_current_frame(i_current_frame)
                     render_set.frame = i_current_frame
                     RenderManager.StartRender(
                         self.RENDER_MODE,
-                        node=render_obj.ktn_obj,
-                        views=[camera],
+                        node=arnold_render_settings_obj.ktn_obj,
+                        views=[camera_location],
                         settings=render_set
                     )
                     #
@@ -121,12 +133,12 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
                     )
             else:
                 output_file_path = u'{}{}'.format(path_base, ext)
-                render_obj.get_port('args.arnoldGlobalStatements.assFile.value').set(output_file_path)
+                arnold_render_settings_obj.set('args.arnoldGlobalStatements.assFile.value', output_file_path)
                 render_set.frame = frame[0]
                 RenderManager.StartRender(
                     self.RENDER_MODE,
-                    node=render_obj.ktn_obj,
-                    views=[camera],
+                    node=arnold_render_settings_obj.ktn_obj,
+                    views=[camera_location],
                     settings=render_set
                 )
                 #
@@ -143,7 +155,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
             #
             merge_obj.set_delete()
             camera_obj.set_delete()
-            render_obj.set_delete()
+            arnold_render_settings_obj.set_delete()
 
 
 class LookKlfExtraExporter(utl_fnc_obj_abs.AbsDccExporter):

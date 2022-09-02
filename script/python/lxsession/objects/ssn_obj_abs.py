@@ -429,6 +429,9 @@ class AbsSsnOptionExecuteDef(object):
         executor = self.get_executor()
         executor.set_run_with_shell(block)
 
+    def get_execute_shell_command(self):
+        return self.get_executor().get_shell_command()
+
 
 class AbsToolPanelSession(AbsSsnObj):
     def __init__(self, *args, **kwargs):
@@ -736,17 +739,22 @@ class AbsSsnRsvDef(object):
     resolver = property(get_resolver)
 
 
-class Validator(object):
+class ValidationChecker(object):
     class CheckStatus(object):
         Error = 'error'
         Warning = 'warning'
 
     def __init__(self, session):
         self._session = session
-        self._results = []
+        #
+        self._check_options = {}
+        self._check_results = []
+
+    def set_options(self, options):
+        self._check_options = options
 
     def set_node_result_register(self, obj_path, description, check_group, check_status='error'):
-        self._results.append(
+        self._check_results.append(
             dict(
                 type='node',
                 node=obj_path,
@@ -758,7 +766,7 @@ class Validator(object):
         )
 
     def set_node_components_result_register(self, obj_path, elements, description, check_group, check_status='error'):
-        self._results.append(
+        self._check_results.append(
             dict(
                 type='component',
                 node=obj_path,
@@ -770,7 +778,7 @@ class Validator(object):
         )
 
     def set_node_files_result_register(self, obj_path, elements, description, check_group, check_status='error'):
-        self._results.append(
+        self._check_results.append(
             dict(
                 type='file',
                 node=obj_path,
@@ -781,20 +789,7 @@ class Validator(object):
             )
         )
 
-    def get_results(self):
-        result_file_path = self._get_result_yaml_file_()
-        return bsc_core.StorageFileOpt(
-            result_file_path
-        ).set_read()
-
-    def get_exists_results(self):
-        result_file_path = self._get_result_yaml_file_()
-        self._results = bsc_core.StorageFileOpt(
-            result_file_path
-        ).set_read()
-        return self._results
-
-    def _get_result_yaml_file_(self):
+    def _get_data_file_path_(self):
         file_path = self._session.option_opt.get('file')
         return bsc_core.TemporaryYamlMtd.get_file_path(
             file_path, 'asset-validator'
@@ -803,23 +798,99 @@ class Validator(object):
     def get_has_history(self):
         pass
 
-    def set_results_restore(self):
-        self._results = []
+    def set_data_restore(self):
+        self._check_options = {}
+        self._check_results = []
 
-    def set_results_accept(self):
-        result_file_path = self._get_result_yaml_file_()
+    def set_data_record(self):
+        result_file_path = self._get_data_file_path_()
         bsc_core.StorageFileOpt(
             result_file_path
         ).set_write(
-            self._results
+            dict(
+                check_results=self._check_results
+            )
         )
 
+    def get_data(self):
+        result_file_path = self._get_data_file_path_()
+        print result_file_path
+        raw = bsc_core.StorageFileOpt(
+            result_file_path
+        ).set_read()
+        self._check_results = raw['check_results']
+        return raw
+
     def get_is_passed(self):
-        for i in self._results:
-            i_status = i['status']
-            if i_status == 'error':
-                return False
-        return True
+        return self.get_summary() != 'error'
+
+    def get_summary(self):
+        if self._check_options:
+            if self._check_results:
+                for i in self._check_results:
+                    i_status = i['status']
+                    if i_status == 'error':
+                        return 'error'
+                return 'warning'
+            return 'passed'
+        return 'ignore'
+
+    def get_info(self):
+        return self._get_info_by_results_(
+            self.get_summary(), self._check_options, self._check_results
+        )
+    @classmethod
+    def _get_info_by_results_(cls, summary, check_options, check_results):
+        list_ = []
+        #
+        if check_options:
+            list_.append(
+                'validation check options:\n'
+            )
+            for k, v in check_options.items():
+                list_.append(
+                    (
+                        '    {}: {}\n'
+                     ).format(k, ['off', 'on'][v])
+                )
+        #
+        error_count = 0
+        warning_count = 0
+        if check_results:
+            list_.append('validation check results:\n')
+            for seq, i in enumerate(check_results):
+                i_d = (
+                    '    result {index}:\n'
+                    '        node: {node}\n'
+                    '        group: {group}\n'
+                    '        status: {status}\n'
+                    '        description: {description}\n'
+                ).format(index=seq+1, **i)
+                list_.append(i_d)
+                i_elements = i['elements']
+                if i_elements:
+                    list_.append('        elements:\n')
+                    for j_element in i_elements:
+                        j_d = (
+                            '            {type}: {element}\n'
+                        ).format(
+                            element=j_element, **i
+                        )
+                        list_.append(j_d)
+                i_status = i['status']
+                if i_status == 'error':
+                    error_count += 1
+                elif i_status == 'warning':
+                    warning_count += 1
+            #
+            list_.insert(
+                0,
+                (
+                    'validation check summary： {} ( {} error and {} warning )\n'
+                ).format(summary, error_count, warning_count)
+            )
+        #
+        return ''.join(list_)
 
 
 # session for rsv task deadline job
@@ -859,7 +930,7 @@ class AbsSsnRsvTaskOptionMethod(
         # print self.get_option_opt()
         # print self.get_option()
 
-        self._validator = Validator(self)
+        self._validation_checker = ValidationChecker(self)
 
     def _set_system_option_completion_(self):
         option_opt = self.get_option_opt()
@@ -1004,8 +1075,8 @@ class AbsSsnRsvTaskOptionMethod(
             self
         )
 
-    def get_validator(self):
-        return self._validator
+    def get_validation_checker(self):
+        return self._validation_checker
 
 
 class AbsOptionRsvTaskBatcherSession(

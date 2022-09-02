@@ -44,10 +44,10 @@ class SsnOptionMethod(ssn_obj_abs.AbsSsnOptionMethod):
         super(SsnOptionMethod, self).__init__(*args, **kwargs)
 
 
-class RsvOptionHookMethodSession(ssn_obj_abs.AbsSsnRsvTaskOptionMethod):
+class RsvTaskMethodSession(ssn_obj_abs.AbsSsnRsvTaskOptionMethod):
     EXECUTOR = _ssn_obj_executor.RsvTaskHookExecutor
     def __init__(self, *args, **kwargs):
-        super(RsvOptionHookMethodSession, self).__init__(*args, **kwargs)
+        super(RsvTaskMethodSession, self).__init__(*args, **kwargs)
 
 
 class RsvObjActionSession(ssn_obj_abs.AbsSsnRsvObjAction):

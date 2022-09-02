@@ -351,6 +351,8 @@ asset-deadline-job-file: <asset-metadata-dir>/deadline.job.yml
 asset-metadata-look-yml-file: <asset-metadata-dir>/<asset-name>.look.yml
 #
 asset-scene-info-file: <asset-metadata-dir>/<asset-name>.info.yml
+# validation
+asset-validation-info-file: <asset-metadata-dir>/info/<asset-name>.validation.info
 #
 asset-camera-dir: <asset-version-dir>/camera
 asset-camera-main-abc-file: <asset-camera-dir>/abc/main.abc
@@ -468,6 +470,8 @@ asset-output-metadata-dir: <asset-output-version-dir>/metadata
 asset-output-scene-src-dir: <asset-output-version-dir>/scene
 #
 asset-output-render-info-yaml-file: <asset-output-metadata-dir>/render-info.yml
+# validation
+asset-output-validation-info-file: <asset-output-metadata-dir>/info/<asset-name>.validation.info
 #
 asset-output-maya-scene-src-dir: <asset-output-version-dir>/scene
 asset-output-maya-scene-src-file: <asset-output-maya-scene-src-dir>/<asset-name>.ma

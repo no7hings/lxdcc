@@ -14,7 +14,8 @@ class osl_window_box_s(ma_ae.AbsNodeTemplate):
         with self.scroll_layout():
             with self.layout('osl window box s', collapse=False):
                 with self.layout('texture', collapse=False):
-                    self.addControl('filename', useAsFileName=True)
+                    # self.addControl('filename', useAsFileName=True)
+                    self.addControl('filename')
                     self.addControl('udim_maximum')
                     self.addControl('texture_flip')
                     self.addControl('texture_flop')

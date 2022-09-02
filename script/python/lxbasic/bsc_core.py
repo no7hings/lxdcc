@@ -219,106 +219,6 @@ class CmdSubProcessThread(threading.Thread):
         return self._status
 
 
-class CmdThread(threading.Thread):
-    Status = bsc_configure.Status
-    def __init__(self, cmd):
-        threading.Thread.__init__(self)
-        self._cmd = cmd
-        #
-        self._status = self.Status.Started
-        #
-        self._status_changed_signal = CmdSubProcessSignal(int)
-        self._completed_signal = CmdSubProcessSignal(list)
-        self._failed_signal = CmdSubProcessSignal(int, str)
-        self._finished_signal = CmdSubProcessSignal(int, str)
-        self._logging_signal = CmdSubProcessSignal(str)
-
-    def __set_status_update(self, status):
-        self._status = status
-        self._status_changed_signal.set_emit_send(
-            status
-        )
-
-    def __set_completed(self, results):
-        self._completed_signal.set_emit_send(results)
-
-    def __set_failed(self, status):
-        self._failed_signal.set_emit_send(
-            status
-        )
-
-    def __set_finished(self, status):
-        self._finished_signal.set_emit_send(
-            status
-        )
-
-    def __set_logging(self, text):
-        self._logging_signal.set_emit_send(
-            text
-        )
-    @property
-    def status_changed(self):
-        return self._status_changed_signal
-    @property
-    def completed(self):
-        return self._completed_signal
-    @property
-    def failed(self):
-        return self._failed_signal
-    @property
-    def finished(self):
-        return self._finished_signal
-    @property
-    def logging(self):
-        return self._logging_signal
-
-    def get_status(self):
-        return self._status
-
-    def set_stop(self):
-        pass
-
-    def run(self):
-        self.__set_status_update(self.Status.Running)
-        results = []
-        s_p = subprocess.Popen(
-            self._cmd,
-            shell=True,
-            # close_fds=True,
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            startupinfo=SubProcessMtd.NO_WINDOW
-        )
-        #
-        while True:
-            next_line = s_p.stdout.readline()
-            #
-            return_line = next_line
-            if return_line == '' and s_p.poll() is not None:
-                break
-            #
-            return_line = return_line.decode('utf-8', 'ignore')
-            return_line = return_line.replace(u'\u2018', "'").replace(u'\u2019', "'")
-            results.append(return_line)
-            #
-            self.__set_logging(
-                return_line.encode('utf-8')
-            )
-        #
-        retcode = s_p.poll()
-        if retcode:
-            self.__set_status_update(self.Status.Failed)
-        else:
-            self.__set_status_update(self.Status.Completed)
-            self.__set_completed(results)
-            s_p.stdout.close()
-
-        self.__set_finished(
-            self._status
-        )
-
-
 class FncThread(threading.Thread):
     STACK = []
     MAXIMUM = 256
@@ -421,6 +321,132 @@ class FncThread(threading.Thread):
 
     def get_status(self):
         return self._status
+
+
+class CommandThread(threading.Thread):
+    Status = bsc_configure.Status
+    def __init__(self, cmd):
+        threading.Thread.__init__(self)
+        self._cmd = cmd
+        #
+        self._status = self.Status.Started
+        #
+        self.__is_killed = False
+        self.__is_stopped = False
+        #
+        self._status_changed_signal = CmdSubProcessSignal(int)
+        self._logging_signal = CmdSubProcessSignal(str)
+        #
+        self._completed_signal = CmdSubProcessSignal(tuple)
+        self._failed_signal = CmdSubProcessSignal(tuple)
+        self._finished_signal = CmdSubProcessSignal(tuple)
+
+    def __set_status_update(self, status):
+        self._status = status
+        self._status_changed_signal.set_emit_send(
+            status
+        )
+
+    def __set_completed(self, results):
+        self._completed_signal.set_emit_send(
+            (self._status, ''.join(results))
+        )
+
+    def __set_failed(self, results):
+        self._failed_signal.set_emit_send(
+            (self._status, ''.join(results))
+        )
+
+    def __set_finished(self, results):
+        self._finished_signal.set_emit_send(
+            (self._status, ''.join(results))
+        )
+
+    def __set_logging(self, text):
+        self._logging_signal.set_emit_send(
+            text
+        )
+    @property
+    def status_changed(self):
+        return self._status_changed_signal
+    @property
+    def completed(self):
+        return self._completed_signal
+    @property
+    def failed(self):
+        return self._failed_signal
+    @property
+    def finished(self):
+        return self._finished_signal
+    @property
+    def logging(self):
+        return self._logging_signal
+
+    def get_status(self):
+        return self._status
+
+    def set_stopped(self):
+        self.__is_stopped = True
+
+    def set_kill(self):
+        self.__is_killed = True
+
+    def run(self):
+        self.__set_status_update(self.Status.Running)
+        results = []
+        s_p = subprocess.Popen(
+            self._cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=SubProcessMtd.NO_WINDOW
+        )
+        #
+        while True:
+            next_line = s_p.stdout.readline()
+            #
+            return_line = next_line
+            if return_line == '' and s_p.poll() is not None:
+                break
+            #
+            return_line = return_line.decode('utf-8', 'ignore')
+            return_line = return_line.replace(u'\u2018', "'").replace(u'\u2019', "'")
+
+            log = return_line.encode('utf-8').rstrip()
+            results.append(log)
+            #
+            if self.__is_stopped is True:
+                s_p.kill()
+                self.__set_failed(results)
+                self.__set_finished(results)
+                return False
+            if self.__is_killed is True:
+                s_p.kill()
+                self.__set_logging('process is killed')
+                self.__set_status_update(self.Status.Killed)
+                #
+                self.__set_failed(results)
+                self.__set_finished(results)
+                return False
+            #
+            self.__set_logging(
+                log
+            )
+        #
+        retcode = s_p.poll()
+        if retcode:
+            self.__set_status_update(self.Status.Failed)
+            self.__set_failed(results)
+            self.__set_finished(results)
+            return False
+        #
+        s_p.stdout.close()
+        self.__set_status_update(self.Status.Completed)
+        self.__set_completed(results)
+        self.__set_finished(results)
+        return True
 
 
 class OrderedYamlMtd(object):
@@ -4222,6 +4248,21 @@ class ExceptionMtd(object):
             )
         if exc_texts:
             print exc_texts
+    @classmethod
+    def get_stack(cls):
+        import sys
+        #
+        import traceback
+        #
+        exc_type, exc_value, exc_stack = sys.exc_info()
+        exc_texts = []
+        # value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+        for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
+            i_file_path, i_line, i_fnc, i_fnc_line = stk
+            exc_texts.append(
+                u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
+            )
+        return '\n'.join(exc_texts)
 
 
 class PointArrayOpt(object):
@@ -5344,9 +5385,4 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    cmd = 'rez-env lxdcc -c "lxhook-engine -o \\\"application=maya&asset=td_test&file=/l/prod/cgm/work/assets/chr/td_test/srf/surfacing/maya/scenes/td_test.srf.surfacing.v006.ma&hook_engine=maya&open_file=True&option_hook_key=rsv-task-methods/asset/maya/gen-surface-validation&project=cgm&save_file=False&step=srf&task=surfacing&time_tag=2022_0829_1846_51_280277&user=dongchangbao&version=v006&with_geometry_check=True&with_geometry_topology_check=True&with_look_check=True&with_scene_check=True&with_shotgun_check=True&with_texture_check=True&with_texture_workspace_check=True&workspace=work\\\""'
-
-    t = CmdThread(cmd)
-
-    t.start()
-    t.join()
+    pass

@@ -157,6 +157,8 @@ class AbsTextureReferences(object):
         'osl_file_path': _ktn_dcc_obj_node.TextureReference,
         'osl_window_box': _ktn_dcc_obj_node.TextureReference,
         'osl_window_box_s': _ktn_dcc_obj_node.TextureReference,
+        'jiWindowBox_Arnold': _ktn_dcc_obj_node.TextureReference,
+        #
         'custom': _ktn_dcc_obj_node.FileReference,
     }
     PORT_PATHSEP = ktn_configure.Util.PORT_PATHSEP
@@ -174,6 +176,9 @@ class AbsTextureReferences(object):
             'parameters.filename'
         ],
         'osl_window_box_s': [
+            'parameters.filename'
+        ],
+        'jiWindowBox_Arnold': [
             'parameters.filename'
         ]
     }
@@ -318,7 +323,8 @@ class TextureReferences(AbsTextureReferences):
         'image',
         'osl_file_path',
         'osl_window_box',
-        'osl_window_box_s'
+        'osl_window_box_s',
+        'jiWindowBox_Arnold'
     ]
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)

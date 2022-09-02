@@ -1,23 +1,33 @@
 OpenShadingLanguage 1.00
-# Compiled by oslc 1.11.6
-# options: -o /home/dongchangbao/packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.oso.f63d-191b-3776-adea.tmp -I/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include
+# Compiled by oslc 1.12.0
+# options: -o /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.oso
 shader jiWindowBox_Arnold
 param	int	zUpAxis	0		%meta{string,widget,"boolean"}  %read{28,28} %write{2147483647,-1}
-param	string	filename	""		%meta{string,widget,"filename"}  %read{245,263} %write{2147483647,-1}
+param	string	filename	"[PG_PROJ_ROOT]/temp"		%meta{string,widget,"filename"}  %read{253,266} %write{2147483647,-1}
 param	int	textureFlip	0		%meta{string,widget,"boolean"}  %read{15,229} %write{2147483647,-1} %derivs
 param	int	textureFlop	0		%meta{string,widget,"boolean"}  %read{20,216} %write{2147483647,-1} %derivs
 param	float	roomDepth	1		%meta{float,min,0.100000001} %meta{float,max,100}  %read{1,1} %write{2147483647,-1} %derivs
 param	float	widthOverscan	0		%meta{float,min,0} %meta{float,max,0.899999976}  %read{8,8} %write{2147483647,-1} %derivs
 param	float	heightOverscan	0		%meta{float,min,0} %meta{float,max,0.899999976}  %read{4,4} %write{2147483647,-1} %derivs
-param	int	enableMidground	0		%meta{string,widget,"boolean"}  %read{249,249} %write{2147483647,-1}
+param	int	enableMidground	0		%meta{string,widget,"boolean"}  %read{273,273} %write{2147483647,-1}
 param	float	midgroundDepth	0.5		%meta{float,min,0.0500000007} %meta{float,max,99}  %read{13,13} %write{2147483647,-1} %derivs
 param	float	midgroundOffsetX	0		%read{23,23} %write{2147483647,-1} %derivs
 param	float	midgroundOffsetY	0		%read{18,18} %write{2147483647,-1} %derivs
-param	int	enableCurtains	0		%meta{string,widget,"boolean"}  %read{256,256} %write{2147483647,-1}
-oparam	color	outRGB	0 0 0		%read{2147483647,-1} %write{262,262}
+param	int	enableCurtains	0		%meta{string,widget,"boolean"}  %read{280,280} %write{2147483647,-1}
+oparam	color	outRGB	0 0 0		%read{2147483647,-1} %write{286,286}
 global	vector	I	%read{25,25} %write{2147483647,-1} %derivs
 global	float	u	%read{47,52} %write{2147483647,-1} %derivs
 global	float	v	%read{47,52} %write{2147483647,-1} %derivs
+local	string[1]	___337_keys	%read{246,265} %write{244,244}
+local	string[1]	___337_values	%read{249,265} %write{245,245}
+local	int	___337_c	%read{249,265} %write{246,246}
+local	int	___338_i	%read{249,265} %write{248,265}
+local	string	___339_i_key	%read{249,265} %write{249,265}
+local	string	___339_i_value	%read{249,265} %write{249,265}
+local	int	___339_i_match	%read{249,265} %write{249,265}
+local	int	___340_i_start	%read{249,265} %write{249,265}
+local	string	___340_i_string_0	%read{249,265} %write{249,265}
+local	string	___340_i_out_string	%read{249,265} %write{249,265}
 local	float	roomDepthMult	%read{11,162} %write{2,2} %derivs
 local	float	heightOverscanMult	%read{37,55} %write{6,6} %derivs
 local	float	widthOverscanMult	%read{37,55} %write{10,10} %derivs
@@ -49,24 +59,25 @@ local	color	FloorCeilUV	%read{138,144} %write{134,134} %derivs
 local	color	ceilUV	%read{212,212} %write{141,141} %derivs
 local	color	floorUV	%read{150,212} %write{148,156} %derivs
 local	color	backWallUV	%read{215,215} %write{173,173} %derivs
-local	color	midgroundUV	%read{184,252} %write{183,238} %derivs
+local	color	midgroundUV	%read{184,276} %write{183,238} %derivs
 local	float	midgroundMask	%read{200,200} %write{197,197} %derivs
-local	color	curtainsUV	%read{209,259} %write{207,242} %derivs
-local	color	finalUV	%read{226,244} %write{215,233} %derivs
-local	color	roomRGB	%read{254,255} %write{245,245}
-local	color	finalRGB	%read{261,262} %write{254,261}
-local	int	e	%read{247,247} %write{246,246}
-local	float	___342_midgroundA	%read{254,254} %write{253,253}
-local	color	___342_midgroundRGB	%read{254,254} %write{253,253}
-local	float	___344_curtainsA	%read{261,261} %write{260,260}
-local	color	___344_curtainsRGB	%read{261,261} %write{260,260}
+local	color	curtainsUV	%read{209,283} %write{207,242} %derivs
+local	color	finalUV	%read{226,271} %write{215,233} %derivs
+local	string	filename_new	%read{267,287} %write{249,266}
+local	int	e	%read{268,268} %write{267,267}
+local	color	___345_roomRGB	%read{278,279} %write{272,272}
+local	color	___345_finalRGB	%read{285,286} %write{278,285}
+local	float	___346_midgroundA	%read{278,278} %write{277,277}
+local	color	___346_midgroundRGB	%read{278,278} %write{277,277}
+local	float	___348_curtainsA	%read{285,285} %write{284,284}
+local	color	___348_curtainsRGB	%read{285,285} %write{284,284}
 const	float	$const1	0.100000001		%read{2,24} %write{2147483647,-1}
 const	float	$const3	100		%read{1,1} %write{2147483647,-1}
 const	string	$const4	"clamp"		%read{0,12} %write{2147483647,-1}
 temp	float	$tmp1	%read{2,2} %write{1,1} %derivs
-const	int	$const5	1		%read{16,259} %write{2147483647,-1}
+const	int	$const5	1		%read{16,283} %write{2147483647,-1}
 temp	float	$tmp2	%read{6,6} %write{5,5} %derivs
-const	int	$const6	0		%read{28,258} %write{2147483647,-1}
+const	int	$const6	0		%read{28,282} %write{2147483647,-1}
 const	float	$const7	0		%read{5,198} %write{2147483647,-1}
 const	float	$const8	0.899999976		%read{4,8} %write{2147483647,-1}
 temp	float	$tmp3	%read{5,5} %write{4,4} %derivs
@@ -264,83 +275,93 @@ temp	float	$tmp184	%read{238,238} %write{237,237} %derivs
 temp	float	$tmp185	%read{241,241} %write{239,239} %derivs
 temp	float	$tmp186	%read{241,241} %write{240,240} %derivs
 temp	float	$tmp187	%read{242,242} %write{241,241} %derivs
-temp	float	$tmp188	%read{245,245} %write{243,243} %derivs
-temp	float	$tmp189	%read{245,245} %write{244,244} %derivs
-temp	int	$tmp190	%read{2147483647,-1} %write{246,246}
-const	string	$const20	"exists"		%read{246,246} %write{2147483647,-1}
-temp	int	$tmp191	%read{248,248} %write{247,247}
-temp	int	$tmp192	%read{250,250} %write{249,249}
-temp	float	$tmp193	%read{253,253} %write{251,251} %derivs
-temp	float	$tmp194	%read{253,253} %write{252,252} %derivs
-const	string	$const21	"alpha"		%read{253,260} %write{2147483647,-1}
-temp	int	$tmp195	%read{257,257} %write{256,256}
-temp	float	$tmp196	%read{260,260} %write{258,258} %derivs
-temp	float	$tmp197	%read{260,260} %write{259,259} %derivs
-const	string	$const22	"%s, is non-exists"		%read{263,263} %write{2147483647,-1}
+const	string	$const20	"resolver_filename_form_environ"		%read{243,243} %write{2147483647,-1}
+const	string[1]	$const21	"[PG_PROJ_ROOT]"		%read{244,244} %write{2147483647,-1}
+const	string[1]	$const22	"/l/prod"		%read{245,245} %write{2147483647,-1}
+temp	int	$tmp188	%read{249,265} %write{249,265}
+temp	int	$tmp189	%read{247,265} %write{248,265}
+temp	int	$tmp190	%read{249,265} %write{249,265}
+const	string	$const23	"substr"		%read{257,257} %write{2147483647,-1}
+temp	int	$tmp191	%read{249,265} %write{249,265}
+const	string	$const24	"resolver texture from environ: %s >> %s"		%read{261,261} %write{2147483647,-1}
+temp	int	$tmp192	%read{2147483647,-1} %write{249,265}
+temp	int	$tmp193	%read{2147483647,-1} %write{267,267}
+const	string	$const25	"exists"		%read{267,267} %write{2147483647,-1}
+temp	int	$tmp194	%read{269,269} %write{268,268}
+temp	float	$tmp195	%read{272,272} %write{270,270} %derivs
+temp	float	$tmp196	%read{272,272} %write{271,271} %derivs
+temp	int	$tmp197	%read{274,274} %write{273,273}
+temp	float	$tmp198	%read{277,277} %write{275,275} %derivs
+temp	float	$tmp199	%read{277,277} %write{276,276} %derivs
+const	string	$const26	"alpha"		%read{277,284} %write{2147483647,-1}
+temp	int	$tmp200	%read{281,281} %write{280,280}
+temp	float	$tmp201	%read{284,284} %write{282,282} %derivs
+temp	float	$tmp202	%read{284,284} %write{283,283} %derivs
+const	string	$const27	"%s, is non-exists"		%read{287,287} %write{2147483647,-1}
 code ___main___
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:21
-#     float heightOverscanMult = 1 - clamp(heightOverscan,0,0.9);
-	functioncall	$const4 3 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{21} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:42
+#     float roomDepthMult = clamp(roomDepth,0.1,100);
+	functioncall	$const4 3 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{42} %argrw{"r"}
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp1 roomDepth $const3 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp1 roomDepth $const3 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		roomDepthMult $tmp1 $const1 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:22
-#     float widthOverscanMult = 1 - clamp(widthOverscan,0,0.9); 
-	functioncall	$const4 6 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{22} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:43
+#     float heightOverscanMult = 1 - clamp(heightOverscan,0,0.9);
+	functioncall	$const4 6 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{43} %argrw{"r"}
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp3 heightOverscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp3 heightOverscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp2 $tmp3 $const7 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:22
-#     float widthOverscanMult = 1 - clamp(widthOverscan,0,0.9); 
-	sub		heightOverscanMult $const9 $tmp2 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{22} %argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:23
-#     float midgroundDepthMult = clamp(midgroundDepth,0.05,roomDepthMult-0.01); 
-	functioncall	$const4 10 	%line{23} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:43
+#     float heightOverscanMult = 1 - clamp(heightOverscan,0,0.9);
+	sub		heightOverscanMult $const9 $tmp2 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{43} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:44
+#     float widthOverscanMult = 1 - clamp(widthOverscan,0,0.9);
+	functioncall	$const4 10 	%line{44} %argrw{"r"}
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp5 widthOverscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp5 widthOverscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp4 $tmp5 $const7 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:23
-#     float midgroundDepthMult = clamp(midgroundDepth,0.05,roomDepthMult-0.01); 
-	sub		widthOverscanMult $const9 $tmp4 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{23} %argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:24
-#     float midgroundOffY = midgroundOffsetY * (textureFlip*2-1) * 0.1;
-	sub		$tmp6 roomDepthMult $const11 	%line{24} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:44
+#     float widthOverscanMult = 1 - clamp(widthOverscan,0,0.9);
+	sub		widthOverscanMult $const9 $tmp4 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{44} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:45
+#     float midgroundDepthMult = clamp(midgroundDepth,0.05,roomDepthMult-0.01);
+	sub		$tmp6 roomDepthMult $const11 	%line{45} %argrw{"wrr"}
 	functioncall	$const4 15 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:141
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp7 midgroundDepth $tmp6 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp7 midgroundDepth $tmp6 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		midgroundDepthMult $tmp7 $const10 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:25
-#     float midgroundOffX = midgroundOffsetX * (textureFlop*2-1) * 0.1;
-	mul		$tmp8 textureFlip $const12 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{25} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:46
+#     float midgroundOffY = midgroundOffsetY * (textureFlip*2-1) * 0.1;
+	mul		$tmp8 textureFlip $const12 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{46} %argrw{"wrr"}
 	sub		$tmp9 $tmp8 $const5 	%argrw{"wrr"}
 	assign		$tmp11 $tmp9 	%argrw{"wr"}
 	mul		$tmp10 midgroundOffsetY $tmp11 	%argrw{"wrr"}
 	mul		midgroundOffY $tmp10 $const1 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:26
-#     
-	mul		$tmp12 textureFlop $const12 	%line{26} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:47
+#     float midgroundOffX = midgroundOffsetX * (textureFlop*2-1) * 0.1;
+	mul		$tmp12 textureFlop $const12 	%line{47} %argrw{"wrr"}
 	sub		$tmp13 $tmp12 $const5 	%argrw{"wrr"}
 	assign		$tmp15 $tmp13 	%argrw{"wr"}
 	mul		$tmp14 midgroundOffsetX $tmp15 	%argrw{"wrr"}
 	mul		midgroundOffX $tmp14 $const1 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:30
-#     if (zUpAxis > 0){ 
-	neg		$tmp16 I 	%line{30} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:51
+#     vector objI = transform("object", -I);
+	neg		$tmp16 I 	%line{51} %argrw{"wr"}
 	functioncall	$const14 28 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h:262
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:262
 # vector transform (string to, vector p) { return transform("common",to,p); }
-	transformv	objI $const15 $const13 $tmp16 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/plug-ins/../bin/../osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:31
-#       objI = vector(-objI[0],-objI[1],-objI[2]) * color(widthOverscanMult, heightOverscanMult, 1);		//reorder to match UV for Y up axis
-	gt		$tmp17 zUpAxis $const6 	%filename{"packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{31} %argrw{"wrr"}
+	transformv	objI $const15 $const13 $tmp16 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:52
+#     if (zUpAxis > 0){
+	gt		$tmp17 zUpAxis $const6 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{52} %argrw{"wrr"}
 	if		$tmp17 39 47 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:32
-#     } else {
-	compref		$tmp19 objI $const6 	%line{32} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:53
+#       objI = vector(-objI[0],-objI[1],-objI[2]) * color(widthOverscanMult, heightOverscanMult, 1);		//reorder to match UV for Y up axis
+	compref		$tmp19 objI $const6 	%line{53} %argrw{"wrr"}
 	neg		$tmp20 $tmp19 	%argrw{"wr"}
 	compref		$tmp21 objI $const5 	%argrw{"wrr"}
 	neg		$tmp22 $tmp21 	%argrw{"wr"}
@@ -349,9 +370,9 @@ code ___main___
 	vector		$tmp18 $tmp20 $tmp22 $tmp24 	%argrw{"wrrr"}
 	color		$tmp25 widthOverscanMult heightOverscanMult $const9 	%argrw{"wrrr"}
 	mul		objI $tmp18 $tmp25 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:34
-#     } 
-	compref		$tmp27 objI $const6 	%line{34} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:55
+#       objI = vector(-objI[0],objI[2],-objI[1]) * color(widthOverscanMult, heightOverscanMult, 1);		//reorder to match UV for Z up axis
+	compref		$tmp27 objI $const6 	%line{55} %argrw{"wrr"}
 	neg		$tmp28 $tmp27 	%argrw{"wr"}
 	compref		$tmp29 objI $const12 	%argrw{"wrr"}
 	compref		$tmp30 objI $const5 	%argrw{"wrr"}
@@ -359,119 +380,119 @@ code ___main___
 	vector		$tmp26 $tmp28 $tmp29 $tmp31 	%argrw{"wrrr"}
 	color		$tmp32 widthOverscanMult heightOverscanMult $const9 	%argrw{"wrrr"}
 	mul		objI $tmp26 $tmp32 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:36
-#     color objP = (color(u,v,0.5) * 2 - 1) * color(widthOverscanMult, heightOverscanMult, 1)  * 0.5 + 0.5; 	//UV seems to be the better approach
-	color		$tmp33 u v $const16 	%line{36} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:57
+#     color objPOrig = (color(u,v,0.5) * 2 - 1) * 0.5 + 0.5;							//for curtains
+	color		$tmp33 u v $const16 	%line{57} %argrw{"wrrr"}
 	mul		$tmp34 $tmp33 $const17 	%argrw{"wrr"}
 	sub		$tmp35 $tmp34 $const9 	%argrw{"wrr"}
 	mul		$tmp36 $tmp35 $const16 	%argrw{"wrr"}
 	add		objPOrig $tmp36 $const16 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:37
-#     
-	color		$tmp37 u v $const16 	%line{37} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:58
+#     color objP = (color(u,v,0.5) * 2 - 1) * color(widthOverscanMult, heightOverscanMult, 1)  * 0.5 + 0.5; 	//UV seems to be the better approach
+	color		$tmp37 u v $const16 	%line{58} %argrw{"wrrr"}
 	mul		$tmp38 $tmp37 $const17 	%argrw{"wrr"}
 	sub		$tmp39 $tmp38 $const9 	%argrw{"wrr"}
 	color		$tmp40 widthOverscanMult heightOverscanMult $const9 	%argrw{"wrrr"}
 	mul		$tmp41 $tmp39 $tmp40 	%argrw{"wrr"}
 	mul		$tmp42 $tmp41 $const16 	%argrw{"wrr"}
 	add		objP $tmp42 $const16 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:41
-#     color baseDepth = (objP-sections)/(-objI * roomDepthMult);
-	assign		$tmp43 $const7 	%line{41} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:62
+#     vector sections = step(0, objI);
+	assign		$tmp43 $const7 	%line{62} %argrw{"wr"}
 	step		sections $tmp43 objI 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:42
-#     color mgDepth = (objP-sections)/(-objI * midgroundDepthMult);    
-	sub		$tmp44 objP sections 	%line{42} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:63
+#     color baseDepth = (objP-sections)/(-objI * roomDepthMult);
+	sub		$tmp44 objP sections 	%line{63} %argrw{"wrr"}
 	neg		$tmp45 objI 	%argrw{"wr"}
 	mul		$tmp46 $tmp45 roomDepthMult 	%argrw{"wrr"}
 	div		baseDepth $tmp44 $tmp46 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:43
-#     color baseBack = (objP-sections)/(-objI);
-	sub		$tmp47 objP sections 	%line{43} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:64
+#     color mgDepth = (objP-sections)/(-objI * midgroundDepthMult);
+	sub		$tmp47 objP sections 	%line{64} %argrw{"wrr"}
 	neg		$tmp48 objI 	%argrw{"wr"}
 	mul		$tmp49 $tmp48 midgroundDepthMult 	%argrw{"wrr"}
 	div		mgDepth $tmp47 $tmp49 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:44
-#     color baseWidth = baseDepth * roomDepthMult;
-	sub		$tmp50 objP sections 	%line{44} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:65
+#     color baseBack = (objP-sections)/(-objI);
+	sub		$tmp50 objP sections 	%line{65} %argrw{"wrr"}
 	neg		$tmp51 objI 	%argrw{"wr"}
 	div		baseBack $tmp50 $tmp51 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:45
-#     
-	mul		baseWidth baseDepth roomDepthMult 	%line{45} %argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:50
-#     color baseDepthY = (baseDepth[0]*objI+objP + 1);
-	compref		$tmp52 baseDepth $const5 	%line{50} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:66
+#     color baseWidth = baseDepth * roomDepthMult;
+	mul		baseWidth baseDepth roomDepthMult 	%line{66} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:71
+#     color baseDepthX = (baseDepth[1]*objI+objP + 1);
+	compref		$tmp52 baseDepth $const5 	%line{71} %argrw{"wrr"}
 	mul		$tmp53 $tmp52 objI 	%argrw{"wrr"}
 	add		$tmp54 $tmp53 objP 	%argrw{"wrr"}
 	add		baseDepthX $tmp54 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:51
-#     color baseWidthX = (baseWidth[1]*objI+objP + 1);
-	compref		$tmp55 baseDepth $const6 	%line{51} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:72
+#     color baseDepthY = (baseDepth[0]*objI+objP + 1);
+	compref		$tmp55 baseDepth $const6 	%line{72} %argrw{"wrr"}
 	mul		$tmp56 $tmp55 objI 	%argrw{"wrr"}
 	add		$tmp57 $tmp56 objP 	%argrw{"wrr"}
 	add		baseDepthY $tmp57 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:52
-#     color baseWidthY = (baseWidth[0]*objI+objP + 1);
-	compref		$tmp58 baseWidth $const5 	%line{52} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:73
+#     color baseWidthX = (baseWidth[1]*objI+objP + 1);
+	compref		$tmp58 baseWidth $const5 	%line{73} %argrw{"wrr"}
 	mul		$tmp59 $tmp58 objI 	%argrw{"wrr"}
 	add		$tmp60 $tmp59 objP 	%argrw{"wrr"}
 	add		baseWidthX $tmp60 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:53
-# 
-	compref		$tmp61 baseWidth $const6 	%line{53} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:74
+#     color baseWidthY = (baseWidth[0]*objI+objP + 1);
+	compref		$tmp61 baseWidth $const6 	%line{74} %argrw{"wrr"}
 	mul		$tmp62 $tmp61 objI 	%argrw{"wrr"}
 	add		$tmp63 $tmp62 objP 	%argrw{"wrr"}
 	add		baseWidthY $tmp63 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:55
-#     float vertU = baseWidthX[0] - 1;
-	compref		$tmp64 baseDepthY $const12 	%line{55} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:76
+#     float horizU = baseDepthY[2] - 0.5;
+	compref		$tmp64 baseDepthY $const12 	%line{76} %argrw{"wrr"}
 	sub		horizU $tmp64 $const16 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:56
-#     float horizV = baseWidthY[1] - 1;
-	compref		$tmp65 baseWidthX $const6 	%line{56} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:77
+#     float vertU = baseWidthX[0] - 1;
+	compref		$tmp65 baseWidthX $const6 	%line{77} %argrw{"wrr"}
 	sub		vertU $tmp65 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:57
-#     float vertV = baseDepthX[2] - 0.5;
-	compref		$tmp66 baseWidthY $const5 	%line{57} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:78
+#     float horizV = baseWidthY[1] - 1;
+	compref		$tmp66 baseWidthY $const5 	%line{78} %argrw{"wrr"}
 	sub		horizV $tmp66 $const9 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:58
-#     
-	compref		$tmp67 baseDepthX $const12 	%line{58} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:79
+#     float vertV = baseDepthX[2] - 0.5;
+	compref		$tmp67 baseDepthX $const12 	%line{79} %argrw{"wrr"}
 	sub		vertV $tmp67 $const16 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:62
-#     color sideWallsUV = color(horizU, horizV, 0) / 3;
-	step		$tmp68 $const7 horizU 	%line{62} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:83
+#     float sideWallsMask = step(0,horizU) * step(0,1-max(horizV, 1-horizV));
+	step		$tmp68 $const7 horizU 	%line{83} %argrw{"wrr"}
 	sub		$tmp71 $const9 horizV 	%argrw{"wrr"}
 	max		$tmp70 horizV $tmp71 	%argrw{"wrr"}
 	sub		$tmp72 $const9 $tmp70 	%argrw{"wrr"}
 	step		$tmp69 $const7 $tmp72 	%argrw{"wrr"}
 	mul		sideWallsMask $tmp68 $tmp69 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:63
-#     color rWallUV = (sideWallsUV + color(2.0/3.0, 1.0/3.0, 0)) * sideWallsMask * sections[0];
-	color		$tmp73 horizU horizV $const7 	%line{63} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:84
+#     color sideWallsUV = color(horizU, horizV, 0) / 3;
+	color		$tmp73 horizU horizV $const7 	%line{84} %argrw{"wrrr"}
 	div		sideWallsUV $tmp73 $const19 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:64
-#     color lWallUV = (sideWallsUV + color(0.0, 1.0/3.0, 0)) * sideWallsMask * (1-sections[0]);
-	div		$tmp75 $const17 $const19 	%line{64} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:85
+#     color rWallUV = (sideWallsUV + color(2.0/3.0, 1.0/3.0, 0)) * sideWallsMask * sections[0];
+	div		$tmp75 $const17 $const19 	%line{85} %argrw{"wrr"}
 	div		$tmp76 $const9 $const19 	%argrw{"wrr"}
 	color		$tmp74 $tmp75 $tmp76 $const7 	%argrw{"wrrr"}
 	add		$tmp77 sideWallsUV $tmp74 	%argrw{"wrr"}
 	mul		$tmp78 $tmp77 sideWallsMask 	%argrw{"wrr"}
 	compref		$tmp79 sections $const6 	%argrw{"wrr"}
 	mul		rWallUV $tmp78 $tmp79 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:65
-#     lWallUV[0] = (1.0/3.0 - lWallUV[0]) * sideWallsMask * (1-sections[0]);     
-	div		$tmp81 $const9 $const19 	%line{65} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:86
+#     color lWallUV = (sideWallsUV + color(0.0, 1.0/3.0, 0)) * sideWallsMask * (1-sections[0]);
+	div		$tmp81 $const9 $const19 	%line{86} %argrw{"wrr"}
 	color		$tmp80 $const7 $tmp81 $const7 	%argrw{"wrrr"}
 	add		$tmp82 sideWallsUV $tmp80 	%argrw{"wrr"}
 	mul		$tmp83 $tmp82 sideWallsMask 	%argrw{"wrr"}
 	compref		$tmp84 sections $const6 	%argrw{"wrr"}
 	sub		$tmp85 $const9 $tmp84 	%argrw{"wrr"}
 	mul		lWallUV $tmp83 $tmp85 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:66
-#     
-	div		$tmp86 $const9 $const19 	%line{66} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:87
+#     lWallUV[0] = (1.0/3.0 - lWallUV[0]) * sideWallsMask * (1-sections[0]);
+	div		$tmp86 $const9 $const19 	%line{87} %argrw{"wrr"}
 	compref		$tmp87 lWallUV $const6 	%argrw{"wrr"}
 	sub		$tmp88 $tmp86 $tmp87 	%argrw{"wrr"}
 	mul		$tmp89 $tmp88 sideWallsMask 	%argrw{"wrr"}
@@ -479,39 +500,39 @@ code ___main___
 	sub		$tmp91 $const9 $tmp90 	%argrw{"wrr"}
 	mul		$tmp92 $tmp89 $tmp91 	%argrw{"wrr"}
 	compassign	lWallUV $const6 $tmp92 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:68
-#     color FloorCeilUV = color(vertU, vertV, 0) / 3;
-	step		$tmp93 $const7 vertV 	%line{68} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:89
+#     float FloorCeilMask = step(0,vertV) * step(0,1-max(vertU, 1-vertU));
+	step		$tmp93 $const7 vertV 	%line{89} %argrw{"wrr"}
 	sub		$tmp96 $const9 vertU 	%argrw{"wrr"}
 	max		$tmp95 vertU $tmp96 	%argrw{"wrr"}
 	sub		$tmp97 $const9 $tmp95 	%argrw{"wrr"}
 	step		$tmp94 $const7 $tmp97 	%argrw{"wrr"}
 	mul		FloorCeilMask $tmp93 $tmp94 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:69
-#     color ceilUV = (FloorCeilUV + color(1.0/3.0, 2.0/3.0, 0)) * FloorCeilMask * sections[1];
-	color		$tmp98 vertU vertV $const7 	%line{69} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:90
+#     color FloorCeilUV = color(vertU, vertV, 0) / 3;
+	color		$tmp98 vertU vertV $const7 	%line{90} %argrw{"wrrr"}
 	div		FloorCeilUV $tmp98 $const19 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:70
-#     color floorUV = (FloorCeilUV + color(1.0/3.0, 0, 0)) * FloorCeilMask * (1-sections[1]);
-	div		$tmp100 $const9 $const19 	%line{70} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:91
+#     color ceilUV = (FloorCeilUV + color(1.0/3.0, 2.0/3.0, 0)) * FloorCeilMask * sections[1];
+	div		$tmp100 $const9 $const19 	%line{91} %argrw{"wrr"}
 	div		$tmp101 $const17 $const19 	%argrw{"wrr"}
 	color		$tmp99 $tmp100 $tmp101 $const7 	%argrw{"wrrr"}
 	add		$tmp102 FloorCeilUV $tmp99 	%argrw{"wrr"}
 	mul		$tmp103 $tmp102 FloorCeilMask 	%argrw{"wrr"}
 	compref		$tmp104 sections $const5 	%argrw{"wrr"}
 	mul		ceilUV $tmp103 $tmp104 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:71
-#     floorUV[1] = (1.0/3.0 - floorUV[1]) * FloorCeilMask * (1-sections[1]);
-	div		$tmp106 $const9 $const19 	%line{71} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:92
+#     color floorUV = (FloorCeilUV + color(1.0/3.0, 0, 0)) * FloorCeilMask * (1-sections[1]);
+	div		$tmp106 $const9 $const19 	%line{92} %argrw{"wrr"}
 	color		$tmp105 $tmp106 $const7 $const7 	%argrw{"wrrr"}
 	add		$tmp107 FloorCeilUV $tmp105 	%argrw{"wrr"}
 	mul		$tmp108 $tmp107 FloorCeilMask 	%argrw{"wrr"}
 	compref		$tmp109 sections $const5 	%argrw{"wrr"}
 	sub		$tmp110 $const9 $tmp109 	%argrw{"wrr"}
 	mul		floorUV $tmp108 $tmp110 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:72
-#     
-	div		$tmp111 $const9 $const19 	%line{72} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:93
+#     floorUV[1] = (1.0/3.0 - floorUV[1]) * FloorCeilMask * (1-sections[1]);
+	div		$tmp111 $const9 $const19 	%line{93} %argrw{"wrr"}
 	compref		$tmp112 floorUV $const5 	%argrw{"wrr"}
 	sub		$tmp113 $tmp111 $tmp112 	%argrw{"wrr"}
 	mul		$tmp114 $tmp113 FloorCeilMask 	%argrw{"wrr"}
@@ -519,9 +540,9 @@ code ___main___
 	sub		$tmp116 $const9 $tmp115 	%argrw{"wrr"}
 	mul		$tmp117 $tmp114 $tmp116 	%argrw{"wrr"}
 	compassign	floorUV $const5 $tmp117 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:74
-# 
-	compref		$tmp118 baseBack $const12 	%line{74} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:95
+#     color backWallUV = ((baseBack[2]*objI + (objP/2)/(roomDepthMult)) * (roomDepthMult*2) / 3 + color(1.0/3.0, 1.0/3.0, 0) ) * (1 - max(step(0,horizU), step(0,vertV)));
+	compref		$tmp118 baseBack $const12 	%line{95} %argrw{"wrr"}
 	mul		$tmp119 $tmp118 objI 	%argrw{"wrr"}
 	div		$tmp120 objP $const17 	%argrw{"wrr"}
 	div		$tmp121 $tmp120 roomDepthMult 	%argrw{"wrr"}
@@ -538,9 +559,9 @@ code ___main___
 	max		$tmp130 $tmp131 $tmp132 	%argrw{"wrr"}
 	sub		$tmp133 $const9 $tmp130 	%argrw{"wrr"}
 	mul		backWallUV $tmp129 $tmp133 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:77
-#     float midgroundMask = step( 0, midgroundUV[1] * 3 * (1-midgroundUV[1]*3) ) * step( 0, midgroundUV[0] * (1.0/3.0-midgroundUV[0]) ); 
-	div		$tmp134 $const9 $const19 	%line{77} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:98
+#     color midgroundUV = (1.0/3.0 - (baseBack[2]*objI + (objP)/(midgroundDepthMult*2)) * (midgroundDepthMult*2) / 3);
+	div		$tmp134 $const9 $const19 	%line{98} %argrw{"wrr"}
 	compref		$tmp135 baseBack $const12 	%argrw{"wrr"}
 	mul		$tmp136 $tmp135 objI 	%argrw{"wrr"}
 	mul		$tmp137 midgroundDepthMult $const17 	%argrw{"wrr"}
@@ -550,9 +571,9 @@ code ___main___
 	mul		$tmp141 $tmp139 $tmp140 	%argrw{"wrr"}
 	div		$tmp142 $tmp141 $const19 	%argrw{"wrr"}
 	sub		midgroundUV $tmp134 $tmp142 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:78
-#     midgroundUV = (color(midgroundOffX, midgroundOffY, 0) + midgroundUV) * midgroundMask;
-	compref		$tmp144 midgroundUV $const5 	%line{78} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:99
+#     float midgroundMask = step( 0, midgroundUV[1] * 3 * (1-midgroundUV[1]*3) ) * step( 0, midgroundUV[0] * (1.0/3.0-midgroundUV[0]) );
+	compref		$tmp144 midgroundUV $const5 	%line{99} %argrw{"wrr"}
 	mul		$tmp145 $tmp144 $const19 	%argrw{"wrr"}
 	compref		$tmp146 midgroundUV $const5 	%argrw{"wrr"}
 	mul		$tmp147 $tmp146 $const19 	%argrw{"wrr"}
@@ -566,120 +587,178 @@ code ___main___
 	mul		$tmp155 $tmp151 $tmp154 	%argrw{"wrr"}
 	step		$tmp150 $const7 $tmp155 	%argrw{"wrr"}
 	mul		midgroundMask $tmp143 $tmp150 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:79
-#     midgroundUV[1] = 1-midgroundUV[1];  
-	color		$tmp156 midgroundOffX midgroundOffY $const7 	%line{79} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:100
+#     midgroundUV = (color(midgroundOffX, midgroundOffY, 0) + midgroundUV) * midgroundMask;
+	color		$tmp156 midgroundOffX midgroundOffY $const7 	%line{100} %argrw{"wrrr"}
 	add		$tmp157 $tmp156 midgroundUV 	%argrw{"wrr"}
 	mul		midgroundUV $tmp157 midgroundMask 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:80
-#     
-	compref		$tmp158 midgroundUV $const5 	%line{80} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:101
+#     midgroundUV[1] = 1-midgroundUV[1];
+	compref		$tmp158 midgroundUV $const5 	%line{101} %argrw{"wrr"}
 	sub		$tmp159 $const9 $tmp158 	%argrw{"wrr"}
 	compassign	midgroundUV $const5 $tmp159 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:82
-#     curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
-	div		$tmp161 $const9 $const19 	%line{82} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:103
+#     color curtainsUV = objPOrig * color(1.0/3.0, 1.0/3.0, 1);
+	div		$tmp161 $const9 $const19 	%line{103} %argrw{"wrr"}
 	div		$tmp162 $const9 $const19 	%argrw{"wrr"}
 	color		$tmp160 $tmp161 $tmp162 $const9 	%argrw{"wrrr"}
 	mul		curtainsUV objPOrig $tmp160 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:83
-# 
-	div		$tmp163 $const9 $const19 	%line{83} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:104
+#     curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
+	div		$tmp163 $const9 $const19 	%line{104} %argrw{"wrr"}
 	compref		$tmp164 curtainsUV $const6 	%argrw{"wrr"}
 	sub		$tmp165 $tmp163 $tmp164 	%argrw{"wrr"}
 	compassign	curtainsUV $const6 $tmp165 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:87
-#     
-	add		$tmp166 ceilUV floorUV 	%line{87} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:108
+#     color finalUV = ceilUV + floorUV + rWallUV + lWallUV + backWallUV;
+	add		$tmp166 ceilUV floorUV 	%line{108} %argrw{"wrr"}
 	add		$tmp167 $tmp166 rWallUV 	%argrw{"wrr"}
 	add		$tmp168 $tmp167 lWallUV 	%argrw{"wrr"}
 	add		finalUV $tmp168 backWallUV 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:93
-#         midgroundUV[0] = 1.0/3.0 - midgroundUV[0];
-	gt		$tmp169 textureFlop $const6 	%line{93} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:114
+#     if (textureFlop > 0){
+	gt		$tmp169 textureFlop $const6 	%line{114} %argrw{"wrr"}
 	if		$tmp169 226 229 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:94
-#         curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
-	div		$tmp170 $const9 $const19 	%line{94} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:115
+#         midgroundUV[0] = 1.0/3.0 - midgroundUV[0];
+	div		$tmp170 $const9 $const19 	%line{115} %argrw{"wrr"}
 	compref		$tmp171 midgroundUV $const6 	%argrw{"wrr"}
 	sub		$tmp172 $tmp170 $tmp171 	%argrw{"wrr"}
 	compassign	midgroundUV $const6 $tmp172 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:95
-#     }else
-	div		$tmp173 $const9 $const19 	%line{95} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:116
+#         curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
+	div		$tmp173 $const9 $const19 	%line{116} %argrw{"wrr"}
 	compref		$tmp174 curtainsUV $const6 	%argrw{"wrr"}
 	sub		$tmp175 $tmp173 $tmp174 	%argrw{"wrr"}
 	compassign	curtainsUV $const6 $tmp175 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:97
-#     if (textureFlip > 0){
-	compref		$tmp176 finalUV $const6 	%line{97} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:118
+#         finalUV[0] = 1-finalUV[0];
+	compref		$tmp176 finalUV $const6 	%line{118} %argrw{"wrr"}
 	sub		$tmp177 $const9 $tmp176 	%argrw{"wrr"}
 	compassign	finalUV $const6 $tmp177 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:98
-#         finalUV[1] = 1-finalUV[1];
-	gt		$tmp178 textureFlip $const6 	%line{98} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:119
+#     if (textureFlip > 0){
+	gt		$tmp178 textureFlip $const6 	%line{119} %argrw{"wrr"}
 	if		$tmp178 243 243 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:99
-#         midgroundUV[1] = 1 - midgroundUV[1] + 2.0/3.0;
-	compref		$tmp179 finalUV $const5 	%line{99} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:120
+#         finalUV[1] = 1-finalUV[1];
+	compref		$tmp179 finalUV $const5 	%line{120} %argrw{"wrr"}
 	sub		$tmp180 $const9 $tmp179 	%argrw{"wrr"}
 	compassign	finalUV $const5 $tmp180 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:100
-#         curtainsUV[1] = 1.0/3.0 - curtainsUV[1];
-	compref		$tmp181 midgroundUV $const5 	%line{100} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:121
+#         midgroundUV[1] = 1 - midgroundUV[1] + 2.0/3.0;
+	compref		$tmp181 midgroundUV $const5 	%line{121} %argrw{"wrr"}
 	sub		$tmp182 $const9 $tmp181 	%argrw{"wrr"}
 	div		$tmp183 $const17 $const19 	%argrw{"wrr"}
 	add		$tmp184 $tmp182 $tmp183 	%argrw{"wrr"}
 	compassign	midgroundUV $const5 $tmp184 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:101
-#     }
-	div		$tmp185 $const9 $const19 	%line{101} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:122
+#         curtainsUV[1] = 1.0/3.0 - curtainsUV[1];
+	div		$tmp185 $const9 $const19 	%line{122} %argrw{"wrr"}
 	compref		$tmp186 curtainsUV $const5 	%argrw{"wrr"}
 	sub		$tmp187 $tmp185 $tmp186 	%argrw{"wrr"}
 	compassign	curtainsUV $const5 $tmp187 	%argrw{"wrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:105
-#         
-	compref		$tmp188 finalUV $const6 	%line{105} %argrw{"wrr"}
-	compref		$tmp189 finalUV $const5 	%argrw{"wrr"}
-	texture		roomRGB filename $tmp188 $tmp189 	%argrw{"wrrr"} %argderivs{2,3}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:110
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:125
+#     string filename_new = resolver_filename_form_environ(filename);
+	functioncall	$const20 267 	%line{125} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:7
+#     string keys[1] = {"[PG_PROJ_ROOT]"};
+	assign		___337_keys $const21 	%line{7} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:8
+#     string values[1] = {"/l/prod"};
+	assign		___337_values $const22 	%line{8} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:9
+#     int c = arraylength(keys);
+	arraylength	___337_c ___337_keys 	%line{9} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:10
+#     for (int i = 0; i < c; i++) {
+	for		$tmp189 249 251 264 266 	%line{10} %argrw{"r"}
+	assign		___338_i $const6 	%argrw{"wr"}
+	lt		$tmp188 ___338_i ___337_c 	%argrw{"wrr"}
+	neq		$tmp189 $tmp188 $const6 	%argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:11
+#         string i_key = keys[i];
+	aref		___339_i_key ___337_keys ___338_i 	%line{11} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:12
+#         string i_value = values[i];
+	aref		___339_i_value ___337_values ___338_i 	%line{12} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:13
+#         int i_match = startswith(in_string, i_key);
+	startswith	___339_i_match filename ___339_i_key 	%line{13} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:14
+#         if (i_match > 0) {
+	gt		$tmp190 ___339_i_match $const6 	%line{14} %argrw{"wrr"}
+	if		$tmp190 264 264 	%argrw{"r"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:15
+#             int i_start = strlen(i_key);
+	strlen		___340_i_start ___339_i_key 	%line{15} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:16
+#             string i_string_0 = substr(in_string, i_start);
+	functioncall	$const23 260 	%line{16} %argrw{"r"}
+# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:427
+# string substr (string s, int start) { return substr (s, start, strlen(s)); }
+	strlen		$tmp191 filename 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{427} %argrw{"wr"}
+	substr		___340_i_string_0 filename ___340_i_start $tmp191 	%argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:17
+#             string i_out_string = concat(i_value, i_string_0);
+	concat		___340_i_out_string ___339_i_value ___340_i_string_0 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl"} %line{17} %argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:18
+#             warning("resolver texture from environ: %s >> %s", in_string, i_out_string);
+	warning		$const24 filename ___340_i_out_string 	%line{18} %argrw{"rrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:19
+#             return i_out_string;
+	assign		filename_new ___340_i_out_string 	%line{19} %argrw{"wr"}
+	return
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:10
+#     for (int i = 0; i < c; i++) {
+	assign		$tmp192 ___338_i 	%line{10} %argrw{"wr"}
+	add		___338_i ___338_i $const5 	%argrw{"wrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:22
+#     return in_string;
+	assign		filename_new filename 	%line{22} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:127
+#     gettextureinfo(filename_new, "exists", e);
+	gettextureinfo	$tmp193 filename_new $const25 e 	%line{127} %argrw{"wrrw"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:128
 #     if (e > 0) {
-	gettextureinfo	$tmp190 filename $const20 e 	%line{110} %argrw{"wrrw"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:111
-#         //midground switch
-	gt		$tmp191 e $const6 	%line{111} %argrw{"wrr"}
-	if		$tmp191 263 264 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:113
-#             float midgroundA;
-	gt		$tmp192 enableMidground $const6 	%line{113} %argrw{"wrr"}
-	if		$tmp192 255 256 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:115
+	gt		$tmp194 e $const6 	%line{128} %argrw{"wrr"}
+	if		$tmp194 287 288 	%argrw{"r"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:129
+#         color roomRGB = texture(filename_new, finalUV[0], finalUV[1]);
+	compref		$tmp195 finalUV $const6 	%line{129} %argrw{"wrr"}
+	compref		$tmp196 finalUV $const5 	%argrw{"wrr"}
+	texture		___345_roomRGB filename_new $tmp195 $tmp196 	%argrw{"wrrr"} %argderivs{2,3}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:132
+#         if (enableMidground > 0){
+	gt		$tmp197 enableMidground $const6 	%line{132} %argrw{"wrr"}
+	if		$tmp197 279 280 	%argrw{"r"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:134
+#             color midgroundRGB = texture(filename_new, midgroundUV[0], midgroundUV[1], "alpha", midgroundA);
+	compref		$tmp198 midgroundUV $const6 	%line{134} %argrw{"wrr"}
+	compref		$tmp199 midgroundUV $const5 	%argrw{"wrr"}
+	texture		___346_midgroundRGB filename_new $tmp198 $tmp199 $const26 ___346_midgroundA 	%argrw{"wrrrrw"} %argderivs{2,3}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:135
 #             finalRGB = mix(roomRGB,midgroundRGB,midgroundA);
-	compref		$tmp193 midgroundUV $const6 	%line{115} %argrw{"wrr"}
-	compref		$tmp194 midgroundUV $const5 	%argrw{"wrr"}
-	texture		___342_midgroundRGB filename $tmp193 $tmp194 $const21 ___342_midgroundA 	%argrw{"wrrrrw"} %argderivs{2,3}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:116
-#         }
-	mix		finalRGB roomRGB ___342_midgroundRGB ___342_midgroundA 	%line{116} %argrw{"wrrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:119
-#         }
-	assign		finalRGB roomRGB 	%line{119} %argrw{"wr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:123
-#             float curtainsA;
-	gt		$tmp195 enableCurtains $const6 	%line{123} %argrw{"wrr"}
-	if		$tmp195 262 262 	%argrw{"r"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:125
+	mix		___345_finalRGB ___345_roomRGB ___346_midgroundRGB ___346_midgroundA 	%line{135} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:138
+#             finalRGB = roomRGB;
+	assign		___345_finalRGB ___345_roomRGB 	%line{138} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:142
+#         if (enableCurtains > 0){
+	gt		$tmp200 enableCurtains $const6 	%line{142} %argrw{"wrr"}
+	if		$tmp200 286 286 	%argrw{"r"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:144
+#             color curtainsRGB = texture(filename_new, curtainsUV[0], curtainsUV[1], "alpha", curtainsA);
+	compref		$tmp201 curtainsUV $const6 	%line{144} %argrw{"wrr"}
+	compref		$tmp202 curtainsUV $const5 	%argrw{"wrr"}
+	texture		___348_curtainsRGB filename_new $tmp201 $tmp202 $const26 ___348_curtainsA 	%argrw{"wrrrrw"} %argderivs{2,3}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:145
 #             finalRGB = mix(finalRGB,curtainsRGB,curtainsA);
-	compref		$tmp196 curtainsUV $const6 	%line{125} %argrw{"wrr"}
-	compref		$tmp197 curtainsUV $const5 	%argrw{"wrr"}
-	texture		___344_curtainsRGB filename $tmp196 $tmp197 $const21 ___344_curtainsA 	%argrw{"wrrrrw"} %argderivs{2,3}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:126
-#         }
-	mix		finalRGB finalRGB ___344_curtainsRGB ___344_curtainsA 	%line{126} %argrw{"wrrr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:128
-#     }
-	assign		outRGB finalRGB 	%line{128} %argrw{"wr"}
-# packages/lxdcc_rsc/0.99.99/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:131
-#             "%s, is non-exists", filename
-	warning		$const22 filename 	%line{131} %argrw{"rr"}
+	mix		___345_finalRGB ___345_finalRGB ___348_curtainsRGB ___348_curtainsA 	%line{145} %argrw{"wrrr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:147
+#         outRGB = finalRGB;
+	assign		outRGB ___345_finalRGB 	%line{147} %argrw{"wr"}
+# /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/jiWindowBox_Arnold.osl:150
+#         warning(
+	warning		$const27 filename_new 	%line{150} %argrw{"rr"}
 	end

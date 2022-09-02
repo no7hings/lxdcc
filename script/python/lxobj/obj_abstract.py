@@ -3361,7 +3361,8 @@ class AbsOsFile(
         return self._path == self._root
     #
     def get_root(self):
-        return self._set_dag_create_(self._root)
+        if self._root is not None:
+            return self._set_dag_create_(self._root)
     # os
     def get_is_directory(self):
         return False

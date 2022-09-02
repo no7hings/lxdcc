@@ -1145,6 +1145,9 @@ workspace:
                 ns_colorg: 0.5
                 ns_colorb: 0.25
             parameters:
+#                render_settings/override_enable: 1
+                # for usd memery crash
+#                render_settings/override: 'sceneTraversal.maxCores=2'
                 arnold_render_settings/override_enable: 1
                 arnold_render_settings/override: 'abort_on_error=0'
                 lynxi_settings/render_output_enable: 1

@@ -232,18 +232,43 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             raise TypeError()
         #
-        movie_file_path = self._hook_option_opt.get('movie_file')
-        if movie_file_path:
-            review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
-                keyword=keyword
-            )
-            review_mov_file_path = review_mov_file_rsv_unit.get_result(
-                version=version
-            )
-            movie_file_opt = bsc_core.StorageFileOpt(movie_file_path)
-            if movie_file_opt.get_is_exists() is True:
-                movie_file_opt.set_copy_to_file(
+        mov_file_path = self._hook_option_opt.get('movie_file')
+        if mov_file_path:
+            mov_file_opt = bsc_core.StorageFileOpt(mov_file_path)
+            if mov_file_opt.get_is_exists() is True:
+                review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                    keyword=keyword
+                )
+                review_mov_file_path = review_mov_file_rsv_unit.get_result(
+                    version=version
+                )
+                mov_file_opt.set_copy_to_file(
                     review_mov_file_path
+                )
+
+    def set_validation_info_export(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'publish':
+            keyword = 'asset-validation-info-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-validation-info-file'
+        else:
+            raise TypeError()
+        #
+        info_file_path = self._hook_option_opt.get('validation_info_file')
+        if info_file_path:
+            info_file_opt = bsc_core.StorageFileOpt(info_file_path)
+            if info_file_opt.get_is_exists() is True:
+                validation_info_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                    keyword=keyword
+                )
+                validation_info_file_path = validation_info_file_rsv_unit.get_result(
+                    version=version
+                )
+                info_file_opt.set_copy_to_file(
+                    validation_info_file_path
                 )
 
     def set_qc_review_mov_export(self, version_qc):

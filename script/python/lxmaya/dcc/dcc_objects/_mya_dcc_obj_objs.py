@@ -125,7 +125,11 @@ class References(mya_dcc_obj_abs.AbsMyaObjs):
                 if i_obj_paths:
                     i_namespace = i_obj.get_namespace()
                     i_root = i_obj_paths[0]
-                    i_shot_asset = _mya_dcc_obj_obj.Node(i_root).get('pg_namespace')
+                    i_namespace_real = _mya_dcc_obj_obj.Node(i_root).get('pg_namespace')
+                    if i_namespace_real:
+                        i_shot_asset = i_namespace_real
+                    else:
+                        i_shot_asset = i_namespace
                     dict_[i_shot_asset] = i_namespace, i_root, i_obj
         return dict_
 

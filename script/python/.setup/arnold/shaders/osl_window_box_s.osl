@@ -1,5 +1,28 @@
 #include <stdosl.h>
 
+
+string resolver_filename_form_environ (
+    string in_string,
+)
+{
+    string keys[1] = {"[PG_PROJ_ROOT]"};
+    string values[1] = {"/l/prod"};
+    int c = arraylength(keys);
+    for (int i = 0; i < c; i++) {
+        string i_key = keys[i];
+        string i_value = values[i];
+        int i_match = startswith(in_string, i_key);
+        if (i_match > 0) {
+            int i_start = strlen(i_key);
+            string i_string_0 = substr(in_string, i_start);
+            string i_out_string = concat(i_value, i_string_0);
+            warning("resolver texture from environ: %s >> %s", in_string, i_out_string);
+            return i_out_string;
+        }
+    }
+    return in_string;
+}
+
 color wb(
     int space,
     string filename,
@@ -24,7 +47,8 @@ color wb(
     float middle_offset_y,
     float uv_offset_x,
     float uv_offset_y,
-) {
+)
+{
     // user controls remapping
     float depth_0 = clamp(depth, 0.01, 100.0);
     // overscan
@@ -210,7 +234,8 @@ shader osl_window_box_s (
     color final_rgb = 0.0;
     int udim_index = 1001;
     // check is udim
-    int is_udim = regex_search(filename, "<udim>");
+    string filename_new = resolver_filename_form_environ(filename);
+    int is_udim = regex_search(filename_new, "<udim>");
     if (is_udim > 0) {
         // maximum search
         int c = udim_maximum - 1000;
@@ -221,12 +246,12 @@ shader osl_window_box_s (
             //float uv_y_hundreds = ( i_uv_offset_y / 10 );
             string i_udim_str = format("%d", udim_index);
             string i_args[2];
-            split(filename, i_args, "<udim>");
+            split(filename_new, i_args, "<udim>");
             string i_file = concat(i_args[0], i_udim_str, i_args[1]);
             // check exists
-            int e;
-            gettextureinfo(i_file, "exists", e);
-            if (e > 0) {
+            int i_e;
+            gettextureinfo(i_file, "exists", i_e);
+            if (i_e > 0) {
                 float i_x_next = (i_uv_offset_x+1);
                 float i_y_next = (i_uv_offset_y+1);
 
@@ -267,28 +292,32 @@ shader osl_window_box_s (
     else {
         float uv_offset_x = 0;
         float uv_offset_y = 0;
-        final_rgb = wb(
-            space,
-            filename,
-            texture_flip,
-            texture_flop,
-            depth,
-            overscan_left,
-            overscan_right,
-            overscan_top,
-            overscan_bottom,
-            contract_back,
-            rotation_x,
-            rotation_y,
-            rotation_z,
-            curtains_enable,
-            middle_enable,
-            middle_depth,
-            middle_offset_x,
-            middle_offset_y,
-            uv_offset_x,
-            uv_offset_y
-        );
+        int e;
+        gettextureinfo(filename_new, "exists", e);
+        if (e > 0) {
+            final_rgb = wb(
+                space,
+                filename_new,
+                texture_flip,
+                texture_flop,
+                depth,
+                overscan_left,
+                overscan_right,
+                overscan_top,
+                overscan_bottom,
+                contract_back,
+                rotation_x,
+                rotation_y,
+                rotation_z,
+                curtains_enable,
+                middle_enable,
+                middle_depth,
+                middle_offset_x,
+                middle_offset_y,
+                uv_offset_x,
+                uv_offset_y
+            );
+        }
     }
 
     out_rgb = final_rgb;

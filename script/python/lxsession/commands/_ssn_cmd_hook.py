@@ -160,14 +160,14 @@ def get_option_hook_args(option):
                     option=option_opt.to_string()
                 )
             elif type_name == 'rsv-task-method':
-                session = ssn_objects.RsvOptionHookMethodSession(
+                session = ssn_objects.RsvTaskMethodSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
             elif type_name == 'rsv-task-batcher':
-                session = ssn_objects.RsvOptionHookMethodSession(
+                session = ssn_objects.RsvTaskMethodSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,
@@ -220,6 +220,13 @@ def set_option_hook_execute(option):
     if hook_args is not None:
         session, execute_fnc = hook_args
         execute_fnc()
+        return session
+
+
+def get_option_hook_session(option):
+    hook_args = get_option_hook_args(option)
+    if hook_args is not None:
+        session, execute_fnc = hook_args
         return session
 
 

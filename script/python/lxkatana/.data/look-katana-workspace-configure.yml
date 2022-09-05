@@ -1210,6 +1210,7 @@ workspace:
             variable: True
             path: <option.root>/<..label>
             obj_type: LookFileBake
+            input: <.path>.orig
             attributes:
                 x: =<...geometry.x>
                 y: =<...geometry.y>
@@ -1239,6 +1240,32 @@ workspace:
                 ns_text: 'look output(s)'
                 ns_fontScale: 6.0
                 ns_stickyLock: 1
+        #
+        node_graph:
+            nodes:
+                geometry_choose:
+                    path: <option.root>/<..key>
+                    obj_category: node
+                    obj_type: VariableSet
+                    input: <.path>.in
+                    output: <.path>.out
+                    layout_main: <....main.path>
+                    layout_backdrop: <....backdrop.path>
+                    attributes:
+                        x: =<.....geometry.x>
+                        y: =<.....geometry.y>+<option.h>/4
+                        ns_colorr: 0.5
+                        ns_colorg: 0.25
+                        ns_colorb: 0.25
+                    parameters:
+                        variableName: geometry
+                        variableValue: asset
+                    connections:
+                        - <.....geometry_switch.main.output>
+                        - <.input>
+                        - <.output>
+                        - <....main.input>
+
 #
 node:
     geometry_abc:

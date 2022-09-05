@@ -163,6 +163,15 @@ class RsvStgTaskOpt(object):
                     'upload movie',
                     u'file="{}" is non-exists'.format(movie_file)
                 )
+        else:
+            if not stg_version_opt.get_movie():
+                f = '/l/resource/td/media_place_holder/no_prevew.mov'
+                f_opt = bsc_core.StorageFileOpt(
+                    f
+                )
+                f_opt.set_map_to_platform()
+                if f_opt.get_is_exists() is True:
+                    stg_version_opt.set_movie_upload(f)
         #
         if todo:
             stg_version_opt.set_stg_todo(todo)

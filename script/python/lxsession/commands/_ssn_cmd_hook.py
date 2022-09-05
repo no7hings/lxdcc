@@ -85,11 +85,18 @@ def get_hook_args(key):
 
 
 def set_hook_execute(key):
+    from lxutil import utl_core
+    #
     hook_args = get_hook_args(key)
     if hook_args is not None:
         session, execute_fnc = hook_args
         execute_fnc()
         return session
+    else:
+        utl_core.Log.set_module_warning_trace(
+            'hook execute',
+            'hook_key="{}" is not found'.format(key)
+        )
 
 
 def get_option_hook_args(option):

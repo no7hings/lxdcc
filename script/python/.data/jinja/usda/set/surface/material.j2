@@ -22,7 +22,6 @@ over "{{ dcc.root_name }}" (
 {% for i_look_pass in look.passes -%}
     {{- '%s"%s" (' | format(option.indent*2*' ', i_look_pass) -}}
     {{- option.linesep -}}
-    {{- '%sreferences = @look.%s.properties.usda@' | format(option.indent*3*' ', i_look_pass) -}}
     {{- option.linesep -}}
     {{- '%s) {}' | format(option.indent*2*' ') -}}
     {%- if not loop.last -%}

@@ -434,23 +434,24 @@ if __name__ == '__main__':
         result
     )
 
-    # files = bsc_core.DirectoryMtd.get_all_file_paths(
-    #     '/l/prod/cgm/publish/assets/chr/yingwu/srf/surfacing/texture'
-    # )
-    # for i in files:
-    #     i_group_data = PathGroupPermission(
-    #         i
-    #     ).get_all_group_data()
-    #     #
-    #     if 'coop_grp' not in i_group_data:
-    #         PathGroupPermission(
-    #             i
-    #         ).set_allow(
-    #             'coop_grp'
-    #         )
-    #     if 'cg_group' not in i_group_data:
-    #         PathGroupPermission(
-    #             i
-    #         ).set_allow(
-    #             'cg_group'
-    #         )
+    files = bsc_core.DirectoryMtd.get_all_file_paths(
+        '/l/prod/cgm/publish/assets/flg/youjialiye_a/srf/surfacing/texture'
+    )
+    for i in files:
+        if not bsc_core.StorageFileOpt(i).name.startswith('eye'):
+            i_group_data = PathGroupPermission(
+                i
+            ).get_all_group_data()
+            #
+            if 'coop_grp' not in i_group_data:
+                PathGroupPermission(
+                    i
+                ).set_allow(
+                    'coop_grp'
+                )
+            if 'cg_group' not in i_group_data:
+                PathGroupPermission(
+                    i
+                ).set_allow(
+                    'cg_group'
+                )

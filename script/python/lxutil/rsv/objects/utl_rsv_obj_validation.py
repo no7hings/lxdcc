@@ -228,260 +228,6 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 check_status=validation_checker.CheckStatus.Warning,
                 description='"shotgun-task" is "non-exists"'
             )
-    # katana
-    def set_katana_scene_check(self, validation_checker):
-        def yes_fnc_():
-            ktn_dcc_objects.Scene.set_file_save()
-        #
-        from lxutil import utl_core
-
-        from lxkatana import ktn_core
-        #
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-        from lxutil_gui.qt import utl_gui_qt_core
-        #
-        check_group = 'Scene Check'
-        #
-        root = self._rsv_scene_properties.get('dcc.root')
-        geometry_location = '/root/world/geo'
-        #
-        location = '{}{}'.format(geometry_location, root)
-        #
-        if ktn_core._get_is_ui_mode_() is True:
-            file_path = ktn_dcc_objects.Scene.get_current_file_path()
-            if ktn_dcc_objects.Scene.get_scene_is_dirty():
-                w = utl_core.DialogWindow.set_create(
-                    label='Save',
-                    content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
-                        ktn_dcc_objects.Scene.get_current_file_path()
-                    ),
-                    window_size=(480, 160),
-                    #
-                    yes_method=yes_fnc_,
-                    #
-                    yes_label='Save',
-                    no_label='Don\'t save',
-                    #
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
-                    #
-                    parent=utl_gui_qt_core.QtDccMtd.get_active_window()
-                )
-                #
-                if not w.get_result():
-                    validation_checker.set_node_files_result_register(
-                        location,
-                        [file_path],
-                        description=u'scene has modifier to save',
-                        check_group=check_group,
-                        check_status=validation_checker.CheckStatus.Warning,
-                    )
-    #
-    def set_katana_geometry_check(self, validation_checker):
-        from lxusd import usd_configure, usd_core
-        #
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-        check_group = 'Geometry Check'
-        #
-        root = self._rsv_scene_properties.get('dcc.root')
-        sub_root = '{}/hi'.format(root)
-        #
-        geometry_location = '/root/world/geo'
-        #
-        location = '{}{}'.format(geometry_location, root)
-        sub_location = '{}{}'.format(geometry_location, sub_root)
-        #
-        katana_workspace = ktn_dcc_objects.AssetWorkspace()
-        scene_usd_file_path = katana_workspace.get_geometry_uv_map_usd_source_file()
-        if scene_usd_file_path is None:
-            validation_checker.set_node_result_register(
-                location,
-                check_group=check_group,
-                check_status=validation_checker.CheckStatus.Warning,
-                description='"geometry usd-file for uv-map" from "scene" is non-exists'
-            )
-            return False
-
-        s = usd_core.UsdStageOpt(scene_usd_file_path)
-        for i_usd_prim in s.usd_instance.TraverseAll():
-            i_usd_prim_type_name = i_usd_prim.GetTypeName()
-            if i_usd_prim_type_name == usd_configure.ObjType.MESH:
-                i_mesh_opt = usd_core.UsdGeometryMeshOpt(i_usd_prim)
-                i_uv_map_names = i_mesh_opt.get_uv_map_names()
-                i_mesh_location = '{}/{}'.format(geometry_location, i_mesh_opt.get_path())
-                if not 'st' in i_uv_map_names:
-                    validation_checker.set_node_result_register(
-                        i_mesh_location,
-                        check_group=check_group,
-                        check_status=validation_checker.CheckStatus.Warning,
-                        description='"mesh default uv-map name" "map1 / st" is non-exists'
-                    )
-                #
-                i_face_vertex_indices = i_mesh_opt.get_face_vertex_indices()
-                for j_uv_map_name in i_uv_map_names:
-                    j_uv_map_face_vertex_indices = i_mesh_opt.get_uv_map_face_vertex_indices(j_uv_map_name)
-                    if j_uv_map_face_vertex_indices:
-                        if len(i_face_vertex_indices) != len(j_uv_map_face_vertex_indices):
-                            validation_checker.set_node_result_register(
-                                i_mesh_location,
-                                check_group=check_group,
-                                check_status=validation_checker.CheckStatus.Error,
-                                description='"mesh uv-map" in "{}" has non-data vertices'.format(j_uv_map_name)
-                            )
-                    else:
-                        validation_checker.set_node_result_register(
-                            i_mesh_location,
-                            check_group=check_group,
-                            check_status=validation_checker.CheckStatus.Warning,
-                            description='"mesh uv-map" in "{}" is non-data'.format(j_uv_map_name)
-                        )
-
-    def set_katana_geometry_topology_check(self, validation_checker):
-        from lxutil import utl_configure
-        #
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-        #
-        import lxkatana.fnc.comparers as ktn_fnc_comparers
-        #
-        check_group = 'Geometry Topology Check'
-        #
-        root = self._rsv_scene_properties.get('dcc.root')
-        sub_root = '{}/hi'.format(root)
-        #
-        geometry_location = '/root/world/geo'
-        #
-        location = '{}{}'.format(geometry_location, root)
-        sub_location = '{}{}'.format(geometry_location, sub_root)
-        #
-        obj_scene = ktn_dcc_objects.Scene()
-        obj_scene.set_load_by_root(
-            ktn_obj='asset_geometries_merge',
-            root=sub_location,
-        )
-        dcc_obj_universe = obj_scene.universe
-
-        dcc_location = dcc_obj_universe.get_obj(location)
-        if dcc_location is None:
-            validation_checker.set_node_result_register(
-                dcc_location,
-                check_group=check_group,
-                check_status=validation_checker.CheckStatus.Warning,
-                description='"asset root" "{}" is non-exists'.format(dcc_location)
-            )
-            return False
-        #
-        rsv_entity = self._rsv_task.get_rsv_entity()
-        model_rsv_task = rsv_entity.get_rsv_task(
-            step='mod', task='modeling'
-        )
-        model_geometry_usd_hi_file_rsv_unit = model_rsv_task.get_rsv_unit(
-            keyword='asset-geometry-usd-hi-file'
-        )
-        latest_model_geometry_usd_hi_file_path = model_geometry_usd_hi_file_rsv_unit.get_result(
-            version='latest', extend_variants=dict(var='hi')
-        )
-        if latest_model_geometry_usd_hi_file_path is None:
-            validation_checker.set_node_result_register(
-                location,
-                check_group=check_group,
-                check_status=validation_checker.CheckStatus.Warning,
-                description='"geometry usd-file" from "model" is non-exists'
-            )
-            return False
-        #
-        katana_workspace = ktn_dcc_objects.AssetWorkspace()
-        scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
-        scene_usd_file_path = katana_workspace.get_geometry_uv_map_usd_source_file()
-        if scene_usd_file_path is None:
-            validation_checker.set_node_result_register(
-                dcc_location,
-                check_group=check_group,
-                check_status=validation_checker.CheckStatus.Warning,
-                description='"geometry usd-file for uv-map" from "scene" is non-exists'
-            )
-            return False
-        #
-        fnc_geometry_comparer = ktn_fnc_comparers.GeometryComparer(
-            scene_file_path, sub_root
-        )
-        warning_es = [
-            utl_configure.DccMeshCheckStatus.ADDITION,
-            utl_configure.DccMeshCheckStatus.DELETION,
-            utl_configure.DccMeshCheckStatus.PATH_CHANGED,
-            utl_configure.DccMeshCheckStatus.PATH_EXCHANGED,
-        ]
-        error_ds = [
-            utl_configure.DccMeshCheckStatus.FACE_VERTICES_CHANGED,
-        ]
-        results = fnc_geometry_comparer.get_results()
-        for i_src_gmt_path, i_tgt_gmt_path, i_description in results:
-            i_dcc_path = '{}{}'.format(location, i_src_gmt_path)
-            for j_e in warning_es:
-                if j_e in i_description:
-                    validation_checker.set_node_result_register(
-                        i_dcc_path,
-                        check_group=check_group,
-                        check_status=validation_checker.CheckStatus.Warning,
-                        description='"mesh" is "{}"'.format(i_description)
-                    )
-            #
-            for j_e in error_ds:
-                if j_e in i_description:
-                    validation_checker.set_node_result_register(
-                        i_dcc_path,
-                        check_group=check_group,
-                        check_status=validation_checker.CheckStatus.Error,
-                        description='"mesh" is "{}"'.format(i_description)
-                    )
-
-    def set_katana_look_check(self, validation_checker):
-        pass
-
-    def set_katana_texture_check(self, validation_checker):
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-        root = self._rsv_scene_properties.get('dcc.root')
-
-        check_group = 'Texture Check'
-        #
-        dcc_texture_references = ktn_dcc_objects.TextureReferences()
-        geometry_location = '/root/world/geo'
-
-        location = '{}{}'.format(geometry_location, root)
-        sub_location = '{}|hi'.format(location)
-
-        dcc_workspace = ktn_dcc_objects.AssetWorkspace()
-        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shader_by_location(sub_location)
-        dcc_objs = dcc_texture_references.get_objs(
-            include_paths=[i.path for i in dcc_shaders]
-        )
-        if dcc_objs:
-            self._set_dcc_texture_check_(validation_checker, check_group, dcc_objs)
-
-    def set_katana_texture_workspace_check(self, validation_checker):
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-        root = self._rsv_scene_properties.get('dcc.root')
-
-        check_group = 'Texture Workspace Check'
-        #
-        dcc_texture_references = ktn_dcc_objects.TextureReferences()
-        geometry_location = '/root/world/geo'
-
-        location = '{}{}'.format(geometry_location, root)
-        sub_location = '{}/hi'.format(location)
-
-        dcc_workspace = ktn_dcc_objects.AssetWorkspace()
-        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shader_by_location(sub_location)
-        dcc_objs = dcc_texture_references.get_objs(
-            include_paths=[i.path for i in dcc_shaders]
-        )
-        if dcc_objs:
-            self._set_dcc_texture_workspace_check_(
-                validation_checker, check_group,
-                dcc_objs
-            )
     # maya
     def set_maya_scene_check(self, validation_checker):
         def yes_fnc_():
@@ -578,8 +324,17 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             i_mesh_location,
                             check_group=check_group,
                             check_status=validation_checker.CheckStatus.Warning,
-                            description='"mesh default uv-map name" "map1 / st" is non-exists'
+                            description='"mesh default uv-map name" "map1" is non-exists'
                         )
+                    else:
+                        index = i_mesh_opt.get_default_uv_map_index()
+                        if index > 0:
+                            validation_checker.set_node_result_register(
+                                i_mesh_location,
+                                check_group=check_group,
+                                check_status=validation_checker.CheckStatus.Warning,
+                                description='"mesh default uv-map name" "map1" is not first index'
+                            )
                     #
                     i_face_vertex_indices = i_mesh_opt.get_face_vertex_indices()
                     for j_uv_map_name in i_uv_map_names:
@@ -625,7 +380,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         if dcc_location.get_is_exists() is False:
             validation_checker.set_node_result_register(
-                dcc_location,
+                location,
                 check_group=check_group,
                 check_status=validation_checker.CheckStatus.Warning,
                 description='"asset root" "{}" is non-exists'.format(location)
@@ -644,7 +399,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         if latest_model_geometry_usd_hi_file_path is None:
             validation_checker.set_node_result_register(
-                dcc_location,
+                location,
                 check_group=check_group,
                 check_status=validation_checker.CheckStatus.Warning,
                 description='"geometry usd-file" from "model" is non-exists'
@@ -792,3 +547,279 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     validation_checker, check_group,
                     dcc_objs
                 )
+    # katana
+    def set_katana_scene_check(self, validation_checker):
+        def yes_fnc_():
+            ktn_dcc_objects.Scene.set_file_save()
+        #
+        from lxutil import utl_core
+
+        from lxkatana import ktn_core
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        from lxutil_gui.qt import utl_gui_qt_core
+        #
+        check_group = 'Scene Check'
+        #
+        root = self._rsv_scene_properties.get('dcc.root')
+        geometry_location = '/root/world/geo'
+        #
+        location = '{}{}'.format(geometry_location, root)
+        #
+        if ktn_core._get_is_ui_mode_() is True:
+            file_path = ktn_dcc_objects.Scene.get_current_file_path()
+            if ktn_dcc_objects.Scene.get_scene_is_dirty():
+                w = utl_core.DialogWindow.set_create(
+                    label='Save',
+                    content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
+                        ktn_dcc_objects.Scene.get_current_file_path()
+                    ),
+                    window_size=(480, 160),
+                    #
+                    yes_method=yes_fnc_,
+                    #
+                    yes_label='Save',
+                    no_label='Don\'t save',
+                    #
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    #
+                    parent=utl_gui_qt_core.QtDccMtd.get_active_window()
+                )
+                #
+                if not w.get_result():
+                    validation_checker.set_node_files_result_register(
+                        location,
+                        [file_path],
+                        description=u'scene has modifier to save',
+                        check_group=check_group,
+                        check_status=validation_checker.CheckStatus.Warning,
+                    )
+    #
+    def set_katana_geometry_check(self, validation_checker):
+        from lxusd import usd_configure, usd_core
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        check_group = 'Geometry Check'
+        #
+        root = self._rsv_scene_properties.get('dcc.root')
+        sub_root = '{}/hi'.format(root)
+        #
+        geometry_location = '/root/world/geo'
+        #
+        location = '{}{}'.format(geometry_location, root)
+        sub_location = '{}{}'.format(geometry_location, sub_root)
+        #
+        katana_workspace = ktn_dcc_objects.AssetWorkspace()
+        scene_usd_file_path = katana_workspace.get_geometry_uv_map_usd_source_file()
+        if scene_usd_file_path is None:
+            validation_checker.set_node_result_register(
+                location,
+                check_group=check_group,
+                check_status=validation_checker.CheckStatus.Warning,
+                description='"geometry usd-file for uv-map" from "scene" is non-exists'
+            )
+            return False
+
+        s = usd_core.UsdStageOpt(scene_usd_file_path)
+        for i_usd_prim in s.usd_instance.TraverseAll():
+            i_usd_prim_type_name = i_usd_prim.GetTypeName()
+            if i_usd_prim_type_name == usd_configure.ObjType.MESH:
+                i_mesh_opt = usd_core.UsdGeometryMeshOpt(i_usd_prim)
+                i_uv_map_names = i_mesh_opt.get_uv_map_names()
+                i_mesh_location = '{}/{}'.format(geometry_location, i_mesh_opt.get_path())
+                if not 'st' in i_uv_map_names:
+                    validation_checker.set_node_result_register(
+                        i_mesh_location,
+                        check_group=check_group,
+                        check_status=validation_checker.CheckStatus.Warning,
+                        description='"mesh default uv-map name" "map1 / st" is non-exists'
+                    )
+                #
+                i_face_vertex_indices = i_mesh_opt.get_face_vertex_indices()
+                for j_uv_map_name in i_uv_map_names:
+                    j_uv_map_face_vertex_indices = i_mesh_opt.get_uv_map_face_vertex_indices(j_uv_map_name)
+                    if j_uv_map_face_vertex_indices:
+                        if len(i_face_vertex_indices) != len(j_uv_map_face_vertex_indices):
+                            validation_checker.set_node_result_register(
+                                i_mesh_location,
+                                check_group=check_group,
+                                check_status=validation_checker.CheckStatus.Error,
+                                description='"mesh uv-map" in "{}" has non-data vertices'.format(j_uv_map_name)
+                            )
+                    else:
+                        validation_checker.set_node_result_register(
+                            i_mesh_location,
+                            check_group=check_group,
+                            check_status=validation_checker.CheckStatus.Warning,
+                            description='"mesh uv-map" in "{}" is non-data'.format(j_uv_map_name)
+                        )
+
+    def set_katana_geometry_topology_check(self, validation_checker):
+        from lxutil import utl_configure
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        import lxkatana.fnc.comparers as ktn_fnc_comparers
+        #
+        check_group = 'Geometry Topology Check'
+        #
+        root = self._rsv_scene_properties.get('dcc.root')
+        sub_root = '{}/hi'.format(root)
+        #
+        geometry_location = '/root/world/geo'
+        #
+        location = '{}{}'.format(geometry_location, root)
+        sub_location = '{}{}'.format(geometry_location, sub_root)
+        #
+        obj_scene = ktn_dcc_objects.Scene()
+        obj_scene.set_load_by_root(
+            ktn_obj='asset_geometries_merge',
+            root=sub_location,
+        )
+        dcc_obj_universe = obj_scene.universe
+
+        dcc_location = dcc_obj_universe.get_obj(location)
+        if dcc_location is None:
+            validation_checker.set_node_result_register(
+                location,
+                check_group=check_group,
+                check_status=validation_checker.CheckStatus.Warning,
+                description='"asset root" "{}" is non-exists'.format(dcc_location)
+            )
+            return False
+        #
+        rsv_entity = self._rsv_task.get_rsv_entity()
+        model_rsv_task = rsv_entity.get_rsv_task(
+            step='mod', task='modeling'
+        )
+        model_geometry_usd_hi_file_rsv_unit = model_rsv_task.get_rsv_unit(
+            keyword='asset-geometry-usd-hi-file'
+        )
+        latest_model_geometry_usd_hi_file_path = model_geometry_usd_hi_file_rsv_unit.get_result(
+            version='latest', extend_variants=dict(var='hi')
+        )
+        if latest_model_geometry_usd_hi_file_path is None:
+            validation_checker.set_node_result_register(
+                location,
+                check_group=check_group,
+                check_status=validation_checker.CheckStatus.Warning,
+                description='"geometry usd-file" from "model" is non-exists'
+            )
+            return False
+        #
+        katana_workspace = ktn_dcc_objects.AssetWorkspace()
+        scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
+        scene_usd_file_path = katana_workspace.get_geometry_uv_map_usd_source_file()
+        if scene_usd_file_path is None:
+            validation_checker.set_node_result_register(
+                location,
+                check_group=check_group,
+                check_status=validation_checker.CheckStatus.Warning,
+                description='"geometry usd-file for uv-map" from "scene" is non-exists'
+            )
+            return False
+        #
+        fnc_geometry_comparer = ktn_fnc_comparers.GeometryComparer(
+            scene_file_path, sub_root
+        )
+        warning_es = [
+            utl_configure.DccMeshCheckStatus.ADDITION,
+            utl_configure.DccMeshCheckStatus.DELETION,
+            utl_configure.DccMeshCheckStatus.PATH_CHANGED,
+            utl_configure.DccMeshCheckStatus.PATH_EXCHANGED,
+        ]
+        error_ds = [
+            utl_configure.DccMeshCheckStatus.FACE_VERTICES_CHANGED,
+        ]
+        results = fnc_geometry_comparer.get_results()
+        for i_src_gmt_path, i_tgt_gmt_path, i_description in results:
+            i_dcc_path = '{}{}'.format(location, i_src_gmt_path)
+            for j_e in warning_es:
+                if j_e in i_description:
+                    validation_checker.set_node_result_register(
+                        i_dcc_path,
+                        check_group=check_group,
+                        check_status=validation_checker.CheckStatus.Warning,
+                        description='"mesh" is "{}"'.format(i_description)
+                    )
+            #
+            for j_e in error_ds:
+                if j_e in i_description:
+                    validation_checker.set_node_result_register(
+                        i_dcc_path,
+                        check_group=check_group,
+                        check_status=validation_checker.CheckStatus.Error,
+                        description='"mesh" is "{}"'.format(i_description)
+                    )
+
+    def set_katana_look_check(self, validation_checker):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        root = self._rsv_scene_properties.get('dcc.root')
+
+        check_group = 'Look Check'
+        #
+        geometry_location = '/root/world/geo'
+
+        location = '{}{}'.format(geometry_location, root)
+        sub_location = '{}/hi'.format(location)
+
+        dcc_workspace = ktn_dcc_objects.AssetWorkspace()
+
+        error_args = dcc_workspace.get_non_material_geometry_args(sub_location)
+        for i_pass_name, i_dcc_path in error_args:
+            validation_checker.set_node_result_register(
+                i_dcc_path,
+                check_group=check_group,
+                check_status=validation_checker.CheckStatus.Warning,
+                description='"mesh" in look-pass "{}" is non material-assign'.format(
+                    i_pass_name
+                )
+            )
+
+    def set_katana_texture_check(self, validation_checker):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        root = self._rsv_scene_properties.get('dcc.root')
+
+        check_group = 'Texture Check'
+        #
+        dcc_texture_references = ktn_dcc_objects.TextureReferences()
+        geometry_location = '/root/world/geo'
+
+        location = '{}{}'.format(geometry_location, root)
+        sub_location = '{}/hi'.format(location)
+
+        dcc_workspace = ktn_dcc_objects.AssetWorkspace()
+        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shader_by_location(sub_location)
+        dcc_objs = dcc_texture_references.get_objs(
+            include_paths=[i.path for i in dcc_shaders]
+        )
+        if dcc_objs:
+            self._set_dcc_texture_check_(validation_checker, check_group, dcc_objs)
+
+    def set_katana_texture_workspace_check(self, validation_checker):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        root = self._rsv_scene_properties.get('dcc.root')
+
+        check_group = 'Texture Workspace Check'
+        #
+        dcc_texture_references = ktn_dcc_objects.TextureReferences()
+        geometry_location = '/root/world/geo'
+
+        location = '{}{}'.format(geometry_location, root)
+        sub_location = '{}/hi'.format(location)
+
+        dcc_workspace = ktn_dcc_objects.AssetWorkspace()
+        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shader_by_location(sub_location)
+        dcc_objs = dcc_texture_references.get_objs(
+            include_paths=[i.path for i in dcc_shaders]
+        )
+        if dcc_objs:
+            self._set_dcc_texture_workspace_check_(
+                validation_checker, check_group,
+                dcc_objs
+            )

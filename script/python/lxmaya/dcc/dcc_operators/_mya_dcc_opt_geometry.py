@@ -225,6 +225,12 @@ class MeshOpt(
         """
         return self.om2_obj.getUVSetNames()
 
+    def get_default_uv_map_index(self):
+        uv_map_names = self.om2_obj.getUVSetNames()
+        default_uv_map = ma_core.Om2Method.DEFAULT_MAP_NAME
+        if default_uv_map in uv_map_names:
+            return uv_map_names.index(default_uv_map)
+
     def get_default_uv_map_is_exists(self):
         return ma_core.Om2Method.DEFAULT_MAP_NAME in self.get_uv_map_names()
 

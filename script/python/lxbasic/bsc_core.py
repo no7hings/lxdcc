@@ -1446,13 +1446,13 @@ class MultiplyFileNameMtd(object):
                     numbers[i], i_key, 1
                 )
             return new_file_name, map(int, numbers)
-
     @classmethod
     def _set_file_args_update_0_(cls, file_dict, file_opt, name_patterns):
         for i_name_pattern in name_patterns:
             i_enable = cls._set_file_args_update_1_(file_dict, file_opt, i_name_pattern)
             if i_enable is True:
-                break
+                return i_enable
+        return False
     @classmethod
     def _set_file_args_update_1_(cls, file_dict, file_opt, name_pattern):
         if MultiplyPatternMtd.get_is_valid(name_pattern):
@@ -1479,9 +1479,10 @@ class MultiplyFileNameMtd(object):
         dict_ = collections.OrderedDict()
         for i_file_path in file_paths:
             i_file_opt = StorageFileOpt(i_file_path)
-            cls._set_file_args_update_0_(
+            if cls._set_file_args_update_0_(
                 dict_, i_file_opt, name_patterns
-            )
+            ) is False:
+                dict_[i_file_path] = []
         return dict_.keys()
 
 
@@ -5385,4 +5386,12 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    pass
+    _ = [
+        '/l/prod/cgm/work/assets/prp/car_b/srf/surfacing/katana/render/20220902_18h05m40.jpg',
+        '/l/prod/cgm/work/assets/prp/car_b/srf/surfacing/katana/render/test.1001.jpg'
+    ]
+    cs = MultiplyFileNameMtd.set_file_path_merge_to(
+        _,
+        ['*.####.*']
+    )
+    print cs

@@ -22,20 +22,26 @@ import fnmatch
 import sys
 
 
-class SceneGraphObjOpt(object):
+class SGObjOpt(object):
     def __init__(self, scene_graph_opt, obj_path):
         self._scene_graph_opt = scene_graph_opt
         self._obj_path = obj_path
         self._traversal = scene_graph_opt._get_traversal_(obj_path)
 
     def get_port(self, port_path):
-        if self._traversal.valid():
-            return self._traversal.getLocationData().getAttrs().getChildByName(port_path)
+        tvl = self._traversal
+        if tvl.valid():
+            attrs = tvl.getLocationData().getAttrs()
+            if attrs:
+                return attrs.getChildByName(port_path)
 
     def get_port_raw(self, port_path):
         port = self.get_port(port_path)
         if port is not None:
             return port.getData()[0]
+
+    def get(self, key):
+        return self.get_port_raw(key)
 
 
 class SceneGraphOpt(object):
@@ -43,7 +49,7 @@ class SceneGraphOpt(object):
     PORT_PATHSEP = '.'
     #
     GEOMETRY_ROOT = '/root/world/geo'
-    OBJ_OPT_CLS = SceneGraphObjOpt
+    OBJ_OPT_CLS = SGObjOpt
     def __init__(self, ktn_obj=None):
         if ktn_obj is not None:
             if isinstance(ktn_obj, (str, unicode)):
@@ -66,6 +72,10 @@ class SceneGraphOpt(object):
 
     def get_obj(self, obj_path):
         return self._get_traversal_(obj_path)
+
+    def get_obj_exists(self, obj_path):
+        t = self._get_traversal_(obj_path)
+        return t.valid()
 
     def get_obj_opt(self, obj_path):
         return self.OBJ_OPT_CLS(self, obj_path)
@@ -108,8 +118,22 @@ class SceneGraphOpt(object):
             tvl.next()
         return list_
 
+    def get_geometry_paths(self, location):
+        list_ = []
+        tvl = self._get_traversal_(
+            location
+        )
+        while tvl.valid():
+            i_path = tvl.getLocationPath()
+            i_attrs = tvl.getLocationData().getAttrs()
+            i_type_name = i_attrs.getChildByName('type').getData()[0]
+            if i_type_name in ['subdmesh', 'renderer procedural']:
+                list_.append(i_path)
+            tvl.next()
+        return list_
+
     def get_geometry_material_paths_by_location(self, location):
-        lis = []
+        list_ = []
         tvl = self._get_traversal_(location)
         while tvl.valid():
             i_path = tvl.getLocationPath()
@@ -119,9 +143,9 @@ class SceneGraphOpt(object):
                 i_attr = i_attrs.getChildByName('materialAssign')
                 if i_attr is not None:
                     i_material_path = i_attrs.getChildByName('materialAssign').getData()[0]
-                    lis.append(i_material_path)
+                    list_.append(i_material_path)
             tvl.next()
-        return lis
+        return list_
 
     def __str__(self):
         return '{}(node="{}")'.format(

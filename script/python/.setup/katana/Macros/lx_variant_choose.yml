@@ -1,7 +1,9 @@
 #
-input_ports: []
+input_ports:
+    - input
 #
-output_ports: []
+output_ports:
+    - output
 
 parameters:
     lynxi_variants/enable:
@@ -14,7 +16,12 @@ parameters:
         value: ['geometry', 'layer', 'quality', 'camera', 'look_pass', 'light_pass']
         tool_tip: '...'
 
-    lynxi_variants/register_variable:
+    lynxi_variants/value:
+        widget: enumerate
+        value: ['None']
+        tool_tip: '...'
+
+    lynxi_variants/load_variable:
         widget: button
-        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxVariant(node).set_variable_register()'
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxVariantChoose(node).set_variable_value_load()'
         tool_tip: '...'

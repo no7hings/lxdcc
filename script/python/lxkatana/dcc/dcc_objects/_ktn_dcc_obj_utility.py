@@ -135,7 +135,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         super(Scene, self).__init__(*args, **kwargs)
 
     def _set_load_by_root_(self, ktn_obj, root, include_obj_type=None):
-        self._scene_graph_opt = ktn_core.SceneGraphOpt(ktn_obj)
+        self._scene_graph_opt = ktn_core.KtnSGStageOpt(ktn_obj)
         tvl = self._scene_graph_opt._get_traversal_(root)
         while tvl.valid():
             i_obj_path = tvl.getLocationPath()
@@ -268,10 +268,10 @@ class Selection(object):
                 ktn_core.NodeGraphTabOpt().set_selection_view_fit()
         #
         if self._scene_graph_obj_paths:
-            ktn_core.SceneGraphSelection(
+            ktn_core.KtnSGSelectionOpt(
                 self._scene_graph_obj_paths
             ).set_all_select()
     @classmethod
     def set_clear(cls):
         NodegraphAPI.SetAllSelectedNodes([])
-        ktn_core.SceneGraphSelection.set_clear()
+        ktn_core.KtnSGSelectionOpt.set_clear()

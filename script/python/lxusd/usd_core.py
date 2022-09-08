@@ -147,15 +147,15 @@ class UsdStageOpt(object):
         self._usd_stage.SetDefaultPrim(default_prim_path)
 
     def get_objs(self, regex):
-        lis = []
+        list_ = []
         for i_usd_prim in self._usd_stage.TraverseAll():
             i_usd_prim_opt = UsdPrimOpt(i_usd_prim)
-            lis.append(i_usd_prim_opt.get_path())
+            list_.append(i_usd_prim_opt.get_path())
         #
         dag_path_opt = bsc_core.DccPathDagOpt(regex)
         #
         child_paths = bsc_core.DccPathDagMtd.get_dag_children(
-            dag_path_opt.get_parent_path(), lis
+            dag_path_opt.get_parent_path(), list_
         )
         #
         return [
@@ -212,6 +212,15 @@ class UsdStageOpt(object):
             tgt_file_path
         )
 
+    def get_fps(self):
+        return self._usd_stage.GetTimeCodesPerSecond()
+
+    def set_frame(self, frame):
+        self._usd_stage.Set()
+
+    def set_frame_range(self, start_frame, end_frame):
+        pass
+
     def get_frame_range(self):
         return (
             int(self._usd_stage.GetStartTimeCode()),
@@ -219,10 +228,17 @@ class UsdStageOpt(object):
         )
 
     def get_all_objs(self):
-        lis = []
+        list_ = []
         for i_usd_prim in self._usd_stage.TraverseAll():
-            lis.append(i_usd_prim)
-        return lis
+            list_.append(i_usd_prim)
+        return list_
+
+    def get_all_obj_paths(self):
+        list_ = []
+        for i_usd_prim in self._usd_stage.TraverseAll():
+            if i_usd_prim.IsValid() is True:
+                list_.append(i_usd_prim.GetPath().pathString)
+        return list_
 
     def get_count(self):
         return len([i for i in self._usd_stage.TraverseAll()])
@@ -247,16 +263,16 @@ class UsdStageOpt(object):
                 if _filter_child_paths:
                     for _i_filter_child_path in _filter_child_paths:
                         if _depth == depth_maximum:
-                            lis.append(_i_filter_child_path)
+                            list_.append(_i_filter_child_path)
                         get_fnc_(_i_filter_child_path, _depth)
         #
-        lis = []
+        list_ = []
         #
         filter_names = regex.split('/')
         depth_maximum = len(filter_names)-1
 
         get_fnc_('/', 0)
-        return lis
+        return list_
 
     def get_bounding_box(self, location=None):
         b_box_cache = UsdGeom.BBoxCache(
@@ -319,10 +335,13 @@ class UsdPrimOpt(object):
     def get_path(self):
         return self._usd_prim.GetPath().pathString
 
+    def get_port(self, port_path):
+        return self._usd_prim.GetAttribute(port_path)
+
     def get_customize_ports(self):
         return self._usd_prim.GetAuthoredAttributes() or []
 
-    def get_customize_attributes(self, includes=None):
+    def get_customize_attributes(self, includes=None, use_full_path=False):
         dic = {}
         _ = self.get_customize_ports()
         for i in _:
@@ -337,21 +356,34 @@ class UsdPrimOpt(object):
         # print self._usd_prim.GetParent()
         return self.__class__(self._usd_prim.GetParent()).get_path()
 
+    def get_children(self):
+        return self._usd_prim.GetChildren()
+
     def get_child_paths(self):
-        return [self.__class__(i).get_path() for i in self._usd_prim.GetChildren()]
+        return [i.GetPath().pathString for i in self._usd_prim.GetChildren()]
+
+    def get_descendant_paths(self):
+        def rcs_fnc_(list__, prim_):
+            for _i_prim in prim_.GetChildren():
+                list__.append(_i_prim.GetPath().pathString)
+                rcs_fnc_(_i_prim)
+
+        list_ = []
+        rcs_fnc_(list_, self._usd_prim)
+        return list_
 
     def get_variant_set(self, variant_set_name):
         return self._usd_prim.GetVariantSet(variant_set_name)
 
     def get_variant_sets(self):
-        lis = []
+        list_ = []
         usd_variant_sets = self._usd_prim.GetVariantSets()
         for i in usd_variant_sets.GetNames():
             i_variant_set = self._usd_prim.GetVariantSet(i)
-            lis.append(
+            list_.append(
                 i_variant_set
             )
-        return lis
+        return list_
 
     def get_variant_names(self, variant_set_name):
         return UsdVariantSetOpt(self.get_variant_set(variant_set_name)).get_variant_names()
@@ -458,21 +490,21 @@ class _Basic(object):
         return [tuple(i) for i in usd_coord_array]
     @classmethod
     def _get_matrix_(cls, usd_matrix):
-        lis = []
+        list_ = []
         for row in usd_matrix:
             for column in row:
-                lis.append(column)
-        return lis
+                list_.append(column)
+        return list_
     @classmethod
     def _get_usd_matrix_(cls, matrix):
-        lis = []
+        list_ = []
         for i in range(4):
             rows = []
             for j in range(4):
                 rows.append(matrix[i * 4 + j])
-            lis.append(rows)
+            list_.append(rows)
         #
-        return Gf.Matrix4d(lis)
+        return Gf.Matrix4d(list_)
 
 
 class UsdGeometryOpt(object):
@@ -580,14 +612,14 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
         return []
 
     def get_uv_map_names(self):
-        lis = []
+        list_ = []
         usd_mesh = self._usd_mesh
         usd_primvars = usd_mesh.GetAuthoredPrimvars()
         for i_primvar in usd_primvars:
             i_name = i_primvar.GetPrimvarName()
             if i_primvar.GetIndices():
-                lis.append(i_name)
-        return lis
+                list_.append(i_name)
+        return list_
 
     def get_uv_map(self, uv_map_name):
         a = self._usd_mesh.GetPrimvar(uv_map_name)
@@ -624,13 +656,13 @@ class UsdMeshOpt(object):
         return self._usd_mesh
 
     def get_uv_map_names(self):
-        lis = []
+        list_ = []
         usd_primvars = self._usd_mesh.GetAuthoredPrimvars()
         for uv_primvar in usd_primvars:
             uv_map_name = uv_primvar.GetPrimvarName()
             if uv_primvar.GetIndices():
-                lis.append(uv_map_name)
-        return lis
+                list_.append(uv_map_name)
+        return list_
 
     def get_uv_map(self, uv_map_name):
         uv_primvar = self._usd_mesh.GetPrimvar(uv_map_name)

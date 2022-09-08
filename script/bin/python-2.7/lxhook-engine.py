@@ -92,9 +92,10 @@ def __set_option_hook_run(hook_option):
             )
         )
         cmd_args = []
-        rez_extend_packages = option_opt.get('rez_extend_packages', as_array=True)
-        if rez_extend_packages:
-            cmd_args.append(' '.join(rez_extend_packages))
+        # add extend packages
+        extend_packages = option_opt.get('extend_packages', as_array=True)
+        if extend_packages:
+            cmd_args.append(' '.join(extend_packages))
         #
         cmd_args.append(
             ssn_core.HookEngineMtd.get_command(
@@ -105,20 +106,28 @@ def __set_option_hook_run(hook_option):
         application = hook_engine.split('-')[0]
         #
         use_thread = option_opt.get('use_thread') or False
+        # add extend environs
+        extend_environs = {}
+        #
+        _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+        if _:
+            extend_environs['LYNXI_RESOURCES'] = _
         #
         if use_thread is True:
             utl_core.AppLauncher(
                 project=project,
                 application=application
             ).set_cmd_run_with_result_use_thread(
-                ' '.join(cmd_args)
+                ' '.join(cmd_args),
+                extend_environs=extend_environs
             )
         else:
             utl_core.AppLauncher(
                 project=project,
                 application=application
             ).set_cmd_run_with_result(
-                ' '.join(cmd_args)
+                ' '.join(cmd_args),
+                extend_environs=extend_environs
             )
     else:
         raise TypeError(

@@ -375,7 +375,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         location = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
         #
         dcc_location = mya_dcc_objects.Node(location)
-        #
+        # use utility pathsep
         sub_location = '{}/hi'.format(root)
         #
         if dcc_location.get_is_exists() is False:
@@ -410,13 +410,16 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         fnc_geometry_comparer = mya_fnc_comparers.GeometryComparer(
             work_scene_src_file_path, sub_location
         )
+        fnc_geometry_comparer._set_model_geometry_usd_hi_file_path_(
+            latest_model_geometry_usd_hi_file_path
+        )
         warning_es = [
             utl_configure.DccMeshCheckStatus.ADDITION,
             utl_configure.DccMeshCheckStatus.DELETION,
             utl_configure.DccMeshCheckStatus.PATH_CHANGED,
-            utl_configure.DccMeshCheckStatus.PATH_EXCHANGED,
         ]
         error_ds = [
+            utl_configure.DccMeshCheckStatus.PATH_EXCHANGED,
             utl_configure.DccMeshCheckStatus.FACE_VERTICES_CHANGED,
         ]
         results = fnc_geometry_comparer.get_results()
@@ -486,7 +489,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             ['{}.{}'.format(i_geometry_path, i) for i in i_components],
                             check_group=check_group,
                             check_status=validation_checker.CheckStatus.Error,
-                            description='"material-assign" has components (faces ) '
+                            description='"mesh" "material-assign" has components (faces ) '
                         )
 
     def set_maya_texture_check(self, validation_checker):
@@ -774,7 +777,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 i_dcc_path,
                 check_group=check_group,
                 check_status=validation_checker.CheckStatus.Warning,
-                description='"mesh" in look-pass "{}" is non material-assign'.format(
+                description='"geometry" in look-pass "{}" is non "material-assign"'.format(
                     i_pass_name
                 )
             )

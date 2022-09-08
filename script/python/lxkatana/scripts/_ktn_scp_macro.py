@@ -4,6 +4,31 @@ import collections
 from Katana import Utils, CacheManager
 
 
+class _MacroMtd(object):
+    @classmethod
+    def set_warning_show(cls, label, contents):
+        from lxutil import utl_core
+        #
+        from lxkatana import ktn_core
+        #
+        if contents:
+            if ktn_core._get_is_ui_mode_():
+                utl_core.DialogWindow.set_create(
+                    label,
+                    content=u'\n'.join(contents),
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
+            else:
+                for i in contents:
+                    utl_core.Log.set_module_warning_trace(
+                        label, i
+                    )
+
+
 class LxCameraAlembic(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
@@ -553,6 +578,90 @@ class LxAsset(object):
                 )
 
 
+class LxGeometryProcess(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def set_guess(self):
+        from lxkatana import ktn_core
+
+        contents = []
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        geometry_branch = obj_opt.get('geometry.branch')
+        if geometry_branch == 'asset':
+            location = '/root/world/geo/master'
+            obj_opt.set(
+                'geometry.location', location
+            )
+        elif geometry_branch == 'shot':
+            rsv_asset = LxAsset._get_rsv_asset_auto_()
+            if rsv_asset is not None:
+                guess_location = '/root/world/geo/assets/efx/{}'.format(
+                    rsv_asset.get('asset')
+                )
+                stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
+                if stage_opt.get_obj_exists(guess_location) is True:
+                    obj_opt.set(
+                        'geometry.location', guess_location
+                    )
+                else:
+                    contents.append(
+                        'location="{}" is not available'.format(guess_location)
+                    )
+            else:
+                contents.append(
+                    'current scene is not available'
+                )
+
+        _MacroMtd.set_warning_show(
+            'geometry process guess', contents
+        )
+
+    def _get_frame_range_(self):
+        from lxkatana import ktn_core
+
+        from lxusd import usd_core
+
+        stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
+
+        _ = stage_opt.get('/root/world/geo/assets.userProperties.scene_file')
+        if _:
+            usd_file_path = _[0]
+            return usd_core.UsdStageOpt(
+                usd_file_path
+            ).get_frame_range()
+
+    def set_create(self):
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
+
+        contents = []
+
+        obj_opt.set('usd_override_enable', False)
+        geometry_branch = obj_opt.get('geometry.branch')
+        if geometry_branch == 'shot':
+            location = obj_opt.get('geometry.location')
+            if stage_opt.get_obj_exists(location) is True:
+                _ = self._get_frame_range_()
+                if _:
+                    start_frame, end_frame = _
+                    print start_frame, end_frame
+                    # paths = stage_opt.get_all_paths_at_as_dynamic(
+                    #     _, location
+                    # )
+            else:
+                contents.append(
+                    'location="{}" is not available'.format(location)
+                )
+
+        _MacroMtd.set_warning_show(
+            'geometry process create', contents
+        )
+
+
 class LxCamera(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
@@ -587,7 +696,7 @@ class LxCamera(object):
             0
         )
         #
-        content = None
+        contents = []
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
@@ -619,23 +728,21 @@ class LxCamera(object):
                             '/root/world/cam/cameras/main'
                         )
                 else:
-                    content = u'asset="{}" camera task is non-exists'.format(rsv_entity.path)
+                    contents.append(
+                        u'asset="{}" camera task is non-exists'.format(rsv_entity.path)
+                    )
             else:
-                content = u'file={} is not not available'.format(f)
-        else:
-            content = u'file={} is not not available'.format(f)
-
-        if content is not None:
-            if ktn_core._get_is_ui_mode_():
-                utl_core.DialogWindow.set_create(
-                    'Asset Camera Loader',
-                    content=content,
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
-                    #
-                    yes_label='Close',
-                    #
-                    no_visible=False, cancel_visible=False
+                contents.append(
+                    u'file={} is not not available'.format(f)
                 )
+        else:
+            contents.append(
+                u'file={} is not not available'.format(f)
+            )
+
+        _MacroMtd.set_warning_show(
+            'camera load', contents
+        )
 
     def set_variable_register(self):
         from lxkatana import ktn_core
@@ -806,19 +913,60 @@ class LxVariant(object):
     def _get_key_(self):
         from lxkatana import ktn_core
         return ktn_core.NGObjOpt(self._ktn_obj).get_port_raw('variableName')
-
-    def _get_item_values_(self):
+    @classmethod
+    def _get_item_values_(cls, ktn_obj):
         from lxkatana import ktn_core
-        ktn_port = ktn_core.NGObjOpt(self._ktn_obj).get_port('patterns')
+        ktn_port = ktn_core.NGObjOpt(ktn_obj).get_port('patterns')
         return [ktn_core.NGPortOpt(i).get() for i in ktn_core.NGObjOpt(ktn_port).get_children()]
 
     def set_variable_register(self):
         from lxkatana import ktn_core
         key = self._get_key_()
-        values = self._get_item_values_()
+        values = self._get_item_values_(self._ktn_obj)
         ktn_core.VariablesSetting().set_register(
             key, values
         )
+
+
+class LxVariantChoose(object):
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+
+    def _set_value_update_(self, values):
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        key = 'lynxi_variants.value'
+        value = obj_opt.get(key)
+        obj_opt.set_as_enumerate(key, values)
+        if value in values:
+            obj_opt.set(
+                key, value
+            )
+
+    def set_variable_value_load(self):
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        key = obj_opt.get('lynxi_variants.key')
+        source_objs = obj_opt.get_all_source_objs()
+        values = []
+        if source_objs:
+            for i_ktn_obj in source_objs:
+                i_obj_opt = ktn_core.NGObjOpt(i_ktn_obj)
+                if i_obj_opt.type_name == 'VariableSwitch':
+                    i_key = i_obj_opt.get('variableName')
+                    if i_key == key:
+                        i_values = LxVariant._get_item_values_(i_ktn_obj)
+                        [values.append(j) for j in i_values if j not in values]
+        #
+        if values:
+            self._set_value_update_(values)
+        else:
+            self._set_value_update_(['None'])
+        return
 
 
 class LxLook(object):
@@ -899,8 +1047,6 @@ class LxLight(object):
         pass
 
     def set_refresh_light_rig(self):
-        from lxutil import utl_core
-
         from lxkatana import ktn_core
 
         import lxshotgun.rsv.objects as stg_rsv_objects
@@ -943,18 +1089,10 @@ class LxLight(object):
                 contents.append(
                     'light-rig(s) is not found'
                 )
-            #
-            if contents:
-                if ktn_core._get_is_ui_mode_():
-                    utl_core.DialogWindow.set_create(
-                        'Light-rig Refresh',
-                        content=u'\n'.join(contents),
-                        status=utl_core.DialogWindow.ValidatorStatus.Error,
-                        #
-                        yes_label='Close',
-                        #
-                        no_visible=False, cancel_visible=False
-                    )
+
+        _MacroMtd.set_warning_show(
+            'light rig refresh', contents
+        )
 
     def set_load_light_rig(self):
         from lxkatana import ktn_core
@@ -965,11 +1103,7 @@ class LxLight(object):
         self._set_load_from_asset_light_rig_(asset)
 
     def _set_load_from_asset_light_rig_(self, light_rig_asset):
-        from lxutil import utl_core
-
         from lxkatana import ktn_core
-
-        import lxshotgun.rsv.objects as stg_rsv_objects
 
         contents = []
 
@@ -1010,17 +1144,9 @@ class LxLight(object):
             # CacheManager.flush()
             self.set_live_groups_update()
         #
-        if contents:
-            if ktn_core._get_is_ui_mode_():
-                utl_core.DialogWindow.set_create(
-                    'Load Light-rig',
-                    content=u'\n'.join(contents),
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
-                    #
-                    yes_label='Close',
-                    #
-                    no_visible=False, cancel_visible=False
-                )
+        _MacroMtd.set_warning_show(
+            'light rig load', contents
+        )
 
     def set_live_groups_update(self):
         from lxkatana import ktn_core

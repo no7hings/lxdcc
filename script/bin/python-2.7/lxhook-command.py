@@ -25,7 +25,7 @@ def main():
                 option = value
         #
         if option is not None:
-            __set_run_by_option(option)
+            __set_run(option)
     #
     except getopt.GetoptError:
         print('argv error')
@@ -40,11 +40,7 @@ def __set_help_print():
     )
 
 
-def __set_run_by_option(option):
-    import functools
-    #
-    import threading
-    #
+def __set_run(option):
     from lxbasic import bsc_core
     #
     option_opt = bsc_core.KeywordArgumentsOpt(option)
@@ -54,10 +50,6 @@ def __set_run_by_option(option):
     else:
         hook_key = option_opt.get('hook_key')
         if hook_key:
-            # t = threading.Thread(
-            #     target=functools.partial(__set_hook_run, option=option)
-            # )
-            # t.start()
             __set_hook_run(option)
 
 
@@ -76,15 +68,21 @@ def __set_hook_run(option):
     if hook_args:
         session, fnc = hook_args
         #
-        packages = session.get_rez_extend_packages()
+        # add extend packages
+        extend_packages = session.get_rez_extend_packages()
         #
-        if packages:
-            cmd = 'rez-env lxdcc {} -- lxhook-python -o "{}"'.format(' ' .join(packages), option)
+        if extend_packages:
+            cmd = 'rez-env lxdcc {} -- lxhook-python -o "{}"'.format(' ' .join(extend_packages), option)
         else:
             cmd = 'rez-env lxdcc -- lxhook-python -o "{}"'.format(option)
+        #
+        extend_environs = {}
+        _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+        if _:
+            extend_environs['LYNXI_RESOURCES'] = _
         # run cmd by subprocess
         utl_core.SubProcessRunner.set_run_with_result_use_thread(
-            cmd
+            cmd, extend_environs=extend_environs
         )
 
 

@@ -1,5 +1,6 @@
 # coding:utf-8
 import locale
+import os
 
 from lxbasic import bsc_core
 
@@ -160,15 +161,22 @@ class AbsHookExecutor(object):
         return self._ddl_submiter.get_job_result()
 
     def set_run_with_shell(self, block=False):
+        #
+        extend_environs = {}
+        #
+        _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+        if _:
+            extend_environs['LYNXI_RESOURCES'] = _
+        #
         cmd = self.get_shell_command()
         #
         if block is True:
             utl_core.SubProcessRunner.set_run_with_result(
-                cmd
+                cmd, extend_environs=extend_environs
             )
         else:
             utl_core.SubProcessRunner.set_run_with_result_use_thread(
-                cmd
+                cmd, extend_environs=extend_environs
             )
 
     def set_run(self):

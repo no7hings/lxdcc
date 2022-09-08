@@ -2,6 +2,8 @@
 import collections
 
 import threading
+#
+import time
 # noinspection PyUnresolvedReferences
 from Katana import NodegraphAPI, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration
 # noinspection PyUnresolvedReferences
@@ -22,7 +24,8 @@ import fnmatch
 import sys
 
 
-class SGObjOpt(object):
+# katana scene graph operator
+class KtnSGObjOpt(object):
     def __init__(self, scene_graph_opt, obj_path):
         self._scene_graph_opt = scene_graph_opt
         self._obj_path = obj_path
@@ -44,12 +47,12 @@ class SGObjOpt(object):
         return self.get_port_raw(key)
 
 
-class SceneGraphOpt(object):
+class KtnSGStageOpt(object):
     OBJ_PATHSEP = '/'
     PORT_PATHSEP = '.'
     #
     GEOMETRY_ROOT = '/root/world/geo'
-    OBJ_OPT_CLS = SGObjOpt
+    OBJ_OPT_CLS = KtnSGObjOpt
     def __init__(self, ktn_obj=None):
         if ktn_obj is not None:
             if isinstance(ktn_obj, (str, unicode)):
@@ -63,32 +66,37 @@ class SceneGraphOpt(object):
         self._transaction = self._runtime.createTransaction()
         self._client = self._transaction.createClient()
         #
-        op = Nodes3DAPI.GetOp(self._transaction, self._ktn_obj)
-        self._transaction.setClientOp(self._client, op)
+        self._transaction.setClientOp(self._client, Nodes3DAPI.GetOp(self._transaction, self._ktn_obj))
         self._runtime.commit(self._transaction)
 
-    def _get_traversal_(self, obj_path):
-        return FnGeolib.Util.Traversal(self._client, obj_path)
+    def _get_traversal_(self, location):
+        return FnGeolib.Util.Traversal(
+            self._client, location
+        )
 
-    def get_obj(self, obj_path):
-        return self._get_traversal_(obj_path)
+    def _test_(self, location):
+        tvl = self._get_traversal_(location)
+        print dir(tvl)
 
     def get_obj_exists(self, obj_path):
         t = self._get_traversal_(obj_path)
         return t.valid()
 
+    def get_obj(self, obj_path):
+        return self._get_traversal_(obj_path)
+
     def get_obj_opt(self, obj_path):
         return self.OBJ_OPT_CLS(self, obj_path)
 
-    def get_obj_descendant_paths(self, obj_path):
-        lis = []
-        tvl = self._get_traversal_(obj_path)
+    def get_descendant_paths_at(self, location):
+        list_ = []
+        tvl = self._get_traversal_(location)
         while tvl.valid():
             i_obj_path = tvl.getLocationPath()
-            if not i_obj_path == obj_path:
-                lis.append(i_obj_path)
+            if not i_obj_path == location:
+                list_.append(i_obj_path)
             tvl.next()
-        return lis
+        return list_
 
     def get_port(self, atr_path):
         _ = atr_path.split(self.PORT_PATHSEP)
@@ -103,49 +111,109 @@ class SceneGraphOpt(object):
         if port is not None:
             return port.getData()
 
-    def get_material_paths(self):
-        root = '/root/materials'
-        tvl = self._get_traversal_(
-            root
-        )
-        list_ = []
-        while tvl.valid():
-            i_obj_path = tvl.getLocationPath()
-            if not i_obj_path == root:
-                i_obj_type_name = tvl.getLocationData().getAttrs().getChildByName('type').getData()[0]
-                if i_obj_type_name == 'material':
-                    list_.append(i_obj_path)
-            tvl.next()
-        return list_
+    def get(self, key):
+        return self.get_port_raw(key)
 
-    def get_geometry_paths(self, location):
+    def get_all_paths_at(self, location, include_types=None, exclude_types=None):
         list_ = []
         tvl = self._get_traversal_(
             location
         )
-        while tvl.valid():
+        # timeout for kill block
+        timeout = 60
+        start_time = int(time.time())
+        while True:
+            if (int(time.time())-start_time) > timeout:
+                raise RuntimeError(
+                    utl_core.Log.set_module_error_trace(
+                        'location traversal is timeout'
+                    )
+                )
+            #
+            if tvl.valid() is False:
+                break
+            #
             i_path = tvl.getLocationPath()
             i_attrs = tvl.getLocationData().getAttrs()
-            i_type_name = i_attrs.getChildByName('type').getData()[0]
-            if i_type_name in ['subdmesh', 'renderer procedural']:
-                list_.append(i_path)
+            # call next in here
             tvl.next()
+            # include filter
+            if isinstance(include_types, (tuple, list)):
+                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                if i_type_name not in include_types:
+                    continue
+            # exclude filter
+            if isinstance(exclude_types, (tuple, list)):
+                i_attrs = tvl.getLocationData().getAttrs()
+                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                if i_type_name in exclude_types:
+                    continue
+            #
+            list_.append(i_path)
         return list_
 
-    def get_geometry_material_paths_by_location(self, location):
+    def get_all_port_raws_at(self, location, port_path, include_types=None, exclude_types=None):
         list_ = []
-        tvl = self._get_traversal_(location)
-        while tvl.valid():
-            i_path = tvl.getLocationPath()
+        tvl = self._get_traversal_(
+            location
+        )
+        # timeout for kill block
+        timeout = 60
+        start_time = int(time.time())
+        while True:
+            if (int(time.time())-start_time) > timeout:
+                raise RuntimeError(
+                    utl_core.Log.set_module_error_trace(
+                        'location traversal is timeout'
+                    )
+                )
+            #
+            if tvl.valid() is False:
+                break
+            #
             i_attrs = tvl.getLocationData().getAttrs()
-            i_type_name = i_attrs.getChildByName('type').getData()[0]
-            if i_type_name in ['subdmesh', 'renderer procedural']:
-                i_attr = i_attrs.getChildByName('materialAssign')
-                if i_attr is not None:
-                    i_material_path = i_attrs.getChildByName('materialAssign').getData()[0]
-                    list_.append(i_material_path)
+            # call next in here
             tvl.next()
+            # include filter
+            if isinstance(include_types, (tuple, list)):
+                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                if i_type_name not in include_types:
+                    continue
+            # exclude filter
+            if isinstance(exclude_types, (tuple, list)):
+                i_attrs = tvl.getLocationData().getAttrs()
+                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                if i_type_name in exclude_types:
+                    continue
+            #
+            i_attr = i_attrs.getChildByName(port_path)
+            if i_attr is not None:
+                i_ = i_attr.getData()[0]
+                if i_ not in list_:
+                    list_.append(i_)
         return list_
+
+    def get_all_paths_at_as_dynamic(self, frame_range, location, include_types=None, exclude_types=None):
+        start_frame, end_frame = frame_range
+        if start_frame == end_frame:
+            NGObjOpt(
+                NodegraphAPI.GetRootNode()
+            ).set('currentTime', start_frame)
+            return self.get_all_paths_at(
+                location, include_types, exclude_types
+            )
+        else:
+            list_ = []
+            for i_frame in range(start_frame, end_frame+1):
+                NGObjOpt(
+                    NodegraphAPI.GetRootNode()
+                ).set('currentTime', i_frame)
+                #
+                i_paths = self.get_all_paths_at(
+                    location, include_types, exclude_types
+                )
+                [list_.append(j) for j in i_paths if j not in list_]
+            return list_
 
     def __str__(self):
         return '{}(node="{}")'.format(
@@ -154,22 +222,22 @@ class SceneGraphOpt(object):
         )
 
 
-class SceneGraphSelection(object):
+class KtnSGSelectionOpt(object):
     def __init__(self, *args):
         self._paths = args[0]
         self._scene_graph = ScenegraphManager.getActiveScenegraph()
 
     def set_all_select(self):
         paths = self._paths
-        lis = []
+        list_ = []
         for path in paths:
             ps = bsc_core.DccPathDagOpt(path).get_ancestor_paths()
             for p in ps:
-                if p not in lis:
+                if p not in list_:
                     if p != '/':
-                        lis.append(p)
+                        list_.append(p)
         #
-        self._scene_graph.addOpenLocations(lis, replace=True)
+        self._scene_graph.addOpenLocations(list_, replace=True)
         self._scene_graph.addSelectedLocations(paths, replace=True)
     @classmethod
     def set_clear(cls):
@@ -227,16 +295,16 @@ class NGObjOpt(object):
             if _ktn_obj is not None:
                 _parent = _ktn_obj.getParent()
                 if _parent is None:
-                    lis.append('')
+                    list_.append('')
                 else:
                     _parent_name = _parent.getName()
-                    lis.append(_parent_name)
+                    list_.append(_parent_name)
                     _rcs_fnc(_parent_name)
         #
-        lis = [name]
+        list_ = [name]
         _rcs_fnc(name)
-        lis.reverse()
-        return cls.PATHSEP.join(lis)
+        list_.reverse()
+        return cls.PATHSEP.join(list_)
     @classmethod
     def _set_create_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -279,6 +347,10 @@ class NGObjOpt(object):
         return self.ktn_obj.getType()
     type = property(get_type)
 
+    def get_type_name(self):
+        return self.get_type()
+    type_name = property(get_type_name)
+
     def get_path(self):
         return self._get_path_(self.get_name())
     path = property(get_path)
@@ -286,6 +358,11 @@ class NGObjOpt(object):
     def get_name(self):
         return self.ktn_obj.getName()
     name = property(get_name)
+
+    def get_stage_opt(self):
+        return KtnSGStageOpt(
+            self._ktn_obj
+        )
 
     def set_gui_expanded(self):
         attributes = self.ktn_obj.getAttributes()
@@ -301,23 +378,64 @@ class NGObjOpt(object):
             attributes['ns_collapsedPages'] = 'Outputs##BUILTIN | Parameters##BUILTIN | '
             self.ktn_obj.setAttributes(attributes)
 
-    def get_sources(self):
-        lis = []
+    def get_sources(self, **kwargs):
+        list_ = []
         _ = self.ktn_obj.getInputPorts() or []
-        for target_ktn_port in _:
-            source_ktn_ports = target_ktn_port.getConnectedPorts()
-            if source_ktn_ports:
-                lis.extend(source_ktn_ports)
-        return lis
+        for i_ktn_port in _:
+            i_ktn_ports_src = i_ktn_port.getConnectedPorts()
+            if i_ktn_ports_src:
+                list_.extend(i_ktn_ports_src)
+        return list_
 
-    def get_source_objs(self):
-        lis = []
-        source_ktn_ports = self.get_sources()
-        for source_ktn_port in source_ktn_ports:
-            ktn_obj = source_ktn_port.getNode()
-            if ktn_obj not in lis:
-                lis.append(ktn_obj)
-        return lis
+    def get_source_objs(self, **kwargs):
+        #
+        list_ = []
+        _ = self.get_sources(**kwargs)
+        for i_ktn_port in _:
+            i_ktn_obj = i_ktn_port.getNode()
+            if i_ktn_obj not in list_:
+                list_.append(i_ktn_obj)
+        return list_
+    @classmethod
+    def _get_sources_inward_(cls, ktn_obj):
+        list_ = []
+        _ = ktn_obj.getOutputPorts() or []
+        for i_ktn_port in _:
+            i_ktn_ports_rtn = ktn_obj.getReturnPort(i_ktn_port.getName())
+            i_ktn_ports_src = i_ktn_ports_rtn.getConnectedPorts()
+            if i_ktn_ports_src:
+                list_.extend(i_ktn_ports_src)
+        return list_
+    @classmethod
+    def _get_source_objs_inward_(cls, ktn_obj):
+        list_ = []
+        _ = cls._get_sources_inward_(ktn_obj)
+        for i_ktn_port in _:
+            i_ktn_obj = i_ktn_port.getNode()
+            if i_ktn_obj not in list_:
+                list_.append(i_ktn_obj)
+        return list_
+
+    def get_all_source_objs(self, **kwargs):
+        def rcs_fnc_(list__, ktn_obj):
+            _ktn_objs = self.__class__(ktn_obj).get_source_objs(**kwargs)
+            for _i_ktn_obj in _ktn_objs:
+                if _i_ktn_obj not in list__:
+                    if hasattr(_i_ktn_obj, 'getChildren'):
+                        _i_ktn_objs = self._get_source_objs_inward_(_i_ktn_obj)
+                        for _j_ktn_obj in _i_ktn_objs:
+                            if _j_ktn_obj not in list__:
+                                list__.append(_j_ktn_obj)
+                                rcs_fnc_(list__, _j_ktn_obj)
+                    else:
+                        list__.append(_i_ktn_obj)
+                        rcs_fnc_(list__, _i_ktn_obj)
+        #
+        inward = kwargs.get('inward', False)
+        #
+        list_ = []
+        rcs_fnc_(list_, self._ktn_obj)
+        return list_
 
     def set_gui_layout(self, layout=('r-l', 't-b'), size=(320, 960), expanded=False, collapsed=False):
         def rcs_fnc_(ktn_obj_, column_):
@@ -613,16 +731,16 @@ class NGPortOpt(object):
         def rcs_fnc_(ktn_port_):
             if ktn_port_ is not None:
                 _port_name = ktn_port_.getName()
-                lis.append(_port_name)
+                list_.append(_port_name)
                 _parent_ktn_port = ktn_port_.getParent()
                 rcs_fnc_(_parent_ktn_port)
         #
-        lis = []
+        list_ = []
         #
         rcs_fnc_(ktn_port)
         #
-        lis.reverse()
-        return cls.PATHSEP.join(lis)
+        list_.reverse()
+        return cls.PATHSEP.join(list_)
     #
     def get(self, frame=0):
         _children = self.ktn_port.getChildren() or []
@@ -719,22 +837,22 @@ class NGAndObjTypeOpt(object):
         self._obj_type_name = type_name
 
     def get_ktn_objs(self):
-        lis = []
+        list_ = []
         for i_ktn_obj in NodegraphAPI.GetAllNodesByType('ArnoldShadingNode') or []:
             i_ktn_obj_opt = NGObjOpt(i_ktn_obj)
             i_shader_type_name = i_ktn_obj_opt.get_port_raw('nodeType')
             if i_shader_type_name in [self._obj_type_name]:
-                lis.append(i_ktn_obj)
-        return lis
+                list_.append(i_ktn_obj)
+        return list_
 
     def get_obj_opts(self):
-        lis = []
+        list_ = []
         for i_ktn_obj in NodegraphAPI.GetAllNodesByType('ArnoldShadingNode') or []:
             i_ktn_obj_opt = NGObjOpt(i_ktn_obj)
             i_shader_type_name = i_ktn_obj_opt.get_port_raw('nodeType')
             if i_shader_type_name in [self._obj_type_name]:
-                lis.append(i_ktn_obj_opt)
-        return lis
+                list_.append(i_ktn_obj_opt)
+        return list_
 
 
 class NodeGraphInputPort(object):

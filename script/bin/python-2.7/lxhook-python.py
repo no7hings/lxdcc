@@ -27,7 +27,7 @@ def main():
                 option = value
         #
         if option is not None:
-            __set_run_by_option(option)
+            __set_run(option)
     #
     except getopt.GetoptError:
         print('argv error')
@@ -42,7 +42,7 @@ def __set_help_print():
     )
 
 
-def __set_run_by_option(option):
+def __set_run(option):
     from lxbasic import bsc_core
     #
     option_opt = bsc_core.KeywordArgumentsOpt(option)

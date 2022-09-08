@@ -130,7 +130,8 @@ class AbsRsvObjHookOpt(object):
             scene_src_file_path = scene_src_file_rsv_unit.get_exists_result(
                 version=version
             )
-            return resolver.get_rsv_scene_properties_by_any_scene_file_path(
-                scene_src_file_path
-            )
+            if scene_src_file_path is not None:
+                return resolver.get_rsv_scene_properties_by_any_scene_file_path(
+                    scene_src_file_path
+                )
 

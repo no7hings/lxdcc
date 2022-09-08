@@ -26,12 +26,20 @@ from lxresolver import rsv_configure
 
 class AssetWorkspace(object):
     CONFIGURE_FILE_PATH = ktn_configure.Data.LOOK_KATANA_WORKSPACE_CONFIGURE_PATH
+    GEOMETRY_TYPES = [
+        'subdmesh',
+        'renderer procedural',
+        'pointcloud',
+        'polymesh',
+        'curves'
+    ]
     def __init__(self, location=None):
         self._look_configure_dict = {}
         self._default_configure = self.set_configure_create()
         if location is not None:
             w, h = self._default_configure.get('option.w'), self._default_configure.get('option.h')
             x, y = _ktn_dcc_obj_node.Node(location).get_position()
+            #
             self._default_configure.set('option.x', x)
             self._default_configure.set('option.y', y-h/2)
         #
@@ -52,7 +60,6 @@ class AssetWorkspace(object):
             configure = self.set_configure_create(pass_name)
             configure.set_flatten()
             return configure
-            # raise TypeError()
 
     def set_configure_create(self, pass_name='default'):
         configure = utl_objects.Configure(value=self.CONFIGURE_FILE_PATH)
@@ -97,7 +104,9 @@ class AssetWorkspace(object):
         query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_pass_source_obj()
         for i_dcc_obj in dcc_objs:
-            i_material_paths = ktn_core.SceneGraphOpt(i_dcc_obj.ktn_obj).get_material_paths()
+            i_material_paths = ktn_core.KtnSGStageOpt(i_dcc_obj.ktn_obj).get_all_paths_at(
+                '/root/materials', include_types=['material']
+            )
             for j_material_path in i_material_paths:
                 if j_material_path in query_dict:
                     j_material_dcc_path = query_dict[j_material_path]
@@ -120,12 +129,12 @@ class AssetWorkspace(object):
         list_ = []
         _ = self.get_all_pass_args()
         for i_pass_name, i_dcc_obj in _:
-            i_s_opt = ktn_core.SceneGraphOpt(i_dcc_obj.ktn_obj)
-            i_geometry_paths = i_s_opt.get_geometry_paths(
-                location
+            i_s_opt = ktn_core.KtnSGStageOpt(i_dcc_obj.ktn_obj)
+            i_geometry_paths = i_s_opt.get_all_paths_at(
+                location, include_types=self.GEOMETRY_TYPES
             )
             for j_path in i_geometry_paths:
-                j_obj_opt = ktn_core.SGObjOpt(i_s_opt, j_path)
+                j_obj_opt = ktn_core.KtnSGObjOpt(i_s_opt, j_path)
                 if not j_obj_opt.get('materialAssign'):
                     list_.append(
                         (i_pass_name, j_path)
@@ -137,13 +146,15 @@ class AssetWorkspace(object):
         query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_pass_source_obj()
         for i_dcc_obj in dcc_objs:
-            i_material_paths = ktn_core.SceneGraphOpt(i_dcc_obj.ktn_obj).get_geometry_material_paths_by_location(location)
-            for j_material_path in i_material_paths:
-                if j_material_path in query_dict:
-                    j_material_dcc_path = query_dict[j_material_path]
-                    if j_material_dcc_path not in list_:
+            i_material_sg_paths = ktn_core.KtnSGStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
+                location, 'materialAssign', include_types=self.GEOMETRY_TYPES
+            )
+            for j_material_sg_path in i_material_sg_paths:
+                if j_material_sg_path in query_dict:
+                    j_material_ng_path = query_dict[j_material_sg_path]
+                    if j_material_ng_path not in list_:
                         list_.append(
-                            j_material_dcc_path
+                            j_material_ng_path
                         )
         return list_
 
@@ -268,7 +279,7 @@ class AssetWorkspace(object):
         with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
             for i_key in workspace_keys:
                 g_p.set_update()
-                for j_sub_key in ['main', 'backdrop']:
+                for j_sub_key in ['main', 'backdrop', 'dot']:
                     cls._set_workspace_node_create_(configure, i_key, j_sub_key, pass_name)
     @classmethod
     def _set_workspace_node_create_(cls, configure, key, sub_key, pass_name='default'):
@@ -319,7 +330,7 @@ class AssetWorkspace(object):
         with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
             for key in workspace_keys:
                 g_p.set_update()
-                for sub_key in ['main', 'node_graph']:
+                for sub_key in ['main', 'node_graph', 'dot']:
                     cls._set_workspace_connections_create_(configure, key, sub_key, pass_name)
     @classmethod
     def _set_workspace_connections_create_(cls, configure, key, sub_key, pass_name='default'):
@@ -340,16 +351,17 @@ class AssetWorkspace(object):
     @classmethod
     def _set_workspace_node_graph_create_(cls, configure, key, pass_name):
         node_graph_node_dict = configure.get('workspace.{}.node_graph.nodes'.format(key))
-        d_w = configure.get('option.w')
-        d_h = configure.get('option.h')
-        cls._set_node_graph_nodes_create_(node_graph_node_dict, (d_w, d_h), pass_name)
+        # dcc_main_node = configure.get('workspace.{}.main.path'.format(key))
+        # backdrop_node_dcc_path = configure.get('workspace.{}.backdrop.path'.format(key))
+        # d_size = configure.get('option.w'), configure.get('option.h')
+        cls._set_node_graph_nodes_create_(configure, key, node_graph_node_dict, pass_name)
     @classmethod
-    def _set_node_graph_nodes_create_(cls, nodes_dict, d_size, pass_name='default'):
+    def _set_node_graph_nodes_create_(cls, configure, key, nodes_dict, pass_name='default'):
         if nodes_dict:
             for seq, (k, i_node_dict) in enumerate(nodes_dict.items()):
-                cls._set_node_graph_node_create_(i_node_dict, d_size, pass_name)
+                cls._set_node_graph_node_create_(configure, key, i_node_dict, pass_name)
     @classmethod
-    def _set_node_graph_node_create_(cls, node_dict, d_size, pass_name='default'):
+    def _set_node_graph_node_create_(cls, configure, key, node_dict, pass_name='default'):
         variable = node_dict.get('variable')
         if pass_name != 'default':
             if not variable:
@@ -370,16 +382,6 @@ class AssetWorkspace(object):
             node_attributes = node_dict.get('attributes')
             if node_attributes:
                 node_ktn_obj.setAttributes(node_attributes)
-            #
-            layout_main = node_dict.get('layout_main')
-            layout_backdrop = node_dict.get('layout_backdrop')
-            if layout_main and layout_backdrop:
-                cls._set_node_layout_by_backdrop_(
-                    dcc_node,
-                    _ktn_dcc_obj_node.Node(layout_main),
-                    _ktn_dcc_obj_node.Node(layout_backdrop),
-                    d_size
-                )
             #
             insert_connections = node_dict.get('insert_connections')
             if insert_connections:
@@ -405,6 +407,19 @@ class AssetWorkspace(object):
             executes = node_dict.get('executes')
             if executes:
                 cls._set_node_executes_(node_ktn_obj, executes)
+            #
+            layout_use_backdrop = configure.get('workspace.{}.option.layout_use_backdrop'.format(key)) or False
+            if layout_use_backdrop is True:
+                dcc_main_node = _ktn_dcc_obj_node.Node(
+                    configure.get('workspace.{}.main.path'.format(key))
+                )
+                dcc_backdrop_node = _ktn_dcc_obj_node.Node(
+                    configure.get('workspace.{}.backdrop.path'.format(key))
+                )
+                d_size = 225, 80
+                cls._set_node_layout_by_backdrop_(
+                    dcc_node, dcc_main_node, dcc_backdrop_node, d_size
+                )
     @classmethod
     def _set_node_connections_create_(cls, node_connections, extend_variants=None):
         if extend_variants is None:
@@ -436,22 +451,30 @@ class AssetWorkspace(object):
     @classmethod
     def _set_node_layout_by_backdrop_(cls, dcc_node, dcc_main_node, dcc_backdrop_node, d_size):
         if dcc_backdrop_node.get_is_exists() is True:
-            index = cls._get_layout_main_index_(dcc_main_node)
-            x, y, w, h = cls._get_layout_backdrop_geometry_(dcc_backdrop_node)
+            index = cls._get_node_layout_index_(dcc_node, dcc_main_node)
+            x, y, w, h = cls._get_layout_backdrop_geometry_(dcc_backdrop_node, d_size)
             d_w, d_h = d_size
-            d_c = w/d_w
-            column = index % d_c
-            row = index/d_c
-            x_0, y_0 = column*d_w, row*d_h
+            d_c = int(w/d_w)+1
+            column = int(index % d_c)
+            row = int(index/d_c)
+            x_0, y_0 = x+column*d_w, y-row*d_h
+            NodegraphAPI.SetNodePosition(dcc_node.ktn_obj, (x_0, y_0))
     @classmethod
-    def _get_layout_main_index_(cls, dcc_main_node):
-        return len(dcc_main_node.get_input_ports())
+    def _get_node_layout_index_(cls, dcc_node, dcc_main_node):
+        path = dcc_node.path
+        paths = [i.path for i in dcc_main_node.get_source_objs()]
+        if path in paths:
+            return paths.index(path)
+        return 0
     @classmethod
-    def _get_layout_backdrop_geometry_(cls, dcc_backdrop_node):
+    def _get_layout_backdrop_geometry_(cls, dcc_backdrop_node, d_size):
         a = dcc_backdrop_node.ktn_obj.getAttributes()
+        d_w, d_h = d_size
         x, y, w, h = a['x'], a['y'], a['ns_sizeX'], a['ns_sizeY']
+        w -= d_w
+        h -= d_h
         x_ = x-w/2
-        y_ = y-h/2
+        y_ = y+h/2
         return x_, y_, w, h
 
     @classmethod
@@ -811,7 +834,7 @@ class AssetWorkspace(object):
     @classmethod
     def _get_geometry_location_(cls, dcc_obj):
         if dcc_obj.get_is_exists() is True:
-            s = ktn_core.SceneGraphOpt(dcc_obj.ktn_obj)
+            s = ktn_core.KtnSGStageOpt(dcc_obj.ktn_obj)
             print s.get_obj_exists('/root/world/geo/master')
 
     @_ktn_mdf_utility.set_undo_mark_mdf
@@ -912,7 +935,7 @@ class AssetWorkspace(object):
         obj_path = configure.get('workspace.{}.main.path'.format(key))
         dcc_obj = _ktn_dcc_obj_node.Node(obj_path)
         if dcc_obj.get_is_exists() is True:
-            scene_graph_opt = ktn_core.SceneGraphOpt(dcc_obj.ktn_obj)
+            scene_graph_opt = ktn_core.KtnSGStageOpt(dcc_obj.ktn_obj)
             return scene_graph_opt.get_port_raw(atr_path)
         else:
             raise RuntimeError(
@@ -1274,3 +1297,4 @@ class AssetWorkspace(object):
         _ = '{}__look'.format(pass_name)
         dcc_obj = _ktn_dcc_obj_node.Node(_)
         return dcc_obj, dcc_obj.ktn_obj
+

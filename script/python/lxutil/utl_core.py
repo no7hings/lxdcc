@@ -509,13 +509,13 @@ class SubProcessRunner(object):
     def __init__(self):
         pass
     @classmethod
-    def set_run_with_result(cls, cmd, clear_environ=False):
+    def set_run_with_result(cls, cmd, **sub_progress_kwargs):
         Log.set_module_result_trace(
             'sub-progress run with result',
             u'command=`{}` is started'.format(cmd.decode('utf-8'))
         )
         bsc_core.SubProcessMtd.set_run_with_result(
-            cmd, clear_environ
+            cmd, **sub_progress_kwargs
         )
         # Log.set_module_result_trace(
         #     'sub-progress run with result',
@@ -541,12 +541,12 @@ class SubProcessRunner(object):
         w.set_process_cmd(cmd)
         w.set_process_start()
     @classmethod
-    def set_run_with_result_use_thread(cls, cmd, clear_environ=False):
+    def set_run_with_result_use_thread(cls, cmd, **sub_progress_kwargs):
         t_0 = threading.Thread(
             target=functools.partial(
                 cls.set_run_with_result,
                 cmd=cmd,
-                clear_environ=clear_environ
+                **sub_progress_kwargs
             )
         )
         t_0.start()
@@ -1071,17 +1071,6 @@ class AppLauncher(object):
     @classmethod
     def _get_run_cmd_(cls, *args):
         return ' '.join(['rez-env'] + list(args))
-    @classmethod
-    def _set_run_with_result_(cls, *args):
-        SubProcessRunner.set_run_with_result(
-            ' '.join(['rez-env'] + list(args))
-        )
-    @classmethod
-    def _set_run_with_result_use_thread_(cls, *args):
-        SubProcessRunner.set_run_with_result_use_thread(
-            ' '.join(['rez-env'] + list(args)),
-            clear_environ=True
-        )
 
     def get_rez_packages(self):
         lis = []
@@ -1139,18 +1128,35 @@ class AppLauncher(object):
         #
         run_args.append(' '.join(args))
         return self._get_run_cmd_(*run_args)
-
-    def set_cmd_run_with_result(self, command=None):
+    # run methods
+    @classmethod
+    def _set_run_with_result_(cls, *run_args, **sub_progress_kwargs):
+        SubProcessRunner.set_run_with_result(
+            ' '.join(['rez-env'] + list(run_args)),
+            **sub_progress_kwargs
+        )
+    @classmethod
+    def _set_run_with_result_use_thread_(cls, *run_args, **sub_progress_kwargs):
+        SubProcessRunner.set_run_with_result_use_thread(
+            ' '.join(['rez-env'] + list(run_args)),
+            **sub_progress_kwargs
+        )
+    #
+    def set_cmd_run_with_result(self, extend_cmd, **sub_progress_kwargs):
         run_args = self.get_rez_packages()
         #
-        run_args.append(command)
-        self._set_run_with_result_(*run_args)
+        run_args.append(extend_cmd)
+        self._set_run_with_result_(
+            *run_args, **sub_progress_kwargs
+        )
 
-    def set_cmd_run_with_result_use_thread(self, cmd):
+    def set_cmd_run_with_result_use_thread(self, extend_cmd, **sub_progress_kwargs):
         run_args = self.get_rez_packages()
         #
-        run_args.append(cmd)
-        self._set_run_with_result_use_thread_(*run_args)
+        run_args.append(extend_cmd)
+        self._set_run_with_result_use_thread_(
+            *run_args, **sub_progress_kwargs
+        )
 
     def get_configure_exists(self):
         pass
@@ -1667,13 +1673,14 @@ class UsdViewLauncher(object):
         args = [
             # 'pgtk',
             # 'shotgun',
+            'usd-20.11',
             #
             '-- usdview',
             '--render "GL" --camera "/renderCamera/defaultCamera/defaultCameraLeft/defaultCameraLeftShape"',
             '"{}"'.format(file_path),
         ]
         cmd = ' '.join(args)
-        AppLauncher(**self._kwargs).set_cmd_run(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
             cmd
         )
 

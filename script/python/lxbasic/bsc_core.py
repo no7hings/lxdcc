@@ -1429,6 +1429,10 @@ class FnmatchPatternMtd(object):
 
 
 class MultiplyFileNameMtd(object):
+    """
+    methods using for multiply file
+    etc. "/tmp/image.1001.exr" convert to "/tmp/image.####.exr"
+    """
     @classmethod
     def get_match_args(cls, file_name, name_pattern):
         new_file_name = file_name
@@ -1447,43 +1451,37 @@ class MultiplyFileNameMtd(object):
                 )
             return new_file_name, map(int, numbers)
     @classmethod
-    def _set_file_args_update_0_(cls, file_dict, file_opt, name_patterns):
-        for i_name_pattern in name_patterns:
-            i_enable = cls._set_file_args_update_1_(file_dict, file_opt, i_name_pattern)
-            if i_enable is True:
-                return i_enable
-        return False
-    @classmethod
-    def _set_file_args_update_1_(cls, file_dict, file_opt, name_pattern):
-        if MultiplyPatternMtd.get_is_valid(name_pattern):
-            match_args = MultiplyFileNameMtd.get_match_args(
-                file_opt.name, name_pattern
-            )
-            if match_args:
-                file_name_, numbers = match_args
-                #
-                file_path_ = '{}/{}'.format(file_opt.directory_path, file_name_)
-                file_dict.setdefault(
-                    file_path_, []
-                ).append(file_opt.path)
-                return True
-        else:
-            if file_opt.get_is_match_name_pattern(name_pattern):
-                file_dict.setdefault(
-                    file_opt.path, []
-                ).append(file_opt.path)
-                return True
-        return False
-    @classmethod
-    def set_file_path_merge_to(cls, file_paths, name_patterns):
-        dict_ = collections.OrderedDict()
+    def set_merge_to(cls, file_paths, name_patterns):
+        list_ = []
         for i_file_path in file_paths:
-            i_file_opt = StorageFileOpt(i_file_path)
-            if cls._set_file_args_update_0_(
-                dict_, i_file_opt, name_patterns
-            ) is False:
-                dict_[i_file_path] = []
-        return dict_.keys()
+            i_file_path = cls.set_convert_to(i_file_path, name_patterns)
+            if i_file_path not in list_:
+                list_.append(i_file_path)
+        return list_
+    @classmethod
+    def set_convert_to(cls, file_path, name_patterns):
+        """
+        use for convert "/tmp/image.1001.exr" to "/tmp/image.####.exr"
+        :param file_path:
+        :param name_patterns: list[str, ...]
+        etc. *.####.{ext}, ext like "exr", "jpg"
+        :return:
+        """
+        file_opt = StorageFileOpt(file_path)
+        for i_name_pattern in name_patterns:
+            i_name_pattern = i_name_pattern.format(
+                **dict(ext=file_opt.ext[1:])
+            )
+            if MultiplyPatternMtd.get_is_valid(i_name_pattern):
+                match_args = MultiplyFileNameMtd.get_match_args(
+                    file_opt.name, i_name_pattern
+                )
+                if match_args:
+                    file_name_, numbers = match_args
+                    #
+                    file_path_ = '{}/{}'.format(file_opt.directory_path, file_name_)
+                    return file_path_
+        return file_path
 
 
 class DirectoryMtd(object):
@@ -1764,6 +1762,13 @@ class EnvironMtd(object):
     def get(cls, key):
         return os.environ.get(key)
     @classmethod
+    def get_as_array(cls, key):
+        if key in os.environ:
+            _ = os.environ[key]
+            if _:
+                return _.split(os.pathsep)
+        return []
+    @classmethod
     def set(cls, key, value):
         os.environ[key] = value
     @classmethod
@@ -1784,6 +1789,22 @@ class EnvironMtd(object):
         if ApplicationMtd.get_is_maya():
             return False
         return True
+
+
+class EnvironsOpt(object):
+    def __init__(self, environs):
+        self._environs = environs
+
+    def set(self, key, value):
+        self._environs[key] = value
+
+    def set_add(self, key, value):
+        if key in self._environs:
+            v = self._environs[key]
+            if value not in v:
+                self._environs[key] += os.pathsep + value
+        else:
+            self._environs[key] = value
 
 
 class HashMtd(object):
@@ -1988,7 +2009,7 @@ class SubProcessMtd(object):
     def __init__(self):
         pass
     @classmethod
-    def set_run_with_result_in_windows(cls, cmd, clear_environ=False):
+    def set_run_with_result_in_windows(cls, cmd, **kwargs):
         # must reload, output error
         # import sys
         # reload(sys)
@@ -1996,6 +2017,8 @@ class SubProcessMtd(object):
         #     sys.setdefaultencoding('utf-8')
         #
         cmd = cmd.replace("&", "^&")
+        #
+        clear_environ = kwargs.get('kwargs', False)
         #
         if clear_environ is True:
             s_p = subprocess.Popen(
@@ -2009,15 +2032,36 @@ class SubProcessMtd(object):
                 # env=cls.ENVIRON_MARK
             )
         else:
-            s_p = subprocess.Popen(
-                cmd,
-                shell=True,
-                # close_fds=True,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                startupinfo=cls.NO_WINDOW,
-            )
+            extend_environs = kwargs.get('extend_environs', {})
+            if extend_environs:
+                environs = dict(os.environ)
+                environs = {str(k): str(v) for k, v in environs.items()}
+                environs_opt = EnvironsOpt(environs)
+                for k, v in environs.items():
+                    environs_opt.set_add(
+                        k, v
+                    )
+                #
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                    env=environs
+                )
+            else:
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                )
         #
         while True:
             next_line = s_p.stdout.readline()
@@ -2048,12 +2092,14 @@ class SubProcessMtd(object):
         #
         s_p.stdout.close()
     @classmethod
-    def set_run_with_result_in_linux(cls, cmd, clear_environ=False):
+    def set_run_with_result_in_linux(cls, cmd, **kwargs):
         # must reload, output error
         # import sys
         # reload(sys)
         # if hasattr(sys, 'setdefaultencoding'):
         #     sys.setdefaultencoding('utf-8')
+        #
+        clear_environ = kwargs.get('kwargs', False)
         #
         if clear_environ is True:
             s_p = subprocess.Popen(
@@ -2067,15 +2113,36 @@ class SubProcessMtd(object):
                 # env=cls.ENVIRON_MARK
             )
         else:
-            s_p = subprocess.Popen(
-                cmd,
-                shell=True,
-                # close_fds=True,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                startupinfo=cls.NO_WINDOW
-            )
+            extend_environs = kwargs.get('extend_environs', {})
+            if extend_environs:
+                environs = dict(os.environ)
+                environs = {str(k): str(v) for k, v in environs.items()}
+                environs_opt = EnvironsOpt(environs)
+                for k, v in environs.items():
+                    environs_opt.set_add(
+                        k, v
+                    )
+                #
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                    env=environs
+                )
+            else:
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                )
         #
         while True:
             next_line = s_p.stdout.readline()
@@ -2107,11 +2174,11 @@ class SubProcessMtd(object):
         #
         s_p.stdout.close()
     @classmethod
-    def set_run_with_result(cls, cmd, clear_environ=False):
+    def set_run_with_result(cls, cmd, **kwargs):
         if SystemMtd.get_is_windows():
-            cls.set_run_with_result_in_windows(cmd, clear_environ)
+            cls.set_run_with_result_in_windows(cmd, **kwargs)
         elif SystemMtd.get_is_linux():
-            cls.set_run_with_result_in_linux(cmd, clear_environ)
+            cls.set_run_with_result_in_linux(cmd, **kwargs)
     @classmethod
     def set_run(cls, cmd):
         _sp = subprocess.Popen(
@@ -5386,12 +5453,12 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    _ = [
-        '/l/prod/cgm/work/assets/prp/car_b/srf/surfacing/katana/render/20220902_18h05m40.jpg',
-        '/l/prod/cgm/work/assets/prp/car_b/srf/surfacing/katana/render/test.1001.jpg'
-    ]
-    cs = MultiplyFileNameMtd.set_file_path_merge_to(
-        _,
+    print MultiplyFileNameMtd.set_merge_to(
+        [
+            '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/beauty.1008.exr',
+            '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/beauty.1009.exr',
+            '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/background.1082.exr',
+            '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/wP_Rooms_v1_R01_L_day_1k.exr'
+        ],
         ['*.####.*']
     )
-    print cs

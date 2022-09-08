@@ -87,6 +87,7 @@ class AbsPermission(object):
         'remove_grp': 'chmod -R -a# {index} "{path}"',
         'file_allow': 'chmod -R +a group {group_id} allow file_gen_all,object_inherit,container_inherit "{path}"',
     }
+    GROUP_PATTERN = r' {index}: group:DIEZHI\{group} {context}'
     @classmethod
     def _set_nas_cmd_run_(cls, cmd):
         import paramiko
@@ -112,6 +113,46 @@ class AbsPermission(object):
         result = stdout.read()
         ssh.close()
         return result
+    @classmethod
+    def _get_all_group_data_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        dict_ = collections.OrderedDict()
+        if result is not None:
+            for i in result.split('\n'):
+                i_p = parse.parse(r' {index}: group:DIEZHI\{group} {context}', i)
+                if i_p:
+                    i_dict = i_p.named
+                    if i_dict:
+                        dict_[i_dict['group']] = (i_dict['index'], i_dict['context'])
+        return dict_
+    @classmethod
+    def _get_all_group_data_1_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        # print result
+        list_ = []
+        if result is not None:
+            for i in result.split('\n'):
+                i_p = parse.parse(cls.GROUP_PATTERN, i)
+                if i_p:
+                    i_dict = i_p.named
+                    if i_dict:
+                        list_.append(
+                            (i_dict['group'], i_dict['index'], i_dict['context'])
+                        )
+        return list_
 
 
 class RsvPermissionMtd(AbsPermission):
@@ -239,25 +280,6 @@ class RsvPermissionMtd(AbsPermission):
 
 
 class PathGroupPermission(AbsPermission):
-    @classmethod
-    def _get_all_group_data_(cls, nas_path):
-        kwargs = dict(
-            path=nas_path
-        )
-        cmd = cls.CMD_QUERY['show_grp'].format(
-            **kwargs
-        )
-        result = cls._set_nas_cmd_run_(cmd)
-        print result
-        dict_ = collections.OrderedDict()
-        if result is not None:
-            for i in result.split('\n'):
-                i_p = parse.parse(r' {index}: group:DIEZHI\{group} {context}', i)
-                if i_p:
-                    i_dict = i_p.named
-                    if i_dict:
-                        dict_[i_dict['group']] = (i_dict['index'], i_dict['context'])
-        return dict_
     @classmethod
     def _get_result_(cls, nas_path):
         kwargs = dict(
@@ -425,33 +447,78 @@ class PathGroupPermission(AbsPermission):
                 self._set_nas_cmd_run_(i_cmd)
 
 
-if __name__ == '__main__':
-    result = PathGroupPermission(
-        '/l/prod/cgm/publish/assets/env/land_b/srf/surfacing/texture/land_ba.diff_clr.1007.tx/V-RH1X1H-R51JX.land_ba.diff_clr.1007.tx'
-    ).get_result()
-    utl_core.Log.set_module_result_trace(
-        'permission gain',
-        result
-    )
+class PathPermissionOpt(AbsPermission):
+    def __init__(self, path):
+        self._path = path
+        self._nas_path = bsc_core.StoragePathMtd.set_map_to_nas(path)
 
-    files = bsc_core.DirectoryMtd.get_all_file_paths(
-        '/l/prod/cgm/publish/assets/flg/youjialiye_a/srf/surfacing/texture'
-    )
-    for i in files:
-        if not bsc_core.StorageFileOpt(i).name.startswith('eye'):
-            i_group_data = PathGroupPermission(
-                i
-            ).get_all_group_data()
-            #
-            if 'coop_grp' not in i_group_data:
-                PathGroupPermission(
-                    i
-                ).set_allow(
-                    'coop_grp'
+    def set_remove_all(self):
+        group_data = self._get_all_group_data_1_(self._nas_path)
+        group_data.reverse()
+        for i_group_name, i_index, i_content in group_data:
+            if i_group_name in self.GROUP_ID_QUERY:
+                i_group_id = self.GROUP_ID_QUERY[i_group_name]
+                i_kwargs = dict(
+                    group_id=i_group_id,
+                    path=self._nas_path,
+                    index=i_index
                 )
-            if 'cg_group' not in i_group_data:
-                PathGroupPermission(
-                    i
-                ).set_allow(
-                    'cg_group'
+                i_cmd = self.CMD_QUERY['remove_grp'].format(
+                    **i_kwargs
                 )
+                self._set_nas_cmd_run_(i_cmd)
+            else:
+                print i_group_name
+
+    def set_read_only_for(self, group_names):
+        for i_group_name in group_names:
+            if i_group_name in self.GROUP_ID_QUERY:
+                i_group_id = self.GROUP_ID_QUERY[i_group_name]
+                i_kwargs = dict(
+                    group_id=i_group_id,
+                    path=self._nas_path,
+                )
+                i_cmd = self.CMD_QUERY['read_only'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
+    def set_just_read_only_for(self, group_names):
+        self.set_remove_all()
+        self.set_read_only_for(group_names)
+
+    def get_all_group_data(self):
+        return self._get_all_group_data_1_(self._nas_path)
+
+
+if __name__ == '__main__':
+    d = '/l/prod/cgm/work/assets/vfx/star/srf/surfacing/texture/main/v001'
+    print PathPermissionOpt(
+        d
+    ).get_all_group_data()
+
+    # PathPermissionOpt(d).set_just_read_only_for(
+    #     ['cg_group', 'coop_grp']
+    # )
+
+    # files = bsc_core.DirectoryMtd.get_all_file_paths(
+    #     '/l/prod/cgm/publish/assets/flg/youjialiye_a/srf/surfacing/texture'
+    # )
+    # for i in files:
+    #     if not bsc_core.StorageFileOpt(i).name.startswith('eye'):
+    #         i_group_data = PathGroupPermission(
+    #             i
+    #         ).get_all_group_data()
+    #         #
+    #         if 'coop_grp' not in i_group_data:
+    #             PathGroupPermission(
+    #                 i
+    #             ).set_allow(
+    #                 'coop_grp'
+    #             )
+    #         if 'cg_group' not in i_group_data:
+    #             PathGroupPermission(
+    #                 i
+    #             ).set_allow(
+    #                 'cg_group'
+    #             )

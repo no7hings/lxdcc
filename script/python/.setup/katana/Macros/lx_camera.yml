@@ -1,0 +1,147 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_reset()'
+        tool_tip: '...'
+    #
+    options/scheme:
+        widget: enumerate
+        value: ['close_up', 'upper_body', 'full_body', 'asset_free', 'shot_free', 'orthographic']
+        tool_tip: '...'
+    #
+    alembic_enable:
+      widget: boolean
+      value: False
+      tool_tip: '...'
+
+    alembic/file:
+      widget: file
+      value: ''
+      tool_tip: 'alembic file'
+
+    alembic/location:
+        widget: path
+        value: '/root/world/cam/cameras/main'
+        tool_tip: 'alembic location'
+
+    alembic/load:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_load()'
+        tool_tip: '...'
+    #
+    cameras/location:
+        widget: path
+        value: '/root/world/cam/cameras/sub/cam_front/cam_frontShape'
+        tool_tip: '...'
+    #
+    cameras/screen_modify/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/screen_modify/mode:
+        widget: enumerate
+        value: [ 'horizontal', 'vertical', 'fill' ]
+        tool_tip: '...'
+    #
+    cameras/render_resolution/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/render_resolution/value:
+        widget: resolution
+        value: '512x512'
+        tool_tip: '...'
+
+    cameras/fov/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/fov/value:
+        widget: float
+        value: 1.0
+        tool_tip: '...'
+
+    cameras/transformation/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    cameras/transformation/translate:
+        widget: float3
+        value: [ 0, 8, 1000 ]
+        tool_tip: '...'
+
+    cameras/transformation/rotate:
+        widget: float3
+        value: [ 0, 0, 0 ]
+        tool_tip: '...'
+
+    cameras/transformation/scale:
+        widget: float3
+        value: [ 1, 1, 1 ]
+        tool_tip: '...'
+
+    checkers/enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    checkers/transformation/translate:
+        widget: float3
+        value: [ 0, 8, 1000 ]
+        tool_tip: '...'
+
+    checkers/transformation/rotate:
+        widget: float3
+        value: [ 0, 0, 0 ]
+        tool_tip: '...'
+
+    checkers/transformation/scale:
+        widget: float3
+        value: [ 1, 1, 1 ]
+        tool_tip: '...'
+    #
+    rotations/enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    rotations/location:
+        widget: path
+        value: '/root/world/cam/cameras/main'
+        tool_tip: '...'
+
+    rotations/value_offset:
+        widget: float
+        value: 0.0
+        tool_tip: '...'
+
+    rotations/directions:
+        widget: string
+        value: '1'
+        tool_tip: '...'
+
+    rotations/frame_ranges:
+        widget: string
+        value: '1-120'
+        tool_tip: '...'
+
+    rotations/frame_offset:
+        widget: float
+        value: 1000.0
+        tool_tip: '...'
+
+    lynxi_info/type:
+        widget: string
+        value: 'lx_camera'
+        tool_tip: '...'

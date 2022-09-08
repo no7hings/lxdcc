@@ -85,6 +85,7 @@ workspace:
                         lynxi_settings/render_end_frame: 1240.0
                         lynxi_settings/resolution: '2048x2048'
                     connections:
+                        # source to target
                         - <.path>.output
                         - <....main.path>.<.name>
                     executes:
@@ -215,6 +216,20 @@ workspace:
                 - <.path>.asset
                 - <...shot_geometries.main.path>.out
                 - <.path>.shot
+        dot:
+            path: <option.root>/<..label>_dot
+            obj_type: Dot
+            input: <.path>.input
+            output: <.path>.output
+            attributes:
+                x: =<...geometry.x>
+                y: =<....property_assigns.geometry.y>
+                ns_colorr: 0.75
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            connections:
+                - <...geometry_switch.main.output>
+                - <.input>
     # look
     # y=0.0
     look_pass:
@@ -504,6 +519,8 @@ workspace:
             connections:
                 - <...property_assigns.main.path>.out
                 - <.path>.<option.look_pass>
+        option:
+            layout_use_backdrop: True
         backdrop:
             path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
@@ -542,6 +559,8 @@ workspace:
                         - <.input>
                         - <.output>
                         - <....main.path>.<option.look_pass>
+                        - <.output>
+                        - <.....look_outputs.main.path>.<option.look_pass>
                 #
                 plastic:
                     path: <option.root>/<..key>__look
@@ -559,7 +578,7 @@ workspace:
                     parameters:
                         look_pass/scheme: plastic
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....geometry_switch.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -580,7 +599,7 @@ workspace:
                     parameters:
                         look_pass/scheme: ambocc
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....geometry_switch.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -601,7 +620,7 @@ workspace:
                     parameters:
                         look_pass/scheme: wire
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....geometry_switch.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -622,7 +641,7 @@ workspace:
                     parameters:
                         look_pass/scheme: white
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....geometry_switch.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -643,7 +662,7 @@ workspace:
                     parameters:
                         look_pass/scheme: assess
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....geometry_switch.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -745,6 +764,8 @@ workspace:
             connections:
                 - <...cameras.main.path>.out
                 - <.path>.<option.light_pass>
+        option:
+            layout_use_backdrop: True
         backdrop:
             path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
@@ -870,6 +891,8 @@ workspace:
             connections:
                 - <...light_pass_switch.main.output>
                 - <.path>.<option.quality>
+        option:
+            layout_use_backdrop: True
         backdrop:
             path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
@@ -992,6 +1015,8 @@ workspace:
             connections:
                 - <...quality_switch.main.output>
                 - <.path>.<option.layer>
+        option:
+            layout_use_backdrop: True
         backdrop:
             path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
@@ -1121,7 +1146,6 @@ workspace:
                         - <.path>.input
                         - <.path>.output
                         - <....main.path>.<..key>
-
     # render settings
     # y=-5.5
     render_settings:
@@ -1224,8 +1248,6 @@ workspace:
             connections:
                 - <...asset_geometries.main.path>.out
                 - <.path>.orig
-                - <...property_assigns.main.path>.out
-                - <.path>.<option.look_pass>
         backdrop:
             path: <option.root>/<..label>_backdrop
             obj_type: Backdrop
@@ -1243,29 +1265,27 @@ workspace:
         #
         node_graph:
             nodes:
-                geometry_choose:
+                geometry_process:
                     path: <option.root>/<..key>
                     obj_category: node
-                    obj_type: VariableSet
-                    input: <.path>.in
-                    output: <.path>.out
-                    layout_main: <....main.path>
-                    layout_backdrop: <....backdrop.path>
+                    obj_type: lx_geometry_process
+                    base_obj_type: Group
+                    input: <.path>.input
+                    output: <.path>.output
                     attributes:
                         x: =<.....geometry.x>
                         y: =<.....geometry.y>+<option.h>/4
-                        ns_colorr: 0.5
-                        ns_colorg: 0.25
+                        ns_colorr: 0.75
+                        ns_colorg: 0.5
                         ns_colorb: 0.25
                     parameters:
-                        variableName: geometry
-                        variableValue: asset
+                        geometry/branch: 'asset'
+                        geometry/location: '/root/world/geo/master'
                     connections:
-                        - <.....geometry_switch.main.output>
+                        - <.....geometry_switch.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.input>
-
 #
 node:
     geometry_abc:

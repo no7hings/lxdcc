@@ -541,6 +541,9 @@ class AbsTypeDef(object):
         """
         return self._category
     @property
+    def category_name(self):
+        return self.category.name
+    @property
     def universe(self):
         """
         :return: instance(<obj-universe>)
@@ -757,6 +760,9 @@ class AbsObjTypeDef(object):
         :return: instance(<obj-category>)
         """
         return self.type.category
+    @property
+    def category_name(self):
+        return self.category.name
     @property
     def type(self):
         """
@@ -1344,6 +1350,9 @@ class AbsPortDef(object):
     @property
     def category(self):
         return self.type.category
+    @property
+    def category_name(self):
+        return self.category.name
     @property
     def type(self):
         return self._type
@@ -1947,6 +1956,16 @@ class AbsPort(
     def get_is_channel(self):
         return False
 
+    def to_properties(self):
+        p = bsc_objects.Properties(self)
+        p.set(
+            'type', self.type_path
+        )
+        p.set(
+            'value', self.get()
+        )
+        return p
+
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
             self.__class__.__name__,
@@ -1969,6 +1988,9 @@ class AbsObjTypeObjDef(object):
         raise NotImplementedError()
     @property
     def category(self):
+        raise NotImplementedError()
+    @property
+    def category_name(self):
         raise NotImplementedError()
     @property
     def name(self):
@@ -2243,6 +2265,9 @@ class AbsPortQuery(object):
     @property
     def category(self):
         return self.type.category
+    @property
+    def category_name(self):
+        return self.category.name
     @property
     def type(self):
         return self._type
@@ -2782,6 +2807,18 @@ class AbsObj(
             obj_category_name, obj_type_name, obj_string
         )
 
+    def to_properties(self):
+        p = bsc_objects.Properties(self)
+        p.set(
+            'type', self.type_path
+        )
+        for i_port in self.get_input_ports():
+            if i_port.get_is_element() is False and i_port.get_is_channel() is False:
+                p.set(
+                    i_port.port_token, i_port.to_properties().get_value()
+                )
+        return p
+
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
             self.__class__.__name__,
@@ -3159,6 +3196,19 @@ class AbsObjUniverseDef(object):
             return [i for i in objs if not i.get_target_connections()]
         else:
             return [i for i in self.get_objs() if not i.get_target_connections()]
+
+    def to_properties(self):
+        p = bsc_objects.Properties(self)
+        for i_obj in self.get_objs():
+            p.set(
+                i_obj.path, i_obj.to_properties().get_value()
+            )
+        return p
+
+    def set_save(self, file_path):
+        dict_ = collections.OrderedDict()
+        for i_obj in self._obj_stack:
+            pass
 
 
 class AbsObjUniverse(
@@ -3566,6 +3616,15 @@ class AbsValue(object):
     @property
     def type_name(self):
         return self.type.name
+    @property
+    def category(self):
+        """
+        :return: instance(<obj-category>)
+        """
+        return self.type.category
+    @property
+    def category_name(self):
+        return self.category.name
     # <type-constant>
     def get_is_constant(self):
         return self.type.get_is_constant()
@@ -3645,6 +3704,19 @@ class AbsValue(object):
             'category': self.type.category,
             'type': self.type
         }
+
+    def to_properties(self):
+        p = bsc_objects.Properties(self)
+        p.set(
+            'category', self.category_name
+        )
+        p.set(
+            'type', self.type_name
+        )
+        p.set(
+            'raw', self.get()
+        )
+        return p
 
     def __str__(self):
         return 'Value(type="{}", raw="{}")'.format(

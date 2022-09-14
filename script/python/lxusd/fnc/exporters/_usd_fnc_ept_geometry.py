@@ -127,18 +127,35 @@ class GeometryColorMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         file_tgt='',
         location='',
         #
+        with_object_color=False,
+        with_group_color=False,
+    )
+    def __init__(self, *args, **kwargs):
+        super(GeometryColorMapExporter, self).__init__(*args, **kwargs)
+
+
+class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+        file_src='',
+        file_tgt='',
+        location='',
+        #
+        color_seed=0,
+        #
         use_object_name=False,
         use_group_name=False,
         use_object_index=False,
         use_group_index=False,
     )
     def __init__(self, *args, **kwargs):
-        super(GeometryColorMapExporter, self).__init__(*args, **kwargs)
+        super(GeometryDisplayColorExporter, self).__init__(*args, **kwargs)
 
         self._file_path_src = self.get('file_src')
         self._file_path_tgt = self.get('file_tgt')
         #
         self._location_path = self.get('location')
+        #
+        self._color_seed = self.get('color_seed')
         #
         self._usd_stage_src = Usd.Stage.Open(self._file_path_src, Usd.Stage.LoadAll)
         self._usd_stage_opt_src = usd_core.UsdStageOpt(self._usd_stage_src)
@@ -146,7 +163,10 @@ class GeometryColorMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._usd_stage_opt_tgt = usd_core.UsdStageOpt(self._usd_stage_tgt)
 
     def set_run(self):
-        with utl_core.log_progress_bar(maximum=len([i for i in self._usd_stage_src.TraverseAll()]), label='geometry export') as l_p:
+        with utl_core.log_progress_bar(
+                maximum=len([i for i in self._usd_stage_src.TraverseAll()]),
+                label='geometry export'
+        ) as l_p:
             for i_usd_prim_src in self._usd_stage_src.TraverseAll():
                 l_p.set_update()
                 #
@@ -154,17 +174,34 @@ class GeometryColorMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 i_obj_path_src = i_usd_prim_src.GetPath().pathString
                 i_obj_path_opt_src = bsc_core.DccPathDagOpt(i_obj_path_src)
                 #
-                i_object_name_color = i_obj_path_opt_src.get_color_from_name(maximum=1.0)
-                print i_object_name_color
-                #
                 i_usd_prim_src = self._usd_stage_src.GetPrimAtPath(i_obj_path_src)
                 i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path_src)
                 if i_obj_type_name == 'Mesh':
+                    i_object_name_color = i_obj_path_opt_src.get_color_from_name(maximum=1.0, seed=self._color_seed)
+                    #
                     i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
                     i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
                     #
                     i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
                     i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
+                    #
+                    i_usd_mesh_opt_src.set_display_color_fill(
+                        i_object_name_color
+                    )
+                    i_usd_mesh_opt_tgt.set_usd_display_colors(
+                        i_usd_mesh_opt_src.get_usd_display_colors()
+                    )
+        #
+        self._usd_stage_opt_tgt.set_default_prim(
+            bsc_core.DccPathDagOpt(self._location_path).get_component_paths()[1]
+        )
+
+        self._usd_stage_opt_tgt.set_export_to(self._file_path_tgt)
+        #
+        utl_core.Log.set_module_result_trace(
+            'geometry display color export',
+            u'file="{}"'.format(self._file_path_tgt)
+        )
 
 
 class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
@@ -196,17 +233,6 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_input_mesh = UsdGeom.Mesh(i_input_prim)
                     i_input_mesh_opt = usd_core.UsdMeshOpt(i_input_mesh)
                     print i_input_mesh_opt.get_face_vertex_indices()
-
-
-class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
-    OPTION = dict(
-        scheme='object-color'
-    )
-    def __init__(self, option):
-        super(GeometryDisplayColorExporter, self).__init__(option)
-
-    def set_run(self):
-        pass
 
 
 class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):

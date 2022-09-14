@@ -283,14 +283,17 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             directory_path_0 = xgen_main_directory_rsv_unit_tgt.get_exists_result(
                 version='latest', extend_variants=dict(variant=variant)
             )
-            utl_core.Log.set_module_warning_trace(
-                'asset xgen repath',
-                u'directory="{}" is not found, use "{}" instance'.format(
-                    xgen_main_directory_path_tgt, directory_path_0
+            if directory_path_0:
+                utl_core.Log.set_module_warning_trace(
+                    'asset xgen repath',
+                    u'directory="{}" is not found, use "{}" instance'.format(
+                        xgen_main_directory_path_tgt, directory_path_0
 
+                    )
                 )
-            )
-            xgen_main_directory_path_tgt = directory_path_0
+                xgen_main_directory_path_tgt = directory_path_0
+            else:
+                return False
 
         e = utl_fnc_exporters.DotXgenExporter
 
@@ -313,8 +316,6 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
-        from lxbasic import bsc_core
-
         from lxutil import utl_core
 
         from lxmaya import ma_core
@@ -330,33 +331,26 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             keyword=keyword
         )
 
-        directory_path_tgt = directory_rsv_unit_tgt.get_result(
+        directory_path_tgt = directory_rsv_unit_tgt.get_exists_result(
             version=version, extend_variants=dict(variant=variant)
         )
-        if bsc_core.StorageDirectoryOpt(directory_path_tgt).get_is_exists() is False:
-            directory_path_0 = directory_rsv_unit_tgt.get_exists_result(
-                version='latest', extend_variants=dict(variant=variant)
+        if directory_path_tgt:
+            utl_dcc_operators.DccTexturesOpt(
+                mya_dcc_objects.TextureReferences(
+                    option=dict(
+                        with_reference=False
+                    )
+                )
+            ).set_search_from_(
+                [
+                    directory_path_tgt
+                ]
             )
+        else:
             utl_core.Log.set_module_warning_trace(
-                'asset texture repath',
-                u'directory="{}" is not found, use "{}" instance'.format(
-                    directory_path_tgt, directory_path_0
-
-                )
+                'texture search',
+                'texture directory is not found'
             )
-            directory_path_tgt = directory_path_0
-        #
-        utl_dcc_operators.DccTexturesOpt(
-            mya_dcc_objects.TextureReferences(
-                option=dict(
-                    with_reference=False
-                )
-            )
-        ).set_search_from_(
-            [
-                directory_path_tgt
-            ]
-        )
         #
         utl_dcc_operators.DccTexturesOpt(
             mya_dcc_objects.TextureReferences(

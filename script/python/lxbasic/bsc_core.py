@@ -2957,8 +2957,8 @@ class DccPathDagOpt(object):
         # print _
         return namespacesep.join(_[:-1])
 
-    def get_color_from_name(self, maximum=255):
-        return TextOpt(self.get_name()).to_rgb(maximum)
+    def get_color_from_name(self, maximum=255, seed=0):
+        return TextOpt(self.get_name()).to_rgb_(maximum, seed)
 
     def __str__(self):
         return self._path
@@ -3190,8 +3190,17 @@ class TextOpt(object):
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
-    def to_rgb_(self, maximum=255):
-        pass
+    def to_rgb_(self, maximum=255, seed=0):
+        string = self._raw
+        if string:
+            d = 1000.0
+            a = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
+            h = float(a % (360+seed)*d)/d
+            s = float(50+a % 50)/100.0
+            v = float(50+(a+h) % 50)/100.0
+            print h, s, v
+            return ColorMtd.hsv2rgb(h, s, v, maximum)
+        return 0, 0, 0
 
     def set_clear_to(self):
         return re.sub(
@@ -5472,6 +5481,5 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print MultiplyFileMtd.get_exists_tiles(
-        '/l/temp/td/dongchangbao/tx_convert_2/jiguang_cloth_mask_tx/jiguang_cloth_mask.<udim>.####.tx'
-    )
+    a = 'mod_qc'
+    print TextOpt(a).to_rgb_()

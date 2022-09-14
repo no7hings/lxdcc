@@ -7,6 +7,8 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_geometry_usd_export(self):
+        from lxutil import utl_core
+
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -35,9 +37,16 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             utl_dcc_objects.OsFile(geometry_uv_map_usd_source_file_path).set_copy_to_file(
                 geometry_usd_var_file_path
             )
+        else:
+            utl_core.Log.set_module_error_trace(
+                'usd export',
+                'file="{}" is non-exists'.format(geometry_uv_map_usd_source_file_path)
+            )
 
     def set_asset_geometry_uv_map_usd_export(self):
         from lxbasic import bsc_core
+        #
+        from lxutil import utl_core
         #
         import lxusd.fnc.exporters as usd_fnc_exporters
         #
@@ -80,3 +89,8 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     display_color=bsc_core.TextOpt(step).to_rgb(maximum=1.0)
                 )
             ).set_run()
+        else:
+            utl_core.Log.set_module_error_trace(
+                'usd export',
+                'file="{}" is non-exists'.format(geometry_usd_var_file_path)
+            )

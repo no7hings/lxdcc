@@ -9,10 +9,10 @@ from lxbasic import bsc_core
 # for k, v in dic.items():
 #     print bsc_core.IntegerArrayMtd.set_merge_to(v)
 
-# print bsc_core.MultiplyFileNameMtd.get_match_args(
+# print bsc_core.MultiplyFileMtd.get_match_args(
 #     'A.1001.1001.exr', '*.<udim>.%04d.*'
 # )
-# print bsc_core.MultiplyFileNameMtd.get_match_args(
+# print bsc_core.MultiplyFileMtd.get_match_args(
 #     'A.1001.exr', '*.####.*'
 # )
 

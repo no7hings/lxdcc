@@ -284,6 +284,8 @@ class LogProgressRunner(object):
         self._start_timestamp = bsc_core.SystemMtd.get_timestamp()
         self._pre_timestamp = bsc_core.SystemMtd.get_timestamp()
         #
+        self._p = 0
+        #
         Log.set_module_result_trace(
             self._label,
             'is started'
@@ -296,25 +298,28 @@ class LogProgressRunner(object):
         self._pre_timestamp = cur_timestamp
         #
         percent = float(self._value) / float(self._maximum)
-        #
-        if self._use_as_progress_bar is True:
-            Log.set_module_result_trace(
-                u'{}'.format(self._label),
-                u'is running {} {}%, cost time {}'.format(
-                    self._get_progress_bar_string_(percent),
-                    '%3d' % (percent*100),
-                    bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+        # trace when value is integer
+        p = '%3d' % (int(percent*100))
+        if self._p != p:
+            self._p = p
+            if self._use_as_progress_bar is True:
+                Log.set_module_result_trace(
+                    u'{}'.format(self._label),
+                    u'is running {} {}%, cost time {}'.format(
+                        self._get_progress_bar_string_(percent),
+                        p,
+                        bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
 
+                    )
                 )
-            )
-        else:
-            Log.set_module_result_trace(
-                u'{}'.format(self._label),
-                u'is running {}%, cost time {}'.format(
-                    '%3d' % (percent*100),
-                    bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+            else:
+                Log.set_module_result_trace(
+                    u'{}'.format(self._label),
+                    u'is running {}%, cost time {}'.format(
+                        p,
+                        bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+                    )
                 )
-            )
     @classmethod
     def _get_progress_bar_string_(cls, percent):
         c = 20
@@ -2162,3 +2167,10 @@ class Resources(object):
                     i_glob_pattern
                 )
                 return i_results
+
+
+if __name__ == '__main__':
+    c = 1000
+    with log_progress_bar(maximum=1000, label='test') as l_p:
+        for i in range(1000):
+            l_p.set_update()

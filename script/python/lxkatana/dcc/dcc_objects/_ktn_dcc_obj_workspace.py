@@ -135,6 +135,7 @@ class AssetWorkspace(object):
             )
             for j_path in i_geometry_paths:
                 j_obj_opt = ktn_core.KtnSGObjOpt(i_s_opt, j_path)
+                # print j_path, j_obj_opt.get('materialAssign', use_global=True), 'AAA'
                 if not j_obj_opt.get('materialAssign'):
                     list_.append(
                         (i_pass_name, j_path)
@@ -613,6 +614,11 @@ class AssetWorkspace(object):
         configure = self.get_configure(pass_name=pass_name)
         return self._get_main_args_(configure, key)
 
+    def get_main_node(self, key, pass_name='default'):
+        configure = self.get_configure(pass_name=pass_name)
+        dcc_path = configure.get('workspace.{}.main.path'.format(key))
+        return _ktn_dcc_obj_node.Node(dcc_path)
+
     def get_group_args(self, key, group_key, pass_name='default'):
         configure = self.get_configure(pass_name=pass_name)
         return self._get_group_args_(configure, key, group_key)
@@ -807,18 +813,36 @@ class AssetWorkspace(object):
     def set_look_klf_file_export(self, file_path):
         configure = self.get_configure()
         key = 'look_outputs'
-        asset_root = configure.get('option.asset_root')
-        obj_path = configure.get('workspace.{}.main.path'.format(key))
-        dcc_obj = _ktn_dcc_obj_node.Node(obj_path)
+        dcc_obj = self.get_main_node(key)
         if dcc_obj.get_is_exists() is True:
-            ktn_obj = dcc_obj.ktn_obj
+            scheme = self.get_geometry_scheme()
+            geometry_settings = self.get_main_node('geometry_settings')
+            if geometry_settings.get_is_exists() is True and geometry_settings.get_is_bypassed() is False:
+                if scheme == 'asset':
+                    location = configure.get('option.asset_root')
+                    dcc_obj.set('rootLocations', [location])
+                elif scheme == 'shot':
+                    geometry_settings_ktn_obj = geometry_settings.ktn_obj
+                    geometry_settings.set('usd.override_enable', False)
+                    #
+                    ktn_core.NGObjOpt(geometry_settings_ktn_obj).set_port_execute('usd.guess')
+                    start_frame, end_frame = geometry_settings.get('usd.start_frame'), geometry_settings.get('usd.end_frame')
+                    if start_frame != end_frame:
+                        ktn_core.NGObjOpt(geometry_settings_ktn_obj).set_port_execute('usd.shot_override.create')
+                        geometry_settings.set('usd.override_enable', True)
+                    #
+                    location = geometry_settings.get('usd.location')
+                    dcc_obj.set('rootLocations', [location])
+
             #
-            dcc_obj.get_port('rootLocations').set([asset_root])
             dcc_obj.get_port('saveTo').set(file_path)
             #
             os_file = utl_dcc_objects.OsFile(file_path)
             os_file.set_directory_create()
-            ktn_obj.WriteToLookFile(None, file_path)
+            dcc_obj.ktn_obj.WriteToLookFile(None, file_path)
+            #
+            if geometry_settings.get_is_exists() is True:
+                geometry_settings.set('usd.override_enable', False)
             #
             utl_core.Log.set_module_result_trace(
                 'look-klf export',
@@ -831,6 +855,15 @@ class AssetWorkspace(object):
                     'obj="{}" is non-exists'.format(dcc_obj.path)
                 )
             )
+
+    def get_geometry_scheme(self):
+        key = 'geometry_settings'
+        dcc_obj = self.get_main_node(key)
+        if dcc_obj.get_is_exists() is True:
+            return dcc_obj.get('options.scheme')
+        else:
+            return 'asset'
+
     @classmethod
     def _get_geometry_location_(cls, dcc_obj):
         if dcc_obj.get_is_exists() is True:

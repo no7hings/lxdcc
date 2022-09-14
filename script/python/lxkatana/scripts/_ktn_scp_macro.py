@@ -578,59 +578,87 @@ class LxAsset(object):
                 )
 
 
-class LxGeometryProcess(object):
+class LxGeometrySettings(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
 
-    def set_guess(self):
+    def set_reset(self):
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        obj_opt.set('usd.location', '')
+        obj_opt.set('usd.file', '')
+        obj_opt.set('usd.start_frame', 1001)
+        obj_opt.set('usd.end_frame', 1001)
+        obj_opt.set('usd.override_enable', False)
+        obj_opt.set('usd.shot_override.file', '')
+
+    def set_usd_guess(self):
+        from lxusd import usd_core
+
         from lxkatana import ktn_core
 
         contents = []
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        geometry_branch = obj_opt.get('geometry.branch')
-        if geometry_branch == 'asset':
+        stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
+
+        location = None
+        scheme = obj_opt.get('options.scheme')
+        if scheme == 'asset':
             location = '/root/world/geo/master'
-            obj_opt.set(
-                'geometry.location', location
-            )
-        elif geometry_branch == 'shot':
+        elif scheme == 'shot':
             rsv_asset = LxAsset._get_rsv_asset_auto_()
             if rsv_asset is not None:
-                guess_location = '/root/world/geo/assets/efx/{}'.format(
+                location = '/root/world/geo/assets/efx/{}'.format(
                     rsv_asset.get('asset')
                 )
-                stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
-                if stage_opt.get_obj_exists(guess_location) is True:
-                    obj_opt.set(
-                        'geometry.location', guess_location
-                    )
-                else:
-                    contents.append(
-                        'location="{}" is not available'.format(guess_location)
-                    )
             else:
                 contents.append(
                     'current scene is not available'
                 )
+        #
+        if stage_opt.get_obj_exists(location) is True:
+            obj_opt.set(
+                'usd.location', location
+            )
+        else:
+            contents.append(
+                'location="{}" is not found'.format(location)
+            )
+        #
+        guess_usd_file_path = self._get_usd_file_path_()
+        if guess_usd_file_path:
+            obj_opt.set(
+                'usd.file', guess_usd_file_path
+            )
+            guess_frame_range = usd_core.UsdStageOpt(
+                guess_usd_file_path
+            ).get_frame_range()
+            obj_opt.set(
+                'usd.start_frame', guess_frame_range[0]
+            )
+            obj_opt.set(
+                'usd.end_frame', guess_frame_range[1]
+            )
+        else:
+            contents.append(
+                'usd-file is not found'
+            )
 
         _MacroMtd.set_warning_show(
-            'geometry process guess', contents
+            'look settings guess', contents
         )
 
-    def _get_frame_range_(self):
+    def _get_usd_file_path_(self):
         from lxkatana import ktn_core
-
-        from lxusd import usd_core
 
         stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
 
-        _ = stage_opt.get('/root/world/geo/assets.userProperties.scene_file')
+        _ = stage_opt.get('/root/world/geo.info.usdOpArgs.fileName')
         if _:
-            usd_file_path = _[0]
-            return usd_core.UsdStageOpt(
-                usd_file_path
-            ).get_frame_range()
+            return _[0]
 
     def set_create(self):
         from lxkatana import ktn_core
@@ -640,26 +668,41 @@ class LxGeometryProcess(object):
 
         contents = []
 
-        obj_opt.set('usd_override_enable', False)
-        geometry_branch = obj_opt.get('geometry.branch')
-        if geometry_branch == 'shot':
-            location = obj_opt.get('geometry.location')
+        obj_opt.set('usd.override_enable', False)
+        scheme = obj_opt.get('options.scheme')
+        if scheme == 'asset':
+            obj_opt.set('usd.override_enable', False)
+        elif scheme == 'shot':
+            location = obj_opt.get('usd.location')
             if stage_opt.get_obj_exists(location) is True:
-                _ = self._get_frame_range_()
-                if _:
-                    start_frame, end_frame = _
-                    print start_frame, end_frame
-                    # paths = stage_opt.get_all_paths_at_as_dynamic(
-                    #     _, location
-                    # )
+                usd_file_path = self._set_override_usd_create_()
+                obj_opt.set(
+                    'usd.shot_override.file', usd_file_path
+                )
             else:
                 contents.append(
                     'location="{}" is not available'.format(location)
                 )
 
         _MacroMtd.set_warning_show(
-            'geometry process create', contents
+            'look settings guess', contents
         )
+
+    def _set_override_usd_create_(self):
+        from lxkatana import ktn_core
+
+        import lxusd.scripts as us_scripts
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        file_path_src = obj_opt.get('usd.file')
+        root = obj_opt.get('usd.shot_override.location')
+        if root:
+            location = obj_opt.get('usd.location')
+            #
+            return us_scripts.ShotUsdCombine(
+                file_path_src, location[len(root):]
+            ).set_run()
 
 
 class LxCamera(object):

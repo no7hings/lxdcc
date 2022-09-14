@@ -152,7 +152,6 @@ workspace:
                         - 'reset'
                         - 'usd.guess'
                         - 'usd.create'
-    # geometry switch
     # materials
     # y=1.0
     materials:
@@ -189,12 +188,13 @@ workspace:
                 ns_text: "<...label>\nobj_type: NetworkMaterialCreate"
                 ns_fontScale: 3.0
                 ns_stickyLock: 1
-    # y=0.5
+    # geometry switch
+    # y=0.75
     geometry_switch:
         label: <..key>
         offset:
             x: -1.0
-            y: 0.5
+            y: .75
         geometry:
             x: =<option.x>+<option.w>*<..offset.x>
             y: =<option.y>+<option.h>*<..offset.y>
@@ -216,6 +216,34 @@ workspace:
                 - <.path>.asset
                 - <...shot_geometries.main.path>.out
                 - <.path>.shot
+    # geometry settings
+    # y=0.25
+    geometry_settings:
+        label: <..key>
+        offset:
+            x: -1.0
+            y: .25
+        geometry:
+            x: =<option.x>+<option.w>*<..offset.x>
+            y: =<option.y>+<option.h>*<..offset.y>
+        main:
+            path: <option.root>/<..label>
+            obj_type: lx_geometry_settings
+            base_obj_type: Group
+            input: <.path>.input
+            output: <.path>.output
+            attributes:
+                x: =<...geometry.x>
+                y: =<...geometry.y>
+                ns_colorr: 0.125
+                ns_colorg: 0.5
+                ns_colorb: 0.25
+            parameters:
+                options/scheme: 'asset'
+            executes: []
+            connections:
+                - <...geometry_switch.main.output>
+                - <.input>
         dot:
             path: <option.root>/<..label>_dot
             obj_type: Dot
@@ -228,7 +256,7 @@ workspace:
                 ns_colorg: 0.5
                 ns_colorb: 0.25
             connections:
-                - <...geometry_switch.main.output>
+                - <...geometry_settings.main.output>
                 - <.input>
     # look
     # y=0.0
@@ -251,7 +279,7 @@ workspace:
                 ns_colorg: 0.25
                 ns_colorb: 0.25
             connections:
-                - <...geometry_switch.main.output>
+                - <...geometry_settings.main.output>
                 - <.path>.geometries
                 - <...materials.main.output>
                 - <.path>.materials
@@ -578,7 +606,7 @@ workspace:
                     parameters:
                         look_pass/scheme: plastic
                     connections:
-                        - <.....geometry_switch.dot.output>
+                        - <.....geometry_settings.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -599,7 +627,7 @@ workspace:
                     parameters:
                         look_pass/scheme: ambocc
                     connections:
-                        - <.....geometry_switch.dot.output>
+                        - <.....geometry_settings.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -620,7 +648,7 @@ workspace:
                     parameters:
                         look_pass/scheme: wire
                     connections:
-                        - <.....geometry_switch.dot.output>
+                        - <.....geometry_settings.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -641,7 +669,7 @@ workspace:
                     parameters:
                         look_pass/scheme: white
                     connections:
-                        - <.....geometry_switch.dot.output>
+                        - <.....geometry_settings.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -662,7 +690,7 @@ workspace:
                     parameters:
                         look_pass/scheme: assess
                     connections:
-                        - <.....geometry_switch.dot.output>
+                        - <.....geometry_settings.dot.output>
                         - <.input>
                         - <.output>
                         - <....main.path>.<..key>
@@ -1246,7 +1274,7 @@ workspace:
                     - <option.asset_root>
             file_parameter: saveTo
             connections:
-                - <...asset_geometries.main.path>.out
+                - <...geometry_settings.main.output>
                 - <.path>.orig
         backdrop:
             path: <option.root>/<..label>_backdrop
@@ -1262,30 +1290,6 @@ workspace:
                 ns_text: 'look output(s)'
                 ns_fontScale: 6.0
                 ns_stickyLock: 1
-        #
-        node_graph:
-            nodes:
-                geometry_process:
-                    path: <option.root>/<..key>
-                    obj_category: node
-                    obj_type: lx_geometry_process
-                    base_obj_type: Group
-                    input: <.path>.input
-                    output: <.path>.output
-                    attributes:
-                        x: =<.....geometry.x>
-                        y: =<.....geometry.y>+<option.h>/4
-                        ns_colorr: 0.75
-                        ns_colorg: 0.5
-                        ns_colorb: 0.25
-                    parameters:
-                        geometry/branch: 'asset'
-                        geometry/location: '/root/world/geo/master'
-                    connections:
-                        - <.....geometry_switch.dot.output>
-                        - <.input>
-                        - <.output>
-                        - <....main.input>
 #
 node:
     geometry_abc:

@@ -618,6 +618,10 @@ class MeshOpt(
         om2_obj = self.get_om2_obj()
         om2_obj.renameUVSet(uv_map_name, new_uv_map_name)
 
+    def get_face_count(self):
+        om2_obj = self.get_om2_obj()
+        return om2_obj.numPolygons
+
 
 class MeshChecker(
     utl_dcc_opt_abs.AbsObjOpt

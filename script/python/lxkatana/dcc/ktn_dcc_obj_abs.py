@@ -615,6 +615,9 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
     def set_expression(self, key, value):
         self.get_port(key).set_expression(value)
 
+    def get_is_bypassed(self):
+        return self._get_ktn_obj_().isBypassed()
+
 
 class AbsKtnObjs(utl_abstract.AbsDccObjs):
     def __init__(self, *args):

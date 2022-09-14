@@ -194,6 +194,9 @@ class AbsObjStack(object):
         obj-gain
     """
     def __init__(self):
+        self._key_dict = {}
+        self._count = 0
+        #
         self._key_list = []
         self._obj_list = []
 
@@ -209,15 +212,15 @@ class AbsObjStack(object):
         :param key: str(<obj-key>)
         :return: int(<obj-index>)
         """
-        return self._key_list.index(key)
+        return self._key_dict[key]
 
     def get_object(self, key):
         """
         :param key: str(<obj-key>)
         :return: instance(<obj>)
         """
-        if key in self._key_list:
-            index = self._key_list.index(key)
+        if key in self._key_dict:
+            index = self._key_dict[key]
             return self._obj_list[index]
 
     def get_object_at(self, index):
@@ -227,6 +230,18 @@ class AbsObjStack(object):
         """
         return self._obj_list[index]
 
+    def get_keys(self, regex=None):
+        """
+        key is sorted by add order
+        :param regex: str(<fnmatch-pattern>)
+        :return: list[str(<obj-key>), ...]
+        """
+        if regex:
+            _ = fnmatch.filter(self._key_dict.keys(), regex)
+            _.sort(key=self._key_list.index)
+            return _
+        return self._key_list
+
     def get_objects(self, regex=None):
         """
         :param regex: str(<fnmatch-pattern>)
@@ -235,25 +250,16 @@ class AbsObjStack(object):
         if regex:
             keys = self.get_keys(regex)
             if keys:
-                return [self._obj_list[self._key_list.index(key)] for key in keys]
+                return [self._obj_list[self._key_dict[i_key]] for i_key in keys]
             return []
         return self._obj_list
-
-    def get_keys(self, regex=None):
-        """
-        :param regex: str(<fnmatch-pattern>)
-        :return: list[str(<obj-key>), ...]
-        """
-        if regex:
-            return fnmatch.filter(self._key_list, regex)
-        return self._key_list
 
     def get_object_exists(self, key):
         """
         :param key: str(<obj-key>)
         :return: bool
         """
-        return key in self._key_list
+        return key in self._key_dict
 
     def get_objects_exists(self, regex=None):
         """
@@ -263,50 +269,69 @@ class AbsObjStack(object):
         if regex:
             keys = self.get_keys(regex)
             return keys != []
-        return self._key_list != []
+        return self._count > 0
 
     def set_object_add(self, obj):
         """
+        add object
         :param obj: instance(<obj>)
         :return: bool
         """
         key = self.get_key(obj)
-        if key not in self._key_list:
+        if key not in self._key_dict:
+            index = self._count
+            #
+            self._key_dict[key] = index
+            #
             self._key_list.append(key)
             self._obj_list.append(obj)
+            #
+            self._count += 1
             return True
         return False
 
     def set_object_del(self, obj):
         """
+        delete object
         :param obj: instance(<obj>)
         :return: bool
         """
         key = self.get_key(obj)
-        if key in self._key_list:
+        if key in self._key_dict:
+            self._key_dict.pop(key)
+            #
             self._key_list.remove(key)
             self._obj_list.remove(obj)
+            #
+            self._count -= 1
             return True
         return False
 
     def set_object_override(self, old_obj, new_obj):
         """
+        override object
         :param old_obj: instance(<obj>)
         :param new_obj: instance(<obj>)
         :return:
         """
         old_key = self.get_key(old_obj)
-        if old_key in self._key_list:
-            index = self._key_list.index(old_key)
+        if old_key in self._key_dict:
+            old_index = self._key_dict[old_key]
             new_key = self.get_key(new_obj)
-            self._key_list[index] = new_key
-            self._obj_list[index] = new_obj
+            self._key_dict.pop(old_key)
+            self._key_dict[new_key] = old_index
+            #
+            self._key_list[old_index] = new_key
+            self._obj_list[old_index] = new_obj
 
     def set_restore(self):
         """
         clear all register <obj>
         :return: None
         """
+        self._key_dict = {}
+        self._count = 0
+        #
         self._key_list = []
         self._obj_list = []
 
@@ -326,7 +351,7 @@ class AbsObjStack(object):
         """
         :return: int
         """
-        return len(self._key_list)
+        return self._count
 
     def get_object_indices(self):
         """
@@ -3090,7 +3115,20 @@ class AbsObjUniverseDef(object):
         :param regex: str("fnmatch regex-pattern")
         :return: list[instance(<obj>), ...]
         """
-        return self._obj_stack.get_objects(regex)
+        if regex is not None:
+            obj_pathsep = obj_configure.Obj.PATHSEP
+            obj_category_name = '*'
+            obj_type_name = '*'
+            if regex.startswith(obj_pathsep):
+                obj_path = regex
+            else:
+                obj_path = '*{}{}'.format(obj_pathsep, regex)
+            #
+            regex = self.OBJ_CATEGORY_CLASS._get_obj_token_(
+                obj_category_name, obj_type_name, obj_path
+            )
+            return self._obj_stack.get_objects(regex=regex)
+        return self._obj_stack.get_objects()
 
     def get_obj(self, obj_string):
         """

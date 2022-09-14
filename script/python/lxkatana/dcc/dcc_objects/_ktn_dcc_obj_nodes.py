@@ -2,6 +2,7 @@
 import collections
 
 import copy
+import os.path
 
 import parse
 # noinspection PyUnresolvedReferences
@@ -182,6 +183,13 @@ class AbsTextureReferences(object):
             'parameters.filename'
         ]
     }
+    EXPRESSION_PATTERNS_SRC = [
+        # etc. "/temp/tx/texture_name.<udim>.%04d.tx'%(frame)"
+        "'{base}'%{argument}",
+        # etc. "extra.texture_directory+'/tx'+'/texture_name.<udim>.%04d.tx'%(frame)"
+        "{extra}'{base}'%{argument}"
+    ]
+    EXPRESSION_PATTERN_TGT = '\'{file}\'%{argument}'
     def __init__(self, *args, **kwargs):
         self._raw = collections.OrderedDict()
         #
@@ -197,15 +205,64 @@ class AbsTextureReferences(object):
         raise NotImplementedError()
     @classmethod
     def _get_real_file_path_(cls, port):
-        parse_pattern = '\'{file}\'%{argument}'
         ktn_port = port.ktn_port
-        e = ktn_port.getExpression()
-        if e:
-            p = parse.parse(parse_pattern, e)
-            if p:
-                return p.named.get('file')
-            return ktn_port.getValue(0)
+        if ktn_port.isExpression() is True:
+            e = ktn_port.getExpression()
+            for i_pattern in cls.EXPRESSION_PATTERNS_SRC:
+                i_p = parse.parse(
+                    i_pattern, e
+                )
+                if i_p:
+                    i_file_path_old = ktn_port.getValue(0)
+                    i_base = i_p['base']
+                    i_file_name = i_base.split('/')[-1]
+                    i_file_path_new = '{}/{}'.format(
+                        os.path.dirname(i_file_path_old), i_file_name
+                    )
+                    return i_file_path_new
         return ktn_port.getValue(0)
+    @classmethod
+    def _set_real_file_path_(cls, port, file_path, remove_expression=False):
+        file_path = str(file_path)
+        ktn_port = port.ktn_port
+        if ktn_port.isExpression() is True:
+            e = ktn_port.getExpression()
+            for i_pattern in cls.EXPRESSION_PATTERNS_SRC:
+                i_p = parse.parse(
+                    i_pattern, e
+                )
+                if i_p:
+                    i_kwargs = dict(
+                        file=file_path,
+                        argument=i_p['argument']
+                    )
+                    i_e_new = cls.EXPRESSION_PATTERN_TGT.format(**i_kwargs)
+                    if not e == i_e_new:
+                        ktn_port.setExpression(i_e_new)
+                        utl_core.Log.set_module_result_trace(
+                            'file repath',
+                            u'attribute="{}", expression="{}"'.format(port.path, i_e_new)
+                        )
+                        return True
+            #
+            if remove_expression is True:
+                ktn_port.setExpressionFlag(False)
+                ktn_port.setValue(file_path, 0)
+                utl_core.Log.set_module_result_trace(
+                    'file repath',
+                    u'attribute="{}", file="{}"'.format(port.path, file_path)
+                )
+                return True
+        else:
+            v = ktn_port.getValue(0)
+            if not v == file_path:
+                ktn_port.setValue(file_path, 0)
+                utl_core.Log.set_module_result_trace(
+                    'file repath',
+                    u'attribute="{}", file="{}"'.format(port.path, file_path)
+                )
+                return True
+        return False
     @classmethod
     def _get_expression_(cls, port):
         ktn_port = port.ktn_port
@@ -225,41 +282,6 @@ class AbsTextureReferences(object):
         port = obj.get_port(port_path)
         #
         cls._set_real_file_path_(port, file_path)
-    @classmethod
-    def _set_real_file_path_(cls, port, file_path, remove_expression=False):
-        file_path = str(file_path)
-        parse_pattern = '\'{file}\'%{argument}'
-        ktn_port = port.ktn_port
-        old_expression = ktn_port.getExpression()
-        if old_expression:
-            p = parse.parse(parse_pattern, old_expression)
-            if p:
-                new_expression = parse_pattern.format(
-                    **dict(file=file_path, argument=p.named.get('argument'))
-                )
-                if not old_expression == new_expression:
-                    ktn_port.setExpression(new_expression)
-                    utl_core.Log.set_module_result_trace(
-                        'texture repath',
-                        u'attribute="{}", expression="{}"'.format(port.path, new_expression)
-                    )
-            else:
-                if remove_expression is True:
-                    ktn_port.setExpressionFlag(False)
-                    ktn_port.setValue(
-                        file_path, 0
-                    )
-        else:
-            v = ktn_port.getValue(0)
-            if not v == file_path:
-                ktn_port.setValue(
-                    file_path, 0
-                )
-                #
-                utl_core.Log.set_module_result_trace(
-                    'texture repath',
-                    u'attribute="{}", file="{}"'.format(port.path, file_path)
-                )
     @classmethod
     def _get_obj_cls_(cls, shader_type_name):
         if shader_type_name in cls.OBJ_CLASS_DICT:

@@ -1324,6 +1324,7 @@ class MultiplyPatternMtd(object):
     ]
     #
     RE_SEQUENCE_KEYS = [
+        # keyword, re_format, count
         (r'#', r'{}', -1),
         # maya
         (r'<f>', r'{}', 4),
@@ -1344,6 +1345,7 @@ class MultiplyPatternMtd(object):
         )
     #
     RE_MULTIPLY_KEYS = RE_UDIM_KEYS + RE_SEQUENCE_KEYS
+    PATHSEP = '/'
     @classmethod
     def to_fnmatch_style(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -1360,25 +1362,6 @@ class MultiplyPatternMtd(object):
                     s = '[0-9]'*i_c
                     new_name_base = new_name_base.replace(pattern[j_start:j_end], s, 1)
         return new_name_base
-    @classmethod
-    def get_args_(cls, pattern):
-        re_keys = cls.RE_MULTIPLY_KEYS
-        #
-        key_args = []
-        for i_k, i_f, i_c in re_keys:
-            i_r = re.finditer(i_f.format(i_k), pattern, re.IGNORECASE) or []
-            ss = list(i_r)
-            if ss:
-                if i_c == -1:
-                    i_count = len(ss)
-                    i_key = i_count * i_k
-                else:
-                    i_count = i_c
-                    i_key = i_k
-                key_args.append(
-                    (i_key, i_count)
-                )
-        return key_args
     @classmethod
     def get_args(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -1428,7 +1411,7 @@ class FnmatchPatternMtd(object):
         return re_pattern_
 
 
-class MultiplyFileNameMtd(object):
+class MultiplyFileMtd(object):
     """
     methods using for multiply file
     etc. "/tmp/image.1001.exr" convert to "/tmp/image.####.exr"
@@ -1473,7 +1456,7 @@ class MultiplyFileNameMtd(object):
                 **dict(ext=file_opt.ext[1:])
             )
             if MultiplyPatternMtd.get_is_valid(i_name_pattern):
-                match_args = MultiplyFileNameMtd.get_match_args(
+                match_args = MultiplyFileMtd.get_match_args(
                     file_opt.name, i_name_pattern
                 )
                 if match_args:
@@ -1482,6 +1465,39 @@ class MultiplyFileNameMtd(object):
                     file_path_ = '{}/{}'.format(file_opt.directory_path, file_name_)
                     return file_path_
         return file_path
+    @classmethod
+    def get_exists_tiles(cls, file_path):
+        P = '[0-9]'
+        re_keys = MultiplyPatternMtd.RE_MULTIPLY_KEYS
+        pathsep = MultiplyPatternMtd.PATHSEP
+        #
+        directory_path = os.path.dirname(file_path)
+        #
+        name_base = os.path.basename(file_path)
+        name_base_new = name_base
+        for i_keyword, i_re_format, i_count in re_keys:
+            i_results = re.finditer(i_re_format.format(i_keyword), name_base, re.IGNORECASE) or []
+            for j_result in i_results:
+                j_start, j_end = j_result.span()
+                if i_count == -1:
+                    s = P
+                else:
+                    s = P*i_count
+                #
+                name_base_new = name_base_new.replace(name_base[j_start:j_end], s, 1)
+        #
+        if name_base != name_base_new:
+            glob_pattern = pathsep.join([directory_path, name_base_new])
+            #
+            list_ = DirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
+            if list_:
+                list_.sort()
+        else:
+            if os.path.isfile(file_path):
+                list_ = [file_path]
+            else:
+                list_ = []
+        return list_
 
 
 class DirectoryMtd(object):
@@ -1683,7 +1699,7 @@ class MultiplyDirectoryMtd(object):
         _ = DirectoryMtd.get_all_file_paths__(directory_path)
         for i_file_path in _:
             i_opt = StorageFileOpt(i_file_path)
-            i_match_args = MultiplyFileNameMtd.get_match_args(
+            i_match_args = MultiplyFileMtd.get_match_args(
                 i_opt.name, name_pattern
             )
             if i_match_args:
@@ -2941,6 +2957,9 @@ class DccPathDagOpt(object):
         # print _
         return namespacesep.join(_[:-1])
 
+    def get_color_from_name(self, maximum=255):
+        return TextOpt(self.get_name()).to_rgb(maximum)
+
     def __str__(self):
         return self._path
 
@@ -3166,8 +3185,8 @@ class TextOpt(object):
             _.reverse()
             a = int(''.join(_))
             h = float(a % 25600)/100.0
-            s = float(50 + a % 50)/100.0
-            v = float(50 + (a+h) % 50)/100.0
+            s = float(50+a % 50)/100.0
+            v = float(50+(a+h) % 50)/100.0
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
@@ -5453,12 +5472,6 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print MultiplyFileNameMtd.set_merge_to(
-        [
-            '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/beauty.1008.exr',
-            '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/beauty.1009.exr',
-            '/l/prod/cgm/output/assets/chr/nn_4y/rig/rigging/nn_4y.rig.rigging.v007/render/katana-images/main/shot.no_hair.all.default.custom/background.1082.exr',
-            '/l/temp/td/dongchangbao/tx_convert_test/window_box_1/wP_Rooms_v1_R01_L_day_1k.exr'
-        ],
-        ['*.####.*']
+    print MultiplyFileMtd.get_exists_tiles(
+        '/l/temp/td/dongchangbao/tx_convert_2/jiguang_cloth_mask_tx/jiguang_cloth_mask.<udim>.####.tx'
     )

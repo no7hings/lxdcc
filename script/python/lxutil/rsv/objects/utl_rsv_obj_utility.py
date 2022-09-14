@@ -522,7 +522,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 j_option = {}
                 j_file_path = j_match['result']
                 j_file_opt = bsc_core.StorageFileOpt(j_file_path)
-                i_f_name_new, i_frame = bsc_core.MultiplyFileNameMtd.get_match_args(
+                i_f_name_new, i_frame = bsc_core.MultiplyFileMtd.get_match_args(
                     j_file_opt.name, '*.%04d.exr'
                 )
                 i_f_new = '{}/{}'.format(j_file_opt.directory_path, i_f_name_new)

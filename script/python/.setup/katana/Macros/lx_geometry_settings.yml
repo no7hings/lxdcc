@@ -1,0 +1,68 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+
+parameters:
+    reset:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxGeometrySettings(node).set_reset()'
+        tool_tip: '...'
+
+    options/scheme:
+        widget: enumerate
+        value: [ 'asset', 'shot' ]
+        tool_tip: '...'
+
+    usd/location:
+        widget: path
+        value: ''
+        tool_tip: '...'
+
+    usd/file:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    usd/start_frame:
+        widget: float
+        value: 1001
+        tool_tip: '...'
+
+    usd/end_frame:
+        widget: float
+        value: 1001
+        tool_tip: '...'
+
+    usd/guess:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxGeometrySettings(node).set_usd_guess()'
+        tool_tip: '...'
+
+    usd/override_enable:
+        widget: boolean
+        value: False
+        tool_tip: '...'
+
+    usd/shot_override/file:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    usd/shot_override/location:
+        widget: path
+        value: '/root/world/geo'
+        tool_tip: '...'
+
+    usd/shot_override/create:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxGeometrySettings(node).set_create()'
+        tool_tip: '...'
+
+    lynxi_info/type:
+        widget: string
+        value: 'lx_geometry_settings'
+        tool_tip: '...'
+

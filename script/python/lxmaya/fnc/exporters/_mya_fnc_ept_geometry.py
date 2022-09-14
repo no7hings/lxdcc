@@ -393,13 +393,14 @@ class GeometryUsdExporter_(object):
             mya_objs = root_mya_obj.get_descendants()
             if mya_objs:
                 usd_geometry_exporter = usd_fnc_exporters.GeometryExporter(
-                    file_path=self._file_path, root=self._root,
                     option=dict(
+                        file=self._file_path,
+                        location=self._root,
                         default_prim_path=default_prim_path
                     )
                 )
                 c = len(mya_objs)
-                l_p = utl_core.LogProgressRunner(maximum=c, label='geometry-usd-export')
+                l_p = utl_core.log_progress_bar(maximum=c, label='geometry-usd-export')
                 #
                 for i_mya_obj in mya_objs:
                     l_p.set_update()
@@ -588,3 +589,105 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionMethod):
             frame=option.get('frame'),
             attribute=['lx_film_fit', 'lx_camera_tag']
         ).set_run()
+
+
+class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+        file='',
+        location='',
+        root='',
+        #
+        display_color=(0.75, .75, 0.5),
+        subdiv_dict={}
+    )
+    def __init__(self, option):
+        super(GeometryUvMapUsdExporter, self).__init__(option)
+    @classmethod
+    def _set_subdiv_(cls, obj_path, subdiv_count):
+        _ = cmds.listConnections(obj_path, destination=0, source=1, type='polySmoothFace')
+        if _:
+            ma_core.CmdObjOpt(_[0]).set('divisions', subdiv_count)
+            ma_core.CmdObjOpt(_[0]).set('smoothUVs', 0)
+            return _
+        return cmds.polySmooth(
+            obj_path,
+            dv=subdiv_count,
+            mth=0,
+            sdt=0,
+            ovb=1,
+            ofb=3,
+            ofc=0,
+            ost=0,
+            ocr=0,
+            bnr=1,
+            c=1,
+            kb=1,
+            ksb=1,
+            khe=0,
+            kt=1,
+            kmb=1,
+            suv=0,
+            peh=0,
+            sl=1,
+            dpe=1,
+            ps=0.1,
+            ro=1,
+            ch=1
+        )
+    @classmethod
+    def _get_tmp_usd_file_(cls):
+        user_directory_path = bsc_core.TemporaryMtd.get_user_directory('usd-export')
+        return '{}/{}.usd'.format(
+            user_directory_path,
+            bsc_core.TimestampOpt(
+                bsc_core.SystemMtd.get_timestamp()
+            ).get_as_tag_36()
+        )
+    @classmethod
+    def _set_tmp_usd_export_(cls, file_path, location, root):
+        GeometryUsdExporter_(
+            file_path=file_path,
+            root=location,
+            option=dict(
+                default_prim_path=root,
+                with_uv=True,
+                with_mesh=True,
+                use_override=False
+            )
+        ).set_run()
+
+    def set_run(self):
+        subdiv_dict = self.get('subdiv_dict')
+        post_deletes = []
+        if subdiv_dict:
+            for k, v in subdiv_dict.items():
+                i_obj_path = bsc_core.DccPathDagOpt(
+                    k
+                ).set_translate_to('|')
+                # i_results = self._set_subdiv_(
+                #     i_obj_path, v
+                # )
+                # post_deletes.extend(i_results)
+        #
+        file_path = self.get('file')
+        temp_usd_file_path = self._get_tmp_usd_file_()
+        location = self.get('location')
+        root = self.get('root')
+
+        self._set_tmp_usd_export_(
+            temp_usd_file_path, location, root
+        )
+
+        # print temp_usd_file_path
+        # temp_usd_file_path = '/l/temp/temporary/usd-export/2022_0913-dongchangbao/RI58SQ.usd'
+
+        usd_fnc_exporters.GeometryUvMapExporter(
+            file_path=file_path,
+            root=root,
+            option=dict(
+                file_0=temp_usd_file_path,
+                file_1=temp_usd_file_path,
+                display_color=self.get('display_color')
+            )
+        ).set_run()
+

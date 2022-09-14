@@ -5,6 +5,8 @@ import collections
 # noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, Vt, UsdGeom
 
+from lxbasic import bsc_core
+
 from lxusd import usd_configure, usd_core
 
 from lxobj import obj_core
@@ -68,46 +70,46 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_uv_map_export(self):
         display_color = self.get('display_color')
-        ps = utl_core.Progress.set_create(len([i for i in self._geometry_stage_0.TraverseAll()]))
-        #
-        for i_usd_prim in self._geometry_stage_0.TraverseAll():
-            utl_core.Progress.set_update(ps)
-            i_obj_type_name = i_usd_prim.GetTypeName()
-            obj_path = i_usd_prim.GetPath().pathString
-            output_prim = self._output_stage_opt.set_obj_create_as_override(obj_path)
-            if i_obj_type_name == 'Mesh':
-                _ = self._geometry_stage_1.GetPrimAtPath(obj_path)
-                i_output_usd_mesh = UsdGeom.Mesh(output_prim)
-                i_output_usd_mesh_opt = usd_core.UsdMeshOpt(i_output_usd_mesh)
-                if _.IsValid() is True:
-                    surface_geometry_prim = _
-                    input_usd_mesh = UsdGeom.Mesh(surface_geometry_prim)
-                    output_prim.CreateAttribute(
-                        'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
-                    ).Set(self._file_path_1)
-                else:
-                    input_usd_mesh = UsdGeom.Mesh(i_usd_prim)
-                    output_prim.CreateAttribute(
-                        'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
-                    ).Set(self._file_path_0)
-                #
-                input_usd_mesh_opt = usd_core.UsdMeshOpt(input_usd_mesh)
-                uv_map_names = input_usd_mesh_opt.get_uv_map_names()
-                if uv_map_names:
-                    for uv_map_name in uv_map_names:
-                        uv_map = input_usd_mesh_opt.get_uv_map(uv_map_name)
-                        i_output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
-                #
-                input_usd_mesh_opt.set_display_color_fill(
-                    display_color
-                )
-                i_output_usd_mesh_opt.set_usd_display_colors(
-                    input_usd_mesh_opt.get_usd_display_colors()
-                )
-        #
-        utl_core.Progress.set_stop(ps)
+        with utl_core.log_progress_bar(maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry export') as l_p:
+            for i_usd_prim in self._geometry_stage_0.TraverseAll():
+                l_p.set_update()
+                i_obj_type_name = i_usd_prim.GetTypeName()
+                obj_path = i_usd_prim.GetPath().pathString
+                output_prim = self._output_stage_opt.set_obj_create_as_override(obj_path)
+                if i_obj_type_name == 'Mesh':
+                    _ = self._geometry_stage_1.GetPrimAtPath(obj_path)
+                    i_output_usd_mesh = UsdGeom.Mesh(output_prim)
+                    i_output_usd_mesh_opt = usd_core.UsdMeshOpt(i_output_usd_mesh)
+                    if _.IsValid() is True:
+                        surface_geometry_prim = _
+                        input_usd_mesh = UsdGeom.Mesh(surface_geometry_prim)
+                        output_prim.CreateAttribute(
+                            'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
+                        ).Set(self._file_path_1)
+                    else:
+                        input_usd_mesh = UsdGeom.Mesh(i_usd_prim)
+                        output_prim.CreateAttribute(
+                            'userProperties:usd:logs:uv_map_from', Sdf.ValueTypeNames.Asset, custom=False
+                        ).Set(self._file_path_0)
+                    #
+                    input_usd_mesh_opt = usd_core.UsdMeshOpt(input_usd_mesh)
+                    uv_map_names = input_usd_mesh_opt.get_uv_map_names()
+                    if uv_map_names:
+                        for uv_map_name in uv_map_names:
+                            uv_map = input_usd_mesh_opt.get_uv_map(uv_map_name)
+                            i_output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
+                    #
+                    input_usd_mesh_opt.set_display_color_fill(
+                        display_color
+                    )
+                    i_output_usd_mesh_opt.set_usd_display_colors(
+                        input_usd_mesh_opt.get_usd_display_colors()
+                    )
         #
         self._output_stage_opt.set_default_prim(self._root)
+        # create directory
+        # bsc_core.StorageFileOpt(self._file_path).set_directory_create()
+        #
         self._output_stage_opt.set_export_to(self._file_path)
         #
         utl_core.Log.set_module_result_trace(
@@ -117,6 +119,52 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_run(self):
         self.set_uv_map_export()
+
+
+class GeometryColorMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+    OPTION = dict(
+        file_src='',
+        file_tgt='',
+        location='',
+        #
+        use_object_name=False,
+        use_group_name=False,
+        use_object_index=False,
+        use_group_index=False,
+    )
+    def __init__(self, *args, **kwargs):
+        super(GeometryColorMapExporter, self).__init__(*args, **kwargs)
+
+        self._file_path_src = self.get('file_src')
+        self._file_path_tgt = self.get('file_tgt')
+        #
+        self._location_path = self.get('location')
+        #
+        self._usd_stage_src = Usd.Stage.Open(self._file_path_src, Usd.Stage.LoadAll)
+        self._usd_stage_opt_src = usd_core.UsdStageOpt(self._usd_stage_src)
+        self._usd_stage_tgt = Usd.Stage.CreateInMemory()
+        self._usd_stage_opt_tgt = usd_core.UsdStageOpt(self._usd_stage_tgt)
+
+    def set_run(self):
+        with utl_core.log_progress_bar(maximum=len([i for i in self._usd_stage_src.TraverseAll()]), label='geometry export') as l_p:
+            for i_usd_prim_src in self._usd_stage_src.TraverseAll():
+                l_p.set_update()
+                #
+                i_obj_type_name = i_usd_prim_src.GetTypeName()
+                i_obj_path_src = i_usd_prim_src.GetPath().pathString
+                i_obj_path_opt_src = bsc_core.DccPathDagOpt(i_obj_path_src)
+                #
+                i_object_name_color = i_obj_path_opt_src.get_color_from_name(maximum=1.0)
+                print i_object_name_color
+                #
+                i_usd_prim_src = self._usd_stage_src.GetPrimAtPath(i_obj_path_src)
+                i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path_src)
+                if i_obj_type_name == 'Mesh':
+                    i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
+                    i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
+                    #
+                    i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
+                    i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
 
 
 class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
@@ -236,39 +284,39 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
         # self._usd_stage.Export(base + '.usda')
 
 
-class GeometryExporter(object):
+class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     OPTION = dict(
+        file='',
+        location='',
+        #
         default_prim_path=None,
         with_usda=False,
         root_lstrip=False,
     )
-    def __init__(self, file_path, root=None, option=None):
-        self._file_path = file_path
-        self._root = root
+    def __init__(self, *args, **kwargs):
+        super(GeometryExporter, self).__init__(*args, **kwargs)
         #
-        self._option = copy.deepcopy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                if k in self.OPTION:
-                    self._option[k] = v
+        self._file_path = self.get('file')
+        self._location_path = self.get('location')
         #
         self._output_stage = Usd.Stage.CreateInMemory()
         self._output_stage_opt = usd_core.UsdStageOpt(self._output_stage)
-
-        self._set_root_build_()
-
-    def _set_root_build_(self):
-        dag_path_comps = obj_core.DccPathDagMtd.get_dag_component_paths(self._root, pathsep=usd_configure.Obj.PATHSEP)
+        self._set_location_create_(self._output_stage, self._location_path)
+    @classmethod
+    def _set_location_create_(cls, stage, location):
+        dag_path_comps = obj_core.DccPathDagMtd.get_dag_component_paths(location, pathsep=usd_configure.Obj.PATHSEP)
         if dag_path_comps:
             dag_path_comps.reverse()
         #
-        root = self._output_stage.GetPseudoRoot()
+        stage.GetPseudoRoot()
         for i in dag_path_comps:
             if i != usd_configure.Obj.PATHSEP:
-                root = self._output_stage.DefinePrim(i, usd_configure.ObjType.TRANSFORM)
+                stage.DefinePrim(
+                    i, usd_configure.ObjType.TRANSFORM
+                )
         #
-        default_prim_path = self._output_stage.GetPrimAtPath(dag_path_comps[1])
-        self._output_stage.SetDefaultPrim(default_prim_path)
+        default_prim_path = stage.GetPrimAtPath(dag_path_comps[1])
+        stage.SetDefaultPrim(default_prim_path)
 
     def _set_transform_opt_create_(self, obj_path, use_override=False):
         if use_override is True:
@@ -297,7 +345,7 @@ class GeometryExporter(object):
         return obj_opt
 
     def _set_export_run_(self):
-        default_prim_path = self._option.get('default_prim_path')
+        default_prim_path = self.get('default_prim_path')
         if default_prim_path is not None:
             self._output_stage_opt.set_default_prim(
                 default_prim_path

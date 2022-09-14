@@ -92,4 +92,5 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
         obj_category = self.universe.set_obj_category_create(obj_category_name)
         obj_type = obj_category.set_type_create(obj_type_name)
         _obj = obj_type.set_obj_create(obj_path)
+        _obj._usd_obj = usd_prim
         return _obj

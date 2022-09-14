@@ -32,7 +32,7 @@ class UsdStageOpt(object):
                             file_path
                         )
                     )
-                    stage = Usd.Stage.Open(file_path)
+                    stage = Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
                     utl_core.Log.set_module_result_trace(
                         'usd-file open is completed', 'file="{}"'.format(
                             file_path
@@ -299,15 +299,52 @@ class UsdStageOpt(object):
         )
 
 
+class UsdFileWriteOpt(object):
+    def __init__(self, file_path):
+        self._file_path = file_path
+        self._usd_stage = Usd.Stage.CreateInMemory()
+
+    def set_location_add(self, location):
+        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
+            location, pathsep=usd_configure.Obj.PATHSEP
+        )
+        if dag_path_comps:
+            dag_path_comps.reverse()
+        #
+        for i in dag_path_comps:
+            if i != usd_configure.Obj.PATHSEP:
+                self.set_obj_add(i)
+        #
+        default_prim_path = self._usd_stage.GetPrimAtPath(dag_path_comps[1])
+        self._usd_stage.SetDefaultPrim(default_prim_path)
+
+    def set_obj_add(self, path):
+        self._usd_stage.DefinePrim(path, usd_configure.ObjType.TRANSFORM)
+
+    def set_save(self):
+        file_opt = bsc_core.StorageFileOpt(self._file_path)
+        file_opt.set_directory_create()
+        self._usd_stage.Export(self._file_path)
+        utl_core.Log.set_module_result_trace(
+            'usd-export',
+            u'file="{}"'.format(self._file_path)
+        )
+
+
 class UsdFileOpt(object):
     def __init__(self, file_path, location=None):
-        usd_stage_mask = Usd.StagePopulationMask()
-        usd_stage_mask.Add(
-            Sdf.Path(location)
-        )
-        self._usd_stage = Usd.Stage.OpenMasked(
-            file_path, usd_stage_mask
-        )
+        if location is not None:
+            usd_stage_mask = Usd.StagePopulationMask()
+            usd_stage_mask.Add(
+                Sdf.Path(location)
+            )
+            self._usd_stage = Usd.Stage.OpenMasked(
+                file_path, usd_stage_mask
+            )
+        else:
+            self._usd_stage = Usd.Stage.OpenMasked(
+                file_path, Usd.Stage.LoadAll
+            )
 
     def get_usd_instance(self):
         return self._usd_stage
@@ -737,5 +774,24 @@ class UsdMeshOpt(object):
             self._usd_prim
         ).get_usd_display_colors()
 
+    def get_face_count(self):
+        usd_mesh = self._usd_mesh
+        return usd_mesh.GetFaceCount()
+
     def get_face_vertex_indices(self, reverse=False):
         pass
+
+
+class UsdProcess(object):
+    SCRIPT_LOCATION = '{}/.script'.format(os.path.dirname(__file__.replace('\\', '/')))
+    SCRIPT_KWARGS = dict(
+        script_root=SCRIPT_LOCATION
+    )
+    @classmethod
+    def get_command(cls, option):
+        run_kwargs = dict(cls.SCRIPT_KWARGS)
+        run_kwargs['option'] = option
+        return 'rez-env lxdcc usd-20.11 -- lxdcc-python {script_root}/usd-file-process.py "{option}"'.format(
+            **run_kwargs
+        )
+

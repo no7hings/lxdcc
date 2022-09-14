@@ -31,20 +31,24 @@ class KtnSGObjOpt(object):
         self._obj_path = obj_path
         self._traversal = scene_graph_opt._get_traversal_(obj_path)
 
-    def get_port(self, port_path):
+    def get_port(self, port_path, use_global=False):
         tvl = self._traversal
         if tvl.valid():
-            attrs = tvl.getLocationData().getAttrs()
+            # print dir(tvl.getLocationData())
+            if use_global is True:
+                attrs = tvl.getLocationData().getAttrs()
+            else:
+                attrs = tvl.getLocationData().getAttrs()
             if attrs:
                 return attrs.getChildByName(port_path)
 
-    def get_port_raw(self, port_path):
-        port = self.get_port(port_path)
+    def get_port_raw(self, port_path, use_global=False):
+        port = self.get_port(port_path, use_global)
         if port is not None:
             return port.getData()[0]
 
-    def get(self, key):
-        return self.get_port_raw(key)
+    def get(self, key, use_global=False):
+        return self.get_port_raw(key, use_global)
 
 
 class KtnSGStageOpt(object):
@@ -76,7 +80,7 @@ class KtnSGStageOpt(object):
 
     def _test_(self, location):
         tvl = self._get_traversal_(location)
-        print dir(tvl)
+        # print dir(tvl)
 
     def get_obj_exists(self, obj_path):
         t = self._get_traversal_(obj_path)
@@ -189,9 +193,11 @@ class KtnSGStageOpt(object):
             i_attr = i_attrs.getChildByName(port_path)
             if i_attr is not None:
                 i_ = i_attr.getData()[0]
-                if i_ not in list_:
-                    list_.append(i_)
-        return list_
+                list_.append(i_)
+        #
+        list__ = list(set(list_))
+        list__.sort(key=list_.index)
+        return list__
 
     def get_all_paths_at_as_dynamic(self, frame_range, location, include_types=None, exclude_types=None):
         start_frame, end_frame = frame_range
@@ -212,8 +218,11 @@ class KtnSGStageOpt(object):
                 i_paths = self.get_all_paths_at(
                     location, include_types, exclude_types
                 )
-                [list_.append(j) for j in i_paths if j not in list_]
-            return list_
+                list_.extend(i_paths)
+            #
+            list__ = list(set(list_))
+            list__.sort(key=list_.index)
+            return list__
 
     def __str__(self):
         return '{}(node="{}")'.format(

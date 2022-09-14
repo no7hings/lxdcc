@@ -342,45 +342,6 @@ class PathGroupPermission(AbsPermission):
             )
             return self._set_nas_cmd_run_(cmd)
 
-    def set_all_remove(self):
-        group_data = self._get_all_group_data_(self._nas_path)
-        for k, v in group_data.items():
-            if k in self.GROUP_ID_QUERY:
-                i_group_name = k
-                i_index, i_content = v
-                i_group_id = self.GROUP_ID_QUERY[i_group_name]
-                i_kwargs = dict(
-                    group_id=i_group_id,
-                    path=self._nas_path,
-                    index=i_index
-                )
-                i_cmd = self.CMD_QUERY['remove_grp'].format(
-                    **i_kwargs
-                )
-                self._set_nas_cmd_run_(i_cmd)
-
-    def set_all_read_only(self):
-        group_data = self._get_all_group_data_(self._nas_path)
-        for k, v in group_data.items():
-            if k in self.GROUP_ID_QUERY:
-                i_group_name = k
-                i_index, i_content = v
-                i_group_id = self.GROUP_ID_QUERY[i_group_name]
-                i_kwargs = dict(
-                    group_id=i_group_id,
-                    path=self._nas_path,
-                    index=i_index
-                )
-                i_cmd = self.CMD_QUERY['remove_grp'].format(
-                    **i_kwargs
-                )
-                self._set_nas_cmd_run_(i_cmd)
-
-                i_cmd = self.CMD_QUERY['read_only'].format(
-                    **i_kwargs
-                )
-                self._set_nas_cmd_run_(i_cmd)
-
     def get_is_allow(self, group_name):
         group_data = self._get_all_group_data_(self._nas_path)
         if group_name in group_data:
@@ -492,7 +453,7 @@ class PathPermissionOpt(AbsPermission):
 
 
 if __name__ == '__main__':
-    d = '/l/prod/cgm/work/assets/vfx/star/srf/surfacing/texture/main/v001'
+    d = '/l/prod/cgm/publish/assets/chr/tx_maoz_f/srf/surfacing/tx_maoz_f.srf.surfacing.v019/texture/tx_maoz_f.diff_clr.1001.tx'
     print PathPermissionOpt(
         d
     ).get_all_group_data()

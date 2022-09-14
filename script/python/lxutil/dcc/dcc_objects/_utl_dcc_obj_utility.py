@@ -26,7 +26,7 @@ class Obj(
     @property
     def icon(self):
         from lxutil_gui import utl_gui_core
-        return utl_gui_core.RscIconFile.get('node')
+        return utl_gui_core.RscIconFile.get('object')
 
     def _set_dag_create_(self, path):
         pass

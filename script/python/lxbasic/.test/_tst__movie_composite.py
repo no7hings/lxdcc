@@ -22,7 +22,7 @@ for i in matchers:
         i_v = {}
         i_f = i['result']
         i_f_opt = bsc_core.StorageFileOpt(i_f)
-        i_f_name_new, i_frame = bsc_core.MultiplyFileNameMtd.get_match_args(
+        i_f_name_new, i_frame = bsc_core.MultiplyFileMtd.get_match_args(
             i_f_opt.name, '*.%04d.exr'
         )
         i_f_new = '{}/{}'.format(i_f_opt.directory_path, i_f_name_new)

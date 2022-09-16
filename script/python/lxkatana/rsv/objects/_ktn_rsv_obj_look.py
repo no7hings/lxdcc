@@ -48,7 +48,8 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         file_path=i_look_ass_file_path,
                         root=root,
                         option=dict(
-                            output_obj=i_look_pass_source_obj.path
+                            look_pass_node=ktn_workspace.get_main_node('look_outputs'),
+                            look_pass=i_look_pass_name
                         )
                     ).set_run()
             else:

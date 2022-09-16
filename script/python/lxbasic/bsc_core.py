@@ -2351,6 +2351,9 @@ class KeywordArgumentsOpt(object):
                 return []
             return self._option_dict[key]
 
+    def get_as_path(self, key):
+        pass
+
     def get_as_array(self, key):
         return self.get(key, as_array=True)
 
@@ -3198,7 +3201,6 @@ class TextOpt(object):
             h = float(a % (360+seed)*d)/d
             s = float(50+a % 50)/100.0
             v = float(50+(a+h) % 50)/100.0
-            print h, s, v
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 

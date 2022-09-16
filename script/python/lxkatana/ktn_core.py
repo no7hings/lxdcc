@@ -557,6 +557,9 @@ class NGObjOpt(object):
     def get_output_port(self, port_path):
         return self._ktn_obj.getOutputPort(port_path)
 
+    def get_output_ports(self):
+        return self._ktn_obj.getOutputPorts()
+
     def get_send_port(self, port_path):
         return self._ktn_obj.getSendPort(port_path)
 

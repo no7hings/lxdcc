@@ -49,6 +49,9 @@ class UsdStageOpt(object):
         UsdGeom.SetStageUpAxis(
             self._usd_stage, UsdGeom.Tokens.y
         )
+    @classmethod
+    def _set_file_open_(cls, file_path):
+        return Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
     @property
     def usd_instance(self):
         return self._usd_stage
@@ -75,12 +78,12 @@ class UsdStageOpt(object):
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.insert(0, file_path)
             utl_core.Log.set_module_result_trace(
-                'usd-layer-prepend',
+                'usd-layer prepend',
                 u'file="{}"'.format(file_path)
             )
         else:
             utl_core.Log.set_module_warning_trace(
-                'usd-layer-prepend',
+                'usd-layer prepend',
                 u'file="{}" is non-exist'.format(file_path)
             )
 
@@ -89,7 +92,7 @@ class UsdStageOpt(object):
         self._usd_stage.SetDefaultPrim(prim)
         #
         utl_core.Log.set_module_result_trace(
-            'usd-stage-set-default-prim',
+            'default-prim set',
             u'obj="{}"'.format(obj_path)
         )
 
@@ -595,33 +598,43 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
     def get_point_count(self):
         return len(self.get_points())
 
+    def get_display_colors_as_fill(self, color):
+        r, g, b = color
+        return Vt.Vec3fArray([(r, g, b)])
+
     def set_display_color_fill(self, color):
-        p = self._usd_mesh.GetDisplayColorAttr()
+        p = self._usd_mesh.GetDisplayColorPrimvar()
         if p:
             pass
         else:
-            p = self._usd_mesh.CreateDisplayColorAttr()
+            p = self._usd_mesh.CreateDisplayColorPrimvar(
+                UsdGeom.Tokens.constant
+            )
         #
         r, g, b = color
         #
         p.Set(
-            Vt.Vec3fArray([(r, g, b) for p in range(self.get_point_count())])
+            Vt.Vec3fArray([(r, g, b)])
         )
 
-    def set_usd_display_colors(self, usd_colors):
-        p = self._usd_mesh.GetDisplayColorAttr()
+    def set_display_colors(self, usd_colors):
+        p = self._usd_mesh.GetDisplayColorPrimvar()
         if p:
             pass
         else:
-            p = self._usd_mesh.CreateDisplayColorAttr()
+            p = self._usd_mesh.CreateDisplayColorPrimvar(
+                UsdGeom.Tokens.constant
+            )
         p.Set(usd_colors)
 
-    def get_usd_display_colors(self):
-        p = self._usd_mesh.GetDisplayColorAttr()
+    def get_display_colors(self):
+        p = self._usd_mesh.GetDisplayColorPrimvar()
         if p:
             pass
         else:
-            p = self._usd_mesh.CreateDisplayColorAttr()
+            p = self._usd_mesh.CreateDisplayColorPrimvar(
+                UsdGeom.Tokens.constant
+            )
         return p.Get()
 
     def get_bounding_box(self):
@@ -688,6 +701,9 @@ class UsdMeshOpt(object):
         self._usd_mesh = mesh
         self._usd_prim = mesh.GetPrim()
         self._obj_path = self._usd_prim.GetPath().pathString
+
+    def get_path(self):
+        return self._obj_path
     @property
     def usd_instance(self):
         return self._usd_mesh
@@ -703,9 +719,10 @@ class UsdMeshOpt(object):
 
     def get_uv_map(self, uv_map_name):
         uv_primvar = self._usd_mesh.GetPrimvar(uv_map_name)
-        uv_map_face_vertex_indices = uv_primvar.GetIndices()
-        uv_map_coords = uv_primvar.Get()
-        return uv_map_face_vertex_indices, uv_map_coords
+        if uv_primvar:
+            uv_map_face_vertex_indices = uv_primvar.GetIndices()
+            uv_map_coords = uv_primvar.Get()
+            return uv_map_face_vertex_indices, uv_map_coords
 
     def set_uv_map_name_add(self, uv_map_name):
         pass
@@ -744,15 +761,17 @@ class UsdMeshOpt(object):
         #
         uv_map_face_vertex_indices, uv_map_coords = uv_map
         primvar.Set(uv_map_coords)
-        primvar.SetIndices(Vt.IntArray(uv_map_face_vertex_indices))
+        primvar.SetIndices(
+            Vt.IntArray(uv_map_face_vertex_indices)
+        )
     #
     def set_uv_map(self, uv_map_name, uv_map):
         primvar = self._usd_mesh.GetPrimvar(uv_map_name)
         #
-        uv_map_face_vertex_indices, uv_map_coords = uv_map
-        primvar.Set(uv_map_coords)
+        indices, values = uv_map
+        primvar.Set(values)
         primvar.SetIndices(
-            Vt.IntArray(uv_map_face_vertex_indices)
+            Vt.IntArray(indices)
         )
 
     def set_display_color_fill(self, color):
@@ -762,23 +781,80 @@ class UsdMeshOpt(object):
             color
         )
 
-    def set_usd_display_colors(self, usd_colors):
+    def set_display_colors(self, usd_colors):
         UsdGeometryMeshOpt(
             self._usd_prim
-        ).set_usd_display_colors(
+        ).set_display_colors(
             usd_colors
         )
 
-    def get_usd_display_colors(self):
+    def get_display_colors(self):
         return UsdGeometryMeshOpt(
             self._usd_prim
-        ).get_usd_display_colors()
+        ).get_display_colors()
+
+    def set_display_color_map(self, color_map):
+        p = self._usd_mesh.GetDisplayColorPrimvar()
+        if not p:
+            p = self._usd_mesh.CreateDisplayColorPrimvar(
+                UsdGeom.Tokens.faceVarying
+            )
+        #
+        indices, values = color_map
+        p.Set(values)
+        p.SetIndices(
+            Vt.IntArray(indices)
+        )
+
+    def get_display_colors_as_fill(self, color):
+        return UsdGeometryMeshOpt(
+            self._usd_prim
+        ).get_display_colors_as_fill(
+            color
+        )
+
+    def get_display_color_map_from_uv_map(self, uv_map_name):
+        uv_map = self.get_uv_map(uv_map_name)
+        if uv_map:
+            list_ = []
+            uv_map_face_vertex_indices, uv_map_coords = uv_map
+            uv_c = len(uv_map_coords)
+            for i in range(uv_c):
+                if i <= uv_c:
+                    i_x, i_y = uv_map_coords[i]
+                    i_color = (i_x-int(i_x) % 1, i_y-int(i_y) % 1, 0)
+                    # i_color = (i_x / 10.0 % 10.0, i_y / 1.0 % 10.0, 0)
+                else:
+                    i_color = (0, 0, 1)
+                #
+                list_.append(i_color)
+            return uv_map_face_vertex_indices, Vt.Vec3fArray(list_)
 
     def get_face_count(self):
         usd_mesh = self._usd_mesh
         return usd_mesh.GetFaceCount()
 
     def get_face_vertex_indices(self, reverse=False):
+        usd_mesh = self._usd_mesh
+        a = usd_mesh.GetFaceVertexIndicesAttr()
+        if a.GetNumTimeSamples():
+            return a.Get(0)
+        else:
+            return a.Get()
+
+    def get_points(self):
+        p = self._usd_mesh.GetPointsAttr()
+        if p.GetNumTimeSamples():
+            return p.Get(0)
+        else:
+            return p.Get()
+
+    def get_point_count(self):
+        return len(self.get_points())
+
+
+class UsdCurveOpt(object):
+    def __init__(self, mesh):
         pass
 
 

@@ -210,7 +210,9 @@ asset-work-asset-set-usd-override-file: <asset-work-set-dir>/<asset-name>.overri
 asset-work-asset-set-usd-file: <asset-work-set-dir>/<asset-name>.usda
 asset-work-shot-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
 #
-asset-work-comp-usd-dir: <asset-task-dir>/cache/usd/<version-name>
+asset-work-usd-dir: <asset-task-dir>/cache/usd/<version-name>
+asset-work-comp-usd-dir: <asset-work-usd-dir>
+asset-work-display_color-usd-dir: <asset-work-usd-dir>/display_color
 #
 asset-work-render-dir: <asset-task-dir>/render/<user-name>
 #
@@ -396,7 +398,10 @@ asset-look-yml-file: <asset-look-yml-dir>/<asset-name>.yml
 asset-texture-src-dir: <asset-task-dir>/texture
 asset-texture-tgt-dir: <asset-version-dir>/texture
 # <asset-usd>
-asset-component-usd-dir: <asset-version-dir>/cache/usd
+asset-usd-dir: <asset-version-dir>/cache/usd
+asset-component-usd-dir: <asset-usd-dir>
+asset-display_color-usd-dir: <asset-usd-dir>/display_color
+#
 asset-usd-payload-file: <asset-component-usd-dir>/payload.usda
 asset-component-registry-usd-file: <asset-component-usd-dir>/registry.usda
 #
@@ -524,7 +529,10 @@ asset-output-xgen-usd-file: <asset-output-xgen-usd-dir>/xgen.usda
 #
 asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
 #
-asset-output-component-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-usd-dir: <asset-output-version-dir>/cache/usd
+asset-output-component-usd-dir: <asset-output-usd-dir>
+asset-output-display_color-usd-dir: <asset-output-usd-dir>/display_color
+#
 asset-output-component-usd-file: <asset-output-component-usd-dir>/<asset-name>.usda
 asset-output-component-registry-usd-file: <asset-output-component-usd-dir>/registry.usda
 #

@@ -662,6 +662,7 @@ class CurveOpt(
             1.str(path)
         """
         super(CurveOpt, self).__init__(*args)
+        self._om2_obj_fnc = self.get_om2_obj()
 
     def get_om2_obj(self):
         return ma_core.Om2Method._get_om2_curve_fnc_(self.obj.path)
@@ -674,6 +675,28 @@ class CurveOpt(
     def get_knots_as_uuid(self):
         raw = self.get_knots()
         return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
+
+    def get_points(self):
+        return ma_core.Om2CurveOpt(
+            self.obj.path
+        ).get_points()
+
+    def get_degree(self):
+        return ma_core.Om2CurveOpt(
+            self.obj.path
+        ).get_degree()
+
+    def get_usd_data(self):
+        points = self.get_points()
+        degree = self.get_degree()
+        form = 1
+        count = len(points)
+        knots = ma_core.Om2Method._get_curve_knots_(count, degree)
+        span = count - 3
+        ranges = [(0, 1)]
+        widths = [1]
+        order = [degree]
+        return points, knots, ranges, widths, order
 
 
 class SurfaceOpt(

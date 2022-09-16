@@ -7,6 +7,7 @@ class Util(object):
     NAMESPACE_PATHSEP = ':'
     #
     MESH_TYPE = 'mesh'
+    CURVE_TYPE = 'nurbsCurve'
     TRANSFORM_TYPE = 'transform'
     FILE_TYPE_NAME = 'file'
     MATERIAL_TYPE = 'shadingEngine'

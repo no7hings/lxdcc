@@ -28,7 +28,9 @@ from lxbasic import bsc_core
 class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
     OPTION = dict(
         uv_map_file=None,
-        root_override=None
+        root_override=None,
+        #
+        port_match_patterns=[]
     )
     PLUG_NAME = None
     OBJ_PATHSEP = ma_configure.Util.OBJ_PATHSEP
@@ -58,17 +60,14 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
             if root_override is not None:
                 self._set_path_create_(root_override)
             #
-            l_p = utl_core.LogProgressRunner(maximum=c, label='usd import')
-            for i_usd_prim in self._usd_stage.TraverseAll():
-                l_p.set_update()
-                #
-                i_usd_prim_type_name = i_usd_prim.GetTypeName()
-                if i_usd_prim_type_name == usd_configure.ObjType.TRANSFORM:
-                    mya_fnc_obj_core.FncUsdTransform(i_usd_prim, location=root_override).set_create()
-                elif i_usd_prim_type_name == usd_configure.ObjType.MESH:
-                    mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
-            #
-            l_p.set_stop()
+            with utl_core.log_progress_bar(maximum=c, label='usd import') as l_p:
+                for i_usd_prim in self._usd_stage.TraverseAll():
+                    l_p.set_update()
+                    i_usd_prim_type_name = i_usd_prim.GetTypeName()
+                    if i_usd_prim_type_name == usd_configure.ObjType.TRANSFORM:
+                        mya_fnc_obj_core.FncUsdTransform(i_usd_prim, location=root_override).set_create()
+                    elif i_usd_prim_type_name == usd_configure.ObjType.MESH:
+                        mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
     @classmethod
     def _set_path_create_(cls, path):
         dag_path = bsc_core.DccPathDagOpt(path)
@@ -234,6 +233,10 @@ class GeometryAbcImporter(utl_fnc_obj_abs.AbsDccExporter):
             namespace=namespace_temporary,
             preserveReferences=1
         )
+        utl_core.Log.set_module_result_trace(
+            'geometry abc import',
+            'file="{}"'.format(self._file_path)
+        )
         #
         hidden = self._option['hidden']
         #
@@ -242,7 +245,7 @@ class GeometryAbcImporter(utl_fnc_obj_abs.AbsDccExporter):
         objs = namespace_obj.get_objs()
         for obj in objs:
             utl_core.Log.set_module_result_trace(
-                'alembic-geometry-import',
+                'geometry abc import',
                 u'obj="{}"'.format(obj.path)
             )
             if obj.type == 'transform':

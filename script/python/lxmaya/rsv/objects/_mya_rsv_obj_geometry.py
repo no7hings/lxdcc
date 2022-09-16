@@ -101,7 +101,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                                 with_uv=True,
                                 with_mesh=True,
                                 use_override=False,
-                                port_macth_patterns=['pg_*']
+                                port_match_patterns=['pg_*']
                             )
                         ).set_run()
         else:

@@ -371,15 +371,11 @@ class CurveOpt(
         p.Set(order)
 
     def set_display_color_fill(self, color):
-        pass
-        # usd_curve = self.get_usd_curve()
-        # p = usd_curve.GetDisplayColorAttr()
-        # if p is None:
-        #     p = usd_curve.CreateDisplayColorAttr()
-        # r, g, b = color
-        # p.Set(
-        #     Vt.Vec3fArray([(r, g, b) for p in range(self.get_point_count())])
-        # )
+        usd_core.UsdGeometryMeshOpt(
+            self.prim
+        ).set_display_color_fill(
+            color
+        )
 
 
 

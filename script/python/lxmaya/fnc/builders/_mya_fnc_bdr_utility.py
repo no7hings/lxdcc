@@ -21,7 +21,7 @@ class GeometryAlembicBlender(object):
         self._tgt_root = bsc_core.DccPathDagOpt(tgt_root).set_translate_to('|').to_string()
 
     def __set_meshes_blend_(self):
-        self._set_mesh_connect_(
+        self._set_meshes_connect_(
             self._get_mesh_dic_(mya_dcc_objects.Group(self._src_root).get_all_shape_paths(include_obj_type='mesh')),
             self._get_mesh_dic_(mya_dcc_objects.Group(self._tgt_root).get_all_shape_paths(include_obj_type='mesh'))
         )
@@ -41,13 +41,22 @@ class GeometryAlembicBlender(object):
             ).append(i_mesh_path)
         return dic
     @classmethod
-    def _set_mesh_connect_(cls, src_dic, tgt_dic):
-        for seq, (k, s_v) in enumerate(src_dic.items()):
-            if k in tgt_dic:
-                t_v = tgt_dic[k]
-                s_p = s_v[0]
-                t_p = t_v[0]
-                cls._set_mesh_shape_blend_(seq, s_p, t_p)
+    def _set_meshes_connect_(cls, src_dic, tgt_dic):
+        for seq, (i_uuid, i_paths_src) in enumerate(src_dic.items()):
+            i_path_src = i_paths_src[0]
+            if i_uuid in tgt_dic:
+                i_paths_tgt = tgt_dic[i_uuid]
+                i_path_tgt = i_paths_tgt[0]
+                cls._set_mesh_shape_blend_(seq, i_path_src, i_path_tgt)
+                utl_core.Log.set_module_result_trace(
+                    'mesh connect',
+                    'obj="{}"'.format(i_path_src)
+                )
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'mesh connect',
+                    'obj="{}" is non-matched founded'.format(i_path_src)
+                )
     @classmethod
     def _set_blend_histories_clear_(cls, obj_path):
         _ = cmds.listConnections(obj_path, destination=0, source=1, type='tweak') or []
@@ -85,7 +94,9 @@ class GeometryAlembicBlender(object):
         )
         #
         if bs:
-            cls._set_shape_parent_(src_mesh_path, tgt_mesh_path, bs[0])
+            cls._set_shape_parent_(
+                src_mesh_path, tgt_mesh_path, bs[0]
+            )
             # for i_b in bs:
             #     cls._set_blend_histories_clear_(i_b)
 
@@ -151,7 +162,10 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                     if model_geometry_usd_hi_file_path:
                         ipt = mya_fnc_importers.GeometryUsdImporter_(
                             file_path=model_geometry_usd_hi_file_path,
-                            root=root
+                            root=root,
+                            option=dict(
+                                port_match_patterns=['pg_*']
+                            )
                         )
                         ipt.set_run()
                     else:
@@ -188,14 +202,20 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 model_act__usd_registry__file = rsv_task.get_rsv_unit(keyword=keyword)
                 model_act__usd_registry__file_path = model_act__usd_registry__file.get_result(version='latest')
                 if model_act__usd_registry__file_path:
-                    usd_stage_opt = usd_core.UsdStageOpt()
-                    usd_stage_opt.set_sublayer_append(model_act__usd_registry__file_path)
-                    usd_stage_opt.set_flatten()
+                    usd_stage_opt = usd_core.UsdStageOpt(model_act__usd_registry__file_path)
                     usd_prim = usd_stage_opt.get_obj(root)
                     usd_prim_opt = usd_core.UsdPrimOpt(usd_prim)
+                    #
                     customize_attributes = usd_prim_opt.get_customize_attributes(
                         includes=model_act_properties
                     )
+                    if not customize_attributes:
+                        start_frame, end_frame = usd_stage_opt.get_frame_range()
+                        if start_frame != end_frame:
+                            customize_attributes = dict(
+                                pg_start_frame=start_frame,
+                                pg_end_frame=end_frame
+                            )
                     #
                     ma_core.CmdObjOpt(
                         bsc_core.DccPathDagOpt(root).set_translate_to('|').to_string()

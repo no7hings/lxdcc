@@ -393,25 +393,33 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     def _get_source_connection_raw_(self, **kwargs):
         inward = kwargs.get('inward') or False
+        # print inward
         lis = []
         ktn_obj = self._get_ktn_obj_()
         _ = ktn_obj.getInputPorts() or []
         for target_ktn_port in _:
             source_ktn_ports = target_ktn_port.getConnectedPorts()
             if source_ktn_ports:
-                for source_ktn_port in source_ktn_ports:
-                    source_obj_name = source_ktn_port.getNode().getName()
-                    source_port_name = source_ktn_port.getName()
-                    source_atr_path = bsc_core.AtrPathMtd.get_atr_path(
-                        source_obj_name, source_port_name
+                for i_source_ktn_port in source_ktn_ports:
+                    i_source_ktn_obj = i_source_ktn_port.getNode()
+                    i_source_obj_name = i_source_ktn_obj.getName()
+                    i_source_port_name = i_source_ktn_port.getName()
+                    i_source_atr_path = bsc_core.AtrPathMtd.get_atr_path(
+                        i_source_obj_name, i_source_port_name
                     )
                     target_obj_name = target_ktn_port.getNode().getName()
                     target_port_name = target_ktn_port.getName()
                     target_atr_path = bsc_core.AtrPathMtd.get_atr_path(
                         target_obj_name, target_port_name
                     )
-                    lis.append((source_atr_path, target_atr_path))
+                    lis.append(
+                        (i_source_atr_path, target_atr_path)
+                    )
         return lis
+
+    # def get_all_source_objs(self, *args, **kwargs):
+    #     # TODO, fix this code
+    #     return [self.__class__(i.getName()) for i in ktn_core.NGObjOpt(self._get_ktn_obj_()).get_all_source_objs()]
 
     def get_target_connections(self):
         lis = []

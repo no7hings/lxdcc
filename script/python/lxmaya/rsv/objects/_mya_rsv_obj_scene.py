@@ -271,6 +271,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     asset=asset,
                     #
                     with_model_geometry=self._hook_option_opt.get('with_model_geometry') or False,
+                    with_model_act_geometry_dyn=True,
+                    with_model_act_geometry_dyn_connect=True,
+                    model_act_properties=['pg_start_frame', 'pg_end_frame'],
                     #
                     with_surface_look=self._hook_option_opt.get('with_surface_look') or False,
                     with_surface_geometry_uv_map=self._hook_option_opt.get('with_surface_geometry_uv_map') or False,

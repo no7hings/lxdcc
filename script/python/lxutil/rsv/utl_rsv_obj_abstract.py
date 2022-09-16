@@ -135,3 +135,35 @@ class AbsRsvObjHookOpt(object):
                     scene_src_file_path
                 )
 
+    def get_look_pass_names(self):
+        import os
+        #
+        import fnmatch
+
+        from lxbasic import bsc_core
+        #
+        step = self._rsv_scene_properties.get('step')
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'work':
+            return ['default']
+        elif workspace == 'publish':
+            keyword = 'asset-look-klf-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-look-klf-file'
+        else:
+            raise TypeError()
+        #
+        file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        file_path = file_rsv_unit.get_exists_result(
+            version=version
+        )
+
+        if file_path:
+            element_names = bsc_core.ZipFileOpt(file_path).get_element_names()
+            look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
+            return look_pass_names
+        return ['default']

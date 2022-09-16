@@ -152,10 +152,10 @@ class AssetWorkspace(object):
             )
             for j_material_sg_path in i_material_sg_paths:
                 if j_material_sg_path in query_dict:
-                    j_material_ng_path = query_dict[j_material_sg_path]
-                    if j_material_ng_path not in list_:
+                    j_material = query_dict[j_material_sg_path]
+                    if j_material not in list_:
                         list_.append(
-                            j_material_ng_path
+                            j_material
                         )
         return list_
 
@@ -163,8 +163,9 @@ class AssetWorkspace(object):
         list_ = []
         dcc_objs = self.get_all_dcc_geometry_material_by_location(location)
         for i_dcc_obj in dcc_objs:
+            i_dcc_nodes = [_ktn_dcc_obj_node.Node(i.getName()) for i in ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
             list_.extend(
-                i_dcc_obj.get_all_source_objs()
+                i_dcc_nodes
             )
         return list_
 
@@ -477,7 +478,6 @@ class AssetWorkspace(object):
         x_ = x-w/2
         y_ = y+h/2
         return x_, y_, w, h
-
     @classmethod
     def _set_node_insert_connections_create_(cls, node_insert_connections, insert_scheme):
         if node_insert_connections:

@@ -660,6 +660,12 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
 
 
 class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
+    COLOR_SCHEME = [
+        'object_color',
+        'group_color',
+        'asset_color',
+        'uv_map_color'
+    ]
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -694,7 +700,136 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             return look_pass_names
         return ['default']
 
-    def set_component_usd_create(self):
+    def set_asset_shot_asset_component_usd_create(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        asset_shot = self._hook_option_opt.get('shot')
+        shot_asset = self._hook_option_opt.get('shot_asset')
+        #
+        if workspace == 'publish':
+            keyword = 'asset-shot_asset-component-usd-dir'
+        elif workspace == 'output':
+            keyword = 'asset-output-shot_asset-component-usd-dir'
+        else:
+            raise TypeError()
+        #
+        component_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        component_usd_directory_path = component_usd_directory_rsv_unit.get_result(
+            version=version,
+            extend_variants=dict(
+                asset_shot=asset_shot,
+                shot_asset=shot_asset,
+            )
+        )
+        key = 'usda/set/shot-asset'
+        c = utl_configure.Jinja.get_configure(key)
+        c.set_update(
+            self._rsv_scene_properties.value
+        )
+        c.set_update(
+            dict(
+                asset_shot=asset_shot,
+                shot_asset=shot_asset,
+            )
+        )
+        c.set_flatten()
+
+        usda_dict = c.get('usdas')
+        #
+        for k, v in usda_dict.items():
+            t = utl_configure.Jinja.get_template(
+                u'{}/{}'.format(key, k)
+            )
+            i_raw = t.render(
+                **c.value
+            )
+            i_usda_file_path = u'{}/{}'.format(
+                component_usd_directory_path, v
+            )
+            i_file = utl_dcc_objects.OsFile(i_usda_file_path)
+            if i_file.get_is_exists() is False:
+                utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                    i_raw
+                )
+
+    def set_asset_shot_set_usd_create(self):
+        pass
+
+    def set_asset_display_color_usd_create(self):
+        from lxutil import utl_core
+
+        from lxusd import usd_core
+
+        import lxusd.fnc.exporters as usd_fnc_exporter
+
+        asset = self._rsv_scene_properties.get('asset')
+        step = self._rsv_scene_properties.get('step')
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        root = self._rsv_scene_properties.get('dcc.root')
+        #
+        if workspace == 'work':
+            keyword_0 = 'asset-work-geometry-usd-var-file'
+            keyword_1 = 'asset-work-display_color-usd-dir'
+        elif workspace == 'publish':
+            keyword_0 = 'asset-geometry-usd-var-file'
+            keyword_1 = 'asset-display_color-usd-dir'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-geometry-usd-var-file'
+            keyword_1 = 'asset-output-display_color-usd-dir'
+        else:
+            raise TypeError()
+        #
+        var_names = ['hi', 'shape', 'hair']
+        #
+        s = usd_core.UsdStageOpt()
+        geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        for i_var_name in var_names:
+            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_exists_result(
+                version=version,
+                extend_variants=dict(var=i_var_name)
+            )
+            if i_geometry_usd_var_file_path:
+                s.set_sublayer_append(i_geometry_usd_var_file_path)
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'display color create',
+                    'file="{}" is not found'.format(i_geometry_usd_var_file_path)
+                )
+        #
+        display_color_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_1
+        )
+        #
+        display_color_usd_directory_path = display_color_usd_directory_rsv_unit.get_result(
+            version=version
+        )
+
+        for i_color_scheme in self.COLOR_SCHEME:
+            i_file_path = '{}/{}.usd'.format(
+                display_color_usd_directory_path,
+                i_color_scheme
+            )
+            usd_fnc_exporter.GeometryDisplayColorExporter(
+                option=dict(
+                    file=i_file_path,
+                    location=root,
+                    #
+                    stage_src=s.usd_instance,
+                    #
+                    asset_name=asset,
+                    #
+                    color_seed=5,
+                    #
+                    color_scheme=i_color_scheme
+                )
+            ).set_run()
+
+    def set_asset_component_usd_create(self):
         step = self._rsv_scene_properties.get('step')
         workspace = self._rsv_scene_properties.get('workspace')
         version = self._rsv_scene_properties.get('version')
@@ -759,60 +894,3 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 import production.gen.record_set_registry as pgs
                 register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
                 pgs.run(register_file_path)
-
-    def set_asset_shot_asset_component_usd_create(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        asset_shot = self._hook_option_opt.get('shot')
-        shot_asset = self._hook_option_opt.get('shot_asset')
-        #
-        if workspace == 'publish':
-            keyword = 'asset-shot_asset-component-usd-dir'
-        elif workspace == 'output':
-            keyword = 'asset-output-shot_asset-component-usd-dir'
-        else:
-            raise TypeError()
-        #
-        component_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword
-        )
-        component_usd_directory_path = component_usd_directory_rsv_unit.get_result(
-            version=version,
-            extend_variants=dict(
-                asset_shot=asset_shot,
-                shot_asset=shot_asset,
-            )
-        )
-        key = 'usda/set/shot-asset'
-        c = utl_configure.Jinja.get_configure(key)
-        c.set_update(
-            self._rsv_scene_properties.value
-        )
-        c.set_update(
-            dict(
-                asset_shot=asset_shot,
-                shot_asset=shot_asset,
-            )
-        )
-        c.set_flatten()
-
-        usda_dict = c.get('usdas')
-        #
-        for k, v in usda_dict.items():
-            t = utl_configure.Jinja.get_template(
-                u'{}/{}'.format(key, k)
-            )
-            i_raw = t.render(
-                **c.value
-            )
-            i_usda_file_path = u'{}/{}'.format(
-                component_usd_directory_path, v
-            )
-            i_file = utl_dcc_objects.OsFile(i_usda_file_path)
-            if i_file.get_is_exists() is False:
-                utl_dcc_objects.OsFile(i_usda_file_path).set_write(
-                    i_raw
-                )
-
-    def set_asset_shot_set_usd_create(self):
-        pass

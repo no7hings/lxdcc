@@ -32,7 +32,16 @@ geometries:
     #
     uv_map: 'uv_map.usd'
 #
+display_colors:
+    object_color: 'display_color/object_color.usd'
+    group_color: 'display_color/group_color.usd'
+    asset_color: 'display_color/asset_color.usd'
+    uv_map_color: 'display_color/uv_map_color.usd'
+#
 usdas:
+    display_color: 'display_color.usda'
+    look_map: 'look_map.usda'
+    #
     material: 'shading.usda'
     #
     payload: 'payload.usda'

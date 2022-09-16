@@ -353,13 +353,15 @@ class GeometryUsdExporter_(object):
         default_prim_path=None,
         with_uv=True,
         with_mesh=True,
+        with_curve=False,
         root_lstrip=None,
         use_override=False,
         export_selected=False,
         namespace_clear=True,
         with_visible=True,
         with_display_color=True,
-        port_macth_patterns=[]
+        #
+        port_match_patterns=[]
     )
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
@@ -378,7 +380,7 @@ class GeometryUsdExporter_(object):
         usd_root_lstrip = self._option['root_lstrip']
         with_visible = self._option['with_visible']
         with_display_color = self._option['with_display_color']
-        port_macth_patterns = self._option['port_macth_patterns']
+        port_match_patterns = self._option['port_match_patterns']
         #
         if self._root.startswith('|'):
             self._root = self._root.replace('|', '/')
@@ -439,10 +441,10 @@ class GeometryUsdExporter_(object):
                                 transform_mya_obj.get_visible()
                             )
                         #
-                        if port_macth_patterns:
+                        if port_match_patterns:
                             i_customize_ports = ma_core.CmdObjOpt(i_mya_obj_path).get_customize_ports()
                             for j_port in i_customize_ports:
-                                if j_port.get_is_naming_matches(port_macth_patterns) is True:
+                                if j_port.get_is_naming_matches(port_match_patterns) is True:
                                     transform_usd_obj_opt.set_customize_attribute_add(
                                         j_port.port_path, j_port.get()
                                     )
@@ -466,7 +468,7 @@ class GeometryUsdExporter_(object):
                                     )
                                 # export color use name
                                 if with_display_color is True:
-                                    color = bsc_core.TextOpt(i_mya_mesh.name).to_rgb(
+                                    color = bsc_core.TextOpt(i_mya_mesh.name).to_rgb_(
                                         maximum=1
                                     )
                                     i_usd_mesh_opt.set_display_color_fill(
@@ -477,6 +479,25 @@ class GeometryUsdExporter_(object):
                                     'usd-mesh export',
                                     'obj="{}" is invalid'.format(i_mya_obj.path)
                                 )
+                    elif i_mya_obj_type == ma_configure.Util.CURVE_TYPE:
+                        i_mya_curve = mya_dcc_objects.Curve(i_mya_obj_path)
+                        if i_mya_curve.get_port('intermediateObject').get() is False:
+                            i_mya_curve_opt = mya_dcc_operators.CurveOpt(i_mya_curve)
+                            if i_mya_curve_opt.get_is_invalid() is False:
+                                i_usd_curve_opt = usd_geometry_exporter._set_curve_create_(
+                                    i_usd_obj_path, use_override=use_override
+                                )
+                                points, knots, ranges, widths, order = i_mya_curve_opt.get_usd_data()
+                                i_usd_curve_opt.set_create(
+                                    points, knots, ranges, widths, order
+                                )
+                                if with_display_color is True:
+                                    color = bsc_core.TextOpt(i_mya_curve.name).to_rgb_(
+                                        maximum=1
+                                    )
+                                    i_usd_curve_opt.set_display_color_fill(
+                                        color
+                                    )
                     elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
                         i_mya_xgen_spline_guide = mya_dcc_objects.XgenSplineGuide(i_mya_obj_path)
                         i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(i_mya_xgen_spline_guide)
@@ -489,7 +510,7 @@ class GeometryUsdExporter_(object):
                                 points, knots, ranges, widths, order
                             )
                             if with_display_color is True:
-                                color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb(
+                                color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb_(
                                     maximum=1
                                 )
                                 i_usd_curve_opt.set_display_color_fill(

@@ -390,6 +390,12 @@ class Mesh(_mya_dcc_obj_dag.Shape):
         self.get_port('visibility').set(boolean)
 
 
+class Curve(_mya_dcc_obj_dag.Shape):
+    PORT_CLASS = _mya_dcc_obj_utility.Port
+    def __init__(self, path):
+        super(Curve, self).__init__(path)
+
+
 class Geometry(_mya_dcc_obj_dag.Shape):
     PORT_CLASS = _mya_dcc_obj_utility.Port
     def __init__(self, path):

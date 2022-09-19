@@ -815,9 +815,9 @@ class AssetWorkspace(object):
         key = 'look_outputs'
         dcc_obj = self.get_main_node(key)
         if dcc_obj.get_is_exists() is True:
-            scheme = self.get_geometry_scheme()
             geometry_settings = self.get_main_node('geometry_settings')
             if geometry_settings.get_is_exists() is True and geometry_settings.get_is_bypassed() is False:
+                scheme = self.get_geometry_scheme()
                 if scheme == 'asset':
                     location = configure.get('option.asset_root')
                     dcc_obj.set('rootLocations', [location])
@@ -833,7 +833,9 @@ class AssetWorkspace(object):
                     #
                     location = geometry_settings.get('usd.location')
                     dcc_obj.set('rootLocations', [location])
-
+            else:
+                location = configure.get('option.asset_root')
+                dcc_obj.set('rootLocations', [location])
             #
             dcc_obj.get_port('saveTo').set(file_path)
             #
@@ -855,6 +857,50 @@ class AssetWorkspace(object):
                     'obj="{}" is non-exists'.format(dcc_obj.path)
                 )
             )
+
+    def set_look_klf_extra_export(self, file_path):
+        import parse
+        #
+        location = self.get_geometry_location()
+        #
+        dcc_shaders = self.get_all_dcc_geometry_shader_by_location(location)
+        texture_references = _ktn_dcc_obj_nodes.TextureReferences()
+        dcc_objs = texture_references.get_objs(
+            include_paths=[i.path for i in dcc_shaders]
+        )
+        dic = {}
+        if dcc_objs:
+            for i_dcc_obj in dcc_objs:
+                for i_port_path, i_file_path in i_dcc_obj.reference_raw.items():
+                    i_port = i_dcc_obj.get_port(i_port_path)
+                    i_expression = texture_references._get_expression_(i_port)
+                    if i_expression is not None:
+                        i_pattern = '\'{file}\'%{argument}'
+                        i_p = parse.parse(i_pattern, i_expression)
+                        if i_p:
+                            i_key = u'{}.{}'.format(i_dcc_obj.name, i_port_path)
+                            dic[i_key] = i_expression
+        #
+        if dic:
+            utl_dcc_objects.OsJsonFile(
+                file_path
+            ).set_write(dic)
+
+    def get_geometry_location(self):
+        configure = self.get_configure()
+        geometry_settings = self.get_main_node('geometry_settings')
+        if geometry_settings.get_is_exists() is True and geometry_settings.get_is_bypassed() is False:
+            scheme = self.get_geometry_scheme()
+            if scheme == 'asset':
+                location = configure.get('option.asset_root')
+            elif scheme == 'shot':
+                location = geometry_settings.get('usd.location')
+            else:
+                raise RuntimeError()
+        else:
+            location = configure.get('option.asset_root')
+        #
+        return location
 
     def get_geometry_scheme(self):
         key = 'geometry_settings'

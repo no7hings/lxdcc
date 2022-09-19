@@ -33,6 +33,7 @@ usd_fnc_exporter.GeometryLookPropertyExporter(
         with_object_color=True,
         with_group_color=True,
         with_asset_color=True,
+        with_shell_color=True,
         #
         with_uv_map=True,
         #

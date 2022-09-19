@@ -486,6 +486,7 @@ class UsdDataMapper(object):
         obj_configure.Type.CONSTANT_STRING: Sdf.ValueTypeNames.String,
         #
         obj_configure.Type.COLOR_COLOR3: Sdf.ValueTypeNames.Color3f,
+        obj_configure.Type.ARRAY_COLOR3: Sdf.ValueTypeNames.Color3fArray,
         #
         obj_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
     }
@@ -577,6 +578,18 @@ class UsdGeometryOpt(object):
                 usd_type
             )
             p.Set(dcc_value)
+
+    def set_customize_port_create_as_face_color(self, port_path, type_path, usd_value):
+        category_name, type_name = type_path.split(obj_configure.Type.PATHSEP)
+        key = category_name, type_name
+        if key in UsdDataMapper.MAPPER:
+            usd_type = UsdDataMapper.MAPPER[key]
+            p = self._usd_geometry.CreatePrimvar(
+                port_path,
+                usd_type,
+                UsdGeom.Tokens.uniform
+            )
+            p.Set(usd_value)
 
     def set_visible(self, boolean):
         p = self._usd_geometry.GetVisibilityAttr()
@@ -820,7 +833,7 @@ class UsdMeshOpt(object):
             Vt.IntArray(indices)
         )
 
-    def set_display_color_as_faces(self, data):
+    def set_display_color_as_face_color(self, data):
         p = self._usd_mesh.GetDisplayColorPrimvar()
         if not p:
             p = self._usd_mesh.CreateDisplayColorPrimvar(
@@ -854,7 +867,7 @@ class UsdMeshOpt(object):
                 colors.append(i_rgb)
             return vertex_indices, Vt.Vec3fArray(colors)
 
-    def get_display_color_map_fom_shell(self, offset=5, seed=0):
+    def get_face_color_fom_shell(self, offset=0, seed=0):
         vertex_counts, vertex_indices = self.get_face_vertices()
         face_to_shell_dict = bsc_core.MeshFaceShellMtd.get_shell_dict_from_face_vertices(
             vertex_counts, vertex_indices

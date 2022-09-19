@@ -50,10 +50,13 @@ class Type(object):
     # color
     COLOR2 = 'color2'
     COLOR_COLOR2 = Category.COLOR, COLOR2
+    ARRAY_COLOR2 = Category.ARRAY, COLOR2
     COLOR3 = 'color3'
     COLOR_COLOR3 = Category.COLOR, COLOR3
+    ARRAY_COLOR3 = Category.ARRAY, COLOR3
     COLOR4 = 'color4'
     COLOR_COLOR4 = Category.COLOR, COLOR4
+    ARRAY_COLOR4 = Category.ARRAY, COLOR4
     # vector
     VECTOR2 = 'vector2'
     VECTOR_VECTOR2 = Category.VECTOR, VECTOR2

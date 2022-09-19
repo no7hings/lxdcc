@@ -9,11 +9,13 @@ usd_setup.UsdSetup.set_environs_setup()
 
 import lxusd.fnc.exporters as usd_fnc_exporter
 
-color_scheme = 'shell_color'
+color_scheme = 'object_color'
 
-f_src = '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v043/cache/usd/geo/hi.usd'
+dir_ = '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v043/cache/usd'
 
-f_tgt = '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v043/cache/usd/display_color/{}.usd'.format(color_scheme)
+f_src = '{}/geo/hi.usd'.format(dir_)
+
+f_tgt = '{}/display_color/{}.usd'.format(dir_, color_scheme)
 
 s = usd_core.UsdStageOpt._set_file_open_(f_src)
 
@@ -24,7 +26,7 @@ usd_fnc_exporter.GeometryDisplayColorExporter(
         #
         stage_src=s,
         #
-        asset_name='nn_4y',
+        asset_name='td_test',
         #
         color_seed=5,
         #

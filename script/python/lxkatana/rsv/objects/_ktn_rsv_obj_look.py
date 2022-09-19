@@ -61,8 +61,6 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        import lxkatana.fnc.exporters as ktn_fnc_exporters
-        #
         workspace = self._rsv_scene_properties.get('workspace')
         version = self._rsv_scene_properties.get('version')
         #
@@ -90,13 +88,13 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             asset_geometries.get_port('lynxi_variants.look').set('asset-work')
         #
         asset_workspace.set_look_klf_file_export(look_klf_file_path)
-        #
+        # extra
         look_json_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_1
         )
         look_json_file_path = look_json_file_rsv_unit.get_result(
             version=version
         )
-        ktn_fnc_exporters.LookKlfExtraExporter(
-            file_path=look_json_file_path
-        ).set_run()
+        asset_workspace.set_look_klf_extra_export(
+            look_json_file_path
+        )

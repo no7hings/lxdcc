@@ -124,6 +124,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         with_object_color=False,
         with_group_color=False,
         with_asset_color=False,
+        with_shell_color=False,
         #
         with_display_color=False,
         display_color=(0.25, 0.75, 0.5)
@@ -155,8 +156,9 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._usd_stage_opt_tgt = usd_core.UsdStageOpt(self._usd_stage_tgt)
 
     def set_run(self):
+        count = len([i for i in self._usd_stage_src.TraverseAll()])
         with utl_core.log_progress_bar(
-                maximum=len([i for i in self._usd_stage_src.TraverseAll()]),
+                maximum=count,
                 label='geometry look property create'
         ) as l_p:
             display_color = self.get('display_color')
@@ -200,6 +202,16 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                                 for j_uv_map_name in i_uv_map_names:
                                     uv_map = i_usd_mesh_opt_src.get_uv_map(j_uv_map_name)
                                     i_usd_mesh_opt_tgt.set_uv_map_create(j_uv_map_name, uv_map)
+                        #
+                        if self.get('with_shell_color') is True:
+                            i_offset = bsc_core.TextOpt(i_obj_path_opt.name).get_index()
+                            face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
+                                offset=i_offset, seed=self._color_seed
+                            )
+                            i_usd_geometry_opt_tgt.set_customize_port_create_as_face_color(
+                                'shell_color', 'array/color3', face_colors
+                            )
+                        #
                         if self.get('with_display_color') is True:
                             i_usd_mesh_opt_tgt.set_display_color_fill(display_color)
         #
@@ -293,10 +305,11 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                             )
                         elif self._color_scheme == 'shell_color':
                             i_offset = bsc_core.TextOpt(i_obj_path_opt.name).get_index()
-                            print i_obj_path
-                            i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_fom_shell(offset=i_offset, seed=self._color_seed)
-                            i_usd_mesh_opt_tgt.set_display_color_as_faces(
-                                i_display_color_map
+                            i_face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
+                                offset=i_offset, seed=self._color_seed
+                            )
+                            i_usd_mesh_opt_tgt.set_display_color_as_face_color(
+                                i_face_colors
                             )
         #
         component_paths = bsc_core.DccPathDagOpt(self._location_path).get_component_paths()

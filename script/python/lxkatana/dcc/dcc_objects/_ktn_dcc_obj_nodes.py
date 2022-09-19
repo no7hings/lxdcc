@@ -266,9 +266,10 @@ class AbsTextureReferences(object):
     @classmethod
     def _get_expression_(cls, port):
         ktn_port = port.ktn_port
-        e = ktn_port.getExpression()
-        if e:
-            return e
+        if ktn_port.isExpression() is True:
+            e = ktn_port.getExpression()
+            if e:
+                return e
     @classmethod
     def _set_real_file_path_by_atr_path_(cls, atr_path, file_path):
         atr_path_opt = bsc_core.DccAttrPathOpt(atr_path)

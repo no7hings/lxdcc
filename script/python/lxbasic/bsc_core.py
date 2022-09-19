@@ -2960,8 +2960,13 @@ class DccPathDagOpt(object):
         # print _
         return namespacesep.join(_[:-1])
 
-    def get_color_from_name(self, maximum=255, seed=0):
-        return TextOpt(self.get_name()).to_rgb_(maximum, seed)
+    def get_color_from_name(self, count=1000, maximum=255, offset=0, seed=0):
+        return ColorMtd.get_color_from_string(
+            self.get_name(), count=count, maximum=maximum, offset=offset, seed=seed
+        )
+
+    def get_color_from_index(self, index, count, maximum=255, seed=0):
+        pass
 
     def __str__(self):
         return self._path
@@ -3128,15 +3133,30 @@ class ColorMtd(object):
     @classmethod
     def get_choice_colors(cls, count, maximum=255, offset=0, seed=0):
         list_ = []
-        d = 1000.0
         for i in range(count):
-            i_p = float(i)/float(count)
-            i_a = offset+i
-            i_h = float(i_a % (360+seed+180.0*i_p)*d)/d
-            i_s = float(45+i % 55)/100.0
-            i_v = float(45+i % 55)/100.0
-            list_.append(ColorMtd.hsv2rgb(i_h, i_s, i_v, maximum))
+            list_.append(
+                cls.get_color_from_index(i, count, maximum, offset, seed)
+            )
         return list_
+    @classmethod
+    def get_color_from_string(cls, string, count=1000, maximum=255, offset=0, seed=0):
+        d = count
+        a_0 = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])+offset
+        a_1 = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string)])
+        h = float(a_0 % (360+seed)*d)/d
+        s = float(45+a_1 % 55)/100.0
+        v = float(45+a_1 % 55)/100.0
+        return ColorMtd.hsv2rgb(h, s, v, maximum)
+    @classmethod
+    def get_color_from_index(cls, index, count, maximum=255, offset=0, seed=0):
+        d = count
+        p = float(index)/float(count)
+        a_0 = int(str(index)[::-1])+offset
+        a_1 = index
+        h = float(a_0 % (360+seed+180.0*p)*d)/d
+        s = float(45+a_1 % 55)/100.0
+        v = float(45+a_1 % 55)/100.0
+        return cls.hsv2rgb(h, s, v, maximum)
 
 
 class ColorSpaceMtd(object):

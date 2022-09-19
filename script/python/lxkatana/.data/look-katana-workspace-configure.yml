@@ -14,7 +14,9 @@ option:
     geometry_root: /root/world/geo
     material_root: /root/materials
     camera_root: /root/world/cam
+    #
     asset_root: <.geometry_root>/master
+    shot_root: <.geometry_root>/assets
     #
     x: 0.0
     y: 0.0

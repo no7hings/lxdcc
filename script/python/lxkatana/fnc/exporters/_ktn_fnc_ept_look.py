@@ -68,10 +68,10 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
         camera_node.get_port('name').set(camera_location)
         #
         render_settings_node.get_dcc_instance('RenderSettings')
-        render_settings_node.set('args.renderSettings.sceneTraversal.cache.cacheSoftLimit.enable', True)
-        render_settings_node.set('args.renderSettings.sceneTraversal.cache.cacheSoftLimit.value', 51200)
-        render_settings_node.set('args.renderSettings.sceneTraversal.useCachePrepopulation.enable', True)
-        render_settings_node.set('args.renderSettings.sceneTraversal.useCachePrepopulation.value', 0)
+        # render_settings_node.set('args.renderSettings.sceneTraversal.cache.cacheSoftLimit.enable', True)
+        # render_settings_node.set('args.renderSettings.sceneTraversal.cache.cacheSoftLimit.value', 51200)
+        # render_settings_node.set('args.renderSettings.sceneTraversal.useCachePrepopulation.enable', True)
+        # render_settings_node.set('args.renderSettings.sceneTraversal.useCachePrepopulation.value', 0)
         #
         arnold_render_settings_node.get_dcc_instance('ArnoldGlobalSettings')
         arnold_render_settings_node.set('args.arnoldGlobalStatements.assFileContents.enable', True)
@@ -180,7 +180,7 @@ class LookKlfExtraExporter(utl_fnc_obj_abs.AbsDccExporter):
 
     def set_run(self):
         import parse
-
+        #
         texture_references = ktn_dcc_objects.TextureReferences()
         objs = texture_references.get_objs()
         dic = {}

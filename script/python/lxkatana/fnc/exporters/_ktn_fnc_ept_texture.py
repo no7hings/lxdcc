@@ -33,12 +33,19 @@ class TextureExporter(
                     self._option[k] = v
 
     def set_run(self):
+        asset_workspace = ktn_dcc_objects.AssetWorkspace()
+        #
+        location = asset_workspace.get_geometry_location()
+        #
         fix_name_blank = self._option[self.FIX_NAME_BLANK]
         use_tx = self._option[self.USE_TX]
         with_reference = self._option[self.WITH_REFERENCE]
         #
         texture_references = ktn_dcc_objects.TextureReferences()
-        dcc_objs = texture_references.get_objs()
+        dcc_shaders = asset_workspace.get_all_dcc_geometry_shader_by_location(location)
+        dcc_objs = texture_references.get_objs(
+            include_paths=[i.path for i in dcc_shaders]
+        )
         self._set_copy_as_src_(
             directory_path_dst=self._directory_path_dst, 
             directory_path_base=self._directory_path_base,

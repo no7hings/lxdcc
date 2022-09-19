@@ -27,6 +27,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         root_lstrip=False,
         file_0=None,
         file_1=None,
+        #
         display_color=(0.25, 0.75, 0.5)
     )
     def __init__(self, file_path, root=None, option=None):
@@ -52,25 +53,10 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         if self._file_path_1 is not None:
             self._geometry_stage_opt_1.set_sublayer_append(self._file_path_1)
             self._geometry_stage_1.Flatten()
-    @classmethod
-    def _get_uv_map_names_(cls, mesh):
-        lis = []
-        usd_primvars = mesh.GetAuthoredPrimvars()
-        for uv_primvar in usd_primvars:
-            uv_map_name = uv_primvar.GetPrimvarName()
-            if uv_primvar.GetIndices():
-                lis.append(uv_map_name)
-        return lis
-    @classmethod
-    def _get_uv_map_(cls, mesh, uv_map_name):
-        uv_primvar = mesh.GetPrimvar(uv_map_name)
-        uv_map_face_vertex_indices = uv_primvar.GetIndices()
-        uv_map_coords = uv_primvar.Get()
-        return uv_map_face_vertex_indices, uv_map_coords
 
     def set_uv_map_export(self):
         display_color = self.get('display_color')
-        with utl_core.log_progress_bar(maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry export') as l_p:
+        with utl_core.log_progress_bar(maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export') as l_p:
             for i_usd_prim in self._geometry_stage_0.TraverseAll():
                 l_p.set_update()
                 i_obj_type_name = i_usd_prim.GetTypeName()
@@ -121,7 +107,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self.set_uv_map_export()
 
 
-class GeometryUserDataExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     OPTION = dict(
         file='',
         location='',
@@ -133,12 +119,17 @@ class GeometryUserDataExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         color_seed=0,
         #
+        with_uv_map=False,
+        #
         with_object_color=False,
         with_group_color=False,
         with_asset_color=False,
+        #
+        with_display_color=False,
+        display_color=(0.25, 0.75, 0.5)
     )
     def __init__(self, *args, **kwargs):
-        super(GeometryUserDataExporter, self).__init__(*args, **kwargs)
+        super(GeometryLookPropertyExporter, self).__init__(*args, **kwargs)
         #
         self._file_path = self.get('file')
         #
@@ -166,8 +157,9 @@ class GeometryUserDataExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def set_run(self):
         with utl_core.log_progress_bar(
                 maximum=len([i for i in self._usd_stage_src.TraverseAll()]),
-                label='geometry display color create'
+                label='geometry look property create'
         ) as l_p:
+            display_color = self.get('display_color')
             asset_color = bsc_core.TextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
             for i_usd_prim_src in self._usd_stage_src.TraverseAll():
                 l_p.set_update()
@@ -176,25 +168,40 @@ class GeometryUserDataExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 i_obj_path = i_usd_prim_src.GetPath().pathString
                 i_obj_path_opt = bsc_core.DccPathDagOpt(i_obj_path)
                 #
-                i_usd_prim_src = self._usd_stage_src.GetPrimAtPath(i_obj_path)
                 i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path)
                 if i_obj_type_name in [usd_configure.ObjType.MESH, usd_configure.ObjType.CURVE]:
-                    #
-                    i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
-                    i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
-                    #
-                    i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
-                    i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
+                    i_usd_geometry_opt_tgt = usd_core.UsdGeometryOpt(i_usd_prim_tgt)
                     #
                     if self.get('with_object_color') is True:
                         i_object_color = i_obj_path_opt.get_color_from_name(maximum=1.0, seed=self._color_seed)
-                        # i_usd_mesh_opt_tgt.set_display_color_fill(i_object_color)
+                        i_usd_geometry_opt_tgt.set_customize_port_create_(
+                            'object_color', 'color/color3', i_object_color
+                        )
                     if self.get('with_group_color') is True:
                         i_group_path_opt = i_obj_path_opt.get_parent().get_parent()
                         i_group_color = i_group_path_opt.get_color_from_name(maximum=1.0, seed=self._color_seed)
-                        # i_usd_mesh_opt_tgt.set_display_color_fill(i_group_color)
+                        i_usd_geometry_opt_tgt.set_customize_port_create_(
+                            'group_color', 'color/color3', i_group_color
+                        )
                     if self.get('with_asset_color') is True:
-                        i_usd_mesh_opt_tgt.set_display_color_fill(asset_color)
+                        i_usd_geometry_opt_tgt.set_customize_port_create_(
+                            'asset_color', 'color/color3', asset_color
+                        )
+                    #
+                    if i_obj_type_name == usd_configure.ObjType.MESH:
+                        i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
+                        i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
+                        #
+                        i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
+                        i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
+                        if self.get('with_uv_map') is True:
+                            i_uv_map_names = i_usd_mesh_opt_src.get_uv_map_names()
+                            if i_uv_map_names:
+                                for j_uv_map_name in i_uv_map_names:
+                                    uv_map = i_usd_mesh_opt_src.get_uv_map(j_uv_map_name)
+                                    i_usd_mesh_opt_tgt.set_uv_map_create(j_uv_map_name, uv_map)
+                        if self.get('with_display_color') is True:
+                            i_usd_mesh_opt_tgt.set_display_color_fill(display_color)
         #
         component_paths = bsc_core.DccPathDagOpt(self._location_path).get_component_paths()
         if component_paths:
@@ -217,7 +224,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         asset_name='',
         #
         color_seed=0,
-        # "object_color", "group_color", "asset_color", "uv_map_color"
+        # "object_color", "group_color", "asset_color", "uv_map_color", "shell_color"
         color_scheme='asset_color'
     )
     def __init__(self, *args, **kwargs):
@@ -252,7 +259,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 label='geometry display color create'
         ) as l_p:
             asset_color = bsc_core.TextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
-            for i_usd_prim_src in self._usd_stage_src.TraverseAll():
+            for seq, i_usd_prim_src in enumerate(self._usd_stage_src.TraverseAll()):
                 l_p.set_update()
                 #
                 i_obj_type_name = i_usd_prim_src.GetTypeName()
@@ -267,7 +274,6 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
                     # all use mesh? but it is run completed
                     i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
-                    #
                     i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
                     #
                     if self._color_scheme == 'object_color':
@@ -279,11 +285,18 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         i_usd_mesh_opt_tgt.set_display_color_fill(i_group_color)
                     elif self._color_scheme == 'asset_color':
                         i_usd_mesh_opt_tgt.set_display_color_fill(asset_color)
-                    elif self._color_scheme == 'uv_map_color':
-                        if i_obj_type_name == usd_configure.ObjType.MESH:
-                            i_usd_display_color_map_from_map = i_usd_mesh_opt_src.get_display_color_map_from_uv_map('st')
-                            i_usd_mesh_opt_tgt.set_display_color_map(
-                                i_usd_display_color_map_from_map
+                    if i_obj_type_name == usd_configure.ObjType.MESH:
+                        if self._color_scheme == 'uv_map_color':
+                            i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_from_uv_map('st')
+                            i_usd_mesh_opt_tgt.set_display_color_as_face_vertices(
+                                i_display_color_map
+                            )
+                        elif self._color_scheme == 'shell_color':
+                            i_offset = bsc_core.TextOpt(i_obj_path_opt.name).get_index()
+                            print i_obj_path
+                            i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_fom_shell(offset=i_offset, seed=self._color_seed)
+                            i_usd_mesh_opt_tgt.set_display_color_as_faces(
+                                i_display_color_map
                             )
         #
         component_paths = bsc_core.DccPathDagOpt(self._location_path).get_component_paths()
@@ -419,6 +432,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         self._output_stage = Usd.Stage.CreateInMemory()
         self._output_stage_opt = usd_core.UsdStageOpt(self._output_stage)
+        #
         self._set_location_create_(self._output_stage, self._location_path)
     @classmethod
     def _set_location_create_(cls, stage, location):

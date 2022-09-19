@@ -541,6 +541,7 @@ asset-output-texture-tgt-dir: <asset-output-version-dir>/texture
 #
 asset-output-look-dir: <asset-output-version-dir>/look
 asset-output-look-klf-file: <asset-output-look-dir>/klf/<asset-name>.klf
+asset-output-look-json-file: <asset-output-look-dir>/klf/<asset-name>.json
 #
 asset-output-look-ass-file: <asset-output-look-dir>/ass/<asset-name>.ass
 asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-pass>.ass

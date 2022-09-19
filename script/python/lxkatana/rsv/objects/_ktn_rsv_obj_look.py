@@ -61,18 +61,22 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
+        import lxkatana.fnc.exporters as ktn_fnc_exporters
+        #
         workspace = self._rsv_scene_properties.get('workspace')
         version = self._rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
-            keyword = 'asset-look-klf-file'
+            keyword_0 = 'asset-look-klf-file'
+            keyword_1 = 'asset-look-json-file'
         elif workspace == 'output':
-            keyword = 'asset-output-look-klf-file'
+            keyword_0 = 'asset-output-look-klf-file'
+            keyword_1 = 'asset-output-look-json-file'
         else:
             raise TypeError()
         #
         look_klf_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword
+            keyword=keyword_0
         )
         look_klf_file_path = look_klf_file_rsv_unit.get_result(
             version=version
@@ -86,4 +90,13 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             asset_geometries.get_port('lynxi_variants.look').set('asset-work')
         #
         asset_workspace.set_look_klf_file_export(look_klf_file_path)
-
+        #
+        look_json_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_1
+        )
+        look_json_file_path = look_json_file_rsv_unit.get_result(
+            version=version
+        )
+        ktn_fnc_exporters.LookKlfExtraExporter(
+            file_path=look_json_file_path
+        ).set_run()

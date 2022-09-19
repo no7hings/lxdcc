@@ -1,54 +1,58 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 import lxresolver.commands as rsv_commands
 
-import lxdeadline.objects as ddl_objects
-
-import lxdeadline.methods as ddl_methods
-#
-utl_core.Environ.set_td_enable(True)
+import lxsession.commands as ssn_commands
 
 assets = [
-    # u'huayao',
-    # u'laohu_xiao',
-    # u'nn_gongshifu',
-    # u'qunzhongnv_b',
-    # u'td_test',
-    # u'wuhu',
-    # 'qunzhongnan_c',
-    # 'qunzhongnv_d',
-    'qunzhongnan_d',
+    # 'shrubs_a',
+    # 'shrubs_b',
+    'shrubs_c',
+    'chrysanthemum_a',
+    'chrysanthemum_b',
+    'chrysanthemum_c',
+    'kite_tree',
+    'xiangzhang_tree_b',
+    'xiangzhang_tree_b',
+    'xiangzhang_tree_c',
+    'xiangzhang_tree_d',
+    'xiangzhang_tree_e',
+    'xiangzhang_tree_f',
+    'xiangzhang_tree_g'
 ]
 
 resolver = rsv_commands.get_resolver()
 
-rsv_project = resolver.get_rsv_project(project='cjd')
+rsv_project = resolver.get_rsv_project(project='cgm')
 
 user = utl_core.System.get_user_name()
 time_tag = utl_core.System.get_time_tag()
 
 for i_asset in assets:
     i_rsv_task = rsv_project.get_rsv_task(asset=i_asset, task='surfacing')
-    i_katana_scene_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
-    i_katana_scene_src_file_path = i_katana_scene_src_file_unit.get_result()
-    if i_katana_scene_src_file_path:
-        i_rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=i_katana_scene_src_file_path)
-        #
-        i_export_query = ddl_objects.DdlRsvTaskQuery(
-            'katana-look-export', i_rsv_task_properties
-        )
-        i_export = ddl_methods.RsvTaskHookExecutor(
-            method_option=i_export_query.get_method_option(),
-            script_option=i_export_query.get_script_option(
-                file=i_katana_scene_src_file_path,
-                with_look_ass=True,
-                with_look_properties_usd=False,
-                with_look_klf=True,
-                with_texture_tx=True,
+    i_file_rsv_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
+    i_file_path = i_file_rsv_unit.get_result(version='latest')
+    if i_file_path:
+        i_option_opt = bsc_core.KeywordArgumentsOpt(
+            option=dict(
+                option_hook_key='rsv-task-batchers/asset/gen-surface-export',
                 #
-                user=user, time_tag=time_tag,
+                file=i_file_path,
+                user=bsc_core.SystemMtd.get_user_name(),
+                #
+                choice_scheme='asset-katana-publish',
+                #
+                # version_type='downstream',
+                #
+                # td_enable=True,
+                rez_beta=True,
             )
         )
-        i_export.set_run_with_deadline()
+        #
+        ssn_commands.set_option_hook_execute_by_deadline(
+            option=i_option_opt.to_string()
+        )
 

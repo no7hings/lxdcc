@@ -752,6 +752,10 @@ class AbsDccTextureExport(object):
                         # ignore when departure same to destination
                         # print j_texture_path_dpt, j_texture_path_dst
                         if j_texture_path_dpt != j_texture_path_dst:
+                            utl_core.Log.set_module_result_trace(
+                                'texture export is started',
+                                u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
+                            )
                             # copy
                             j_file_tiles = j_texture_dpt.get_exists_files_()
                             if j_file_tiles:
@@ -783,7 +787,7 @@ class AbsDccTextureExport(object):
                                     j_texture_path_dst = j_texture_tx_path_dst
                                 else:
                                     utl_core.Log.set_module_warning_trace(
-                                        'texture-tx search',
+                                        'texture export',
                                         u'file="{}" is Non-exists'.format(j_texture_tx_path_dst)
                                     )
                             #
@@ -804,12 +808,12 @@ class AbsDccTextureExport(object):
                                     remove_expression,
                                 )
                                 utl_core.Log.set_module_result_trace(
-                                    'texture repath',
+                                    'texture export is completed',
                                     u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
                                 )
                             else:
                                 utl_core.Log.set_module_warning_trace(
-                                    'texture search',
+                                    'texture export is failed',
                                     u'file="{}" is Non-exists'.format(j_texture_path_dst)
                                 )
 

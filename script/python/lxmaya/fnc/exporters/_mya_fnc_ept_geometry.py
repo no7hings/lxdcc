@@ -498,6 +498,7 @@ class GeometryUsdExporter_(object):
                                     i_usd_curve_opt.set_display_color_fill(
                                         color
                                     )
+                    # xgen
                     elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
                         i_mya_xgen_spline_guide = mya_dcc_objects.XgenSplineGuide(i_mya_obj_path)
                         i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(i_mya_xgen_spline_guide)

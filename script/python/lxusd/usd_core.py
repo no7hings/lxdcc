@@ -484,6 +484,9 @@ class UsdDataMapper(object):
         obj_configure.Type.CONSTANT_INTEGER: Sdf.ValueTypeNames.Int,
         obj_configure.Type.CONSTANT_FLOAT: Sdf.ValueTypeNames.Float,
         obj_configure.Type.CONSTANT_STRING: Sdf.ValueTypeNames.String,
+        #
+        obj_configure.Type.COLOR_COLOR3: Sdf.ValueTypeNames.Color3f,
+        #
         obj_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
     }
     def __init__(self, dcc_type, dcc_value):
@@ -563,9 +566,17 @@ class UsdGeometryOpt(object):
                 usd_type
             )
             p.Set(dcc_value)
-        else:
-            pass
-            # print dcc_type
+
+    def set_customize_port_create_(self, port_path, type_path, dcc_value):
+        category_name, type_name = type_path.split(obj_configure.Type.PATHSEP)
+        key = category_name, type_name
+        if key in UsdDataMapper.MAPPER:
+            usd_type = UsdDataMapper.MAPPER[key]
+            p = self._usd_geometry.CreatePrimvar(
+                port_path,
+                usd_type
+            )
+            p.Set(dcc_value)
 
     def set_visible(self, boolean):
         p = self._usd_geometry.GetVisibilityAttr()
@@ -580,6 +591,9 @@ class UsdGeometryOpt(object):
         p.Set(
             UsdGeom.Tokens.inherited if boolean is True else UsdGeom.Tokens.invisible
         )
+
+    def set_display_color_fill(self, color):
+        pass
 
 
 class UsdGeometryMeshOpt(UsdGeometryOpt):
@@ -793,18 +807,28 @@ class UsdMeshOpt(object):
             self._usd_prim
         ).get_display_colors()
 
-    def set_display_color_map(self, color_map):
+    def set_display_color_as_face_vertices(self, data):
         p = self._usd_mesh.GetDisplayColorPrimvar()
         if not p:
             p = self._usd_mesh.CreateDisplayColorPrimvar(
                 UsdGeom.Tokens.faceVarying
             )
         #
-        indices, values = color_map
+        indices, values = data
         p.Set(values)
         p.SetIndices(
             Vt.IntArray(indices)
         )
+
+    def set_display_color_as_faces(self, data):
+        p = self._usd_mesh.GetDisplayColorPrimvar()
+        if not p:
+            p = self._usd_mesh.CreateDisplayColorPrimvar(
+                UsdGeom.Tokens.uniform
+            )
+        #
+        values = data
+        p.Set(values)
 
     def get_display_colors_as_fill(self, color):
         return UsdGeometryMeshOpt(
@@ -816,23 +840,51 @@ class UsdMeshOpt(object):
     def get_display_color_map_from_uv_map(self, uv_map_name):
         uv_map = self.get_uv_map(uv_map_name)
         if uv_map:
-            list_ = []
-            uv_map_face_vertex_indices, uv_map_coords = uv_map
-            uv_c = len(uv_map_coords)
-            for i in range(uv_c):
-                if i <= uv_c:
-                    i_x, i_y = uv_map_coords[i]
-                    i_color = (i_x-int(i_x) % 1, i_y-int(i_y) % 1, 0)
-                    # i_color = (i_x / 10.0 % 10.0, i_y / 1.0 % 10.0, 0)
+            colors = []
+            vertex_indices, coords = uv_map
+            c = len(coords)
+            for i in range(c):
+                if i <= c:
+                    i_x, i_y = coords[i]
+                    i_rgb = (i_x-int(i_x) % 1, i_y-int(i_y) % 1, 0)
+                    # i_rgb = (i_x / 10.0 % 10.0, i_y / 1.0 % 10.0, 0)
                 else:
-                    i_color = (0, 0, 1)
+                    i_rgb = (0, 0, 1)
                 #
-                list_.append(i_color)
-            return uv_map_face_vertex_indices, Vt.Vec3fArray(list_)
+                colors.append(i_rgb)
+            return vertex_indices, Vt.Vec3fArray(colors)
+
+    def get_display_color_map_fom_shell(self, offset=5, seed=0):
+        vertex_counts, vertex_indices = self.get_face_vertices()
+        face_to_shell_dict = bsc_core.MeshFaceShellMtd.get_shell_dict_from_face_vertices(
+            vertex_counts, vertex_indices
+        )
+        max_shell_index = max(face_to_shell_dict.values())
+        choice_colors = bsc_core.ColorMtd.get_choice_colors(
+            count=max_shell_index+1, maximum=1.0, offset=offset, seed=seed
+        )
+        colors = []
+        c = len(vertex_counts)
+        for i in range(c):
+            i_shell_index = face_to_shell_dict[i]
+            i_rgb = choice_colors[i_shell_index]
+            colors.append(i_rgb)
+        return Vt.Vec3fArray(colors)
 
     def get_face_count(self):
         usd_mesh = self._usd_mesh
         return usd_mesh.GetFaceCount()
+
+    def get_face_vertices(self):
+        return self.get_face_vertex_counts(), self.get_face_vertex_indices()
+
+    def get_face_vertex_counts(self):
+        usd_mesh = self._usd_mesh
+        a = usd_mesh.GetFaceVertexCountsAttr()
+        if a.GetNumTimeSamples():
+            return a.Get(0)
+        else:
+            return a.Get()
 
     def get_face_vertex_indices(self, reverse=False):
         usd_mesh = self._usd_mesh

@@ -680,6 +680,12 @@ class Om2MeshOpt(object):
         om2_vertex_itr.setIndex(vertex_index)
         print om2_vertex_itr.getConnectedFaces()
 
+    def get_face_shell_ids(self):
+        counts, indices = self.get_face_vertices()
+        return bsc_core.MeshFaceShellMtd.get_shell_dict_from_face_vertices(
+            counts, indices
+        )
+
 
 class Om2MeshChecker(object):
     def __init__(self, path):

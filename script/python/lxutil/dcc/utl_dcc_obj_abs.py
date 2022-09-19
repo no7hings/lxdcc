@@ -489,16 +489,16 @@ class AbsOsFile(
                             file_path_link_log_src, link_log
                         )
                         # permission log record
-                        permission_result = rsv_methods.PathGroupPermission(
-                            file_path_src
-                        ).get_result()
-                        permission_log = utl_core.Log.set_module_result_trace(
-                            'permission gain',
-                            permission_result
-                        )
-                        utl_core.Log.set_log_write(
-                            file_path_permission_log_src, permission_log
-                        )
+                        # permission_result = rsv_methods.PathGroupPermission(
+                        #     file_path_src
+                        # ).get_result()
+                        # permission_log = utl_core.Log.set_module_result_trace(
+                        #     'permission gain',
+                        #     permission_result
+                        # )
+                        # utl_core.Log.set_log_write(
+                        #     file_path_permission_log_src, permission_log
+                        # )
                         return True, link_log
                 else:
                     return False, utl_core.Log.set_module_warning_trace(
@@ -518,16 +518,16 @@ class AbsOsFile(
                     file_path_link_log_src, link_log
                 )
                 # permission log record
-                permission_result = rsv_methods.PathGroupPermission(
-                    file_path_src
-                ).get_result()
-                permission_log = utl_core.Log.set_module_result_trace(
-                    'permission gain',
-                    permission_result
-                )
-                utl_core.Log.set_log_write(
-                    file_path_permission_log_src, permission_log
-                )
+                # permission_result = rsv_methods.PathGroupPermission(
+                #     file_path_src
+                # ).get_result()
+                # permission_log = utl_core.Log.set_module_result_trace(
+                #     'permission gain',
+                #     permission_result
+                # )
+                # utl_core.Log.set_log_write(
+                #     file_path_permission_log_src, permission_log
+                # )
                 return True, link_log
         else:
             utl_core.Log.set_warning_trace(

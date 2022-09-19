@@ -51,7 +51,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version_status = None
         extra_key = self._hook_option_opt.get('extra_key')
         create_shotgun_playlists = self._hook_option_opt.get_as_boolean('create_shotgun_playlists')
-        if extra_key is not None:
+        if extra_key:
             extra_data = bsc_core.SessionMtd.get_extra_data(extra_key)
             if extra_data:
                 description = extra_data.get('description')

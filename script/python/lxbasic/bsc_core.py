@@ -3125,6 +3125,18 @@ class ColorMtd(object):
     @classmethod
     def set_rgb_offset(cls, rgb, hsv_offset):
         r, g, b = rgb
+    @classmethod
+    def get_choice_colors(cls, count, maximum=255, offset=0, seed=0):
+        list_ = []
+        d = 1000.0
+        for i in range(count):
+            i_p = float(i)/float(count)
+            i_a = offset+i
+            i_h = float(i_a % (360+seed+180.0*i_p)*d)/d
+            i_s = float(45+i % 55)/100.0
+            i_v = float(45+i % 55)/100.0
+            list_.append(ColorMtd.hsv2rgb(i_h, i_s, i_v, maximum))
+        return list_
 
 
 class ColorSpaceMtd(object):
@@ -3188,8 +3200,8 @@ class TextOpt(object):
             _.reverse()
             a = int(''.join(_))
             h = float(a % 25600)/100.0
-            s = float(50+a % 50)/100.0
-            v = float(50+(a+h) % 50)/100.0
+            s = float(45+a % 55)/100.0
+            v = float(45+a % 55)/100.0
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
@@ -3199,10 +3211,14 @@ class TextOpt(object):
             d = 1000.0
             a = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
             h = float(a % (360+seed)*d)/d
-            s = float(50+a % 50)/100.0
-            v = float(50+(a+h) % 50)/100.0
+            s = float(45+a % 55)/100.0
+            v = float(45+a % 55)/100.0
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
+
+    def get_index(self):
+        string = self._raw
+        return sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
 
     def set_clear_to(self):
         return re.sub(
@@ -4723,24 +4739,97 @@ class MeshFaceVertexIndicesOpt(object):
 
     def set_reverse_by_counts(self, counts):
         lis = []
-        start_index = 0
+        vertex_index_start = 0
         for i_count in counts:
-            end_index = start_index+i_count
-            for j in range(end_index - start_index):
-                lis.append(self._raw[end_index-j-1])
+            vertex_index_end = vertex_index_start+i_count
+            for j in range(vertex_index_end - vertex_index_start):
+                lis.append(self._raw[vertex_index_end-j-1])
             #
-            start_index += i_count
+            vertex_index_start += i_count
         return lis
 
-    def set_reverse_by_start_indices(self, start_indices):
+    def set_reverse_by_start_indices(self, start_vertex_indices):
         lis = []
-        for i in range(len(start_indices)):
+        for i in range(len(start_vertex_indices)):
             if i > 0:
-                start_index = start_indices[i-1]
-                end_index = start_indices[i]
-                for j in range(end_index-start_index):
-                    lis.append(self._raw[end_index-j-1])
+                vertex_index_start = start_vertex_indices[i-1]
+                vertex_index_end = start_vertex_indices[i]
+                for j in range(vertex_index_end-vertex_index_start):
+                    lis.append(self._raw[vertex_index_end-j-1])
         return lis
+
+
+class MeshFaceShellMtd(object):
+    @classmethod
+    def get_connected_face_indices(cls, face_to_vertex_dict, vertex_to_face_dict, face_index):
+        return set(j for i in face_to_vertex_dict[face_index] for j in vertex_to_face_dict[i])
+    @classmethod
+    def get_face_and_vertex_query_dict(cls, vertex_counts, vertex_indices):
+        face_to_vertex_dict = {}
+        vertex_to_face_dict = {}
+        vertex_index_start = 0
+        for i_face_index, i_vertex_count in enumerate(vertex_counts):
+            vertex_index_end = vertex_index_start + i_vertex_count
+            for j in range(vertex_index_end - vertex_index_start):
+                j_vertex_index = vertex_indices[vertex_index_start + j]
+                vertex_to_face_dict.setdefault(j_vertex_index, []).append(i_face_index)
+                face_to_vertex_dict.setdefault(i_face_index, []).append(j_vertex_index)
+            #
+            vertex_index_start += i_vertex_count
+        return face_to_vertex_dict, vertex_to_face_dict
+    @classmethod
+    def get_shell_dict_from_face_vertices(cls, vertex_counts, vertex_indices):
+        # StorageFileOpt(
+        #     '/data/f/shell_id_test/input.json'
+        # ).set_write([vertex_counts, vertex_indices])
+        face_to_vertex_dict, vertex_to_face_dict = cls.get_face_and_vertex_query_dict(
+            vertex_counts, vertex_indices
+        )
+        #
+        _face_count = len(vertex_counts)
+        #
+        all_face_indices = set(range(_face_count))
+        #
+        _cur_shell_index = 0
+        #
+        shell_to_face_dict = {}
+        #
+        _less_face_indices = set(range(_face_count))
+        _cur_search_face_indices = set()
+        _cur_shell_face_indices = set()
+        c = 0
+        while _less_face_indices:
+            if c > _face_count:
+                break
+            #
+            if _less_face_indices == all_face_indices:
+                _cur_search_face_indices = cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, 0)
+                _cur_shell_face_indices = set()
+                _cur_shell_face_indices.update(_cur_search_face_indices)
+
+            _less_face_indices -= _cur_search_face_indices
+            #
+            cur_connected_face_indices = set()
+            [cur_connected_face_indices.update(cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, i)) for i in _cur_search_face_indices]
+
+            cur_int = cur_connected_face_indices & _cur_shell_face_indices
+            cur_dif = cur_connected_face_indices - _cur_shell_face_indices
+            if cur_int:
+                if cur_dif:
+                    _cur_shell_face_indices.update(cur_dif)
+                    _cur_search_face_indices = cur_dif
+                else:
+                    shell_to_face_dict[_cur_shell_index] = _cur_shell_face_indices
+                    if _less_face_indices:
+                        _cur_shell_index += 1
+                        #
+                        _cur_face_index = min(_less_face_indices)
+                        _cur_search_face_indices = cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, _cur_face_index)
+                        _cur_shell_face_indices = set()
+                        _cur_shell_face_indices.update(_cur_search_face_indices)
+            #
+            c += 1
+        return {i: k for k, v in shell_to_face_dict.items() for i in v}
 
 
 class OiioMtd(object):
@@ -5483,5 +5572,6 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    a = 'mod_qc'
-    print TextOpt(a).to_rgb_()
+    MeshFaceShellMtd.get_shell_dict_from_face_vertices(
+        *StorageFileOpt('/data/f/shell_id_test/input.json').set_read()
+    )

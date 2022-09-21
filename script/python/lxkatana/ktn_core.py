@@ -529,6 +529,11 @@ class NGObjOpt(object):
         if port:
             NGPortOpt(port).set_expression(value)
 
+    def set_expression_enable(self, key, value):
+        p = self.ktn_obj.getParameter(key)
+        if p:
+            p.setExpressionFlag(value)
+
     def get_is_expression(self, key):
         port = self.ktn_obj.getParameter(key)
         if port:
@@ -639,6 +644,7 @@ class NGObjOpt(object):
                 hint_dict = eval(hint_string)
                 if hint_dict['widget'] in ['scriptButton']:
                     script = hint_dict['scriptText']
+                    # noinspection PyUnusedLocal
                     node = self._ktn_obj
                     exec script
 

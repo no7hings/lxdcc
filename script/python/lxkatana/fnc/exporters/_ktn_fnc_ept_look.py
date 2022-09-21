@@ -28,6 +28,10 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         geometry_root='/root/world/geo',
         output_obj=None,
         #
+        camera_location='/root/world/cam/camera',
+        #
+        usd_file='',
+        #
         look_pass_node=None,
         look_pass=None,
         #
@@ -57,8 +61,8 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         path_base = file_obj.path_base
         ext = file_obj.ext
         #
-        camera_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__camera')
         merge_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__merge')
+        camera_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__camera')
         render_settings_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__render_settings')
         arnold_render_settings_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__arnold_render_settings')
         #
@@ -76,8 +80,9 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         arnold_render_settings_node.set('args.arnoldGlobalStatements.assFileContents.enable', True)
         arnold_render_settings_node.set('args.arnoldGlobalStatements.assFileContents.value', 'geometry and materials')
         arnold_render_settings_node.set('args.arnoldGlobalStatements.assFile.enable', True)
+
         source_port.set_target(
-            merge_node.get_input_port('output'),
+            merge_node.get_input_port('look_pass'),
             force=True
         )
         camera_node.get_output_port('out').set_target(
@@ -91,11 +96,11 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             arnold_render_settings_node.get_input_port('input')
         )
         #
-        render_set = RenderManager.RenderingSettings()
-        render_set.ignoreROI = True
-        render_set.asynch = False
-        render_set.interactiveOutputs = True
-        render_set.interactiveMode = True
+        rss = RenderManager.RenderingSettings()
+        rss.ignoreROI = True
+        rss.asynch = False
+        rss.interactiveOutputs = True
+        rss.interactiveMode = True
         #
         if not self._get_katana_is_ui_mode_():
             Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
@@ -107,12 +112,12 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 #
                 NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(i_current_frame, 0)
                 ktn_dcc_objects.Scene.set_current_frame(i_current_frame)
-                render_set.frame = i_current_frame
+                rss.frame = i_current_frame
                 RenderManager.StartRender(
                     self.RENDER_MODE,
                     node=arnold_render_settings_node.ktn_obj,
                     views=[camera_location],
-                    settings=render_set
+                    settings=rss
                 )
                 #
                 i_output_file = utl_dcc_objects.OsFile(i_output_file_path)
@@ -132,12 +137,12 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         else:
             output_file_path = u'{}{}'.format(path_base, ext)
             arnold_render_settings_node.set('args.arnoldGlobalStatements.assFile.value', output_file_path)
-            render_set.frame = frame[0]
+            rss.frame = frame[0]
             RenderManager.StartRender(
                 self.RENDER_MODE,
                 node=arnold_render_settings_node.ktn_obj,
                 views=[camera_location],
-                settings=render_set
+                settings=rss
             )
             #
             output_file = utl_dcc_objects.OsFile(output_file_path)
@@ -155,15 +160,16 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         u'file="{}"'.format(file_path)
                     )
         #
-        merge_node.set_delete()
-        camera_node.set_delete()
-        arnold_render_settings_node.set_delete()
+        # merge_node.set_delete()
+        # camera_node.set_delete()
+        # render_settings_node.set_delete()
+        # arnold_render_settings_node.set_delete()
 
     def __set_export_(self, file_path, frame, location):
-        camera_location = '/root/world/cam/camera'
-        #
-        look_pass_node = self._option.get('look_pass_node')
-        look_pass_name = self._option.get('look_pass')
+        usd_file_path = self.get('usd_file')
+        camera_location = self.get('camera_location')
+        look_pass_node = self.get('look_pass_node')
+        look_pass_name = self.get('look_pass')
         utl_core.Log.set_module_result_trace(
             'ass export',
             'obj="{}", look_pass="{}"'.format(

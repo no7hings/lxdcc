@@ -1,0 +1,67 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: ''
+        tool_tip: 'press to rest all parameters'
+    #
+    export/scheme:
+        widget: enumerate
+        value: [ 'static', 'dynamic' ]
+        tool_tip: '...'
+
+    export/start_frame:
+        widget: float
+        value: 1001
+        tool_tip: '...'
+
+    export/end_frame:
+        widget: float
+        value: 1001
+        tool_tip: '...'
+
+    export/geometry/location:
+        widget: path
+        value: '/root/world/geo/master'
+        tool_tip: '...'
+
+    export/look/pass:
+        widget: string
+        value: 'default'
+        tool_tip: '...'
+
+    export/camera/path:
+        widget: path
+        value: '/root/world/cam/camera'
+        tool_tip: '...'
+
+    export/usd/input_dynamic_file:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    export/ass/output_file:
+        widget: file
+        value: ''
+        tool_tip: '...'
+
+    export/guess:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAssetAss(node).set_guess()'
+        tool_tip: '...'
+
+    export/execute:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAssetAss(node).set_ass_export()'
+        tool_tip: '...'
+    #
+    lynxi_info/type:
+        widget: string
+        value: 'lx_look_ass_exporter'
+        tool_tip: '...'

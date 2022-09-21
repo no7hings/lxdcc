@@ -886,14 +886,40 @@ class AssetWorkspace(object):
                 file_path
             ).set_write(dic)
 
+    def set_dynamic_ass_export(self):
+        node = self.get_main_node('look_outputs')
+        geometry_scheme = self.get_geometry_scheme()
+        if node.get_is_exists() is True:
+            look_pass_names = self.get_look_pass_names()
+            if geometry_scheme == 'asset':
+                for i_look_pass_name in look_pass_names:
+                    i_input_port = node.get_input_port(i_look_pass_name)
+                    if i_input_port:
+                        i_source_port = i_input_port.get_source()
+                        if i_source_port is not None:
+                            i_asset_ass_exporter = _ktn_dcc_obj_node.Node('/rootNode/asset_ass_export__{}'.format(i_look_pass_name))
+                            i_asset_ass_exporter.get_dcc_instance('lx_asset_ass_exporter', 'Group')
+                            i_asset_ass_exporter.set(
+                                'export.look.pass', i_look_pass_name
+                            )
+                            i_source_port.set_target(
+                                i_asset_ass_exporter.get_input_port('input')
+                            )
+                            ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).set_port_execute(
+                                'export.guess'
+                            )
+                            ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).set_port_execute(
+                                'export.execute'
+                            )
+
     def get_geometry_location(self):
         configure = self.get_configure()
         geometry_settings = self.get_main_node('geometry_settings')
         if geometry_settings.get_is_exists() is True and geometry_settings.get_is_bypassed() is False:
-            scheme = self.get_geometry_scheme()
-            if scheme == 'asset':
+            geometry_scheme = self.get_geometry_scheme()
+            if geometry_scheme == 'asset':
                 location = configure.get('option.asset_root')
-            elif scheme == 'shot':
+            elif geometry_scheme == 'shot':
                 location = geometry_settings.get('usd.location')
             else:
                 raise RuntimeError()

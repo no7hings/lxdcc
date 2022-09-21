@@ -32,17 +32,6 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ktn_workspace = ktn_dcc_objects.AssetWorkspace()
         look_pass_names = ktn_workspace.get_look_pass_names()
         #
-        model_act_cmp_usd_file_path = self.get_asset_model_act_cmp_usd_file()
-        if model_act_cmp_usd_file_path is not None:
-            frame_range = usd_core.UsdStageOpt(
-                model_act_cmp_usd_file_path
-            ).get_frame_range()
-            start_frame, end_frame = frame_range
-            if start_frame != end_frame:
-                pass
-        else:
-            frame_range = None
-        #
         for i_look_pass_name in look_pass_names:
             if i_look_pass_name == 'default':
                 i_look_ass_file_rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword_0)
@@ -62,8 +51,6 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             file=i_look_ass_file_path,
                             location=root,
                             #
-                            frame=frame_range,
-                            #
                             look_pass_node=ktn_workspace.get_main_node('look_outputs'),
                             look_pass=i_look_pass_name,
                             #
@@ -75,6 +62,10 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     'look-ass export',
                     u'file="{}" is exists'.format(i_look_ass_file_path)
                 )
+        #
+        model_act_cmp_usd_file_path = self.get_asset_model_act_cmp_usd_file()
+        if model_act_cmp_usd_file_path is not None:
+            ktn_workspace.set_dynamic_ass_export()
 
     def set_asset_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects

@@ -1,7 +1,9 @@
 # coding:utf-8
 import collections
 # noinspection PyUnresolvedReferences
-from Katana import Utils, CacheManager
+from Katana import Utils, NodegraphAPI, CacheManager, RenderManager
+# noinspection PyUnresolvedReferences
+from UI4 import Manifest
 
 
 class _MacroMtd(object):
@@ -576,6 +578,167 @@ class LxAsset(object):
                     #
                     no_visible=False, cancel_visible=False
                 )
+
+
+class LxAssetAss(object):
+    RENDER_MODE = 'previewRender'
+    def __init__(self, ktn_obj):
+        self._ktn_obj = ktn_obj
+    @classmethod
+    def _get_input_dynamic_usd_file_(cls, rsv_asset):
+        rsv_task = rsv_asset.get_rsv_task(
+            step='mod', task='mod_dynamic'
+        )
+        if rsv_task is not None:
+            keyword = 'asset-geometry-usd-var-file'
+            usd_file_rsv_unit = rsv_task.get_rsv_unit(
+                keyword=keyword
+            )
+            return usd_file_rsv_unit.get_exists_result(version='latest', extend_variants=dict(var='hi'))
+    @classmethod
+    def _get_output_ass_file_(cls, rsv_scene_properties, rsv_task, look_pass_name):
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        if workspace == 'publish':
+            keyword_0 = 'asset-look-ass-file'
+            keyword_1 = 'asset-look-ass-sub-file'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-look-ass-file'
+            keyword_1 = 'asset-output-look-ass-sub-file'
+        else:
+            raise TypeError()
+        #
+        if look_pass_name == 'default':
+            look_ass_file_rsv_unit = rsv_task.get_rsv_unit(keyword=keyword_0)
+            look_ass_file_path = look_ass_file_rsv_unit.get_result(version=version)
+        else:
+            look_ass_file_rsv_unit = rsv_task.get_rsv_unit(keyword=keyword_1)
+            look_ass_file_path = look_ass_file_rsv_unit.get_result(
+                version=version, extend_variants=dict(look_pass=look_pass_name)
+            )
+        return look_ass_file_path
+
+    def set_guess(self):
+        from lxbasic import bsc_core
+
+        from lxusd import usd_core
+
+        from lxkatana import ktn_core
+
+        import lxresolver.commands as rsv_commands
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        contents = []
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+        any_scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
+        resolver = rsv_commands.get_resolver()
+        rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
+        if rsv_scene_properties:
+            rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
+            input_dynamic_usd_file_path = self._get_input_dynamic_usd_file_(
+                rsv_task.get_rsv_entity()
+            )
+            if input_dynamic_usd_file_path is not None:
+                guess_frame_range = usd_core.UsdStageOpt(
+                    input_dynamic_usd_file_path
+                ).get_frame_range()
+                #
+                obj_opt.set(
+                    'export.scheme', 'dynamic'
+                )
+                obj_opt.set(
+                    'export.start_frame', guess_frame_range[0]
+                )
+                obj_opt.set(
+                    'export.end_frame', guess_frame_range[1]
+                )
+                obj_opt.set('export.usd.input_dynamic_file', input_dynamic_usd_file_path)
+            else:
+                obj_opt.set(
+                    'export.scheme', 'static'
+                )
+            #
+            scheme = obj_opt.get('export.scheme')
+            #
+            look_pass_name = obj_opt.get('export.look.pass')
+            output_ass_file_path = self._get_output_ass_file_(
+                rsv_scene_properties, rsv_task, look_pass_name
+            )
+            if scheme == 'static':
+                obj_opt.set_expression_enable('export.ass.output_file', False)
+                obj_opt.set(
+                    'export.ass.output_file', output_ass_file_path
+                )
+            elif scheme == 'dynamic':
+                output_ass_file = bsc_core.StorageFileOpt(output_ass_file_path)
+                path_base = output_ass_file.path_base
+                ext = output_ass_file.ext
+                file_path = u'{}.%04d{}'.format(path_base, ext)
+                expression = '\'{}\' % (frame)'.format(file_path)
+                obj_opt.set_expression_enable('export.ass.output_file', True)
+                obj_opt.set_expression('export.ass.output_file', expression)
+        else:
+            contents.append(
+                'current scene is not available'
+            )
+
+    def set_ass_export(self):
+        from lxutil import utl_core
+
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        scheme = obj_opt.get('export.scheme')
+        look_pass_name = obj_opt.get('export.look.pass')
+        camera_path = obj_opt.get('export.camera.path')
+        ass_file_path = obj_opt.get('export.ass.output_file')
+        if not ass_file_path:
+            return
+        #
+        rss = RenderManager.RenderingSettings()
+        rss.ignoreROI = True
+        rss.asynch = False
+        rss.interactiveOutputs = True
+        rss.interactiveMode = True
+        #
+        if not ktn_core._get_is_ui_mode_():
+            Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
+        #
+        if scheme == 'static':
+            rss.frame = ktn_core.NGObjOpt(
+                NodegraphAPI.GetRootNode()
+            ).get('currentTime')
+            RenderManager.StartRender(
+                self.RENDER_MODE,
+                node=self._ktn_obj,
+                views=[camera_path],
+                settings=rss
+            )
+        elif scheme == 'dynamic':
+            stat_frame, end_frame = obj_opt.get('export.start_frame'), obj_opt.get('export.end_frame')
+            if stat_frame != end_frame:
+                frames = range(int(stat_frame), int(end_frame)+1)
+                with utl_core.log_progress_bar(maximum=len(frames), label='ass sequence export') as l_p:
+                    for i_frame in frames:
+                        ktn_core.NGObjOpt(
+                            NodegraphAPI.GetRootNode()
+                        ).set('currentTime', i_frame)
+                        rss.frame = i_frame
+                        RenderManager.StartRender(
+                            self.RENDER_MODE,
+                            node=self._ktn_obj,
+                            views=[camera_path],
+                            settings=rss
+                        )
+                        l_p.set_update()
+                        utl_core.Log.set_module_result_trace(
+                            'ass sequence export',
+                            'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
+                        )
 
 
 class LxGeometrySettings(object):

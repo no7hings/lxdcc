@@ -2640,14 +2640,14 @@ class IntegerMtd(object):
         return '%s:%s:%s' % (str(h).zfill(2), str(m).zfill(2), str(s).zfill(2))
     @classmethod
     def second_to_time(cls, second):
-        h = int(second/3600)
-        m = int(second/60-60*h)
-        s = int(second-3600*h-60*m)
+        h = int(int(second)/3600.0)
+        m = int(int(second)/60.0-60.0*h)
+        s = float(second-3600.0*h-60.0*m)
         return h, m, s
     @classmethod
     def second_to_time_prettify(cls, second):
-        h, m, s = cls.second_to_time(int(second))
-        return '%s:%s:%s' % (str(h).zfill(2), str(m).zfill(2), str(s).zfill(2))
+        h, m, s = cls.second_to_time(second)
+        return '%02d:%02d:%07.4f' % (h, m, s)
     @classmethod
     def second_to_minute(cls, second):
         dv = 60.0
@@ -2965,7 +2965,7 @@ class DccPathDagOpt(object):
             self.get_name(), count=count, maximum=maximum, offset=offset, seed=seed
         )
 
-    def get_color_from_index(self, index, count, maximum=255, seed=0):
+    def get_rgb_from_index(self, index, count, maximum=255, seed=0):
         pass
 
     def __str__(self):
@@ -3144,21 +3144,22 @@ class ColorMtd(object):
         list_ = []
         for i in range(count):
             list_.append(
-                cls.get_color_from_index(i, count, maximum, offset, seed)
+                cls.get_rgb_from_index(i, count, maximum, offset, seed)
             )
         return list_
     @classmethod
-    def get_color_from_index(cls, index, count, maximum=255, offset=0, seed=0):
+    def get_rgb_from_index(cls, index, count, maximum=255, offset=0, seed=0):
         d = 1000.0
         p = float(index)/float(count)
         i_0 = 360.0*p
         i_1 = 360.0*(1.0-p)
-        a_0 = i_0+offset+seed
-        a_1 = i_1+offset+seed
+        i_offset = i_0 % 60.0
+        i_offset = 0
+        a_0 = i_0+offset+seed+i_offset
+        a_1 = i_1+offset+seed-i_offset
         h = float(a_0 % 360.0*d)/d
         s = float(0.25*d+(a_0 % 0.75*d))/d
         v = float(0.25*d+(a_1 % 0.75*d))/d
-        print index, h, s, v
         return cls.hsv2rgb(h, s, v, maximum)
 
 
@@ -5598,8 +5599,6 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    c = 1000
-    for i in range(c):
-        ColorMtd.get_color_from_index(
-            i, c
-        )
+    print IntegerMtd.second_to_time_prettify(
+        25.0005
+    )

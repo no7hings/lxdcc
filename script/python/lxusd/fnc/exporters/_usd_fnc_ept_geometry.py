@@ -273,8 +273,6 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         ) as l_p:
             asset_color = bsc_core.TextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
             for i_index, i_usd_prim_src in enumerate(self._usd_stage_src.TraverseAll()):
-                l_p.set_update()
-                #
                 i_obj_type_name = i_usd_prim_src.GetTypeName()
                 i_obj_path = i_usd_prim_src.GetPath().pathString
                 i_obj_path_opt = bsc_core.DccPathDagOpt(i_obj_path)
@@ -316,6 +314,8 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                             i_usd_mesh_opt_tgt.set_display_color_as_face_color(
                                 i_face_colors
                             )
+                #
+                l_p.set_update()
         #
         component_paths = bsc_core.DccPathDagOpt(self._location_path).get_component_paths()
         if component_paths:

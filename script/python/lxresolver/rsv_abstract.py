@@ -358,6 +358,7 @@ class AbsRsvMatcher(
             self._rsv_project = rsv_obj._rsv_project
         #
         self._match_variants = format_dict
+        self._extend_variants = {}
         self._orig_pattern = pattern
         self._match_patterns = []
         #
@@ -410,6 +411,9 @@ class AbsRsvMatcher(
             if os.path.exists(glob_pattern):
                 return False, [glob_pattern]
         return False, []
+
+    def set_extend_variants(self, **kwargs):
+        self._extend_variants = kwargs
 
     def get_results(self, trim=None):
         lis = []
@@ -529,6 +533,8 @@ class AbsRsvMatcher(
             result, parameters = matches[-1]
             format_dict = copy.copy(self._match_variants)
             format_dict.update(parameters)
+            # print(self._extend_variants, 'AAAA')
+            # format_dict.update(self._extend_variants)
             return self.__get_path_by_local_variants_(format_dict)
     @classmethod
     def _get_properties_by_result_(cls, pattern, properties, result):

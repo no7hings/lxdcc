@@ -16,35 +16,34 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
-class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
+class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     RENDER_MODE = 'previewRender'
     #
     OPTION = dict(
+        file='',
+        location='',
+        #
+        frame=None,
+        #
         geometry_root='/root/world/geo',
         output_obj=None,
         #
         look_pass_node=None,
         look_pass=None,
+        #
+        texture_use_environ_map=False,
     )
-    def __init__(self, file_path, root=None, option=None):
-        super(LookAssExporter, self).__init__(file_path, root, option)
+    def __init__(self, option=None):
+        super(LookAssExporter, self).__init__(option)
+        self._file_path = self.get('file')
+        self._location = self.get('location')
 
     def set_run(self):
-        # utl_core.Log.set_module_result_trace(
-        #     'python-run',
-        #     '{}.{}(file_path="{}", root="{}").{}()'.format(
-        #         self.__module__,
-        #         self.__class__.__name__,
-        #         self._file_path,
-        #         self._root,
-        #         sys._getframe().f_code.co_name
-        #     )
-        # )
-        frame = ktn_dcc_objects.Scene.get_frame_range(frame=self._option.get('frame'))
+        frame = ktn_dcc_objects.Scene.get_frame_range(frame=self.get('frame'))
         self.__set_export_(
             file_path=self._file_path,
             frame=frame, 
-            root='/master',
+            location=self._location,
         )
     @classmethod
     def _get_katana_is_ui_mode_(cls):
@@ -116,13 +115,20 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
                     settings=render_set
                 )
                 #
-                fr = utl_scripts.DotAssFileReader(i_output_file_path)
-                fr._set_file_paths_convert_()
-                #
-                utl_core.Log.set_module_result_trace(
-                    'katana-ass-sequence-export',
-                    u'file="{}"'.format(file_path)
-                )
+                i_output_file = utl_dcc_objects.OsFile(i_output_file_path)
+                if i_output_file.get_is_exists() is True:
+                    utl_core.Log.set_module_result_trace(
+                        'ass export',
+                        'file="{}"'.format(i_output_file_path)
+                    )
+                    if self.get('texture_use_environ_map') is True:
+                        fr = utl_scripts.DotAssFileReader(i_output_file_path)
+                        fr._set_file_paths_convert_()
+                        #
+                        utl_core.Log.set_module_result_trace(
+                            'katana-ass-sequence-export',
+                            u'file="{}"'.format(file_path)
+                        )
         else:
             output_file_path = u'{}{}'.format(path_base, ext)
             arnold_render_settings_node.set('args.arnoldGlobalStatements.assFile.value', output_file_path)
@@ -136,20 +142,24 @@ class LookAssExporter(utl_fnc_obj_abs.AbsDccExporter):
             #
             output_file = utl_dcc_objects.OsFile(output_file_path)
             if output_file.get_is_exists() is True:
-                #
-                fr = utl_scripts.DotAssFileReader(output_file_path)
-                fr._set_file_paths_convert_()
-                #
                 utl_core.Log.set_module_result_trace(
-                    'katana-ass-export',
-                    u'file="{}"'.format(file_path)
+                    'ass export',
+                    'file="{}"'.format(output_file_path)
                 )
+                if self.get('texture_use_environ_map') is True:
+                    fr = utl_scripts.DotAssFileReader(output_file_path)
+                    fr._set_file_paths_convert_()
+                    #
+                    utl_core.Log.set_module_result_trace(
+                        'katana-ass-export',
+                        u'file="{}"'.format(file_path)
+                    )
         #
         merge_node.set_delete()
         camera_node.set_delete()
         arnold_render_settings_node.set_delete()
 
-    def __set_export_(self, file_path, frame, root):
+    def __set_export_(self, file_path, frame, location):
         camera_location = '/root/world/cam/camera'
         #
         look_pass_node = self._option.get('look_pass_node')

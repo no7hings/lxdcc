@@ -12,7 +12,7 @@ def set_session_option_hooks_execute_by_deadline(session):
 
     from lxutil import utl_core
     #
-    def run_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
+    def run_branch_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
         _batch_hook_option_opt = bsc_core.KeywordArgumentsOpt(batch_hook_option_)
         _batch_choice_scheme = _batch_hook_option_opt.get('choice_scheme')
         _hook_option_opt = bsc_core.KeywordArgumentsOpt(
@@ -76,7 +76,7 @@ def set_session_option_hooks_execute_by_deadline(session):
             g_p.set_update()
             if isinstance(i, (str, unicode)):
                 i_sub_key = i
-                run_fnc_(
+                run_branch_fnc_(
                     main_key,
                     i_sub_key,
                     session.option,
@@ -86,7 +86,7 @@ def set_session_option_hooks_execute_by_deadline(session):
                 for i_k, i_v in i.items():
                     i_sub_key = i_k
                     i_script_option = i_v
-                    run_fnc_(
+                    run_branch_fnc_(
                         main_key,
                         i_sub_key,
                         session.option,

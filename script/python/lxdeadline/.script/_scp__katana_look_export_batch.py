@@ -8,8 +8,8 @@ import lxresolver.commands as rsv_commands
 import lxsession.commands as ssn_commands
 
 assets = [
-    # 'shrubs_a',
-    # 'shrubs_b',
+    'shrubs_a',
+    'shrubs_b',
     'shrubs_c',
     'chrysanthemum_a',
     'chrysanthemum_b',

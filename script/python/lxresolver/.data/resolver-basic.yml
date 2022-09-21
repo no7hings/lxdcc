@@ -175,9 +175,9 @@ asset-work-geometry-usd-temp-file: <asset-work-geometry-dir>/temp.usd
 # <asset-work-geometry-uv_map>
 asset-work-geometry-uv_map-usd-file: <asset-work-geometry-dir>/uv_map.usd
 asset-work-geometry-uv_map-usd-var-file: <asset-work-geometry-dir>/<var-name>.uv_map.usd
-
-asset-work-geometry-display_color-usd-file: <asset-work-geometry-dir>/display_color.usd
-asset-work-geometry-display_color-usd-var-file: <asset-work-geometry-dir>/<var-name>.display_color.usd
+#
+asset-work-geometry-extra-usd-dir: <asset-work-geometry-dir>/geo_extra
+asset-work-geometry-user_property-usd-file: <asset-work-geometry-extra-usd-dir>/user_property.usd
 #
 asset-work-geometry-info-xml-file: <asset-work-geometry-dir>/<var-name>.info.xml
 asset-work-geometry-info-xml-hi-file: <asset-work-geometry-dir>/hi.info.xml
@@ -212,7 +212,6 @@ asset-work-shot-set-usd-file: <asset-work-set-dir>/<asset-shot-name>.usda
 #
 asset-work-usd-dir: <asset-task-dir>/cache/usd/<version-name>
 asset-work-comp-usd-dir: <asset-work-usd-dir>
-asset-work-display_color-usd-dir: <asset-work-usd-dir>/display_color
 #
 asset-work-render-dir: <asset-task-dir>/render/<user-name>
 #
@@ -331,6 +330,9 @@ asset-geometry-proxy-usd-var-file: <asset-geometry-usd-var-dir>/proxy_<var-name>
 #
 asset-geometry-uv_map-usd-file: <asset-geometry-usd-dir>/uv_map.usd
 asset-geometry-uv_map-usd-var-file: <asset-geometry-usd-dir>/uv_map.<var-name>.usd
+#
+asset-geometry-extra-usd-dir: <asset-geometry-usd-dir>/geo_extra
+asset-geometry-user_property-usd-file: <asset-geometry-extra-usd-dir>/user_property.usd
 # <asset-geometry-ass>
 asset-geometry-ass-dir: <asset-geometry-dir>/ass
 asset-geometry-ass-file: <asset-geometry-ass-dir>/<var-name>.ass
@@ -400,7 +402,6 @@ asset-texture-tgt-dir: <asset-version-dir>/texture
 # <asset-usd>
 asset-usd-dir: <asset-version-dir>/cache/usd
 asset-component-usd-dir: <asset-usd-dir>
-asset-display_color-usd-dir: <asset-usd-dir>/display_color
 #
 asset-usd-payload-file: <asset-component-usd-dir>/payload.usda
 asset-component-registry-usd-file: <asset-component-usd-dir>/registry.usda
@@ -528,10 +529,11 @@ asset-output-xgen-usd-dir: <asset-output-version-dir>/cache/usd
 asset-output-xgen-usd-file: <asset-output-xgen-usd-dir>/xgen.usda
 #
 asset-output-geometry-uv_map-usd-file: <asset-output-geometry-usd-dir>/uv_map.usd
+asset-output-geometry-extra-usd-dir: <asset-output-geometry-usd-dir>/geo_extra
+asset-output-geometry-user_property-usd-file: <asset-output-geometry-extra-usd-dir>/user_property.usd
 #
 asset-output-usd-dir: <asset-output-version-dir>/cache/usd
 asset-output-component-usd-dir: <asset-output-usd-dir>
-asset-output-display_color-usd-dir: <asset-output-usd-dir>/display_color
 #
 asset-output-component-usd-file: <asset-output-component-usd-dir>/<asset-name>.usda
 asset-output-component-registry-usd-file: <asset-output-component-usd-dir>/registry.usda

@@ -6,7 +6,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_texture_export(self, location, use_tx):
+    def set_texture_export(self, location, use_tx=False):
         import lxutil.dcc.dcc_operators as utl_dcc_operators
         #
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
@@ -59,12 +59,16 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         # TODO remove orig directory
         mya_fnc_exporters.TextureExporter(
-            src_dir_path=texture_src_directory_path,
-            tgt_dir_path=texture_tgt_directory_path,
-            root=location,
             option=dict(
+                directory_base=texture_src_directory_path,
+                directory=texture_tgt_directory_path,
+                #
+                location=location,
+                #
                 fix_name_blank=True,
                 use_tx=with_texture_tx,
-                with_reference=False
+                with_reference=False,
+                #
+                use_environ_map=True,
             )
         ).set_run()

@@ -135,7 +135,7 @@ class AbsRsvObjHookOpt(object):
                     scene_src_file_path
                 )
 
-    def get_look_pass_names(self):
+    def get_asset_exists_look_pass_names(self):
         import os
         #
         import fnmatch
@@ -167,3 +167,56 @@ class AbsRsvObjHookOpt(object):
             look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
             return look_pass_names
         return ['default']
+
+    def get_asset_exists_geometry_variant_names(self):
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        #
+        if workspace == 'work':
+            keyword = 'asset-work-geometry-usd-var-file'
+        elif workspace == 'publish':
+            keyword = 'asset-geometry-usd-var-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-geometry-usd-var-file'
+        else:
+            raise TypeError()
+        #
+        var_names = ['hi', 'shape', 'hair']
+        #
+        geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
+        )
+        list_ = []
+        for i_var_name in var_names:
+            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_exists_result(
+                version=version,
+                extend_variants=dict(var=i_var_name)
+            )
+            if i_geometry_usd_var_file_path:
+                list_.append(i_var_name)
+        return list_
+
+    def get_asset_model_act_frame_range(self):
+        import lxutil.scripts as utl_scripts
+        rsv_asset = self._rsv_task.get_rsv_entity()
+        model_act_rsv_task = rsv_asset.get_rsv_task(
+            step='mod',
+            task='mod_dynamic'
+        )
+        if model_act_rsv_task is not None:
+            keyword = 'asset-component-usd-file'
+            cmp_usd_file_rsv_unit = model_act_rsv_task.get_rsv_unit(keyword=keyword)
+            cmp_usd_file_path = cmp_usd_file_rsv_unit.get_exists_result(version='latest')
+            if cmp_usd_file_path:
+                return utl_scripts.DotUsdaFileReader(cmp_usd_file_path).get_frame_range()
+
+    def get_asset_model_act_cmp_usd_file(self):
+        rsv_asset = self._rsv_task.get_rsv_entity()
+        model_act_rsv_task = rsv_asset.get_rsv_task(
+            step='mod',
+            task='mod_dynamic'
+        )
+        if model_act_rsv_task is not None:
+            keyword = 'asset-component-usd-file'
+            cmp_usd_file_rsv_unit = model_act_rsv_task.get_rsv_unit(keyword=keyword)
+            return cmp_usd_file_rsv_unit.get_exists_result(version='latest')

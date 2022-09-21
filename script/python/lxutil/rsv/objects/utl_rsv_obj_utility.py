@@ -379,8 +379,11 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
         mya_fnc_exporters.LookAssExporter(
-            file_path=ass_file_path,
-            root=root
+            option=dict(
+                file=ass_file_path,
+                location=root,
+                texture_use_environ_map=True,
+            )
         ).set_run()
     # katana
     def set_katana_create(self):
@@ -498,6 +501,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
+        layer_from_geometry_variant = self._hook_option_opt.get_as_boolean('layer_from_geometry_variant')
         layers = self._hook_option_opt.get_as_array('layers')
         render_passes = self._hook_option_opt.get_as_array('render_passes')
 
@@ -521,7 +525,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
                 i_f_new = '{}/{}'.format(j_file_opt.directory_path, i_f_name_new)
                 j_option['name'] = i_render_pass
-                j_option['image_foreground'] = '/l/resource/td/asset/image/foreground/{}-{}.png'.format(
+                j_option['image_foreground'] = '/l/resource/td/asset/image/foreground-v001/{}-{}.png'.format(
                     i_layer, i_render_pass
                 )
                 dict_[i_f_new] = j_option

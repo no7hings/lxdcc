@@ -3,6 +3,8 @@
     defaultPrim = "{{ dcc.root_name }}"
     metersPerUnit = 0.01
     upAxis = "Y"
+    startTimeCode = {{ start_frame }}
+    endTimeCode = {{ end_frame }}
 )
 
 def Xform "{{ dcc.root_name }}" (
@@ -16,7 +18,14 @@ def Xform "{{ dcc.root_name }}" (
         string version = "{{ version }}"
     }
     kind = "component"
+    prepend references = [
+        @{{ usdas.material }}@,
+        @{{ usdas.geo_extra }}@,
+        # @{{ usdas.geo_map }}@,
+    ]
     payload = @{{ usdas.payload }}@
 )
 {
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
 }

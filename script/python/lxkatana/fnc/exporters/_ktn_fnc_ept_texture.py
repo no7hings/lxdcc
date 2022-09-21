@@ -11,35 +11,30 @@ import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
 class TextureExporter(
-    utl_fnc_obj_abs.AbsDccTextureExport
+    utl_fnc_obj_abs.AbsDccTextureExport,
+    utl_fnc_obj_abs.AbsFncOptionMethod,
 ):
     FIX_NAME_BLANK = 'fix_name_blank'
     USE_TX = 'use_tx'
     WITH_REFERENCE = 'width_reference'
-    OPTION = {
-        FIX_NAME_BLANK: False,
-        USE_TX: False,
-        WITH_REFERENCE: True,
-        'ignore_missing_texture': False,
-    }
-    def __init__(self, tgt_dir_path, src_dir_path, root=None, option=None):
-        self._directory_path_dst = tgt_dir_path
-        self._directory_path_base = src_dir_path
-        self._root = None
-        self._option = copy.deepcopy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                if k in self._option:
-                    self._option[k] = v
+    OPTION = dict(
+        directory_base='',
+        directory='',
+        location='',
+        fix_name_blank=False,
+        use_tx=False,
+        width_reference=False,
+        use_environ_map=False,
+    )
+    def __init__(self, option=None):
+        super(TextureExporter, self).__init__(option)
+        self._directory_path_dst = self.get('directory')
+        self._directory_path_base = self.get('directory_base')
+        self._location = self.get('location')
 
     def set_run(self):
         asset_workspace = ktn_dcc_objects.AssetWorkspace()
-        #
         location = asset_workspace.get_geometry_location()
-        #
-        fix_name_blank = self._option[self.FIX_NAME_BLANK]
-        use_tx = self._option[self.USE_TX]
-        with_reference = self._option[self.WITH_REFERENCE]
         #
         texture_references = ktn_dcc_objects.TextureReferences()
         dcc_shaders = asset_workspace.get_all_dcc_geometry_shader_by_location(location)
@@ -50,11 +45,13 @@ class TextureExporter(
             directory_path_dst=self._directory_path_dst, 
             directory_path_base=self._directory_path_base,
             dcc_objs=dcc_objs,
-            fix_name_blank=fix_name_blank,
-            use_tx=use_tx,
-            with_reference=with_reference,
+            fix_name_blank=self.get('fix_name_blank'),
+            use_tx=self.get('use_tx'),
+            with_reference=self.get('width_reference'),
+            #
             ignore_missing_texture=True,
             remove_expression=True,
-            use_environ_map=True,
+            use_environ_map=self.get('use_environ_map'),
+            #
             repath_fnc=texture_references.set_obj_repath_to,
         )

@@ -9,13 +9,13 @@ usd_setup.UsdSetup.set_environs_setup()
 
 import lxusd.fnc.exporters as usd_fnc_exporter
 
-color_scheme = 'object_color'
+color_scheme = 'shell_color'
 
-dir_ = '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v043/cache/usd'
+dir_ = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v056/cache/usd'
 
 f_src = '{}/geo/hi.usd'.format(dir_)
 
-f_tgt = '{}/display_color/{}.usd'.format(dir_, color_scheme)
+f_tgt = '{}/geo_extra/{}.usd'.format(dir_, color_scheme)
 
 s = usd_core.UsdStageOpt._set_file_open_(f_src)
 

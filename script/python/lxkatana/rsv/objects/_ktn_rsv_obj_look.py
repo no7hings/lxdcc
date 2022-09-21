@@ -6,10 +6,12 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccLookHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_look_ass_export(self, force=False):
+    def set_asset_look_ass_export(self, force=False, texture_use_environ_map=True):
         from lxutil import utl_core
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
+        #
+        from lxusd import usd_core
         #
         import lxkatana.fnc.exporters as ktn_fnc_exporters
         #
@@ -30,6 +32,17 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ktn_workspace = ktn_dcc_objects.AssetWorkspace()
         look_pass_names = ktn_workspace.get_look_pass_names()
         #
+        model_act_cmp_usd_file_path = self.get_asset_model_act_cmp_usd_file()
+        if model_act_cmp_usd_file_path is not None:
+            frame_range = usd_core.UsdStageOpt(
+                model_act_cmp_usd_file_path
+            ).get_frame_range()
+            start_frame, end_frame = frame_range
+            if start_frame != end_frame:
+                pass
+        else:
+            frame_range = None
+        #
         for i_look_pass_name in look_pass_names:
             if i_look_pass_name == 'default':
                 i_look_ass_file_rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword_0)
@@ -45,11 +58,16 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 i_look_pass_source_obj = ktn_workspace.get_pass_source_obj(i_look_pass_name)
                 if i_look_pass_source_obj is not None:
                     ktn_fnc_exporters.LookAssExporter(
-                        file_path=i_look_ass_file_path,
-                        root=root,
                         option=dict(
+                            file=i_look_ass_file_path,
+                            location=root,
+                            #
+                            frame=frame_range,
+                            #
                             look_pass_node=ktn_workspace.get_main_node('look_outputs'),
-                            look_pass=i_look_pass_name
+                            look_pass=i_look_pass_name,
+                            #
+                            texture_use_environ_map=texture_use_environ_map
                         )
                     ).set_run()
             else:
@@ -58,7 +76,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     u'file="{}" is exists'.format(i_look_ass_file_path)
                 )
 
-    def set_look_klf_export(self):
+    def set_asset_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
         workspace = self._rsv_scene_properties.get('workspace')

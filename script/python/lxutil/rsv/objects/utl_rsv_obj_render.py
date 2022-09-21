@@ -16,6 +16,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxsession.commands as ssn_commands
         #
         option_hook_key = self._hook_option_opt.get('option_hook_key')
+        #
         katana_render_hook_key = 'rsv-task-methods/asset/render/katana-render'
         movie_convert_hook_key = 'rsv-task-methods/asset/rv/movie-convert'
         image_convert_hook_key = 'rsv-task-methods/oiio/image-convert'
@@ -37,6 +38,21 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         with_video_convert = self._hook_option_opt.get_as_boolean('with_video_convert')
         with_image_convert = self._hook_option_opt.get_as_boolean('with_image_convert')
+        #
+        layer_from_geometry_variant = self._hook_option_opt.get_as_boolean('layer_from_geometry_variant')
+        layer_variant_mapper = {
+            'hi': 'high',
+            'shape': 'shape',
+        }
+        #
+        if layer_from_geometry_variant is True:
+            geometry_variant_names = self.get_asset_exists_geometry_variant_names()
+            layers = [layer_variant_mapper[i] for i in geometry_variant_names]
+            utl_core.Log.set_module_result_trace(
+                'load layer form geometry variant',
+                'layers={}'.format(', '.join(map(lambda x: '"{}"'.format(x), layers)))
+            )
+            self._hook_option_opt.set('layers', layers)
         #
         variable_keys = [
             'camera',

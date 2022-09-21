@@ -3,6 +3,8 @@
     defaultPrim = "{{ dcc.root_name }}"
     metersPerUnit = 0.01
     upAxis = "Y"
+    startTimeCode = {{ start_frame }}
+    endTimeCode = {{ end_frame }}
 )
 
 over "{{ dcc.root_name }}" (
@@ -17,21 +19,11 @@ over "{{ dcc.root_name }}" (
     }
     kind = "component"
     prepend references = [
-        @{{ usdas.material }}@
+        @{{ usdas.material }}@,
+        # @{{ usdas.geo_extra }}@,
+        @{{ usdas.geo_map }}@,
     ]
-    variants = {
-        string uv = "{{ look.passes[0] }}"
-    }
-    prepend variantSets="uv"
+    # payload = @{{ usdas.payload }}@
 )
 {
-    variantSet "uv" = {
-        "None" (){}
-        "default" (
-            payload = @{{ geometries.uv_map }}@
-        ){
-            asset userProperties:usd:variants:asset:geometry_uv_map:file = @{{ geometries.uv_map }}@
-            asset userProperties:usd:variants:asset:geometry_uv_map:source_file = @{{ geometries.hi }}@
-        }
-   }
 }

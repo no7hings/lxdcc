@@ -5,6 +5,9 @@ step: ''
 task: ''
 version: ''
 #
+start_frame: 0
+end_frame: 0
+#
 dcc:
     root: /master
     root_name: master
@@ -31,19 +34,21 @@ geometries:
     hair: 'geo/hair.usd'
     #
     uv_map: 'uv_map.usd'
-#
-display_colors:
-    object_color: 'display_color/object_color.usd'
-    group_color: 'display_color/group_color.usd'
-    asset_color: 'display_color/asset_color.usd'
-    uv_map_color: 'display_color/uv_map_color.usd'
+    user_property: "geo_extra/user_property.usd"
+    #
+    display_colors:
+        object_color: 'geo_extra/object_color.usd'
+        group_color: 'geo_extra/group_color.usd'
+        asset_color: 'geo_extra/asset_color.usd'
+        shell_color: 'geo_extra/shell_color.usd'
+        uv_map_color: 'geo_extra/uv_map_color.usd'
 #
 usdas:
-    display_color: 'display_color.usda'
-    look_map: 'look_map.usda'
+    geo_extra: 'geo_extra.usda'
+    geo_map: 'geo_map.usda'
     #
     material: 'shading.usda'
     #
     payload: 'payload.usda'
-    registry: 'registry.usda'
-    asset: '<asset>.usda'
+    registry: {file: 'registry.usda', replace: True}
+    asset: {file: '<asset>.usda', replace: True}

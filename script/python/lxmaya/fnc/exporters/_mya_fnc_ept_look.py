@@ -37,17 +37,30 @@ from lxutil.fnc import utl_fnc_obj_abs
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 
-class LookAssExporter(object):
+class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     PLUG_NAME = 'mtoa'
-    def __init__(self, file_path, root=None, frame=None, camera=None):
-        self._file_path = file_path
+    OPTION = dict(
+        file='',
+        location='',
+        frame=None,
+        camera=None,
+        #
+        texture_use_environ_map=False,
+    )
+    def __init__(self, option=None):
+        super(LookAssExporter, self).__init__(option)
+        self._file_path = self.get('file')
+        self._location = self.get('location')
+        self._frame = self.get('frame')
+        self._camera = self.get('camera')
+        self._texture_use_environ_map = self.get('texture_use_environ_map')
         #
         self._root = obj_core.DccPathDagMtd.get_dag_pathsep_replace(
-            root, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP
+            self._location, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP
         )
         #
-        self._star_frame, self._end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
-        self._camera_path = mya_dcc_objects.Scene.get_current_render_camera_path(camera)
+        self._star_frame, self._end_frame = mya_dcc_objects.Scene.get_frame_range(self._frame)
+        self._camera_path = mya_dcc_objects.Scene.get_current_render_camera_path(self._camera)
         #
         self._results = []
     @classmethod
@@ -120,16 +133,21 @@ class LookAssExporter(object):
         if self._star_frame != self._end_frame:
             kwargs['startFrame'] = self._star_frame
             kwargs['endFrame'] = self._end_frame
-        #
+        # map texture use environ
         self._results = self._set_cmd_run_(**kwargs)
         if self._results:
-            for i in self._results:
-                fr = utl_scripts.DotAssFileReader(i)
-                fr._set_file_paths_convert_()
-                utl_core.Log.set_module_result_trace(
-                    'maya-look-ass-exporter',
-                    u'file="{}"'.format(i)
-                )
+            if self._texture_use_environ_map is True:
+                with utl_core.log_progress_bar(maximum=len(self._results), label='texture environ-map') as l_p:
+                    for i in self._results:
+                        l_p.set_update()
+                        #
+                        fr = utl_scripts.DotAssFileReader(i)
+                        fr._set_file_paths_convert_()
+            #
+            utl_core.Log.set_module_result_trace(
+                ' ass export',
+                u'file="{}"'.format(self._file_path)
+            )
         #
         if 'selected' in kwargs:
             if _selected_paths:
@@ -204,8 +222,11 @@ class LookMtlxExporter(object):
         #
         if self._use_exists_ass is False:
             exporter = LookAssExporter(
-                file_path=self._ass_file_path,
-                root=self._root,
+                option=dict(
+                    file=self._ass_file_path,
+                    location=self._root,
+                    texture_use_environ_map=True,
+                )
             )
             exporter.set_run()
         #

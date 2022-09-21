@@ -895,8 +895,8 @@ class File(object):
     @classmethod
     def set_write(cls, file_path, raw):
         Log.set_module_result_trace(
-            'file write',
-            u'file="{}" is started'.format(file_path)
+            'file write is started',
+            u'file="{}"'.format(file_path)
         )
         directory = os.path.dirname(file_path)
         if os.path.isdir(directory) is False:
@@ -922,8 +922,8 @@ class File(object):
                 f.write(raw)
         #
         Log.set_module_result_trace(
-            'file write',
-            u'file="{}" is completed'.format(file_path)
+            'file write is completed',
+            u'file="{}"'.format(file_path)
         )
     @classmethod
     def set_read(cls, file_path):

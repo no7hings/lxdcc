@@ -99,8 +99,11 @@ class ProxyAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         start_frame, end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         #
         _mya_fnc_ept_look.LookAssExporter(
-            file_path=file_path,
-            root=location
+            option=dict(
+                file=file_path,
+                location=location,
+                texture_use_environ_map=True,
+            ),
         ).set_run()
     @classmethod
     def _set_color_correct_create_(cls):

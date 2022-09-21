@@ -16,9 +16,7 @@ layers = [
     'high', 'shape'
 ]
 
-render_passes = [
-    'primary', 'ass_object_color', 'ass_wire', 'ass_density'
-]
+render_passes = ['primary', 'ass_asset_color', 'ass_group_color', 'ass_object_color', 'ass_shell_color']
 
 dict_ = collections.OrderedDict()
 for i_layer, i_render_pass in itertools.product(layers, render_passes):
@@ -35,7 +33,7 @@ for i_layer, i_render_pass in itertools.product(layers, render_passes):
         )
         i_f_new = '{}/{}'.format(j_file_opt.directory_path, i_f_name_new)
         j_option['name'] = i_render_pass
-        j_option['image_foreground'] = '/l/resource/td/asset/image/foreground/{}-{}.png'.format(
+        j_option['image_foreground'] = '/l/resource/td/asset/image/foreground-v001/{}-{}.png'.format(
             i_layer, i_render_pass
         )
         dict_[i_f_new] = j_option

@@ -25,7 +25,9 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             raise TypeError()
         #
-        if use_tx is True:
+        with_texture_tx = self._hook_option_opt.get('with_texture_tx') or False
+        #
+        if with_texture_tx is True:
             pass
             # utl_dcc_operators.DccTexturesOpt(
             #     ktn_dcc_objects.TextureReferences(
@@ -57,11 +59,13 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         # TODO remove orig directory
         ktn_fnc_exporters.TextureExporter(
-            src_dir_path=texture_src_directory_path,
-            tgt_dir_path=texture_tgt_directory_path,
             option=dict(
+                directory_base=texture_src_directory_path,
+                directory=texture_tgt_directory_path,
+                #
                 fix_name_blank=True,
                 use_tx=False,
-                with_reference=False
+                with_reference=False,
+                use_environ_map=True,
             )
         ).set_run()

@@ -3131,14 +3131,6 @@ class ColorMtd(object):
     def set_rgb_offset(cls, rgb, hsv_offset):
         r, g, b = rgb
     @classmethod
-    def get_choice_colors(cls, count, maximum=255, offset=0, seed=0):
-        list_ = []
-        for i in range(count):
-            list_.append(
-                cls.get_color_from_index(i, count, maximum, offset, seed)
-            )
-        return list_
-    @classmethod
     def get_color_from_string(cls, string, count=1000, maximum=255, offset=0, seed=0):
         d = count
         a_0 = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])+offset
@@ -3148,14 +3140,25 @@ class ColorMtd(object):
         v = float(45+a_1 % 55)/100.0
         return ColorMtd.hsv2rgb(h, s, v, maximum)
     @classmethod
+    def get_choice_colors(cls, count, maximum=255, offset=0, seed=0):
+        list_ = []
+        for i in range(count):
+            list_.append(
+                cls.get_color_from_index(i, count, maximum, offset, seed)
+            )
+        return list_
+    @classmethod
     def get_color_from_index(cls, index, count, maximum=255, offset=0, seed=0):
-        d = count
+        d = 1000.0
         p = float(index)/float(count)
-        a_0 = int(str(index)[::-1])+offset
-        a_1 = index
-        h = float(a_0 % (360+seed+180.0*p)*d)/d
-        s = float(45+a_1 % 55)/100.0
-        v = float(45+a_1 % 55)/100.0
+        i_0 = 360.0*p
+        i_1 = 360.0*(1.0-p)
+        a_0 = i_0+offset+seed
+        a_1 = i_1+offset+seed
+        h = float(a_0 % 360.0*d)/d
+        s = float(0.25*d+(a_0 % 0.75*d))/d
+        v = float(0.25*d+(a_1 % 0.75*d))/d
+        print index, h, s, v
         return cls.hsv2rgb(h, s, v, maximum)
 
 
@@ -3270,6 +3273,9 @@ class TextOpt(object):
 
     def get_is_float(self):
         return sum([n.isdigit() for n in self._raw.strip().split('.')]) == 2
+
+    def get_is_matched(self, p):
+        return fnmatch.filter([self._raw], p)
 
 
 class ValueMtd(object):
@@ -5592,6 +5598,8 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    MeshFaceShellMtd.get_shell_dict_from_face_vertices(
-        *StorageFileOpt('/data/f/shell_id_test/input.json').set_read()
-    )
+    c = 1000
+    for i in range(c):
+        ColorMtd.get_color_from_index(
+            i, c
+        )

@@ -12,8 +12,12 @@ def set_asset_look_ass_export(file_path, root=None):
     :return: list[str(<result>)]
     """
     exporter = mya_fnc_exporters.LookAssExporter(
-        file_path=file_path,
-        root=root
+        option=dict(
+            file=file_path,
+            location=root,
+            #
+            texture_use_environ_map=True,
+        )
     ).set_run()
     return exporter.get_outputs()
 

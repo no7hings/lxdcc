@@ -10,9 +10,7 @@ p = bsc_core.ParsePatternOpt(render_output_file_path_pattern)
 p.set_update(directory=render_output_directory_path)
 matchers = p.get_matches()
 
-render_passes = [
-    'primary', 'ass_object_color', 'ass_wire', 'ass_density'
-]
+render_passes = ['primary', 'ass_asset_color', 'ass_group_color', 'ass_object_color', 'ass_shell_color']
 
 dict_ = collections.OrderedDict()
 for i in matchers:
@@ -27,7 +25,7 @@ for i in matchers:
         )
         i_f_new = '{}/{}'.format(i_f_opt.directory_path, i_f_name_new)
         i_v['name'] = i_render_pass
-        i_v['image_foreground'] = '/l/resource/td/asset/image/foreground/{}-{}.png'.format(
+        i_v['image_foreground'] = '/l/resource/td/asset/image/foreground-v001/{}-{}.png'.format(
             i_layer, i_render_pass
         )
         dict_[i_f_new] = i_v

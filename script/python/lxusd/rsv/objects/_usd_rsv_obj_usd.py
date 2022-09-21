@@ -664,41 +664,11 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         'object_color',
         'group_color',
         'asset_color',
+        'shell_color',
         'uv_map_color'
     ]
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
-
-    def get_look_pass_names(self):
-        import os
-        #
-        import fnmatch
-        #
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        #
-        if workspace == 'work':
-            return ['default']
-        elif workspace == 'publish':
-            keyword = 'asset-look-klf-file'
-        elif workspace == 'output':
-            keyword = 'asset-output-look-klf-file'
-        else:
-            raise TypeError()
-        #
-        file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword
-        )
-        file_path = file_rsv_unit.get_exists_result(
-            version=version
-        )
-
-        if file_path:
-            element_names = bsc_core.ZipFileOpt(file_path).get_element_names()
-            look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
-            return look_pass_names
-        return ['default']
 
     def set_asset_shot_asset_component_usd_create(self):
         workspace = self._rsv_scene_properties.get('workspace')
@@ -757,13 +727,11 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_shot_set_usd_create(self):
         pass
 
-    def set_asset_display_color_usd_create(self):
-        from lxutil import utl_core
-
+    def set_asset_user_property_usd_create(self):
         from lxusd import usd_core
 
-        import lxusd.fnc.exporters as usd_fnc_exporter
-
+        import lxusd.fnc.exporters as usd_fnc_exporters
+        #
         asset = self._rsv_scene_properties.get('asset')
         step = self._rsv_scene_properties.get('step')
         workspace = self._rsv_scene_properties.get('workspace')
@@ -772,13 +740,13 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         if workspace == 'work':
             keyword_0 = 'asset-work-geometry-usd-var-file'
-            keyword_1 = 'asset-work-display_color-usd-dir'
+            keyword_1 = 'asset-work-geometry-user_property-usd-file'
         elif workspace == 'publish':
             keyword_0 = 'asset-geometry-usd-var-file'
-            keyword_1 = 'asset-display_color-usd-dir'
+            keyword_1 = 'asset-geometry-user_property-usd-file'
         elif workspace == 'output':
             keyword_0 = 'asset-output-geometry-usd-var-file'
-            keyword_1 = 'asset-output-display_color-usd-dir'
+            keyword_1 = 'asset-output-geometry-user_property-usd-file'
         else:
             raise TypeError()
         #
@@ -797,21 +765,93 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 s.set_sublayer_append(i_geometry_usd_var_file_path)
             else:
                 utl_core.Log.set_module_warning_trace(
-                    'display color create',
+                    'look property create',
+                    'variant="{}" is not found'.format(i_var_name)
+                )
+        #
+        geometry_user_property_usd_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_1
+        )
+        geometry_user_property_usd_file_path = geometry_user_property_usd_file_rsv_unit.get_result(
+            version=version
+        )
+        usd_fnc_exporters.GeometryLookPropertyExporter(
+            option=dict(
+                file=geometry_user_property_usd_file_path,
+                location=root,
+                #
+                stage_src=s.usd_instance,
+                #
+                asset_name=asset,
+                #
+                color_seed=5,
+                #
+                with_object_color=True,
+                with_group_color=True,
+                with_asset_color=True,
+                with_shell_color=True,
+                #
+                # with_uv_map=True,
+                # #
+                # with_display_color=True
+            )
+        ).set_run()
+
+    def set_asset_display_color_usd_create(self):
+        from lxutil import utl_core
+
+        from lxusd import usd_core
+
+        import lxusd.fnc.exporters as usd_fnc_exporter
+
+        asset = self._rsv_scene_properties.get('asset')
+        step = self._rsv_scene_properties.get('step')
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        root = self._rsv_scene_properties.get('dcc.root')
+        #
+        if workspace == 'work':
+            keyword_0 = 'asset-work-geometry-usd-var-file'
+            keyword_1 = 'asset-work-geometry-extra-usd-dir'
+        elif workspace == 'publish':
+            keyword_0 = 'asset-geometry-usd-var-file'
+            keyword_1 = 'asset-geometry-extra-usd-dir'
+        elif workspace == 'output':
+            keyword_0 = 'asset-output-geometry-usd-var-file'
+            keyword_1 = 'asset-output-geometry-extra-usd-dir'
+        else:
+            raise TypeError()
+        #
+        var_names = ['hi', 'shape', 'hair']
+        #
+        s = usd_core.UsdStageOpt()
+        geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword_0
+        )
+        for i_var_name in var_names:
+            i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_exists_result(
+                version=version,
+                extend_variants=dict(var=i_var_name)
+            )
+            if i_geometry_usd_var_file_path:
+                s.set_sublayer_append(i_geometry_usd_var_file_path)
+            else:
+                utl_core.Log.set_module_warning_trace(
+                    'geometry display-color create',
                     'file="{}" is not found'.format(i_geometry_usd_var_file_path)
                 )
         #
-        display_color_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+        geometry_extra_usd_directory_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_1
         )
         #
-        display_color_usd_directory_path = display_color_usd_directory_rsv_unit.get_result(
+        geometry_extra_usd_directory_path = geometry_extra_usd_directory_rsv_unit.get_result(
             version=version
         )
 
         for i_color_scheme in self.COLOR_SCHEME:
             i_file_path = '{}/{}.usd'.format(
-                display_color_usd_directory_path,
+                geometry_extra_usd_directory_path,
                 i_color_scheme
             )
             usd_fnc_exporter.GeometryDisplayColorExporter(
@@ -830,6 +870,8 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             ).set_run()
 
     def set_asset_component_usd_create(self):
+        import lxutil.scripts as utl_scripts
+        #
         step = self._rsv_scene_properties.get('step')
         workspace = self._rsv_scene_properties.get('workspace')
         version = self._rsv_scene_properties.get('version')
@@ -868,7 +910,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             c.set_flatten()
             #
-            look_pass_names = self.get_look_pass_names()
+            look_pass_names = self.get_asset_exists_look_pass_names()
             c.set(
                 'look.passes', look_pass_names
             )
@@ -876,18 +918,39 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             usda_dict = c.get('usdas')
             #
             for k, v in usda_dict.items():
+                if isinstance(v, (str, unicode)):
+                    i_file_base = v
+                    i_replace = False
+                elif isinstance(v, dict):
+                    i_file_base = v['file']
+                    i_replace = v['replace']
+                else:
+                    raise RuntimeError()
                 t = utl_configure.Jinja.get_template('{}/{}'.format(key, k))
                 i_raw = t.render(
                     **c.value
                 )
                 i_usda_file_path = '{}/{}'.format(
-                    component_usd_directory_path, v
+                    component_usd_directory_path, i_file_base
                 )
                 i_file = utl_dcc_objects.OsFile(i_usda_file_path)
                 if i_file.get_is_exists() is False:
                     utl_dcc_objects.OsFile(i_usda_file_path).set_write(
                         i_raw
                     )
+                else:
+                    if i_replace is True:
+                        i_start_frame, i_end_frame = utl_scripts.DotUsdaFileReader(
+                            i_usda_file_path
+                        ).get_frame_range()
+                        c.set('start_frame', i_start_frame)
+                        c.set('end_frame', i_end_frame)
+                        i_raw = t.render(
+                            **c.value
+                        )
+                        utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                            i_raw
+                        )
             #
             if workspace in ['publish']:
                 # noinspection PyUnresolvedReferences

@@ -97,8 +97,8 @@ class AbsFileReader(object):
     def _set_line_raw_update_(self):
         self._lines = []
         utl_core.Log.set_module_result_trace(
-            'maya-ascii-read',
-            u'file="{}" start'.format(self._file_path)
+            'file read is started',
+            u'file="{}"'.format(self._file_path)
         )
         if self._file_path is not None:
             with open(self._file_path) as f:
@@ -107,8 +107,8 @@ class AbsFileReader(object):
                 self._lines = self._get_lines_(raw, sep)
         #
         utl_core.Log.set_module_result_trace(
-            'maya-ascii-read',
-            u'file="{}" complete'.format(self._file_path)
+            'file read is completed',
+            u'file="{}"'.format(self._file_path)
         )
     @classmethod
     def _get_lines_(cls, raw, sep):
@@ -664,31 +664,32 @@ class DotAssFileReader(AbsFileReader):
                 self._lines, matcher.fnmatch_pattern
             )
             if results:
-                for line in results:
-                    p = parse.parse(
-                        matcher.parse_pattern, line
+                for i_line in results:
+                    i_p = parse.parse(
+                        matcher.parse_pattern, i_line
                     )
-                    if p:
-                        variants = p.named
-                        file_path = variants['file_path']
-                        new_file_path = None
-                        for k, v in self.MAPPER_DICT.items():
-                            if file_path.lower().startswith(k.lower()):
-                                new_file_path = v + file_path[len(k):]
+                    if i_p:
+                        i_variants = i_p.named
+                        i_file_path = i_variants['file_path']
                         #
-                        if new_file_path is not None:
-                            new_line = line.replace(file_path, new_file_path)
+                        i_new_file_path = None
+                        for k, v in self.MAPPER_DICT.items():
+                            if i_file_path.lower().startswith(k.lower()):
+                                i_new_file_path = v+i_file_path[len(k):]
+                        #
+                        if i_new_file_path is not None:
+                            i_new_line = i_line.replace(i_file_path, i_new_file_path)
 
                             replace_lis.append(
-                                (line, new_line, file_path, new_file_path)
+                                (i_line, i_new_line, i_file_path, i_new_file_path)
                             )
         #
-        for line, new_line, file_path, new_file_path in replace_lis:
-            index = self._lines.index(line)
-            self._lines[index] = new_line
+        for i_line, i_new_line, i_file_path, i_new_file_path in replace_lis:
+            index = self._lines.index(i_line)
+            self._lines[index] = i_new_line
             utl_core.Log.set_module_result_trace(
-                'dot-ass-file-path-convert',
-                'file="{}" >> "{}"'.format(file_path, new_file_path)
+                'dot-ass path-convert',
+                'file="{}" >> "{}"'.format(i_file_path, i_new_file_path)
             )
 
         utl_core.File.set_write(self._file_path, ''.join(self._lines))
@@ -710,9 +711,42 @@ class DotAssFileReader(AbsFileReader):
         return False
 
 
+class DotUsdaFileReader(AbsFileReader):
+    SEP = '\n'
+    LINE_MATCHER_CLS = LineMatcher
+    def __init__(self, file_path):
+        super(DotUsdaFileReader, self).__init__(file_path)
+
+    def get_frame_range(self):
+        m_0 = self.LINE_MATCHER_CLS('    startTimeCode = {value}\n')
+        m_1 = self.LINE_MATCHER_CLS('    endTimeCode = {value}\n')
+        results_0 = fnmatch.filter(
+            self._lines, m_0.fnmatch_pattern
+        )
+        start_frame = 0
+        if results_0:
+            p_0 = parse.parse(
+                m_0.parse_pattern, results_0[0]
+            )
+            if p_0:
+                start_frame = int(p_0['value'])
+
+        results_1 = fnmatch.filter(
+            self._lines, m_1.fnmatch_pattern
+        )
+        end_frame = 0
+        if results_1:
+            p_1 = parse.parse(
+                m_1.parse_pattern, results_1[0]
+            )
+            if p_1:
+                end_frame = int(p_1['value'])
+        return start_frame, end_frame
+
+
 if __name__ == '__main__':
-    d = DotAssFileReader(
-        '/l/prod/cjd/publish/assets/flg/ast_shl_cao_a/srf/surfacing/ast_shl_cao_a.srf.surfacing.v001/cache/ass/ast_shl_cao_a.ass'
+    d = DotUsdaFileReader(
+        '/l/prod/cgm/publish/assets/flg/xiangzhang_tree_g/mod/mod_dynamic/xiangzhang_tree_g.mod.mod_dynamic.v001/cache/usd/xiangzhang_tree_g.usda'
     )
 
-    print d.get_is_from_maya()
+    print d.get_frame_range()

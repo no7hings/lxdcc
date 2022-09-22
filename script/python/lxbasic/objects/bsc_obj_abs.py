@@ -187,6 +187,16 @@ class AbsContent(object):
         if value not in es:
             es.append(value)
 
+    def set_element_append(self, key, value):
+        v = self.get(key)
+        if isinstance(v, (tuple, list)):
+            es = v
+        else:
+            es = []
+            self.set(key, es)
+        #
+        es.append(value)
+
     def _set_value_unfold_(self, key, keys):
         def rcs_fnc_(key_, value_):
             if isinstance(value_, (str, unicode)):

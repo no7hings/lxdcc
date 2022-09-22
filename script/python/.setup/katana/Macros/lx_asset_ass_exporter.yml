@@ -26,6 +26,16 @@ parameters:
         value: 1001
         tool_tip: '...'
 
+    export/dynamic/override_points:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    export/dynamic/override_uv_maps:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
     export/geometry/location:
         widget: path
         value: '/root/world/geo/master'

@@ -169,6 +169,16 @@ parameters:
         widget: button
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_create()'
         tool_tip: '...'
+
+    extra/translate_to_origin/location:
+        widget: string
+        value: '/root/world/geo/master'
+        tool_tip: '...'
+
+    extra/translate_to_origin/execute:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_translate_to_center()'
+        tool_tip: '...'
     #
     lynxi_info/type:
         widget: string

@@ -579,6 +579,9 @@ class LxAsset(object):
                     no_visible=False, cancel_visible=False
                 )
 
+    def set_translate_to_center(self):
+        pass
+
 
 class LxAssetAss(object):
     RENDER_MODE = 'previewRender'

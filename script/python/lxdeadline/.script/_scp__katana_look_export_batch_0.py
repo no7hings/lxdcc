@@ -8,12 +8,12 @@ import lxresolver.commands as rsv_commands
 import lxsession.commands as ssn_commands
 
 assets = [
-    'shrubs_a',
+    # 'shrubs_a',
     # 'shrubs_b',
     # 'shrubs_c',
-    # 'chrysanthemum_a',
-    # 'chrysanthemum_b',
-    # 'chrysanthemum_c',
+    'chrysanthemum_a',
+    'chrysanthemum_b',
+    'chrysanthemum_c',
     # 'kite_tree',
     # 'xiangzhang_tree_b',
     # 'xiangzhang_tree_b',
@@ -48,8 +48,8 @@ for i_asset in assets:
                 with_texture_tx=True,
                 with_look_ass=True,
                 #
-                td_enable=True,
-                # rez_beta=True,
+                # td_enable=True,
+                rez_beta=True,
             )
         )
         #

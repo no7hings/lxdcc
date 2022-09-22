@@ -35,10 +35,10 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                 dcc_objs = self._stage.get_objs()
                 if dcc_objs:
                     utl_core.Log.set_module_result_trace(
-                        'mesh-data-build',
+                        'comparer-data build',
                         'file="{}"'.format(file_path)
                     )
-                    gp = utl_core.GuiProgressesRunner(maximum=len(dcc_objs), label='mesh-data-build')
+                    gp = utl_core.GuiProgressesRunner(maximum=len(dcc_objs), label='comparer-data build')
                     for dcc_obj in dcc_objs:
                         gp.set_update()
                         obj_type_name = dcc_obj.type.name
@@ -74,7 +74,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
     def get_mesh_comparer_data(self, file_path):
         if file_path:
             yml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(file_path, 'mesh-comparer')
-            return self._get_mesh_data_content_(self._stage, yml_file_path)
+            return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
         else:
             return bsc_objects.Content(value={})
     @classmethod

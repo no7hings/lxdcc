@@ -236,7 +236,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         asset_name='',
         #
         color_seed=0,
-        # "object_color", "group_color", "asset_color", "uv_map_color", "shell_color"
+        # "object_color", "group_color", "asset_color", "uv_map_color", "shell_color", "enable_color"
         color_scheme='asset_color'
     )
     def __init__(self, *args, **kwargs):
@@ -267,6 +267,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_run(self):
         count = len([i for i in self._usd_stage_src.TraverseAll()])
+        color_scheme = self.get('color_scheme')
         with utl_core.log_progress_bar(
             maximum=count,
             label='geometry display-color create'
@@ -287,33 +288,36 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
                     i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
                     #
-                    if self._color_scheme == 'object_color':
-                        i_object_color = i_obj_path_opt.get_color_from_name(
-                            maximum=1.0, seed=self._color_seed
-                        )
-                        i_usd_mesh_opt_tgt.set_display_color_fill(i_object_color)
-                    elif self._color_scheme == 'group_color':
-                        i_group_path_opt = i_obj_path_opt.get_parent().get_parent()
-                        i_group_color = i_group_path_opt.get_color_from_name(
-                            maximum=1.0, seed=self._color_seed
-                        )
-                        i_usd_mesh_opt_tgt.set_display_color_fill(i_group_color)
-                    elif self._color_scheme == 'asset_color':
-                        i_usd_mesh_opt_tgt.set_display_color_fill(asset_color)
-                    #
-                    if i_obj_type_name == usd_configure.ObjType.MESH:
-                        if self._color_scheme == 'uv_map_color':
-                            i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_from_uv_map('st')
-                            i_usd_mesh_opt_tgt.set_display_color_as_face_vertices(
-                                i_display_color_map
+                    if isinstance(color_scheme, (str, unicode)):
+                        if color_scheme == 'object_color':
+                            i_object_color = i_obj_path_opt.get_color_from_name(
+                                maximum=1.0, seed=self._color_seed
                             )
-                        elif self._color_scheme == 'shell_color':
-                            i_face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
-                                offset=i_index, seed=self._color_seed
+                            i_usd_mesh_opt_tgt.set_display_color_fill(i_object_color)
+                        elif color_scheme == 'group_color':
+                            i_group_path_opt = i_obj_path_opt.get_parent().get_parent()
+                            i_group_color = i_group_path_opt.get_color_from_name(
+                                maximum=1.0, seed=self._color_seed
                             )
-                            i_usd_mesh_opt_tgt.set_display_color_as_face_color(
-                                i_face_colors
-                            )
+                            i_usd_mesh_opt_tgt.set_display_color_fill(i_group_color)
+                        elif color_scheme == 'asset_color':
+                            i_usd_mesh_opt_tgt.set_display_color_fill(asset_color)
+                        # for mesh
+                        if i_obj_type_name == usd_configure.ObjType.MESH:
+                            if color_scheme == 'uv_map_color':
+                                i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_from_uv_map('st')
+                                i_usd_mesh_opt_tgt.set_display_color_as_face_vertices(
+                                    i_display_color_map
+                                )
+                            elif color_scheme == 'shell_color':
+                                i_face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
+                                    offset=i_index, seed=self._color_seed
+                                )
+                                i_usd_mesh_opt_tgt.set_display_color_as_face_color(
+                                    i_face_colors
+                                )
+                    elif isinstance(color_scheme, dict):
+                        pass
                 #
                 l_p.set_update()
         #

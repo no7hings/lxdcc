@@ -30,6 +30,9 @@ class FncUsdObj(object):
             self._usd_path
         )
 
+    def set_customize_ports_create(self, port_match_patterns):
+        pass
+
 
 class FncUsdTransform(FncUsdObj):
     def __init__(self, usd_prim, location=None):

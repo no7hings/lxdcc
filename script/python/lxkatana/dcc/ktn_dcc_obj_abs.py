@@ -58,7 +58,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         if ktn_port is None:
             utl_core.Log.set_module_result_trace(
                 'port create',
-                'atr-path="{}"'.format(self.path)
+                'attribute="{}"'.format(self.path)
             )
             if self.port_assign == obj_configure.PortAssign.VARIANTS:
                 if parent is not None:

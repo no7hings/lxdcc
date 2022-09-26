@@ -45,7 +45,7 @@ class KtnSGObjOpt(object):
     def get_port_raw(self, port_path, use_global=False):
         port = self.get_port(port_path, use_global)
         if port is not None:
-            return port.getData()[0]
+            return port.getValue()
 
     def get(self, key, use_global=False):
         return self.get_port_raw(key, use_global)
@@ -111,9 +111,13 @@ class KtnSGStageOpt(object):
             return tvl.getLocationData().getAttrs().getChildByName(port_path)
 
     def get_port_raw(self, atr_path):
-        port = self.get_port(atr_path)
-        if port is not None:
-            return port.getData()
+        p = self.get_port(atr_path)
+        if p is not None:
+            c = p.getTupleSize()
+            if c == 1:
+                return p.getValue()
+            else:
+                return p.getData()
 
     def get(self, key):
         return self.get_port_raw(key)
@@ -143,13 +147,13 @@ class KtnSGStageOpt(object):
             tvl.next()
             # include filter
             if isinstance(include_types, (tuple, list)):
-                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                i_type_name = i_attrs.getChildByName('type').getValue()
                 if i_type_name not in include_types:
                     continue
             # exclude filter
             if isinstance(exclude_types, (tuple, list)):
                 i_attrs = tvl.getLocationData().getAttrs()
-                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                i_type_name = i_attrs.getChildByName('type').getValue()
                 if i_type_name in exclude_types:
                     continue
             #
@@ -180,19 +184,19 @@ class KtnSGStageOpt(object):
             tvl.next()
             # include filter
             if isinstance(include_types, (tuple, list)):
-                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                i_type_name = i_attrs.getChildByName('type').getValue()
                 if i_type_name not in include_types:
                     continue
             # exclude filter
             if isinstance(exclude_types, (tuple, list)):
                 i_attrs = tvl.getLocationData().getAttrs()
-                i_type_name = i_attrs.getChildByName('type').getData()[0]
+                i_type_name = i_attrs.getChildByName('type').getValue()
                 if i_type_name in exclude_types:
                     continue
             #
             i_attr = i_attrs.getChildByName(port_path)
             if i_attr is not None:
-                i_ = i_attr.getData()[0]
+                i_ = i_attr.getValue()
                 list_.append(i_)
         #
         list__ = list(set(list_))

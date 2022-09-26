@@ -148,6 +148,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         render_file_path = scene_file_path
         # save file first
         ktn_dcc_objects.Scene.set_file_save_to(render_file_path)
+        #
+        katana_workspace = ktn_dcc_objects.AssetWorkspace()
         # create workspace
         ktn_fnc_creators.LookWorkspaceCreator().set_run()
         #
@@ -167,7 +169,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 shot_geometries_node_opt.set('options.shot', _[0])
             shot_geometries_node_opt.set_port_execute('usd.create')
         # usd
-        geometries = [ktn_dcc_objects.Node(i) for i in ['asset__geometries', 'asset__geometries']]
+        geometries = [ktn_dcc_objects.Node(i) for i in ['asset__geometries', 'shot__geometries']]
         usd_version_enable = self._hook_option_opt.get_as_boolean('usd_version_enable')
         usd_version_override_enable = self._hook_option_opt.get_as_boolean('usd_version_override_enable')
         usd_reverse_face_vertex_enable = self._hook_option_opt.get_as_boolean('usd_reverse_face_vertex_enable')
@@ -190,9 +192,11 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_camera == 'front':
                 if front_camera_scheme is not None:
                     if front_camera_scheme == 'lineup':
-                        self.set_front_camera()
+                        # self.set_front_camera()
+                        katana_workspace.set_asset_front_camera_fill_to_front()
                     elif front_camera_scheme == 'assess':
-                        self.set_front_camera_for_assess()
+                        # self.set_front_camera_for_assess()
+                        katana_workspace.set_asset_front_camera_fill_to_rotation()
         #
         light_pass_all = self._hook_option_opt.get('light_pass_all')
         if light_pass_all:
@@ -505,3 +509,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         dcc_camera.set(
             'cameras.front.render_resolution', '{}x{}'.format(width, height)
         )
+
+    def set_asset_usd_reload(self):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        ktn_dcc_objects.AssetWorkspace().set_set_usd_reload()

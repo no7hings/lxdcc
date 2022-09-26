@@ -14,14 +14,14 @@ assets = [
     'chrysanthemum_a',
     'chrysanthemum_b',
     'chrysanthemum_c',
-    'kite_tree',
-    'xiangzhang_tree_b',
-    'xiangzhang_tree_b',
-    'xiangzhang_tree_c',
-    'xiangzhang_tree_d',
-    'xiangzhang_tree_e',
-    'xiangzhang_tree_f',
-    'xiangzhang_tree_g'
+    # 'kite_tree',
+    # 'xiangzhang_tree_b',
+    # 'xiangzhang_tree_b',
+    # 'xiangzhang_tree_c',
+    # 'xiangzhang_tree_d',
+    # 'xiangzhang_tree_e',
+    # 'xiangzhang_tree_f',
+    # 'xiangzhang_tree_g'
 ]
 
 resolver = rsv_commands.get_resolver()
@@ -36,23 +36,26 @@ keyword = 'asset-geometry-usd-var-file'
 
 list_ = []
 for i_asset in assets:
-    i_static_rsv_task = rsv_project.get_rsv_task(
+    i_model_static_rsv_task = rsv_project.get_rsv_task(
         asset=i_asset, task='modeling'
     )
-    i_dynamic_rsv_task = rsv_project.get_rsv_task(
+    i_model_dynamic_rsv_task = rsv_project.get_rsv_task(
         asset=i_asset, task='mod_dynamic'
     )
 
-    if i_static_rsv_task and i_dynamic_rsv_task:
-        i_static_file_rsv_unit = i_static_rsv_task.get_rsv_unit( keyword=keyword)
-        i_static_file_path = i_static_file_rsv_unit.get_result(version='latest', extend_variants=dict(var='hi'))
-        i_dynamic_file_rsv_unit = i_dynamic_rsv_task.get_rsv_unit(keyword=keyword)
-        i_dynamic_file_path = i_dynamic_file_rsv_unit.get_result(version='latest', extend_variants=dict(var='hi'))
+    i_surface_rsv_task = rsv_project.get_rsv_task(
+        asset=i_asset, task='surfacing'
+    )
 
-        if i_static_file_path and i_dynamic_file_path:
+    if i_model_static_rsv_task and i_model_dynamic_rsv_task:
+        i_model_static_file_rsv_unit = i_model_static_rsv_task.get_rsv_unit(keyword=keyword)
+        i_model_static_file_path = i_model_static_file_rsv_unit.get_result(version='latest', extend_variants=dict(var='hi'))
+        i_dynamic_file_rsv_unit = i_model_dynamic_rsv_task.get_rsv_unit(keyword=keyword)
+        i_dynamic_file_path = i_dynamic_file_rsv_unit.get_result(version='latest', extend_variants=dict(var='hi'))
+        if i_model_static_file_path and i_dynamic_file_path:
             i_results = usd_fnc_comparers.GeometryComparer(
                 option=dict(
-                    file_src=i_static_file_path,
+                    file_src=i_model_static_file_path,
                     file_tgt=i_dynamic_file_path,
                     #
                     location='/master/hi'
@@ -70,7 +73,7 @@ for i_asset in assets:
             )
             if i_results:
                 print i_results
-                print i_static_file_path, i_dynamic_file_path
+                print i_model_static_file_path, i_dynamic_file_path
                 list_.append(i_asset)
                 utl_core.Log.set_error_trace(
                     'asset="{}" is non matched'.format(i_asset)

@@ -57,6 +57,7 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
         c = len([i for i in self._usd_stage.TraverseAll()])
         if c:
             root_override = self._option['root_override']
+            port_match_patterns = self._option['port_match_patterns']
             if root_override is not None:
                 self._set_path_create_(root_override)
             #
@@ -66,6 +67,9 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.TRANSFORM:
                         mya_fnc_obj_core.FncUsdTransform(i_usd_prim, location=root_override).set_create()
+                        mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
+                            port_match_patterns
+                        )
                     elif i_usd_prim_type_name == usd_configure.ObjType.MESH:
                         mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
     @classmethod

@@ -1,5 +1,7 @@
 # coding:utf-8
 import collections
+#
+import math
 # noinspection PyUnresolvedReferences
 from Katana import Utils, NodegraphAPI, CacheManager, RenderManager
 # noinspection PyUnresolvedReferences
@@ -349,6 +351,8 @@ class LxAsset(object):
             )
 
     def __set_asset_usd_create_(self, rsv_asset):
+        from lxutil import utl_core
+
         from lxkatana import ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -384,12 +388,19 @@ class LxAsset(object):
                     asset_set_usd_file_path
                 )
                 self.__set_usd_variant_by_dict_(usd_variant_dict)
-
+                #
+                utl_core.Log.set_module_result_trace(
+                    'set usd create for asset',
+                    'file="{}"'.format(asset_set_usd_file_path)
+                )
+        #
         CacheManager.flush()
 
     def __set_asset_shot_usd_create_(self, rsv_asset, rsv_shot):
+        from lxutil import utl_core
+
         from lxkatana import ktn_core
-        #
+
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxusd.rsv.objects as usd_rsv_objects
@@ -448,6 +459,11 @@ class LxAsset(object):
                 #
                 self.__set_usd_variant_by_dict_(
                     usd_variant_dict
+                )
+                #
+                utl_core.Log.set_module_result_trace(
+                    'set usd create for shot-asset',
+                    'file="{}"'.format(asset_shot_set_usd_file_path)
                 )
         #
         CacheManager.flush()
@@ -580,7 +596,33 @@ class LxAsset(object):
                 )
 
     def set_translate_to_center(self):
-        pass
+        from lxusd import usd_core
+
+        from lxkatana import ktn_core
+        #
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        #
+        file_path = obj_opt.get('usd.asset.file')
+        if file_path:
+            root = '/master'
+            sub_locations = [
+                '/master/hi',
+                '/master/shape',
+            ]
+            s_opt = usd_core.UsdStageOpt(
+                file_path
+            )
+            [s_opt.set_active_at(i, True) for i in sub_locations]
+            g = s_opt.get_geometry_args(root)
+            (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
+            if obj_opt.get('extra.transformation.translate_above_axis_y'):
+                obj_opt.set(
+                    'extra.transformation.translate_offset', [-c_x, -y, -c_z]
+                )
+            else:
+                obj_opt.set(
+                    'extra.transformation.translate_offset', [-c_x, -c_y, -c_z]
+                )
 
 
 class LxAssetAss(object):
@@ -822,9 +864,7 @@ class LxGeometrySettings(object):
 
         stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
 
-        _ = stage_opt.get('/root/world/geo.info.usdOpArgs.fileName')
-        if _:
-            return _[0]
+        return stage_opt.get('/root/world/geo.info.usdOpArgs.fileName')
 
     def set_create(self):
         from lxkatana import ktn_core
@@ -979,6 +1019,123 @@ class LxCamera(object):
             ]
             ktn_core.VariablesSetting().set_register(
                 key, values
+            )
+
+    def set_front_fill_to_front(self):
+        from lxbasic import bsc_core
+
+        from lxusd import usd_core
+
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
+
+        location = '/root/world/geo'
+
+        file_path = stage_opt.get(
+            '/root/world/geo.info.usdOpArgs.fileName'.format(location)
+        )
+        translate_offset = stage_opt.get(
+            '/root/world/geo/master.xform.interactive.translate'.format(location)
+        )
+        if file_path:
+            root = '/master'
+            sub_locations = [
+                '/master/hi',
+                '/master/shape',
+            ]
+            s_opt = usd_core.UsdStageOpt(
+                file_path
+            )
+            [s_opt.set_active_at(i, True) for i in sub_locations]
+            g = s_opt.get_geometry_args(root)
+            #
+            x_o, y_o, z_o = translate_offset
+            (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
+            #
+            w += .1
+            h += .2
+            c_y += .1
+            #
+            (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z) = bsc_core.CameraMtd.get_front_transformation(
+                geometry_args=((x, y, z), (c_x, c_y, c_z), (w, h, d)),
+                angle=1,
+            )
+            #
+            obj_opt.set('settings.screen_modify_mode', 'fill')
+            #
+            obj_opt.set('cameras.front.translate', (t_x+x_o, t_y+y_o, t_z+z_o))
+            obj_opt.set('cameras.front.rotate', (r_x, r_y, r_z))
+            obj_opt.set('cameras.front.scale', (s_x, s_y, s_z))
+            #
+            width, height = int(w * 50), int(h * 50)
+            #
+            obj_opt.set(
+                'cameras.front.render_resolution', '{}x{}'.format(width, height)
+            )
+
+    def set_front_fill_to_all(self):
+        from lxbasic import bsc_core
+
+        from lxusd import usd_core
+
+        from lxkatana import ktn_core
+
+        obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnSGStageOpt(self._ktn_obj)
+
+        location = '/root/world/geo'
+
+        file_path = stage_opt.get(
+            '/root/world/geo.info.usdOpArgs.fileName'.format(location)
+        )
+        pivot = stage_opt.get(
+            '/root/world/geo/master.xform.interactive.translate'.format(location)
+        )
+        if file_path:
+            root = '/master'
+            sub_locations = [
+                '/master/hi',
+                '/master/shape',
+            ]
+            s_opt = usd_core.UsdStageOpt(
+                file_path
+            )
+            [s_opt.set_active_at(i, True) for i in sub_locations]
+            g = s_opt.get_geometry_args(root)
+            x_o, y_o, z_o = pivot
+            (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
+            #
+            r = s_opt.get_radius(pivot)
+            w = r*2
+            #
+            w += .1
+            h += .2
+            c_y += .1
+            #
+            (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z) = bsc_core.CameraMtd.get_front_transformation(
+                geometry_args=((x, y, z), (c_x, c_y, c_z), (w, h, d)),
+                angle=1,
+                mode=1
+            )
+            #
+            obj_opt.set('settings.screen_modify_mode', 'fill')
+            #
+            obj_opt.set('cameras.front.translate', (t_x+x_o, t_y+y_o, t_z+z_o))
+            obj_opt.set('cameras.front.rotate', (r_x, r_y, r_z))
+            obj_opt.set('cameras.front.scale', (s_x, s_y, s_z))
+            #
+            multipy = 4
+            #
+            width, height = int(w*50*multipy), int(h*50*multipy)
+            #
+            width_, height_ = bsc_core.SizeMtd.set_size_fit_to(
+                width, height, 2048, 512
+            )
+            #
+            obj_opt.set(
+                'cameras.front.render_resolution', '{}x{}'.format(int(width_), int(height_))
             )
 
 

@@ -170,12 +170,22 @@ parameters:
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_create()'
         tool_tip: '...'
 
-    extra/translate_to_origin/location:
-        widget: string
-        value: '/root/world/geo/master'
+    extra/transformation_enable:
+        widget: boolean
+        value: True
         tool_tip: '...'
 
-    extra/translate_to_origin/execute:
+    extra/transformation/translate_offset:
+        widget: float3
+        value: [0, 0, 0]
+        tool_tip: '...'
+
+    extra/transformation/translate_above_axis_y:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    extra/transformation/translate_to_origin:
         widget: button
         value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxAsset(node).set_translate_to_center()'
         tool_tip: '...'

@@ -113,7 +113,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                     else:
                         utl_core.Log.set_module_warning_trace(
                             'port set',
-                            u'atr-path="{}", value="{}" is not available'.format(self.path, value)
+                            u'attribute="{}", value="{}" is not available'.format(self.path, value)
                         )
                 elif self.type == 'enum':
                     if isinstance(value, (str, unicode)):
@@ -143,7 +143,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
             else:
                 utl_core.Log.set_module_warning_trace(
                     'port set',
-                    u'atr-path="{}" has source'.format(self.path)
+                    u'attribute="{}" has source'.format(self.path)
                 )
 
     def _set_as_array_(self, values):
@@ -164,7 +164,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
             #
             # utl_core.Log.set_module_result_trace(
             #     'port set',
-            #     'atr-path="{}" value="{}"'.format(self.path, value)
+            #     'attribute="{}" value="{}"'.format(self.path, value)
             # )
 
     def set_source(self, output_port, validation=False):

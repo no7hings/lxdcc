@@ -11,9 +11,9 @@ import lxusd.fnc.exporters as usd_fnc_exporter
 
 color_scheme = 'asset_color'
 
-f_src = '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v043/cache/usd/geo/hi.usd'
+f_src = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v056/cache/usd/geo/hi.usd'
 
-f_tgt = '/l/prod/cgm/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v043/cache/usd/uv_map.usd'
+f_tgt = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v056/cache/usd/geo_extra/user_property.usd'
 
 s = usd_core.UsdStageOpt._set_file_open_(f_src)
 
@@ -35,9 +35,9 @@ usd_fnc_exporter.GeometryLookPropertyExporter(
         with_asset_color=True,
         with_shell_color=True,
         #
-        with_uv_map=True,
+        # with_uv_map=True,
         #
-        with_display_color=True
+        # with_display_color=True
     )
 ).set_run()
 

@@ -239,7 +239,7 @@ class AndRamp(AndShader):
     def _set_ramp_value_(self, key, value):
         utl_core.Log.set_module_result_trace(
             'arnold-ramp-set',
-            'atr-path="{}"'.format(key)
+            'attribute="{}"'.format(key)
         )
         cur_size = len(value)
         self.set_ramp_size(cur_size)

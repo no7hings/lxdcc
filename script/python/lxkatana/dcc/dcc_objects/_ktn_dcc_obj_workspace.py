@@ -619,6 +619,11 @@ class AssetWorkspace(object):
         dcc_path = configure.get('workspace.{}.main.path'.format(key))
         return _ktn_dcc_obj_node.Node(dcc_path)
 
+    def get_node_graph_node(self, key, sub_key, pass_name='default'):
+        configure = self.get_configure(pass_name=pass_name)
+        dcc_path = configure.get('workspace.{}.node_graph.nodes.{}.path'.format(key, sub_key))
+        return _ktn_dcc_obj_node.Node(dcc_path)
+
     def get_group_args(self, key, group_key, pass_name='default'):
         configure = self.get_configure(pass_name=pass_name)
         return self._get_group_args_(configure, key, group_key)
@@ -991,9 +996,7 @@ class AssetWorkspace(object):
         configure = self.get_configure()
         asset_root = configure.get('option.asset_root')
         atr_path = '{}.userProperties.geometry__model__hi'.format(asset_root)
-        _ = self._get_stage_port_raw_(atr_path)
-        if _:
-            return _[0]
+        return self._get_stage_port_raw_(atr_path)
 
     def get_geometry_uv_map_usd_source_file(self):
         configure = self.get_configure()
@@ -1002,18 +1005,18 @@ class AssetWorkspace(object):
         atr_path = '{}.userProperties.geometry__surface__hi'.format(asset_root)
         _ = self._get_stage_port_raw_(atr_path)
         if _:
-            return _[0]
+            return _
         #
         atr_path = '{}.userProperties.usd.variants.asset.surface.override.file'.format(asset_root)
         _ = self._get_stage_port_raw_(atr_path)
         if _:
-            f = utl_dcc_objects.OsFile(_[0])
+            f = utl_dcc_objects.OsFile(_)
             # TODO fix this bug
             if f.get_is_naming_match('hi.uv_map.usd'):
                 return '{}/hi.usd'.format(
                     f.directory.path
                 )
-            return _[0]
+            return _
 
     def get_geometry_usd_check_raw(self):
         dic = {}
@@ -1024,7 +1027,7 @@ class AssetWorkspace(object):
             atr_path = '{}.userProperties.geometry__{}'.format(asset_root, element_label)
             _ = self._get_stage_port_raw_(atr_path)
             if _:
-                dic[element_label] = _[0]
+                dic[element_label] = _
         return dic
 
     def get_asset_usd_check_raw(self):
@@ -1041,7 +1044,7 @@ class AssetWorkspace(object):
         dcc_obj = _ktn_dcc_obj_node.Node(obj_path)
         if dcc_obj.get_is_exists() is True:
             scene_graph_opt = ktn_core.KtnSGStageOpt(dcc_obj.ktn_obj)
-            return scene_graph_opt.get_port_raw(atr_path)
+            return scene_graph_opt.get(atr_path)
         else:
             raise RuntimeError(
                 utl_core.Log.set_module_error_trace(
@@ -1403,3 +1406,50 @@ class AssetWorkspace(object):
         dcc_obj = _ktn_dcc_obj_node.Node(_)
         return dcc_obj, dcc_obj.ktn_obj
 
+    def set_set_usd_reload(self):
+        node = self.get_node_graph_node(
+            'asset_geometries', 'asset'
+        )
+        ktn_core.NGObjOpt(
+            node.ktn_obj
+        ).set_port_execute(
+            'usd.create'
+        )
+
+    def set_asset_front_camera_fill_to_front(self):
+        node = self.get_node_graph_node(
+            'asset_geometries', 'asset'
+        )
+        ktn_core.NGObjOpt(
+            node.ktn_obj
+        ).set_port_execute(
+            'extra.transformation.translate_to_origin'
+        )
+        #
+        node = self.get_node_graph_node(
+            'cameras', 'cameras'
+        )
+        ktn_core.NGObjOpt(
+            node.ktn_obj
+        ).set_port_execute(
+            'cameras.front.fill_to_front'
+        )
+
+    def set_asset_front_camera_fill_to_rotation(self):
+        node = self.get_node_graph_node(
+            'asset_geometries', 'asset'
+        )
+        ktn_core.NGObjOpt(
+            node.ktn_obj
+        ).set_port_execute(
+            'extra.transformation.translate_to_origin'
+        )
+        #
+        node = self.get_node_graph_node(
+            'cameras', 'cameras'
+        )
+        ktn_core.NGObjOpt(
+            node.ktn_obj
+        ).set_port_execute(
+            'cameras.front.fill_to_rotation'
+        )

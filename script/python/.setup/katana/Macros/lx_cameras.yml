@@ -235,7 +235,6 @@ parameters:
         widget: resolution
         value: '2048x2048'
         tool_tip: '...'
-
     # shot
     cameras/shot/location:
         widget: path
@@ -285,6 +284,16 @@ parameters:
     cameras/front/scale:
         widget: float3
         value: [ 1, 1, 1 ]
+        tool_tip: '...'
+    #
+    cameras/front/fill_to_front:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_front_fill_to_front()'
+        tool_tip: '...'
+    #
+    cameras/front/fill_to_rotation:
+        widget: button
+        value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.LxCamera(node).set_front_fill_to_all()'
         tool_tip: '...'
     #
     rotations/enable:

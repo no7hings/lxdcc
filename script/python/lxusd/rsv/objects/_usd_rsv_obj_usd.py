@@ -108,20 +108,28 @@ class RsvUsdAssetSetCreator(object):
 
         shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         #
-        paths = usd_core.UsdStageOpt(
-            shot_set_dress_usd_file_path
-        ).set_obj_paths_find(
-            '/assets/*/{}*'.format(
-                rsv_asset.get('asset')
+        # noinspection PyBroadException
+        try:
+            paths = usd_core.UsdStageOpt(
+                shot_set_dress_usd_file_path
+            ).set_obj_paths_find(
+                '/assets/*/{}*'.format(
+                    rsv_asset.get('asset')
+                )
             )
-        )
-        if paths:
-            paths = bsc_core.TextsOpt(paths).set_sort_to()
-        #
-        for i_location in paths:
-            i_shot_asset = i_location.split('/')[-1]
-            dict_[i_shot_asset] = i_location
-        return dict_
+            if paths:
+                paths = bsc_core.TextsOpt(paths).set_sort_to()
+            #
+            for i_location in paths:
+                i_shot_asset = i_location.split('/')[-1]
+                dict_[i_shot_asset] = i_location
+        except:
+            utl_core.Log.set_module_error_trace(
+                'shot-asset resolver',
+                'file="{}" is error'.format(shot_set_dress_usd_file_path)
+            )
+        finally:
+            return dict_
     @classmethod
     def _get_shot_asset_override_dict_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         dict_ = collections.OrderedDict()
@@ -517,14 +525,15 @@ class RsvUsdAssetSetCreator(object):
         )
 
         c.set_flatten()
-        raw = t.render(
+        #
+        new_raw = t.render(
             c.value
         )
 
         bsc_core.StorageFileOpt(
             asset_set_usd_file_path
         ).set_write(
-            raw
+            new_raw
         )
         return asset_set_usd_file_path
     @classmethod
@@ -790,10 +799,6 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 with_group_color=True,
                 with_asset_color=True,
                 with_shell_color=True,
-                #
-                # with_uv_map=True,
-                # #
-                # with_display_color=True
             )
         ).set_run()
 

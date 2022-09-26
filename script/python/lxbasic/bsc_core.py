@@ -4730,6 +4730,38 @@ class BBoxMtd(object):
         if use_int_size is True:
             w, h, d = int(math.ceil(w)), int(math.ceil(h)), int(math.ceil(d))
         return (x, y, z), (c_x, c_y, c_z), (w, h, d)
+    @classmethod
+    def get_radius(cls, p_0, p_1, pivot):
+        o_x, o_y, o_z = pivot
+        x_0, y_0, z_0 = p_0
+        x_1, y_1, z_1 = p_1
+        r_0 = abs(math.sqrt((x_0+o_x)**2+(z_0+o_z)**2))
+        r_1 = abs(math.sqrt((x_1+o_x)**2+(z_1+o_z)**2))
+        return max(r_0, r_1)
+
+
+class SizeMtd(object):
+    @classmethod
+    def set_size_fit_to(cls, width, height, maximum, minimum):
+        if width > height:
+            p = float(height)/float(width)
+            if width > maximum:
+                w = maximum
+                return w, w*p
+            else:
+                w = minimum
+                return w, w*p
+        elif width < height:
+            p = float(width)/float(height)
+            if height > maximum:
+                h = maximum
+                return h*p, h
+            else:
+                h = minimum
+                return h*p, h
+        else:
+            w = max(min(width, maximum), minimum)
+            return w, w
 
 
 class CameraMtd(object):
@@ -4740,7 +4772,7 @@ class CameraMtd(object):
         if mode == 1:
             r = max(w, h)
         else:
-            r = max(w, h, d)
+            r = max(w, h)
 
         z_1 = r / math.tan(math.radians(angle))
         t_x, t_y, t_z = (c_x, c_y, z_1 - c_z)
@@ -5599,6 +5631,7 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print IntegerMtd.second_to_time_prettify(
-        25.0005
+    print SizeMtd.set_size_fit_to(
+        5824, 7374, 4096, 512
     )
+

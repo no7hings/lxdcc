@@ -435,7 +435,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     else:
                         utl_core.Log.set_module_warning_trace(
                             'shader-port set',
-                            'atr-path="{}" is non-exists'.format(i_value_dcc_port.path)
+                            'attribute="{}" is non-exists'.format(i_value_dcc_port.path)
                         )
 
     def __set_look_assigns_create_(self, and_geometries):

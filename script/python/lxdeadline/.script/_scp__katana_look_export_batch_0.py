@@ -8,20 +8,12 @@ import lxresolver.commands as rsv_commands
 import lxsession.commands as ssn_commands
 
 assets = [
-    # 'shrubs_a',
-    # 'shrubs_b',
-    # 'shrubs_c',
+    'shrubs_a',
+    'shrubs_b',
+    'shrubs_c',
     'chrysanthemum_a',
     'chrysanthemum_b',
     'chrysanthemum_c',
-    # 'kite_tree',
-    # 'xiangzhang_tree_b',
-    # 'xiangzhang_tree_b',
-    # 'xiangzhang_tree_c',
-    # 'xiangzhang_tree_d',
-    # 'xiangzhang_tree_e',
-    # 'xiangzhang_tree_f',
-    # 'xiangzhang_tree_g'
 ]
 
 resolver = rsv_commands.get_resolver()
@@ -36,7 +28,7 @@ for i_asset in assets:
     i_file_rsv_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
     i_file_path = i_file_rsv_unit.get_result(version='latest')
     if i_file_path:
-        i_option_opt = bsc_core.KeywordArgumentsOpt(
+        i_option_opt_0 = bsc_core.KeywordArgumentsOpt(
             option=dict(
                 option_hook_key='rsv-task-methods/asset/katana/gen-look-export',
                 #
@@ -44,6 +36,8 @@ for i_asset in assets:
                 user=bsc_core.SystemMtd.get_user_name(),
                 #
                 choice_scheme='asset-katana-publish',
+                #
+                reload_set_usd=True,
                 #
                 with_texture_tx=True,
                 with_look_ass=True,
@@ -54,6 +48,26 @@ for i_asset in assets:
         )
         #
         ssn_commands.set_option_hook_execute_by_deadline(
-            option=i_option_opt.to_string()
+            option=i_option_opt_0.to_string()
         )
+
+        # i_option_opt_1 = bsc_core.KeywordArgumentsOpt(
+        #     option=dict(
+        #         option_hook_key='rsv-task-methods/asset/katana/gen-geometry-export',
+        #         #
+        #         file=i_file_path,
+        #         user=bsc_core.SystemMtd.get_user_name(),
+        #         #
+        #         choice_scheme='asset-katana-publish',
+        #         #
+        #         with_geometry_uv_map_usd=True,
+        #         #
+        #         # td_enable=True,
+        #         rez_beta=True,
+        #     )
+        # )
+        # #
+        # ssn_commands.set_option_hook_execute_by_deadline(
+        #     option=i_option_opt_1.to_string()
+        # )
 

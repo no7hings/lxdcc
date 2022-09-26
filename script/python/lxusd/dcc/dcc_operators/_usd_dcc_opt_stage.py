@@ -35,7 +35,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
             if yml_file.set_read():
                 utl_core.Log.set_module_result_trace(
                     'comparer-data read',
-                    'cache="{}"'.format(yml_file_path)
+                    'cache="{}", source="{}"'.format(yml_file_path, file_path)
                 )
                 return bsc_objects.Content(value=yml_file_path)
         #
@@ -62,7 +62,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         if content_0.value:
             utl_core.Log.set_module_result_trace(
                 'comparer-data write',
-                'cache="{}"'.format(yml_file_path)
+                'cache="{}", source="{}"'.format(yml_file_path, file_path)
             )
             yml_file.set_write(content_0.value)
         else:

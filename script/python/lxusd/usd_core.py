@@ -1,6 +1,8 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
 import collections
+#
+import math
 # noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, Vt, UsdGeom, Gf
 
@@ -17,7 +19,13 @@ from lxobj import obj_configure
 import os
 
 
-class UsdStageOpt(object):
+class UsdBasic(object):
+    @classmethod
+    def _set_file_open_(cls, file_path):
+        return Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
+
+
+class UsdStageOpt(UsdBasic):
     def __init__(self, *args):
         if not args:
             stage = Usd.Stage.CreateInMemory()
@@ -32,7 +40,7 @@ class UsdStageOpt(object):
                             file_path
                         )
                     )
-                    stage = Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
+                    stage = self._set_file_open_(file_path)
                     utl_core.Log.set_module_result_trace(
                         'usd-file open is completed', 'file="{}"'.format(
                             file_path
@@ -49,9 +57,6 @@ class UsdStageOpt(object):
         UsdGeom.SetStageUpAxis(
             self._usd_stage, UsdGeom.Tokens.y
         )
-    @classmethod
-    def _set_file_open_(cls, file_path):
-        return Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
     @property
     def usd_instance(self):
         return self._usd_stage
@@ -118,6 +123,9 @@ class UsdStageOpt(object):
             u'obj="{}"'.format(obj_path)
         )
         return self._usd_stage.OverridePrim(obj_path)
+
+    def get_obj_is_exists(self, obj_path):
+        return self._usd_stage.GetPrimAtPath(obj_path).IsValid()
 
     def get_obj(self, obj_path):
         return self._usd_stage.GetPrimAtPath(obj_path)
@@ -277,7 +285,12 @@ class UsdStageOpt(object):
         get_fnc_('/', 0)
         return list_
 
-    def get_bounding_box(self, location=None):
+    def set_active_at(self, location, boolean):
+        prim = self._usd_stage.GetPrimAtPath(location)
+        if prim.IsValid():
+            prim.SetActive(boolean)
+
+    def get_bounding_box(self, location=None, active=False):
         b_box_cache = UsdGeom.BBoxCache(
             1,
             includedPurposes=[
@@ -295,11 +308,45 @@ class UsdStageOpt(object):
         return b_box_cache.ComputeWorldBound(usd_prim)
 
     def get_geometry_args(self, location=None, use_int_size=False):
-        b_box = self.get_bounding_box(location)
-        r = b_box.GetRange()
-        return bsc_core.BBoxMtd.get_geometry_args(
-            r.GetMin(), r.GetMax(), use_int_size
+        if self.get_obj_is_exists(location) is True:
+            b_box = self.get_bounding_box(location)
+            r = b_box.GetRange()
+            return bsc_core.BBoxMtd.get_geometry_args(
+                r.GetMin(), r.GetMax(), use_int_size
+            )
+
+    def get_radius(self, pivot):
+        b_box_cache = UsdGeom.BBoxCache(
+            1,
+            includedPurposes=[
+                UsdGeom.Tokens.default_,
+                UsdGeom.Tokens.render,
+                UsdGeom.Tokens.proxy
+            ],
+            useExtentsHint=True,
+            ignoreVisibility=True,
         )
+        dict_ = {}
+        for i_usd_prim in self._usd_stage.TraverseAll():
+            if i_usd_prim.IsValid():
+                i_b_box = b_box_cache.ComputeWorldBound(i_usd_prim)
+                if i_usd_prim.GetTypeName() in [
+                    usd_configure.ObjType.MESH
+                ]:
+                    i_range = i_b_box.GetRange()
+                    i_radius = bsc_core.BBoxMtd.get_radius(
+                        i_range.GetMin(), i_range.GetMax(), pivot
+                    )
+                    dict_.setdefault(
+                        i_radius, []
+                    ).append(
+                        i_usd_prim
+                    )
+        if dict_:
+            usd_prim = dict_[max(dict_.keys())][0]
+            return UsdMeshOpt(
+                UsdGeom.Mesh(usd_prim)
+            ).get_radius(pivot)
 
 
 class UsdFileWriteOpt(object):
@@ -916,6 +963,16 @@ class UsdMeshOpt(object):
 
     def get_point_count(self):
         return len(self.get_points())
+
+    def get_radius(self, pivot):
+        o_x, o_y, o_z = pivot
+        points = self.get_points()
+        set_ = set()
+        for i_point in points:
+            i_x, i_y, i_z = i_point
+            i_r = abs(math.sqrt((i_x+o_x)**2+(i_z+o_z)**2))
+            set_.add(i_r)
+        return max(set_)
 
 
 class UsdCurveOpt(object):

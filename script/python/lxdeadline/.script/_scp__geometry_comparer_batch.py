@@ -8,12 +8,12 @@ from lxutil import utl_configure
 import lxusd.fnc.comparers as usd_fnc_comparers
 
 assets = [
-    'shrubs_a',
-    'shrubs_b',
-    'shrubs_c',
-    'chrysanthemum_a',
-    'chrysanthemum_b',
-    'chrysanthemum_c',
+    # 'shrubs_a',
+    # 'shrubs_b',
+    # 'shrubs_c',
+    # 'chrysanthemum_a',
+    # 'chrysanthemum_b',
+    # 'chrysanthemum_c',
     # 'kite_tree',
     # 'xiangzhang_tree_b',
     # 'xiangzhang_tree_b',
@@ -21,7 +21,7 @@ assets = [
     # 'xiangzhang_tree_d',
     # 'xiangzhang_tree_e',
     # 'xiangzhang_tree_f',
-    # 'xiangzhang_tree_g'
+    'xiangzhang_tree_g'
 ]
 
 resolver = rsv_commands.get_resolver()

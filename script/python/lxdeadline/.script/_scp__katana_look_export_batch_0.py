@@ -8,12 +8,19 @@ import lxresolver.commands as rsv_commands
 import lxsession.commands as ssn_commands
 
 assets = [
-    'shrubs_a',
-    'shrubs_b',
-    'shrubs_c',
-    'chrysanthemum_a',
-    'chrysanthemum_b',
-    'chrysanthemum_c',
+    # 'shrubs_a',
+    # 'shrubs_b',
+    # 'shrubs_c',
+    # 'chrysanthemum_a',
+    # 'chrysanthemum_b',
+    # 'chrysanthemum_c',
+    # 'kite_tree',
+    'xiangzhang_tree_b',
+    'xiangzhang_tree_c',
+    'xiangzhang_tree_d',
+    'xiangzhang_tree_e',
+    'xiangzhang_tree_f',
+    # 'xiangzhang_tree_g'
 ]
 
 resolver = rsv_commands.get_resolver()

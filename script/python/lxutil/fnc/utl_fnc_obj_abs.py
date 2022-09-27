@@ -855,41 +855,42 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
             (self._get_data_, (self.get('file_tgt'), self.get('location'))),
         ]
         if methods:
-            gp = utl_core.GuiProgressesRunner(maximum=len(methods))
-            for i_method, i_args in methods:
-                i_geometries, i_comparer_data = i_method(*i_args)
-                data.append((i_geometries, i_comparer_data))
-                gp.set_update()
-            #
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(methods)) as g_p:
+                for i_method, i_args in methods:
+                    i_geometries, i_comparer_data = i_method(*i_args)
+                    data.append((i_geometries, i_comparer_data))
+                    #
+                    g_p.set_update()
         #
-        geometries_src, comparer_data_src = data[0]
-        geometries_tgt, comparer_data_tgt = data[1]
+        objs_src, data_src = data[0]
+        objs_tgt, data_tgt = data[1]
         #
-        dcc_geometry_paths = []
-        if geometries_src:
-            gp = utl_core.GuiProgressesRunner(maximum=len(geometries_src))
-            for i_src_geometry in geometries_src:
-                gp.set_update()
-                if i_src_geometry.type_name == 'Mesh':
-                    i_src_mesh_path = i_src_geometry.path
-                    i_tgt_mesh_path, i_check_statuses = self.FNC_DCC_MESH_MATCHER_CLASS(
-                        i_src_mesh_path, comparer_data_src, comparer_data_tgt
-                    ).get()
-                    lis.append(
-                        (i_src_mesh_path, i_tgt_mesh_path, i_check_statuses)
-                    )
-                    dcc_geometry_paths.append(i_tgt_mesh_path)
-            #
-            gp.set_stop()
+        if objs_src:
+            with utl_core.gui_progress(maximum=len(objs_src)) as g_p:
+                for i_obj_src in objs_src:
+                    if i_obj_src.type_name == 'Mesh':
+                        i_path_src = i_obj_src.path
+
+                        i_mesh_matcher = self.FNC_DCC_MESH_MATCHER_CLASS(
+                            i_path_src, data_src, data_tgt
+                        )
+                        i_path_tgt, i_check_statuses = i_mesh_matcher.get()
+
+                        lis.append(
+                            (i_path_src, i_path_tgt, i_check_statuses)
+                        )
+                    #
+                    g_p.set_update()
         # addition
-        src_dcc_geometry_paths = [i.path for i in geometries_src]
-        tgt_dcc_geometry_paths = [i.path for i in geometries_tgt]
-        addition_geometry_paths = list(
-            set(tgt_dcc_geometry_paths) - set(src_dcc_geometry_paths) - set(dcc_geometry_paths))
-        for i_tgt_geometry_path in addition_geometry_paths:
+        paths_src = [i.path for i in objs_src]
+        paths_tgt = [i.path for i in objs_tgt]
+        #
+        path_addition = list(
+            set(paths_tgt) - set(paths_src)
+        )
+        for i_path_tgt in path_addition:
             lis.append(
-                (i_tgt_geometry_path, i_tgt_geometry_path, utl_configure.DccMeshCheckStatus.ADDITION)
+                (i_path_tgt, i_path_tgt, utl_configure.DccMeshCheckStatus.ADDITION)
             )
         return lis
 

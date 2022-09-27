@@ -108,6 +108,7 @@ class KtnSGStageOpt(object):
         port_path = self.PORT_PATHSEP.join(_[1:])
         tvl = self._get_traversal_(obj_path)
         if tvl.valid():
+            atrs = tvl.getLocationData().getAttrs()
             return tvl.getLocationData().getAttrs().getChildByName(port_path)
 
     def get_port_raw(self, atr_path):

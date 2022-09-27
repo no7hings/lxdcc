@@ -255,7 +255,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if mya_dcc_objects.Scene.get_scene_is_dirty():
                 w = utl_core.DialogWindow.set_create(
                     label='Save',
-                    content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
+                    content=u'scene has been modified, do you want to save changed to "{}"'.format(
                         mya_dcc_objects.Scene.get_current_file_path()
                     ),
                     window_size=(480, 160),

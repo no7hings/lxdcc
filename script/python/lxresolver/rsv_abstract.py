@@ -1099,6 +1099,15 @@ class AbsRsvUnit(
             lis.append(i_rsv_version)
         return lis
 
+    def get_rsv_task(self):
+        return self.get_parent()
+
+    def get_rsv_step(self):
+        return self.get_parent().get_parent()
+
+    def get_rsv_entity(self):
+        return self.get_parent().get_parent().get_parent()
+
 
 class AbsRsvUnitVersion(
     AbsRsvObj
@@ -1294,7 +1303,6 @@ class AbsRsvTask(
                             #
                             j_rsv_properties.set('dcc.pathsep', rsv_configure.Application.get_pathsep(i_application))
                             return j_rsv_properties
-    # ================================================================================================================ #
     # tag
     def get_rsv_tag(self):
         return self.get_parent().get_parent().get_parent()

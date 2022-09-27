@@ -78,7 +78,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         else:
             return bsc_objects.Content(value={})
     @classmethod
-    def _get_mesh_data_content_(cls, stage, yml_file_path):
+    def _get_mesh_data_content_(cls, stage, file_path, yml_file_path):
         from lxmaya.dcc.dcc_objects import _mya_dcc_obj_geometry
         #
         from lxmaya.dcc.dcc_operators import _mya_dcc_opt_geometry

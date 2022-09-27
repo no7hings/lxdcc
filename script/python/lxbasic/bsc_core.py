@@ -2968,6 +2968,16 @@ class DccPathDagOpt(object):
     def get_rgb_from_index(self, index, count, maximum=255, seed=0):
         pass
 
+    def get_path_prettify(self, maximum=18):
+        p = self.path
+        n = self.name
+        #
+        d = p[:-len(n)-1]
+        c = len(d)
+        if c > maximum:
+            return u'{}...{}/{}'.format(d[:(int(maximum/2)-3)], d[-(int(maximum/2)):], n)
+        return p
+
     def __str__(self):
         return self._path
 
@@ -4742,7 +4752,7 @@ class BBoxMtd(object):
 
 class SizeMtd(object):
     @classmethod
-    def set_size_fit_to(cls, width, height, maximum, minimum):
+    def set_clamp_to(cls, width, height, maximum, minimum):
         if width > height:
             p = float(height)/float(width)
             if width > maximum:
@@ -4762,6 +4772,37 @@ class SizeMtd(object):
         else:
             w = max(min(width, maximum), minimum)
             return w, w
+    @classmethod
+    def set_fit_to(cls, size_0, size_1):
+        w_0, h_0 = size_0
+        w_1, h_1 = size_1
+        p_0 = float(w_0) / float(h_0)
+        p_1 = float(w_1) / float(h_1)
+        m_1 = min(w_1, h_1)
+        if p_0 > 1:
+            if p_0 > p_1:
+                w, h = w_1, w_1/p_0
+            elif p_0 < p_1:
+                w, h = h_1*p_0, h_1
+            else:
+                w, h = w_1, h_1
+        elif p_0 < 1:
+            if p_0 > p_1:
+                w, h = w_1, w_1/p_0
+            elif p_0 < p_1:
+                w, h = h_1*p_0, h_1
+            else:
+                w, h = w_1, h_1
+        else:
+            w, h = m_1, m_1
+        x, y = int((w_1-w)/2), int((h_1-h)/2)
+        return x, y, w, h
+    @classmethod
+    def set_fill_to(cls, size_0, size_1):
+        w_0, h_0 = size_0
+        w_1, h_1 = size_1
+        p_0 = float(w_0) / float(h_0)
+        p_1 = float(w_1) / float(h_1)
 
 
 class CameraMtd(object):
@@ -5631,7 +5672,7 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print SizeMtd.set_size_fit_to(
+    print SizeMtd.set_clamp_to(
         5824, 7374, 4096, 512
     )
 

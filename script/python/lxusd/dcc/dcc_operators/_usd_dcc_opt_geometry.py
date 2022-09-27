@@ -327,9 +327,12 @@ class CurveOpt(
     def get_points(self):
         usd_curve = self.get_usd_curve()
         p = usd_curve.GetPointsAttr()
-        if p:
-            raw = p.Get()
-            return UsdOptCore._get_point_array_(raw)
+        if p.GetNumTimeSamples():
+            v = p.Get(0)
+        else:
+            v = p.Get()
+        if v:
+            return UsdOptCore._get_point_array_(v)
         return []
 
     def get_point_count(self):

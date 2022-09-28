@@ -907,6 +907,9 @@ class AssetWorkspace(object):
                             i_asset_ass_exporter.set(
                                 'export.look.pass', i_look_pass_name
                             )
+                            i_asset_ass_exporter.set(
+                                'dynamic.override_uv_maps', False
+                            )
                             i_source_port.set_target(
                                 i_asset_ass_exporter.get_input_port('input')
                             )

@@ -1179,14 +1179,16 @@ class AbsObjGuiDef(object):
         else:
             return p
 
-    def get_path_prettify_(self, maximum=18):
+    def get_path_prettify_(self, maximum=24):
         p = self.path
         n = self.name
         #
+        maximum_ = max(min(maximum-len(n), maximum), 8)
+        #
         d = p[:-len(n)-1]
         c = len(d)
-        if c > maximum:
-            return u'{}...{}/{}'.format(d[:(int(maximum/2)-3)], d[-(int(maximum/2)):], n)
+        if c > maximum_:
+            return u'{}...{}/{}'.format(d[:(int(maximum_/2))], d[-(int(maximum_/2)+3):], n)
         return p
 
     def set_gui_attribute(self, key, value):

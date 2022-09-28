@@ -662,6 +662,15 @@ class LxAssetAss(object):
                 version=version, extend_variants=dict(look_pass=look_pass_name)
             )
         return look_ass_file_path
+    @classmethod
+    def _get_look_pass_(cls, obj_opt):
+        targets = obj_opt.get_targets('output')
+        if targets:
+            for i in targets:
+                i_node = i.getNode()
+                if i_node.getType() == 'LookFileBake':
+                    return i.getName()
+        return 'default'
 
     def set_guess(self):
         from lxbasic import bsc_core
@@ -683,6 +692,7 @@ class LxAssetAss(object):
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
+
             input_dynamic_usd_file_path = self._get_input_dynamic_usd_file_(
                 rsv_task.get_rsv_entity()
             )
@@ -706,9 +716,11 @@ class LxAssetAss(object):
                     'export.scheme', 'static'
                 )
             #
+            look_pass_name = self._get_look_pass_(obj_opt)
+            obj_opt.set('export.look.pass', look_pass_name)
+            #
             scheme = obj_opt.get('export.scheme')
             #
-            look_pass_name = obj_opt.get('export.look.pass')
             output_ass_file_path = self._get_output_ass_file_(
                 rsv_scene_properties, rsv_task, look_pass_name
             )

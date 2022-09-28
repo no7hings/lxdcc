@@ -45,6 +45,16 @@ class ShotUsdCombine(object):
                 list_.append(
                     i_path
                 )
+                if i_port is None:
+                    utl_core.Log.set_error_trace(
+                        'attribute="{}.fileName" is non-exists'.format(i_path)
+                    )
+                    continue
+                if i_port.Get() is None:
+                    utl_core.Log.set_error_trace(
+                        'attribute="{}.fileName" is non-data'.format(i_path)
+                    )
+                    continue
                 i_file_path = i_port.Get().resolvedPath
 
                 i_yaml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(

@@ -69,3 +69,24 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 use_environ_map=True,
             )
         ).set_run()
+
+    def set_workspace_texture_lock(self):
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        import lxutil.rsv.objects as utl_rsv_objects
+
+        asset_workspace = ktn_dcc_objects.AssetWorkspace()
+        location = asset_workspace.get_geometry_location()
+        #
+        texture_references = ktn_dcc_objects.TextureReferences()
+        dcc_shaders = asset_workspace.get_all_dcc_geometry_shader_by_location(location)
+        dcc_objs = texture_references.get_objs(
+            include_paths=[i.path for i in dcc_shaders]
+        )
+
+        texture_workspace_opt = utl_rsv_objects.RsvAssetWorkspaceTextureOpt(
+            self._rsv_task
+        )
+        texture_workspace_opt.set_all_directories_locked(
+            dcc_objs
+        )

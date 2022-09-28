@@ -795,6 +795,18 @@ class ValidationChecker(object):
             )
         )
 
+    def set_node_directories_result_register(self, obj_path, elements, description, check_group, check_status='error'):
+        self._check_results.append(
+            dict(
+                type='directory',
+                node=obj_path,
+                elements=elements,
+                description=description,
+                group=check_group,
+                status=check_status,
+            )
+        )
+
     def _get_data_file_path_(self):
         file_path = self._session.option_opt.get('file')
         return bsc_core.TemporaryYamlMtd.get_file_path(

@@ -117,12 +117,14 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         check_status=validation_checker.CheckStatus.Error
                     )
 
-    def _set_dcc_texture_workspace_check_(self, validation_checker, check_group, dcc_objs):
+    def _set_dcc_texture_workspace_check_(self, validation_checker, check_group, location, dcc_objs):
         from lxbasic import bsc_core
 
         from lxutil import utl_core
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
+
+        import lxutil.rsv.objects as utl_rsv_objects
 
         rsv_project = self._rsv_task.get_rsv_project()
 
@@ -172,9 +174,6 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             #
                             if is_passed is False:
                                 j_check_results[0] = False
-                            else:
-                                if j_texture.get_is_writeable() is True:
-                                    j_check_results[1] = False
                     #
                     for index, k_check_result in enumerate(j_check_results):
                         if k_check_result is False:
@@ -188,14 +187,21 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         check_group=check_group,
                         check_status=validation_checker.CheckStatus.Warning
                     )
-                if file_paths_1:
-                    validation_checker.set_node_files_result_register(
-                        i_obj.path,
-                        file_paths_1,
-                        description='"texture" in "workspace" is not "locked"',
-                        check_group=check_group,
-                        check_status=validation_checker.CheckStatus.Warning
-                    )
+        #
+        directory_paths = utl_rsv_objects.RsvAssetWorkspaceTextureOpt(
+            self._rsv_task
+        ).get_all_directories(
+            dcc_objs
+        )
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StoragePathMtd.get_is_writeable(i) is True]
+        if unlocked_directory_paths:
+            validation_checker.set_node_directories_result_register(
+                location,
+                unlocked_directory_paths,
+                description='"directory" in "workspace" is not "locked"',
+                check_group=check_group,
+                check_status=validation_checker.CheckStatus.Warning
+            )
 
     def set_shotgun_check(self, validation_checker):
         import lxshotgun.objects as stg_objects
@@ -535,11 +541,8 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         location = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
         dcc_location = mya_dcc_objects.Group(location)
         #
-        sub_location = '{}|hi'.format(location)
-        sub_dcc_location = mya_dcc_objects.Group(sub_location)
-        #
-        if sub_dcc_location.get_is_exists() is True:
-            objs = sub_dcc_location.get_descendants()
+        if dcc_location.get_is_exists() is True:
+            objs = dcc_location.get_descendants()
             #
             objs_look_opt = mya_dcc_operators.ObjsLookOpt(objs)
             includes = objs_look_opt.get_texture_reference_paths()
@@ -548,7 +551,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 dcc_objs = mya_dcc_objects.TextureReferences._get_objs_(includes)
                 self._set_dcc_texture_workspace_check_(
                     validation_checker, check_group,
-                    dcc_objs
+                    location, dcc_objs
                 )
     # katana
     def set_katana_scene_check(self, validation_checker):
@@ -823,6 +826,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         check_group = 'Texture Workspace Check'
+
         ktn_workspace = ktn_dcc_objects.AssetWorkspace()
         geometry_scheme = ktn_workspace.get_geometry_scheme()
         geometry_location = '/root/world/geo'
@@ -845,5 +849,5 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if dcc_objs:
             self._set_dcc_texture_workspace_check_(
                 validation_checker, check_group,
-                dcc_objs
+                location, dcc_objs
             )

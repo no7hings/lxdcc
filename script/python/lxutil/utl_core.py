@@ -362,6 +362,7 @@ class DialogWindow(object):
     def set_create(
         cls,
         label,
+        sub_label=None,
         content=None,
         content_text_size=10,
         window_size=(480, 160),
@@ -398,8 +399,13 @@ class DialogWindow(object):
         #
         w.set_use_thread(use_thread)
         w.set_window_title(label)
+        #
+        if sub_label is not None:
+            w.set_sub_label(sub_label)
+        #
         if content is not None:
             w.set_content(content)
+        #
         w.set_content_font_size(content_text_size)
         w.set_definition_window_size(window_size)
         if yes_label is not None:

@@ -89,6 +89,7 @@ class ValidatorStatus(enum.IntEnum):
     Error = 0x23
     Ignore = 0x24
     Locked = 0x25
+    Active = 0x26
 
 
 class ActionState(enum.IntEnum):

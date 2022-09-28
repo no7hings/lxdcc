@@ -576,6 +576,11 @@ class NGObjOpt(object):
     def get_return_port(self, port_path):
         return self._ktn_obj.getReturnPort(port_path)
 
+    def get_targets(self, port_path):
+        p = self.get_output_port(port_path)
+        if p:
+            return p.getConnectedPorts()
+
     def set_port_create(self, port_path, type_, value):
         _ = self.get_port(port_path)
         port_parent = obj_core.PortPathMethod.get_dag_parent(

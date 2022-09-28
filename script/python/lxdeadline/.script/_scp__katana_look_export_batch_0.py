@@ -16,7 +16,7 @@ assets = [
     # 'chrysanthemum_c',
     # 'kite_tree',
     'xiangzhang_tree_b',
-    'xiangzhang_tree_c',
+    # 'xiangzhang_tree_c',
     'xiangzhang_tree_d',
     'xiangzhang_tree_e',
     'xiangzhang_tree_f',

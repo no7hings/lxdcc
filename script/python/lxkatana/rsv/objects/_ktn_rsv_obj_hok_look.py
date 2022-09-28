@@ -65,7 +65,10 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         model_act_cmp_usd_file_path = self.get_asset_model_act_cmp_usd_file()
         if model_act_cmp_usd_file_path is not None:
-            ktn_workspace.set_dynamic_ass_export()
+            dynamic_override_uv_maps = self._hook_option_opt.get_as_boolean('with_look_ass_dynamic_override_uv_maps')
+            ktn_workspace.set_dynamic_ass_export(
+                dynamic_override_uv_maps=dynamic_override_uv_maps
+            )
 
     def set_asset_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects

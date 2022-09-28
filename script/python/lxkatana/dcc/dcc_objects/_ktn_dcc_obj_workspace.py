@@ -891,7 +891,7 @@ class AssetWorkspace(object):
                 file_path
             ).set_write(dic)
 
-    def set_dynamic_ass_export(self):
+    def set_dynamic_ass_export(self, dynamic_override_uv_maps=True):
         node = self.get_main_node('look_outputs')
         geometry_scheme = self.get_geometry_scheme()
         if node.get_is_exists() is True:
@@ -908,7 +908,7 @@ class AssetWorkspace(object):
                                 'export.look.pass', i_look_pass_name
                             )
                             i_asset_ass_exporter.set(
-                                'dynamic.override_uv_maps', False
+                                'dynamic.override_uv_maps', dynamic_override_uv_maps
                             )
                             i_source_port.set_target(
                                 i_asset_ass_exporter.get_input_port('input')

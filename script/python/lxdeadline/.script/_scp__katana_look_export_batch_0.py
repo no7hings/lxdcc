@@ -48,6 +48,7 @@ for i_asset in assets:
                 #
                 with_texture_tx=True,
                 with_look_ass=True,
+                with_look_ass_dynamic_override_uv_maps=True,
                 #
                 # td_enable=True,
                 rez_beta=True,

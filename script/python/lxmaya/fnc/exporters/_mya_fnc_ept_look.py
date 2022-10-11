@@ -145,7 +145,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         fr._set_file_paths_convert_()
             #
             utl_core.Log.set_module_result_trace(
-                ' ass export',
+                'ass export',
                 u'file="{}"'.format(self._file_path)
             )
         #

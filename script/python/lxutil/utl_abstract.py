@@ -216,11 +216,22 @@ class AbsDccPort(AbsDccObjDef):
         _ = atr_path.split(cls.PATHSEP)
         return _[0], cls.PATHSEP.join(_[1:])
 
+    def get_child(self, port_name):
+        pass
+
     def get_children(self):
         pass
 
-    def get_child(self, port_name):
-        pass
+    def get_descendants(self):
+        def rcs_fnc_(p_):
+            _children = p_.get_children()
+            for _i in _children:
+                list_.append(_i)
+                rcs_fnc_(_i)
+
+        list_ = []
+        rcs_fnc_(self)
+        return list_
 
     def __str__(self):
         return '{}(type="{}", path="{}", assign="{}")'.format(

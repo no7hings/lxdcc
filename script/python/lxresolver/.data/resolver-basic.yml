@@ -545,6 +545,9 @@ asset-output-look-dir: <asset-output-version-dir>/look
 asset-output-look-klf-file: <asset-output-look-dir>/klf/<asset-name>.klf
 asset-output-look-json-file: <asset-output-look-dir>/klf/<asset-name>.json
 #
+asset-output-look-yml-dir: <asset-output-look-dir>/yml
+asset-output-look-yml-file: <asset-output-look-yml-dir>/<asset-name>.yml
+#
 asset-output-look-ass-file: <asset-output-look-dir>/ass/<asset-name>.ass
 asset-output-look-ass-sub-file: <asset-output-look-dir>/ass/<asset-name>.<look-pass>.ass
 #

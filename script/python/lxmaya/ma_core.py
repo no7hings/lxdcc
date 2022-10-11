@@ -92,6 +92,10 @@ def _get_is_ui_mode_():
     return not cmds.about(batch=1)
 
 
+def set_stack_trace_enable(boolean=True):
+    cmds.stackTrace(state=boolean)
+
+
 class Om2Method(object):
     DEFAULT_MAP_NAME = 'map1'
     @classmethod

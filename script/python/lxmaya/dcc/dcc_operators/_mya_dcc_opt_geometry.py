@@ -652,7 +652,7 @@ class MeshChecker(
             cmds.delete(p)
 
 
-class CurveOpt(
+class NurbsCurveOpt(
     utl_dcc_opt_abs.AbsObjOpt,
     AbsOm2ObjDef,
 ):
@@ -661,7 +661,7 @@ class CurveOpt(
         :param args:
             1.str(path)
         """
-        super(CurveOpt, self).__init__(*args)
+        super(NurbsCurveOpt, self).__init__(*args)
         self._om2_obj_fnc = self.get_om2_obj()
 
     def get_om2_obj(self):

@@ -850,6 +850,9 @@ class NGPortOpt(object):
     def set_expression(self, raw):
         self._ktn_port.setExpression(raw)
 
+    def get_expression(self):
+        return self._ktn_port.getExpression()
+
     def get_is_expression(self):
         return self._ktn_port.isExpression()
 

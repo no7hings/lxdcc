@@ -1,4 +1,5 @@
 # coding:utf-8
+import fnmatch
 import re
 
 import types
@@ -142,7 +143,7 @@ class AssetWorkspace(object):
                     )
         return list_
 
-    def get_all_dcc_geometry_material_by_location(self, location):
+    def get_all_dcc_geometry_materials_by_location(self, location):
         list_ = []
         query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_pass_source_obj()
@@ -159,9 +160,9 @@ class AssetWorkspace(object):
                         )
         return list_
 
-    def get_all_dcc_geometry_shader_by_location(self, location):
+    def get_all_dcc_geometry_shaders_by_location(self, location):
         list_ = []
-        dcc_objs = self.get_all_dcc_geometry_material_by_location(location)
+        dcc_objs = self.get_all_dcc_geometry_materials_by_location(location)
         for i_dcc_obj in dcc_objs:
             i_dcc_nodes = [_ktn_dcc_obj_node.Node(i.getName()) for i in ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
             list_.extend(
@@ -864,34 +865,35 @@ class AssetWorkspace(object):
             )
 
     def set_look_klf_extra_export(self, file_path):
-        import parse
-        #
         location = self.get_geometry_location()
         #
-        dcc_shaders = self.get_all_dcc_geometry_shader_by_location(location)
-        texture_references = _ktn_dcc_obj_nodes.TextureReferences()
-        dcc_objs = texture_references.get_objs(
-            include_paths=[i.path for i in dcc_shaders]
-        )
-        dic = {}
-        if dcc_objs:
-            for i_dcc_obj in dcc_objs:
-                for i_port_path, i_file_path in i_dcc_obj.reference_raw.items():
-                    i_port = i_dcc_obj.get_port(i_port_path)
-                    i_expression = texture_references._get_expression_(i_port)
-                    if i_expression is not None:
-                        i_pattern = '\'{file}\'%{argument}'
-                        i_p = parse.parse(i_pattern, i_expression)
-                        if i_p:
-                            i_key = u'{}.{}'.format(i_dcc_obj.name, i_port_path)
-                            dic[i_key] = i_expression
+        dcc_shaders = self.get_all_dcc_geometry_shaders_by_location(location)
         #
-        if dic:
+        patterns = [
+            '\'*%0[0-9]d*\'%*',
+            '*frame*'
+        ]
+        dict_ = {}
+
+        if dcc_shaders:
+            for i_dcc_shader in dcc_shaders:
+                i_p = i_dcc_shader.get_port('parameters')
+                i_descendants = i_p.get_descendants()
+                for j_child in i_descendants:
+                    if j_child.type != 'group':
+                        if j_child.get_is_expression() is True:
+                            j_expression = j_child.get_expression()
+                            for k_p in patterns:
+                                if fnmatch.filter([j_expression], k_p):
+                                    j_key = u'{}.{}'.format(i_dcc_shader.name, j_child.port_path)
+                                    dict_[j_key] = j_expression
+        #
+        if dict_:
             utl_dcc_objects.OsJsonFile(
                 file_path
-            ).set_write(dic)
+            ).set_write(dict_)
 
-    def set_dynamic_ass_export(self, dynamic_override_uv_maps=True):
+    def set_dynamic_ass_export(self, dynamic_override_uv_maps=False):
         node = self.get_main_node('look_outputs')
         geometry_scheme = self.get_geometry_scheme()
         if node.get_is_exists() is True:

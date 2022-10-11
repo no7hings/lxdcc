@@ -18,7 +18,8 @@ class UsdCmdBasic(object):
         cmd_str = u'paMaUsdExport "{}" "{}" "{}" {} {}'.format(
             root, location, file_path, start_frame, end_frame
         )
-        cmd_str += u' {} 1 0'
+        # args "meshuv, curve, verbose"
+        cmd_str += u' {} 1 0 0'
         utl_core.Log.set_module_result_trace(
             'usd export',
             u'file="{}", location="{}", frames="{}-{}" is started'.format(

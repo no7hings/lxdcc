@@ -24,7 +24,7 @@ def get_curves_uuid(location):
     if group.get_is_exists() is True:
         paths = group.get_all_shape_paths(include_obj_type='nurbsCurve')
         for i_path in paths:
-            i_uuid = mya_dcc_operators.CurveOpt(mya_dcc_objects.Shape(i_path)).get_knots_as_uuid()
+            i_uuid = mya_dcc_operators.NurbsCurveOpt(mya_dcc_objects.Shape(i_path)).get_knots_as_uuid()
             lis.append(i_uuid)
     lis.sort()
     return bsc_core.HashMtd.get_hash_value(lis, as_unique_id=True)

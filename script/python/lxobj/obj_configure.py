@@ -217,8 +217,8 @@ class ObjType(object):
     #
     NULL = 'null'
     BUILTIN_NULL = ObjCategory.BUILTIN, NULL
-    TRANSFORM = 'transform'
-    BUILTIN_TRANSFORM = ObjCategory.BUILTIN, TRANSFORM
+    Xform = 'transform'
+    BUILTIN_TRANSFORM = ObjCategory.BUILTIN, Xform
     ALL = [
         BUILTIN_ROOT,
         BUILTIN_NULL

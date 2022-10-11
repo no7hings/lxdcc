@@ -638,7 +638,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             s = usd_core.UsdStageOpt(scene_usd_file_path)
             for i_usd_prim in s.usd_instance.TraverseAll():
                 i_usd_prim_type_name = i_usd_prim.GetTypeName()
-                if i_usd_prim_type_name == usd_configure.ObjType.MESH:
+                if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
                     i_mesh_opt = usd_core.UsdGeometryMeshOpt(i_usd_prim)
                     i_uv_map_names = i_mesh_opt.get_uv_map_names()
                     i_mesh_location = '{}/{}'.format(geometry_location, i_mesh_opt.get_path())
@@ -815,7 +815,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         dcc_texture_references = ktn_dcc_objects.TextureReferences()
 
         dcc_workspace = ktn_dcc_objects.AssetWorkspace()
-        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shader_by_location(location)
+        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shaders_by_location(location)
         dcc_objs = dcc_texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )
@@ -842,7 +842,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         dcc_texture_references = ktn_dcc_objects.TextureReferences()
 
         dcc_workspace = ktn_dcc_objects.AssetWorkspace()
-        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shader_by_location(location)
+        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shaders_by_location(location)
         dcc_objs = dcc_texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )

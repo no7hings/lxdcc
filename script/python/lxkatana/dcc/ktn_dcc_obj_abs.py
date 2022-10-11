@@ -106,8 +106,14 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         if ktn_port is not None:
             ktn_core.NGPortOpt(ktn_port).set(value, time)
 
+    def get_is_expression(self):
+        return self.ktn_port.isExpression()
+
     def set_expression(self, expression):
         self.ktn_port.setExpression(expression)
+
+    def get_expression(self):
+        return self.ktn_port.getExpression()
     @classmethod
     def _set_constant_value_(cls, ktn_port, value, time=0):
         _value = value
@@ -210,13 +216,13 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         return self.__class__(self.obj, port_path, port_assign)
 
     def get_children(self):
-        lis = []
-        _ = self.ktn_port.getChildren()
+        list_ = []
+        _ = self.ktn_port.getChildren() or []
         for i in _:
-            lis.append(
+            list_.append(
                self.get_child(i.getName())
             )
-        return lis
+        return list_
 
     def get_child(self, port_name):
         _ = [i.getName() for i in self.ktn_port.getChildren()]
@@ -310,16 +316,16 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
             if _ktn_obj is not None:
                 _parent = _ktn_obj.getParent()
                 if _parent is None:
-                    lis.append('')
+                    list_.append('')
                 else:
                     _parent_name = _parent.getName()
-                    lis.append(_parent_name)
+                    list_.append(_parent_name)
                     _rcs_fnc(_parent_name)
         #
-        lis = [name]
+        list_ = [name]
         _rcs_fnc(name)
-        lis.reverse()
-        return lis
+        list_.reverse()
+        return list_
     @classmethod
     def _get_ktn_obj_path_(cls, name):
         return cls.PATHSEP.join(cls._get_ktn_obj_path_args_(name))

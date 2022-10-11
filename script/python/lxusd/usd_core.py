@@ -152,7 +152,7 @@ class UsdStageOpt(UsdBasic):
                 if override is True:
                     self.set_obj_create_as_override(i_path)
                 else:
-                    self._usd_stage.DefinePrim(i_path, usd_configure.ObjType.TRANSFORM)
+                    self._usd_stage.DefinePrim(i_path, usd_configure.ObjType.Xform)
         #
         default_prim_path = self._usd_stage.GetPrimAtPath(dag_path_comps[-1])
         self._usd_stage.SetDefaultPrim(default_prim_path)
@@ -331,7 +331,7 @@ class UsdStageOpt(UsdBasic):
             if i_usd_prim.IsValid():
                 i_b_box = b_box_cache.ComputeWorldBound(i_usd_prim)
                 if i_usd_prim.GetTypeName() in [
-                    usd_configure.ObjType.MESH
+                    usd_configure.ObjType.Mesh
                 ]:
                     i_range = i_b_box.GetRange()
                     i_radius = bsc_core.BBoxMtd.get_radius(
@@ -369,7 +369,7 @@ class UsdFileWriteOpt(object):
         self._usd_stage.SetDefaultPrim(default_prim_path)
 
     def set_obj_add(self, path):
-        self._usd_stage.DefinePrim(path, usd_configure.ObjType.TRANSFORM)
+        self._usd_stage.DefinePrim(path, usd_configure.ObjType.Xform)
 
     def set_save(self):
         file_opt = bsc_core.StorageFileOpt(self._file_path)

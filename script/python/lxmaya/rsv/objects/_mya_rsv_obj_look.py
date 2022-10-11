@@ -89,3 +89,46 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 'ass export',
                 'obj="{}" is non-exists'.format(mya_root.path)
             )
+
+    def set_asset_look_yml_export(self):
+        from lxbasic import bsc_core
+
+        from lxutil import utl_core
+
+        import lxmaya.fnc.exporters as mya_fnc_exporters
+
+        import lxmaya.dcc.dcc_objects as mya_dcc_objects
+
+        workspace = self._rsv_scene_properties.get('workspace')
+        version = self._rsv_scene_properties.get('version')
+        root = self._rsv_scene_properties.get('dcc.root')
+        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+
+        if workspace == 'publish':
+            keyword = 'asset-look-yml-file'
+        elif workspace == 'output':
+            keyword = 'asset-output-look-yml-file'
+        else:
+            raise TypeError()
+
+        look_yml_file_rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword)
+
+        root_dcc_dag_path = bsc_core.DccPathDagOpt(root)
+        root_mya_dag_path = root_dcc_dag_path.set_translate_to(pathsep)
+        root_mya_obj = mya_dcc_objects.Group(root_mya_dag_path.path)
+        if root_mya_obj.get_is_exists() is True:
+            look_yml_file_path = look_yml_file_rsv_unit.get_result(
+                version=version
+            )
+            #
+            mya_fnc_exporters.LookYamlExporter(
+                option=dict(
+                    file=look_yml_file_path,
+                    root=root
+                )
+            ).set_run()
+        else:
+            utl_core.Log.set_module_warning_trace(
+                'look-yml export',
+                'obj="{}" is non-exists'.format(root)
+            )

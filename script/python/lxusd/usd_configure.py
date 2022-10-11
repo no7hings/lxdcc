@@ -18,9 +18,9 @@ class ObjCategory(object):
 
 
 class ObjType(object):
-    TRANSFORM = 'Xform'
-    MESH = 'Mesh'
-    CURVE = 'NurbsCurves'
+    Xform = 'Xform'
+    Mesh = 'Mesh'
+    NurbsCurves = 'NurbsCurves'
 
 
 class Obj(object):

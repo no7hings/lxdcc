@@ -482,9 +482,9 @@ class GeometryUsdExporter_(object):
                     elif i_mya_obj_type == ma_configure.Util.CURVE_TYPE:
                         i_mya_curve = mya_dcc_objects.Curve(i_mya_obj_path)
                         if i_mya_curve.get_port('intermediateObject').get() is False:
-                            i_mya_curve_opt = mya_dcc_operators.CurveOpt(i_mya_curve)
+                            i_mya_curve_opt = mya_dcc_operators.NurbsCurveOpt(i_mya_curve)
                             if i_mya_curve_opt.get_is_invalid() is False:
-                                i_usd_curve_opt = usd_geometry_exporter._set_curve_create_(
+                                i_usd_curve_opt = usd_geometry_exporter._set_nurbs_curves_create_(
                                     i_usd_obj_path, use_override=use_override
                                 )
                                 points, knots, ranges, widths, order = i_mya_curve_opt.get_usd_data()
@@ -503,7 +503,7 @@ class GeometryUsdExporter_(object):
                         i_mya_xgen_spline_guide = mya_dcc_objects.XgenSplineGuide(i_mya_obj_path)
                         i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(i_mya_xgen_spline_guide)
                         if i_mya_xgen_spline_guide_opt.get_is_invalid() is False:
-                            i_usd_curve_opt = usd_geometry_exporter._set_curve_create_(
+                            i_usd_curve_opt = usd_geometry_exporter._set_nurbs_curves_create_(
                                 i_usd_obj_path, use_override=use_override
                             )
                             points, knots, ranges, widths, order = i_mya_xgen_spline_guide_opt.get_usd_curve_data()

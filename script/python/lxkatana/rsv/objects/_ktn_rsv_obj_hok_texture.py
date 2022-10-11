@@ -6,7 +6,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_texture_export(self, use_tx):
+    def set_texture_export(self, use_tx=False):
         import lxutil.dcc.dcc_operators as utl_dcc_operators
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -79,7 +79,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         location = asset_workspace.get_geometry_location()
         #
         texture_references = ktn_dcc_objects.TextureReferences()
-        dcc_shaders = asset_workspace.get_all_dcc_geometry_shader_by_location(location)
+        dcc_shaders = asset_workspace.get_all_dcc_geometry_shaders_by_location(location)
         dcc_objs = texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )

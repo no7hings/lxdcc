@@ -37,7 +37,7 @@ class TextureExporter(
         location = asset_workspace.get_geometry_location()
         #
         texture_references = ktn_dcc_objects.TextureReferences()
-        dcc_shaders = asset_workspace.get_all_dcc_geometry_shader_by_location(location)
+        dcc_shaders = asset_workspace.get_all_dcc_geometry_shaders_by_location(location)
         dcc_objs = texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )

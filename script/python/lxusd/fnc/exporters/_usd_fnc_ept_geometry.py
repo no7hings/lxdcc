@@ -171,7 +171,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 i_obj_path_opt = bsc_core.DccPathDagOpt(i_obj_path)
                 #
                 i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path)
-                if i_obj_type_name in [usd_configure.ObjType.MESH, usd_configure.ObjType.CURVE]:
+                if i_obj_type_name in [usd_configure.ObjType.Mesh, usd_configure.ObjType.NurbsCurves]:
                     i_usd_geometry_opt_tgt = usd_core.UsdGeometryOpt(i_usd_prim_tgt)
                     #
                     if self.get('with_object_color') is True:
@@ -190,7 +190,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                             'asset_color', 'color/color3', asset_color
                         )
                     #
-                    if i_obj_type_name == usd_configure.ObjType.MESH:
+                    if i_obj_type_name == usd_configure.ObjType.Mesh:
                         i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
                         i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
                         #
@@ -280,7 +280,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 #
                 i_usd_prim_src = self._usd_stage_src.GetPrimAtPath(i_obj_path)
                 i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path)
-                if i_obj_type_name in [usd_configure.ObjType.MESH, usd_configure.ObjType.CURVE]:
+                if i_obj_type_name in [usd_configure.ObjType.Mesh, usd_configure.ObjType.NurbsCurves]:
                     #
                     i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
                     i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
@@ -303,7 +303,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         elif color_scheme == 'asset_color':
                             i_usd_mesh_opt_tgt.set_display_color_fill(asset_color)
                         # for mesh
-                        if i_obj_type_name == usd_configure.ObjType.MESH:
+                        if i_obj_type_name == usd_configure.ObjType.Mesh:
                             if color_scheme == 'uv_map_color':
                                 i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_from_uv_map('st')
                                 i_usd_mesh_opt_tgt.set_display_color_as_face_vertices(
@@ -466,7 +466,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         for i in dag_path_comps:
             if i != usd_configure.Obj.PATHSEP:
                 stage.DefinePrim(
-                    i, usd_configure.ObjType.TRANSFORM
+                    i, usd_configure.ObjType.Xform
                 )
         #
         default_prim_path = stage.GetPrimAtPath(dag_path_comps[1])
@@ -474,29 +474,32 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def _set_transform_opt_create_(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.TRANSFORM)
+            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.Xform)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.TRANSFORM)
+            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.Xform)
         obj_opt = usd_dcc_operators.TransformOpt(prim)
         return obj_opt
 
     def _set_mesh_opt_create_(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.MESH)
+            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.Mesh)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.MESH)
+            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.Mesh)
         #
         obj_opt = usd_dcc_operators.MeshOpt(prim)
         return obj_opt
 
-    def _set_curve_create_(self, obj_path, use_override=False):
+    def _set_nurbs_curves_create_(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.CURVE)
+            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.NurbsCurves)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.CURVE)
+            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.NurbsCurves)
         #
-        obj_opt = usd_dcc_operators.CurveOpt(prim)
+        obj_opt = usd_dcc_operators.NurbsCurveOpt(prim)
         return obj_opt
+
+    def _set_basis_curves_create_(self, obj_path, use_override=False):
+        pass
 
     def _set_export_run_(self):
         default_prim_path = self.get('default_prim_path')

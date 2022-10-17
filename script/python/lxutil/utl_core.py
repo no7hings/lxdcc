@@ -389,6 +389,8 @@ class DialogWindow(object):
         options_configure=None,
         use_thread=True,
         parent=None,
+        #
+        usd_window_modality=True
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
@@ -396,6 +398,8 @@ class DialogWindow(object):
             w = prx_widgets.PrxDialogWindow1(parent=parent)
         else:
             w = prx_widgets.PrxDialogWindow0(parent=parent)
+        #
+        w.set_window_modality(usd_window_modality)
         #
         w.set_use_thread(use_thread)
         w.set_window_title(label)

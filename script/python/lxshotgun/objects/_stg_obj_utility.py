@@ -200,6 +200,14 @@ class StgConnector(object):
             i_key = key_pattern.format(**i)
             list_.append(i_key.decode('utf-8'))
         return list_
+
+    def get_shotgun_entities_(self, **kwargs):
+        list_ = []
+        _ = self._shotgun.find(**kwargs) or []
+        for i in _:
+            i = {k: (v if v else 'N/a') for k, v in i.items()}
+            list_.append(i)
+        return list_
     # entity
     def get_stg_entity(self, **kwargs):
         """
@@ -443,6 +451,13 @@ class StgConnector(object):
                     ['id', 'is', kwargs['id']]
                 ]
             )
+        elif 'name' in kwargs:
+            return self._shotgun.find_one(
+                entity_type='HumanUser',
+                filters=[
+                    ['name', 'is', kwargs['name']]
+                ]
+            )
         elif 'user' in kwargs:
             return self._shotgun.find_one(
                 entity_type='HumanUser',
@@ -469,6 +484,13 @@ class StgConnector(object):
                 entity_type='HumanUser',
                 filters=[
                     ['id', 'in', kwargs['id']]
+                ]
+            )
+        elif 'name' in kwargs:
+            return self._shotgun.find(
+                entity_type='HumanUser',
+                filters=[
+                    ['name', 'in', kwargs['name']]
                 ]
             )
         elif 'user' in kwargs:

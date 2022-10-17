@@ -301,11 +301,11 @@ class NurbsCurveOpt(
         super(NurbsCurveOpt, self).__init__(*args, **kwargs)
         self._set_curve_opt_def_init_()
 
-    def get_usd_obj_fnc(self):
+    def get_usd_fnc(self):
         return UsdGeom.NurbsCurves(self.prim)
     @property
-    def usd_obj_fnc(self):
-        return self.get_usd_obj_fnc()
+    def usd_fnc(self):
+        return self.get_usd_fnc()
 
     def set_create(self, points, knots, ranges, widths, order):
         self.set_points(points)
@@ -315,19 +315,20 @@ class NurbsCurveOpt(
         self.set_order(order)
 
     def set_points(self, values):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetPointsAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetPointsAttr()
         if p is None:
-            p = fnc.CreatePointsAttr()
+            p = usd_fnc.CreatePointsAttr()
+        #
         p.Set(values)
-        p = fnc.GetCurveVertexCountsAttr()
+        p = usd_fnc.GetCurveVertexCountsAttr()
         if p is None:
-            p = fnc.CreateCurveVertexCountsAttr()
+            p = usd_fnc.CreateCurveVertexCountsAttr()
         p.Set([len(values)])
 
     def get_points(self):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetPointsAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetPointsAttr()
         if p.GetNumTimeSamples():
             v = p.Get(0)
         else:
@@ -340,38 +341,38 @@ class NurbsCurveOpt(
         return len(self.get_points())
 
     def set_knots(self, values):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetKnotsAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetKnotsAttr()
         if p is None:
-            p = fnc.CreateKnotsAttr()
+            p = usd_fnc.CreateKnotsAttr()
         p.Set(values)
 
     def set_ranges(self, values):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetRangesAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetRangesAttr()
         if p is None:
-            p = fnc.CreateRangesAttr()
+            p = usd_fnc.CreateRangesAttr()
         p.Set(values)
 
     def set_widths(self, values):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetWidthsAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetWidthsAttr()
         if p is None:
-            p = fnc.CreateWidthsAttr()
+            p = usd_fnc.CreateWidthsAttr()
         p.Set(values)
 
     def set_extent(self, extent):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetPrim().HasAttribute('extent')
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetPrim().HasAttribute('extent')
         if p is None:
-            p = fnc.CreateExtentAttr()
+            p = usd_fnc.CreateExtentAttr()
         p.Set(extent)
 
     def set_order(self, order):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetOrderAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetOrderAttr()
         if p is None:
-            p = fnc.CreateOrderAttr()
+            p = usd_fnc.CreateOrderAttr()
         p.Set(order)
 
     def set_display_color_fill(self, color):
@@ -390,30 +391,56 @@ class BasisCurveOpt(
         super(BasisCurveOpt, self).__init__(*args, **kwargs)
         self._set_curve_opt_def_init_()
 
-    def get_usd_obj_fnc(self):
+    def get_usd_fnc(self):
         return UsdGeom.BasisCurves(self.prim)
     @property
-    def usd_obj_fnc(self):
-        return self.get_usd_obj_fnc()
+    def usd_fnc(self):
+        return self.get_usd_fnc()
 
-    def set_create(self, points, widths):
+    def set_create(self, counts, points, widths):
+        self.set_curve_basis(
+            UsdGeom.Tokens.catmullRom
+        )
+        self.set_curve_type(
+            UsdGeom.Tokens.cubic
+        )
+        self.set_curve_vertex_counts(counts)
         self.set_points(points)
+        self.set_widths(widths)
+
+    def set_curve_type(self, value):
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetTypeAttr()
+        if p is not None:
+            p = usd_fnc.CreateTypeAttr()
+
+        p.Set(value)
+
+    def set_curve_basis(self, value):
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetBasisAttr()
+        if p is not None:
+            p = usd_fnc.CreateBasisAttr()
+
+        p.Set(value)
+
+    def set_curve_vertex_counts(self, values):
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetCurveVertexCountsAttr()
+        if p is None:
+            p = usd_fnc.CreateCurveVertexCountsAttr()
+        p.Set(values)
 
     def set_points(self, values):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetPointsAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetPointsAttr()
         if p is None:
-            p = fnc.CreatePointsAttr()
+            p = usd_fnc.CreatePointsAttr()
         p.Set(values)
-        #
-        p = fnc.GetCurveVertexCountsAttr()
-        if p is None:
-            p = fnc.CreateCurveVertexCountsAttr()
-        p.Set([len(values)])
 
     def get_points(self):
-        fnc = self.get_usd_obj_fnc()
-        p = fnc.GetPointsAttr()
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetPointsAttr()
         if p.GetNumTimeSamples():
             v = p.Get(0)
         else:
@@ -421,3 +448,18 @@ class BasisCurveOpt(
         if v:
             return UsdOptCore._get_point_array_(v)
         return []
+
+    def set_widths(self, values):
+        usd_fnc = self.get_usd_fnc()
+        p = usd_fnc.GetWidthsAttr()
+        if p is None:
+            p = usd_fnc.CreateWidthsAttr()
+        p.Set(values)
+
+    def set_display_color_fill(self, color):
+        usd_fnc = self.get_usd_fnc()
+        usd_core.UsdGeometryOpt_(
+            usd_fnc
+        ).set_display_color_fill(
+            color
+        )

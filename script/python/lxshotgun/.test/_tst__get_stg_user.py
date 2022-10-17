@@ -1,6 +1,16 @@
 # coding:utf-8
-from lxshotgun import stg_core
+import urllib
 
-stg_core.ShotgunMtd.set_shotgun_instance_create()
+import lxshotgun.objects as stg_objects
 
+c = stg_objects.StgConnector()
 
+q = c.get_stg_user_query(
+    user='dongchangbao'
+)
+
+i = q.get('groups')
+
+print i
+
+# print urllib.urlopen(i).read()

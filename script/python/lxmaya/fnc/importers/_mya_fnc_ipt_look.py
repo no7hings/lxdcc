@@ -186,18 +186,26 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         geometry_and_objs = mesh_and_objs + curve_and_objs + xgen_and_objs
         # material
         material_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
-        material_and_objs = material_and_type.get_objs()
-        #
-        method_args = [
-            (self.__set_look_materials_create_, (material_and_objs, ), self.get('with_material')),
-            (self.__set_look_assigns_create_, (geometry_and_objs,), self.get('with_assign'))
-        ]
-        if method_args:
-            with utl_core.gui_progress(maximum=len(method_args)) as g_p:
-                for i_method, i_args, i_enable in method_args:
-                    g_p.set_update()
-                    if i_enable is True:
-                        i_method(*i_args)
+        if material_and_type is not None:
+            material_and_objs = material_and_type.get_objs()
+            #
+            method_args = [
+                (self.__set_look_materials_create_, (material_and_objs, ), self.get('with_material')),
+                (self.__set_look_assigns_create_, (geometry_and_objs,), self.get('with_assign'))
+            ]
+            if method_args:
+                with utl_core.gui_progress(maximum=len(method_args)) as g_p:
+                    for i_method, i_args, i_enable in method_args:
+                        g_p.set_update()
+                        if i_enable is True:
+                            i_method(*i_args)
+        else:
+            raise RuntimeError(
+                utl_core.Log.set_module_error_trace(
+                    'look import',
+                    'material(s) is not found'
+                )
+            )
     @classmethod
     def _set_look_create_by_geometry_obj_path_(cls, geometry_and_obj):
         obj_universe = geometry_and_obj.universe

@@ -27,19 +27,19 @@ from lxutil.dcc import utl_dcc_opt_abs
 import lxmaya.modifiers as mya_modifiers
 
 
-class AbsOm2ObjDef(object):
+class AbsOm2FncDef(object):
     @property
     def obj(self):
         raise NotImplementedError()
 
-    def _set_om2_obj_def_init_(self):
+    def _set_om2_fnc_def_init_(self):
         pass
 
-    def get_om2_obj(self):
+    def get_om2_fnc(self):
         raise NotImplementedError()
     @property
     def om2_obj(self):
-        return self.get_om2_obj()
+        return self.get_om2_fnc()
 
     def get_is_invalid(self):
         return self.om2_obj.object().isNull()
@@ -50,9 +50,9 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
         super(TransformOpt, self).__init__(*args, **kwargs)
     @property
     def om2_obj(self):
-        return self.get_om2_obj()
+        return self.get_om2_fnc()
 
-    def get_om2_obj(self):
+    def get_om2_fnc(self):
         return ma_core.Om2Method._get_om2_transform_(self.obj.path)
 
     def set_create(self, matrix=None):
@@ -104,14 +104,14 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
 class MeshOpt(
     utl_dcc_opt_abs.AbsObjOpt,
     utl_dcc_opt_abs.AbsMeshOptDef,
-    AbsOm2ObjDef
+    AbsOm2FncDef
 ):
     COMPONENT_PATHSEP = '.'
     def __init__(self, *args, **kwargs):
         super(MeshOpt, self).__init__(*args, **kwargs)
-        self._set_om2_obj_def_init_()
+        self._set_om2_fnc_def_init_()
 
-    def get_om2_obj(self):
+    def get_om2_fnc(self):
         return ma_core.Om2Method._get_om2_mesh_fnc_(self.obj.path)
 
     def set_create(self, face_vertices, points, uv_map_coords=None, normal_maps=None, color_maps=None):
@@ -271,12 +271,12 @@ class MeshOpt(
 
     def get_uv_map_check_error_result(self):
         if ma_core.Om2Method.DEFAULT_MAP_NAME in self.get_uv_map_names():
-            om2_obj = self.get_om2_obj()
+            om2_obj = self.get_om2_fnc()
             om2_obj.setCurrentUVSetName(ma_core.Om2Method.DEFAULT_MAP_NAME)
             return self._get_map_face_non_uv_comp_names_()
 
     def get_uv_map_error_comp_names(self, uv_map_name):
-        om2_obj = self.get_om2_obj()
+        om2_obj = self.get_om2_fnc()
         om2_obj.setCurrentUVSetName(uv_map_name)
         return self._get_map_face_non_uv_comp_names_()
 
@@ -393,7 +393,7 @@ class MeshOpt(
         return valueIds
 
     def set_uv_map(self, uv_map_name, uv_map):
-        om2_obj = self.get_om2_obj()
+        om2_obj = self.get_om2_fnc()
         #
         if uv_map_name == 'st':
             uv_map_name = 'map1'
@@ -435,7 +435,7 @@ class MeshOpt(
         :return: None
         """
         if clear is True:
-            om2_obj = self.get_om2_obj()
+            om2_obj = self.get_om2_fnc()
             om2_obj.clearUVs()
         #
         for uv_map_name, uv_map in uv_maps.items():
@@ -575,7 +575,7 @@ class MeshOpt(
         pass
 
     def get_maximum_face_index(self):
-        om2_obj = self.get_om2_obj()
+        om2_obj = self.get_om2_fnc()
         count = om2_obj.numPolygons
         return count - 1
 
@@ -615,11 +615,11 @@ class MeshOpt(
         )
 
     def set_uv_map_rename(self, uv_map_name, new_uv_map_name):
-        om2_obj = self.get_om2_obj()
+        om2_obj = self.get_om2_fnc()
         om2_obj.renameUVSet(uv_map_name, new_uv_map_name)
 
     def get_face_count(self):
-        om2_obj = self.get_om2_obj()
+        om2_obj = self.get_om2_fnc()
         return om2_obj.numPolygons
 
 
@@ -629,11 +629,11 @@ class MeshChecker(
     def __init__(self, *args, **kwargs):
         super(MeshChecker, self).__init__(*args, **kwargs)
 
-    def get_om2_obj(self):
+    def get_om2_fnc(self):
         return ma_core.Om2Method._get_om2_mesh_fnc_(self.obj.path)
     @property
     def om2_obj(self):
-        return self.get_om2_obj()
+        return self.get_om2_fnc()
 
     def get_unused_vertex_comp_names(self):
         lis = []
@@ -654,7 +654,7 @@ class MeshChecker(
 
 class NurbsCurveOpt(
     utl_dcc_opt_abs.AbsObjOpt,
-    AbsOm2ObjDef,
+    AbsOm2FncDef,
 ):
     def __init__(self, *args):
         """
@@ -662,10 +662,10 @@ class NurbsCurveOpt(
             1.str(path)
         """
         super(NurbsCurveOpt, self).__init__(*args)
-        self._om2_obj_fnc = self.get_om2_obj()
+        self._om2_obj_fnc = self.get_om2_fnc()
 
-    def get_om2_obj(self):
-        return ma_core.Om2Method._get_om2_curve_fnc_(self.obj.path)
+    def get_om2_fnc(self):
+        return ma_core.Om2Method._get_om2_nurbs_curve_fnc_(self.obj.path)
 
     def get_knots(self):
         return ma_core.Om2CurveOpt(
@@ -694,14 +694,20 @@ class NurbsCurveOpt(
         knots = ma_core.Om2Method._get_curve_knots_(count, degree)
         span = count - 3
         ranges = [(0, 1)]
-        widths = [1]
+        widths = [0.1]
         order = [degree]
         return points, knots, ranges, widths, order
+
+    def get_usd_basis_curve_data(self):
+        points = self.get_points()
+        counts = [len(points)]
+        widths = [0.01]
+        return counts, points, widths
 
 
 class SurfaceOpt(
     utl_dcc_opt_abs.AbsObjOpt,
-    AbsOm2ObjDef,
+    AbsOm2FncDef,
 ):
     def __init__(self, *args):
         """
@@ -710,54 +716,8 @@ class SurfaceOpt(
         """
         super(SurfaceOpt, self).__init__(*args)
 
-    def get_om2_obj(self):
-        return ma_core.Om2Method._get_om2_surface_fnc_(
+    def get_om2_fnc(self):
+        return ma_core.Om2Method._get_om2_nurbs_surface_fnc_(
             self.obj.path
         )
-
-
-class XgenSplineGuideOpt(
-    utl_dcc_opt_abs.AbsObjOpt,
-    AbsOm2ObjDef,
-):
-    def __init__(self, *args, **kwargs):
-        super(XgenSplineGuideOpt, self).__init__(*args, **kwargs)
-        self._set_om2_obj_def_init_()
-        self._cmd_xgen_spline_guid_opt = ma_core.CmdXgenSplineGuideOpt(
-            self.obj.path
-        )
-
-    def get_om2_obj(self):
-        return ma_core.Om2Method._get_om2_dag_(
-            self.obj.path
-        )
-
-    def _test_(self):
-        lis = self.get_control_points()
-        for seq, i in enumerate(lis):
-            cmds.spaceLocator(name='test_{}_loc'.format(seq), position=i)
-
-    def get_control_points(self):
-        return self._cmd_xgen_spline_guid_opt.get_control_points()
-
-    def get_curve_data(self):
-        points = self.get_control_points()
-        degree = 2
-        form = 1
-        count = len(points)
-        knots = ma_core.Om2Method._get_curve_knots_(count, degree)
-        span = count - 3
-        return points, knots, degree, form, span
-
-    def get_usd_curve_data(self):
-        points = self.get_control_points()
-        degree = 2
-        form = 1
-        count = len(points)
-        knots = ma_core.Om2Method._get_curve_knots_(count, degree)
-        span = count - 3
-        ranges = [(0, 1)]
-        widths = [1]
-        order = [degree]
-        return points, knots, ranges, widths, order
 

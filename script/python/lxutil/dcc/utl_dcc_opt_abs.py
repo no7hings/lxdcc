@@ -16,6 +16,9 @@ class AbsObjOpt(object):
     def get_path(self):
         return self._obj.path
 
+    def get_is_exists(self):
+        return self._obj.get_is_exists()
+
     def __str__(self):
         return '{}(path="{}")'.format(
             self.__class__.__name__,

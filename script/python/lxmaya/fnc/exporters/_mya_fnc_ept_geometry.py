@@ -402,7 +402,7 @@ class GeometryUsdExporter_(object):
                     )
                 )
                 c = len(mya_objs)
-                l_p = utl_core.log_progress_bar(maximum=c, label='geometry-usd-export')
+                l_p = utl_core.log_progress_bar(maximum=c, label='geometry-usd export')
                 #
                 for i_mya_obj in mya_objs:
                     l_p.set_update()
@@ -479,17 +479,18 @@ class GeometryUsdExporter_(object):
                                     'usd-mesh export',
                                     'obj="{}" is invalid'.format(i_mya_obj.path)
                                 )
+                    # nurbs curve
                     elif i_mya_obj_type == ma_configure.Util.CURVE_TYPE:
                         i_mya_curve = mya_dcc_objects.Curve(i_mya_obj_path)
                         if i_mya_curve.get_port('intermediateObject').get() is False:
                             i_mya_curve_opt = mya_dcc_operators.NurbsCurveOpt(i_mya_curve)
                             if i_mya_curve_opt.get_is_invalid() is False:
-                                i_usd_curve_opt = usd_geometry_exporter._set_nurbs_curves_create_(
+                                i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
                                     i_usd_obj_path, use_override=use_override
                                 )
-                                points, knots, ranges, widths, order = i_mya_curve_opt.get_usd_data()
+                                counts, points, widths = i_mya_curve_opt.get_usd_basis_curve_data()
                                 i_usd_curve_opt.set_create(
-                                    points, knots, ranges, widths, order
+                                    counts, points, widths
                                 )
                                 if with_display_color is True:
                                     color = bsc_core.TextOpt(i_mya_curve.name).to_rgb_(
@@ -498,25 +499,48 @@ class GeometryUsdExporter_(object):
                                     i_usd_curve_opt.set_display_color_fill(
                                         color
                                     )
-                    # xgen
-                    elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
-                        i_mya_xgen_spline_guide = mya_dcc_objects.XgenSplineGuide(i_mya_obj_path)
-                        i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(i_mya_xgen_spline_guide)
-                        if i_mya_xgen_spline_guide_opt.get_is_invalid() is False:
-                            i_usd_curve_opt = usd_geometry_exporter._set_nurbs_curves_create_(
+                    # xgen description
+                    elif i_mya_obj_type == ma_configure.Util.XGEN_DESCRIPTION:
+                        i_mya_xgen_description = mya_dcc_objects.Shape(i_mya_obj_path)
+                        i_mya_xgen_description_guide_opt = mya_dcc_operators.XgenDescriptionOpt(
+                            i_mya_xgen_description
+                        )
+                        if i_mya_xgen_description_guide_opt.get_is_exists() is True:
+                            i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
                                 i_usd_obj_path, use_override=use_override
                             )
-                            points, knots, ranges, widths, order = i_mya_xgen_spline_guide_opt.get_usd_curve_data()
+                            counts, points, widths = i_mya_xgen_description_guide_opt.get_usd_basis_curve_data()
                             i_usd_curve_opt.set_create(
-                                points, knots, ranges, widths, order
+                                counts, points, widths
                             )
                             if with_display_color is True:
-                                color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb_(
+                                color = bsc_core.TextOpt(i_mya_xgen_description.name).to_rgb_(
                                     maximum=1
                                 )
                                 i_usd_curve_opt.set_display_color_fill(
                                     color
                                 )
+                    # xgen guide
+                    # elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
+                    #     i_mya_xgen_spline_guide = mya_dcc_objects.Shape(i_mya_obj_path)
+                    #     i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(
+                    #         i_mya_xgen_spline_guide
+                    #     )
+                    #     if i_mya_xgen_spline_guide_opt.get_is_exists() is True:
+                    #         i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
+                    #             i_usd_obj_path, use_override=use_override
+                    #         )
+                    #         counts, points, widths = i_mya_xgen_spline_guide_opt.get_usd_basis_curve_data()
+                    #         i_usd_curve_opt.set_create(
+                    #             counts, points, widths
+                    #         )
+                    #         if with_display_color is True:
+                    #             color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb_(
+                    #                 maximum=1
+                    #             )
+                    #             i_usd_curve_opt.set_display_color_fill(
+                    #                 color
+                    #             )
                 #
                 l_p.set_stop()
                 #

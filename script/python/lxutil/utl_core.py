@@ -1865,7 +1865,6 @@ class History(object):
                 value=f_o.path
             )
             exists_values = configure.get(key) or []
-            #
             for i_value in values:
                 if i_value not in exists_values:
                     #
@@ -1878,12 +1877,16 @@ class History(object):
     @classmethod
     def get(cls, key):
         f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
-        if f_o.get_is_exists() is True:
-            configure = bsc_objects.Configure(
-                value=f_o.path
+        if f_o.get_is_exists() is False:
+            bsc_core.StorageFileOpt(cls.FILE_PATH).set_write(
+                {}
             )
-            return configure.get(key) or []
-        return []
+            return []
+        #
+        configure = bsc_objects.Configure(
+            value=f_o.path
+        )
+        return configure.get(key) or []
     @classmethod
     def get_latest(cls, key):
         f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)

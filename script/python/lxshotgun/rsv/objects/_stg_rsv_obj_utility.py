@@ -185,26 +185,13 @@ class RsvStgTaskOpt(object):
                 stg_version_opt.set_description(description)
         #
         if notice is not None:
-            ptn = '{sg_nickname};{email};{name}'
-            ns = []
-            for i in notice:
-                p = parse.parse(ptn, i)
-                if p:
-                    ns.append(p.named['sg_nickname'])
-                else:
-                    utl_core.Log.set_module_warning_trace(
-                        'shotgun version update',
-                        '"{}" is not available'.format(i)
-                    )
-            #
-            if ns:
-                stg_users = self._stg_connector.get_stg_users(
-                    sg_nickname=ns
+            stg_users = self._stg_connector.get_stg_users(
+                name=notice
+            )
+            if stg_users:
+                stg_version_opt.set_stg_notice_users_extend(
+                    stg_users
                 )
-                if stg_users:
-                    stg_version_opt.set_stg_notice_users_extend(
-                        stg_users
-                    )
         # batch tag
         stg_tag = self._stg_connector.get_stg_tag_force('td-batch')
         stg_version_opt.set_stg_tags_append(

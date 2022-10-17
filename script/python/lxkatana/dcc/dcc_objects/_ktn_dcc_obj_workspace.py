@@ -870,7 +870,9 @@ class AssetWorkspace(object):
         dcc_shaders = self.get_all_dcc_geometry_shaders_by_location(location)
         #
         patterns = [
-            '\'*%0[0-9]d*\'%*',
+            # etc. '/tmp/file.%04d.ext'%frame
+            '\'*.%0[0-9]d.*\'%*',
+            # etc. frame/2, frame*2
             '*frame*'
         ]
         dict_ = {}
@@ -878,15 +880,30 @@ class AssetWorkspace(object):
         if dcc_shaders:
             for i_dcc_shader in dcc_shaders:
                 i_p = i_dcc_shader.get_port('parameters')
+                if i_p.get_is_exists() is False:
+                    continue
+                #
                 i_descendants = i_p.get_descendants()
                 for j_child in i_descendants:
                     if j_child.type != 'group':
-                        if j_child.get_is_expression() is True:
-                            j_expression = j_child.get_expression()
-                            for k_p in patterns:
-                                if fnmatch.filter([j_expression], k_p):
-                                    j_key = u'{}.{}'.format(i_dcc_shader.name, j_child.port_path)
-                                    dict_[j_key] = j_expression
+                        if j_child.port_path.endswith('.value'):
+                            j_value_port = j_child
+                            j_enable_port = i_dcc_shader.get_port(
+                                '{}.enable'.format('.'.join(j_child.port_path.split('.')[:-1]))
+                            )
+                            if j_enable_port.get_is_exists() is True:
+                                # ignore when enable is 0.0
+                                if not j_enable_port.get():
+                                    continue
+                                #
+                                if j_value_port.get_is_expression() is True:
+                                    j_expression = j_value_port.get_expression()
+                                    for k_p in patterns:
+                                        if fnmatch.filter([j_expression], k_p):
+                                            j_key = '{}.{}'.format(i_dcc_shader.name, j_value_port.port_path)
+                                            dict_[j_key] = j_expression
+                                            # match once
+                                            break
         #
         if dict_:
             utl_dcc_objects.OsJsonFile(
@@ -906,15 +923,22 @@ class AssetWorkspace(object):
                         if i_source_port is not None:
                             i_asset_ass_exporter = _ktn_dcc_obj_node.Node('/rootNode/asset_ass_export__{}'.format(i_look_pass_name))
                             i_asset_ass_exporter.get_dcc_instance('lx_asset_ass_exporter', 'Group')
-                            i_asset_ass_exporter.set(
-                                'export.look.pass', i_look_pass_name
-                            )
+                            # i_asset_ass_exporter.set(
+                            #     'export.look.pass', i_look_pass_name
+                            # )
                             i_asset_ass_exporter.set(
                                 'dynamic.override_uv_maps', dynamic_override_uv_maps
                             )
+                            # connection
                             i_source_port.set_target(
                                 i_asset_ass_exporter.get_input_port('input')
                             )
+                            i_asset_ass_exporter.get_output_port(
+                                'output'
+                            ).set_target(
+                                i_input_port
+                            )
+                            #
                             ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).set_port_execute(
                                 'export.guess'
                             )

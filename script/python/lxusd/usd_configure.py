@@ -21,6 +21,7 @@ class ObjType(object):
     Xform = 'Xform'
     Mesh = 'Mesh'
     NurbsCurves = 'NurbsCurves'
+    BasisCurves = 'BasisCurves'
 
 
 class Obj(object):

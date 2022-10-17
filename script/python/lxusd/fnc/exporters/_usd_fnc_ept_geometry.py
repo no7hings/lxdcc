@@ -499,7 +499,13 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         return obj_opt
 
     def _set_basis_curves_create_(self, obj_path, use_override=False):
-        pass
+        if use_override is True:
+            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.BasisCurves)
+        else:
+            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.BasisCurves)
+        #
+        obj_opt = usd_dcc_operators.BasisCurveOpt(prim)
+        return obj_opt
 
     def _set_export_run_(self):
         default_prim_path = self.get('default_prim_path')

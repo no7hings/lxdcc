@@ -3018,9 +3018,12 @@ class DccAttrPathOpt(object):
 class TextsMtd(object):
     @classmethod
     def set_sort_to(cls, texts):
-        _ = texts
-        _.sort(key=lambda x: TextMtd.to_number_embedded_args(x))
-        return _
+        texts.sort(key=lambda x: TextMtd.to_number_embedded_args(x))
+        return texts
+    @classmethod
+    def set_sort_by_initial(cls, texts):
+        texts.sort(key=lambda x: x[0].lower())
+        return texts
 
 
 class ParsePatternMtd(object):
@@ -3239,14 +3242,14 @@ class TextOpt(object):
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
-    def to_rgb_(self, maximum=255, seed=0):
+    def to_rgb_(self, maximum=255, seed=0, p=45):
         string = self._raw
         if string:
             d = 1000.0
             a = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
             h = float(a % (360+seed)*d)/d
-            s = float(45+a % 55)/100.0
-            v = float(45+a % 55)/100.0
+            s = float(p+a % (100-p))/100.0
+            v = float(p+a % (100-p))/100.0
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
@@ -4805,6 +4808,35 @@ class SizeMtd(object):
         p_1 = float(w_1) / float(h_1)
 
 
+class RectMtd(object):
+    @classmethod
+    def set_fit_to(cls, pos, size_0, size_1):
+        x_0, y_0 = pos
+        w_0, h_0 = size_0
+        w_1, h_1 = size_1
+        p_0 = float(w_0) / float(h_0)
+        p_1 = float(w_1) / float(h_1)
+        m_1 = min(w_1, h_1)
+        if p_0 > 1:
+            if p_0 > p_1:
+                w, h = w_1, w_1/p_0
+            elif p_0 < p_1:
+                w, h = h_1*p_0, h_1
+            else:
+                w, h = w_1, h_1
+        elif p_0 < 1:
+            if p_0 > p_1:
+                w, h = w_1, w_1/p_0
+            elif p_0 < p_1:
+                w, h = h_1*p_0, h_1
+            else:
+                w, h = w_1, h_1
+        else:
+            w, h = m_1, m_1
+        x, y = int((w_1-w)/2), int((h_1-h)/2)
+        return x_0+x, y_0+y, w, h
+
+
 class CameraMtd(object):
     @classmethod
     def get_front_transformation(cls, geometry_args, angle, mode=0):
@@ -5672,7 +5704,7 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print SizeMtd.set_clamp_to(
-        5824, 7374, 4096, 512
+    print ColorMtd.rgb2hex(
+        207, 207, 207
     )
 

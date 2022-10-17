@@ -656,6 +656,25 @@ class UsdGeometryOpt(object):
         pass
 
 
+class UsdGeometryOpt_(object):
+    def __init__(self, usd_fnc):
+        self._usd_fnc = usd_fnc
+        self._usd_prim = usd_fnc.GetPrim()
+
+    def set_display_color_fill(self, color):
+        p = self._usd_fnc.GetDisplayColorPrimvar()
+        if p is None:
+            p = self._usd_fnc.CreateDisplayColorPrimvar(
+                UsdGeom.Tokens.constant
+            )
+        #
+        r, g, b = color
+        #
+        p.Set(
+            Vt.Vec3fArray([(r, g, b)])
+        )
+
+
 class UsdGeometryMeshOpt(UsdGeometryOpt):
     def __init__(self, usd_prim):
         super(UsdGeometryMeshOpt, self).__init__(usd_prim)
@@ -771,9 +790,9 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
 
 
 class UsdMeshOpt(object):
-    def __init__(self, mesh):
-        self._usd_mesh = mesh
-        self._usd_prim = mesh.GetPrim()
+    def __init__(self, usd_fnc):
+        self._usd_mesh = usd_fnc
+        self._usd_prim = usd_fnc.GetPrim()
         self._obj_path = self._usd_prim.GetPath().pathString
 
     def get_path(self):
@@ -975,8 +994,13 @@ class UsdMeshOpt(object):
         return max(set_)
 
 
-class UsdCurveOpt(object):
-    def __init__(self, mesh):
+class UsdNurbsCurvesOpt(object):
+    def __init__(self, usd_fnc):
+        pass
+
+
+class UsdBasisCurvesOpt(object):
+    def __init__(self, usd_fnc):
         pass
 
 

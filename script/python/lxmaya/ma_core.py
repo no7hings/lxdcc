@@ -92,10 +92,6 @@ def _get_is_ui_mode_():
     return not cmds.about(batch=1)
 
 
-def set_stack_trace_enable(boolean=True):
-    cmds.stackTrace(state=boolean)
-
-
 class Om2Method(object):
     DEFAULT_MAP_NAME = 'map1'
     @classmethod
@@ -113,13 +109,13 @@ class Om2Method(object):
     def _get_om2_mesh_fnc_(cls, path):
         return om2.MFnMesh(cls._get_om2_dag_path_(path))
     @classmethod
-    def _get_om2_curve_fnc_(cls, path):
+    def _get_om2_nurbs_curve_fnc_(cls, path):
         return om2.MFnNurbsCurve(cls._get_om2_dag_path_(path))
     @classmethod
-    def _get_om2_surface_fnc_(cls, path):
+    def _get_om2_nurbs_surface_fnc_(cls, path):
         return om2.MFnNurbsSurface(cls._get_om2_dag_path_(path))
     @classmethod
-    def _get_om2_dag_(cls, path):
+    def _get_om2_dag_node_fnc_(cls, path):
         return om2.MFnDagNode(cls._get_om2_dag_path_(path))
     @classmethod
     def _get_om2_obj_(cls, name):
@@ -417,7 +413,7 @@ class Om2CurveCreator(object):
 
 class Om2CurveOpt(object):
     def __init__(self, path):
-        self._om2_obj_fnc = Om2Method._get_om2_curve_fnc_(path)
+        self._om2_obj_fnc = Om2Method._get_om2_nurbs_curve_fnc_(path)
     @property
     def path(self):
         return self._om2_obj_fnc.fullPathName()
@@ -947,7 +943,7 @@ class MeshToSurfaceConverter(object):
 
 class SurfaceOpt(object):
     def __init__(self, path):
-        self._om2_obj_fnc = Om2Method._get_om2_surface_fnc_(path)
+        self._om2_obj_fnc = Om2Method._get_om2_nurbs_surface_fnc_(path)
     @property
     def path(self):
         return self._om2_obj_fnc.fullPathName()
@@ -1135,7 +1131,7 @@ class SurfaceOpt(object):
 
 class CmdXgenSplineGuideOpt(object):
     def __init__(self, path):
-        self._om2_obj_fnc = Om2Method._get_om2_dag_(path)
+        self._om2_obj_fnc = Om2Method._get_om2_dag_node_fnc_(path)
         self._obj_path = self._om2_obj_fnc.fullPathName()
     @property
     def path(self):
@@ -2533,5 +2529,5 @@ def undo_stack(key=None):
     return CmdUndoStack(key)
 
 
-def set_stack_trace_enable(boolean):
+def set_stack_trace_enable(boolean=False):
     cmds.stackTrace(state=boolean)

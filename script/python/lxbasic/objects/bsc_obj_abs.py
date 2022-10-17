@@ -37,17 +37,18 @@ class AbsContent(object):
                 if isinstance(_, dict):
                     self._value = _
                 else:
-                    raise TypeError()
+                    self._value = collections.OrderedDict()
+                    # raise TypeError()
             else:
                 raise OSError()
+        #
         elif isinstance(value, dict):
             self._value = value
-        elif value is None:
-            self._value = collections.OrderedDict()
         else:
-            raise TypeError()
+            self._value = collections.OrderedDict()
+            # raise TypeError()
         #
-        self._unfold_exludes = []
+        self._unfold_excludes = []
 
     def set_save_to(self, file_path):
         bsc_core.StorageFileOpt(
@@ -205,7 +206,7 @@ class AbsContent(object):
                 _v_ks = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
                 if _v_ks:
                     for _i_v_k in _v_ks:
-                        self._unfold_exludes.append(_i_v_k)
+                        self._unfold_excludes.append(_i_v_k)
                         _value_unfold = _value_unfold.replace('\\<', '<').replace('\\>', '>')
                 # etc: "<A>"
                 else:
@@ -232,7 +233,7 @@ class AbsContent(object):
                                     _c = len([i for i in _ if i == ''])
                                     __k = '{}.{}'.format('.'.join(key_.split('.')[:-_c]), '.'.join(_[_c:]))
                                     #
-                                    if __k in self._unfold_exludes:
+                                    if __k in self._unfold_excludes:
                                         continue
                                     if __k not in keys:
                                         raise KeyError('key="{}" is Non-exists'.format(__k))
@@ -241,7 +242,7 @@ class AbsContent(object):
                                     _v = rcs_fnc_(__k, _v)
                                 else:
                                     #
-                                    if _i_var_key in self._unfold_exludes:
+                                    if _i_var_key in self._unfold_excludes:
                                         continue
                                     if _i_var_key not in keys:
                                         raise KeyError('key="{}" is Non-exists'.format(_i_var_key))

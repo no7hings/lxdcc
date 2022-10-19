@@ -27,8 +27,10 @@ def set_session_option_hooks_execute_by_deadline(session):
                 #
                 choice_scheme=_batch_hook_option_opt.get('choice_scheme'),
                 #
-                td_enable=_batch_hook_option_opt.get('td_enable') or False,
                 rez_beta=_batch_hook_option_opt.get('rez_beta') or False,
+                #
+                td_enable=_batch_hook_option_opt.get('td_enable') or False,
+                localhost_enable=_batch_hook_option_opt.get('localhost_enable') or False,
             )
         )
         #

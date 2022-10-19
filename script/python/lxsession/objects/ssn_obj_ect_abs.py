@@ -137,6 +137,18 @@ class AbsHookExecutor(object):
                 'Whitelist', bsc_core.SystemMtd.get_host()
             )
         #
+        localhost_enable = hook_option_opt.get('localhost_enable') or False
+        if localhost_enable is True:
+            self._ddl_submiter.job_info.set(
+                'Pool', 'artist'
+            )
+            self._ddl_submiter.job_info.set(
+                'Group', 'artist'
+            )
+            self._ddl_submiter.job_info.set(
+                'Whitelist', bsc_core.SystemMtd.get_host()
+            )
+        #
         exists_ddl_job_id = session.set_ddl_job_id_find(hook_option)
         if exists_ddl_job_id:
             session._ddl_job_id = exists_ddl_job_id

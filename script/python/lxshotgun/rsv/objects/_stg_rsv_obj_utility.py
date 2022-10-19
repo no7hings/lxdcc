@@ -183,8 +183,8 @@ class RsvStgTaskOpt(object):
                 stg_version_opt.set_description(unquote(description))
             else:
                 stg_version_opt.set_description(description)
-        #
-        if notice is not None:
+        # value is list
+        if notice:
             stg_users = self._stg_connector.get_stg_users(
                 name=notice
             )

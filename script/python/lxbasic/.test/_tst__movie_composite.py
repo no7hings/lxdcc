@@ -10,7 +10,7 @@ p = bsc_core.ParsePatternOpt(render_output_file_path_pattern)
 p.set_update(directory=render_output_directory_path)
 matchers = p.get_matches()
 
-render_passes = ['primary', 'ass_asset_color', 'ass_group_color', 'ass_object_color', 'ass_shell_color']
+render_passes = ['primary', 'ass_asset_color', 'ass_group_color', 'ass_object_color', 'ass_shell_color', 'ass_wire']
 
 dict_ = collections.OrderedDict()
 for i in matchers:

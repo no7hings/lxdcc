@@ -16,7 +16,7 @@ layers = [
     'high', 'shape'
 ]
 
-render_passes = ['primary', 'ass_asset_color', 'ass_group_color', 'ass_object_color', 'ass_shell_color']
+render_passes = ['primary', 'ass_asset_color', 'ass_group_color', 'ass_object_color', 'ass_shell_color', 'ass_wire']
 
 dict_ = collections.OrderedDict()
 for i_layer, i_render_pass in itertools.product(layers, render_passes):

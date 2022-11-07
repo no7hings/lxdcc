@@ -176,6 +176,7 @@ class ObjUniverse(obj_abstract.AbsObjUniverse):
     OBJ_TYPE_STACK_CLASS = _obj_stack.ObjTypeStack
     #
     OBJ_STACK_CLASS = _obj_stack.ObjStack
+    OBJ_STACK_CLASS_TEST = _obj_stack.ObjStackTest
     #
     OBJ_CONNECTION_STACK_CLASS = _obj_stack.ObjConnectionStack
     OBJ_CONNECTION_CLASS = ObjConnection

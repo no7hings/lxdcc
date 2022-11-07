@@ -1,0 +1,38 @@
+#
+input_ports:
+    - input
+#
+output_ports:
+    - output
+#
+parameters:
+    reset:
+        widget: button
+        value: ''
+        tool_tip: '...'
+
+    geometry/location:
+        widget: path
+        value: '/root/world/geo/master'
+        tool_tip: '...'
+
+    attribute/match_pattern:
+        widget: string
+        value: 'pg_*'
+        tool_tip: '...'
+
+    attribute/copy_enable:
+        widget: boolean
+        value: True
+        tool_tip: '...'
+
+    attribute/copy/from_path:
+        widget: string
+        value: 'userProperties'
+        tool_tip: '...'
+
+    attribute/copy/to_path:
+        widget: string
+        value: 'geometry.arbitrary'
+        tool_tip: '...'
+

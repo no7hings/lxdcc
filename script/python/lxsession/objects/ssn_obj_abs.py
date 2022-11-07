@@ -310,15 +310,15 @@ class AbsSsnShotgunDef(object):
 
 class AbsSsnRsvUnitDef(object):
     def _set_rsv_unit_def_init_(self, rsv_obj, configure):
-        keyword = configure.get('resolver.rsv_unit.keyword')
+        self._rsv_keyword = configure.get('resolver.rsv_unit.keyword')
         self._rsv_unit_version = configure.get('resolver.rsv_unit.version')
         self._rsv_unit_extend_variants = configure.get('resolver.rsv_unit.extend_variants')
         self._rsv_unit = None
-        if keyword:
+        if self._rsv_keyword:
             variants = configure.get('variants')
-            keyword = keyword.format(**variants)
+            self._rsv_keyword = self._rsv_keyword.format(**variants)
             self._rsv_unit = rsv_obj.get_rsv_unit(
-                keyword=keyword
+                keyword=self._rsv_keyword
             )
     @property
     def rsv_task(self):
@@ -333,11 +333,20 @@ class AbsSsnRsvUnitDef(object):
     def rsv_unit(self):
         return self._rsv_unit
     @property
+    def rsv_keyword(self):
+        return self._rsv_keyword
+    @property
     def rsv_unit_version(self):
         return self._rsv_unit_version
     @property
     def rsv_unit_extend_variants(self):
         return self._rsv_unit_extend_variants
+
+    def set_view_gui(self, prx_widget):
+        self._view_gui = prx_widget
+
+    def get_view_gui(self):
+        return self._view_gui
 
 
 class AbsSsnRsvObjAction(

@@ -240,28 +240,14 @@ class GuiProgressesRunner(object):
             self._ps = QT_PROGRESS_CREATE_METHOD(maximum, label=label)
         else:
             self._ps = []
-        #
-        if self._label is not None:
-            self._log_progress_runner = LogProgressRunner(
-                maximum=self._maximum,
-                label=self._label
-            )
-        else:
-            self._log_progress_runner = None
 
-    def set_update(self):
+    def set_update(self, sub_label=None):
         for p in self._ps:
             p.set_update()
-        #
-        if self._log_progress_runner is not None:
-            self._log_progress_runner.set_update()
 
     def set_stop(self):
         for p in self._ps:
             p.set_stop()
-        #
-        if self._log_progress_runner is not None:
-            self._log_progress_runner.set_stop()
 
     def __enter__(self):
         return self
@@ -390,7 +376,7 @@ class DialogWindow(object):
         use_thread=True,
         parent=None,
         #
-        usd_window_modality=True
+        use_window_modality=True
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
         #
@@ -399,7 +385,7 @@ class DialogWindow(object):
         else:
             w = prx_widgets.PrxDialogWindow0(parent=parent)
         #
-        w.set_window_modality(usd_window_modality)
+        w.set_window_modality(use_window_modality)
         #
         w.set_use_thread(use_thread)
         w.set_window_title(label)

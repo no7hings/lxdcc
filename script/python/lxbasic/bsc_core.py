@@ -517,11 +517,21 @@ class ApplicationMtd(object):
             return True
         return False
     @classmethod
+    def get_is_nuke(cls):
+        pass
+    @classmethod
+    def get_is_clarisse(cls):
+        _ = os.environ.get('IX_PYTHON2HOME')
+        if _:
+            return True
+        return False
+    @classmethod
     def get_is_dcc(cls):
         for i_fnc in [
             cls.get_is_maya,
             cls.get_is_houdini,
             cls.get_is_katana,
+            cls.get_is_clarisse,
             cls.get_is_lynxi
         ]:
             if i_fnc() is True:
@@ -533,6 +543,7 @@ class ApplicationMtd(object):
             (cls.get_is_maya, bsc_configure.Application.Maya),
             (cls.get_is_houdini, bsc_configure.Application.Houdini),
             (cls.get_is_katana, bsc_configure.Application.Katana),
+            (cls.get_is_clarisse, bsc_configure.Application.Clarisse),
             (cls.get_is_lynxi, bsc_configure.Application.Lynxi)
         ]:
             if i_fnc() is True:
@@ -4401,7 +4412,7 @@ class ExceptionMtd(object):
                 u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
         if exc_texts:
-            print exc_texts
+            print '\n'.join(exc_texts)
     @classmethod
     def get_stack(cls):
         import sys
@@ -4416,6 +4427,32 @@ class ExceptionMtd(object):
             exc_texts.append(
                 u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
+        return '\n'.join(exc_texts)
+    @classmethod
+    def get_stack_(cls):
+        import sys
+        #
+        import traceback
+
+        exc_texts = []
+        exc_type, exc_value, exc_stack = sys.exc_info()
+        if exc_type:
+            value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+            for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
+                i_file_path, i_line, i_fnc, i_fnc_line = stk
+                exc_texts.append(
+                    '{indent}file "{file}" line {line} in {fnc}\n{indent}{indent}{fnc_line}'.format(
+                        **dict(
+                            indent='    ',
+                            file=i_file_path,
+                            line=i_line,
+                            fnc=i_fnc,
+                            fnc_line=i_fnc_line
+                        )
+                    )
+                )
+            #
+            exc_texts.append(value)
         return '\n'.join(exc_texts)
 
 
@@ -5705,6 +5742,6 @@ class SPathMtd(object):
 
 if __name__ == '__main__':
     print ColorMtd.rgb2hex(
-        207, 207, 207
+        31, 31, 31
     )
 

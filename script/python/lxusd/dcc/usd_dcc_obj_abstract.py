@@ -2,6 +2,8 @@
 # noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, UsdGeom
 
+from lxutil import utl_core
+
 from lxusd import usd_configure
 
 from lxobj import obj_configure, obj_core, obj_abstract
@@ -60,8 +62,8 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
         # base, ext = os.path.splitext(file_path)
         # self._usd_stage.Export('{}.usda'.format(base))
 
-        for usd_prim in self._usd_stage.TraverseAll():
-            self._set_obj_create_(usd_prim)
+        for i_usd_prim in self._usd_stage.TraverseAll():
+            self._set_obj_create_(i_usd_prim)
 
     def _set_load_by_dot_usd_(self, file_obj, root=None):
         self.set_restore()
@@ -80,17 +82,22 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
         #
         usd_root.GetReferences().AddReference('{}'.format(file_path), usd_root.GetPath())
         self._usd_stage.Flatten()
-        # base, ext = os.path.splitext(file_path)
-        # self._usd_stage.Export('{}.usda'.format(base))
-        for i_usd_prim in self._usd_stage.TraverseAll():
-            self._set_obj_create_(i_usd_prim)
+        utl_core.Log.set_module_result_trace(
+            'build universe',
+            'file="{}"'.format(file_path)
+        )
+        with utl_core.gui_progress(maximum=len([i for i in self._usd_stage.TraverseAll()]), label='build universe') as l_p:
+            for i_usd_prim in self._usd_stage.TraverseAll():
+                l_p.set_update()
+                self._set_obj_create_(i_usd_prim)
 
     def _set_obj_create_(self, usd_prim):
         obj_category_name = obj_configure.ObjCategory.USD
         obj_type_name = usd_prim.GetTypeName()
         obj_path = usd_prim.GetPath().pathString
+        #
         obj_category = self.universe.set_obj_category_create(obj_category_name)
         obj_type = obj_category.set_type_create(obj_type_name)
-        _obj = obj_type.set_obj_create(obj_path)
+        _obj = obj_type.set_obj_register(obj_path)
         _obj._usd_obj = usd_prim
         return _obj

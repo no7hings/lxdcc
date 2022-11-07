@@ -507,6 +507,11 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         obj_opt = usd_dcc_operators.BasisCurveOpt(prim)
         return obj_opt
 
+    def _get_geometry_fnc_(self, obj_path):
+        prim = self._output_stage.GetPrimAtPath(obj_path)
+        if prim.IsValid() is True:
+            return UsdGeom.Xform(prim)
+
     def _set_export_run_(self):
         default_prim_path = self.get('default_prim_path')
         if default_prim_path is not None:

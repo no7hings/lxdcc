@@ -34,7 +34,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         if yml_file.get_is_exists() is True:
             if yml_file.set_read():
                 utl_core.Log.set_module_result_trace(
-                    'comparer-data read',
+                    'geometry-comparer data read',
                     'cache="{}", source="{}"'.format(yml_file_path, file_path)
                 )
                 return bsc_objects.Content(value=yml_file_path)
@@ -42,7 +42,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         content_0 = bsc_objects.Content(value={})
         c = len([i for i in stage.TraverseAll()])
         if c:
-            with utl_core.gui_progress(maximum=c) as g_p:
+            with utl_core.gui_progress(maximum=c, label='gain geometry-comparer data') as g_p:
                 for i_prim in stage.TraverseAll():
                     g_p.set_update()
                     i_obj_type_name = i_prim.GetTypeName()
@@ -52,22 +52,22 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                         #
                         i_dcc_obj_name = i_prim.GetName()
                         i_face_vertices_uuid = i_mesh_obj_opt.get_face_vertices_as_uuid()
-                        points_uuid = i_mesh_obj_opt.get_points_as_uuid()
+                        i_points_uuid = i_mesh_obj_opt.get_points_as_uuid()
                         cls._set_mesh_comparer_data_build_(
                             content_0,
                             i_dcc_obj_path,
-                            i_dcc_obj_name, i_face_vertices_uuid, points_uuid
+                            i_dcc_obj_name, i_face_vertices_uuid, i_points_uuid
                         )
         #
         if content_0.value:
             utl_core.Log.set_module_result_trace(
-                'comparer-data write',
+                'geometry comparer-data write',
                 'cache="{}", source="{}"'.format(yml_file_path, file_path)
             )
             yml_file.set_write(content_0.value)
         else:
             utl_core.Log.set_module_warning_trace(
-                'comparer-data resolver',
+                'geometry comparer-data resolver',
                 'file="{}" geometry is not found'.format(file_path)
             )
 

@@ -63,15 +63,15 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
             #
             with utl_core.log_progress_bar(maximum=c, label='usd import') as l_p:
                 for i_usd_prim in self._usd_stage.TraverseAll():
-                    l_p.set_update()
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.Xform:
                         mya_fnc_obj_core.FncUsdTransform(i_usd_prim, location=root_override).set_create()
-                        mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
-                            port_match_patterns
-                        )
                     elif i_usd_prim_type_name == usd_configure.ObjType.Mesh:
                         mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
+                    #
+                    mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(port_match_patterns)
+                    #
+                    l_p.set_update()
     @classmethod
     def _set_path_create_(cls, path):
         dag_path = bsc_core.DccPathDagOpt(path)
@@ -83,13 +83,18 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
                     cls._set_transform_create_by_path_(i_path)
 
     def set_meshes_uv_maps_import_run(self, uv_map_face_vertices_contrast=True):
-        for i_usd_prim in self._usd_stage.TraverseAll():
-            i_usd_prim_type_name = i_usd_prim.GetTypeName()
-            if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
-                self._set_mesh_uv_maps_(
-                    i_usd_prim,
-                    uv_map_face_vertices_contrast=uv_map_face_vertices_contrast
-                )
+        c = len([i for i in self._usd_stage.TraverseAll()])
+        if c:
+            with utl_core.log_progress_bar(maximum=c, label='usd uv-map import') as l_p:
+                for i_usd_prim in self._usd_stage.TraverseAll():
+                    i_usd_prim_type_name = i_usd_prim.GetTypeName()
+                    if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
+                        self._set_mesh_uv_maps_(
+                            i_usd_prim,
+                            uv_map_face_vertices_contrast=uv_map_face_vertices_contrast
+                        )
+                    #
+                    l_p.set_update()
     @classmethod
     def _set_transform_create_by_path_(cls, path, matrix=None):
         dag_path = bsc_core.DccPathDagOpt(path)

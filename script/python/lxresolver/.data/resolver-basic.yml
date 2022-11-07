@@ -147,6 +147,14 @@ asset-work-nuke-scene-src-dir: <asset-work-nuke-dir>
 asset-work-nuke-scene-src-file: <asset-work-nuke-scene-src-dir>/<asset-version-name>.nk
 asset-work-nuke-user-scene-src-file: <asset-work-nuke-scene-src-dir>/<user-name>/<asset-version-name>.nk
 asset-work-nuke-scene-tmp-file: <asset-work-nuke-tmp-dir>/<asset-version-name>.nk
+# clarisse
+asset-work-clarisse-dir: <asset-task-dir>/clarisse
+asset-work-clarisse-tmp-dir: <asset-work-clarisse-dir>/temporary/<user-name>
+#
+asset-work-clarisse-scene-src-dir: <asset-work-clarisse-dir>
+asset-work-clarisse-scene-src-file: <asset-work-clarisse-scene-src-dir>/<asset-version-name>.project
+asset-work-clarisse-user-scene-src-file: <asset-work-clarisse-scene-src-dir>/<user-name>/<asset-version-name>.project
+asset-work-clarisse-scene-tmp-file: <asset-work-clarisse-tmp-dir>/<asset-version-name>.project
 # sp
 asset-work-sp-dir: <asset-task-dir>/sp
 asset-work-sp-scene-src-dir: <asset-work-sp-dir>/<variant>/<version-name>
@@ -242,12 +250,28 @@ asset-preview-mov-file: <asset-preview-dir>/<asset-version-name>.mov
 # <asset-maya-scene>
 asset-maya-scene-dir: <asset-version-dir>/maya
 asset-maya-scene-file: <asset-maya-scene-dir>/<asset-name>.ma
+asset-maya-scene-src-dir: <asset-version-dir>/scene
+asset-maya-scene-src-file: <asset-maya-scene-src-dir>/<asset-name>.ma
 # <asset-houdini-scene>
 asset-houdini-scene-dir: <asset-version-dir>/houdini
 asset-houdini-scene-file: <asset-houdini-scene-dir>/<asset-name>.hip
+asset-houdini-scene-src-dir: <asset-version-dir>/scene
+asset-houdini-scene-src-file: <asset-houdini-scene-src-dir>/<asset-name>.hip
 # <asset-katana-scene>
 asset-katana-scene-dir: <asset-version-dir>/katana
 asset-katana-scene-file: <asset-katana-scene-dir>/<asset-name>.katana
+asset-katana-scene-src-dir: <asset-version-dir>/scene
+asset-katana-scene-src-file: <asset-katana-scene-src-dir>/<asset-name>.katana
+#
+asset-nuke-scene-dir: <asset-version-dir>/nuke
+asset-nuke-scene-file: <asset-nuke-scene-dir>/<asset-name>.nk
+asset-nuke-scene-src-dir: <asset-version-dir>/scene
+asset-nuke-scene-src-file: <asset-nuke-scene-src-dir>/<asset-name>.nk
+#
+asset-clarisse-scene-dir: <asset-version-dir>/clarisse
+asset-clarisse-scene-file: <asset-clarisse-scene-dir>/<asset-name>.project
+asset-clarisse-scene-src-dir: <asset-version-dir>/scene
+asset-clarisse-scene-src-file: <asset-clarisse-scene-src-dir>/<asset-name>.project
 #
 asset-katana-render-output-dir: <asset-render-dir>/katana-images
 asset-katana-render-image-file: <asset-katana-render-output-dir>/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr
@@ -256,22 +280,10 @@ asset-katana-render-image-png-file: <asset-katana-render-output-dir>/main/<camer
 #
 asset-katana-render-video-all-mov-file: <asset-katana-render-output-dir>/main/all.mov
 #
-asset-nuke-scene-dir: <asset-version-dir>/nuke
-asset-nuke-scene-file: <asset-nuke-scene-dir>/<asset-name>.nk
-#
 asset-maya-xgen-dir: <asset-version-dir>/maya
 asset-maya-xgen-file: <asset-maya-xgen-dir>/<asset-name>__<xgen-name>.xgen
 # <scene>
 asset-scene-src-dir: <asset-version-dir>/scene
-#
-asset-maya-scene-src-dir: <asset-version-dir>/scene
-asset-maya-scene-src-file: <asset-maya-scene-src-dir>/<asset-name>.ma
-#
-asset-houdini-scene-src-dir: <asset-version-dir>/scene
-asset-houdini-scene-src-file: <asset-houdini-scene-src-dir>/<asset-name>.hip
-#
-asset-katana-scene-src-dir: <asset-version-dir>/scene
-asset-katana-scene-src-file: <asset-katana-scene-src-dir>/<asset-name>.katana
 
 asset-light-dir: <asset-version-dir>/light
 asset-light-live_group-file: <asset-light-dir>/<asset-name>.livegroup
@@ -280,9 +292,6 @@ asset-live_group-dir: <asset-version-dir>/livegroup
 asset-live_group-file: <asset-live_group-dir>/<asset-name>.livegroup
 #
 asset-light-ass-file: <asset-version-dir>/ass/<asset-name>.ass
-#
-asset-nuke-scene-src-dir: <asset-version-dir>/scene
-asset-nuke-scene-src-file: <asset-nuke-scene-src-dir>/<asset-name>.nk
 #
 asset-scene-xgen-dir: <asset-version-dir>/scene
 asset-scene-xgen-file: <asset-scene-xgen-dir>/<asset-name>__<xgen-name>.xgen
@@ -764,6 +773,8 @@ include-asset-step:
     - lgt
     # set
     - set
+    # environment
+    - env
 #
 include-asset-step-extra:
     - '{step}_qc'

@@ -90,6 +90,7 @@ class ValidatorStatus(enum.IntEnum):
     Ignore = 0x24
     Locked = 0x25
     Active = 0x26
+    Disable = 0x27
 
 
 class ActionState(enum.IntEnum):
@@ -139,6 +140,7 @@ class Application(object):
     Houdini = 'houdini'
     Katana = 'katana'
     Nuke = 'nuke'
+    Clarisse = 'clarisse'
     #
     Lynxi = 'lynxi'
     #
@@ -149,6 +151,7 @@ class Application(object):
         Houdini,
         Katana,
         Nuke,
+        Clarisse,
         #
         Lynxi
     ]

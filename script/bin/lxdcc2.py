@@ -308,10 +308,10 @@ def set_test_window_show():
         def _test_(self):
             n = utl_prx_widgets.PrxNode()
             self.set_widget_add(n)
-            p = n.set_port_add(utl_prx_widgets.PrxEnumeratePort('test_0', 'Test-0'))
+            p = n.set_port_add(utl_prx_widgets.PrxEnumeratePort_('test_0', 'Test-0'))
             p.set(['a', 'b', 'c'])
 
-            p = n.set_port_add(utl_prx_widgets.PrxStringPort('test_1', 'Test-1'))
+            p = n.set_port_add(utl_prx_widgets.PrxPortForString('test_1', 'Test-1'))
             p.set('a')
 
             p.set_use_as_storage(True)

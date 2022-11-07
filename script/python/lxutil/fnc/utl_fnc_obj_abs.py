@@ -522,29 +522,25 @@ class AbsFncDccGeometryComparer(object):
             self._set_scene_dcc_objs_update_
         ]
         if methods:
-            gp = utl_core.GuiProgressesRunner(maximum=len(methods))
-            for method in methods:
-                gp.set_update()
-                method()
-            #
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(methods), label='execute geometry-comparer method') as g_p:
+                for method in methods:
+                    g_p.set_update()
+                    method()
         #
         src_dcc_geometries = self._model_dcc_geometries
         tgt_dcc_geometries = self._scene_dcc_geometries
         #
         if src_dcc_geometries:
-            gp = utl_core.GuiProgressesRunner(maximum=len(src_dcc_geometries))
-            for i_src_geometry in src_dcc_geometries:
-                gp.set_update()
-                if i_src_geometry.type_name == 'Mesh':
-                    i_src_mesh_path = i_src_geometry.path
-                    #
-                    i_mesh_path, i_check_statuses = self.get_matched_mesh(src_path=i_src_mesh_path)
-                    self._results.append(
-                        (i_mesh_path, i_check_statuses)
-                    )
-            #
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(src_dcc_geometries), label='gain geometry-comparer result') as g_p:
+                for i_src_geometry in src_dcc_geometries:
+                    g_p.set_update()
+                    if i_src_geometry.type_name == 'Mesh':
+                        i_src_mesh_path = i_src_geometry.path
+                        #
+                        i_mesh_path, i_check_statuses = self.get_matched_mesh(src_path=i_src_mesh_path)
+                        self._results.append(
+                            (i_mesh_path, i_check_statuses)
+                        )
         #
         src_dcc_paths = [i.path for i in src_dcc_geometries]
         tgt_dcc_paths = [i.path for i in tgt_dcc_geometries]
@@ -563,35 +559,31 @@ class AbsFncDccGeometryComparer(object):
             self._set_scene_dcc_objs_update_
         ]
         if methods:
-            gp = utl_core.GuiProgressesRunner(maximum=len(methods))
-            for method in methods:
-                gp.set_update()
-                method()
-            #
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(methods), label='execute geometry-comparer method') as g_p:
+                for method in methods:
+                    g_p.set_update()
+                    method()
         #
-        src_dcc_geometries = self._model_dcc_geometries
-        tgt_dcc_geometries = self._scene_dcc_geometries
+        dcc_geometries_src = self._model_dcc_geometries
+        dcc_geometries_tgt = self._scene_dcc_geometries
         #
         dcc_geometry_paths = []
-        if src_dcc_geometries:
-            gp = utl_core.GuiProgressesRunner(maximum=len(src_dcc_geometries))
-            for i_src_geometry in src_dcc_geometries:
-                gp.set_update()
-                if i_src_geometry.type_name == 'Mesh':
-                    i_src_mesh_path = i_src_geometry.path
-                    #
-                    i_tgt_mesh_path, i_check_statuses = self.get_matched_mesh(src_path=i_src_mesh_path)
-                    lis.append(
-                        (i_src_mesh_path, i_tgt_mesh_path, i_check_statuses)
-                    )
-                    dcc_geometry_paths.append(i_tgt_mesh_path)
-            #
-            gp.set_stop()
+        if dcc_geometries_src:
+            with utl_core.gui_progress(maximum=len(dcc_geometries_src), label='gain geometry-comparer result') as g_p:
+                for i_src_geometry in dcc_geometries_src:
+                    g_p.set_update()
+                    if i_src_geometry.type_name == 'Mesh':
+                        i_src_mesh_path = i_src_geometry.path
+                        #
+                        i_tgt_mesh_path, i_check_statuses = self.get_matched_mesh(src_path=i_src_mesh_path)
+                        lis.append(
+                            (i_src_mesh_path, i_tgt_mesh_path, i_check_statuses)
+                        )
+                        dcc_geometry_paths.append(i_tgt_mesh_path)
         # addition
-        src_dcc_geometry_paths = [i.path for i in src_dcc_geometries]
-        tgt_dcc_geometry_paths = [i.path for i in tgt_dcc_geometries]
-        addition_geometry_paths = list(set(tgt_dcc_geometry_paths) - set(src_dcc_geometry_paths) - set(dcc_geometry_paths))
+        dcc_geometry_paths_src = [i.path for i in dcc_geometries_src]
+        dcc_geometry_paths_tgt = [i.path for i in dcc_geometries_tgt]
+        addition_geometry_paths = list(set(dcc_geometry_paths_tgt) - set(dcc_geometry_paths_src) - set(dcc_geometry_paths))
         for i_tgt_geometry_path in addition_geometry_paths:
             lis.append(
                 (i_tgt_geometry_path, i_tgt_geometry_path, utl_configure.DccMeshCheckStatus.ADDITION)
@@ -845,28 +837,17 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
             #
             return geometries, comparer_data
 
-    def _get_results_(self):
-        lis = []
-        #
-        data = []
-        #
-        methods = [
-            (self._get_data_, (self.get('file_src'), self.get('location'))),
-            (self._get_data_, (self.get('file_tgt'), self.get('location'))),
-        ]
-        if methods:
-            with utl_core.gui_progress(maximum=len(methods)) as g_p:
-                for i_method, i_args in methods:
-                    i_geometries, i_comparer_data = i_method(*i_args)
-                    data.append((i_geometries, i_comparer_data))
-                    #
-                    g_p.set_update()
-        #
-        objs_src, data_src = data[0]
-        objs_tgt, data_tgt = data[1]
+    def __gain_data_fnc_(self, file_path, location):
+        self._comparer_data.append(
+            self._get_data_(file_path, location)
+        )
+
+    def __gain_result_fnc_(self):
+        objs_src, data_src = self._comparer_data[0]
+        objs_tgt, data_tgt = self._comparer_data[1]
         #
         if objs_src:
-            with utl_core.gui_progress(maximum=len(objs_src)) as g_p:
+            with utl_core.gui_progress(maximum=len(objs_src), label='comparer geometry by data') as g_p:
                 for i_obj_src in objs_src:
                     if i_obj_src.type_name == 'Mesh':
                         i_path_src = i_obj_src.path
@@ -876,7 +857,7 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
                         )
                         i_path_tgt, i_check_statuses = i_mesh_matcher.get()
 
-                        lis.append(
+                        self._comparer_results.append(
                             (i_path_src, i_path_tgt, i_check_statuses)
                         )
                     #
@@ -889,13 +870,31 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
             set(paths_tgt) - set(paths_src)
         )
         for i_path_tgt in path_addition:
-            lis.append(
+            self._comparer_results.append(
                 (i_path_tgt, i_path_tgt, utl_configure.DccMeshCheckStatus.ADDITION)
             )
-        return lis
+
+    def __get_results_(self):
+        self._comparer_data = []
+        self._comparer_results = []
+        #
+        ms = [
+            # gain source data
+            (self.__gain_data_fnc_, (self.get('file_src'), self.get('location'))),
+            # gain target data
+            (self.__gain_data_fnc_, (self.get('file_tgt'), self.get('location'))),
+            # comparer
+            (self.__gain_result_fnc_, ())
+        ]
+        if ms:
+            with utl_core.gui_progress(maximum=len(ms), label='execute geometry-comparer method') as g_p:
+                for i_method, i_args in ms:
+                    g_p.set_update()
+                    i_method(*i_args)
+        return self._comparer_results
 
     def get_results(self, check_status_includes=None):
-        results = self._get_results_()
+        results = self.__get_results_()
         if check_status_includes is not None:
             list_ = []
             for i_path_src, i_path_tgt, i_check_status in results:

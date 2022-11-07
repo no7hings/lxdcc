@@ -22,6 +22,8 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
+from lxusd import usd_core
+
 import lxusd.fnc.exporters as usd_fnc_exporters
 
 from lxutil.fnc import utl_fnc_obj_abs
@@ -440,14 +442,7 @@ class GeometryUsdExporter_(object):
                             transform_usd_obj_opt.set_visible(
                                 transform_mya_obj.get_visible()
                             )
-                        #
-                        if port_match_patterns:
-                            i_customize_ports = ma_core.CmdObjOpt(i_mya_obj_path).get_customize_ports()
-                            for j_port in i_customize_ports:
-                                if j_port.get_is_naming_matches(port_match_patterns) is True:
-                                    transform_usd_obj_opt.set_customize_attribute_add(
-                                        j_port.port_path, j_port.get()
-                                    )
+                    #
                     elif i_mya_obj_type == ma_configure.Util.MESH_TYPE:
                         i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
                         if i_mya_mesh.get_port('intermediateObject').get() is False:
@@ -520,6 +515,7 @@ class GeometryUsdExporter_(object):
                                 i_usd_curve_opt.set_display_color_fill(
                                     color
                                 )
+
                     # xgen guide
                     # elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
                     #     i_mya_xgen_spline_guide = mya_dcc_objects.Shape(i_mya_obj_path)
@@ -541,6 +537,20 @@ class GeometryUsdExporter_(object):
                     #             i_usd_curve_opt.set_display_color_fill(
                     #                 color
                     #             )
+
+                    if port_match_patterns:
+                        i_geometry_usd_fnc = usd_geometry_exporter._get_geometry_fnc_(i_usd_obj_path)
+                        if i_geometry_usd_fnc is not None:
+                            i_customize_ports = ma_core.CmdObjOpt(i_mya_obj_path).get_customize_ports()
+                            for j_port in i_customize_ports:
+                                if j_port.get_is_naming_matches(port_match_patterns) is True:
+                                    j_key = j_port.port_path
+                                    j_value = j_port.get()
+                                    if j_value is None:
+                                        j_value = ''
+                                    usd_core.UsdPrimOpt._set_customize_attribute_add_(
+                                        i_geometry_usd_fnc, j_key, j_value
+                                    )
                 #
                 l_p.set_stop()
                 #

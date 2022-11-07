@@ -438,7 +438,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
             ]
 
-            with utl_core.gui_progress(maximum=len(ms)) as g_p:
+            with utl_core.gui_progress(maximum=len(ms), label='execute workspace load method') as g_p:
                 for i_m, i_as in ms:
                     g_p.set_update()
                     if i_as:

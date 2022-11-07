@@ -477,6 +477,7 @@ class AbsCategoryDef(object):
         key = self._get_type_path_(category_name, type_name)
         if stack.get_object_exists(key) is True:
             return stack.get_object(key)
+        #
         type_ = category._set_type_create_as_new_(type_name)
         stack.set_object_add(type_)
         return type_
@@ -880,6 +881,9 @@ class AbsObjDagDef(object):
         :return: str(<obj-pathsep>)
         """
         return self.PATHSEP
+
+    def get_path(self):
+        return self._path
     @property
     def path(self):
         """
@@ -2026,7 +2030,7 @@ class AbsObjTypeObjDef(object):
     def _set_obj_branches_create_(self):
         pass
 
-    def set_obj_create(self, obj_path_args, default_obj_type=None):
+    def set_obj_create(self, obj_path_args, **kwargs):
         # etc: /a/b/c
         if isinstance(obj_path_args, (str, unicode)):
             obj_path = obj_path_args
@@ -2047,6 +2051,11 @@ class AbsObjTypeObjDef(object):
             obj = self._set_obj_create_(obj_path)
             self.universe._set_obj_add_(obj)
         return obj
+
+    def set_obj_register(self, obj_oath):
+        obj = self.DCC_OBJ_CLASS(self, obj_oath)
+        self.universe._set_obj_add_(obj)
+        return obj
     @property
     def obj_pathsep(self):
         return self.DCC_OBJ_CLASS.PATHSEP
@@ -2054,7 +2063,7 @@ class AbsObjTypeObjDef(object):
     def _get_obj_path_(cls, obj_path_args):
         return cls.DCC_OBJ_CLASS.PATHSEP.join(obj_path_args)
 
-    def _set_obj_create_(self, obj_path):
+    def _set_obj_create_(self, obj_path, **kwargs):
         new_obj = self.DCC_OBJ_CLASS(self, obj_path)
         new_obj.set_ancestors_create()
         return new_obj
@@ -2304,6 +2313,11 @@ class AbsPortQuery(object):
     @property
     def type_name(self):
         return self.type.name
+
+    def get_path(self):
+        return self.PATHSEP.join(
+            [self.obj.path, self.port_path]
+        )
     # obj
     @property
     def path(self):
@@ -2526,7 +2540,7 @@ class AbsObjType(
         self._set_obj_type_obj_def_init_()
         self._set_obj_type_port_query_def_init_()
 
-    def _set_obj_create_(self, obj_path_args):
+    def _set_obj_create_(self, obj_path_args, **kwargs):
         if isinstance(obj_path_args, (str, unicode)):
             obj_path = obj_path_args
         elif isinstance(obj_path_args, (tuple, list)):
@@ -2783,18 +2797,10 @@ class AbsObj(
     def _get_child_paths_(self, path):
         lis = []
         obj_pathsep = self.PATHSEP
-        obj_category_name = '*'
-        obj_type_name = '*'
-        obj_string_0 = '{}{}*'.format(self.path, obj_pathsep)
-        regex = self.category._get_obj_token_(
-            obj_category_name, obj_type_name, obj_string_0
-        )
+        regex = '{}{}*'.format(self.path, obj_pathsep)
         #
-        obj_string_1 = '{}{}*{}*'.format(path, obj_pathsep, obj_pathsep)
-        pattern = self.category._get_obj_token_(
-            obj_category_name, obj_type_name, obj_string_1
-        )
-        _ = self.universe._obj_stack.get_objects(regex=regex)
+        pattern = '{}{}*{}*'.format(path, obj_pathsep, obj_pathsep)
+        _ = self.universe._obj_stack_test.get_objects(regex=regex)
         for i in _:
             match = fnmatch.filter([i.path], pattern)
             if match:
@@ -2810,13 +2816,8 @@ class AbsObj(
 
     def get_descendants(self):
         obj_pathsep = self.PATHSEP
-        obj_category_name = '*'
-        obj_type_name = '*'
-        obj_string = '{}{}*'.format(self.path, obj_pathsep)
-        regex = self.category._get_obj_token_(
-            obj_category_name, obj_type_name, obj_string
-        )
-        return self.universe._obj_stack.get_objects(regex=regex)
+        regex = '{}{}*'.format(self.path, obj_pathsep)
+        return self.universe._obj_stack_test.get_objects(regex=regex)
 
     def _format_dict_(self):
         return {
@@ -2947,6 +2948,7 @@ class AbsObjUniverseDef(object):
     OBJ_TYPE_STACK_CLASS = None
     #
     OBJ_STACK_CLASS = None
+    OBJ_STACK_CLASS_TEST = None
     #
     OBJ_CONNECTION_STACK_CLASS = None
     OBJ_CONNECTION_CLASS = None
@@ -2967,6 +2969,7 @@ class AbsObjUniverseDef(object):
         self._obj_type_stack = self.OBJ_TYPE_STACK_CLASS()
         # <obj>
         self._obj_stack = self.OBJ_STACK_CLASS()
+        self._obj_stack_test = self.OBJ_STACK_CLASS_TEST()
         # <obj-connection>
         self._obj_connection_stack = self.OBJ_CONNECTION_STACK_CLASS()
         self._obj_bind_stack = self.OBJ_BIND_STACK_CLASS()
@@ -3083,6 +3086,7 @@ class AbsObjUniverseDef(object):
     # <obj>
     def _set_obj_add_(self, obj):
         self._obj_stack.set_object_add(obj)
+        self._obj_stack_test.set_object_add(obj)
 
     def _set_obj_override_(self, old_obj, new_obj):
         """
@@ -3092,6 +3096,7 @@ class AbsObjUniverseDef(object):
         :return:
         """
         self._obj_stack.set_object_override(old_obj, new_obj)
+        self._obj_stack_test.set_object_override(old_obj, new_obj)
     # noinspection PyMethodMayBeStatic
     def _set_obj_copy_to_(self, source_obj, target_path):
         """
@@ -3138,16 +3143,12 @@ class AbsObjUniverseDef(object):
         :return: instance(<obj>) or None
         """
         obj_pathsep = obj_configure.Obj.PATHSEP
-        obj_category_name = '*'
-        obj_type_name = '*'
         if obj_string.startswith(obj_pathsep):
             obj_path = obj_string
-        else:
-            obj_path = '*{}{}'.format(obj_pathsep, obj_string)
-        regex = self.OBJ_CATEGORY_CLASS._get_obj_token_(
-            obj_category_name, obj_type_name, obj_path
-        )
-        _ = self._obj_stack.get_objects(regex=regex)
+            return self._obj_stack_test.get_object(obj_path)
+        # must join pathsep
+        regex = '*{}{}'.format(obj_pathsep, obj_string)
+        _ = self._obj_stack_test.get_objects(regex=regex)
         if _:
             return _[-1]
 
@@ -3157,16 +3158,12 @@ class AbsObjUniverseDef(object):
         :return: bool
         """
         obj_pathsep = obj_configure.Obj.PATHSEP
-        obj_category_name = '*'
-        obj_type_name = '*'
         if obj_string.startswith(obj_pathsep):
             obj_path = obj_string
-        else:
-            obj_path = '*{}{}'.format(obj_pathsep, obj_string)
-        regex = self.OBJ_CATEGORY_CLASS._get_obj_token_(
-            obj_category_name, obj_type_name, obj_path
-        )
-        return self._obj_stack.get_objects_exists(regex=regex)
+            return self._obj_stack_test.get_object_exists(obj_path)
+        #
+        regex = '*{}{}'.format(obj_pathsep, obj_string)
+        return self._obj_stack_test.get_objects_exists(regex=regex)
     # <obj-connection>
     def set_connection_create(self, source_obj_args, source_port_args, target_obj_args, target_port_args):
         obj_connection = self._set_connection_create_(

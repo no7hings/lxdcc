@@ -48,6 +48,9 @@ class RsvAssetWorkspaceTextureOpt(object):
             extend_variants=dict(variant=variant)
         )
 
+    def get_all_variants(self):
+        pass
+
     def set_version_create_at(self, variant, version):
         if version == 'new':
             version = self.get_new_version_at(variant)

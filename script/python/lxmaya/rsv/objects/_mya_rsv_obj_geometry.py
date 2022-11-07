@@ -75,7 +75,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.gui_progress(maximum=len(location_names)) as g_p:
+            with utl_core.gui_progress(maximum=len(location_names), label='export geometry in location') as g_p:
                 for i_location_name in location_names:
                     g_p.set_update()
                     #
@@ -180,7 +180,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.gui_progress(maximum=len(location_names)) as g_p:
+            with utl_core.gui_progress(maximum=len(location_names), label='export geometry in location') as g_p:
                 for i_location_name in location_names:
                     g_p.set_update()
                     #
@@ -252,7 +252,7 @@ class RsvDccGeometryExtraHookOpt(
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.gui_progress(maximum=len(location_names)) as g_p:
+            with utl_core.gui_progress(maximum=len(location_names), label='export geometry-extra in location') as g_p:
                 for i_location_name in location_names:
                     g_p.set_update()
                     #

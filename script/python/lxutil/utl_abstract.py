@@ -7,6 +7,8 @@ import platform
 
 import fnmatch
 
+from lxbasic import bsc_core
+
 from lxobj import obj_configure, obj_core, obj_abstract
 
 from . import utl_core
@@ -98,22 +100,19 @@ class AbsDccObjDef(object):
 class AbsDccMtd(object):
     @classmethod
     def get_is_maya(cls):
-        _ = os.environ.get('MAYA_APP_DIR')
-        if _:
-            return True
-        return False
+        return bsc_core.ApplicationMtd.get_is_maya()
     @classmethod
     def get_is_houdini(cls):
-        _ = os.environ.get('HIP')
-        if _:
-            return True
-        return False
+        return bsc_core.ApplicationMtd.get_is_houdini()
     @classmethod
     def get_is_katana(cls):
         _ = os.environ.get('KATANA_ROOT')
         if _:
             return True
-        return False
+        return bsc_core.ApplicationMtd.get_is_katana()
+    @classmethod
+    def get_is_clarisse(cls):
+        return bsc_core.ApplicationMtd.get_is_clarisse()
 
 
 class AbsDccDagDef(object):

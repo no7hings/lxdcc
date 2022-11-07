@@ -1292,7 +1292,7 @@ class LxVariant(object):
         from lxkatana import ktn_core
         return ktn_core.NGObjOpt(self._ktn_obj).get_port_raw('variableName')
     @classmethod
-    def _get_item_values_(cls, ktn_obj):
+    def _get_values_(cls, ktn_obj):
         from lxkatana import ktn_core
         ktn_port = ktn_core.NGObjOpt(ktn_obj).get_port('patterns')
         return [ktn_core.NGPortOpt(i).get() for i in ktn_core.NGObjOpt(ktn_port).get_children()]
@@ -1300,7 +1300,7 @@ class LxVariant(object):
     def set_variable_register(self):
         from lxkatana import ktn_core
         key = self._get_key_()
-        values = self._get_item_values_(self._ktn_obj)
+        values = self._get_values_(self._ktn_obj)
         ktn_core.VariablesSetting().set_register(
             key, values
         )
@@ -1337,7 +1337,7 @@ class LxVariantChoose(object):
                 if i_obj_opt.type_name == 'VariableSwitch':
                     i_key = i_obj_opt.get('variableName')
                     if i_key == key:
-                        i_values = LxVariant._get_item_values_(i_ktn_obj)
+                        i_values = LxVariant._get_values_(i_ktn_obj)
                         [values.append(j) for j in i_values if j not in values]
         #
         if values:

@@ -494,7 +494,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             (self._set_scene_save_, (rsv_asset, save_scene)),
         ]
         if method_args:
-            with utl_core.gui_progress(maximum=len(method_args)) as g_p:
+            with utl_core.gui_progress(maximum=len(method_args), label='execute geometry build method') as g_p:
                 for i_method, i_args in method_args:
                     g_p.set_update()
                     #

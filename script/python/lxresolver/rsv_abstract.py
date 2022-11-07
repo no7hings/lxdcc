@@ -33,6 +33,8 @@ from lxobj import obj_core, obj_abstract
 
 import lxbasic.objects as bsc_objects
 
+from lxutil_gui import utl_gui_core
+
 import threading
 
 THREAD_MAXIMUM = threading.Semaphore(1024)
@@ -748,7 +750,7 @@ class AbsRsvObj(
         return self._rsv_project
     @property
     def icon(self):
-        return utl_core.Icon.get('file/folder')
+        return utl_gui_core.RscIconFile.get('file/folder')
 
     def _set_dag_create_(self, path):
         return self.rsv_project._project__get_rsv_obj_(path)
@@ -1193,7 +1195,7 @@ class AbsRsvTask(
         keyword = '{}-version-dir'.format(self.properties.get('branch'))
         rsv_unit = self.get_rsv_unit(keyword=keyword)
         return rsv_unit.get_result()
-
+    # for work
     def get_properties_by_work_scene_src_file_path(self, file_path):
         return self._get_properties_by_scene_file_path_(
             file_path,
@@ -1338,6 +1340,9 @@ class AbsRsvTask(
             'user', utl_core.System.get_user_name()
         )
         return properties
+    @property
+    def icon(self):
+        return utl_gui_core.RscIconFile.get('file/file')
 
 
 # <rsv-step>
@@ -1377,11 +1382,14 @@ class AbsRsvStep(
         return rsv_obj
 
 
-class AbsRsvEntity(
+class AbsRsvResource(
     AbsRsvObj
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvEntity, self).__init__(*args, **kwargs)
+        super(AbsRsvResource, self).__init__(*args, **kwargs)
+    @property
+    def icon(self):
+        return utl_gui_core.RscIconFile.get('resolver/asset')
 
     def get_rsv_step(self, **kwargs):
         """
@@ -1557,7 +1565,7 @@ class AbsRsvProject(
         return self._rsv_path
     @property
     def icon(self):
-        return utl_core.Icon.get('file/folder')
+        return utl_gui_core.RscIconFile.get('resolver/project')
 
     def get_workspace_src(self):
         return self.get_value('workspace-src')
@@ -2545,7 +2553,7 @@ class AbsRsvRoot(
         return ''
     @property
     def icon(self):
-        return utl_core.Icon.get('file/root')
+        return utl_gui_core.RscIconFile.get('resolver/root')
 
     def _set_dag_create_(self, path):
         if path == self.path:

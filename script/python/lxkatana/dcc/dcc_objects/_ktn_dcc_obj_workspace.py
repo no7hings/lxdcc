@@ -272,14 +272,14 @@ class AssetWorkspace(object):
             cls._set_workspace_connections_create_mtd_,
             cls._set_workspace_node_graphs_create_mtd_
         ]
-        with utl_core.gui_progress(maximum=len(method_args)) as g_p:
+        with utl_core.gui_progress(maximum=len(method_args), label='create workspace') as g_p:
             for i_method in method_args:
                 g_p.set_update()
                 i_method(configure, workspace_keys)
     @classmethod
     def _set_workspace_nodes_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
-        with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
+        with utl_core.gui_progress(maximum=len(workspace_keys), label='crate workspace node') as g_p:
             for i_key in workspace_keys:
                 g_p.set_update()
                 for j_sub_key in ['main', 'backdrop', 'dot']:
@@ -330,7 +330,7 @@ class AssetWorkspace(object):
     @classmethod
     def _set_workspace_connections_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
-        with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
+        with utl_core.gui_progress(maximum=len(workspace_keys), label='crate workspace connection') as g_p:
             for key in workspace_keys:
                 g_p.set_update()
                 for sub_key in ['main', 'node_graph', 'dot']:
@@ -347,7 +347,7 @@ class AssetWorkspace(object):
     @classmethod
     def _set_workspace_node_graphs_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
-        with utl_core.gui_progress(maximum=len(workspace_keys)) as g_p:
+        with utl_core.gui_progress(maximum=len(workspace_keys), label='crate workspace node-graph') as g_p:
             for key in workspace_keys:
                 g_p.set_update()
                 cls._set_workspace_node_graph_create_(configure, key, pass_name)

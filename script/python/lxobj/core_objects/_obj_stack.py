@@ -97,3 +97,12 @@ class ObjStack(obj_abstract.AbsObjStack):
 
     def get_key(self, obj):
         return obj._get_stack_key_()
+
+
+# obj
+class ObjStackTest(obj_abstract.AbsObjStack):
+    def __init__(self):
+        super(ObjStackTest, self).__init__()
+
+    def get_key(self, obj):
+        return obj.get_path()

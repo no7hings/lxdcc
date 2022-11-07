@@ -15,7 +15,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
         check_dict = {}
-        with utl_core.gui_progress(maximum=len(dcc_objs)) as g_p:
+        with utl_core.gui_progress(maximum=len(dcc_objs), label='check texture') as g_p:
             for i_obj in dcc_objs:
                 g_p.set_update()
                 #
@@ -148,7 +148,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             check_pattern_opts.append(i_check_p_opt)
 
         check_dict = {}
-        with utl_core.gui_progress(maximum=len(dcc_objs)) as g_p:
+        with utl_core.gui_progress(maximum=len(dcc_objs), label='check texture workspace') as g_p:
             for i_obj in dcc_objs:
                 g_p.set_update()
                 #
@@ -317,7 +317,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         geometry_paths = sub_dc_location.get_all_shape_paths(include_obj_type=['mesh'])
         if geometry_paths:
-            with utl_core.gui_progress(maximum=len(geometry_paths)) as g_p:
+            with utl_core.gui_progress(maximum=len(geometry_paths), label='check geometry') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
                     g_p.set_update()
                     #
@@ -480,7 +480,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         geometry_paths = sub_dcc_location.get_all_shape_paths(include_obj_type=['mesh'])
         if geometry_paths:
-            with utl_core.gui_progress(maximum=len(geometry_paths)) as g_p:
+            with utl_core.gui_progress(maximum=len(geometry_paths), label='check look') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
                     g_p.set_update()
                     #
@@ -671,10 +671,13 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def set_katana_geometry_topology_check(self, validation_checker):
         from lxutil import utl_configure
+
+        from lxkatana import ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
         import lxkatana.fnc.comparers as ktn_fnc_comparers
+
         #
         check_group = 'Geometry Topology Check'
         #
@@ -687,21 +690,15 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             location = '{}{}'.format(geometry_location, root)
             sub_location = '{}{}'.format(geometry_location, sub_root)
-            #
-            obj_scene = ktn_dcc_objects.Scene()
-            obj_scene.set_load_by_root(
-                ktn_obj='asset_geometries_merge',
-                root=sub_location,
-            )
-            dcc_obj_universe = obj_scene.universe
 
-            dcc_location = dcc_obj_universe.get_obj(location)
-            if dcc_location is None:
+            stage_opt = ktn_core.KtnSGStageOpt('asset_geometries_merge')
+
+            if stage_opt.get_obj_exists(location) is False:
                 validation_checker.set_node_result_register(
                     location,
                     check_group=check_group,
                     check_status=validation_checker.CheckStatus.Warning,
-                    description='"asset root" "{}" is non-exists'.format(dcc_location)
+                    description='"asset root" "{}" is non-exists'.format(location)
                 )
                 return False
             #
@@ -723,6 +720,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     description='"geometry usd-file" from "model" is non-exists'
                 )
                 return False
+            #
             scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
             scene_usd_file_path = ktn_workspace.get_geometry_uv_map_usd_source_file()
             if scene_usd_file_path is None:

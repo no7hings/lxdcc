@@ -563,15 +563,14 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def set_unknown_plug_ins_clear(cls):
         _ = cmds.unknownPlugin(query=1, list=1) or []
         if _:
-            gp = utl_core.GuiProgressesRunner(maximum=len(_))
-            for i in _:
-                gp.set_update()
-                cmds.unknownPlugin(i, remove=1)
-                utl_core.Log.set_module_result_trace(
-                    'unknown-plug-in-clear',
-                    u'plug-in="{}"'.format(i)
-                )
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(_), label='clean unknown-plug') as g_p:
+                for i in _:
+                    g_p.set_update()
+                    cmds.unknownPlugin(i, remove=1)
+                    utl_core.Log.set_module_result_trace(
+                        'unknown-plug-in-clear',
+                        u'plug-in="{}"'.format(i)
+                    )
     @classmethod
     @utl_core._run_ignore_
     def set_unused_namespaces_clear(cls):
@@ -640,18 +639,17 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def set_unknown_nodes_clear(cls):
         _ = cmds.ls(type='unknown', long=1) or []
         if _:
-            gp = utl_core.GuiProgressesRunner(maximum=len(_))
-            for i in _:
-                gp.set_update()
-                if cmds.objExists(i) is True:
-                    if cmds.referenceQuery(i, isNodeReferenced=1) is False:
-                        cmds.lockNode(i, lock=0)
-                        cmds.delete(i)
-                        utl_core.Log.set_module_result_trace(
-                            'scene-clear',
-                            u'unknown-node: "{}"'.format(i)
-                        )
-                gp.set_stop()
+            with utl_core.gui_progress(maximum=len(_), label='clean unknown-node') as g_p:
+                for i in _:
+                    g_p.set_update()
+                    if cmds.objExists(i) is True:
+                        if cmds.referenceQuery(i, isNodeReferenced=1) is False:
+                            cmds.lockNode(i, lock=0)
+                            cmds.delete(i)
+                            utl_core.Log.set_module_result_trace(
+                                'scene-clear',
+                                u'unknown-node: "{}"'.format(i)
+                            )
     @classmethod
     @utl_core._run_ignore_
     def set_unload_references_clear(cls):
@@ -674,37 +672,36 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def set_unused_names_clear(cls):
         _ = cmds.ls('pasted__*', long=1) or []
         if _:
-            gp = utl_core.GuiProgressesRunner(maximum=len(_))
-            for i in _:
-                gp.set_update()
-                if cmds.objExists(i) is True:
-                    if cmds.referenceQuery(i, isNodeReferenced=1) is False:
-                        name = i.split('|')[-1]
-                        new_name = str(name).replace('pasted__', '')
-                        cmds.rename(
-                            i, new_name
-                        )
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(_), label='clean unused-name') as g_p:
+                for i in _:
+                    g_p.set_update()
+                    if cmds.objExists(i) is True:
+                        if cmds.referenceQuery(i, isNodeReferenced=1) is False:
+                            name = i.split('|')[-1]
+                            new_name = str(name).replace('pasted__', '')
+                            cmds.rename(
+                                i, new_name
+                            )
     @classmethod
     @utl_core._run_ignore_
     def set_unused_display_layers_clear(cls):
         _ = cmds.ls(type='displayLayer', long=1) or []
         if _:
-            gp = utl_core.GuiProgressesRunner(maximum=len(_))
-            for i in _:
-                if i in ['defaultLayer']:
-                    continue
-                #
-                gp.set_update()
-                if cmds.objExists(i) is True:
-                    if cmds.referenceQuery(i, isNodeReferenced=1) is False:
-                        cmds.lockNode(i, lock=0)
-                        cmds.delete(i)
-                        utl_core.Log.set_module_result_trace(
-                            'scene-clear',
-                            u'display-layer: "{}"'.format(i)
-                        )
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(_), label='clean unknown-plug') as g_p:
+                for i in _:
+                    g_p.set_update()
+                    #
+                    if i in ['defaultLayer']:
+                        continue
+                    #
+                    if cmds.objExists(i) is True:
+                        if cmds.referenceQuery(i, isNodeReferenced=1) is False:
+                            cmds.lockNode(i, lock=0)
+                            cmds.delete(i)
+                            utl_core.Log.set_module_result_trace(
+                                'scene-clear',
+                                u'display-layer: "{}"'.format(i)
+                            )
     #
     @classmethod
     def set_workspace(cls, directory_path):

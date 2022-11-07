@@ -55,22 +55,20 @@ class AssetBatcher(object):
         surface_publish = self._option.get('surface_publish') or False
 
         if self._assets_tgt:
-            g_p = utl_core.GuiProgressesRunner(maximum=len(self._assets_tgt))
-            for i_asset_tgt in self._assets_tgt:
-                g_p.set_update()
-                #
-                i_rsv_asset_tgt = self._resolver.get_rsv_entity(
-                    project=self._project_tgt,
-                    workspace='publish',
-                    asset=i_asset_tgt
-                )
-                if i_rsv_asset_tgt is not None:
-                    if surface_katana_render is True:
-                        self._set_i_rsv_asset_surface_katana_render_(i_rsv_asset_tgt)
-                    if surface_publish is True:
-                        self._set_i_rsv_asset_surface_publish_(i_rsv_asset_tgt)
-            #
-            g_p.set_stop()
+            with utl_core.gui_progress(maximum=len(self._assets_tgt), label='execute batch') as g_p:
+                for i_asset_tgt in self._assets_tgt:
+                    g_p.set_update()
+                    #
+                    i_rsv_asset_tgt = self._resolver.get_rsv_entity(
+                        project=self._project_tgt,
+                        workspace='publish',
+                        asset=i_asset_tgt
+                    )
+                    if i_rsv_asset_tgt is not None:
+                        if surface_katana_render is True:
+                            self._set_i_rsv_asset_surface_katana_render_(i_rsv_asset_tgt)
+                        if surface_publish is True:
+                            self._set_i_rsv_asset_surface_publish_(i_rsv_asset_tgt)
     @classmethod
     def _set_i_rsv_asset_surface_publish_(cls, i_rsv_asset_tgt, user=None, time_tag=None):
         #

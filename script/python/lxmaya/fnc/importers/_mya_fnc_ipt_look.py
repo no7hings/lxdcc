@@ -194,7 +194,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 (self.__set_look_assigns_create_, (geometry_and_objs,), self.get('with_assign'))
             ]
             if method_args:
-                with utl_core.gui_progress(maximum=len(method_args)) as g_p:
+                with utl_core.gui_progress(maximum=len(method_args), label='execute look create method') as g_p:
                     for i_method, i_args, i_enable in method_args:
                         g_p.set_update()
                         if i_enable is True:
@@ -228,11 +228,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def __set_look_materials_create_(self, material_and_objs):
         if material_and_objs:
-            gp = utl_core.GuiProgressesRunner(maximum=len(material_and_objs))
-            for material_seq, material_and_obj in enumerate(material_and_objs):
-                gp.set_update()
-                self.__set_look_material_create_(material_and_obj)
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(material_and_objs), label='create material') as g_p:
+                for material_seq, material_and_obj in enumerate(material_and_objs):
+                    g_p.set_update()
+                    self.__set_look_material_create_(material_and_obj)
     #
     def __set_look_material_create_(self, material_and_obj):
         material_and_obj_name = material_and_obj.name
@@ -498,17 +497,16 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def __set_look_assigns_create_(self, geometry_and_objs):
         if geometry_and_objs:
-            gp = utl_core.GuiProgressesRunner(maximum=len(geometry_and_objs))
-            for geometry_seq, geometry_and_obj in enumerate(geometry_and_objs):
-                gp.set_update()
-                #
-                geometry_and_obj_path = geometry_and_obj.path
-                geometry_dcc_dag_path = core_objects.ObjDagPath(geometry_and_obj_path).set_translate_to(
-                    ma_configure.Util.OBJ_PATHSEP
-                )
-                geometry_dcc_obj = mya_dcc_objects.Geometry(geometry_dcc_dag_path.path)
-                self._set_geometry_assign_create_(geometry_and_obj, geometry_dcc_obj)
-            gp.set_stop()
+            with utl_core.gui_progress(maximum=len(geometry_and_objs), label='create assign') as g_p:
+                for geometry_seq, geometry_and_obj in enumerate(geometry_and_objs):
+                    g_p.set_update()
+                    #
+                    geometry_and_obj_path = geometry_and_obj.path
+                    geometry_dcc_dag_path = core_objects.ObjDagPath(geometry_and_obj_path).set_translate_to(
+                        ma_configure.Util.OBJ_PATHSEP
+                    )
+                    geometry_dcc_obj = mya_dcc_objects.Geometry(geometry_dcc_dag_path.path)
+                    self._set_geometry_assign_create_(geometry_and_obj, geometry_dcc_obj)
             #
             if self._assign_selection_enable is True:
                 self._set_look_assign_selection_(geometry_and_objs)

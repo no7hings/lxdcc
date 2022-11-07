@@ -292,6 +292,11 @@ class MeshOpt(
             color
         )
 
+    def set_customize_attribute_add(self, key, value):
+        usd_core.UsdPrimOpt._set_customize_attribute_add_(
+            self.mesh, key, value
+        )
+
 
 class NurbsCurveOpt(
     AbsUsdOptDef,

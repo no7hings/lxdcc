@@ -4,9 +4,9 @@ from lxutil import utl_configure, utl_core
 from lxutil_gui.qt import utl_gui_qt_core
 
 
-class MayaMenuSetup(utl_gui_qt_core.AsbQtMenuSetup):
+class MenuBuilder(utl_gui_qt_core.AsbQtMenuSetup):
     def __init__(self):
-        super(MayaMenuSetup, self).__init__()
+        super(MenuBuilder, self).__init__()
 
     @classmethod
     def get_menu(cls, name):
@@ -33,4 +33,5 @@ class MayaMenuSetup(utl_gui_qt_core.AsbQtMenuSetup):
         )
         #
         import lxsession.commands as ssn_commands
+        #
         ssn_commands.set_hook_execute('dcc-menus/gen-menu')

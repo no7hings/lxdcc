@@ -12,10 +12,10 @@ class Setup(object):
     @classmethod
     def set_menu_setup(cls):
         def fnc_():
-            print 'lx-maya-menu setup: is started'
+            print 'lx-dcc menu setup: is started'
             from lxmaya import ma_setup
-            ma_setup.MayaMenuSetup().set_setup()
-            print 'lx-maya-menu setup: is completed'
+            ma_setup.MenuBuilder().set_setup()
+            print 'lx-dcc menu setup: is completed'
         # noinspection PyUnresolvedReferences
         from maya import cmds
         cmds.evalDeferred(fnc_)
@@ -40,7 +40,7 @@ class Setup(object):
         from maya import cmds
         cmds.evalDeferred(fnc_)
     @classmethod
-    def set_run(cls, *args, **kwargs):
+    def run(cls, *args, **kwargs):
         print '*'*40
         print 'lx-maya setup: is started'
         if cls.get_is_maya():
@@ -56,4 +56,4 @@ class Setup(object):
 
 
 if __name__ == '__main__':
-    Setup.set_run()
+    Setup.run()

@@ -59,7 +59,7 @@ class AssetBatcher(object):
                 for i_asset_tgt in self._assets_tgt:
                     g_p.set_update()
                     #
-                    i_rsv_asset_tgt = self._resolver.get_rsv_entity(
+                    i_rsv_asset_tgt = self._resolver.get_rsv_resource(
                         project=self._project_tgt,
                         workspace='publish',
                         asset=i_asset_tgt
@@ -444,7 +444,7 @@ class LibAssetPusher(AbsLibMethod):
             self._set_i_rsv_asset_run_(i_asset_src)
 
     def _set_i_rsv_asset_run_(self, i_asset_src):
-        i_rsv_asset_src = self._resolver.get_rsv_entity(
+        i_rsv_asset_src = self._resolver.get_rsv_resource(
             project=self._project_src,
             workspace='work',
             asset=i_asset_src
@@ -472,7 +472,7 @@ class LibAssetPusher(AbsLibMethod):
                     self._project_tgt, i_role_tgt, i_asset_tgt
                 )
             #
-            i_rsv_asset_tgt = self._resolver.get_rsv_entity(
+            i_rsv_asset_tgt = self._resolver.get_rsv_resource(
                 project=self._project_tgt,
                 workspace='work',
                 role=i_role_tgt,
@@ -520,7 +520,7 @@ class LibAssetPuller(AbsLibMethod):
             self._set_i_rsv_asset_run_(i_asset_src)
 
     def _set_i_rsv_asset_run_(self, i_asset_src):
-        i_rsv_asset_src = self._resolver.get_rsv_entity(
+        i_rsv_asset_src = self._resolver.get_rsv_resource(
             project=self._project_src,
             workspace='work',
             asset=i_asset_src
@@ -543,7 +543,7 @@ class LibAssetPuller(AbsLibMethod):
                     self._project_tgt, i_role_tgt, i_asset_tgt
                 )
             #
-            i_rsv_asset_tgt = self._resolver.get_rsv_entity(
+            i_rsv_asset_tgt = self._resolver.get_rsv_resource(
                 project=self._project_tgt,
                 workspace='work',
                 role=i_role_tgt,

@@ -71,7 +71,7 @@ class LxCameraAlembic(object):
             resolver = rsv_commands.get_resolver()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
             if rsv_task:
-                rsv_entity = rsv_task.get_rsv_entity()
+                rsv_entity = rsv_task.get_rsv_resource()
                 rsv_camera_task = rsv_entity.get_rsv_task(
                     step='cam',
                     task='camera'
@@ -260,7 +260,7 @@ class LxAsset(object):
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
             rsv_task = resolver.get_rsv_task_by_file_path(file_path)
             if rsv_task:
-                rsv_asset = rsv_task.get_rsv_entity()
+                rsv_asset = rsv_task.get_rsv_resource()
             else:
                 content = 'file="{}" is not available'.format(file_path)
 
@@ -287,7 +287,7 @@ class LxAsset(object):
         _ = rsv_asset_path.split('/')
         project, role, asset = _[1:]
         resolver = rsv_commands.get_resolver()
-        return resolver.get_rsv_entity(
+        return resolver.get_rsv_resource(
             project=project,
             asset=asset
         )
@@ -298,7 +298,7 @@ class LxAsset(object):
         _ = rsv_shot_path.split('/')
         project, sequence, shot = _[1:]
         resolver = rsv_commands.get_resolver()
-        return resolver.get_rsv_entity(project=project, shot=shot)
+        return resolver.get_rsv_resource(project=project, shot=shot)
     @classmethod
     def _get_rsv_asset_auto_(cls):
         import lxresolver.commands as rsv_commands
@@ -311,7 +311,7 @@ class LxAsset(object):
             resolver = rsv_commands.get_resolver()
             rsv_task = resolver.get_rsv_task_by_file_path(any_scene_file_path)
             if rsv_task:
-                rsv_asset = rsv_task.get_rsv_entity()
+                rsv_asset = rsv_task.get_rsv_resource()
                 return rsv_asset
 
     def _get_rsv_shot_auto_(self, rsv_asset):
@@ -694,7 +694,7 @@ class LxAssetAss(object):
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
 
             input_dynamic_usd_file_path = self._get_input_dynamic_usd_file_(
-                rsv_task.get_rsv_entity()
+                rsv_task.get_rsv_resource()
             )
             if input_dynamic_usd_file_path is not None:
                 guess_frame_range = usd_core.UsdStageOpt(
@@ -964,7 +964,7 @@ class LxCamera(object):
             resolver = rsv_commands.get_resolver()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
             if rsv_task is not None:
-                rsv_entity = rsv_task.get_rsv_entity()
+                rsv_entity = rsv_task.get_rsv_resource()
                 rsv_camera_task = rsv_entity.get_rsv_task(
                     step='cam',
                     task='camera'
@@ -1405,7 +1405,7 @@ class LxLight(object):
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
             rsv_task = resolver.get_rsv_task_by_file_path(file_path)
             if rsv_task:
-                rsv_asset = rsv_task.get_rsv_entity()
+                rsv_asset = rsv_task.get_rsv_resource()
             else:
                 content = u'file="{}" is not available'.format(file_path)
 

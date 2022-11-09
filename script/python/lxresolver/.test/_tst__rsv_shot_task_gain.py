@@ -5,7 +5,7 @@ r = rsv_commands.get_resolver()
 
 # rsv_project = r.get_rsv_project(project='cjd')
 #
-# rsv_shot = rsv_project.get_rsv_entity(
+# rsv_shot = rsv_project.get_rsv_resource(
 #     shot='e10060'
 # )
 #
@@ -17,6 +17,6 @@ r = rsv_commands.get_resolver()
 #     print i_rsv_task.name
 
 
-print r.get_rsv_entities(
+print r.get_rsv_resources(
     project='cjd', branch='shot'
 )

@@ -393,7 +393,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return False
         #
-        rsv_entity = self._rsv_task.get_rsv_entity()
+        rsv_entity = self._rsv_task.get_rsv_resource()
         model_rsv_task = rsv_entity.get_rsv_task(
             step='mod', task='modeling'
         )
@@ -702,7 +702,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
                 return False
             #
-            rsv_entity = self._rsv_task.get_rsv_entity()
+            rsv_entity = self._rsv_task.get_rsv_resource()
             model_rsv_task = rsv_entity.get_rsv_task(
                 step='mod', task='modeling'
             )

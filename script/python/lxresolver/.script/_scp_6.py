@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     rsv_project = resolver.get_rsv_project(project=project)
 
-    rsv_entities = rsv_project.get_rsv_entities(branch='asset')
+    rsv_entities = rsv_project.get_rsv_resources(branch='asset')
 
     black_list = ['forest']
     info_file = utl_dcc_objects.OsYamlFile('/l/temp/td/database/{}.info.yml'.format(project))

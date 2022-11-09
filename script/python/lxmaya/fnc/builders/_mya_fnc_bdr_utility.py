@@ -455,7 +455,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         resolver = rsv_commands.get_resolver()
         rsv_project = resolver.get_rsv_project(project=project)
         #
-        rsv_asset = rsv_project.get_rsv_entity(asset=asset)
+        rsv_asset = rsv_project.get_rsv_resource(asset=asset)
         #
         model_rsv_task = rsv_project.get_rsv_task(asset=asset, step='mod', task='modeling')
         model_act_rsv_task = rsv_project.get_rsv_task(asset=asset, step='mod', task='mod_dynamic')

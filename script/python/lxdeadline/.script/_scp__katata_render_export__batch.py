@@ -31,7 +31,7 @@ rsv_project = resolver.get_rsv_project(project='cjd')
 user = utl_core.System.get_user_name()
 time_tag = utl_core.System.get_time_tag()
 
-rsv_entities = rsv_project.get_rsv_entities(role='chr')
+rsv_entities = rsv_project.get_rsv_resources(role='chr')
 
 for i_rsv_entity in rsv_entities:
     i_rsv_task = i_rsv_entity.get_rsv_task(step='srf', task='surfacing')

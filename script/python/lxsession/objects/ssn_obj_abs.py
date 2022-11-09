@@ -328,7 +328,7 @@ class AbsSsnRsvUnitDef(object):
         return self._rsv_unit.get_rsv_setp()
     @property
     def rsv_entity(self):
-        return self._rsv_unit.get_rsv_entity()
+        return self._rsv_unit.get_rsv_resource()
     @property
     def rsv_unit(self):
         return self._rsv_unit

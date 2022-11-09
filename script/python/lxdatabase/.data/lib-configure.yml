@@ -1,0 +1,144 @@
+option:
+    # base
+    basic:
+        # default options for all entity types
+        default_basic_entity_type_options:
+            id: { type: 'integer', args: [ 'primary key', 'autoincrement', 'not null', 'unique' ] }
+            #
+            basic_type: { type: 'string', args: ['not null'] }
+            entity_type: { type: 'string', args: ['not null'] }
+            # unique value
+            path: { type: 'string', args: [ 'not null', 'unique' ] }
+            name: { type: 'string', args: [ 'not null' ] }
+            # icon show in GUI
+            gui_name: { type: 'string' }
+            gui_icon_name: { type: 'string' }
+            description: { type: 'string' }
+    # definition for all entity types
+    basic_types:
+        unit_group:
+            options:
+                # override GUI icon name and use default
+                gui_icon_name: { type: 'string', args: [ 'default "file/folder"' ] }
+                #
+                group: { type: 'string' }
+        #
+        unit:
+            options:
+                # override GUI icon name and use default
+                gui_icon_name: { type: 'string', args: [ 'default "file/file"' ] }
+                #
+                group: { type: 'string' }
+        #
+        unit_properties:
+            options:
+                # override GUI icon name and use default
+                gui_icon_name: { type: 'string', args: [ 'default "file/file"' ] }
+                #
+                unit: { type: 'string' }
+            #
+            options_extra:
+                resolution: { type: 'string' }
+                state: { type: 'string' }
+                environment: { type: 'string' }
+                color: { type: 'string' }
+        #
+        property_group:
+            options:
+                # override GUI icon name and use default
+                gui_icon_name: { type: 'string', args: [ 'default "file/folder"' ] }
+            #
+            defaults: ['/resolutions', '/states', '/environments', '/colors']
+        #
+        property:
+            options:
+                # override GUI icon name and use default
+                gui_icon_name: { type: 'string', args: [ 'default "tag"' ] }
+                #
+                group: { type: 'string' }
+            #
+            defaults:
+                resolution: [ '< 256', '256', '256 - 512', '512', '512 - 1024', '1024', '1024 - 2048', '2048', '2048 - 4096', '4096', '4096 - 8192', '> 8192' ]
+                state: [ 'old', 'new', 'damaged' ]
+                environment: [ 'ancient', 'desert', 'forest', 'freshwater', 'grassland', 'industrial', 'medieval' ]
+                color: [ 'black', 'brown', 'blue', 'gray', 'green', 'orange', 'pink', 'purple', 'red', 'white', 'yellow' ]
+        #
+        version:
+            path_pattern: '/{unit}/{name}'
+            options:
+                unit: { type: 'string' }
+                #
+                location: { type: 'json' }
+    #
+    entity_types:
+        # type group
+        type_group:
+            path_pattern: '{group}/{name}'
+            basic_type: unit_group
+        #
+        type:
+            path_pattern: '{group}/{name}'
+            basic_type: unit_group
+        #
+        resource:
+            path_pattern: '{group}/{name}'
+            basic_type: unit
+        #
+        attributes:
+            path_pattern: '{unit}'
+            basic_type: unit_properties
+            #
+            options_extra:
+                resolution: { type: 'string' }
+                state: { type: 'string' }
+                environment: { type: 'string' }
+                color: { type: 'string' }
+        #
+        tags:
+            path_pattern: '{unit}'
+            basic_type: unit_properties
+            #
+            options_extra:
+                tag_0: { type: 'string' }
+                tag_1: { type: 'string' }
+                tag_2: { type: 'string' }
+                tag_3: { type: 'string' }
+                tag_4: { type: 'string' }
+        #
+        attribute_group:
+            path_pattern: '{group}/{name}'
+            basic_type: property_group
+        #
+        attribute:
+            path_pattern: '/{name}'
+            basic_type: property
+        #
+        tag:
+            path_pattern: '/{name}'
+            basic_type: property
+    #
+    entities:
+        type_group:
+            /textures: {}
+            /textures/wall_shatter: {}
+            /textures/ground_shatter: {}
+            /textures/wood_shatter: {}
+            /textures/surface_texture: {}
+            /textures/varnish: {}
+            /textures/scrawl: {}
+            /textures/sticker: {}
+            /textures/moss_shatter: {}
+            /textures/other_shatter: {}
+            /textures/corrosion: {}
+            /textures/blots: {}
+            /textures/propaganda: {}
+    #
+    variants:
+        root-windows: 'l:/resource/lib/texture'
+        root-linux: '/l/resource/lib/texture'
+#
+patterns:
+    #
+    database-file: '{root}/.database/sqlite.db'
+    #
+    resource-dir: '{root}/{category}/{type}/{resource}'

@@ -7,7 +7,7 @@ if __name__ == '__main__':
     import lxdeadline.methods as ddl_methods
 
     r = rsv_commands.get_resolver()
-    for rsv_entity in r.get_rsv_entities(project='shl', branch='asset', role='flg'):
+    for rsv_entity in r.get_rsv_resources(project='shl', branch='asset', role='flg'):
         rsv_task = rsv_entity.get_rsv_task(step='srf', task='surfacing')
         if rsv_task is not None:
             src_exists_scene_file_path = rsv_task.get_rsv_unit(

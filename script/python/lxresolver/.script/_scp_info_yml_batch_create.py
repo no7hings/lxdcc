@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     rsv_project = resolver.get_rsv_project(project='cjd')
 
-    rsv_entities = rsv_project.get_rsv_entities(branch='asset')
+    rsv_entities = rsv_project.get_rsv_resources(branch='asset')
 
     black_list = []
     white_list = ['nn_gongshifu']

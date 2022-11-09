@@ -25,7 +25,7 @@ r.run_finished.set_connect_to(post_fnc)
 for i in p.get_rsv_tags(
     branch='asset'
 ):
-    j_entities = i.get_rsv_entities()
+    j_entities = i.get_rsv_resources()
     for j_entity in j_entities:
         r.set_fnc_add(
             j_entity.get_rsv_tasks

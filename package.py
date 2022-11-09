@@ -35,12 +35,14 @@ def commands():
     # startup in dcc
     # maya
     env.PYTHONPATH.append('{root}/script/python/.setup/maya/scripts')
-    # houdini
+    # houdini-setup
     env.HOUDINI_PATH.append('{root}/script/python/.setup/houdini:&')
-    # katana
+    # katana-setup
     env.KATANA_RESOURCES.append('{root}/script/python/.setup/katana')
-    # arnold
+    # arnold-setup
     # env.ARNOLD_PLUGIN_PATH.append('{root}/script/python/.setup/arnold/shaders')
+    # clarisse
+    env.CLARISSE_STARTUP_SCRIPT.append('{root}/script/python/.setup/clarisse/startup_script.py')
 
 
 timestamp = 1639389924

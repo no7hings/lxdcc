@@ -22,7 +22,7 @@ if __name__ == '__main__':
     ]
 
     for src_asset in assets:
-        src_rsv_asset = src_rsv_project.get_rsv_entity(asset=src_asset)
+        src_rsv_asset = src_rsv_project.get_rsv_resource(asset=src_asset)
         if src_rsv_asset is not None:
             for step, task in task_args:
                 src_rsv_task = src_rsv_asset.get_rsv_task(step=step, task=task)

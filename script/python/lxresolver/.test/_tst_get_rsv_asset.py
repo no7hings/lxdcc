@@ -6,4 +6,4 @@ if __name__ == '__main__':
 
     rsv_project = r.get_rsv_project(project='cjd')
 
-    print rsv_project.get_rsv_entity(asset='sce_td_test')
+    print rsv_project.get_rsv_resource(asset='sce_td_test')

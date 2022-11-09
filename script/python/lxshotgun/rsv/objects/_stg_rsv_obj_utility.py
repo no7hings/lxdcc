@@ -29,7 +29,7 @@ class RsvStgProjectOpt(object):
             tags=['DefaultRig']
         )
         if _:
-            return self._rsv_project.get_rsv_entity(
+            return self._rsv_project.get_rsv_resource(
                 role='lig',
                 asset=_[0].get('code')
             )
@@ -42,7 +42,7 @@ class RsvStgProjectOpt(object):
         )
         if _:
             rsv_assets = [
-                self._rsv_project.get_rsv_entity(
+                self._rsv_project.get_rsv_resource(
                     role='lig',
                     asset=i.get('code')
                 )

@@ -646,7 +646,7 @@ class AbsRsvObjDef(object):
         return self._rsv_path
 
     def get_path_args(self):
-        search_keys = [
+        types = [
             'project',
             #
             'role', 'sequence',
@@ -659,10 +659,10 @@ class AbsRsvObjDef(object):
         keys = MtdBasic._get_keys_by_parse_pattern_(self._pattern)
         dic = collections.OrderedDict()
         # dic['root'] = ''
-        for key in search_keys:
-            if key in keys:
-                value = self._rsv_properties.get(key)
-                dic[key] = value
+        for i_type in types:
+            if i_type in keys:
+                i_name = self._rsv_properties.get(i_type)
+                dic[i_name] = i_type
         return dic
 
 
@@ -1107,7 +1107,7 @@ class AbsRsvUnit(
     def get_rsv_step(self):
         return self.get_parent().get_parent()
 
-    def get_rsv_entity(self):
+    def get_rsv_resource(self):
         return self.get_parent().get_parent().get_parent()
 
 
@@ -1309,7 +1309,7 @@ class AbsRsvTask(
     def get_rsv_tag(self):
         return self.get_parent().get_parent().get_parent()
     # entity
-    def get_rsv_entity(self):
+    def get_rsv_resource(self):
         return self.get_parent().get_parent()
     # step
     def get_rsv_step(self):
@@ -1452,20 +1452,20 @@ class AbsRsvTag(
     def __init__(self, *args, **kwargs):
         super(AbsRsvTag, self).__init__(*args, **kwargs)
 
-    def get_rsv_entity(self, **kwargs):
+    def get_rsv_resource(self, **kwargs):
         """
         :param kwargs: asset: str(<asset-name>) / shot: str(<shot-name>)
         :return: instance(<rsv-entity>)
         """
-        rsv_obj = self._rsv_project._project__get_rsv_entity_(
+        rsv_obj = self._rsv_project._project__get_rsv_resource_(
             rsv_obj=self,
             **kwargs
         )
         return rsv_obj
 
-    def get_rsv_entities(self, **kwargs):
+    def get_rsv_resources(self, **kwargs):
         kwargs.update(self._rsv_properties.value)
-        return self._rsv_project._project__get_rsv_entities_(
+        return self._rsv_project._project__get_rsv_resources_(
             **kwargs
         )
 
@@ -1849,12 +1849,12 @@ class AbsRsvProject(
         )
         return rsv_obj
     # entity
-    def _tag__get_rev_entity_(self, **kwargs):
+    def _tag__get_rev_resource_(self, **kwargs):
         rsv_tag = self.get_rsv_tag(**kwargs)
         if rsv_tag:
-            return rsv_tag.get_rsv_entity(**kwargs)
+            return rsv_tag.get_rsv_resource(**kwargs)
 
-    def _project__get_rsv_entities_(self, **kwargs):
+    def _project__get_rsv_resources_(self, **kwargs):
         lis = []
         branch = kwargs['branch']
         keyword = '{}-dir'.format(branch)
@@ -1868,13 +1868,13 @@ class AbsRsvProject(
             _, i_variants = i_match
             i_kwargs = copy.copy(kwargs)
             i_kwargs.update(i_variants)
-            rsv_entity = self._tag__get_rev_entity_(**i_kwargs)
+            rsv_entity = self._tag__get_rev_resource_(**i_kwargs)
             if rsv_entity is not None:
                 if rsv_entity not in lis:
                     lis.append(rsv_entity)
         return lis
     #
-    def _project__get_rsv_entity_(self, rsv_obj, **kwargs):
+    def _project__get_rsv_resource_(self, rsv_obj, **kwargs):
         kwargs_ = collections.OrderedDict()
         for k, v in rsv_obj.properties.value.items():
             kwargs_[k] = v
@@ -1907,9 +1907,9 @@ class AbsRsvProject(
             kwargs_,
             extend_keys=['type', 'branch']
         )
-        return self._project__set_rsv_entity_create_(**variants)
+        return self._project__set_rsv_resource_create_(**variants)
     #
-    def _project__set_rsv_entity_create_(self, **kwargs):
+    def _project__set_rsv_resource_create_(self, **kwargs):
         rsv_matcher = self._project__set_rsv_matcher_create_(
             kwargs
         )
@@ -1921,30 +1921,30 @@ class AbsRsvProject(
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
     #
-    def get_rsv_entities(self, **kwargs):
+    def get_rsv_resources(self, **kwargs):
         branch = self._get_rsv_branch_0_(**kwargs)
         if branch is not None:
             kwargs['branch'] = branch
-            return self._project__get_rsv_entities_(**kwargs)
+            return self._project__get_rsv_resources_(**kwargs)
         else:
             lis = []
             for branch in rsv_configure.Branch.ALL:
                 kwargs['branch'] = branch
                 lis.extend(
-                    self._project__get_rsv_entities_(**kwargs)
+                    self._project__get_rsv_resources_(**kwargs)
                 )
             return lis
     #
-    def get_rsv_entity(self, **kwargs):
+    def get_rsv_resource(self, **kwargs):
         if 'role' in kwargs or 'sequence' in kwargs:
-            return self._tag__get_rev_entity_(**kwargs)
+            return self._tag__get_rev_resource_(**kwargs)
         else:
-            _ = self.get_rsv_entities(**kwargs)
+            _ = self.get_rsv_resources(**kwargs)
             if _:
                 return _[-1]
     # step
     def _entity__get_rsv_step_(self, **kwargs):
-        rsv_entity = self.get_rsv_entity(**kwargs)
+        rsv_entity = self.get_rsv_resource(**kwargs)
         if rsv_entity is not None:
             return rsv_entity.get_rsv_step(**kwargs)
 
@@ -2383,7 +2383,7 @@ class AbsRsvProject(
                 if i_properties:
                     i_properties.set('branch', i_branch)
                     # i_properties.set('workspace', 'work')
-                    i_rsv_entity = self.get_rsv_entity(**i_properties.value)
+                    i_rsv_entity = self.get_rsv_resource(**i_properties.value)
                     return i_rsv_entity
     # rsv-step
     def get_rsv_step_work_file_path(self, file_path):
@@ -2697,20 +2697,20 @@ class AbsRsvRoot(
                             return i_rsv_project
         #
         return self._resolver__get_rsv_project_use_default_(file_path)
-    # = rsv_project.get_rsv_entities
-    def get_rsv_entities(self, **kwargs):
+    # = rsv_project.get_rsv_resources
+    def get_rsv_resources(self, **kwargs):
         kwargs_ = self._get_rsv_kwargs_(**kwargs)
         if kwargs_:
             rsv_project = self.get_rsv_project(**kwargs_)
             if rsv_project:
-                return rsv_project.get_rsv_entities(**kwargs_)
-    # = rsv_project.get_rsv_entity
-    def get_rsv_entity(self, **kwargs):
+                return rsv_project.get_rsv_resources(**kwargs_)
+    # = rsv_project.get_rsv_resource
+    def get_rsv_resource(self, **kwargs):
         kwargs_ = self._get_rsv_kwargs_(**kwargs)
         if kwargs_:
             rsv_project = self.get_rsv_project(**kwargs_)
             if rsv_project:
-                return rsv_project.get_rsv_entity(**kwargs_)
+                return rsv_project.get_rsv_resource(**kwargs_)
     #
     def get_rsv_step(self, **kwargs):
         kwargs_ = self._get_rsv_kwargs_(**kwargs)

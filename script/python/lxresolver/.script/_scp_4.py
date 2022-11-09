@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     r = rsv_commands.get_resolver()
 
-    rsv_entity = r.get_rsv_entity(
+    rsv_entity = r.get_rsv_resource(
         project='shl', asset='nn_gongshifu'
     )
 

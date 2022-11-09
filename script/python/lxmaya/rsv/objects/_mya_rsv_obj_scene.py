@@ -549,7 +549,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         rsv_project = self._rsv_task.get_rsv_project()
-        rsv_shot = rsv_project.get_rsv_entity(
+        rsv_shot = rsv_project.get_rsv_resource(
             shot=asset_shot
         )
         #

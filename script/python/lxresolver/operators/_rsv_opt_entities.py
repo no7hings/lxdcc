@@ -47,7 +47,7 @@ class AbsEntities(object):
             if k in _kwargs:
                 _kwargs[k] = v
         #
-        rsv_entities = resolver.get_rsv_entities(
+        rsv_entities = resolver.get_rsv_resources(
             **_kwargs
         )
         return rsv_entities

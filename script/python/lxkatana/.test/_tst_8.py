@@ -7,4 +7,4 @@ rsv_project = r.get_rsv_project(project='cjd')
 
 print rsv_project.properties
 
-print rsv_project.get_rsv_entities(branch='asset')
+print rsv_project.get_rsv_resources(branch='asset')

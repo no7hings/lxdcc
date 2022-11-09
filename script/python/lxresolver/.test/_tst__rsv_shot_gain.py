@@ -5,7 +5,7 @@ r = rsv_commands.get_resolver()
 
 rsv_project = r.get_rsv_project(project='cjd')
 
-rsv_shots = rsv_project.get_rsv_entities(branch='shot', sequence='e10')
+rsv_shots = rsv_project.get_rsv_resources(branch='shot', sequence='e10')
 
 task_args_lis = [
     ('rlo', 'rough_layout'),

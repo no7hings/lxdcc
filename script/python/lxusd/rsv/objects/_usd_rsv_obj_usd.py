@@ -168,7 +168,7 @@ class RsvUsdAssetSetCreator(object):
         #
         resolver = rsv_commands.get_resolver()
         #
-        rsv_shots = resolver.get_rsv_entities(
+        rsv_shots = resolver.get_rsv_resources(
             project=rsv_asset.get('project'), branch='shot'
         )
         for i_rsv_shot in rsv_shots:

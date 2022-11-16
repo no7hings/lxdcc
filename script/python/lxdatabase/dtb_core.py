@@ -66,6 +66,11 @@ class DtbDict(dict):
     def __getattr__(self, item):
         return self.__getitem__(item)
 
+    def to_string(self):
+        keys = self.keys()
+        keys.sort()
+        return '\n'.join(['{}: {}'.format(i, self[i]) for i in keys])
+
 
 class AbsDtbSqlBaseOpt(object):
     TYPE_MAPPER = {
@@ -74,9 +79,10 @@ class AbsDtbSqlBaseOpt(object):
         'float': 'real',
         'boolean': 'integer',
         'json': 'text',
+        'list': 'blob'
     }
     #
-    DEBUGGER_ENABLE = True
+    DEBUGGER_ENABLE = False
     DEBUGGER_PRINT_MAXIMUM = 200
     #
     def __init__(self, database, connection):

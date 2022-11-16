@@ -859,7 +859,7 @@ class NGPortOpt(object):
     def get_children(self):
         return [self._ktn_port.getChildren()]
 
-    def set_children_clear(self):
+    def clear_children(self):
         [self._ktn_port.deleteChild(i) for i in self.get_children()]
 
 

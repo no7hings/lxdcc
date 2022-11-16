@@ -383,7 +383,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
             ktn_obj.setName(new_name)
             return self.__class__(new_name)
 
-    def set_children_clear(self):
+    def clear_children(self):
         [i.set_delete() for i in self.get_children()]
 
     def get_source_ktn_connections(self):

@@ -445,7 +445,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             key = 'material_assign'
             node_key = self._configure.get('node.{}.keyword'.format(key))
             dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
-            dcc_group.set_children_clear()
+            dcc_group.clear_children()
             with utl_core.gui_progress(maximum=len(and_geometries), label='create material-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
@@ -454,7 +454,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             key = 'property_assign'
             node_key = self._configure.get('node.{}.keyword'.format(key))
             dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
-            dcc_group.set_children_clear()
+            dcc_group.clear_children()
             #
             with utl_core.gui_progress(maximum=len(and_geometries), label='create property-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):

@@ -88,6 +88,7 @@ class AbsPermission(object):
         'file_allow': 'chmod -R +a group {group_id} allow file_gen_all,object_inherit,container_inherit "{path}"',
     }
     GROUP_PATTERN = r' {index}: group:DIEZHI\{group} {context}'
+    USER_PATTERN = r' {index}: user:DIEZHI\{user} {context}'
     @classmethod
     def _set_nas_cmd_run_(cls, cmd):
         import paramiko
@@ -141,7 +142,7 @@ class AbsPermission(object):
             **kwargs
         )
         result = cls._set_nas_cmd_run_(cmd)
-        # print result
+        print result
         list_ = []
         if result is not None:
             for i in result.split('\n'):
@@ -152,6 +153,56 @@ class AbsPermission(object):
                         list_.append(
                             (i_dict['group'], i_dict['index'], i_dict['context'])
                         )
+        return list_
+    @classmethod
+    def _get_all_user_data_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        list_ = []
+        if result is not None:
+            for i in result.split('\n'):
+                i_p = parse.parse(cls.USER_PATTERN, i)
+                if i_p:
+                    i_dict = i_p.named
+                    if i_dict:
+                        list_.append(
+                            (i_dict['user'], i_dict['index'], i_dict['context'])
+                        )
+        return list_
+    @classmethod
+    def _get_all_data_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        list_ = []
+        if result is not None:
+            for i in result.split('\n'):
+                i_p_0 = parse.parse(cls.USER_PATTERN, i)
+                if i_p_0:
+                    i_dict = i_p_0.named
+                    if i_dict:
+                        list_.append(
+                            (i_dict['user'], i_dict['index'], i_dict['context'])
+                        )
+                else:
+                    i_p_1 = parse.parse(cls.GROUP_PATTERN, i)
+                    if i_p_1:
+                        i_dict = i_p_1.named
+                        if i_dict:
+                            list_.append(
+                                (i_dict['group'], i_dict['index'], i_dict['context'])
+                            )
         return list_
 
 
@@ -413,14 +464,12 @@ class PathPermissionOpt(AbsPermission):
         self._path = path
         self._nas_path = bsc_core.StoragePathMtd.set_map_to_nas(path)
 
-    def set_remove_all(self):
+    def remove_all_group(self):
         group_data = self._get_all_group_data_1_(self._nas_path)
         group_data.reverse()
         for i_group_name, i_index, i_content in group_data:
             if i_group_name in self.GROUP_ID_QUERY:
-                i_group_id = self.GROUP_ID_QUERY[i_group_name]
                 i_kwargs = dict(
-                    group_id=i_group_id,
                     path=self._nas_path,
                     index=i_index
                 )
@@ -428,10 +477,8 @@ class PathPermissionOpt(AbsPermission):
                     **i_kwargs
                 )
                 self._set_nas_cmd_run_(i_cmd)
-            else:
-                print i_group_name
 
-    def set_read_only_for(self, group_names):
+    def set_read_only_for_groups(self, group_names):
         for i_group_name in group_names:
             if i_group_name in self.GROUP_ID_QUERY:
                 i_group_id = self.GROUP_ID_QUERY[i_group_name]
@@ -445,18 +492,45 @@ class PathPermissionOpt(AbsPermission):
                 self._set_nas_cmd_run_(i_cmd)
 
     def set_just_read_only_for(self, group_names):
-        self.set_remove_all()
-        self.set_read_only_for(group_names)
+        self.remove_all_group()
+        self.remove_all_user()
+        self.set_read_only_for_groups(group_names)
 
     def get_all_group_data(self):
         return self._get_all_group_data_1_(self._nas_path)
 
+    def get_all_user_data(self):
+        return self._get_all_user_data_(self._nas_path)
+
+    def remove_all_user(self):
+        user_data = self._get_all_user_data_(self._nas_path)
+        user_data.reverse()
+        for i_user_name, i_index, i_content in user_data:
+            print i_user_name, i_index
+            i_kwargs = dict(
+                path=self._nas_path,
+                index=i_index
+            )
+            i_cmd = self.CMD_QUERY['remove_grp'].format(
+                **i_kwargs
+            )
+            self._set_nas_cmd_run_(i_cmd)
+
+    def get_all_data(self):
+        return self._get_all_data_(self._nas_path)
+
 
 if __name__ == '__main__':
-    d = '/l/prod/cgm/publish/assets/chr/tx_maoz_f/srf/surfacing/tx_maoz_f.srf.surfacing.v019/texture/tx_maoz_f.diff_clr.1001.tx'
+    d = '/l/prod/cgm/work/assets/chr/x40210_nn_14y/srf/surfacing/texture/main/v001'
     print PathPermissionOpt(
         d
-    ).get_all_group_data()
+    ).get_all_data()
+
+    # PathPermissionOpt(
+    #     d
+    # ).set_just_read_only_for(
+    #     ['cg_group', 'coop_grp']
+    # )
 
     # PathPermissionOpt(d).set_just_read_only_for(
     #     ['cg_group', 'coop_grp']

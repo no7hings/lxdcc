@@ -7,7 +7,6 @@ from lxutil_gui.qt import utl_gui_qt_core
 class MenuBuilder(utl_gui_qt_core.AsbQtMenuSetup):
     def __init__(self):
         super(MenuBuilder, self).__init__()
-
     @classmethod
     def get_menu(cls, name):
         qt_menu = utl_gui_qt_core.QtMayaMtd.get_qt_menu(name)

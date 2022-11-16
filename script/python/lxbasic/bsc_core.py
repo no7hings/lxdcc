@@ -1977,6 +1977,14 @@ class TemporaryThumbnailMtd(object):
         return '{}/.thumbnail/{}/{}{}'.format(
             directory_path, region, key, ext
         )
+    @classmethod
+    def get_file_path_(cls, file_path, width=128, ext='.jpg'):
+        directory_path = EnvironMtd.get_temporary_root()
+        key = cls.get_key(file_path)
+        region = UuidMtd.get_save_region(key)
+        return '{}/.thumbnail/{}/{}/{}{}'.format(
+            directory_path, region, key, width, ext
+        )
 
 
 class TemporaryYamlMtd(object):
@@ -4068,8 +4076,11 @@ class ImageOpt(object):
         self._file_path = file_path
         self._file_path_opt = StorageFileOpt(self._file_path)
 
-    def get_thumbnail_file_path(self):
-        return TemporaryThumbnailMtd.get_file_path(self._file_path)
+    def get_thumbnail_file_path(self, ext='.jpg'):
+        return TemporaryThumbnailMtd.get_file_path(self._file_path, ext)
+
+    def get_thumbnail_file_path_(self, width=128, ext='.jpg'):
+        return TemporaryThumbnailMtd.get_file_path_(self._file_path, width, ext)
 
     def get_thumbnail(self, width=128):
         thumbnail_file_path = self.get_thumbnail_file_path()
@@ -4090,8 +4101,8 @@ class ImageOpt(object):
                 )
         return thumbnail_file_path
 
-    def get_thumbnail_create_args(self, width=128):
-        thumbnail_file_path = self.get_thumbnail_file_path()
+    def get_thumbnail_create_args(self, width=128, ext='.jpg'):
+        thumbnail_file_path = self.get_thumbnail_file_path_(width, ext)
         if os.path.exists(thumbnail_file_path) is False:
             if os.path.exists(self._file_path):
                 directory_path = os.path.dirname(thumbnail_file_path)
@@ -5742,6 +5753,6 @@ class SPathMtd(object):
 
 if __name__ == '__main__':
     print ColorMtd.rgb2hex(
-        31, 31, 31
+        63, 63, 63
     )
 

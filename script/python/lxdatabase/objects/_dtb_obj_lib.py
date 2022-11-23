@@ -47,8 +47,12 @@ class DtbBase(object):
         Version = 'version'
         #
         Attribute = 'attribute'
-        Assign = 'assign'
         Connection = 'connection'
+        #
+        Assign = 'assign'
+        #
+        Types = 'types'
+        Tags = 'tags'
 
     class Kinds(object):
         # category
@@ -70,10 +74,6 @@ class DtbBase(object):
         Resource = 'resource'
         ResourceVersion = 'resource-version'
 
-    class Assigns(object):
-        ResourceTypeAssign = 'resource-type-assign'
-        ResourceTagAssign = 'resource-tag-assign'
-
     EntityTypeCategoryMapper = {
         EntityTypes.CategoryGroup: EntityCategories.Type,
         EntityTypes.Category: EntityCategories.Type,
@@ -86,8 +86,11 @@ class DtbBase(object):
         EntityTypes.Version: EntityCategories.Node,
         #
         EntityTypes.Attribute: EntityCategories.Port,
-        EntityTypes.Assign: EntityCategories.Assign,
         EntityTypes.Connection: EntityCategories.Connection,
+        #
+        EntityTypes.Assign: EntityCategories.Assign,
+        EntityTypes.Types: EntityCategories.Assign,
+        EntityTypes.Tags: EntityCategories.Assign,
     }
 
     def __init__(self, database):

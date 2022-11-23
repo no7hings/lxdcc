@@ -203,7 +203,7 @@ for i_cfg_file_path_src in fs:
                         #
                         k_tag_path = '/{}/{}'.format(j_tag_group_name, k_tag)
                         dtb.add_entity(
-                            entity_type=dtb.EntityTypes.Assign,
+                            entity_type=dtb.EntityTypes.Tags,
                             data=dict(
                                 kind=k_kind,
                                 #
@@ -245,7 +245,7 @@ for i_cfg_file_path_src in fs:
             j_size = bsc_core.OiioImageOpt(j_file_path_tgt).get_size()
             i_sizes.add(j_size)
             dtb.add_entity(
-                entity_type=dtb.EntityTypes.Assign,
+                entity_type=dtb.EntityTypes.Tags,
                 data=dict(
                     kind=dtb.Kinds.ResourceFileTag,
                     #
@@ -258,7 +258,7 @@ for i_cfg_file_path_src in fs:
             j_resolution = '{}x{}'.format(*j_size)
             j_tag_path = '/resolution/{}'.format(j_resolution)
             dtb.add_entity(
-                entity_type=dtb.EntityTypes.Assign,
+                entity_type=dtb.EntityTypes.Tags,
                 data=dict(
                     kind=dtb.Kinds.ResourcePropertyTag,
                     #
@@ -291,7 +291,7 @@ for i_cfg_file_path_src in fs:
             j_unit_path = '/{}'.format(j_unit_name)
             #
             dtb.add_entity(
-                entity_type=dtb.EntityTypes.Assign,
+                entity_type=dtb.EntityTypes.Types,
                 data=dict(
                     kind=dtb.Kinds.ResourceType,
                     #

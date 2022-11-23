@@ -138,6 +138,13 @@ def get_option_hook_args(option):
                     configure=configure,
                     option=option_opt.to_string()
                 )
+            elif type_name == 'dtb-action':
+                session = ssn_objects.DatabaseOptionActionSession(
+                    type=type_name,
+                    hook=option_hook_key,
+                    configure=configure,
+                    option=option_opt.to_string()
+                )
             elif type_name == 'launcher':
                 session = ssn_objects.OptionLauncherSession(
                     type=type_name,

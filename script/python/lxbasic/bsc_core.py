@@ -3067,13 +3067,17 @@ class ParsePatternMtd(object):
             return s
         return pattern
     @classmethod
-    def get_as_fnmatch(cls, pattern):
+    def get_as_fnmatch(cls, pattern, key_format=None):
         if pattern is not None:
             keys = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
             s = pattern
             if keys:
                 for i_key in keys:
-                    s = s.replace('{{{}}}'.format(i_key), '*')
+                    i_v = '*'
+                    if isinstance(key_format, dict):
+                        if i_key in key_format:
+                            i_v = key_format[i_key]
+                    s = s.replace('{{{}}}'.format(i_key), i_v)
             return s
         return pattern
 
@@ -3939,9 +3943,11 @@ class OiioImageOpt(object):
     @property
     def path(self):
         return self._file_path
-    @property
-    def size(self):
+
+    def get_size(self):
         return int(self._info['width']), int(self._info['height'])
+    size = property(get_size)
+
     @property
     def bit(self):
         return self.BIT_DICT[self._info['type']]
@@ -4609,11 +4615,17 @@ class FramesMtd(object):
 
 
 class ParsePatternOpt(object):
-    def __init__(self, p):
+    def __init__(self, p, key_format=None):
         self._variants = {}
         self._pattern = p
+
+        if isinstance(key_format, dict):
+            self._key_format = key_format
+        else:
+            self._key_format = {}
+
         self._fnmatch_pattern = ParsePatternMtd.get_as_fnmatch(
-            self._pattern
+            self._pattern, self._key_format
         )
     @property
     def pattern(self):
@@ -4638,7 +4650,7 @@ class ParsePatternOpt(object):
             self._pattern, **kwargs
         )
         self._fnmatch_pattern = ParsePatternMtd.get_as_fnmatch(
-            self._pattern
+            self._pattern, self._key_format
         )
 
     def set_update_to(self, **kwargs):
@@ -4651,7 +4663,9 @@ class ParsePatternOpt(object):
     def get_matches(self):
         list_ = []
         paths = glob.glob(
-            self._fnmatch_pattern
+            ParsePatternMtd.get_as_fnmatch(
+                self._pattern, self._key_format
+            )
         ) or []
         for i_path in paths:
             i_p = parse.parse(
@@ -4686,6 +4700,9 @@ class ParsePatternOpt(object):
         return glob.glob(
             p._fnmatch_pattern
         ) or []
+
+    def set_key_format(self, key, value):
+        self._key_format[key] = value
 
     def __str__(self):
         return self._pattern

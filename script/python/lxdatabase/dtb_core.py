@@ -78,8 +78,9 @@ class AbsDtbSqlBaseOpt(object):
         'integer': 'integer',
         'float': 'real',
         'boolean': 'integer',
-        'json': 'text',
-        'list': 'blob'
+        'json': 'blob',
+        'list': 'blob',
+        'timestamp': 'timestamp'
     }
     #
     DEBUGGER_ENABLE = False
@@ -262,37 +263,6 @@ class DtbSqlTableOpt(AbsDtbSqlBaseOpt):
             csr = self._execute_cmd(cmd)
         return csr.fetchone()
 
-    def _get_command_for_find_one(self, **kwargs):
-        def get_string_fnc_(kwargs_):
-            _key_list = []
-            _value_list = []
-            for _i_k, _i_v in kwargs_.items():
-                if isinstance(_i_v, str):
-                    _i_v_ = '"{}"'.format(_i_v)
-                elif isinstance(_i_v, unicode):
-                    _i_v_ = '"{}"'.format(_i_v.decode('utf-8'))
-                else:
-                    _i_v_ = _i_v
-                #
-                _value_list.append('{} = {}'.format(_i_k, _i_v_))
-            return ' and '.join(_value_list)
-
-        condition_string = get_string_fnc_(kwargs)
-
-        return (
-            'select * from {name} where {values}'
-        ).format(
-            **dict(name=self._name, values=condition_string)
-        )
-
-    def get_one_(self, **kwargs):
-        csr = self._execute_cmd(self._get_command_for_find_one(**kwargs))
-        return csr.fetchone()
-
-    def get_one_as_new_connection(self, **kwargs):
-        csr = self._execute_cmd_as_new_connection(self._get_command_for_find_one(**kwargs))
-        return csr.fetchone()
-
     def get_all(self, filters=None, new_connection=True):
         def get_string_fnc_(filters_):
             _key_list = []
@@ -350,6 +320,37 @@ class DtbSqlTableOpt(AbsDtbSqlBaseOpt):
         else:
             csr = self._execute_cmd(cmd)
         return csr.fetchall()
+
+    def _get_command_for_find_one(self, **kwargs):
+        def get_string_fnc_(kwargs_):
+            _key_list = []
+            _value_list = []
+            for _i_k, _i_v in kwargs_.items():
+                if isinstance(_i_v, str):
+                    _i_v_ = '"{}"'.format(_i_v)
+                elif isinstance(_i_v, unicode):
+                    _i_v_ = '"{}"'.format(_i_v.decode('utf-8'))
+                else:
+                    _i_v_ = _i_v
+                #
+                _value_list.append('{} = {}'.format(_i_k, _i_v_))
+            return ' and '.join(_value_list)
+
+        condition_string = get_string_fnc_(kwargs)
+
+        return (
+            'select * from {name} where {values}'
+        ).format(
+            **dict(name=self._name, values=condition_string)
+        )
+
+    def get_one_(self, **kwargs):
+        csr = self._execute_cmd(self._get_command_for_find_one(**kwargs))
+        return csr.fetchone()
+
+    def get_one_as_new_connection(self, **kwargs):
+        csr = self._execute_cmd_as_new_connection(self._get_command_for_find_one(**kwargs))
+        return csr.fetchone()
 
     def _get_command_for_find_all(self, **kwargs):
         def get_string_fnc_(kwargs_):

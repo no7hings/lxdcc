@@ -15,6 +15,8 @@ from lxutil import utl_core
 
 import lxshotgun.objects as stg_objects
 
+import lxdatabase.objects as dtb_objects
+
 
 class AbsSsnGuiDef(object):
     @property
@@ -571,6 +573,26 @@ class AbsSsnOptionAction(
 ):
     def __init__(self, *args, **kwargs):
         super(AbsSsnOptionAction, self).__init__(*args, **kwargs)
+
+
+class AbsSsnDatabaseOptionAction(
+    AbsSsnOptionObj
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnDatabaseOptionAction, self).__init__(*args, **kwargs)
+
+    def get_database(self):
+        return dtb_objects.DtbBase(
+            self.option_opt.get('database')
+        )
+
+    database = property(get_database)
+
+    def get_window(self):
+        from lxutil_gui.qt import utl_gui_qt_core
+        return utl_gui_qt_core.get_lx_window_by_unique_id(
+            self.option_opt.get('window_unique_id')
+        )
 
 
 class AbsSsnOptionLauncher(

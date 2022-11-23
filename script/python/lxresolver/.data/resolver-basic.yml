@@ -369,6 +369,7 @@ asset-validation-info-file: <asset-metadata-dir>/info/<asset-name>.validation.in
 #
 asset-camera-dir: <asset-version-dir>/camera
 asset-camera-main-abc-file: <asset-camera-dir>/abc/main.abc
+asset-camera-main-usd-file: <asset-camera-dir>/usd/main.usd
 #
 asset-camera-persp-yml-file: <asset-camera-dir>/yml/persp.yml
 asset-camera-persp-abc-file: <asset-camera-dir>/abc/persp.abc

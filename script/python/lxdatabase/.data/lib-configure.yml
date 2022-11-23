@@ -6,341 +6,358 @@ option:
             id: { type: 'integer', args: [ 'primary key', 'autoincrement', 'not null', 'unique' ] }
             #
             enable: { type: 'boolean', args: [ 'not null', 'default 1' ] }
+            status: { type: 'string', args: [ 'not null', 'default "normal"' ] }
+            # create time
+            ctime: { type: 'timestamp', args: [ 'default CURRENT_TIMESTAMP' ] }
+            # modify time
+            mtime: { type: 'timestamp', args: [ 'default CURRENT_TIMESTAMP' ] }
             #
-            basic_type: { type: 'string', args: ['not null'] }
+            entity_category: { type: 'string', args: ['not null'] }
             entity_type: { type: 'string', args: ['not null'] }
+            #
+            kind: { type: 'string' }
+            #
+            matadata: { type: 'json' }
+            #
+            namespace: { type: 'string' }
             # key
             path: { type: 'string', args: [ 'not null', 'unique' ] }
-            name: { type: 'string', args: [ 'not null' ] }
-            #
-            group: { type: 'string', args: [ 'not null' ] }
-            # icon show in GUI
-            gui_name: { type: 'string' }
-            gui_icon_name: { type: 'string' }
-            gui_description: { type: 'string' }
     # definition for all entity types
     basic_types:
-        bsc_group:
+        bsc_prim:
             options:
-                # override GUI icon name and use default
-                gui_icon_name: { type: 'string', args: [ 'default "database/group"' ] }
-        #
-        bsc_unit:
-            options:
-                # override GUI icon name and use default
-                gui_icon_name: { type: 'string', args: [ 'default "database/unit"' ] }
+                name: { type: 'string', args: ['not null'] }
+                group: { type: 'string', args: ['not null'] }
+                # icon show in GUI
+                gui_name: { type: 'string' }
                 #
-                type: { type: 'string', args: [ 'not null' ] }
-                #
-                resource: { type: 'string' }
+                gui_icon_name: { type: 'string', args: [ 'default "database/object"' ] }
+                gui_description: { type: 'string' }
+                gui_status: { type: 'string' }
         #
-        bsc_tag_key:
+        bsc_assign:
             options:
-                # override GUI icon name and use default
-                gui_icon_name: { type: 'string', args: [ 'default "database/group"' ] }
-                #
-                type: { type: 'string', args: [ 'not null' ] }
+                node: { type: 'string', args: [ 'not null' ] }
+                value: { type: 'string', args: [ 'not null' ] }
         #
-        bsc_tag:
+        bsc_port:
             options:
-                # override GUI icon name and use default
-                gui_icon_name: { type: 'string', args: [ 'default "database/tag"' ] }
+                node: { type: 'string', args: [ 'not null' ] }
+                port: { type: 'string', args: [ 'not null' ] }
+                value: { type: 'json', args: [ 'not null' ] }
         #
-        bsc_resource:
-            options:
-                # override GUI icon name and use default
-                gui_icon_name: { type: 'string', args: [ 'default "database/unit"' ] }
-                #
-                version: { type: 'string' }
-        #
-        bsc_version:
+        bsc_connection:
             options:
                 # override GUI icon name and use default
                 gui_icon_name: { type: 'string', args: [ 'default "database/tag"' ] }
                 #
-                resource: { type: 'string', args: [ 'not null' ] }
-                #
-                image: { type: 'string' }
-                location: { type: 'string' }
-        #
-        bsc_resource_tag:
-            options:
-                # override GUI icon name and use default
-                gui_icon_name: { type: 'string', args: [ 'default "database/group"' ] }
-                #
-                resource: { type: 'string', args: [ 'not null' ] }
-                tag: { type: 'string', args: [ 'not null' ] }
+                source: { type: 'string', args: [ 'not null' ] }
+                target: { type: 'string', args: [ 'not null' ] }
     #
-    entity_types:
-        # group for type
-        resource_type:
-            basic_type: 'bsc_group'
+    entity_categories:
+        dtb_type:
+            basic_type: 'bsc_prim'
             #
             options_over:
-                gui_icon_name: { type: 'string', args: [ 'default "database/groups"' ] }
-        # category this is definition for action
-        category:
-            basic_type: 'bsc_group'
+                gui_icon_name: { type: 'string', args: [ 'default "database/objects"' ] }
+        #
+        dtb_tag:
+            basic_type: 'bsc_prim'
             #
             options_over:
-                gui_icon_name: { type: 'string', args: [ 'default "database/group"' ] }
+                gui_icon_name: { type: 'string', args: [ 'default "database/tag"' ] }
         #
-        type:
-            basic_type: 'bsc_group'
-            #
-            options_over:
-                gui_icon_name: { type: 'string', args: [ 'default "database/units"' ] }
+        dtb_node:
+            basic_type: 'bsc_prim'
         #
-        unit:
-            basic_type: 'bsc_unit'
-        # tag
-        tag_type:
-            basic_type: 'bsc_group'
-        # property
-        tag_key:
-            basic_type: 'bsc_tag_key'
-        # value
-        tag:
-            basic_type: 'bsc_tag'
+        dtb_port:
+            basic_type: 'bsc_port'
         #
-        resource:
-            basic_type: 'bsc_resource'
+        dtb_assign:
+            basic_type: 'bsc_assign'
         #
-        version:
-            basic_type: 'bsc_version'
-        #
-        resource_tag:
-            basic_type: 'bsc_resource_tag'
+        dtb_connection:
+            basic_type: 'bsc_connection'
     #
     entities:
-        # categories > type groups > types
-        /surface: { entity_type: 'resource_type' }
+        # resource type
+        /surface:
+            entity_type: 'category_group'
+            options: { kind: 'resource-category-group', gui_icon_name: 'database/groups' }
         #
         /surface/asphalt:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             # definition children
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'fine', 'rough', 'torn', 'other' ]
         #
         /surface/bark:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'beech', 'birch', 'oak', 'palm', 'pine', 'spruce', 'willow', 'other' ]
         #
         /surface/branch:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'alder', 'birch', 'juniper', 'pine', 'spruce', 'other' ]
         #
         /surface/brick:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'modern', 'mortar', 'painted', 'rough', 'other' ]
         #
         /surface/coal:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'brick', 'debris', 'other' ]
         #
         /surface/concrete:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'cast_in_situ', 'damaged', 'dirty', 'painted', 'rough', 'slab', 'smooth', 'other' ]
         #
         /surface/debris:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'construction', 'nature', 'other' ]
         #
         /surface/fabric:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'carpet', 'leather', 'pattern', 'plain', 'tarp', 'other' ]
         #
         /surface/grass:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'artificial', 'dried', 'lawn', 'patchy', 'wild', 'other' ]
         #
         /surface/gravel:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'construction', 'natural', 'pebbledash', 'other' ]
         #
         /surface/ground:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'forest', 'jungle', 'roots', 'other' ]
         #
         /surface/historical:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'asian', 'medieval', 'middle_eastern', 'roman', 'other' ]
         #
         /surface/marble:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'polished', 'rough', 'tile', 'other' ]
         #
         /surface/metal:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'bare', 'corroded', 'corrugated', 'gun', 'painted', 'sheet', 'treated', 'other' ]
         #
         /surface/moss:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'ground', 'rock', 'other' ]
         #
         /surface/plaster:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'damaged', 'fresh', 'old', 'painted', 'other' ]
         #
         /surface/rock:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'cliff', 'jagged', 'lava', 'mossy', 'rough', 'smooth', 'other' ]
         #
         /surface/roofing:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'new', 'old', 'other' ]
         #
         /surface/sand:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'beach', 'desert', 'other' ]
         #
         /surface/snow:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'mixed', 'pure', 'other' ]
         #
         /surface/soil:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'clay', 'mud', 'mulch', 'sandy', 'other' ]
         #
         /surface/stone:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'castle', 'cobblestone', 'floor', 'granite', 'limestone', 'mosaic', 'pebble', 'terrazzo', 'tile', 'wall', 'other' ]
         #
         /surface/tile:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'ceramic', 'grout', 'pavestone', 'sidewalk', 'stone', 'other' ]
         #
         /surface/wood:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'board', 'log', 'parquet', 'plank', 'veneer', 'other' ]
         #
         /surface/other:
             entity_type: 'category'
+            options: { kind: 'resource-category', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'type'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-type', group: '<....key>' }
                 names: [ 'climber', 'creature', 'dirt road', 'edible', 'fur', 'paper', 'various', 'other' ]
-        # tag type > tag key > tag
-        /semantic: { entity_type: 'tag_type' }
-        # tag for texture size
-        /resolution:
-            entity_type: 'tag_key'
-            options: { type: '/semantic' }
-            children:
-                entity_type: 'tag'
-                options: { group: '<....key>' }
-                names: [ '< 512', '512', '1024', '2048', '4096', '8192', '> 8192' ]
-        #
-        /state:
-            entity_type: 'tag_key'
-            options: { type: '/semantic' }
-            children:
-                entity_type: 'tag'
-                options: { group: '<....key>' }
-                names: ['old', 'new', 'damaged', 'other']
-        #
-        /environment:
-            entity_type: 'tag_key'
-            options: { type: '/semantic' }
-            children:
-                entity_type: 'tag'
-                options: { group: '<....key>' }
-                names: [ 'ancient', 'desert', 'forest', 'freshwater', 'grassland', 'industrial', 'medieval', 'other' ]
-        #
+        # resource-tag
+        # resource-primary-semantic-tag
         /color:
-            entity_type: 'tag_key'
-            options: { type: '/semantic' }
+            entity_type: 'tag_group'
+            options: { kind: 'resource-semantic-tag-group', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'tag'
-                options: { group: '<....key>' }
+                options: { kind: 'resource-primary-semantic-tag', group: '<....key>' }
                 names: [ 'black', 'brown', 'blue', 'gray', 'green', 'orange', 'pink', 'purple', 'red', 'tan', 'white', 'yellow', 'other' ]
         #
-        /theme:
-            entity_type: 'tag_key'
-            options: { type: '/semantic' }
+        /environment:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-semantic-tag-group', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'tag'
-                options: { group: '<....key>' }
-                names: [ 'decorative', 'furniture', 'other' ]
+                options: { kind: 'resource-primary-semantic-tag', group: '<....key>' }
+                names: [ 'ancient', 'desert', 'forest', 'freshwater', 'grassland', 'industrial', 'medieval', 'other' ]
         #
-        /seamless:
-            entity_type: 'tag_key'
-            options: { type: '/semantic' }
+        /state:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-semantic-tag-group', gui_icon_name: 'database/group' }
             children:
                 entity_type: 'tag'
-                options: { group: '<....key>' }
-                names: [ 'all_orientation', 'horizontal', 'vertical' ]
+                options: { kind: 'resource-primary-semantic-tag', group: '<....key>' }
+                names: ['old', 'new', 'damaged', 'other']
+        # resource-semantic-tag
+        /orientation:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-semantic-tag-group', gui_icon_name: 'database/group' }
+            children:
+                entity_type: 'tag'
+                options: { kind: 'resource-secondary-semantic-tag', group: '<....key>' }
+                names: [ ]
+        #
+        /descriptive:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-semantic-tag-group', gui_icon_name: 'database/group' }
+            children:
+                entity_type: 'tag'
+                options: { kind: 'resource-secondary-semantic-tag', group: '<....key>' }
+                names: [ ]
+        #
+        /theme:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-semantic-tag-group', gui_icon_name: 'database/group' }
+            children:
+                entity_type: 'tag'
+                options: { kind: 'resource-secondary-semantic-tag', group: '<....key>' }
+                names: [ ]
+        # property tag
+        /resolution:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-property-tag-group', gui_icon_name: 'database/group' }
+            children:
+                entity_type: 'tag'
+                options: { kind: 'resource-primary-semantic-tag', group: '<....key>' }
+                names: [ ]
+        # resource-user-tag
+        /favorite:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-user-tag-group', gui_icon_name: 'database/group' }
+            children:
+                entity_type: 'tag'
+                options: { kind: 'resource-user-tag', group: '<....key>' }
+                names: [ ]
+        # resource-file-tag
+        /texture:
+            entity_type: 'tag_group'
+            options: { kind: 'resource-storage-tag-group', gui_icon_name: 'database/group' }
+            children:
+                entity_type: 'tag'
+                options: { kind: 'resource-file-tag', group: '<....key>' }
+                names: [ 'albedo', 'ao', 'bump', 'cavity', 'displacement', 'gloss', 'normal', 'roughness', 'specular', 'translucency' ]
     #
     variants:
         root-windows: 'l:/resource/library/texture'
@@ -350,4 +367,4 @@ patterns:
     #
     database-file: '{root}/.database/sqlite.db'
     #
-    resource-dir: '{root}/{category}/{type}/{resource}'
+    resource-dir: '{root}/{resource_group}/{resource_name}'

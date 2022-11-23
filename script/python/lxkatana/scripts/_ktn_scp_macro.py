@@ -1062,8 +1062,11 @@ class LxCamera(object):
             )
             [s_opt.set_active_at(i, True) for i in sub_locations]
             g = s_opt.get_geometry_args(root)
+            if translate_offset:
+                x_o, y_o, z_o = translate_offset
+            else:
+                x_o, y_o, z_o = 0, 0, 0
             #
-            x_o, y_o, z_o = translate_offset
             (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
             #
             w += .1
@@ -1116,7 +1119,10 @@ class LxCamera(object):
             )
             [s_opt.set_active_at(i, True) for i in sub_locations]
             g = s_opt.get_geometry_args(root)
-            x_o, y_o, z_o = pivot
+            if pivot:
+                x_o, y_o, z_o = pivot
+            else:
+                x_o, y_o, z_o = 0, 0, 0
             (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
             #
             r = s_opt.get_radius(pivot)

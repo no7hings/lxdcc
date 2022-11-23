@@ -42,7 +42,7 @@ def commands():
     # arnold-setup
     # env.ARNOLD_PLUGIN_PATH.append('{root}/script/python/.setup/arnold/shaders')
     # clarisse
-    env.CLARISSE_STARTUP_SCRIPT.append('{root}/script/python/.setup/clarisse/startup_script.py')
+    # env.CLARISSE_STARTUP_SCRIPT.append('{root}/script/python/.setup/clarisse/startup_script.py')
 
 
 timestamp = 1639389924

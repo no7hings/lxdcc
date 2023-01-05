@@ -663,7 +663,7 @@ def _get_resolution_(file_path):
 
 
 @utl_core._debug_
-def _get_bit_depth_(file_path):
+def _get_bit_(file_path):
     return ai.AiTextureGetBitDepth(file_path)
 
 
@@ -683,13 +683,34 @@ class AndImageOpt(object):
         _f = file_path.encode("UTF8")
         width, height = _get_resolution_(_f) or (0, 0)
         dic = dict(
-            bit=_get_bit_depth_(file_path) or 0,
-            type=_get_type_(_f),
+            bit=cls._get_bit_(file_path) or 0,
+            type=cls._get_type_(_f),
             channel_count=_get_channels_count_(_f),
             width=width,
             height=height
         )
         return dic
+    @staticmethod
+    def _get_bit_(file_path):
+        return ai.AiTextureGetBitDepth(file_path)
+    @staticmethod
+    def _get_type_(file_path):
+        return ai.AiTextureGetFormat(file_path)
+    @classmethod
+    def _get_is_srgb_(cls, file_path):
+        return (
+            cls._get_bit_(file_path) <= 16
+            and cls._get_type_(file_path) in (ai.AI_TYPE_BYTE, ai.AI_TYPE_INT, ai.AI_TYPE_UINT)
+        )
+    @classmethod
+    def _get_is_linear_(cls, file_path):
+        return not cls._get_is_srgb_(file_path)
+    @classmethod
+    def _get_is_8_bit_(cls, file_path):
+        return cls._get_bit_(file_path) <= 8
+    @classmethod
+    def _get_is_16_bit_(cls, file_path):
+        return cls._get_bit_(file_path) <= 16
     #
     def __init__(self, file_path):
         self._file_path = file_path
@@ -888,38 +909,80 @@ class AndTextureOpt_(AndImageOpt):
         #
         return ' '.join(cmd_args)
     @classmethod
-    def get_color_space_convert_cmd(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+    def get_format_convert_as_aces_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
         option = dict(
-            input=file_path_src,
-            output=file_path_tgt,
-            from_color_space=color_space_src,
-            to_color_space=color_space_tgt,
-            format=os.path.splitext(file_path_tgt)[-1][1:]
+            file_src=file_path_src,
+            file_tgt=file_path_tgt,
+            color_space_src=color_space_src,
+            color_space_tgt=color_space_tgt,
+            format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
+            aces_file=cls.COLOR_SPACE_CFG.get_ocio_file()
+            # channel_count_src=_get_channels_count_(file_path_src)
         )
         cmd_args = [
             'maketx',
-            #
+            # verbose status messages
             '-v',
+            # update mode
             '-u',
+            # number of output image channels
+            # '--nchannels {channel_count_src}',
             '--unpremult',
             '--threads 2',
             '--oiio',
             '--colorengine ocio',
             '--nomipmap',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
-            '--colorconvert "{from_color_space}" "{to_color_space}"',
-            '--format {format}',
-            '"{input}"',
-            '-o "{output}"'
+            '--colorconvert "{color_space_src}" "{color_space_tgt}"',
+            '--format {format_tgt}',
+            '"{file_src}"',
+            '-o "{file_tgt}"'
         ]
         cmd = ' '.join(cmd_args).format(**option)
         return cmd
     @classmethod
-    def set_color_space_convert_to(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
-        cmd = cls.get_color_space_convert_cmd(file_path_src, file_path_tgt, color_space_src, color_space_tgt)
-        bsc_core.SubProcessMtd.set_run_with_result(
-            cmd
-        )
+    def get_tx_convert_as_aces_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+        cmd_args = [
+            'maketx',
+            '-v',
+            '-u',
+            '--unpremult',
+            '--threads 2',
+            '--oiio'
+        ]
+        aces_file = cls.COLOR_SPACE_CFG.get_ocio_file()
+        aces_color_spaces = cls.COLOR_SPACE_CFG.get_all_color_spaces()
+        if color_space_src in aces_color_spaces:
+            if color_space_src != color_space_tgt:
+                cmd_args += [
+                    '--colorengine ocio',
+                    '--colorconfig "{}"'.format(aces_file),
+                    #
+                    '--colorconvert "{}" "{}"'.format(color_space_src, color_space_tgt),
+                ]
+        else:
+            raise TypeError(
+                u'file="{}", aces color-space="{}" is not available'.format(
+                    file_path_src, color_space_src
+                )
+            )
+        #
+        cmd_args += [
+            u'-o "{}"'.format(file_path_tgt)
+        ]
+        #
+        if cls._get_is_srgb_(file_path_src) and cls._get_is_8_bit_(file_path_src):
+            cmd_args += [
+                '--format exr',
+                '-d half',
+                '--compression dwaa'
+            ]
+        #
+        cmd_args += [
+            u'"{}"'.format(file_path_src)
+        ]
+        #
+        return ' '.join(cmd_args)
 
 
 class AndOslShaderMtd(object):

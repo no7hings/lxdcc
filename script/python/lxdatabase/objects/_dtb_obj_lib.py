@@ -12,7 +12,7 @@ from lxdatabase import dtb_core
 import lxbasic.objects as bsc_objects
 
 
-class DtbBase(object):
+class DtbBaseOpt(object):
     PATHSEP = '/'
 
     class EntityCategories(object):
@@ -112,7 +112,6 @@ class DtbBase(object):
 
     def get_database(self):
         return self._dtb_file_path
-
     database = property(get_database)
 
     def accept(self):
@@ -186,38 +185,54 @@ class DtbBase(object):
         self.accept()
 
 
-class DtbResourceLib(DtbBase):
+class DtbResourceLibraryOpt(DtbBaseOpt):
     def __init__(self, configure_file_path):
+        self._dtb_cfg_file_path = configure_file_path
         self._dtb_cfg = bsc_objects.Configure(value=configure_file_path)
 
         self._dtb_cfg.set_flatten()
 
-        self._dtb_kwargs = {}
+        self._dtb_pattern_kwargs = {}
         if bsc_core.SystemMtd.get_is_linux():
-            self._dtb_kwargs['root'] = self._dtb_cfg.get(
-                'option.variants.root-linux'
-            )
+            self._dtb_root = self._dtb_cfg.get('option.variants.root-linux')
         elif bsc_core.SystemMtd.get_is_windows():
-            self._dtb_kwargs['root'] = self._dtb_cfg.get(
-                'option.variants.root-windows'
-            )
+            self._dtb_root = self._dtb_cfg.get('option.variants.root-windows')
         else:
             raise NotImplementedError()
         #
+        self._dtb_pattern_kwargs['root'] = self._dtb_root
         db_file_pattern = self._dtb_cfg.get('patterns.database-file')
         if db_file_pattern is None:
             return
 
-        super(DtbResourceLib, self).__init__(
+        super(DtbResourceLibraryOpt, self).__init__(
             db_file_pattern.format(
-                **self._dtb_kwargs
+                **self._dtb_pattern_kwargs
             )
         )
 
-    def get_configure(self):
-        return self._dtb_cfg
+    def get_database_configure(self):
+        return self._dtb_cfg_file_path
+    database_configure = property(get_database_configure)
 
-    configure = property(get_configure)
+    def get_root(self):
+        return self._dtb_root
+    root = property(get_root)
+
+    def get_pattern(self, keyword):
+        return self._dtb_cfg.get(
+            'patterns.{}'.format(keyword)
+        )
+
+    def get_pattern_opt(self, keyword):
+        p = self.get_pattern(keyword)
+        p_opt = bsc_core.ParsePatternOpt(p)
+        return p_opt.set_update_to(
+            **self._dtb_pattern_kwargs
+        )
+
+    def get_pattern_kwargs(self):
+        return self._dtb_pattern_kwargs
 
     def setup_entity_categories(self):
         dtb_type_options_dict = {}
@@ -283,13 +298,9 @@ class DtbResourceLib(DtbBase):
 
 
 if __name__ == '__main__':
-    cfg_f = '/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/lib-configure.yml'
-    dtb = DtbResourceLib(cfg_f)
+    dtb = DtbResourceLibraryOpt('/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/dtb-library-basic.yml')
 
     dtb.setup_entity_categories()
     dtb.setup_entities()
 
-    dtb.accept()
-
-    ks = [chr(i) for i in range(97, 97+5)]
     dtb.accept()

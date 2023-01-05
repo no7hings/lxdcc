@@ -364,7 +364,28 @@ option:
         root-linux: '/l/resource/library/texture'
 #
 patterns:
+    root-dir: '{root}'
     #
-    database-file: '{root}/.database/sqlite.db'
+    database-file: '<.root-dir>/.database/sqlite.db'
     #
-    resource-dir: '{root}/{resource_group}/{resource_name}'
+    resource-dir: '<.root-dir>/all/{category_group}/{resource}'
+    #
+    version-dir: '<.resource-dir>/{version}'
+    # image
+    image-dir: '<.version-dir>/image'
+    image-preview-png-file: '<.image-dir>/preview.png'
+    # quixel
+    quixel-dir: '<.version-dir>/quixel'
+    quixel-metadata-dir: '<.quixel-dir>/metadata'
+    quixel-metadata-json-file: '<.quixel-metadata-dir>/{resource}.json'
+    #
+    quixel-texture-dir: '<.quixel-dir>/texture'
+    # texture
+    texture-dir: '<.version-dir>/texture'
+    texture-original-dir: '<.texture-dir>/original'
+    texture-original-src-dir: '<.texture-original-dir>/src'
+    texture-original-src-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.{texture_format}'
+    #
+    texture-acescg-dir: '<.texture-dir>/acescg'
+    texture-acescg-src-dir: '<.texture-acescg-dir>/src'
+    texture-acescg-src-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.{texture_format}'

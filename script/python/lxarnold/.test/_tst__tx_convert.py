@@ -11,12 +11,12 @@ from lxarnold import and_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-f = '/l/temp/td/dongchangbao/tx_test/new/grandma.z_disp.1026.exr'
+f = '/l/resource/srf/hdri/in_use/exr/outdoor_day_cloudy_02.exr'
 
 t = and_core.AndTextureOpt_(f)
 
 utl_dcc_objects.OsTexture._set_unit_tx_create_by_src_(
     f,
-    directory_path='/l/temp/td/dongchangbao/tx_test/new/tx',
+    search_directory_path='/l/resource/srf/hdri/in_use/tx/aces/test',
     block=True
 )

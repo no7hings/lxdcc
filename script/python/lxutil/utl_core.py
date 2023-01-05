@@ -78,7 +78,7 @@ class _Pattern(object):
 
 class Log(object):
     DEFAULT_CODING = sys.getdefaultencoding()
-    print(
+    bsc_core.SystemMtd.trace(
         'lynxi logger is initialization, default coding is "{}"'.format(DEFAULT_CODING)
     )
     # reload(sys)
@@ -104,7 +104,7 @@ class Log(object):
             if cls.PRINT_ENABLE is True:
                 # noinspection PyBroadException
                 try:
-                    print(text.encode('utf-8'))
+                    bsc_core.SystemMtd.trace(text.encode('utf-8'))
                 except:
                     pass
             #
@@ -2019,7 +2019,7 @@ def _print_time_(fnc):
                 time.localtime(start_timestamp)
             )
         )
-        print(message)
+        bsc_core.SystemMtd.trace(message)
 
         _fnc = fnc(*args, **kwargs)
 
@@ -2033,7 +2033,7 @@ def _print_time_(fnc):
             ),
             (end_timestamp - start_timestamp)
         )
-        print(message)
+        bsc_core.SystemMtd.trace(message)
         return _fnc
     return fnc_
 

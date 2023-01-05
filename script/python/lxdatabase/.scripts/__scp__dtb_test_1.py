@@ -5,7 +5,7 @@ p_ = '{key}_{size}_{tag}.{ext}'
 
 
 cfg_f = '/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/lib-configure.yml'
-dtb = dtb_objects.DtbResourceLib(cfg_f)
+dtb = dtb_objects.DtbResourceLibraryOpt(cfg_f)
 
 
 print dtb.get_entity(

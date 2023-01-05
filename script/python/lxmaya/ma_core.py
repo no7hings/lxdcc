@@ -284,7 +284,7 @@ class Om2Method(object):
         return cls._get_mesh_comp_names_(indices, 'vtx')
     @classmethod
     def _get_curve_knots_(cls, count, degree):
-        span = count - 3
+        span = count-3
         M = span
         N = degree
         # c = M+2*N-1
@@ -421,6 +421,9 @@ class Om2CurveOpt(object):
     def get_degree(self):
         return self._om2_obj_fnc.degree
 
+    def get_form(self):
+        return self._om2_obj_fnc.form
+
     def get_knots(self):
         return Om2Method._get_float_array_(self._om2_obj_fnc.knots())
 
@@ -440,11 +443,52 @@ class Om2CurveOpt(object):
 
     def _test_(self):
         print self._om2_obj_fnc.cvs()
+    @staticmethod
+    def _get_curve_knots_(count, degree, form):
+        if form == 1:
+            if count == 2:
+                return [0.0]*degree+[1.0]
+            span = max(count - 3, 1)
+            M = span
+            N = degree
+            lis = []
+            knot_minimum, knot_maximum = 0.0, float(M)
+            #
+            [lis.append(knot_minimum) for _ in range(degree)]
+            #
+            add_count = count - N - 1
+            for seq in range(add_count):
+                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+            #
+            [lis.append(knot_maximum) for _ in range(degree)]
+            return lis
+        elif form == 3:
+            span = max(count - 3, 1)
+            M = span
+            N = degree
+            lis = []
+            knot_minimum, knot_maximum = 0.0, float(M) + 1
+            #
+            [lis.append(knot_minimum + i - degree + 1) for i in range(degree)]
+            #
+            add_count = count - N - 1
+            for seq in range(add_count):
+                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+            #
+            [lis.append(knot_maximum + i) for i in range(degree)]
+            return lis
     @classmethod
     def set_create(cls, name, degree, form, points):
-        transform = cmds.createNode('transform', name=name)
+        if form == 3:
+            if degree > 1:
+                points.append(points[1])
+        #
         count = len(points)
-        knots = Om2Method._get_curve_knots_(count, degree)
+        knots = cls._get_curve_knots_(count, degree, 1)
+        # print knots
+        # knots = [-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+        knots = [0.0, 0.2, 0.4, 0.6, 1.0]
+        transform = cmds.createNode('transform', name=name)
         Om2Method._set_om2_curve_create_(
             Om2Method._get_om2_point_array_(points),
             knots, degree, form,
@@ -936,12 +980,12 @@ class MeshToSurfaceConverter(object):
     def set_run(self):
         self._set_mesh_data_update_()
         self._set_surface_data_update_()
-        SurfaceOpt.set_create(
+        Om2SurfaceOpt.set_create(
             'test', self._surface_u_count, self._surface_v_count, self._surface_points
         )
 
 
-class SurfaceOpt(object):
+class Om2SurfaceOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_nurbs_surface_fnc_(path)
     @property
@@ -953,6 +997,9 @@ class SurfaceOpt(object):
             self._om2_obj_fnc.cvPositions(),
             round_count
         )
+
+    def get_count(self):
+        return self._om2_obj_fnc.numCVsInU, self._om2_obj_fnc.numCVsInV
 
     def get_knots(self):
         return self._om2_obj_fnc.knotsInU(), self._om2_obj_fnc.knotsInV()
@@ -1109,13 +1156,46 @@ class SurfaceOpt(object):
             mesh_points,
             mesh_map_coords
         )
+    @staticmethod
+    def _get_surface_knots_(count, degree, form):
+        if form == 1:
+            lis = []
+            span = max(count - 3, 1)
+            M = span
+            N = degree
+            knot_minimum, knot_maximum = 0.0, 1.0
+            #
+            add_count = count - N - 1
+            [lis.append(knot_minimum) for _ in range(degree)]
+            #
+            for seq in range(add_count):
+                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+            #
+            [lis.append(knot_maximum) for _ in range(degree)]
+            return lis
+        elif form == 3:
+            span = max(count - 3, 1)
+            M = span
+            N = degree
+            lis = []
+            knot_minimum, knot_maximum = 0.0, float(M)+1
+            #
+            [lis.append(knot_minimum + i - degree + 1) for i in range(degree)]
+            #
+            add_count = count - N - 1
+            for seq in range(add_count):
+                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+            #
+            [lis.append(knot_maximum + i) for i in range(degree)]
+            return lis
     @classmethod
-    def set_create(cls, name, u_count, v_count, points):
-        u_degree, v_degree = 3, 3
-        u_form, v_form = 1, 1
+    def set_create(cls, name, u_count, v_count, points, u_form=1, v_form=3):
+        u_degree, v_degree = 3, 2
+        u_form, v_form = u_form, v_form
+
         u_knots, v_knots = (
-            Om2Method._get_surface_knots_(u_count, u_degree),
-            Om2Method._get_surface_knots_(v_count, v_degree)
+            cls._get_surface_knots_(u_count, u_degree, u_form),
+            cls._get_surface_knots_(v_count, v_degree, v_form)
         )
         transform = cmds.createNode('transform', name=name)
         om2_obj = om2.MFnNurbsSurface()

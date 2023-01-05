@@ -24,7 +24,7 @@ def get_aces_color_space_configure():
     #
     _ = ACES_COLOR_SPACE
     if _ is None:
-        _ = _utl_cfg_product.ColorSpaceCfg(
+        _ = _utl_cfg_product.AcesColorSpaceConfigure(
             utl_configure.MainData.get_as_configure('utility/product/color-space')
         )
         ACES_COLOR_SPACE = _

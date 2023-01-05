@@ -7,19 +7,36 @@
 """
 Copyright (c) 2019 The Foundry Visionmongers Ltd. All Rights Reserved.
 """
+import sys
+
+import os
+
+c = os.environ['KATANA_VERSION'] > '4.5'
+
 try:
-    import v1 as NetworkMaterials
+    if c is True:
+        import v2 as NetworkMaterials
+        sys.stdout.write('"NetworkMaterials" use version 2.0' + '\n')
+    else:
+        import v1 as NetworkMaterials
+        sys.stdout.write('"NetworkMaterials" use version 1.0' + '\n')
 except ImportError:
     NetworkMaterialCreate = None
     NetworkMaterialEdit = None
 
 try:
-    from v1.NetworkMaterialCreateNode import NetworkMaterialCreateNode
+    if c is True:
+        from v2.NetworkMaterialCreateNode import NetworkMaterialCreateNode
+    else:
+        from v1.NetworkMaterialCreateNode import NetworkMaterialCreateNode
 except ImportError:
     NetworkMaterialCreateNode = None
 
 try:
-    from v1.NetworkMaterialEditNode import NetworkMaterialEditNode
+    if c is True:
+        from v2.NetworkMaterialEditNode import NetworkMaterialEditNode
+    else:
+        from v1.NetworkMaterialEditNode import NetworkMaterialEditNode
 except ImportError:
     NetworkMaterialEditNode = None
 

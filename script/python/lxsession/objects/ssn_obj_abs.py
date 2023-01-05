@@ -581,12 +581,11 @@ class AbsSsnDatabaseOptionAction(
     def __init__(self, *args, **kwargs):
         super(AbsSsnDatabaseOptionAction, self).__init__(*args, **kwargs)
 
-    def get_database(self):
-        return dtb_objects.DtbBase(
-            self.option_opt.get('database')
+    def get_database_opt(self):
+        return dtb_objects.DtbResourceLibraryOpt(
+            self.option_opt.get('database_configure')
         )
-
-    database = property(get_database)
+    database_opt = property(get_database_opt)
 
     def get_window(self):
         from lxutil_gui.qt import utl_gui_qt_core

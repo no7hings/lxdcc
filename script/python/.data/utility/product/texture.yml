@@ -18,6 +18,8 @@ tx:
             # for cg6
             - '*_dif_*'
             - '*_difB_*'
+            # for quixel
+            - '*.albedo.*'
         color-space: auto
     diffuse-roughness:
         type: float
@@ -59,6 +61,8 @@ tx:
         name-patterns:
             - '*.rough.*'
             - '*_Roughness.*'
+            # for quixel
+            - '*.roughness.*'
         color-space: Raw
     specular-ior:
         type: float
@@ -168,10 +172,10 @@ tx:
     normal:
         type: vector3
         name-patterns:
-            - '*.normal.*'
-            - '*_NORM.*'
-            #
             - '*_nor_*'
+            - '*_NORM.*'
+            # for quixel
+            - '*.normal.*'
         color-space: Raw
     tangent:
         type: vector3
@@ -278,6 +282,8 @@ tx:
             - '*.disp.*'
             - '*_disp.*'
             - '*.z_disp.*'
+            # for quixel
+            - '*.displacement.*'
         color-space: Raw
     #
     mask:

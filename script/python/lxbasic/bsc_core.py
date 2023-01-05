@@ -749,6 +749,12 @@ class SystemMtd(object):
     def get_group_id(cls, group_name):
         import grp
         return grp.getgrnam(group_name).gr_gid
+    @classmethod
+    def trace(cls, text):
+        return sys.stdout.write(text+'\n')
+    @classmethod
+    def trace_error(cls, text):
+        return sys.stderr.write(text+'\n')
 
 
 class StoragePathMtd(object):
@@ -950,6 +956,13 @@ class StoragePathMtd(object):
         base = os.path.basename(file_path)
         name_base, ext = os.path.splitext(base)
         return directory_path, name_base, ext
+    @classmethod
+    def to_deduplication_mapper(cls, file_paths):
+        dict_ = {}
+        for i_path in file_paths:
+            i_path_base = os.path.splitext(i_path)[0]
+            dict_[i_path_base] = i_path
+        return dict_
 
 
 class StgFileSearchOpt(object):
@@ -2528,7 +2541,9 @@ class DirectoryOpt(object):
         )
 
     def set_create(self):
-        pass
+        StoragePathMtd.set_directory_create(
+            self._path
+        )
 
 
 class ZipFileOpt(StorageFileOpt):
@@ -4640,6 +4655,9 @@ class ParsePatternOpt(object):
         )
     keys = property(get_keys)
 
+    def get_value(self):
+        return self._pattern
+
     def set_update(self, **kwargs):
         keys = self.get_keys()
         for k, v in kwargs.items():
@@ -5135,7 +5153,7 @@ class OiioMtd(object):
             # '--text:x=100:y=200:font="Arial":color=1,0,0:size=60 "Go Big Red!"',
             u'-o "{output}"',
         ]
-        print ' '.join(cmd_args).format(**option)
+        # print ' '.join(cmd_args).format(**option)
         SubProcessMtd.set_run_with_result(
             ' '.join(cmd_args).format(**option)
         )
@@ -5193,7 +5211,7 @@ class OiioMtd(object):
             # '--text:x=100:y=200:font="Arial":color=1,0,0:size=60 "Go Big Red!"',
             u'-o "{output}"',
         ]
-        print ' '.join(cmd_args).format(**option)
+        # print ' '.join(cmd_args).format(**option)
         SubProcessMtd.set_run_with_result(
             ' '.join(cmd_args).format(**option)
         )
@@ -5769,7 +5787,5 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print ColorMtd.rgb2hex(
-        63, 63, 63
-    )
+    SystemMtd.trace(u'test')
 

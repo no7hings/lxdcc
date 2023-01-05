@@ -705,7 +705,7 @@ class NurbsCurveOpt(
         return counts, points, widths
 
 
-class SurfaceOpt(
+class Om2SurfaceOpt(
     utl_dcc_opt_abs.AbsObjOpt,
     AbsOm2FncDef,
 ):
@@ -714,7 +714,7 @@ class SurfaceOpt(
         :param args:
             1.str(path)
         """
-        super(SurfaceOpt, self).__init__(*args)
+        super(Om2SurfaceOpt, self).__init__(*args)
 
     def get_om2_fnc(self):
         return ma_core.Om2Method._get_om2_nurbs_surface_fnc_(

@@ -61,29 +61,29 @@ class TextureTxCfg(AbsCfg):
         return 'unknown'
 
 
-class ColorSpaceCfg(AbsCfg):
+class AcesColorSpaceConfigure(AbsCfg):
     def __init__(self, configure):
-        super(ColorSpaceCfg, self).__init__(configure)
+        super(AcesColorSpaceConfigure, self).__init__(configure)
     @classmethod
-    def get_is_use_aces(cls):
+    def get_is_enable(cls):
         return utl_core.Environ.get('OCIO') is not None
 
     def _set_build_(self):
         self._convert_dict = self._configure.get('aces.convert')
 
-    def get_aces_color_spaces(self):
+    def get_all_color_spaces(self):
         return self._configure.get('aces.color-spaces')
 
-    def get_aces_render_color_space(self):
+    def get_default_color_space(self):
         return self._configure.get('aces.default-color-space')
 
-    def get_aces_file(self):
+    def get_ocio_file(self):
         _ = utl_core.Environ.get('OCIO')
         if _ is not None:
             return _
         return self._configure.get('aces.file')
 
-    def get_aces_color_space(self, color_space):
-        if self.get_is_use_aces() is True:
+    def to_aces_color_space(self, color_space):
+        if self.get_is_enable() is True:
             return self._convert_dict[color_space]
         return color_space

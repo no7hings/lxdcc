@@ -5,7 +5,7 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxkatana import ktn_core
+from lxkatana import ktn_configure, ktn_core
 
 import lxkatana.modifiers as ktn_modifiers
 
@@ -18,7 +18,7 @@ class ScpTextureImportFromDatabase(object):
     def __init__(self, root, resource, texture_data):
         self._root_opt = ktn_core.NGObjOpt(root)
         self._cfg = bsc_objects.Configure(
-            value='/data/e/myworkspace/td/lynxi/script/python/lxkatana/.data/texture-resource-shader-group-configure.yml'
+            value=ktn_configure.DataFile.TEXTURE_RESOURCE_SHADER_GROUP_CONFIGURE
         )
         self._cfg.set(
             'option.root', self._root_opt.get_path(),
@@ -31,7 +31,7 @@ class ScpTextureImportFromDatabase(object):
         )
 
         self._texture_data = texture_data
-    # @ktn_modifiers.set_undo_mark_mdf
+    @ktn_modifiers.set_undo_mark_mdf
     def create_auto(self):
         def post_fnc_():
             self.layout_shader_group()

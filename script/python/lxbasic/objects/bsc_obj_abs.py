@@ -274,11 +274,11 @@ class AbsContent(object):
     def set_clear(self):
         self._value = collections.OrderedDict()
 
-    def set_update(self, dic):
-        if isinstance(dic, self.__class__):
-            self._value.update(dic.get_value())
-        elif isinstance(dic, dict):
-            self._value.update(dic)
+    def set_update(self, data):
+        if isinstance(data, self.__class__):
+            self._value.update(data.get_value())
+        elif isinstance(data, dict):
+            self._value.update(data)
 
     def __str__(self):
         return json.dumps(

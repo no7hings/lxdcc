@@ -50,8 +50,8 @@ with utl_core.log_progress_bar(maximum=len(file_paths), label='test') as l_p:
             search_directory_path=output_directory_path,
         )
         if i_cmd:
-            bsc_core.CmdSubProcessThread.set_wait()
-            i_t = bsc_core.CmdSubProcessThread.set_start(i_cmd, index=i_index)
+            bsc_core.SPCmdThread.set_wait()
+            i_t = bsc_core.SPCmdThread.set_start(i_cmd, index=i_index)
             i_t.finished.set_connect_to(
                 finished_fnc_
             )

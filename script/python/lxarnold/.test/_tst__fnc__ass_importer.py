@@ -11,7 +11,7 @@ s = dcc_objects.Scene()
 
 s.set_load_from_dot_ass(f)
 
-gs = s.universe.get_obj_type('mesh').get_objs()
+ms = s.universe.get_obj_type('mesh').get_objs()
 
-for g in gs:
+for g in ms:
     print g.get_port('subdiv_iterations').get()

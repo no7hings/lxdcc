@@ -3283,6 +3283,8 @@ class AbsOsDirectory(
     # <obj-pathsep>
     LOG = None
     PATHSEP = '/'
+    #
+    OS_FILE_CLASS = None
     def __init__(self, path):
         self._set_obj_dag_def_init_(path)
         self._set_obj_def_init_(
@@ -3345,6 +3347,9 @@ class AbsOsDirectory(
         return bsc_core.DirectoryMtd.get_file_paths__(
             self.path, include_exts
         )
+
+    def get_files(self, include_exts=None):
+        return [self.OS_FILE_CLASS(i) for i in self.get_file_paths(include_exts)]
 
     def get_all_file_paths(self, include_exts=None):
         return bsc_core.DirectoryMtd.get_all_file_paths__(

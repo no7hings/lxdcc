@@ -264,8 +264,8 @@ class Selection(object):
             #
             if hasattr(ktn_obj, 'getParent'):
                 parent_ktn_obj = ktn_obj.getParent()
-                ktn_core.NodeGraphTabOpt().set_current_node(parent_ktn_obj)
-                ktn_core.NodeGraphTabOpt().set_selection_view_fit()
+                ktn_core.GuiNodeGraphTabOpt().set_current_node(parent_ktn_obj)
+                ktn_core.GuiNodeGraphTabOpt().set_selection_view_fit()
         #
         if self._scene_graph_obj_paths:
             ktn_core.KtnSGSelectionOpt(

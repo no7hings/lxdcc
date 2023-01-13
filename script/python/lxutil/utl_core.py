@@ -417,7 +417,7 @@ class DialogWindow(object):
         w.set_cancel_visible(cancel_visible)
         #
         if status is not None:
-            w.set_window_title('[ {} ] {}'.format(str(status).split('.')[-1], label))
+            w.set_window_title(label)
             w.set_status(status)
         #
         if options_configure is not None:
@@ -1131,33 +1131,39 @@ class AppLauncher(object):
         return self._get_run_cmd_(*run_args)
     # run methods
     @classmethod
-    def _set_run_with_result_(cls, *run_args, **sub_progress_kwargs):
+    def _set_run_with_result_as_rez_(cls, *run_args, **sub_progress_kwargs):
         SubProcessRunner.set_run_with_result(
             ' '.join(['rez-env'] + list(run_args)),
             **sub_progress_kwargs
         )
     @classmethod
-    def _set_run_with_result_use_thread_(cls, *run_args, **sub_progress_kwargs):
+    def _set_run_with_result_use_thread_as_rez_(cls, *run_args, **sub_progress_kwargs):
         SubProcessRunner.set_run_with_result_use_thread(
             ' '.join(['rez-env'] + list(run_args)),
             **sub_progress_kwargs
         )
     #
-    def set_cmd_run_with_result(self, extend_cmd, **sub_progress_kwargs):
+    def set_cmd_run_with_result_as_rez(self, extend_cmd, **sub_progress_kwargs):
         run_args = self.get_rez_packages()
         #
         run_args.append(extend_cmd)
-        self._set_run_with_result_(
+        self._set_run_with_result_as_rez_(
+            *run_args, **sub_progress_kwargs
+        )
+
+    def set_cmd_run_with_result(self, extend_cmd, **sub_progress_kwargs):
+        self.set_cmd_run_with_result_as_rez(extend_cmd, **sub_progress_kwargs)
+
+    def set_cmd_run_with_result_use_thread_as_rez(self, extend_cmd, **sub_progress_kwargs):
+        run_args = self.get_rez_packages()
+        #
+        run_args.append(extend_cmd)
+        self._set_run_with_result_use_thread_as_rez_(
             *run_args, **sub_progress_kwargs
         )
 
     def set_cmd_run_with_result_use_thread(self, extend_cmd, **sub_progress_kwargs):
-        run_args = self.get_rez_packages()
-        #
-        run_args.append(extend_cmd)
-        self._set_run_with_result_use_thread_(
-            *run_args, **sub_progress_kwargs
-        )
+        self.set_cmd_run_with_result_use_thread_as_rez(extend_cmd, **sub_progress_kwargs)
 
     def get_configure_exists(self):
         pass
@@ -1201,7 +1207,7 @@ class MayaLauncher(object):
             )
         ]
         cmd = ' '.join(args)
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1213,7 +1219,7 @@ class MayaLauncher(object):
             )
         ]
         cmd = ' '.join(args)
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1253,7 +1259,7 @@ class MayaLauncher(object):
         ]
         cmd = ' '.join(args)
         #
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1496,7 +1502,7 @@ class HoudiniLauncher(object):
         ]
         cmd = ' '.join(args)
         #
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1627,7 +1633,7 @@ class KatanaLauncher(object):
         ]
         cmd = ' '.join(args)
         #
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1637,7 +1643,7 @@ class KatanaLauncher(object):
         ]
         cmd = ' '.join(args)
         #
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1650,7 +1656,7 @@ class KatanaLauncher(object):
             )
         ]
         cmd = ' '.join(create_args)
-        AppLauncher(**self._kwargs).set_cmd_run_with_result(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_as_rez(
             cmd
         )
         self.set_file_open(file_path)
@@ -1681,7 +1687,7 @@ class UsdViewLauncher(object):
             '"{}"'.format(file_path),
         ]
         cmd = ' '.join(args)
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread(
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
             cmd
         )
 
@@ -1743,7 +1749,7 @@ class RvLauncher(object):
             else:
                 return
         #
-        AppLauncher._set_run_with_result_use_thread_(
+        AppLauncher._set_run_with_result_use_thread_as_rez_(
             *run_args
         )
 

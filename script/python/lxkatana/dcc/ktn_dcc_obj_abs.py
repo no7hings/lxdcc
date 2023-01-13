@@ -279,7 +279,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                 )
                 return ktn_obj
 
-    def set_ktn_type(self, type_name):
+    def set_shader_type(self, type_name):
         ktn_obj = self._get_ktn_obj_()
         if ktn_obj is not None:
             type_ktn_port = ktn_obj.getParameter('nodeType')

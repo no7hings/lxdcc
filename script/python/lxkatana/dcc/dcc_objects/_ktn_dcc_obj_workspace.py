@@ -969,13 +969,11 @@ class AssetWorkspace(object):
             return dcc_obj.get('options.scheme')
         else:
             return 'asset'
-
     @classmethod
     def _get_geometry_location_(cls, dcc_obj):
         if dcc_obj.get_is_exists() is True:
             s = ktn_core.KtnSGStageOpt(dcc_obj.ktn_obj)
             print s.get_obj_exists('/root/world/geo/master')
-
     @_ktn_mdf_utility.set_undo_mark_mdf
     def set_light_rig_update(self):
         configure = self.get_configure()
@@ -1200,6 +1198,7 @@ class AssetWorkspace(object):
         return dcc_path
 
     def get_ng_material_force(self, dcc_path, pass_name='default'):
+        # todo: fix bug to "NetworkMaterial" is exists
         def get_exists_material():
             pass
         #

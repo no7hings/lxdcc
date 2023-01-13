@@ -8,7 +8,7 @@ def finished_fnc_(index, status, results):
     print index, status, results[-1]
 
 
-t = bsc_core.CmdSubProcessThread
+t = bsc_core.SPCmdThread
 
 usdFilePath = '/l/prod/cgm/work/assets/vfx/efx_dissipation_grandma/srf/surfacing/katana/set/x40130/v012/x40130.usda'
 
@@ -45,9 +45,9 @@ for i_seq, i_prim in enumerate(prim_opt.get_children()):
     #         'method=cache-hierarchy&location={}&file={}'.format(i_path, j_file_path)
     #     )
     #
-    #     bsc_core.CmdSubProcessThread.set_wait()
+    #     bsc_core.SPCmdThread.set_wait()
     #     #
-    #     i_t = bsc_core.CmdSubProcessThread.set_start(j_cmd, i_seq)
+    #     i_t = bsc_core.SPCmdThread.set_start(j_cmd, i_seq)
     #     #
     #     i_t.finished.set_connect_to(finished_fnc_)
 

@@ -10,8 +10,9 @@ import lxresolver.commands as rsv_commands
 
 
 class AbsHookExecutor(object):
-    SHELL_CMD_PATTERN = 'rez-env lxdcc -c \"lxhook-engine -o \\\"{option}\\\"\"'
-    DEADLINE_RUN_PATTERN = 'rez-env lxdcc -- lxhook-engine -o "{option}&start_index=<STARTFRAME>&end_index=<ENDFRAME>"'
+    REZ_SHELL_CMD_PATTERN = 'rez-env lxdcc -c \"lxhook-engine -o \\\"{option}\\\"\"'
+    REZ_DEADLINE_CMD_PATTERN = 'rez-env lxdcc -- lxhook-engine -o "{option}&start_index=<STARTFRAME>&end_index=<ENDFRAME>"'
+    #
     SUBMITTER_CLASS = None
     def __init__(self, session):
         self._session = session
@@ -195,12 +196,12 @@ class AbsHookExecutor(object):
         return self.set_run_with_deadline()
 
     def get_shell_command(self):
-        return self.SHELL_CMD_PATTERN.format(
+        return self.REZ_SHELL_CMD_PATTERN.format(
             **dict(option=self.get_session().get_option())
         )
 
     def get_deadline_command(self):
-        return self.DEADLINE_RUN_PATTERN.format(
+        return self.REZ_DEADLINE_CMD_PATTERN.format(
             **dict(option=self.get_session().get_option())
         ).replace(
             '<', '\\<'

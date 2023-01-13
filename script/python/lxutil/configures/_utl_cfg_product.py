@@ -16,20 +16,20 @@ class AbsCfg(object):
         return self._configure.__str__()
 
 
-class TextureTxCfg(AbsCfg):
+class TextureColorSpaceConfigure(AbsCfg):
     def __init__(self, configure):
-        super(TextureTxCfg, self).__init__(configure)
+        super(TextureColorSpaceConfigure, self).__init__(configure)
 
     def _set_build_(self):
         self._color_space_dict = {}
         self._purpose_dict = {}
         purposes = self._configure.get_branch_keys('tx')
-        for purpose in purposes:
-            name_patterns = self._configure.get('tx.{}.name-patterns'.format(purpose))
-            color_space = self._configure.get('tx.{}.color-space'.format(purpose))
-            for i_name_pattern in name_patterns:
-                self._color_space_dict[i_name_pattern] = color_space
-                self._purpose_dict[i_name_pattern] = purpose
+        for i_purpose in purposes:
+            i_name_patterns = self._configure.get('tx.{}.name-patterns'.format(i_purpose))
+            i_color_space = self._configure.get('tx.{}.color-space'.format(i_purpose))
+            for i_name_pattern in i_name_patterns:
+                self._color_space_dict[i_name_pattern] = i_color_space
+                self._purpose_dict[i_name_pattern] = i_purpose
 
     def get_name_patterns(self):
         return self._color_space_dict.keys()
@@ -39,7 +39,7 @@ class TextureTxCfg(AbsCfg):
         #
         return and_core.AndTextureOpt_(file_path).get_color_space()
 
-    def get_used_color_space(self, file_path):
+    def get_tx_color_space(self, file_path):
         from lxarnold import and_core
         #
         file_opt = bsc_core.StorageFileOpt(file_path)
@@ -61,9 +61,9 @@ class TextureTxCfg(AbsCfg):
         return 'unknown'
 
 
-class AcesColorSpaceConfigure(AbsCfg):
+class TextureAcesColorSpaceConfigure(AbsCfg):
     def __init__(self, configure):
-        super(AcesColorSpaceConfigure, self).__init__(configure)
+        super(TextureAcesColorSpaceConfigure, self).__init__(configure)
     @classmethod
     def get_is_enable(cls):
         return utl_core.Environ.get('OCIO') is not None

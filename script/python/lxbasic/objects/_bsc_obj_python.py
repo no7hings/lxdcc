@@ -257,30 +257,35 @@ class PyReloader(object):
         return require_connections
 
     def get_requires_graph(self):
-        lis = []
+        list_ = [
+            'graph LR\n'
+        ]
         connections = self.get_require_connections()
         for i in connections:
-            module_name, required_module_name = i
+            i_module_name, i_required_module_name = i
+            i_module_node_name = i_module_name.replace('.', '_')
+            i_module_node_text = '{}["{}"]\n'.format(i_module_node_name, i_module_name)
+            if not i_module_node_text in list_:
+                list_.append(i_module_node_text)
             #
-            module_node_name = module_name.replace('.', '_')
-            module_node_context = '{}["{}"]\n'.format(module_node_name, module_name)
-            if not module_node_context in lis:
-                lis.append(module_node_context)
-            #
-            required_module_node_name = required_module_name.replace('.', '_')
-            required_module_node_context = '{}["{}"]\n'.format(required_module_node_name, required_module_name)
-            if not required_module_node_context in lis:
-                lis.append(required_module_node_context)
+            i_required_module_node_name = i_required_module_name.replace('.', '_')
+            i_c = len(i_required_module_name.split('.'))
+            if i_c == 1:
+                i_required_module_node_text = '{}(("{}"))\n'.format(i_required_module_node_name, i_required_module_name)
+            else:
+                i_required_module_node_text = '{}["{}"]\n'.format(i_required_module_node_name, i_required_module_name)
+            if not i_required_module_node_text in list_:
+                list_.append(i_required_module_node_text)
 
-            lis.append('{1} --> {0}\n'.format(module_node_name, required_module_node_name))
+            list_.append('{0} --> {1}\n'.format(i_module_node_name, i_required_module_node_name))
 
-        return ''.join(lis)
+        return ''.join(list_)
 
     def set_reload(self):
-        for module_name in self.get_require_module_names():
-            _ = pkgutil.find_loader(module_name)
+        for i_module_name in self.get_require_module_names():
+            _ = pkgutil.find_loader(i_module_name)
             if _:
-                module = PyModule(module_name)
+                module = PyModule(i_module_name)
                 module.set_reload()
 
     def test_(self):

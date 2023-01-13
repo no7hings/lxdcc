@@ -396,7 +396,7 @@ class DccTexturesOpt(object):
                 #
                 if check_file_obj.get_exists_files_() or force is True:
                     self._set_port_repath_(i_port, tgt_stg_file)
-                    color_space = tgt_stg_file.get_used_color_space()
+                    color_space = tgt_stg_file.get_tx_color_space()
                     if tgt_stg_file.get_exists_files_() is True:
                         i_port.obj.set_color_space(color_space)
                 else:
@@ -643,7 +643,7 @@ class DccTexturesOpt(object):
                 if stg_files:
                     for stg_file in stg_files:
                         if stg_file.get_is_exists() is True:
-                            color_space = stg_file.get_used_color_space()
+                            color_space = stg_file.get_tx_color_space()
                             dcc_node.set_color_space(color_space)
             #
             g_p.set_stop()

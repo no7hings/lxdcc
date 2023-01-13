@@ -45,6 +45,7 @@ class DtbBaseOpt(object):
         # node
         Resource = 'resource'
         Version = 'version'
+        Storage = 'storage'
         #
         Attribute = 'attribute'
         Connection = 'connection'
@@ -55,16 +56,16 @@ class DtbBaseOpt(object):
         Tags = 'tags'
 
     class Kinds(object):
-        # category
+        # type, use for "resource" classification, one "resource" can have one or more "type"
         ResourceCategoryGroup = 'resource-category-group'
         ResourceCategory = 'resource-category'
         ResourceType = 'resource-type'
-        # tag group
+        # tag, use for "resource" filter, one "resource" can have one or more "tag"
         ResourceSemanticTagGroup = 'resource-semantic-tag-group'
         ResourceUserTagGroup = 'resource-user-tag-group'
         ResourcePropertyTagGroup = 'resource-property-tag-group'
         ResourceStorageTagGroup = 'resource-storage-tag-group'
-        # tag
+        #
         ResourcePrimarySemanticTag = 'resource-primary-semantic-tag'
         ResourceSecondarySemanticTag = 'resource-secondary-semantic-tag'
         ResourcePropertyTag = 'resource-property-tag'
@@ -72,22 +73,30 @@ class DtbBaseOpt(object):
         ResourceFileTag = 'resource-file-tag'
         # resource
         Resource = 'resource'
-        ResourceVersion = 'resource-version'
+        Asset = 'asset'
+        # version
+        Version = 'version'
+        # storage
+        Directory = 'directory'
+        File = 'file'
 
     EntityTypeCategoryMapper = {
+        # type
         EntityTypes.CategoryGroup: EntityCategories.Type,
         EntityTypes.Category: EntityCategories.Type,
         EntityTypes.Type: EntityCategories.Type,
-        #
+        # tag
         EntityTypes.TagGroup: EntityCategories.Tag,
         EntityTypes.Tag: EntityCategories.Tag,
-        #
+        # node
         EntityTypes.Resource: EntityCategories.Node,
         EntityTypes.Version: EntityCategories.Node,
-        #
+        EntityTypes.Storage: EntityCategories.Node,
+        # port
         EntityTypes.Attribute: EntityCategories.Port,
+        # connection
         EntityTypes.Connection: EntityCategories.Connection,
-        #
+        # assign
         EntityTypes.Assign: EntityCategories.Assign,
         EntityTypes.Types: EntityCategories.Assign,
         EntityTypes.Tags: EntityCategories.Assign,
@@ -188,20 +197,20 @@ class DtbBaseOpt(object):
 class DtbResourceLibraryOpt(DtbBaseOpt):
     def __init__(self, configure_file_path):
         self._dtb_cfg_file_path = configure_file_path
-        self._dtb_cfg = bsc_objects.Configure(value=configure_file_path)
+        self._dtb_cfg_opt = bsc_objects.Configure(value=configure_file_path)
 
-        self._dtb_cfg.set_flatten()
+        self._dtb_cfg_opt.set_flatten()
 
         self._dtb_pattern_kwargs = {}
         if bsc_core.SystemMtd.get_is_linux():
-            self._dtb_root = self._dtb_cfg.get('option.variants.root-linux')
+            self._dtb_root = self._dtb_cfg_opt.get('option.variants.root-linux')
         elif bsc_core.SystemMtd.get_is_windows():
-            self._dtb_root = self._dtb_cfg.get('option.variants.root-windows')
+            self._dtb_root = self._dtb_cfg_opt.get('option.variants.root-windows')
         else:
             raise NotImplementedError()
         #
         self._dtb_pattern_kwargs['root'] = self._dtb_root
-        db_file_pattern = self._dtb_cfg.get('patterns.database-file')
+        db_file_pattern = self._dtb_cfg_opt.get('patterns.database-file')
         if db_file_pattern is None:
             return
 
@@ -215,12 +224,16 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         return self._dtb_cfg_file_path
     database_configure = property(get_database_configure)
 
+    def get_database_configure_opt(self):
+        return self._dtb_cfg_opt
+    database_configure_opt = property(get_database_configure_opt)
+
     def get_root(self):
         return self._dtb_root
     root = property(get_root)
 
     def get_pattern(self, keyword):
-        return self._dtb_cfg.get(
+        return self._dtb_cfg_opt.get(
             'patterns.{}'.format(keyword)
         )
 
@@ -236,8 +249,8 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
 
     def setup_entity_categories(self):
         dtb_type_options_dict = {}
-        basic_dtb_type_options = self._dtb_cfg.get('option.basic.default_basic_entity_type_options')
-        basic_types = self._dtb_cfg.get('option.basic_types')
+        basic_dtb_type_options = self._dtb_cfg_opt.get('option.basic.default_basic_entity_type_options')
+        basic_types = self._dtb_cfg_opt.get('option.basic_types')
         for i_basic_type, i_basic_kwargs in basic_types.items():
             i_dtb_type_options = collections.OrderedDict()
             i_dtb_type_options.update(basic_dtb_type_options)
@@ -245,7 +258,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             i_dtb_type_options.update(i_basic_kwargs.get('options_extra') or {})
             dtb_type_options_dict[i_basic_type] = i_dtb_type_options
         #
-        entity_categories = self._dtb_cfg.get('option.entity_categories')
+        entity_categories = self._dtb_cfg_opt.get('option.entity_categories')
         for i_entity_category, i_entity_kwargs in entity_categories.items():
             i_basic_type = i_entity_kwargs['basic_type']
             # use copy
@@ -257,7 +270,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             i_table_opt.create(i_entity_type_options)
 
     def setup_entities(self):
-        entities = self._dtb_cfg.get('option.entities')
+        entities = self._dtb_cfg_opt.get('option.entities')
         for i_path, i_kwargs in entities.items():
             i_entity_type = i_kwargs['entity_type']
             i_options = i_kwargs.get('options') or {}
@@ -295,6 +308,31 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                             **i_child_options
                         )
                     )
+
+
+class DtbNodeOpt(object):
+    def __init__(self, dtb_opt, dtb_entity):
+        self._dtb_opt = dtb_opt
+        self._dtb_entity = dtb_entity
+
+    def get(self, key):
+        return self._dtb_opt.get_entity(
+            entity_type=self._dtb_opt.EntityTypes.Attribute,
+            filters=[
+                ('node', 'is', self._dtb_entity.path),
+                ('port', 'is', key),
+            ],
+            new_connection=False
+        ).value
+
+    def get_as_node(self, key):
+        return self._dtb_opt.get_entity(
+            entity_type=key,
+            filters=[
+                ('path', 'is', self.get(key)),
+            ],
+            new_connection=False
+        )
 
 
 if __name__ == '__main__':

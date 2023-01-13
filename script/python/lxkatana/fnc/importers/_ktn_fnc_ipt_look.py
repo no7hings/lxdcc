@@ -250,7 +250,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             material_group_dcc_path = self._workspace.get_ng_material_group_path_use_hash(and_geometry_opt, pass_name)
             is_material_group_create, dcc_material_group = self._workspace.get_ng_material_group_force(material_group_dcc_path, pass_name)
             if is_material_group_create is True:
-                show_obj = [i for i in dcc_material_group.get_children() if i.type_name == 'Material'][0]
+                show_obj = [i for i in dcc_material_group.get_children() if i.type_name == 'NetworkMaterial'][0]
                 self.__set_tags_add_(show_obj, and_material.path, parent_port_path='shaders.parameters')
             #
             material_dcc_path = self._workspace.get_ng_material_path_use_hash(and_geometry_opt, pass_name)
@@ -283,7 +283,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_dcc_shader = ktn_dcc_objects.Node(i_shader_dcc_path)
                     i_ktn_shader, is_create = i_dcc_shader.get_dcc_instance('ArnoldShadingNode')
                     #
-                    i_dcc_shader.set_ktn_type(i_ktn_shader_type_name)
+                    i_dcc_shader.set_shader_type(i_ktn_shader_type_name)
                     i_ktn_shader.checkDynamicParameters()
                     #
                     self.__set_shader_ports_(i_and_shader, i_dcc_shader)
@@ -326,7 +326,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 i_dcc_node = ktn_dcc_objects.Node(i_dcc_node_path)
             #
             i_ktn_node, _ = i_dcc_node.get_dcc_instance('ArnoldShadingNode')
-            i_dcc_node.set_ktn_type(i_dcc_node_type_name)
+            i_dcc_node.set_shader_type(i_dcc_node_type_name)
             #
             i_ktn_node.checkDynamicParameters()
             #

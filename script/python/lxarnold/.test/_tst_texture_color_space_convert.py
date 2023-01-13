@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-    # utl_dcc_objects.OsTexture._convert_unit_format_as_acescg_(
+    # utl_dcc_objects.OsTexture._create_unit_exr_as_acescg_(
     #     '/l/resource/library/texture/all/surface/rough_concrete_ogioE0/v0001/texture/test/src/rough_concrete_ogioE0.displacement.lin_srgb.exr',
     #     '/l/resource/library/texture/all/surface/rough_concrete_ogioE0/v0001/texture/test/acescg/rough_concrete_ogioE0.displacement.exr',
     # )
@@ -44,11 +44,11 @@ if __name__ == '__main__':
     jpg_file_paths = d_original_src_opt.get_all_file_paths(
         include_exts=['.jpg']
     )
-    jpg_file_path_mapper = bsc_core.StoragePathMtd.to_deduplication_mapper(jpg_file_paths)
+    jpg_file_path_mapper = bsc_core.StoragePathMtd.to_file_deduplication_mapper(jpg_file_paths)
     exr_file_paths = d_original_src_opt.get_all_file_paths(
         include_exts=['.exr']
     )
-    exr_file_path_mapper = bsc_core.StoragePathMtd.to_deduplication_mapper(exr_file_paths)
+    exr_file_path_mapper = bsc_core.StoragePathMtd.to_file_deduplication_mapper(exr_file_paths)
 
     for k, v in jpg_file_path_mapper.items():
         if k in exr_file_path_mapper:
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         i_file_opt_src = bsc_core.StorageFileOpt(i_file_path_src)
         i_file_path_tgt = '{}/{}.exr'.format(directory_path_tgt, i_file_opt_src.name_base)
         #
-        utl_dcc_objects.OsTexture._convert_unit_format_as_acescg_(
+        utl_dcc_objects.OsTexture._create_unit_exr_as_acescg_(
             i_file_path_src,
             i_file_path_tgt,
         )

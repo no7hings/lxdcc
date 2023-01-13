@@ -378,6 +378,8 @@ patterns:
     quixel-dir: '<.version-dir>/quixel'
     quixel-metadata-dir: '<.quixel-dir>/metadata'
     quixel-metadata-json-file: '<.quixel-metadata-dir>/{resource}.json'
+    quixel-image-dir: '<.quixel-dir>/image'
+    quixel-image-png-file: '<.quixel-image-dir>/{resource}.png'
     #
     quixel-texture-dir: '<.quixel-dir>/texture'
     # texture
@@ -389,3 +391,16 @@ patterns:
     texture-acescg-dir: '<.texture-dir>/acescg'
     texture-acescg-src-dir: '<.texture-acescg-dir>/src'
     texture-acescg-src-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.{texture_format}'
+    texture-acescg-tx-dir: '<.texture-acescg-dir>/tx'
+#
+version-storage:
+    # directory mapper for version
+    directory:
+        /texture/original/src: 'texture-original-src-dir'
+        /texture/acescg/src: 'texture-acescg-src-dir'
+        /texture/acescg/tx: 'texture-acescg-tx-dir'
+    file:
+        /texture/original/src/texture: {
+            database: '/texture/original/src/{texture_type_tag}',
+            storage: 'texture-original-src-file'
+        }

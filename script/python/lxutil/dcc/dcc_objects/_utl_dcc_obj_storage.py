@@ -40,6 +40,9 @@ class OsFile(utl_dcc_obj_abs.AbsOsFile):
         self.set_copy_to_file(backup_file_path)
 
 
+OsDirectory_.OS_FILE_CLASS = OsFile
+
+
 class OsPythonFile(utl_dcc_obj_abs.AbsOsFile):
     OS_DIRECTORY_CLASS = OsDirectory_
     def __init__(self, path):

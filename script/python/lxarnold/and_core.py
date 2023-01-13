@@ -696,6 +696,9 @@ class AndImageOpt(object):
     @staticmethod
     def _get_type_(file_path):
         return ai.AiTextureGetFormat(file_path)
+    @staticmethod
+    def _get_channel_count_(file_path):
+        return ai.AiTextureGetNumChannels(file_path)
     @classmethod
     def _get_is_srgb_(cls, file_path):
         return (
@@ -813,7 +816,7 @@ class AndTextureOpt_(AndImageOpt):
     """
     #
     TX_EXT = '.tx'
-    COLOR_SPACE_CFG = utl_configures.get_aces_color_space_configure()
+    TEXTURE_ACES_COLOR_SPACE_CONFIGURE = utl_configures.get_aces_color_space_configure()
     def __init__(self, *args, **kwargs):
         super(AndTextureOpt_, self).__init__(*args, **kwargs)
 
@@ -895,7 +898,7 @@ class AndTextureOpt_(AndImageOpt):
             cmd_args += [
                 u'-o "{}"'.format(file_path_src_tgt)
             ]
-        #
+        # etc. jpg to exr
         if self.get_is_srgb() and self.get_is_8_bit():
             cmd_args += [
                 '--format exr',
@@ -916,7 +919,7 @@ class AndTextureOpt_(AndImageOpt):
             color_space_src=color_space_src,
             color_space_tgt=color_space_tgt,
             format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
-            aces_file=cls.COLOR_SPACE_CFG.get_ocio_file()
+            aces_file=cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
             # channel_count_src=_get_channels_count_(file_path_src)
         )
         cmd_args = [
@@ -930,57 +933,98 @@ class AndTextureOpt_(AndImageOpt):
             '--unpremult',
             '--threads 2',
             '--oiio',
-            '--colorengine ocio',
+            # do not mip map
             '--nomipmap',
+            # color convert
+            '--colorengine ocio',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
             '--colorconvert "{color_space_src}" "{color_space_tgt}"',
-            '--format {format_tgt}',
+            '--format exr',
             '"{file_src}"',
             '-o "{file_tgt}"'
         ]
         cmd = ' '.join(cmd_args).format(**option)
         return cmd
     @classmethod
-    def get_tx_convert_as_aces_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+    def get_create_exr_as_acescg_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt, use_update_mode=True):
+        option = dict(
+            file_src=file_path_src,
+            file_tgt=file_path_tgt,
+            color_space_src=color_space_src,
+            color_space_tgt=color_space_tgt,
+            format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
+            aces_file=cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
+            # channel_count_src=_get_channels_count_(file_path_src)
+        )
         cmd_args = [
             'maketx',
+            '"{file_src}"',
+            '-o "{file_tgt}"',
+            # verbose status messages
+            '-v',
+            '--unpremult',
+            '--threads 2',
+            '--oiio',
+        ]
+        # use update mode
+        if use_update_mode is True:
+            cmd_args += [
+                '-u'
+            ]
+        # convert color
+        if color_space_src != color_space_tgt:
+            cmd_args += [
+                '--colorengine ocio',
+                '--colorconfig "{}"'.format(cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()),
+                '--colorconvert "{color_space_src}" "{color_space_tgt}"',
+            ]
+        # format args, etc. jpg to exr
+        if cls._get_is_srgb_(file_path_src) and cls._get_is_8_bit_(file_path_src):
+            cmd_args += [
+                '--format exr',
+                '-d half',
+                '--compression dwaa',
+            ]
+        else:
+            cmd_args += [
+                '--format exr',
+            ]
+        cmd = ' '.join(cmd_args).format(**option)
+        return cmd
+    @classmethod
+    def get_create_tx_as_acescg_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt, use_update_mode=True):
+        cmd_args = [
+            'maketx',
+            u'"{}"'.format(file_path_src),
+            u'-o "{}"'.format(file_path_tgt),
             '-v',
             '-u',
             '--unpremult',
-            '--threads 2',
+            '--threads 4',
             '--oiio'
         ]
-        aces_file = cls.COLOR_SPACE_CFG.get_ocio_file()
-        aces_color_spaces = cls.COLOR_SPACE_CFG.get_all_color_spaces()
-        if color_space_src in aces_color_spaces:
-            if color_space_src != color_space_tgt:
+        # color space args
+        if color_space_src != color_space_tgt:
+            aces_color_spaces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_all_color_spaces()
+            if color_space_src in aces_color_spaces:
                 cmd_args += [
                     '--colorengine ocio',
-                    '--colorconfig "{}"'.format(aces_file),
-                    #
+                    '--colorconfig "{}"'.format(cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()),
                     '--colorconvert "{}" "{}"'.format(color_space_src, color_space_tgt),
                 ]
-        else:
-            raise TypeError(
-                u'file="{}", aces color-space="{}" is not available'.format(
-                    file_path_src, color_space_src
+            else:
+                raise TypeError(
+                    u'file="{}", aces color-space="{}" is not available'.format(
+                        file_path_src, color_space_src
+                    )
                 )
-            )
-        #
-        cmd_args += [
-            u'-o "{}"'.format(file_path_tgt)
-        ]
-        #
+        # format args, etc. jpg to exr
         if cls._get_is_srgb_(file_path_src) and cls._get_is_8_bit_(file_path_src):
             cmd_args += [
                 '--format exr',
                 '-d half',
                 '--compression dwaa'
             ]
-        #
-        cmd_args += [
-            u'"{}"'.format(file_path_src)
-        ]
         #
         return ' '.join(cmd_args)
 

@@ -64,7 +64,7 @@ class DtbDict(dict):
         super(DtbDict, self).__init__(*args, **kwargs)
 
     def __getattr__(self, item):
-        return self.__getitem__(item)
+        return self.__getitem__(item)  # = self[item]
 
     def to_string(self):
         keys = self.keys()

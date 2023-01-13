@@ -263,22 +263,62 @@ def get_node_graph_tag():
     return App.Tabs.FindTopTab('Node Graph')
 
 
-class NodeGraphTabOpt(object):
-    def __init__(self, tab=None):
-        self._tag = App.Tabs.FindTopTab('Node Graph')
+class GuiNodeGraphBase(object):
+    @classmethod
+    def get_node_position(cls, ktn_obj):
+        if isinstance(ktn_obj, (str, unicode)):
+            return NodegraphAPI.GetNodePosition(
+                NodegraphAPI.GetNode(ktn_obj)
+            )
+        return NodegraphAPI.GetNodePosition(ktn_obj)
+    @classmethod
+    def set_node_position(cls, ktn_obj, position):
+        if isinstance(ktn_obj, (str, unicode)):
+            return NodegraphAPI.SetNodePosition(
+                NodegraphAPI.GetNode(ktn_obj), position
+            )
+        return NodegraphAPI.SetNodePosition(ktn_obj, position)
+
+
+class GuiNodeGraphOpt(GuiNodeGraphBase):
+    def __init__(self, ktn_gui=None):
+        if ktn_gui is None:
+            self._ktn_gui = App.Tabs.FindTopTab('Node Graph').getNodeGraphWidget()
+        else:
+            self._ktn_gui = ktn_gui
+
+    def get_track_position(self):
+        x, y, z = self._ktn_gui.getEyePoint()
+        return x, y
+
+    def move_node_to_view_center(self, ktn_obj):
+        x, y = self.get_track_position()
+        self.set_node_position(ktn_obj, (x, y))
+
+
+class GuiNodeGraphTabOpt(GuiNodeGraphBase):
+    def __init__(self, ktn_gui=None):
+        if ktn_gui is None:
+            self._ktn_gui = App.Tabs.FindTopTab('Node Graph')
+        else:
+            self._ktn_gui = ktn_gui
 
     def set_current_node(self, ktn_obj):
-        self._tag.setCurrentNodeView(
+        self._ktn_gui.setCurrentNodeView(
             ktn_obj
         )
 
     def set_selection_view_fit(self):
-        self._tag.frameSelection()
+        self._ktn_gui.frameSelection()
 
+    def get_current_group(self):
+        return self._ktn_gui.getEnteredGroupNode()
 
-class NodeGraphOpt(object):
-    def __init__(self, ktn_gui):
-        self._ktn_gui = ktn_gui
+    def get_node_graph(self):
+        return self._ktn_gui.getNodeGraphWidget()
+
+    def get_node_graph_opt(self):
+        return GuiNodeGraphOpt(self.get_node_graph())
 
 
 class NGObjsOpt(object):
@@ -302,6 +342,7 @@ class NGObjsOpt(object):
 class NGObjOpt(object):
     PATHSEP = '/'
     PORT_PATHSEP = '.'
+    #
     @classmethod
     def _get_path_(cls, name):
         def _rcs_fnc(name_):
@@ -336,7 +377,7 @@ class NGObjOpt(object):
                 #
                 name_ktn_port = ktn_obj.getParameter('name')
                 if name_ktn_port is not None:
-                    name_ktn_port.setValue(name, 0)
+                    name_ktn_port.setValue(str(name), 0)
                 #
                 ktn_obj.setName(name)
                 return ktn_obj
@@ -344,12 +385,162 @@ class NGObjOpt(object):
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj
     @classmethod
+    def _get_create_args_(cls, path, type_name):
+        path_opt = bsc_core.DccPathDagOpt(path)
+        name = path_opt.name
+        parent_opt = path_opt.get_parent()
+        parent_name = parent_opt.get_name()
+        ktn_obj = NodegraphAPI.GetNode(name)
+        if ktn_obj is None:
+            parent = cls(parent_name)
+            parent_ktn_obj = parent.ktn_obj
+            if parent_ktn_obj is not None:
+                ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
+                if ktn_obj is None:
+                    raise RuntimeError('type="{}" is known'.format(type_name))
+                #
+                name_ktn_port = ktn_obj.getParameter('name')
+                if name_ktn_port is not None:
+                    name_ktn_port.setValue(str(name), 0)
+                #
+                ktn_obj.setName(name)
+                return ktn_obj, True
+            else:
+                raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
+        return ktn_obj, False
+    @classmethod
+    def _get_arnold_shader_create_args_(cls, path, shader_type_name):
+        ktn_obj, is_create = cls._get_create_args_(path, 'ArnoldShadingNode')
+        if is_create is True:
+            type_ktn_port = ktn_obj.getParameter('nodeType')
+            if type_ktn_port is not None:
+                type_ktn_port.setValue(str(shader_type_name), 0)
+                ktn_obj.checkDynamicParameters()
+        return ktn_obj, is_create
+    @classmethod
+    def _get_shader_create_args_(cls, path, type_name, shader_type_name):
+        ktn_obj, is_create = cls._get_create_args_(path, type_name)
+        if is_create is True:
+            type_ktn_port = ktn_obj.getParameter('nodeType')
+            if type_ktn_port is not None:
+                type_ktn_port.setValue(str(shader_type_name), 0)
+                ktn_obj.checkDynamicParameters()
+        return ktn_obj, is_create
+    @classmethod
+    def _get_usd_shader_create_args_(cls, path, shader_type_name):
+        ktn_obj, is_create = cls._get_create_args_(path, 'UsdShadingNode')
+        if is_create is True:
+            type_ktn_port = ktn_obj.getParameter('nodeType')
+            if type_ktn_port is not None:
+                type_ktn_port.setValue(str(shader_type_name), 0)
+                ktn_obj.checkDynamicParameters()
+        return ktn_obj, is_create
+    @classmethod
+    def __connection_by_data_fnc_(cls, connections_data, source_fnc, target_fnc, extend_kwargs=None):
+        """
+        :param connections_data: etc. [
+            'node_a.a.b',
+            'node_b.a.b'
+        ]
+        :return:
+        """
+        for seq, i in enumerate(connections_data):
+            if not (seq + 1) % 2:
+                i_source_attr_path = connections_data[seq - 1]
+                i_target_attr_path = i
+                if isinstance(extend_kwargs, dict):
+                    i_source_attr_path = i_source_attr_path.format(**extend_kwargs)
+                    i_target_attr_path = i_target_attr_path.format(**extend_kwargs)
+                #
+                i_args_src = i_source_attr_path.split('.')
+                i_source_obj_path, i_source_port_name = i_args_src[0], '.'.join(i_args_src[1:])
+                i_args_tgt = i_target_attr_path.split('.')
+                i_target_obj_path, i_target_port_name = i_args_tgt[0], '.'.join(i_args_tgt[1:])
+                #
+                i_obj_src = cls(i_source_obj_path)
+                if i_obj_src is None:
+                    raise RuntimeError(
+                        'node="{}" is non-exists'.format(i_source_obj_path)
+                    )
+                #
+                i_obj_tgt = cls(i_target_obj_path)
+                if i_obj_tgt is None:
+                    raise RuntimeError(
+                        'node="{}" is non-exists'.format(i_target_obj_path)
+                    )
+                #
+                i_port_src = i_obj_src.__getattribute__(source_fnc)(i_source_port_name)
+                if i_port_src is None:
+                    raise RuntimeError(
+                        'attribute="{}" is non-exists'.format(i_source_attr_path)
+                    )
+                #
+                i_port_tgt = i_obj_tgt.__getattribute__(target_fnc)(i_target_port_name)
+                if i_port_tgt is None:
+                    raise RuntimeError(
+                        'attribute="{}" is non-exists'.format(i_target_attr_path)
+                    )
+                #
+                i_port_src.connect(
+                    i_port_tgt
+                )
+    @classmethod
+    def _create_connections_by_data_(cls, connections_data, extend_kwargs=None):
+        """
+        :param connections_data: etc. [
+            'node_a.a.b',
+            'node_b.a.b'
+        ]
+        :return:
+        """
+        cls.__connection_by_data_fnc_(
+            connections_data,
+            'get_output_port',
+            'get_input_port',
+            extend_kwargs
+        )
+    @classmethod
+    def _create_return_connections_by_data_(cls, connections_data, extend_kwargs=None):
+        """
+        :param connections_data: etc. [
+            'node_a.a.b',
+            'node_b.a.b'
+        ]
+        :return:
+        """
+        cls.__connection_by_data_fnc_(
+            connections_data,
+            'get_output_port',
+            'get_return_port',
+            extend_kwargs
+        )
+    @classmethod
+    def _create_send_connections_by_data_(cls, connections_data, extend_kwargs=None):
+        """
+        :param connections_data: etc. [
+            'node_a.a.b',
+            'node_b.a.b'
+        ]
+        :return:
+        """
+        cls.__connection_by_data_fnc_(
+            connections_data,
+            'get_send_port',
+            'get_input_port',
+            extend_kwargs
+        )
+    @classmethod
     def _get_is_exists_(cls, name):
         return NodegraphAPI.GetNode(name) is not None
 
     def __init__(self, ktn_obj):
         if isinstance(ktn_obj, (str, unicode)):
-            self._ktn_obj = NodegraphAPI.GetNode(ktn_obj)
+            if ktn_obj.startswith(self.PATHSEP):
+                self._ktn_obj = NodegraphAPI.GetNode(
+                    bsc_core.DccPathDagOpt(ktn_obj).get_name()
+                )
+            else:
+                self._ktn_obj = NodegraphAPI.GetNode(ktn_obj)
         else:
             self._ktn_obj = ktn_obj
 
@@ -365,6 +556,10 @@ class NGObjOpt(object):
         return self.get_type()
     type_name = property(get_type_name)
 
+    def get_shader_type_name(self):
+        return self.get('nodeType')
+    shader_type_name = property(get_shader_type_name)
+
     def get_path(self):
         return self._get_path_(self.get_name())
     path = property(get_path)
@@ -372,6 +567,15 @@ class NGObjOpt(object):
     def get_name(self):
         return self.ktn_obj.getName()
     name = property(get_name)
+
+    def set_rename(self, new_name):
+        if isinstance(new_name, unicode):
+            new_name = str(new_name)
+        #
+        name_ktn_port = self._ktn_obj.getParameter('name')
+        if name_ktn_port is not None:
+            name_ktn_port.setValue(new_name, 0)
+        self._ktn_obj.setName(new_name)
 
     def get_stage_opt(self):
         return KtnSGStageOpt(
@@ -402,9 +606,11 @@ class NGObjOpt(object):
         return list_
 
     def get_source_objs(self, **kwargs):
-        #
         list_ = []
-        _ = self.get_sources(**kwargs)
+        if 'inward' in kwargs:
+            _ = self._get_sources_inward_(self._ktn_obj)
+        else:
+            _ = self.get_sources(**kwargs)
         for i_ktn_port in _:
             i_ktn_obj = i_ktn_port.getNode()
             if i_ktn_obj not in list_:
@@ -451,9 +657,13 @@ class NGObjOpt(object):
         rcs_fnc_(list_, self._ktn_obj)
         return list_
 
-    def set_gui_layout(self, layout=('r-l', 't-b'), size=(320, 960), expanded=False, collapsed=False):
+    def set_gui_layout(self, layout=('r-l', 't-b'), size=(320, 960), expanded=False, collapsed=False, inward=False):
         def rcs_fnc_(ktn_obj_, column_):
-            _source_ktn_objs = self.__class__(ktn_obj_).get_source_objs()
+            if hasattr(ktn_obj_, 'getChildren'):
+                _source_ktn_objs = self._get_source_objs_inward_(ktn_obj_)
+            else:
+                _source_ktn_objs = self.__class__(ktn_obj_).get_source_objs()
+            #
             if _source_ktn_objs:
                 column_ += 1
                 if column_ not in ktn_obj_in_column_dict:
@@ -468,13 +678,16 @@ class NGObjOpt(object):
                         _i_ktn_objs.append(_i_ktn_obj)
                         rcs_fnc_(_i_ktn_obj, column_)
         #
-        ktn_obj_stack = []
+        ktn_obj_stack = [
+            self._ktn_obj
+        ]
         ktn_obj_in_column_dict = {}
         #
         layout_x, layout_y = layout
         x, y = NodegraphAPI.GetNodePosition(self.ktn_obj)
         w, h = size
-        rcs_fnc_(self.ktn_obj, 0)
+        #
+        rcs_fnc_(self._ktn_obj, 0)
         if ktn_obj_in_column_dict:
             for column, v in ktn_obj_in_column_dict.items():
                 c = len(v)
@@ -529,20 +742,37 @@ class NGObjOpt(object):
     def get(self, key):
         return self.get_port_raw(key)
 
-    def set_expression(self, key, value):
-        port = self.ktn_obj.getParameter(key)
-        if port:
-            NGPortOpt(port).set_expression(value)
+    def set_parameters_by_data(self, parameters_data):
+        pass
 
-    def set_expression_enable(self, key, value):
+    def set_shader_parameters_by_data(self, parameters_data, extend_kwargs=None):
+        for k, v in parameters_data.items():
+            if isinstance(extend_kwargs, dict):
+                if isinstance(v, (unicode, str)):
+                    v = v.format(**extend_kwargs)
+            #
+            i_enable_key = 'parameters.{}.enable'.format(k)
+            i_value_key = 'parameters.{}.value'.format(k)
+            self.set(i_enable_key, True)
+            if self.get_is_expression(i_value_key) is True:
+                self.set_expression_enable(i_value_key, False)
+            #
+            self.set(i_value_key, v)
+
+    def set_expression(self, key, value):
         p = self.ktn_obj.getParameter(key)
         if p:
-            p.setExpressionFlag(value)
+            p.setExpression(value)
+
+    def set_expression_enable(self, key, boolean):
+        p = self.ktn_obj.getParameter(key)
+        if p:
+            p.setExpressionFlag(boolean)
 
     def get_is_expression(self, key):
-        port = self.ktn_obj.getParameter(key)
-        if port:
-            return NGPortOpt(port).get_is_expression()
+        p = self.ktn_obj.getParameter(key)
+        if p:
+            return p.isExpression()
 
     def get_as_enumerate(self, key):
         port = self.ktn_obj.getParameter(key)
@@ -569,7 +799,7 @@ class NGObjOpt(object):
 
     def get_output_ports(self):
         return self._ktn_obj.getOutputPorts()
-
+    # send and return
     def get_send_port(self, port_path):
         return self._ktn_obj.getSendPort(port_path)
 
@@ -615,8 +845,8 @@ class NGObjOpt(object):
         )
         self._ktn_obj.setAttributes(atr)
 
-    def set_color(self, color):
-        r, g, b = color
+    def set_color(self, rgb):
+        r, g, b = rgb
         atr = self._ktn_obj.getAttributes()
         atr.update(
             dict(
@@ -626,6 +856,11 @@ class NGObjOpt(object):
             )
         )
         self._ktn_obj.setAttributes(atr)
+
+    def move_to_view_center(self):
+        GuiNodeGraphOpt().move_node_to_view_center(
+            self._ktn_obj
+        )
 
     def set_ports_clear(self, port_path=None):
         if port_path is None:
@@ -663,10 +898,18 @@ class NGObjOpt(object):
         if _ is None:
             self._ktn_obj.addInputPort(port_path)
 
+    def create_input_ports_by_data(self, ports_data):
+        for i in ports_data:
+            self.set_input_port_create(i)
+
     def set_output_port_create(self, port_path):
         _ = self._ktn_obj.getOutputPort(port_path)
         if _ is None:
             self._ktn_obj.addOutputPort(port_path)
+
+    def create_output_ports_by_data(self, ports_data):
+        for i in ports_data:
+            self.set_output_port_create(i)
 
     def get_parent(self):
         return self._ktn_obj.getParent()
@@ -683,6 +926,12 @@ class NGObjOpt(object):
         attributes_ = self._ktn_obj.getAttributes()
         attributes_.update(attributes)
         self._ktn_obj.setAttributes(attributes_)
+
+    def set_edited(self, boolean):
+        NodegraphAPI.SetNodeEdited(
+            self._ktn_obj,
+            edited=boolean, exclusive=True
+        )
 
 
 class NGGroupStackOpt(NGObjOpt):
@@ -708,7 +957,7 @@ class NGGroupStackOpt(NGObjOpt):
             raise TypeError('unknown-obj-type: "{}"'.format(type_name))
         name_ktn_port = tgt_ktn_obj.getParameter('name')
         if name_ktn_port is not None:
-            name_ktn_port.setValue(name, 0)
+            name_ktn_port.setValue(str(name), 0)
         tgt_ktn_obj.setName(name)
         #
         last_ktn_obj = self._get_last_()

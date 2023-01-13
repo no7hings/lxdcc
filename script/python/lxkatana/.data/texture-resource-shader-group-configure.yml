@@ -1,0 +1,193 @@
+option:
+    root: ''
+    resource: ''
+    time_tag: ''
+#
+node:
+    material_group:
+        type: 'NetworkMaterialCreate'
+        path: '<option.root>/<option.resource>__<option.time_tag>_MTL_GRP'
+
+    material:
+        type: 'NetworkMaterial'
+        path: '<..material_group.path>/<option.resource>__<option.time_tag>_MTL'
+    #
+    shader_group:
+        type: 'ShadingGroup'
+        path: '<..material_group.path>/<option.resource>__<option.time_tag>_SDR_GRP'
+        #
+        input_ports:
+            - 'texture.diffuse.diffuse_weight'
+            - 'texture.diffuse.diffuse_color'
+            - 'texture.diffuse.diffuse_roughness'
+            #
+            - 'texture.specular.specular_weight'
+            - 'texture.specular.specular_color'
+            - 'texture.specular.specular_roughness'
+            #
+            - 'texture.geometry.normal'
+            - 'texture.geometry.opacity'
+            - 'texture.geometry.displacement'
+            #
+            - 'extra.uv_coords'
+        #
+        output_ports:
+            - 'shader.arnold_surface'
+            - 'shader.arnold_displacement'
+            - 'shader.usd_surface'
+            - 'shader.usd_displacement'
+        #
+        connections:
+            - '<.path>.shader.arnold_surface'
+            - '<..material.path>.arnoldSurface'
+            #
+            - '<.path>.shader.arnold_displacement'
+            - '<..material.path>.arnoldDisplacement'
+            #
+            - '<.path>.shader.usd_surface'
+            - '<..material.path>.usdSurface'
+            #
+            - '<.path>.shader.usd_displacement'
+            - '<..material.path>.usdDisplacement'
+    # arnold shader
+    arnold_surface_shader:
+        tag: 'Surface'
+        type: 'ArnoldShadingNode'
+        shader_type: 'standard_surface'
+        path: '<..shader_group.path>/<.tag>__<option.time_tag>_AND'
+        #
+        return_connections:
+            - '<.path>.out'
+            - '<..shader_group.path>.shader.arnold_surface'
+    #
+    arnold_displacement_shader:
+        tag: 'Displacement'
+        type: 'ArnoldShadingNode'
+        shader_type: 'range'
+        path: '<..shader_group.path>/<.tag>__<option.time_tag>_AND'
+        #
+        shader_parameters:
+            input_min: 0.5
+            output_max: 0.1
+        #
+        return_connections:
+            - '<.path>.out'
+            - '<..shader_group.path>.shader.arnold_displacement'
+    # usd shader
+    usd_shader:
+        tag: 'Preview'
+        type: 'UsdShadingNode'
+        shader_type: 'UsdPreviewSurface'
+        path: '<..shader_group.path>/<.tag>__<option.time_tag>_USD'
+        #
+        return_connections:
+            - '<.path>.surface'
+            - '<..shader_group.path>.shader.usd_surface'
+            - '<.path>.displacement'
+            - '<..shader_group.path>.shader.usd_displacement'
+    #
+    arnold_normal_map:
+        tag: 'Normal_Map'
+        type: 'ArnoldShadingNode'
+        shader_type: 'normal_map'
+        path: '<..shader_group.path>/<.tag>__<option.time_tag>_AND'
+        #
+        connections:
+            - '<.path>.out'
+            - '<..arnold_surface_shader.path>.normal'
+    # image
+    arnold_texture:
+        type: 'ArnoldShadingNode'
+        shader_type: 'image'
+        path: '<..shader_group.path>/{tag}__<option.time_tag>_AND'
+        #
+        shader_parameters:
+            filename: '{texture}'
+            ignore_missing_textures: True
+    #
+    usd_texture:
+        type: 'UsdShadingNode'
+        shader_type: 'UsdUVTexture'
+        path: '<..shader_group.path>/{tag}__<option.time_tag>_USD'
+        #
+        shader_parameters:
+            file: '{texture}'
+#
+arnold_texture_option:
+    albedo:
+        tag: 'Diffuse_Color'
+        connections:
+            - '{node}.out'
+            - '<node.arnold_surface_shader.path>.base_color'
+        #
+        send_connections:
+            - '<node.shader_group.path>.texture.diffuse.diffuse_color'
+            - '{node}.filename'
+            #
+            - '<node.shader_group.path>.extra.uv_coords'
+            - '{node}.uvcoords'
+    #
+    roughness:
+        tag: 'Specular_Roughness'
+        connections:
+            - '{node}.out'
+            - '<node.arnold_surface_shader.path>.specular_roughness'
+        #
+        send_connections:
+            - '<node.shader_group.path>.texture.specular.specular_roughness'
+            - '{node}.filename'
+            #
+            - '<node.shader_group.path>.extra.uv_coords'
+            - '{node}.uvcoords'
+    #
+    normal:
+        tag: 'Geometry_Normal'
+        connections:
+            - '{node}.out'
+            - '<node.arnold_normal_map.path>.input'
+        #
+        send_connections:
+            - '<node.shader_group.path>.texture.geometry.normal'
+            - '{node}.filename'
+            #
+            - '<node.shader_group.path>.extra.uv_coords'
+            - '{node}.uvcoords'
+    #
+    translucency:
+        tag: 'Geometry_Opacity'
+        connections:
+            - '{node}.out'
+            - '<node.arnold_normal_map.path>.input'
+        #
+        send_connections:
+            - '<node.shader_group.path>.texture.geometry.opacity'
+            - '{node}.filename'
+            #
+            - '<node.shader_group.path>.extra.uv_coords'
+            - '{node}.uvcoords'
+    #
+    displacement:
+        tag: 'Geometry_Displacement'
+        connections:
+            - '{node}.out'
+            - '<node.arnold_displacement_shader.path>.input'
+        #
+        send_connections:
+            - '<node.shader_group.path>.texture.geometry.displacement'
+            - '{node}.filename'
+            #
+            - '<node.shader_group.path>.extra.uv_coords'
+            - '{node}.uvcoords'
+
+usd_texture_option:
+    albedo:
+        tag: 'Diffuse_Color'
+        connections:
+            - '{node}.rgb'
+            - '<node.usd_shader.path>.diffuseColor'
+    #
+    roughness:
+        tag: 'Specular_Roughness'
+        connections:
+            - '{node}.rgb'
+            - '<node.usd_shader.path>.roughness'

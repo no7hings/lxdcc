@@ -10,10 +10,11 @@ from lxutil import utl_core
 import lxbasic.objects as bsc_objects
 
 
-class TextureResourcesAddByQuixelScript(object):
+class ScpTextureResourcesAddByQuixel(object):
     TEXTURE_PATTERN = '{texture_key}_{texture_size_tag}_{texture_type_tag}.{texture_format}'
     def __init__(self, database_opt):
         self._dtb_opt = database_opt
+        self._dtb_cfg_opt = self._dtb_opt.get_database_configure_opt()
 
         self._resource_dict = dict()
         self._file_tags = set()
@@ -70,9 +71,9 @@ class TextureResourcesAddByQuixelScript(object):
         # create version directory
         version_directory_path = self.__stg_add_version_(pattern_kwargs)
         # copy json file
-        quixel_json_file_path_tgt = self.__stg_add_quixel_json_file_(pattern_kwargs, quixel_json_file_opt)
+        quixel_json_file_path_tgt = self.__stg_add_quixel_metadata_json_file_(pattern_kwargs, quixel_json_file_opt)
         # copy preview file
-        preview_file_path_tgt = self.__stg_add_image_preview_file_(pattern_kwargs, directory_path_src)
+        image_preview_file_path_tgt = self.__stg_add_image_preview_file_(pattern_kwargs, directory_path_src)
         #
         resource_path = '/{}/{}'.format(category_group, resource_name)
         version_path = '{}/{}'.format(resource_path, version_name)
@@ -107,10 +108,14 @@ class TextureResourcesAddByQuixelScript(object):
         )
         # add version
         # add version to database
-        self.__dtb_add_version_(
-            version_path,  version_gui_name,
+        self.__dtb_add_resource_version_(
+            resource_path, version_path,
             # storage properties
-            version_directory_path, quixel_json_file_path_tgt, preview_file_path_tgt,
+            version_directory_path, quixel_json_file_path_tgt, image_preview_file_path_tgt,
+        )
+        self.__stg_add_version_directories_(
+            pattern_kwargs,
+            version_path
         )
         self.__dtb_add_version_storage_properties_(
             pattern_kwargs,
@@ -119,7 +124,7 @@ class TextureResourcesAddByQuixelScript(object):
         # add version textures to storage and database
         self.__stg_and_dtb_add_version_textures_(
             pattern_kwargs,
-            resource_path,
+            resource_path, version_path,
             directory_path_src
         )
     # add resource
@@ -154,7 +159,7 @@ class TextureResourcesAddByQuixelScript(object):
             data=dict(
                 kind=self._dtb_opt.Kinds.Resource,
                 node=resource_path,
-                port='directory',
+                port='location',
                 value=resource_directory_path
             )
         )
@@ -235,29 +240,38 @@ class TextureResourcesAddByQuixelScript(object):
         path_opt.set_create()
         return path
 
-    def __dtb_add_version_(self, version_path, version_gui_name, version_directory_path, quixel_json_file_path_tgt, preview_file_path_tgt):
+    def __dtb_add_resource_version_(self, resource_path, version_path, version_directory_path, quixel_json_file_path_tgt, image_preview_file_path_tgt):
         self._dtb_opt.add_entity(
             entity_type=self._dtb_opt.EntityTypes.Version,
             data=dict(
-                kind=self._dtb_opt.Kinds.ResourceVersion,
-                path=version_path,
-                gui_name=version_gui_name
+                kind=self._dtb_opt.Kinds.Version,
+                path=version_path
             )
         )
         # add properties
         self._dtb_opt.add_entity(
             entity_type=self._dtb_opt.EntityTypes.Attribute,
             data=dict(
-                kind=self._dtb_opt.Kinds.ResourceVersion,
+                kind=self._dtb_opt.Kinds.Version,
                 node=version_path,
-                port='directory',
+                port='location',
                 value=version_directory_path
+            )
+        )
+        #
+        self._dtb_opt.add_entity(
+            entity_type=self._dtb_opt.EntityTypes.Attribute,
+            data=dict(
+                kind=self._dtb_opt.Kinds.Version,
+                node=version_path,
+                port='resource',
+                value=resource_path
             )
         )
         self._dtb_opt.add_entity(
             entity_type=self._dtb_opt.EntityTypes.Attribute,
             data=dict(
-                kind=self._dtb_opt.Kinds.ResourceVersion,
+                kind=self._dtb_opt.Kinds.Version,
                 node=version_path,
                 port='quixel_json_file',
                 value=quixel_json_file_path_tgt
@@ -267,17 +281,15 @@ class TextureResourcesAddByQuixelScript(object):
         self._dtb_opt.add_entity(
             entity_type=self._dtb_opt.EntityTypes.Attribute,
             data=dict(
-                kind=self._dtb_opt.Kinds.ResourceVersion,
+                kind=self._dtb_opt.Kinds.Version,
                 node=version_path,
                 port='image_preview_file',
-                value=preview_file_path_tgt
+                value=image_preview_file_path_tgt
             )
         )
 
     def __dtb_add_version_storage_properties_(self, pattern_kwargs, version_path):
         add_args = [
-            ('directory', 'version-dir'),
-            #
             ('image_directory', 'image-dir'),
             ('image_preview_file', 'image-preview-png-file'),
             #
@@ -292,31 +304,34 @@ class TextureResourcesAddByQuixelScript(object):
             self._dtb_opt.add_entity(
                 entity_type=self._dtb_opt.EntityTypes.Attribute,
                 data=dict(
-                    kind=self._dtb_opt.Kinds.ResourceVersion,
+                    kind=self._dtb_opt.Kinds.Version,
                     node=version_path,
                     port=i_port,
                     value=i_path
                 )
             )
 
-    def __stg_add_quixel_json_file_(self, pattern_kwargs, file_opt_src):
+    def __stg_add_quixel_metadata_json_file_(self, pattern_kwargs, file_opt_src):
         pattern_opt = self._dtb_opt.get_pattern_opt('quixel-metadata-json-file')
         path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
         file_opt_src.set_copy_to_file(path)
         return path
 
     def __stg_add_image_preview_file_(self, pattern_kwargs, directory_path_src):
-        pattern_opt = self._dtb_opt.get_pattern_opt('image-preview-png-file')
+        quixel_image_png_file_pattern_opt = self._dtb_opt.get_pattern_opt('quixel-image-png-file')
+        quixel_image_png_file_path = quixel_image_png_file_pattern_opt.set_update_to(**pattern_kwargs).get_value()
+        image_preview_png_file_pattern_opt = self._dtb_opt.get_pattern_opt('image-preview-png-file')
+        image_preview_png_file_path = image_preview_png_file_pattern_opt.set_update_to(**pattern_kwargs).get_value()
         file_path_glog_pattern_src = '{}/*_Preview.png'.format(directory_path_src)
-        path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
         file_paths_src = glob.glob(file_path_glog_pattern_src)
         if file_paths_src:
             file_path_src = file_paths_src[0]
             file_opt_src = bsc_core.StorageFileOpt(file_path_src)
-            file_opt_src.set_copy_to_file(path)
-        return path
+            file_opt_src.set_copy_to_file(quixel_image_png_file_path)
+            file_opt_src.set_copy_to_file(image_preview_png_file_path)
+        return image_preview_png_file_path
 
-    def __stg_and_dtb_add_version_textures_(self, pattern_kwargs, resource_path, directory_path_src):
+    def __stg_and_dtb_add_version_textures_(self, pattern_kwargs, resource_path, version_path, directory_path_src):
         quixel_texture_directory_p_opt = self._dtb_opt.get_pattern_opt('quixel-texture-dir')
         texture_original_src_file_p_opt = self._dtb_opt.get_pattern_opt('texture-original-src-file')
         #
@@ -343,13 +358,14 @@ class TextureResourcesAddByQuixelScript(object):
                     quixel_texture_directory_path
                 )
                 #
-                texture_original_src_file_path = texture_original_src_file_p_opt.set_update_to(
-                    **i_pattern_kwargs).get_value()
+                texture_original_src_file_path = texture_original_src_file_p_opt.set_update_to(**i_pattern_kwargs).get_value()
                 bsc_core.StorageFileOpt(j_file_path_src).set_copy_to_file(
                     texture_original_src_file_path
                 )
 
                 i_texture_type_tag_path = '/texture/{}'.format(i_texture_type_tag)
+
+                # self.__stg_add_version_file_(i_pattern_kwargs, version_path)
 
                 i_texture_size = bsc_core.OiioImageOpt(texture_original_src_file_path).get_size()
                 texture_sizes.add(i_texture_size)
@@ -362,7 +378,7 @@ class TextureResourcesAddByQuixelScript(object):
                         value=i_texture_type_tag_path
                     )
                 )
-
+            # property tag
             for i_texture_size in texture_sizes:
                 i_resource_tag = '{}x{}'.format(*i_texture_size)
                 i_resource_tag_path = '/resolution/{}'.format(i_resource_tag)
@@ -379,14 +395,119 @@ class TextureResourcesAddByQuixelScript(object):
             utl_core.Log.set_module_warning_trace(
                 'add resource', 'resource="{}" has no texture found'.format(resource_path)
             )
+    # add directory
+    def __stg_add_version_directories_(self, pattern_kwargs, version_path):
+        add_mapper = self._dtb_cfg_opt.get('version-storage.directory')
+        kind = self._dtb_opt.Kinds.Directory
+        for k, v in add_mapper.items():
+            i_storage_path = '{}{}'.format(version_path, k)
+            self._dtb_opt.add_entity(
+                entity_type=self._dtb_opt.EntityTypes.Storage,
+                data=dict(
+                    kind=kind,
+                    path=i_storage_path,
+                )
+            )
+            #
+            i_keyword = v
+            i_pattern_opt = self._dtb_opt.get_pattern_opt(i_keyword)
+            i_directory_path = i_pattern_opt.set_update_to(**pattern_kwargs).get_value()
+            #
+            self._dtb_opt.add_entity(
+                entity_type=self._dtb_opt.EntityTypes.Attribute,
+                data=dict(
+                    kind=kind,
+                    node=i_storage_path,
+                    port='location',
+                    value=i_directory_path
+                )
+            )
+            self._dtb_opt.add_entity(
+                entity_type=self._dtb_opt.EntityTypes.Attribute,
+                data=dict(
+                    kind=kind,
+                    node=i_storage_path,
+                    port='version',
+                    value=version_path
+                )
+            )
+
+    def __stg_add_version_file_(self, pattern_kwargs, version_path):
+        storage_path = version_path + '/texture/original/src/{texture_type_tag}'.format(
+            **pattern_kwargs
+        )
+        print storage_path
+        file_path = ''
+        # kind = self._dtb_opt.Kinds.File
+        # self._dtb_opt.add_entity(
+        #     entity_type=self._dtb_opt.EntityTypes.Storage,
+        #     data=dict(
+        #         kind=kind,
+        #         path=storage_path,
+        #     )
+        # )
+        # self._dtb_opt.add_entity(
+        #     entity_type=self._dtb_opt.EntityTypes.Attribute,
+        #     data=dict(
+        #         kind=kind,
+        #         node=storage_path,
+        #         port='location',
+        #         value=file_path
+        #     )
+        # )
+        # self._dtb_opt.add_entity(
+        #     entity_type=self._dtb_opt.EntityTypes.Attribute,
+        #     data=dict(
+        #         kind=kind,
+        #         node=storage_path,
+        #         port='version',
+        #         value=version_path
+        #     )
+        # )
+
+    def _test_(self):
+        pass
+
+
+class ScpTextureResourceData(object):
+    def __init__(self, directory_path):
+        self._directory_path = directory_path
+
+    def get_data(self):
+        dict_ = {}
+        directory_opt = bsc_core.StorageDirectoryOpt(self._directory_path)
+
+        texture_paths = directory_opt.get_all_file_paths(include_exts=['.tx'])
+
+        p = bsc_core.ParsePatternOpt(
+            '{name}.{key}'
+        )
+
+        for i_texture_path in texture_paths:
+            i_texture_opt = bsc_core.StorageFileOpt(i_texture_path)
+            i_name_base = i_texture_opt.name_base
+
+            i_variants = p.get_variants(i_name_base)
+            if i_variants:
+                i_key = i_variants['key']
+                dict_[i_key] = i_texture_opt.get_path()
+
+        return dict_
 
 
 if __name__ == '__main__':
-    import lxdatabase.objects as dtb_objects
-    TextureResourcesAddByQuixelScript(
-        database_opt=dtb_objects.DtbResourceLibraryOpt(
-            '/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/dtb-library-basic.yml'
-        )
-    ).add_resources_from(
-        '/l/resource/srf/tex_lib/surfaces'
+    # import lxdatabase.objects as dtb_objects
+    # scp = ScpTextureResourcesAddByQuixel(
+    #     database_opt=dtb_objects.DtbResourceLibraryOpt(
+    #         '/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/dtb-library-basic.yml'
+    #     )
+    # )
+    # scp.add_resources_from(
+    #     '/l/resource/srf/tex_lib/surfaces'
+    # )
+
+    scp = ScpTextureResourceData(
+        '/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/acescg/tx'
     )
+
+    print scp.get_data()

@@ -115,7 +115,7 @@ class CmdSubProcessSignal(object):
                 t.join()
 
 
-class CmdSubProcessThread(threading.Thread):
+class SPCmdThread(threading.Thread):
     STACK = []
     # MAXIMUM = int(CPU_COUNT*.75)
     MAXIMUM = 6
@@ -135,26 +135,32 @@ class CmdSubProcessThread(threading.Thread):
         self._failed_signal = CmdSubProcessSignal(int, list)
         self._finished_signal = CmdSubProcessSignal(int, int, list)
 
+        self._is_kill = False
+
     def __set_status_update(self, status):
         self._status = status
-        self._status_changed_signal.set_emit_send(
-            self._index, status
-        )
+        if self._is_kill is False:
+            self._status_changed_signal.set_emit_send(
+                self._index, status
+            )
 
     def __set_completed(self, results):
-        self._completed_signal.set_emit_send(
-            self._index, results
-        )
+        if self._is_kill is False:
+            self._completed_signal.set_emit_send(
+                self._index, results
+            )
 
     def __set_failed(self, results):
-        self._failed_signal.set_emit_send(
-            self._index, results
-        )
+        if self._is_kill is False:
+            self._failed_signal.set_emit_send(
+                self._index, results
+            )
 
     def __set_finished(self, status, results):
-        self._finished_signal.set_emit_send(
-            self._index, status, results
-        )
+        if self._is_kill is False:
+            self._finished_signal.set_emit_send(
+                self._index, status, results
+            )
     @property
     def status_changed(self):
         return self._status_changed_signal
@@ -172,11 +178,21 @@ class CmdSubProcessThread(threading.Thread):
         self.__set_status_update(self.Status.Running)
         results = []
         try:
-            results = SubProcessMtd.set_run_as_block(
-                self._cmd
-            )
-            self.__set_status_update(self.Status.Completed)
-            self.__set_completed(results)
+            if isinstance(self._cmd, (str, unicode)):
+                results = SubProcessMtd.set_run_as_block(
+                    self._cmd
+                )
+                self.__set_status_update(self.Status.Completed)
+                self.__set_completed(results)
+            elif isinstance(self._cmd, (set, tuple, list)):
+                for i_cmd in self._cmd:
+                    results.extend(
+                        SubProcessMtd.set_run_as_block(
+                            i_cmd
+                        )
+                    )
+                self.__set_status_update(self.Status.Completed)
+                self.__set_completed(results)
         except subprocess.CalledProcessError as exc:
             # o = exc.output
             # s = exc.returncode
@@ -184,39 +200,48 @@ class CmdSubProcessThread(threading.Thread):
             self.__set_status_update(self.Status.Failed)
             self.__set_failed(results)
         finally:
-            CmdSubProcessThread.LOCK.acquire()
-            CmdSubProcessThread.STACK.remove(self)
+            SPCmdThread.LOCK.acquire()
+            SPCmdThread.STACK.remove(self)
             # unlock
-            if len(CmdSubProcessThread.STACK) < CmdSubProcessThread.MAXIMUM:
-                CmdSubProcessThread.EVENT.set()
-                CmdSubProcessThread.EVENT.clear()
+            if len(SPCmdThread.STACK) < SPCmdThread.MAXIMUM:
+                SPCmdThread.EVENT.set()
+                SPCmdThread.EVENT.clear()
 
-            CmdSubProcessThread.LOCK.release()
+            SPCmdThread.LOCK.release()
 
             self.__set_finished(self._status, results)
     @staticmethod
     def get_is_busy():
-        return len(CmdSubProcessThread.STACK) >= CmdSubProcessThread.MAXIMUM
+        return len(SPCmdThread.STACK) >= SPCmdThread.MAXIMUM
     @staticmethod
     def set_wait():
-        CmdSubProcessThread.LOCK.acquire()
+        SPCmdThread.LOCK.acquire()
         # lock
-        if len(CmdSubProcessThread.STACK) >= CmdSubProcessThread.MAXIMUM:
-            CmdSubProcessThread.LOCK.release()
-            CmdSubProcessThread.EVENT.wait()
+        if len(SPCmdThread.STACK) >= SPCmdThread.MAXIMUM:
+            SPCmdThread.LOCK.release()
+            SPCmdThread.EVENT.wait()
         else:
-            CmdSubProcessThread.LOCK.release()
+            SPCmdThread.LOCK.release()
     @staticmethod
     def set_start(cmd, index=0):
-        CmdSubProcessThread.LOCK.acquire()
-        t = CmdSubProcessThread(cmd, index)
-        CmdSubProcessThread.STACK.append(t)
-        CmdSubProcessThread.LOCK.release()
+        SPCmdThread.LOCK.acquire()
+        t = SPCmdThread(cmd, index)
+        SPCmdThread.STACK.append(t)
+        SPCmdThread.LOCK.release()
         t.start()
         return t
 
     def get_status(self):
         return self._status
+
+    def set_kill(self):
+        self.__set_status_update(
+            self.Status.Killed
+        )
+        self._is_kill = True
+
+    def set_quit(self):
+        pass
 
 
 class FncThread(threading.Thread):
@@ -321,6 +346,12 @@ class FncThread(threading.Thread):
 
     def get_status(self):
         return self._status
+
+
+class SPFncThread(FncThread):
+    MAXIMUM = 6
+    def __init__(self, fnc, index, *args, **kwargs):
+        super(SPFncThread, self).__init__(fnc, index, *args, **kwargs)
 
 
 class CommandThread(threading.Thread):
@@ -603,8 +634,8 @@ class SystemMtd(object):
     def get_time_tag(cls):
         return datetime.datetime.now().strftime(cls.TIME_TAG_FORMAT)
     @classmethod
-    def get_time_tag_36(cls):
-        return IntegerOpt(int(time.time())).set_encode_to_36()
+    def get_time_tag_36(cls, multiply=1):
+        return IntegerOpt(int(time.time()*multiply)).set_encode_to_36()
     @classmethod
     def get_batch_tag(cls):
         pass
@@ -957,12 +988,30 @@ class StoragePathMtd(object):
         name_base, ext = os.path.splitext(base)
         return directory_path, name_base, ext
     @classmethod
-    def to_deduplication_mapper(cls, file_paths):
+    def to_file_deduplication_mapper(cls, file_paths):
         dict_ = {}
         for i_path in file_paths:
             i_path_base = os.path.splitext(i_path)[0]
             dict_[i_path_base] = i_path
         return dict_
+    @classmethod
+    def deduplication_files_by_formats(cls, file_paths, formats):
+        list_ = []
+        dict_ = {}
+        set_ = set()
+        for i_file_path in file_paths:
+            i_path_base, i_ext = os.path.splitext(i_file_path)
+            i_format = i_ext[1:]
+            set_.add(i_format)
+            dict_.setdefault(i_path_base, []).append(i_format)
+        #
+        fs = [i for i in formats]
+        [fs.append(i) for i in set_ if i not in fs]
+        #
+        for k, v in dict_.items():
+            v.sort(key=fs.index)
+            list_.append('{}.{}'.format(k, v[0]))
+        return list_
 
 
 class StgFileSearchOpt(object):
@@ -1178,6 +1227,11 @@ class StorageDirectoryOpt(StoragePathOpt):
     def get_all_file_paths(self, include_exts=None):
         return DirectoryMtd.get_all_file_paths__(
             self.path, include_exts
+        )
+
+    def get_all_directory_paths(self):
+        return DirectoryMtd.get_all_directory_paths__(
+            self._path
         )
 
     def set_copy_to_directory(self, directory_path_tgt, replace=False):
@@ -2679,9 +2733,11 @@ class IntegerMtd(object):
         s = float(second-3600.0*h-60.0*m)
         return h, m, s
     @classmethod
-    def second_to_time_prettify(cls, second):
+    def second_to_time_prettify(cls, second, mode=0):
         h, m, s = cls.second_to_time(second)
-        return '%02d:%02d:%07.4f' % (h, m, s)
+        if mode == 0:
+            return '%02d:%02d:%07.4f' % (h, m, s)
+        return '%02d:%02d:%02d' % (h, m, s)
     @classmethod
     def second_to_minute(cls, second):
         dv = 60.0
@@ -4206,16 +4262,16 @@ class ImageOpt(object):
         return u' '.join(cmd_args)
 
     def set_convert_to(self, file_path_tgt):
-        file_opt = StorageFileOpt(self._file_path)
-        if file_opt.get_is_file() is True:
+        file_opt_src = StorageFileOpt(self._file_path)
+        if file_opt_src.get_is_file() is True:
             file_opt_tgt = StorageFileOpt(file_path_tgt)
             ext_tgt = file_opt_tgt.get_ext()
             time_mark = TimestampMtd.to_string(
-                '%Y:%m:%d %H:%M:%S', file_opt.get_modify_timestamp()
+                '%Y:%m:%d %H:%M:%S', file_opt_src.get_modify_timestamp()
             )
             cmd_args = [
                 Bin.get_oiiotool(),
-                u'-i "{}"'.format(file_opt.path),
+                u'-i "{}"'.format(file_opt_src.path),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
                 '--threads 1',
@@ -4224,6 +4280,27 @@ class ImageOpt(object):
             SubProcessMtd.set_run_with_result(
                 ' '.join(cmd_args)
             )
+    @classmethod
+    def r_to_rgb(cls, file_path_src, file_path_tgt):
+        option = dict(
+            input=file_path_src,
+            output=file_path_tgt,
+            time_mark=TimestampMtd.to_string(
+                '%Y:%m:%d %H:%M:%S', StorageFileOpt(file_path_src).get_modify_timestamp()
+            )
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'-i "{input}"',
+            '--ch 0,0,0',
+            '--attrib:type=string DateTime "{time_mark}"',
+            '--adjust-time ',
+            '--threads 1',
+            u'-o "{output}"',
+        ]
+        SubProcessMtd.set_run_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
 
 
 class ListMtd(object):
@@ -5787,5 +5864,15 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    SystemMtd.trace(u'test')
+    print StoragePathMtd.deduplication_files_by_formats(
+        [
+            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.normal.jpg',
+            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.displacement.exr',
+            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.albedo.jpg',
+            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.ao.jpg',
+            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.displacement.jpg',
+            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.roughness.jpg'
+        ],
+        ['exr', 'tiff', 'tga', 'png', 'jpg']
+    )
 

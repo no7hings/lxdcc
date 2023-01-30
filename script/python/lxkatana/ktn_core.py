@@ -339,6 +339,87 @@ class NGObjsOpt(object):
         return obj_names
 
 
+class NGLayout(object):
+    class Direction(object):
+        RightToLeft = 'r-l'
+        LeftToRight = 'l-r'
+        TopToBottom = 't-b'
+        BottomToTop = 'b-t'
+    def __init__(self, data, layout=(Direction.RightToLeft, Direction.TopToBottom), position=(0, 0), size=(320, 80), option=None):
+        self._data = data
+        self._layout = layout
+        self._position = position
+        self._size = size
+        self._option = option
+
+    def layout_fnc(self, obj, position):
+        #
+        x, y = position
+        i_atr = dict(
+            x=x, y=y,
+        )
+        i_atr_ = obj.getAttributes()
+        i_atr_.update(i_atr)
+        obj.setAttributes(i_atr_)
+        if isinstance(self._option, dict):
+            expanded = self._option.get('expanded')
+            collapsed = self._option.get('collapsed')
+            shader_view_state = self._option.get('shader_view_state')
+            obj_opt = NGObjOpt(obj)
+            if expanded is True:
+                obj_opt.set_shader_gui_expanded()
+            #
+            elif collapsed is True:
+                obj_opt.set_shader_gui_collapsed()
+            #
+            if isinstance(shader_view_state, (int, float)):
+                obj_opt.set_shader_view_state(float(shader_view_state))
+    @classmethod
+    def _get_h_(cls, x, w, column, layout):
+        if layout == 'r-l':
+            return x - column * w * 2
+        elif layout == 'l-r':
+            return x + column * w * 2
+        else:
+            raise ValueError()
+
+    def get_v(self, row, row_count, layout):
+        pass
+
+    def run(self):
+        if self._data:
+            layout_h, layout_v = self._layout
+            x, y = self._position
+            w, h = self._size
+            for i_column, v in self._data.items():
+                if v:
+                    row_count = len(v)
+                    if layout_h == 'r-l':
+                        s_x = x - i_column * w * 2
+                    elif layout_h == 'l-r':
+                        s_x = x + i_column * w * 2
+                    else:
+                        raise ValueError()
+                    #
+                    if layout_v == 't-b':
+                        s_y = y + ((row_count-(row_count % 2))*h) / 2
+                    elif layout_v == 'b-t':
+                        s_y = y - ((row_count-(row_count % 2))*h) / 2
+                    else:
+                        raise ValueError()
+                    #
+                    for j_row, i_obj in enumerate(v):
+                        i_x = s_x
+                        if layout_v == 't-b':
+                            i_y = s_y - j_row*h
+                        elif layout_v == 'b-t':
+                            i_y = s_y + j_row*h
+                        else:
+                            raise ValueError()
+                        #
+                        self.layout_fnc(i_obj, (i_x, i_y))
+
+
 class NGObjOpt(object):
     PATHSEP = '/'
     PORT_PATHSEP = '.'
@@ -373,7 +454,7 @@ class NGObjOpt(object):
             if parent_ktn_obj is not None:
                 ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
                 if ktn_obj is None:
-                    raise RuntimeError('type="{}" is known'.format(type_name))
+                    raise RuntimeError('type="{}" is unknown'.format(type_name))
                 #
                 name_ktn_port = ktn_obj.getParameter('name')
                 if name_ktn_port is not None:
@@ -384,6 +465,9 @@ class NGObjOpt(object):
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj
+    @classmethod
+    def _get_is_parent_for_(cls, parent_ktn_obj, child_ktn_obj):
+        return child_ktn_obj.getParent().getName() == parent_ktn_obj.getName()
     @classmethod
     def _get_create_args_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -397,7 +481,7 @@ class NGObjOpt(object):
             if parent_ktn_obj is not None:
                 ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
                 if ktn_obj is None:
-                    raise RuntimeError('type="{}" is known'.format(type_name))
+                    raise RuntimeError('type="{}" is unknown'.format(type_name))
                 #
                 name_ktn_port = ktn_obj.getParameter('name')
                 if name_ktn_port is not None:
@@ -408,15 +492,6 @@ class NGObjOpt(object):
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj, False
-    @classmethod
-    def _get_arnold_shader_create_args_(cls, path, shader_type_name):
-        ktn_obj, is_create = cls._get_create_args_(path, 'ArnoldShadingNode')
-        if is_create is True:
-            type_ktn_port = ktn_obj.getParameter('nodeType')
-            if type_ktn_port is not None:
-                type_ktn_port.setValue(str(shader_type_name), 0)
-                ktn_obj.checkDynamicParameters()
-        return ktn_obj, is_create
     @classmethod
     def _get_shader_create_args_(cls, path, type_name, shader_type_name):
         ktn_obj, is_create = cls._get_create_args_(path, type_name)
@@ -436,7 +511,7 @@ class NGObjOpt(object):
                 ktn_obj.checkDynamicParameters()
         return ktn_obj, is_create
     @classmethod
-    def __connection_by_data_fnc_(cls, connections_data, source_fnc, target_fnc, extend_kwargs=None):
+    def _create_connections_by_data_(cls, connections_data, extend_kwargs=None):
         """
         :param connections_data: etc. [
             'node_a.a.b',
@@ -453,85 +528,67 @@ class NGObjOpt(object):
                     i_target_attr_path = i_target_attr_path.format(**extend_kwargs)
                 #
                 i_args_src = i_source_attr_path.split('.')
-                i_source_obj_path, i_source_port_name = i_args_src[0], '.'.join(i_args_src[1:])
+                i_obj_path_src, i_port_path_src = i_args_src[0], '.'.join(i_args_src[1:])
                 i_args_tgt = i_target_attr_path.split('.')
-                i_target_obj_path, i_target_port_name = i_args_tgt[0], '.'.join(i_args_tgt[1:])
+                i_obj_path_tgt, i_port_path_tgt = i_args_tgt[0], '.'.join(i_args_tgt[1:])
                 #
-                i_obj_src = cls(i_source_obj_path)
+                i_obj_src = cls._get_ktn_obj_(i_obj_path_src)
                 if i_obj_src is None:
                     raise RuntimeError(
-                        'node="{}" is non-exists'.format(i_source_obj_path)
+                        'node="{}" is non-exists'.format(i_obj_path_src)
                     )
                 #
-                i_obj_tgt = cls(i_target_obj_path)
+                i_obj_tgt = cls._get_ktn_obj_(i_obj_path_tgt)
                 if i_obj_tgt is None:
                     raise RuntimeError(
-                        'node="{}" is non-exists'.format(i_target_obj_path)
+                        'node="{}" is non-exists'.format(i_obj_path_tgt)
                     )
                 #
-                i_port_src = i_obj_src.__getattribute__(source_fnc)(i_source_port_name)
+                if i_obj_src.getName() == i_obj_tgt.getName():
+                    source_mtd, target_mtd = 'getSendPort', 'getReturnPort'
+                else:
+                    i_condition = (
+                        cls._get_is_parent_for_(i_obj_src, i_obj_tgt),
+                        cls._get_is_parent_for_(i_obj_tgt, i_obj_src)
+                    )
+                    if i_condition == (False, False):
+                        #
+                        source_mtd, target_mtd = 'getOutputPort', 'getInputPort'
+                    elif i_condition == (True, False):
+                        #
+                        source_mtd, target_mtd = 'getSendPort', 'getInputPort'
+                    elif i_condition == (False, True):
+                        #
+                        source_mtd, target_mtd = 'getOutputPort', 'getReturnPort'
+                    else:
+                        raise RuntimeError()
+                #
+                i_port_src = i_obj_src.__getattribute__(source_mtd)(i_port_path_src)
                 if i_port_src is None:
                     raise RuntimeError(
-                        'attribute="{}" is non-exists'.format(i_source_attr_path)
+                        'method="{}", attribute="{}" is non-exists'.format(source_mtd, i_source_attr_path)
                     )
                 #
-                i_port_tgt = i_obj_tgt.__getattribute__(target_fnc)(i_target_port_name)
+                i_port_tgt = i_obj_tgt.__getattribute__(target_mtd)(i_port_path_tgt)
                 if i_port_tgt is None:
                     raise RuntimeError(
-                        'attribute="{}" is non-exists'.format(i_target_attr_path)
+                        'method="{}", attribute="{}" is non-exists'.format(target_mtd, i_target_attr_path)
                     )
                 #
                 i_port_src.connect(
                     i_port_tgt
                 )
     @classmethod
-    def _create_connections_by_data_(cls, connections_data, extend_kwargs=None):
-        """
-        :param connections_data: etc. [
-            'node_a.a.b',
-            'node_b.a.b'
-        ]
-        :return:
-        """
-        cls.__connection_by_data_fnc_(
-            connections_data,
-            'get_output_port',
-            'get_input_port',
-            extend_kwargs
-        )
+    def _get_is_exists_(cls, string_arg):
+        return cls._get_ktn_obj_(string_arg) is not None
     @classmethod
-    def _create_return_connections_by_data_(cls, connections_data, extend_kwargs=None):
-        """
-        :param connections_data: etc. [
-            'node_a.a.b',
-            'node_b.a.b'
-        ]
-        :return:
-        """
-        cls.__connection_by_data_fnc_(
-            connections_data,
-            'get_output_port',
-            'get_return_port',
-            extend_kwargs
-        )
-    @classmethod
-    def _create_send_connections_by_data_(cls, connections_data, extend_kwargs=None):
-        """
-        :param connections_data: etc. [
-            'node_a.a.b',
-            'node_b.a.b'
-        ]
-        :return:
-        """
-        cls.__connection_by_data_fnc_(
-            connections_data,
-            'get_send_port',
-            'get_input_port',
-            extend_kwargs
-        )
-    @classmethod
-    def _get_is_exists_(cls, name):
-        return NodegraphAPI.GetNode(name) is not None
+    def _get_ktn_obj_(cls, string_arg):
+        if string_arg.startswith(cls.PATHSEP):
+            return NodegraphAPI.GetNode(
+                bsc_core.DccPathDagOpt(string_arg).get_name()
+            )
+        else:
+            return NodegraphAPI.GetNode(string_arg)
 
     def __init__(self, ktn_obj):
         if isinstance(ktn_obj, (str, unicode)):
@@ -582,19 +639,22 @@ class NGObjOpt(object):
             self._ktn_obj
         )
 
-    def set_gui_expanded(self):
+    def set_shader_gui_expanded(self):
         attributes = self.ktn_obj.getAttributes()
         if 'ns_expandedPages' in attributes and 'ns_collapsedPages' in attributes:
             attributes['ns_expandedPages'] = 'Outputs##BUILTIN | Parameters##BUILTIN | '
             attributes['ns_collapsedPages'] = 'Outputs | Parameters | '
             self.ktn_obj.setAttributes(attributes)
 
-    def set_gui_collapsed(self):
+    def set_shader_gui_collapsed(self):
         attributes = self.ktn_obj.getAttributes()
         if 'ns_expandedPages' in attributes:
             attributes['ns_expandedPages'] = 'Outputs | Parameters | '
             attributes['ns_collapsedPages'] = 'Outputs##BUILTIN | Parameters##BUILTIN | '
             self.ktn_obj.setAttributes(attributes)
+
+    def set_shader_view_state(self, value):
+        self.set_attributes(dict(ns_viewState=value))
 
     def get_sources(self, **kwargs):
         list_ = []
@@ -657,7 +717,7 @@ class NGObjOpt(object):
         rcs_fnc_(list_, self._ktn_obj)
         return list_
 
-    def set_gui_layout(self, layout=('r-l', 't-b'), size=(320, 960), expanded=False, collapsed=False, inward=False):
+    def set_gui_layout(self, layout=(NGLayout.Direction.RightToLeft, NGLayout.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
         def rcs_fnc_(ktn_obj_, column_):
             if hasattr(ktn_obj_, 'getChildren'):
                 _source_ktn_objs = self._get_source_objs_inward_(ktn_obj_)
@@ -677,54 +737,27 @@ class NGObjOpt(object):
                         ktn_obj_stack.append(_i_ktn_obj)
                         _i_ktn_objs.append(_i_ktn_obj)
                         rcs_fnc_(_i_ktn_obj, column_)
+                    else:
+                        pass
         #
         ktn_obj_stack = [
             self._ktn_obj
         ]
         ktn_obj_in_column_dict = {}
         #
-        layout_x, layout_y = layout
-        x, y = NodegraphAPI.GetNodePosition(self.ktn_obj)
-        w, h = size
-        #
         rcs_fnc_(self._ktn_obj, 0)
-        if ktn_obj_in_column_dict:
-            for column, v in ktn_obj_in_column_dict.items():
-                c = len(v)
-                if layout_x == 'r-l':
-                    s_x = x-column*w*2
-                elif layout_x == 'l-r':
-                    s_x = x+column*w*2
-                else:
-                    raise ValueError()
-                #
-                if layout_y == 't-b':
-                    s_y = y+c*h/2
-                elif layout_y == 'b-t':
-                    s_y = y-c*h/2
-                else:
-                    raise ValueError()
-                if v:
-                    for seq, i_ktn_obj in enumerate(v):
-                        i_x = s_x
-                        if layout_y == 't-b':
-                            i_y = s_y-seq*h
-                        elif layout_y == 'b-t':
-                            i_y = s_y+seq*h
-                        else:
-                            raise ValueError()
-                        #
-                        i_atr = dict(
-                            x=i_x,
-                            y=i_y,
-                        )
-                        i_atr_ = i_ktn_obj.getAttributes()
-                        i_atr_.update(i_atr)
-                        i_ktn_obj.setAttributes(i_atr_)
-                        if expanded is True:
-                            self.__class__(i_ktn_obj).set_gui_expanded()
-                        elif collapsed is True:
-                            self.__class__(i_ktn_obj).set_gui_collapsed()
+        #
+        NGLayout(
+            ktn_obj_in_column_dict,
+            layout=layout,
+            position=NodegraphAPI.GetNodePosition(self.ktn_obj),
+            size=size,
+            option=dict(
+                expanded=expanded,
+                collapsed=collapsed,
+                shader_view_state=shader_view_state
+            )
+        ).run()
 
     def get_port_raw(self, port_path):
         port = self.ktn_obj.getParameter(port_path)
@@ -742,32 +775,73 @@ class NGObjOpt(object):
     def get(self, key):
         return self.get_port_raw(key)
 
-    def set_parameters_by_data(self, parameters_data):
+    def set_parameters_by_data(self, data):
         pass
 
-    def set_shader_parameters_by_data(self, parameters_data, extend_kwargs=None):
-        for k, v in parameters_data.items():
-            if isinstance(extend_kwargs, dict):
-                if isinstance(v, (unicode, str)):
-                    v = v.format(**extend_kwargs)
+    def set_shader_parameters_by_data(self, data, extend_kwargs=None):
+        """
+        :param data: {
+            <port_path>: <value>
+        }
+        :param extend_kwargs:
+        :return:
+        """
+        for i_port_path, i_value in data.items():
             #
-            i_enable_key = 'parameters.{}.enable'.format(k)
-            i_value_key = 'parameters.{}.value'.format(k)
+            i_port_path = i_port_path.replace('/', '.')
+            if isinstance(extend_kwargs, dict):
+                if isinstance(i_value, (unicode, str)):
+                    i_value = i_value.format(**extend_kwargs)
+            # turn on enable first
+            i_enable_key = 'parameters.{}.enable'.format(i_port_path)
             self.set(i_enable_key, True)
+            #
+            i_value_key = 'parameters.{}.value'.format(i_port_path)
+            # turn off the expression-flag
             if self.get_is_expression(i_value_key) is True:
                 self.set_expression_enable(i_value_key, False)
-            #
-            self.set(i_value_key, v)
+            self.set(i_value_key, i_value)
 
-    def set_expression(self, key, value):
-        p = self.ktn_obj.getParameter(key)
-        if p:
-            p.setExpression(value)
+    def set_shader_hints(self, data):
+        pass
+
+    def set_shader_expressions_by_data(self, data, extend_kwargs=None):
+        for i_port_path, i_value in data.items():
+            #
+            i_port_path = i_port_path.replace('/', '.')
+            if isinstance(extend_kwargs, dict):
+                if isinstance(i_value, (unicode, str)):
+                    i_value = i_value.format(**extend_kwargs)
+            # turn on enable first
+            i_enable_key = 'parameters.{}.enable'.format(i_port_path)
+            self.set(i_enable_key, True)
+            #
+            i_value_key = 'parameters.{}.value'.format(i_port_path)
+            # turn on the expression-flag
+            self.set_expression_enable(i_value_key, True)
+            self.set_expression(i_value_key, i_value)
+
+    def set_shader_hints_by_data(self, data, extend_kwargs=None):
+        for i_port_path, i_value in data.items():
+            #
+            i_port_path = i_port_path.replace('/', '.')
+            # if isinstance(extend_kwargs, dict):
+            #     if isinstance(i_value, (unicode, str)):
+            #         i_value = i_value.format(**extend_kwargs)
+            #
+            i_hints_key = 'parameters.{}.hints'.format(i_port_path)
+            #
+            self.set_port_create(i_hints_key, 'string', i_value)
 
     def set_expression_enable(self, key, boolean):
         p = self.ktn_obj.getParameter(key)
         if p:
             p.setExpressionFlag(boolean)
+
+    def set_expression(self, key, value):
+        p = self.ktn_obj.getParameter(key)
+        if p:
+            p.setExpression(value)
 
     def get_is_expression(self, key):
         p = self.ktn_obj.getParameter(key)
@@ -811,7 +885,7 @@ class NGObjOpt(object):
         if p:
             return p.getConnectedPorts()
 
-    def set_port_create(self, port_path, type_, value):
+    def set_port_create(self, port_path, port_type, default_value):
         _ = self.get_port(port_path)
         port_parent = obj_core.PortPathMethod.get_dag_parent(
             path=port_path, pathsep=self.PORT_PATHSEP
@@ -826,8 +900,10 @@ class NGObjOpt(object):
                 parent_ktn_port = self.ktn_obj.getParameters()
             #
             if parent_ktn_port is not None:
-                if type_ == 'string':
-                    parent_ktn_port.createChildString(port_name, str(value))
+                if port_type == 'string':
+                    parent_ktn_port.createChildString(port_name, str(default_value))
+        else:
+            self.set(port_path, default_value)
 
     def set_delete(self):
         self.ktn_obj.delete()

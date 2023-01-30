@@ -625,6 +625,9 @@ class SystemMtd(object):
     def get_timestamp(cls):
         return time.time()
     @classmethod
+    def get_year(cls):
+        return time.localtime().tm_year
+    @classmethod
     def get_minute(cls):
         return time.localtime().tm_min
     @classmethod
@@ -636,6 +639,15 @@ class SystemMtd(object):
     @classmethod
     def get_time_tag_36(cls, multiply=1):
         return IntegerOpt(int(time.time()*multiply)).set_encode_to_36()
+    @classmethod
+    def get_time_tag_36_(cls, multiply=1):
+        s = time.time()
+        y = time.localtime().tm_year
+        m = time.localtime().tm_mon
+        d = time.localtime().tm_mday
+        c_s = time.mktime(time.strptime('{}-{}-{}'.format(y, m, d), '%Y-%m-%d'))
+        return IntegerOpt(int((s-c_s)*multiply)).set_encode_to_36()
+
     @classmethod
     def get_batch_tag(cls):
         pass
@@ -3336,14 +3348,15 @@ class TextOpt(object):
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
-    def to_rgb_(self, maximum=255, seed=0, p=45):
+    def to_rgb_(self, maximum=255, seed=0, s_p=45, v_p=45):
         string = self._raw
         if string:
             d = 1000.0
             a = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
             h = float(a % (360+seed)*d)/d
-            s = float(p+a % (100-p))/100.0
-            v = float(p+a % (100-p))/100.0
+            s = float(s_p+a % s_p)/100.0
+            v = float(v_p+a % v_p)/100.0
+            # print h, s, v
             return ColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 
@@ -5864,15 +5877,7 @@ class SPathMtd(object):
 
 
 if __name__ == '__main__':
-    print StoragePathMtd.deduplication_files_by_formats(
-        [
-            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.normal.jpg',
-            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.displacement.exr',
-            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.albedo.jpg',
-            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.ao.jpg',
-            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.displacement.jpg',
-            u'/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/original/src/concrete_damaged_pkngj0.roughness.jpg'
-        ],
-        ['exr', 'tiff', 'tga', 'png', 'jpg']
+    print TextOpt('user_data_int').to_rgb_(
+        s_p=10, v_p=10
     )
 

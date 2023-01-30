@@ -198,64 +198,89 @@ class AbsContent(object):
         #
         es.append(value)
 
-    def _set_value_unfold_(self, key, keys):
+    def _set_quote_unfold_(self, key, all_keys):
+        value = self.get(key)
+        if isinstance(value, (str, unicode)):
+            if fnmatch.filter([value], '$*'):
+                v_k = value[1:].lstrip()
+                if fnmatch.filter([v_k], '.*'):
+                    _ = v_k.split('.')
+                    c_2 = len([i for i in _ if i == ''])
+                    k_p_2 = '.'.join(key.split('.')[:-c_2])
+                    if k_p_2:
+                        k_2 = '{}.{}'.format(k_p_2, '.'.join(_[c_2:]))
+                    else:
+                        k_2 = '.'.join(_[c_2:])
+                else:
+                    k_2 = v_k
+                #
+                if k_2 not in all_keys:
+                    raise KeyError('key="{}" is Non-exists'.format(k_2))
+                # need use copy
+                self.set(key, copy.copy(self.get(k_2)))
+
+    def _set_value_unfold_(self, key, all_keys):
         def rcs_fnc_(key_, value_):
             if isinstance(value_, (str, unicode)):
                 _value_unfold = value_
-                # etc: "\\<A\\>"
-                _v_ks = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
-                if _v_ks:
-                    for _i_v_k in _v_ks:
-                        self._unfold_excludes.append(_i_v_k)
+                # remove excludes, etc. "\\<A\\>"
+                _v_ks_0 = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
+                if _v_ks_0:
+                    for _i_v_k_0 in _v_ks_0:
+                        self._unfold_excludes.append(_i_v_k_0)
                         _value_unfold = _value_unfold.replace('\\<', '<').replace('\\>', '>')
-                # etc: "<A>"
+                # etc. "<A>"
                 else:
-                    _var_keys = re.findall(re.compile(self.VARIANT_RE_PATTERN, re.S), _value_unfold)
-                    if _var_keys:
-                        for _i_var_key in set(_var_keys):
-                            if '|' in _i_var_key:
-                                _j_var_keys = map(lambda x: x.lstrip().rstrip(), _i_var_key.split('|'))
-                                for _j_var_key in _j_var_keys:
-                                    _j_v = self.get(_j_var_key)
+                    _v_ks_1 = re.findall(re.compile(self.VARIANT_RE_PATTERN, re.S), _value_unfold)
+                    if _v_ks_1:
+                        for _i_v_k_1 in set(_v_ks_1):
+                            if '|' in _i_v_k_1:
+                                _i_v_ks_2 = map(lambda x: x.lstrip().rstrip(), _i_v_k_1.split('|'))
+                                for _j_v_k_2 in _i_v_ks_2:
+                                    _j_v = self.get(_j_v_k_2)
                                     if _j_v is not None:
                                         _value_unfold = _j_v
                                         break
                             else:
                                 # catch value
-                                if fnmatch.filter([_i_var_key], '*.key'):
-                                    _ = _i_var_key.split('.')
-                                    _c = len([i for i in _ if i == ''])
-                                    _ks = key_.split('.')
-                                    _v = _ks[-_c]
-                                elif fnmatch.filter([_i_var_key], '.*'):
-                                    # etc: key=nodes.asset.name, _i_var_key=<.label>, result=nodes.asset.label
-                                    _ = _i_var_key.split('.')
-                                    _c = len([i for i in _ if i == ''])
-                                    __k = '{}.{}'.format('.'.join(key_.split('.')[:-_c]), '.'.join(_[_c:]))
+                                if fnmatch.filter([_i_v_k_1], '*.key'):
+                                    _ = _i_v_k_1.split('.')
+                                    _i_c_2 = len([i for i in _ if i == ''])
+                                    _i_v_2 = key_.split('.')[-_i_c_2]
+                                elif fnmatch.filter([_i_v_k_1], '.*'):
+                                    # etc. key=nodes.asset.name, key=<.label>, result=nodes.asset.label
+                                    _ = _i_v_k_1.split('.')
+                                    _i_c_2 = len([i for i in _ if i == ''])
+                                    _i_k_p_2 = '.'.join(key_.split('.')[:-_i_c_2])
+                                    if _i_k_p_2:
+                                        _i_k_2 = '{}.{}'.format(_i_k_p_2, '.'.join(_[_i_c_2:]))
+                                    else:
+                                        _i_k_2 = '.'.join(_[_i_c_2:])
                                     #
-                                    if __k in self._unfold_excludes:
+                                    if _i_k_2 in self._unfold_excludes:
                                         continue
-                                    if __k not in keys:
-                                        raise KeyError('key="{}" is Non-exists'.format(__k))
-                                    _v = self.get(__k)
                                     #
-                                    _v = rcs_fnc_(__k, _v)
+                                    if _i_k_2 not in all_keys:
+                                        raise KeyError('key="{}" is Non-exists'.format(_i_k_2))
+                                    _i_v_2 = self.get(_i_k_2)
+                                    #
+                                    _i_v_2 = rcs_fnc_(_i_k_2, _i_v_2)
                                 else:
                                     #
-                                    if _i_var_key in self._unfold_excludes:
+                                    if _i_v_k_1 in self._unfold_excludes:
                                         continue
-                                    if _i_var_key not in keys:
-                                        raise KeyError('key="{}" is Non-exists'.format(_i_var_key))
-                                    _v = self.get(_i_var_key)
+                                    if _i_v_k_1 not in all_keys:
+                                        raise KeyError('key="{}" is Non-exists'.format(_i_v_k_1))
+                                    _i_v_2 = self.get(_i_v_k_1)
                                     #
-                                    _v = rcs_fnc_(_i_var_key, _v)
+                                    _i_v_2 = rcs_fnc_(_i_v_k_1, _i_v_2)
                                 #
-                                if isinstance(_v, (str, unicode)):
-                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_var_key), _v)
-                                elif isinstance(_v, (int, float, bool)):
-                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_var_key), str(_v))
+                                if isinstance(_i_v_2, (str, unicode)):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2)
+                                elif isinstance(_i_v_2, (int, float, bool)):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), str(_i_v_2))
                     else:
-                        _v_ks = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
+                        _v_ks_0 = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
                 # etc: "=0+1"
                 if fnmatch.filter([_value_unfold], '=*'):
                     cmd = _value_unfold[1:]
@@ -303,12 +328,18 @@ class AbsContent(object):
         print self.get_str_as_yaml_style()
 
     def set_flatten(self):
-        keys = self.get_keys()
-        for key in keys:
-            value = self.get(key)
-            if isinstance(value, dict) is False:
-                value = self._set_value_unfold_(key, keys)
-                self.set(key, value)
+        all_keys = self.get_keys()
+        for i_key in all_keys:
+            i_value = self.get(i_key)
+            if isinstance(i_value, dict) is False:
+                self._set_quote_unfold_(i_key, all_keys)
+        #
+        all_keys = self.get_keys()
+        for i_key in all_keys:
+            i_value = self.get(i_key)
+            if isinstance(i_value, dict) is False:
+                i_value = self._set_value_unfold_(i_key, all_keys)
+                self.set(i_key, i_value)
 
     def get_is_empty(self):
         return not self._value

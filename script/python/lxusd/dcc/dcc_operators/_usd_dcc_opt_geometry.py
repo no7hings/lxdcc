@@ -220,7 +220,7 @@ class MeshOpt(
                 if i_uv_map_name == 'map1':
                     i_uv_map_name = 'st'
                 #
-                i_uv_map_name_new = bsc_core.TextMtd.set_clear_up_to(
+                i_uv_map_name_new = bsc_core.RawTextMtd.set_clear_up_to(
                     i_uv_map_name
                 )
                 if i_uv_map_name != i_uv_map_name_new:
@@ -263,7 +263,7 @@ class MeshOpt(
         if ordered is True:
             raw.sort()
         #
-        raw = bsc_core.PointArrayOpt(raw).round_to(round_count)
+        raw = bsc_core.RawPointArrayOpt(raw).round_to(round_count)
         return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
 
     def get_uv_maps_as_uuid(self, uv_map_name='st'):

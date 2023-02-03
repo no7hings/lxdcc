@@ -26,7 +26,7 @@ for i_file in [
     '/l/prod/cgm/work/assets/chr/ext_suraj/mod/modeling/maya/scenes/ext_suraj.mod.modeling.v001.ma',
     '/l/prod/cgm/work/assets/chr/ext_woodpecker/mod/modeling/maya/scenes/ext_woodpecker.mod.modeling.v001.ma'
 ]:
-    j_option_opt = bsc_core.KeywordArgumentsOpt(
+    j_option_opt = bsc_core.ArgDictStringOpt(
         option=dict(
             option_hook_key='rsv-task-batchers/asset/maya/model-export',
             #

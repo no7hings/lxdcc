@@ -42,7 +42,7 @@ class TextureColorSpaceConfigure(AbsCfg):
     def get_tx_color_space(self, file_path):
         from lxarnold import and_core
         #
-        file_opt = bsc_core.StorageFileOpt(file_path)
+        file_opt = bsc_core.StgFileOpt(file_path)
         _ = 'auto'
         for i_name_pattern in self.get_name_patterns():
             if file_opt.get_is_match_name_pattern(i_name_pattern) is True:
@@ -54,7 +54,7 @@ class TextureColorSpaceConfigure(AbsCfg):
         return _
 
     def get_purpose(self, file_path):
-        file_opt = bsc_core.StorageFileOpt(file_path)
+        file_opt = bsc_core.StgFileOpt(file_path)
         for i_name_pattern in self.get_name_patterns():
             if file_opt.get_is_match_name_pattern(i_name_pattern) is True:
                 return self._purpose_dict[i_name_pattern]

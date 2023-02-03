@@ -45,13 +45,13 @@ def __set_help_print():
 def __set_run(option):
     from lxbasic import bsc_core
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     bsc_core.EnvironMtd.set(
-        'hook_start_m', str(bsc_core.SystemMtd.get_minute())
+        'hook_start_m', str(bsc_core.TimeBaseMtd.get_minute())
     )
     bsc_core.EnvironMtd.set(
-        'hook_start_s', str(bsc_core.SystemMtd.get_second())
+        'hook_start_s', str(bsc_core.TimeBaseMtd.get_second())
     )
     # do not use thread, there will be run with subprocess use thread by lxhook-command
     option_hook_key = option_opt.get('option_hook_key')

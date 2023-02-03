@@ -27,7 +27,7 @@ for i_file_path in [
     '/l/prod/cgm/work/assets/chr/ext_woodpecker/rig/rigging/maya/scenes/ext_woodpecker.rig.rigging.v001.ma',
     # '/l/prod/cgm_dev/work/assets/chr/nn_14y_test/rig/rigging/maya/scenes/nn_14y_test.rig.rigging.v001.ma'
 ]:
-    j_option_opt = bsc_core.KeywordArgumentsOpt(
+    j_option_opt = bsc_core.ArgDictStringOpt(
         option=dict(
             option_hook_key='rsv-task-batchers/asset/gen-rig-export',
             #

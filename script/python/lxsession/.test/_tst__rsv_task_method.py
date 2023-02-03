@@ -35,7 +35,7 @@ for i_f in [
             ('rsv-task-methods/asset/katana/render-scene-create', {}),
         ]
     ):
-        j_option_opt = bsc_core.KeywordArgumentsOpt(
+        j_option_opt = bsc_core.ArgDictStringOpt(
             option=dict(
                 option_hook_key=j_option_hook_key,
                 #

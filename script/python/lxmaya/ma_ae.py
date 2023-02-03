@@ -14,6 +14,8 @@ import maya.mel as mel
 import maya.cmds as cmds
 # noinspection PyUnresolvedReferences
 from maya import OpenMayaUI
+# noinspection PyUnresolvedReferences,PyPep8Naming
+import pymel.core as pm
 #
 from PySide2 import QtCore, QtGui, QtWidgets
 
@@ -21,60 +23,65 @@ import functools
 #
 import shiboken2
 #
-_objectStore = {}
+_OBJECT_STORE = {}
 
 
-#
-def pyToMelProc(pyObj, args=(), returnType=None, procName=None, useName=False, procPrefix='pyToMel_'):
-    melParams = []
-    pyParams = []
-    melReturn = returnType if returnType else ''
+# for convert python func to mel script
+def ae_py_to_mel_proc(py_object, args=(), return_type=None, proc_name=None, use_name=False, proc_prefix='pyToMel_'):
+    mel_params = []
+    py_params = []
+    mel_return = return_type if return_type else ''
     #
     for t, n in args:
-        melParams.append('%s $%s' % (t, n))
+        mel_params.append('%s $%s' % (t, n))
         #
         if t == 'string':
-            pyParams.append(r"""'"+$%s+"'""" % n)
+            py_params.append(r"""'"+$%s+"'""" % n)
         else:
-            pyParams.append(r'"+$%s+"' % n)
+            py_params.append(r'"+$%s+"' % n)
     #
-    objId = id(pyObj)
+    py_object_id = id(py_object)
     #
     d = {}
     #
-    if procName:
-        d['procName'] = procName
-    elif useName:
-        d['procName'] = pyObj.__name__
+    if proc_name:
+        d['proc_name'] = proc_name
+    elif use_name:
+        d['proc_name'] = py_object.__name__
     else:
-        if isinstance(pyObj, types.LambdaType):
-            procPrefix += '_lambda'
-        elif isinstance(pyObj, (types.FunctionType, types.BuiltinFunctionType)):
+        if isinstance(py_object, types.LambdaType):
+            proc_prefix += '_lambda'
+        elif isinstance(py_object, (types.FunctionType, types.BuiltinFunctionType)):
             try:
-                procPrefix += '_' + pyObj.__name__
+                proc_prefix += '_' + py_object.__name__
             except (AttributeError, TypeError):
                 pass
-        elif isinstance(pyObj, types.MethodType):
+        elif isinstance(py_object, types.MethodType):
             try:
-                procPrefix += '_' + pyObj.im_class.__name__ + '_' + pyObj.__name__
+                proc_prefix += '_' + py_object.im_class.__name__ + '_' + py_object.__name__
             except (AttributeError, TypeError):
                 pass
-        d['procName'] = '%s%s' % (procPrefix, objId)
+        d['proc_name'] = '%s%s' % (proc_prefix, py_object_id)
     #
-    d['procName'] = d['procName'].replace('<', '_').replace('>', '_').replace('-', '_')
-    d['melParams'] = ', '.join(melParams)
-    d['pyParams'] = ', '.join(pyParams)
-    d['melReturn'] = melReturn
-    d['thisModule'] = __name__
-    d['id'] = objId
+    d['proc_name'] = d['proc_name'].replace('<', '_').replace('>', '_').replace('-', '_')
+    d['mel_params'] = ', '.join(mel_params)
+    d['py_params'] = ', '.join(py_params)
+    d['mel_return'] = mel_return
+    d['this_module'] = __name__
+    d['id'] = py_object_id
     #
-    contents = '''global proc %(melReturn)s %(procName)s(%(melParams)s){'''
-    if melReturn:
+    contents = '''global proc %(mel_return)s %(proc_name)s(%(mel_params)s){'''
+    if mel_return:
         contents += 'return '
-    contents += '''python("import %(thisModule)s;%(thisModule)s._objectStore[%(id)s](%(pyParams)s)");}'''
+    contents += '''python("import %(this_module)s;%(this_module)s._OBJECT_STORE[%(id)s](%(py_params)s)");}'''
     mel.eval(contents % d)
-    _objectStore[objId] = pyObj
-    return d['procName']
+    _OBJECT_STORE[py_object_id] = py_object
+    return d['proc_name']
+
+
+#
+def ae_callback(func):
+    return ae_py_to_mel_proc(func, [('string', 'nodeName')], proc_prefix='AECallback')
 
 
 def capitalize(s):
@@ -88,10 +95,6 @@ def get_name_prettify(s):
 def toCamelCase(s):
     parts = s.split('_')
     return ''.join([parts[0]] + [capitalize(x) for x in parts[1:]])
-
-
-def aeCallback(func):
-    return pyToMelProc(func, [('string', 'nodeName')], procPrefix='AECallback')
 
 
 def attrTextFieldGrp(*args, **kwargs):
@@ -428,8 +431,8 @@ class rootMode(baseMode):
             except RuntimeError:
                 pass
         cmds.editorTemplate(
-            aeCallback(template._doSetup),
-            aeCallback(template._doUpdate),
+            ae_callback(template._doSetup),
+            ae_callback(template._doUpdate),
             attr,
             callCustom=True
         )
@@ -448,7 +451,7 @@ class rootMode(baseMode):
         #
         if changeCommand:
             if hasattr(changeCommand, '__call__'):
-                changeCommand = aeCallback(changeCommand)
+                changeCommand = ae_callback(changeCommand)
             #
             args.append(changeCommand)
         if label:
@@ -527,9 +530,9 @@ class rootMode(baseMode):
     @staticmethod
     def addCustom(attr, newFunc, replaceFunc):
         if hasattr(newFunc, '__call__'):
-            newFunc = aeCallback(newFunc)
+            newFunc = ae_callback(newFunc)
         if hasattr(replaceFunc, '__call__'):
-            replaceFunc = aeCallback(replaceFunc)
+            replaceFunc = ae_callback(replaceFunc)
         args = (newFunc, replaceFunc, attr)
         cmds.editorTemplate(callCustom=1, *args)
     @staticmethod
@@ -948,3 +951,577 @@ class AeMtd2(object):
             print "Failed to Load Python Attribute Editor Template '%s.%s'" % (modName, objName)
             import traceback
             traceback.print_exc()
+
+
+class ControlBase(object):
+    @classmethod
+    def get_gui_key(cls, atr_path):
+        _ = atr_path.split('.')
+        node, port_path = _
+        node_type = cmds.nodeType(node)
+        return 'GUI_{}__{}'.format(node_type, port_path)
+    @classmethod
+    def get_gui_replace_args(cls, atr_path):
+        _ = atr_path.split('.')
+        node, keys = _
+        node_type = cmds.nodeType(node)
+        list_ = []
+        for i_index, i_key in enumerate(keys.split('&')):
+            list_.append(
+                (i_key, 'GUI_{}__{}'.format(node_type, i_key))
+            )
+        return node, list_
+    @classmethod
+    def get_gui_new_args(cls, atr_path, labels, icons):
+        _ = atr_path.split('.')
+        node, keys = _
+        node_type = cmds.nodeType(node)
+        list_ = []
+        for i_index, i_key in enumerate(keys.split('&')):
+            i_label = labels.split('&')[i_index]
+            i_icon = icons.split('&')[i_index]
+            list_.append(
+                (i_key, 'GUI_{}__{}'.format(node_type, i_key), i_label, i_icon)
+            )
+        return node, list_
+    @classmethod
+    def gui_new_fnc(cls, *args, **kwargs):
+        raise NotImplementedError()
+    @classmethod
+    def gui_replace_fnc(cls, *args, **kwargs):
+        raise NotImplementedError()
+
+
+class SwatchControl(ControlBase):
+    @classmethod
+    def get_gui_label(cls, atr_path):
+        pass
+    @classmethod
+    def gui_new_fnc(cls, atr_path):
+        pass
+    @classmethod
+    def gui_replace_fnc(cls, atr_path):
+        pass
+
+
+class FileControl(ControlBase):
+    @classmethod
+    def gui_update_value(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        value = cmds.getAttr(atr_path) or ''
+        cmds.textFieldGrp(
+            gui_key,
+            edit=True,
+            text=value,
+            annotation='attribute="{}"'.format(atr_path)
+        )
+    @classmethod
+    def gui_update_edit_callback(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.textFieldGrp(
+            gui_key,
+            edit=1,
+            changeCommand=lambda x: cls.dcc_update_value(atr_path),
+        )
+        cmds.symbolButton(
+            gui_key+'__button',
+            edit=1,
+            command=lambda x: cls.dcc_update_value_by_button(atr_path)
+        )
+    #
+    @classmethod
+    def dcc_update_value(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        value = cmds.getAttr(atr_path) or ''
+        value_new = cmds.textFieldGrp(
+            gui_key,
+            query=1,
+            text=1
+        ) or ''
+        if value_new != value:
+            cmds.setAttr(atr_path, value_new, type="string")
+    @classmethod
+    def dcc_update_value_by_button(cls, atr_path):
+        import os
+
+        gui_key = cls.get_gui_key(atr_path)
+        value = cmds.getAttr(atr_path) or ''
+        #
+        results = cmds.fileDialog2(
+            fileFilter='All Files (*.*)',
+            cap='Load File',
+            okc='Load',
+            fm=4,
+            dir=os.path.dirname(value)
+        ) or []
+        if results:
+            value_new = results[0]
+            if value_new != value:
+                cmds.setAttr(atr_path, value_new, type="string")
+                cmds.textFieldGrp(
+                    gui_key,
+                    edit=1,
+                    text=value_new
+                )
+    @classmethod
+    def dcc_update_attribute_change_callback(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.scriptJob(
+            parent=gui_key,
+            replacePrevious=True,
+            attributeChange=[
+                atr_path,
+                lambda: cls.gui_update_value(atr_path)
+            ]
+        )
+    #
+    @classmethod
+    def gui_new_fnc(cls, atr_path, label):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        cmds.rowLayout(
+            nc=2,
+            cw2=(360, 30),
+            cl2=('left', 'left'),
+            adjustableColumn=1,
+            columnAttach=[(1, 'left', -2), (2, 'left', 0)]
+        )
+        cmds.textFieldGrp(
+            gui_key,
+            label=label
+        )
+        cmds.symbolButton(
+            gui_key+'__button',
+            image='folder-closed.png'
+        )
+        cls.gui_update_edit_callback(atr_path)
+        cls.gui_update_value(atr_path)
+        cls.dcc_update_attribute_change_callback(atr_path)
+    @classmethod
+    def gui_replace_fnc(cls, atr_path):
+        cls.gui_update_edit_callback(atr_path)
+        cls.gui_update_value(atr_path)
+        cls.dcc_update_attribute_change_callback(atr_path)
+
+
+class ButtonControls(ControlBase):
+    ICON_DICT = {
+        'create': 'QR_add.png',
+        'refresh': 'QR_refresh.png'
+    }
+    @classmethod
+    def execute_fnc(cls, *args, **kwargs):
+        print args, kwargs
+    @classmethod
+    def gui_new_fnc(cls, atr_path, labels, icons, data_port_path):
+        node_, gui_args = cls.get_gui_new_args(atr_path, labels, icons)
+        cmds.columnLayout(
+            adjustableColumn=2,
+            rowSpacing=4,
+            # backgroundColor=(.15, .15, .15)
+        )
+        cmds.rowLayout(
+            numberOfColumns=4,
+            adjustableColumn=1,
+            columnWidth4=[120] * 4,
+            columnAttach4=['both'] * 4,
+            columnAlign4=['center'] * 4,
+            columnOffset4=[2] * 4
+        )
+        cmds.text(label='')
+        for i_key, i_gui_key, i_label, i_icon in gui_args:
+            cmds.nodeIconButton(
+                i_gui_key,
+                style='iconAndTextHorizontal',
+                image1=i_icon,
+                label=i_label,
+                command=lambda key=i_key, node=node_: cls.execute_fnc(key=key, node=node)
+            )
+    @classmethod
+    def gui_replace_fnc(cls, atr_path, data_port_path):
+        node_, gui_args = cls.get_gui_replace_args(atr_path)
+        for i_key, i_gui_key in gui_args:
+            cmds.nodeIconButton(
+                i_gui_key,
+                edit=1,
+                command=lambda key=i_key, node=node_: cls.execute_fnc(key=key, node=node)
+            )
+
+
+class TextControl(ControlBase):
+    @classmethod
+    def gui_update_value(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        value = cmds.getAttr(atr_path) or ''
+        cmds.textFieldGrp(
+            gui_key,
+            edit=True,
+            text=value,
+            annotation='attribute="{}"'.format(atr_path)
+        )
+    @classmethod
+    def gui_update_edit_callback(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.textFieldGrp(
+            gui_key,
+            edit=1,
+            changeCommand=lambda x: cls.dcc_update_value(atr_path)
+        )
+    #
+    @classmethod
+    def dcc_update_value(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        value = cmds.getAttr(atr_path) or ''
+        value_new = cmds.textFieldGrp(
+            gui_key,
+            query=1,
+            text=1
+        ) or ''
+        if value_new != value:
+            cmds.setAttr(atr_path, value_new, type="string")
+    @classmethod
+    def dcc_update_attribute_change_callback(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.scriptJob(
+            parent=gui_key,
+            replacePrevious=True,
+            attributeChange=[
+                atr_path,
+                lambda: cls.gui_update_value(atr_path)
+            ]
+        )
+    #
+    @classmethod
+    def gui_new_fnc(cls, atr_path, label, lock=False):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        cmds.textFieldGrp(
+            gui_key,
+            label=label,
+            editable=not lock,
+        )
+        cls.gui_update_edit_callback(atr_path)
+        cls.gui_update_value(atr_path)
+        cls.dcc_update_attribute_change_callback(atr_path)
+    @classmethod
+    def gui_replace_fnc(cls, atr_path):
+        cls.gui_update_edit_callback(atr_path)
+        cls.gui_update_value(atr_path)
+        cls.dcc_update_attribute_change_callback(atr_path)
+
+
+class DataControl(ControlBase):
+    @classmethod
+    def get_dcc_value_data(cls, atr_path):
+        raw = cmds.getAttr(
+            atr_path
+        )
+        try:
+            _ = eval(raw)
+            if isinstance(_, dict):
+                return _
+        except SyntaxError as e:
+            pass
+        return {}
+    @classmethod
+    def get_gui_key_data(cls, atr_path, build_port_path, build_key):
+        _ = atr_path.split('.')
+        node, port_path = _
+        data_atr_path = '{}.{}'.format(node, build_port_path)
+        raw = cmds.getAttr(
+            data_atr_path
+        )
+        try:
+            _ = eval(raw)
+            if isinstance(_, dict):
+                if port_path in _:
+                    data = _[port_path]
+                    return data.get(build_key) or []
+        except SyntaxError as e:
+            pass
+        return []
+    #
+    @classmethod
+    def gui_update_value(cls, atr_path, key_data):
+        data = cls.get_dcc_value_data(atr_path)
+        gui_key = cls.get_gui_key(atr_path)
+        for i_key, i_label in key_data:
+            i_gui_key = gui_key + '__' + i_key
+            if i_key in data:
+                i_value = data[i_key]
+            else:
+                i_value = ''
+            #
+            cmds.textFieldGrp(
+                i_gui_key,
+                edit=1,
+                text=i_value,
+                annotation='attribute="{}"\nkey="{}"'.format(atr_path, i_key)
+            )
+    @classmethod
+    def dcc_update_attribute_change_callback(cls, atr_path, key_data):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.scriptJob(
+            parent=gui_key,
+            replacePrevious=True,
+            attributeChange=[
+                atr_path,
+                lambda: cls.gui_update_value(atr_path, key_data)
+            ]
+        )
+    #
+    @classmethod
+    def gui_new_fnc(cls, atr_path, build_port_path, build_key):
+        key_data = cls.get_gui_key_data(atr_path, build_port_path, build_key)
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.columnLayout(
+            gui_key,
+            adjustableColumn=1,
+            # backgroundColor=(.275, .275, .275)
+        )
+        for i_key, i_label in key_data:
+            i_gui_key = gui_key+'__'+i_key
+            cmds.textFieldGrp(
+                i_gui_key,
+                label=i_label,
+                editable=False
+            )
+        cls.gui_update_value(atr_path, key_data)
+        cls.dcc_update_attribute_change_callback(atr_path, key_data)
+    @classmethod
+    def gui_replace_fnc(cls, atr_path, build_port_path, build_key):
+        key_data = cls.get_gui_key_data(atr_path, build_port_path, build_key)
+        #
+        cls.gui_update_value(atr_path, key_data)
+        cls.dcc_update_attribute_change_callback(atr_path, key_data)
+
+
+class VariantControl(ControlBase):
+    @classmethod
+    def get_dcc_values(cls, atr_path, data_port_path):
+        _ = atr_path.split('.')
+        node, port_path = _
+        data_atr_path = '{}.{}'.format(node, data_port_path)
+        raw = cmds.getAttr(
+            data_atr_path
+        )
+        try:
+            _ = eval(raw)
+            if isinstance(_, dict):
+                if port_path in _:
+                    data = _[port_path]
+                    return data['all'], data['default']
+        except SyntaxError as e:
+            pass
+        return ['None'], 'None'
+    @classmethod
+    def get_gui_values(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        return [cmds.menuItem(i, query=1, label=1) for i in cmds.optionMenuGrp(gui_key, query=1, itemListLong=1) or []]
+    #
+    @classmethod
+    def gui_build_and_update_value(cls, atr_path, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        gui_values = cls.get_gui_values(atr_path)
+        values, value_default = cls.get_dcc_values(atr_path, data_port_path)
+        if values != gui_values:
+            [cmds.deleteUI(i) for i in cmds.optionMenuGrp(gui_key, query=1, itemListLong=1) or []]
+            for i_index, i_version in enumerate(values):
+                cmds.menuItem(
+                    label=i_version, data=i_index,
+                    parent=gui_key+'|OptionMenu'
+                )
+        #
+        cls.gui_update_value(atr_path, data_port_path)
+    @classmethod
+    def gui_update_value(cls, atr_path, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        values = cls.get_gui_values(atr_path)
+        value_current = cmds.getAttr(atr_path)
+        if value_current in values:
+            index = values.index(value_current)
+            cmds.optionMenuGrp(
+                gui_key,
+                edit=1,
+                select=index+1,
+                annotation='attribute="{}"'.format(atr_path)
+            )
+        else:
+            cmds.optionMenuGrp(
+                gui_key,
+                edit=1,
+                select=1,
+                annotation='attribute="{}"'.format(atr_path)
+            )
+        #
+        cls.gui_check_value(atr_path, data_port_path)
+    @classmethod
+    def gui_update_edit_callback(cls, atr_path, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.optionMenuGrp(
+            gui_key,
+            edit=1,
+            changeCommand=lambda x: cls.dcc_update_value(atr_path, data_port_path)
+        )
+    #
+    @classmethod
+    def dcc_update_value(cls, atr_path, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        items = cmds.optionMenuGrp(gui_key, query=1, itemListLong=1)
+        index = cmds.optionMenuGrp(gui_key, query=1, select=1)
+        value_current = cmds.getAttr(atr_path)
+        value_current_new = cmds.menuItem(items[index-1], query=1, label=1)
+        if value_current_new != value_current:
+            cmds.setAttr(
+                atr_path, value_current_new, type='string'
+            )
+        cls.gui_check_value(atr_path, data_port_path)
+    @classmethod
+    def dcc_update_attribute_change_callback(cls, atr_path, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        cmds.scriptJob(
+            parent=gui_key,
+            replacePrevious=True,
+            attributeChange=[
+                atr_path,
+                lambda: cls.gui_update_value(atr_path, data_port_path)
+            ]
+        )
+    #
+    @classmethod
+    def gui_update_value_by_data(cls, atr_path, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        gui_values = cls.get_gui_values(atr_path)
+        values, value_default = cls.get_dcc_values(atr_path, data_port_path)
+        if values != gui_values:
+            [cmds.deleteUI(i) for i in cmds.optionMenuGrp(gui_key, query=1, itemListLong=1) or []]
+            for i_index, i_version in enumerate(values):
+                cmds.menuItem(
+                    label=i_version, data=i_index,
+                    parent=gui_key+'|OptionMenu'
+                )
+        cls.gui_update_value(atr_path, data_port_path)
+    @classmethod
+    def dcc_update_data_change_callback(cls, atr_path, data_port_path):
+        _ = atr_path.split('.')
+        node, port_path = _
+
+        gui_key = cls.get_gui_key(atr_path)
+
+        data_atr_path = '{}.{}'.format(node, data_port_path)
+        cmds.scriptJob(
+            parent=gui_key,
+            replacePrevious=True,
+            attributeChange=[
+                data_atr_path,
+                lambda: cls.gui_update_value_by_data(atr_path, data_port_path)
+            ]
+        )
+    #
+    @classmethod
+    def gui_check_value(cls, atr_path, data_port_path):
+        values, value_default = cls.get_dcc_values(atr_path, data_port_path)
+        gui_key = cls.get_gui_key(atr_path)
+        value_current = cmds.getAttr(atr_path)
+        if value_current != 'None':
+            if value_current == value_default:
+                cmds.optionMenu(gui_key+'|OptionMenu', edit=1, backgroundColor=(.125, 0.75, 0.5))
+            else:
+                cmds.optionMenu(gui_key+'|OptionMenu', edit=1, backgroundColor=(.75, 0.75, 0.125))
+        else:
+            cmds.optionMenu(gui_key + '|OptionMenu', edit=1, backgroundColor=(.375, 0.375, 0.375))
+    #
+    @classmethod
+    def gui_new_fnc(cls, atr_path, label, data_port_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.optionMenuGrp(
+            gui_key,
+            label=label
+        )
+        cls.gui_update_edit_callback(atr_path, data_port_path)
+        cls.gui_build_and_update_value(atr_path, data_port_path)
+        cls.dcc_update_attribute_change_callback(atr_path, data_port_path)
+        cls.dcc_update_data_change_callback(atr_path, data_port_path)
+    @classmethod
+    def gui_replace_fnc(cls, atr_path, data_port_path):
+        cls.gui_update_edit_callback(atr_path, data_port_path)
+        cls.gui_build_and_update_value(atr_path, data_port_path)
+        cls.dcc_update_attribute_change_callback(atr_path, data_port_path)
+        cls.dcc_update_data_change_callback(atr_path, data_port_path)
+
+
+class AbsNodeTemplate_(pm.ui.AETemplate):
+    def __init__(self, node_name):
+        super(AbsNodeTemplate_, self).__init__(node_name)
+        self.setup()
+    @contextmanager
+    def scroll_layout(self):
+        # noinspection PyArgumentList
+        self.beginScrollLayout()
+        yield
+        # noinspection PyArgumentList
+        self.endScrollLayout()
+    @contextmanager
+    def layout(self, label, **kwargs):
+        # noinspection PyArgumentList
+        self.beginLayout(label, **kwargs)
+        yield
+        # noinspection PyArgumentList
+        self.endLayout()
+
+    def _add_swatch_control_(self):
+        self.addCustom(
+            'message',
+            lambda atr_path: SwatchControl.gui_new_fnc(atr_path),
+            lambda atr_path: SwatchControl.gui_replace_fnc(atr_path)
+        )
+
+    def _add_text_control_(self, port_path, label, lock=False):
+        self.addCustom(
+            port_path,
+            lambda atr_path: TextControl.gui_new_fnc(atr_path, label, lock),
+            lambda atr_path: TextControl.gui_replace_fnc(atr_path)
+        )
+
+    def _add_data_controls_(self, port_path, build_port_path, build_key):
+        self.addCustom(
+            port_path,
+            lambda atr_path: DataControl.gui_new_fnc(atr_path, build_port_path, build_key),
+            lambda atr_path: DataControl.gui_replace_fnc(atr_path, build_port_path, build_key)
+        )
+
+    def _add_file_control_(self, port_path, label):
+        self.addCustom(
+            port_path,
+            lambda atr_path: FileControl.gui_new_fnc(atr_path, label),
+            lambda atr_path: FileControl.gui_replace_fnc(atr_path)
+        )
+
+    def _add_button_controls_(self, keys, labels, icons, data_port_path):
+        self.addCustom(
+            keys,
+            lambda atr_path: ButtonControls.gui_new_fnc(atr_path, labels, icons, data_port_path),
+            lambda atr_path: ButtonControls.gui_replace_fnc(atr_path, data_port_path)
+        )
+
+    def _add_variant_control_(self, port_path, label, data_port_path):
+        self.addCustom(
+            port_path,
+            lambda atr_path: VariantControl.gui_new_fnc(atr_path, label, data_port_path),
+            lambda atr_path: VariantControl.gui_replace_fnc(atr_path, data_port_path)
+        )
+    @staticmethod
+    def addCustom(attr, newFunc, replaceFunc):
+        if hasattr(newFunc, '__call__'):
+            newFunc = ae_callback(newFunc)
+        if hasattr(replaceFunc, '__call__'):
+            replaceFunc = ae_callback(replaceFunc)
+        args = (newFunc, replaceFunc, attr)
+        cmds.editorTemplate(callCustom=1, *args)
+
+    def setup(self):
+        raise NotImplementedError()

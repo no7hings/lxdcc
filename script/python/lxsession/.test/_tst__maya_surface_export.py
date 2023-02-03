@@ -26,7 +26,7 @@ for i_file_path in [
     '/l/prod/cgm/work/assets/chr/ext_suraj/srf/surfacing/maya/scenes/ext_suraj.srf.surfacing.v001.ma',
     '/l/prod/cgm/work/assets/chr/ext_woodpecker/srf/surfacing/maya/scenes/ext_woodpecker.srf.surfacing.v001.ma'
 ]:
-    j_option_opt = bsc_core.KeywordArgumentsOpt(
+    j_option_opt = bsc_core.ArgDictStringOpt(
         option=dict(
             option_hook_key='rsv-task-batchers/asset/maya/surface-export',
             #

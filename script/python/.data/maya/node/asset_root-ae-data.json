@@ -1,0 +1,81 @@
+{
+    "asset_dcc_data": {
+        "main": [
+            ["rsv_version", "resolver version"],
+            ["file", "file"],
+            ["path", "path"],
+            ["namespace", "namespace"],
+            ["namespace_index", "namespace_index"],
+            ["start_frame", "start frame"],
+            ["end_frame", "end frame"],
+            ["user", "user"],
+            ["update", "update"]
+        ]
+    },
+    "shot_asset_dcc_data" : {
+        "main": [
+            ["rsv_version", "resolver version"],
+            ["file", "file"],
+            ["path", "path"],
+            ["namespace", "namespace"],
+            ["namespace_index", "namespace_index"],
+            ["start_frame", "start frame"],
+            ["end_frame", "end frame"],
+            ["user", "user"],
+            ["update", "update"]
+        ]
+    },
+    "asset_dcc_hash_data": {
+        "geometry": [
+            ["geometry_face_vertices_uuid", "face vertices"],
+            ["geometry_points_uuid", "points"],
+            ["geometry_uv_map_face_vertices_uuid", "uv-map face vertices"]
+        ]
+    },
+    "asset_cache_hash_data": {
+        "geometry": [
+            ["geometry_face_vertices_uuid", "face vertices"],
+            ["geometry_points_uuid", "points"],
+            ["geometry_uv_map_face_vertices_uuid", "uv-map face vertices"]
+        ]
+    },
+    "asset_cache_variant_record_data": {
+        "main": [
+            ["asset_shot", "shot"],
+            ["asset_namespace", "namespace"]
+        ],
+        "asset_version": [
+            ["asset_model_version", "model"],
+            ["asset_groom_version", "groom"],
+            ["asset_effect_version", "effect"],
+            ["asset_rig_version", "rig"],
+            ["asset_surface_version", "surface"],
+            ["asset_light_version", "light"],
+            ["asset_camera_version", "camera"]
+        ],
+        "asset_version_override": [
+            ["asset_model_version_override", "model"],
+            ["asset_groom_version_override", "groom"],
+            ["asset_effect_version_override", "effect"],
+            ["asset_rig_version_override", "rig"],
+            ["asset_surface_version_override", "surface"],
+            ["asset_light_version_override", "light"],
+            ["asset_camera_version_override", "camera"]
+        ],
+        "shot_version": [
+            ["shot_animation_version", "animation"],
+            ["shot_character_effect_version", "character effect"],
+            ["shot_effect_version", "effect"],
+            ["shot_light_version", "light"],
+            ["shot_camera_version", "camera"]
+        ],
+        "shot_version_override": [
+            ["shot_animation_version_override", "animation"],
+            ["shot_character_effect_version_override", "character effect"],
+            ["shot_effect_version_override", "effect"],
+            ["shot_light_version_override", "light"],
+            ["shot_camera_version_override", "camera"]
+
+        ]
+    }
+}

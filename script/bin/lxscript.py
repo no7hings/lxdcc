@@ -62,7 +62,7 @@ def set_script_run(project, engine, script, option):
 
     from lxbasic import bsc_core
 
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     rez_beta = option_opt.get_as_boolean('rez_beta')
     if rez_beta is True:
         bsc_core.EnvironMtd.set(
@@ -180,7 +180,7 @@ def set_script_run(project, engine, script, option):
 def get_katana_render_cmd_args(option):
     from lxbasic import bsc_core
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     cmd_args = [
         r'-c "katana --batch --katana-file=\"{render_file}\" -t {start_index}-{end_index} --render-node=\"{renderer}\""'.format(

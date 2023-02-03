@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import collections
 
 import threading
@@ -22,6 +24,10 @@ from lxobj import obj_core
 import fnmatch
 
 import sys
+
+
+def _get_is_ui_mode_():
+    return Configuration.get('KATANA_UI_MODE') == '1'
 
 
 # katana scene graph operator
@@ -59,7 +65,7 @@ class KtnSGStageOpt(object):
     OBJ_OPT_CLS = KtnSGObjOpt
     def __init__(self, ktn_obj=None):
         if ktn_obj is not None:
-            if isinstance(ktn_obj, (str, unicode)):
+            if isinstance(ktn_obj, six.string_types):
                 self._ktn_obj = NodegraphAPI.GetNode(ktn_obj)
             else:
                 self._ktn_obj = ktn_obj
@@ -259,21 +265,17 @@ class KtnSGSelectionOpt(object):
         ScenegraphManager.getActiveScenegraph().addSelectedLocations([], replace=True)
 
 
-def get_node_graph_tag():
-    return App.Tabs.FindTopTab('Node Graph')
-
-
 class GuiNodeGraphBase(object):
     @classmethod
     def get_node_position(cls, ktn_obj):
-        if isinstance(ktn_obj, (str, unicode)):
+        if isinstance(ktn_obj, six.string_types):
             return NodegraphAPI.GetNodePosition(
                 NodegraphAPI.GetNode(ktn_obj)
             )
         return NodegraphAPI.GetNodePosition(ktn_obj)
     @classmethod
     def set_node_position(cls, ktn_obj, position):
-        if isinstance(ktn_obj, (str, unicode)):
+        if isinstance(ktn_obj, six.string_types):
             return NodegraphAPI.SetNodePosition(
                 NodegraphAPI.GetNode(ktn_obj), position
             )
@@ -591,7 +593,7 @@ class NGObjOpt(object):
             return NodegraphAPI.GetNode(string_arg)
 
     def __init__(self, ktn_obj):
-        if isinstance(ktn_obj, (str, unicode)):
+        if isinstance(ktn_obj, six.string_types):
             if ktn_obj.startswith(self.PATHSEP):
                 self._ktn_obj = NodegraphAPI.GetNode(
                     bsc_core.DccPathDagOpt(ktn_obj).get_name()
@@ -1629,10 +1631,6 @@ class CallbackMethod(object):
             callback_opt.set_add()
 
 
-def _get_is_ui_mode_():
-    return Configuration.get('KATANA_UI_MODE') == '1'
-
-
 class NGNmeOpt(object):
     STATE_DICT = {}
     def __init__(self, ktn_obj):
@@ -1797,7 +1795,7 @@ class NGObjCustomizePortOpt(object):
         # )
         ps = self._ktn_obj.getParameters()
         for k, v in raw.items():
-            if isinstance(k, (str, unicode)):
+            if isinstance(k, six.string_types):
                 i_port_path = k
                 scheme = None
             elif isinstance(k, (tuple, )):
@@ -1814,7 +1812,7 @@ class NGObjCustomizePortOpt(object):
                 if i_g is None:
                     i_g = c_g.createChildGroup(i_p_n)
                 #
-                i_g_l = bsc_core.StrUnderlineOpt(i_p_n).to_prettify(capitalize=False)
+                i_g_l = bsc_core.RawStringUnderlineOpt(i_p_n).to_prettify(capitalize=False)
                 i_g.setHintString(
                     str(
                         str({'label': i_g_l})
@@ -1834,13 +1832,13 @@ class NGObjCustomizePortOpt(object):
         pass
     @classmethod
     def _set_type_port_add_(cls, ktn_group_port, name, scheme, value, default):
-        label = bsc_core.StrUnderlineOpt(name).to_prettify(capitalize=False)
+        label = bsc_core.RawStringUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = ktn_group_port.getChild(name)
         if ktn_port is None:
             if isinstance(default, (bool, )):
                 ktn_port = ktn_group_port.createChildNumber(name, value)
                 ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
-            elif isinstance(default, (str, unicode)):
+            elif isinstance(default, six.string_types):
                 ktn_port = ktn_group_port.createChildString(name, value)
                 if scheme in ['path']:
                     ktn_port.setHintString(
@@ -1872,7 +1870,7 @@ class NGObjCustomizePortOpt(object):
                     )
                 else:
                     c = len(default)
-                    if isinstance(default[0], (str, unicode)):
+                    if isinstance(default[0], six.string_types):
                         ktn_port = ktn_group_port.createChildStringArray(name, c)
                     elif isinstance(default[0], (int, float)):
                         ktn_port = ktn_group_port.createChildNumberArray(name, c)
@@ -1923,7 +1921,7 @@ class NGMacro(object):
             if i_ktn_group_port is None:
                 i_ktn_group_port = current_group_port.createChildGroup(i_group_name)
             #
-            i_group_label = bsc_core.StrUnderlineOpt(i_group_name).to_prettify(capitalize=False)
+            i_group_label = bsc_core.RawStringUnderlineOpt(i_group_name).to_prettify(capitalize=False)
             i_ktn_group_port.setHintString(
                 str(
                     str({'label': i_group_label})
@@ -1943,13 +1941,13 @@ class NGMacro(object):
         )
     @classmethod
     def _set_type_parameter_create_(cls, ktn_group_port, name, widget, value, expression, tool_tip):
-        label = bsc_core.StrUnderlineOpt(name).to_prettify(capitalize=False)
+        label = bsc_core.RawStringUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = ktn_group_port.getChild(name)
         if ktn_port is None:
             if isinstance(value, (bool,)):
                 ktn_port = ktn_group_port.createChildNumber(name, value)
                 ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
-            elif isinstance(value, (str, unicode)):
+            elif isinstance(value, six.string_types):
                 ktn_port = ktn_group_port.createChildString(name, value)
                 if expression:
                     ktn_port.setExpression(expression)
@@ -2003,7 +2001,7 @@ class NGMacro(object):
                         i_ktn_port.setValue(value[i], 0)
                 else:
                     c = len(value)
-                    if isinstance(value[0], (str, unicode)):
+                    if isinstance(value[0], six.string_types):
                         ktn_port = ktn_group_port.createChildStringArray(name, c)
                     elif isinstance(value[0], (int, float)):
                         ktn_port = ktn_group_port.createChildNumberArray(name, c)
@@ -2144,7 +2142,7 @@ class WorkspaceSettings(object):
         ktn_port = self._ktn_obj.getParameter(key)
         if ktn_port is None:
             port_raw = {}
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, six.string_types):
                 port_raw['widget'] = 'string'
                 port_raw['value'] = value
             NGMacro(self._ktn_obj).set_parameter_create(

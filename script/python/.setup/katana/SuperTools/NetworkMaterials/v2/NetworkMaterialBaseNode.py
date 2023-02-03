@@ -584,7 +584,7 @@ def SanitizeSceneGraphLocationString(sceneGraphLocation):
     @param sceneGraphLocation: Potentially invalid scene graph location.
     @return: Sanitized string representing a scene graph location.
     """
-    if not sceneGraphLocation or not isinstance(sceneGraphLocation, (str, unicode)):
+    if not sceneGraphLocation or not isinstance(sceneGraphLocation, six.string_types):
         return ''
     result = sceneGraphLocationRegex.sub('_', sceneGraphLocation)
     if not re.search('^/', result):

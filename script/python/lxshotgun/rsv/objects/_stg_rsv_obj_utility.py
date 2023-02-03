@@ -155,7 +155,7 @@ class RsvStgTaskOpt(object):
             stg_version_opt.set_stg_user(stg_user)
         #
         if movie_file:
-            movie_file_opt = bsc_core.StorageFileOpt(movie_file)
+            movie_file_opt = bsc_core.StgFileOpt(movie_file)
             if movie_file_opt.get_is_exists() is True:
                 stg_version_opt.set_movie_upload(movie_file)
             else:
@@ -166,7 +166,7 @@ class RsvStgTaskOpt(object):
         else:
             if not stg_version_opt.get_movie():
                 f = '/l/resource/td/media_place_holder/no_prevew.mov'
-                f_opt = bsc_core.StorageFileOpt(
+                f_opt = bsc_core.StgFileOpt(
                     f
                 )
                 f_opt.set_map_to_platform()

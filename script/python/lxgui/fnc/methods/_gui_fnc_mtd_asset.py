@@ -44,7 +44,7 @@ class AssetBatcher(object):
         self._option = option
         #
         self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.SystemMtd.get_time_tag()
+        self._time_tag = bsc_core.TimeBaseMtd.get_time_tag()
         #
         self._td_enable = True
         #
@@ -76,7 +76,7 @@ class AssetBatcher(object):
             user = bsc_core.SystemMtd.get_user_name()
         #
         if time_tag is None:
-            time_tag = bsc_core.SystemMtd.get_time_tag()
+            time_tag = bsc_core.TimeBaseMtd.get_time_tag()
         #
         i_rsv_task = i_rsv_asset_tgt.get_rsv_task(step='srf', task='surfacing')
         if i_rsv_task:
@@ -98,7 +98,7 @@ class AssetBatcher(object):
                 i_look_klf_file_path = i_look_klf_file_unit.get_result(version=version)
                 i_look_klf_file = utl_dcc_objects.OsFile(i_look_klf_file_path)
                 if i_look_klf_file.get_is_exists() is True:
-                    element_names = bsc_core.ZipFileOpt(i_look_klf_file_path).get_element_names()
+                    element_names = bsc_core.StgZipFileOpt(i_look_klf_file_path).get_element_names()
                     look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
                     for j_look_pass_name in look_pass_names:
                         if j_look_pass_name != 'default':
@@ -377,7 +377,7 @@ class AbsLibMethodShotgunDef(object):
                 i_stg_asset_query_tgt = stg_connector.get_stg_entity_query(
                     project=project, asset=asset
                 )
-                i_thumbnail_file_path = bsc_core.VedioOpt(i_move_file_path).get_thumbnail(block=True)
+                i_thumbnail_file_path = bsc_core.VdoFileOpt(i_move_file_path).get_thumbnail(block=True)
                 if i_thumbnail_file_path:
                     i_stg_asset_query_tgt.set_upload(
                         'image', i_thumbnail_file_path
@@ -430,7 +430,7 @@ class LibAssetPusher(AbsLibMethod):
         self._project_tgt = 'lib'
         #
         self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.SystemMtd.get_time_tag()
+        self._time_tag = bsc_core.TimeBaseMtd.get_time_tag()
         #
         self._option = option
         #
@@ -459,7 +459,7 @@ class LibAssetPusher(AbsLibMethod):
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
             user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
-            time_tag = self._option.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+            time_tag = self._option.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = self._get_lib_asset_(
@@ -509,7 +509,7 @@ class LibAssetPuller(AbsLibMethod):
         self._project_tgt = project
         #
         self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.SystemMtd.get_time_tag()
+        self._time_tag = bsc_core.TimeBaseMtd.get_time_tag()
         #
         self._option = option
         #
@@ -534,7 +534,7 @@ class LibAssetPuller(AbsLibMethod):
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
             user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
-            time_tag = self._option.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+            time_tag = self._option.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = i_asset_src

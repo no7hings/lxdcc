@@ -97,7 +97,7 @@ class AbsObjScene(
         self._shader_name_dict = {}
         self._index_dict = {}
         #
-        self._platform = utl_core.Platform.get_current()
+        self._platform = bsc_core.PlatformMtd.get_current()
     @property
     def ar_universe(self):
         return self._and_universe

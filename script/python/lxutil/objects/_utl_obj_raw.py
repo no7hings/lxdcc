@@ -207,7 +207,7 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
     def set_repair(self):
         lis = []
         project_directory_path = self.get_project_directory_path()
-        project_directory_path = bsc_core.StoragePathOpt(
+        project_directory_path = bsc_core.StgPathOpt(
             project_directory_path
         ).get_path()
         _ = self.get_file_paths()
@@ -258,7 +258,7 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
             i_port_name = i['port_name']
             if i_port_name == 'xgDataPath':
                 i_raw = i['port_raw']
-                i_raw = bsc_core.StoragePathOpt(
+                i_raw = bsc_core.StgPathOpt(
                     i_raw
                 ).get_path()
                 #
@@ -313,7 +313,7 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
             i_port_name = i['port_name']
             if i_port_name == 'xgProjectPath':
                 i_raw = i['port_raw']
-                i_raw = bsc_core.StoragePathOpt(
+                i_raw = bsc_core.StgPathOpt(
                     i_raw
                 ).get_path()
                 #
@@ -730,7 +730,7 @@ class DotUsdaFile(object):
         #
         kwargs.update(option)
         raw = j2_template.render(**kwargs)
-        bsc_core.StorageFileOpt(file_path).set_write(
+        bsc_core.StgFileOpt(file_path).set_write(
             raw
         )
         utl_core.Log.set_module_result_trace(

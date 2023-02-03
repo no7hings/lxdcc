@@ -12,7 +12,7 @@ key_ = 'vdxicg2'
 
 
 def get_files(d, key):
-    p = bsc_core.ParsePatternOpt(
+    p = bsc_core.PtnParseOpt(
         '{}/{}'.format(d, p_)
     )
     p.set_update(**dict(key=key))

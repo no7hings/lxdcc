@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 import collections
 #
@@ -32,7 +33,7 @@ class UsdStageOpt(UsdBasic):
         else:
             if isinstance(args[0], Usd.Stage):
                 stage = args[0]
-            elif isinstance(args[0], (str, unicode)):
+            elif isinstance(args[0], six.string_types):
                 file_path = args[0]
                 if os.path.isfile(file_path) is True:
                     utl_core.Log.set_module_result_trace(
@@ -311,7 +312,7 @@ class UsdStageOpt(UsdBasic):
         if self.get_obj_is_exists(location) is True:
             b_box = self.get_bounding_box(location)
             r = b_box.GetRange()
-            return bsc_core.BBoxMtd.get_geometry_args(
+            return bsc_core.RawBBoxMtd.get_geometry_args(
                 r.GetMin(), r.GetMax(), use_int_size
             )
 
@@ -334,7 +335,7 @@ class UsdStageOpt(UsdBasic):
                     usd_configure.ObjType.Mesh
                 ]:
                     i_range = i_b_box.GetRange()
-                    i_radius = bsc_core.BBoxMtd.get_radius(
+                    i_radius = bsc_core.RawBBoxMtd.get_radius(
                         i_range.GetMin(), i_range.GetMax(), pivot
                     )
                     dict_.setdefault(
@@ -372,7 +373,7 @@ class UsdFileWriteOpt(object):
         self._usd_stage.DefinePrim(path, usd_configure.ObjType.Xform)
 
     def set_save(self):
-        file_opt = bsc_core.StorageFileOpt(self._file_path)
+        file_opt = bsc_core.StgFileOpt(self._file_path)
         file_opt.set_directory_create()
         self._usd_stage.Export(self._file_path)
         utl_core.Log.set_module_result_trace(
@@ -489,7 +490,7 @@ class UsdPrimOpt(object):
             dcc_type_name = obj_configure.Type.CONSTANT_INTEGER
         elif isinstance(value, float):
             dcc_type_name = obj_configure.Type.CONSTANT_FLOAT
-        elif isinstance(value, (str, unicode)):
+        elif isinstance(value, six.string_types):
             dcc_type_name = obj_configure.Type.CONSTANT_STRING
         else:
             raise TypeError()
@@ -939,7 +940,7 @@ class UsdMeshOpt(object):
             vertex_counts, vertex_indices
         )
         max_shell_index = max(face_to_shell_dict.values())
-        choice_colors = bsc_core.ColorMtd.get_choice_colors(
+        choice_colors = bsc_core.RawColorMtd.get_choice_colors(
             count=max_shell_index+1, maximum=1.0, offset=offset, seed=seed
         )
         colors = []

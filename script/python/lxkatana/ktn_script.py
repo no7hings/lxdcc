@@ -14,7 +14,7 @@ def set_scene_new():
 
     file_path = args
 
-    bsc_core.StorageFileOpt(file_path).set_directory_create()
+    bsc_core.StgFileOpt(file_path).set_directory_create()
     KatanaFile.New()
     KatanaFile.Save(file_path)
 

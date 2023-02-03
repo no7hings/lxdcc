@@ -291,10 +291,10 @@ class AbsDccObjSourceDef(object):
         connection_raw = self._get_source_connection_raw_(*args, **kwargs)
         pathsep = self.CONNECTION_CLASS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
-            source_obj_path, source_port_path = obj_core.AtrPathMtd.set_atr_path_split(
+            source_obj_path, source_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
             )
-            target_obj_path, target_port_path = obj_core.AtrPathMtd.set_atr_path_split(
+            target_obj_path, target_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
                 target_atr_path, pathsep=pathsep
             )
             source = source_obj_cls(source_obj_path).get_port(source_port_path)
@@ -386,10 +386,10 @@ class AbsDccObjTargetDef(object):
         connection_raw = self._get_target_connection_raw_(*args, **kwargs)
         pathsep = self.CONNECTION_CLASS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
-            source_obj_path, source_port_path = obj_core.AtrPathMtd.set_atr_path_split(
+            source_obj_path, source_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
             )
-            target_obj_path, target_port_path = obj_core.AtrPathMtd.set_atr_path_split(
+            target_obj_path, target_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
                 target_atr_path, pathsep=pathsep
             )
             source = self.__class__(source_obj_path).get_port(source_port_path)

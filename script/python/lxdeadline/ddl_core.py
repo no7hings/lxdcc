@@ -274,7 +274,7 @@ class DdlCacheMtd(object):
     @classmethod
     def get_ddl_method_path(cls, method_option):
         return cls.METHOD_PATH_PATTERN.format(
-            **bsc_core.KeywordArgumentsOpt(method_option).value
+            **bsc_core.ArgDictStringOpt(method_option).value
         )
 
 

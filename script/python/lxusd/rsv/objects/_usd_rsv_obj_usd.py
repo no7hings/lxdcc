@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import collections
 
 from lxbasic import bsc_core
@@ -88,8 +90,8 @@ class RsvUsdAssetSetCreator(object):
     def _get_shot_asset_cache_(cls, rsv_asset, rsv_shot):
         file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         if file_path:
-            yml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(file_path, 'shot-asset/{}'.format(rsv_asset.name))
-            file_opt = bsc_core.StorageFileOpt(yml_file_path)
+            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'shot-asset/{}'.format(rsv_asset.name))
+            file_opt = bsc_core.StgFileOpt(yml_file_path)
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
             else:
@@ -118,7 +120,7 @@ class RsvUsdAssetSetCreator(object):
                 )
             )
             if paths:
-                paths = bsc_core.TextsOpt(paths).set_sort_to()
+                paths = bsc_core.RawTextsOpt(paths).set_sort_to()
             #
             for i_location in paths:
                 i_shot_asset = i_location.split('/')[-1]
@@ -249,7 +251,7 @@ class RsvUsdAssetSetCreator(object):
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
         else:
             usd_file_path = '{}{}.usda'.format(
-                bsc_core.SystemMtd.get_temporary_directory_path(),
+                bsc_core.StgUserMtd.get_user_temporary_directory(),
                 rsv_asset.path
             )
         return usd_file_path
@@ -293,7 +295,7 @@ class RsvUsdAssetSetCreator(object):
                 )
         else:
             usd_file_path = '{}{}.usda'.format(
-                bsc_core.SystemMtd.get_temporary_directory_path(),
+                bsc_core.StgUserMtd.get_user_temporary_directory(),
                 rsv_asset.path
             )
         return usd_file_path
@@ -305,8 +307,8 @@ class RsvUsdAssetSetCreator(object):
     def _get_asset_usd_set_dress_variant_cache_(cls, rsv_asset):
         file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
         if file_path:
-            yml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(file_path, 'asset-versions/{}'.format(rsv_asset.name))
-            file_opt = bsc_core.StorageFileOpt(yml_file_path)
+            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'asset-versions/{}'.format(rsv_asset.name))
+            file_opt = bsc_core.StgFileOpt(yml_file_path)
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
             else:
@@ -530,7 +532,7 @@ class RsvUsdAssetSetCreator(object):
             c.value
         )
 
-        bsc_core.StorageFileOpt(
+        bsc_core.StgFileOpt(
             asset_set_usd_file_path
         ).set_write(
             new_raw
@@ -582,7 +584,7 @@ class RsvUsdAssetSetCreator(object):
                 c.value
             )
 
-            bsc_core.StorageFileOpt(
+            bsc_core.StgFileOpt(
                 asset_shot_set_usd_file_path
             ).set_write(
                 raw
@@ -611,7 +613,7 @@ class RsvUsdShotSetCreator(object):
             '/assets/efx/effects/*'
         )
         if paths:
-            paths = bsc_core.TextsOpt(paths).set_sort_to()
+            paths = bsc_core.RawTextsOpt(paths).set_sort_to()
         return paths
 
 
@@ -923,7 +925,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             usda_dict = c.get('usdas')
             #
             for k, v in usda_dict.items():
-                if isinstance(v, (str, unicode)):
+                if isinstance(v, six.string_types):
                     i_file_base = v
                     i_replace = False
                 elif isinstance(v, dict):

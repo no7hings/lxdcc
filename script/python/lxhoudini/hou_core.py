@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 import hou
 
@@ -21,12 +22,12 @@ class HoudiniBasic(object):
 
         lis = []
 
-        if isinstance(path, (str, unicode)):
+        if isinstance(path, six.string_types):
             node = hou.node(path)
         else:
             node = path
 
-        if isinstance(include, (str, unicode)):
+        if isinstance(include, six.string_types):
             include_arg = [include]
         elif isinstance(include, (tuple, list)):
             include_arg = list(include)
@@ -55,11 +56,11 @@ class HoudiniBasic(object):
         lis = []
         paths = []
 
-        if isinstance(path, (str, unicode)):
+        if isinstance(path, six.string_types):
             node = hou.node(path)
         else:
             node = path
-        if isinstance(include, (str, unicode)):
+        if isinstance(include, six.string_types):
             include_arg = [include]
 
         elif isinstance(include, (tuple, list)):
@@ -85,12 +86,12 @@ class HoudiniBasic(object):
 
         lis = []
 
-        if isinstance(path, (str, unicode)):
+        if isinstance(path, six.string_types):
             node = hou.node(path)
         else:
             node = path
 
-        if isinstance(include, (str, unicode)):
+        if isinstance(include, six.string_types):
             include_arg = [include]
         elif isinstance(include, (tuple, list)):
             include_arg = list(include)
@@ -100,7 +101,7 @@ class HoudiniBasic(object):
         return lis
     @classmethod
     def get_geo_is_visible(cls, path):
-        if isinstance(path, (str, unicode)):
+        if isinstance(path, six.string_types):
             node = hou.node(path)
         else:
             node = path
@@ -185,7 +186,7 @@ class HouGeos(object):
     def __init__(self, *args):
         self._geo_hou_objs = []
         for i in args:
-            if isinstance(i, (str, unicode)):
+            if isinstance(i, six.string_types):
                 geo = hou.node(i)
             else:
                 geo = i
@@ -261,7 +262,7 @@ class HouInstances(object):
     def __init__(self, *args):
         self._instance_hou_objs = []
         for i in args:
-            if isinstance(i, (str, unicode)):
+            if isinstance(i, six.string_types):
                 geo = hou.node(i)
             else:
                 geo = i
@@ -287,7 +288,7 @@ class HoudiniShops(object):
     def __init__(self, *args):
         self._hou_shops = []
         for i in args:
-            if isinstance(i, (str, unicode)):
+            if isinstance(i, six.string_types):
                 shop = hou.node(i)
             else:
                 shop = i
@@ -306,7 +307,7 @@ class HoudiniVops(object):
     def __init__(self, *args):
         self._hou_vops = []
         for i in args:
-            if isinstance(i, (str, unicode)):
+            if isinstance(i, six.string_types):
                 vop = hou.node(i)
             else:
                 vop = i

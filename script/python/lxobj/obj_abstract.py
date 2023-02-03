@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-import glob
+import six
 
 import platform
 
@@ -1174,9 +1174,9 @@ class AbsObjGuiDef(object):
         #
         _ = p.split(pathsep)
         if len(_) > 6:
-            if bsc_core.StoragePathMtd.get_path_is_windows(p):
+            if bsc_core.StorageBaseMtd.get_path_is_windows(p):
                 return u'{0}{2}...{2}{1}'.format(pathsep.join(_[:3]), pathsep.join(_[-3:]), pathsep)
-            elif bsc_core.StoragePathMtd.get_path_is_linux(p):
+            elif bsc_core.StorageBaseMtd.get_path_is_linux(p):
                 return u'{0}{2}...{2}{1}'.format(pathsep.join(_[:2]), pathsep.join(_[-3:]), pathsep)
             else:
                 return p
@@ -1272,7 +1272,7 @@ class AbsObjOsDef(object):
         return new_path
 
     def _set_obj_os_def_init_(self):
-        self._root = bsc_core.StoragePathMtd.get_root(
+        self._root = bsc_core.StorageBaseMtd.get_root(
             self.path
         )
     @property
@@ -1342,13 +1342,13 @@ class AbsObjOsDef(object):
         return os.path.normpath(self.path) == os.path.normpath(file_path)
 
     def get_permission(self):
-        return bsc_core.StoragePathMtd.get_permission(self.path)
+        return bsc_core.StorageBaseMtd.get_permission(self.path)
 
     def get_is_writeable(self):
-        return bsc_core.StoragePathMtd.get_is_writeable(self.path)
+        return bsc_core.StorageBaseMtd.get_is_writeable(self.path)
 
     def get_is_readable(self):
-        return bsc_core.StoragePathMtd.get_is_readable(self.path)
+        return bsc_core.StorageBaseMtd.get_is_readable(self.path)
 
     def set_link_to(self, *args, **kwargs):
         pass
@@ -1360,7 +1360,7 @@ class AbsPortDef(object):
     PATHSEP = None
     def _set_port_def_init_(self, obj, type_path, port_path, port_assign):
         self._obj = obj
-        if isinstance(type_path, (str, unicode)):
+        if isinstance(type_path, six.string_types):
             _type = self.obj.universe._get_type_(type_path)
         else:
             _type = type_path
@@ -2032,7 +2032,7 @@ class AbsObjTypeObjDef(object):
 
     def set_obj_create(self, obj_path_args, **kwargs):
         # etc: /a/b/c
-        if isinstance(obj_path_args, (str, unicode)):
+        if isinstance(obj_path_args, six.string_types):
             obj_path = obj_path_args
         # etc: [a, b, c, ...]
         elif isinstance(obj_path_args, (tuple, list)):
@@ -2541,7 +2541,7 @@ class AbsObjType(
         self._set_obj_type_port_query_def_init_()
 
     def _set_obj_create_(self, obj_path_args, **kwargs):
-        if isinstance(obj_path_args, (str, unicode)):
+        if isinstance(obj_path_args, six.string_types):
             obj_path = obj_path_args
         elif isinstance(obj_path_args, (tuple, list)):
             obj_path = self._get_obj_path_(obj_path_args)
@@ -3174,13 +3174,13 @@ class AbsObjUniverseDef(object):
     #
     def _set_connection_create_(self, source_obj_args, source_port_args, target_obj_args, target_port_args):
         def get_obj_path_fnc_(obj_args_):
-            if isinstance(obj_args_, (str, unicode)):
+            if isinstance(obj_args_, six.string_types):
                 return obj_args_
             elif isinstance(obj_args_, (tuple, list)):
                 return self.OBJ_CONNECTION_CLASS.OBJ_PATHSEP.join(obj_args_)
         #
         def get_port_path_fnc_(port_args_):
-            if isinstance(port_args_, (str, unicode)):
+            if isinstance(port_args_, six.string_types):
                 return port_args_
             elif isinstance(port_args_, (tuple, list)):
                 return self.OBJ_CONNECTION_CLASS.PORT_PATHSEP.join(port_args_)
@@ -3296,7 +3296,7 @@ class AbsOsDirectory(
         return self.__class__(path)
 
     def _get_child_paths_(self, path, includes=None):
-        return bsc_core.DirectoryMtd.get_directory_paths__(
+        return bsc_core.StgDirectoryMtd.get_directory_paths__(
             path
         )
 
@@ -3333,7 +3333,7 @@ class AbsOsDirectory(
         raise NotImplementedError()
 
     def get_child_file_paths(self):
-        return bsc_core.DirectoryMtd.get_file_paths__(
+        return bsc_core.StgDirectoryMtd.get_file_paths__(
             self.path
         )
 
@@ -3344,7 +3344,7 @@ class AbsOsDirectory(
             )
 
     def get_file_paths(self, include_exts=None):
-        return bsc_core.DirectoryMtd.get_file_paths__(
+        return bsc_core.StgDirectoryMtd.get_file_paths__(
             self.path, include_exts
         )
 
@@ -3352,7 +3352,7 @@ class AbsOsDirectory(
         return [self.OS_FILE_CLASS(i) for i in self.get_file_paths(include_exts)]
 
     def get_all_file_paths(self, include_exts=None):
-        return bsc_core.DirectoryMtd.get_all_file_paths__(
+        return bsc_core.StgDirectoryMtd.get_all_file_paths__(
             self.path, include_exts
         )
 
@@ -3391,7 +3391,7 @@ class AbsOsDirectory(
 
     def set_open(self):
         if os.path.exists(self.path):
-            bsc_core.SystemMtd.set_directory_open(self.path)
+            bsc_core.StgExtraMtd.set_directory_open(self.path)
 
     def __str__(self):
         return u'{}(path="{}")'.format(
@@ -3507,7 +3507,7 @@ class AbsOsFile(
 
     def set_copy_to(self, target_dir_path, ignore_structure=True):
         if self.get_is_exists() is True:
-            if isinstance(target_dir_path, (str, unicode)):
+            if isinstance(target_dir_path, six.string_types):
                 target_dir_path = [target_dir_path]
             #
             for i_directory_path_tgt in target_dir_path:
@@ -3528,7 +3528,7 @@ class AbsOsFile(
             self.LOG.set_warning_trace('file copy: source "{}" is Non-exist.'.format(self.path))
 
     def get_target_file_path(self, tgt_directory_path, fix_name_blank=False, ignore_structure=True, ext_override=None):
-        tgt_directory_path = bsc_core.StoragePathOpt(tgt_directory_path).__str__()
+        tgt_directory_path = bsc_core.StgPathOpt(tgt_directory_path).__str__()
         if ignore_structure is True:
             name = self.name
             if fix_name_blank is True:
@@ -3567,8 +3567,8 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             file_tgt = self.__class__(file_path_tgt)
             if replace is True:
-                if bsc_core.StoragePathMtd.get_is_exists(file_path_tgt) is True:
-                    if bsc_core.StoragePathMtd.get_is_writeable(file_path_tgt) is True:
+                if bsc_core.StorageBaseMtd.get_is_exists(file_path_tgt) is True:
+                    if bsc_core.StorageBaseMtd.get_is_writeable(file_path_tgt) is True:
                         os.remove(file_tgt.path)
                         shutil.copy2(self.path, file_tgt.path)
                         return True, self.LOG.set_module_result_trace(
@@ -3616,7 +3616,7 @@ class AbsOsFile(
         if self.ext == ext:
             base, ext = os.path.splitext(self.path)
             glob_pattern = u'{}.*'.format(base)
-            _ = bsc_core.DirectoryMtd.get_file_paths_by_glob_pattern__(
+            _ = bsc_core.StgDirectoryMtd.get_file_paths_by_glob_pattern__(
                 glob_pattern
             )
             lis = []
@@ -3738,7 +3738,7 @@ class AbsValue(object):
 
     def get_as_obj(self):
         obj_string = self.get()
-        if isinstance(obj_string, (str, unicode)):
+        if isinstance(obj_string, six.string_types):
             return self.universe.get_obj(obj_string)
 
     def _format_dict_(self):

@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 import lxresolver.commands as rsv_commands
@@ -28,8 +30,8 @@ resolver = rsv_commands.get_resolver()
 
 rsv_project = resolver.get_rsv_project(project='cgm')
 
-user = utl_core.System.get_user_name()
-time_tag = utl_core.System.get_time_tag()
+user = bsc_core.SystemMtd.get_user_name()
+time_tag = bsc_core.SystemMtd.get_time_tag()
 
 keyword = 'asset-geometry-usd-var-file'
 

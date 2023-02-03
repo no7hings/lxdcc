@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
@@ -42,7 +43,7 @@ def set_ramps_convert():
                 if v is not None:
                     cmds.setAttr('{}.enable{}'.format(ar_rgba, i + 1), True)
                     a = '{}.input{}'.format(ar_rgba, i + 1)
-                    if isinstance(v, (str, unicode)):
+                    if isinstance(v, six.string_types):
                         if cmds.connectionInfo(a, isExactDestination=1) is False:
                             cmds.connectAttr(v, a)
                     elif isinstance(v, (tuple, list)):

@@ -1,6 +1,8 @@
 # coding:utf-8
 from __future__ import print_function
 
+import six
+
 import sys
 
 import platform
@@ -50,30 +52,6 @@ QT_LOG_ERROR_TRACE_METHOD = None
 LOG_WRITE_METHOD = None
 #
 QT_PROGRESS_CREATE_METHOD = None
-
-
-class _Pattern(object):
-    def __init__(self, pattern):
-        self._pattern = pattern
-        self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
-    @classmethod
-    def _get_fnmatch_pattern_(cls, variant):
-        if variant is not None:
-            re_pattern = re.compile(r'[{](.*?)[}]', re.S)
-            #
-            keys = re.findall(re_pattern, variant)
-            s = variant
-            if keys:
-                for key in keys:
-                    s = s.replace('{{{}}}'.format(key), '*')
-            return s
-        return variant
-    @property
-    def format(self):
-        return self._pattern
-    @property
-    def pattern(self):
-        return self._fnmatch_pattern
 
 
 class Log(object):
@@ -172,21 +150,6 @@ class Log(object):
     @classmethod
     def set_progress_stop(cls, *args):
         pass
-    @classmethod
-    def get_trace(cls, *args):
-        text = args[0]
-        ts = text.split('\n')
-        pattern_0 = _Pattern(
-            (
-                '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
-                ' [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
-                ' {status} | {content}'
-            )
-        )
-        lines = fnmatch.filter(
-            ts, pattern_0.pattern
-        )
-        return '\n'.join(lines)
 
 
 class ModuleResultLog(object):
@@ -267,8 +230,8 @@ class LogProgressRunner(object):
         self._label = label
         self._use_as_progress_bar = use_as_progress_bar
         #
-        self._start_timestamp = bsc_core.SystemMtd.get_timestamp()
-        self._pre_timestamp = bsc_core.SystemMtd.get_timestamp()
+        self._start_timestamp = bsc_core.TimeBaseMtd.get_timestamp()
+        self._pre_timestamp = bsc_core.TimeBaseMtd.get_timestamp()
         #
         self._p = 0
         #
@@ -279,7 +242,7 @@ class LogProgressRunner(object):
 
     def set_update(self, sub_label=None):
         self._value += 1
-        cur_timestamp = bsc_core.SystemMtd.get_timestamp()
+        cur_timestamp = bsc_core.TimeBaseMtd.get_timestamp()
         cost_timestamp = cur_timestamp - self._pre_timestamp
         self._pre_timestamp = cur_timestamp
         #
@@ -294,7 +257,7 @@ class LogProgressRunner(object):
                     u'is running {} {}%, cost time {}'.format(
                         self._get_progress_bar_string_(percent),
                         p,
-                        bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+                        bsc_core.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
 
                     )
                 )
@@ -303,7 +266,7 @@ class LogProgressRunner(object):
                     u'{}'.format(self._label),
                     u'is running {}%, cost time {}'.format(
                         p,
-                        bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+                        bsc_core.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
                     )
                 )
     @classmethod
@@ -319,11 +282,11 @@ class LogProgressRunner(object):
         self._value = 0
         self._maximum = 0
         #
-        cost_timestamp = bsc_core.SystemMtd.get_timestamp() - self._start_timestamp
+        cost_timestamp = bsc_core.TimeBaseMtd.get_timestamp() - self._start_timestamp
         Log.set_module_result_trace(
             self._label,
             'is completed, cost time {}'.format(
-                bsc_core.IntegerMtd.second_to_time_prettify(cost_timestamp),
+                bsc_core.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
             )
         )
 
@@ -605,7 +568,7 @@ class CommandMonitor(object):
         w.set_window_title(label)
         #
         status_button = w.get_status_button()
-        c_t = bsc_core.CommandThread(command)
+        c_t = bsc_core.PrcCmdThread_(command)
         status_button.set_statuses([c_t.get_status()])
         status_button.set_initialization(1)
         c_t.status_changed.set_connect_to(lambda x: w.set_status_at(0, x))
@@ -637,7 +600,7 @@ class Icon(object):
         glob_pattern = '{}/{}.*'.format(cls.ROOT_PATH, icon_name)
         results = glob.glob(glob_pattern) or []
         if results:
-            return bsc_core.StoragePathOpt(results[-1]).get_path()
+            return bsc_core.StgPathOpt(results[-1]).get_path()
     @classmethod
     def get_katana_obj(cls):
         return cls.get('application/katana', ext='.png')
@@ -689,19 +652,8 @@ class FileIcon(object):
     def get_houdini(cls):
         return Icon.get('file/houdini')
     @classmethod
-    def get_maya(cls):
-        return Icon.get('file/ma')
-    @classmethod
     def get_by_file_ext(cls, ext):
         return Icon.get('file/{}'.format(ext[1:]))
-
-
-class MayaIcon(object):
-    pass
-
-
-class HoudiniIcon(object):
-    pass
 
 
 class Scheme(object):
@@ -750,37 +702,15 @@ class OrderedYamlMtd(object):
 
 
 class System(object):
-    TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
-    TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S'
     @classmethod
     def get_user_name(cls):
-        return getpass.getuser()
-    @classmethod
-    def get_platform(cls):
-        if cls.get_is_windows():
-            return 'windows'
-        elif cls.get_is_linux():
-            return 'linux'
-        raise TypeError()
-    @staticmethod
-    def get_is_linux():
-        return platform.system() == 'Linux'
-    @staticmethod
-    def get_is_windows():
-        return platform.system() == 'Windows'
+        return bsc_core.SystemMtd.get_user_name()
     @classmethod
     def get_time(cls):
-        timestamp = time.time()
-        return time.strftime(
-            cls.TIME_FORMAT,
-            time.localtime(timestamp)
-        )
+        return bsc_core.SystemMtd.get_time()
     @classmethod
     def get_time_tag(cls):
-        return bsc_core.SystemMtd.get_time_tag()
-    @classmethod
-    def get_application(cls):
-        return Application.get_current()
+        return bsc_core.TimeBaseMtd.get_time_tag()
 
 
 class Environ(object):
@@ -835,58 +765,6 @@ class Environ(object):
             )
 
 
-class Platform(object):
-    @classmethod
-    def get_current(cls):
-        if cls.get_is_windows():
-            return 'windows'
-        elif cls.get_is_linux():
-            return 'linux'
-        raise TypeError()
-    @staticmethod
-    def get_is_linux():
-        return platform.system() == 'Linux'
-    @staticmethod
-    def get_is_windows():
-        return platform.system() == 'Windows'
-
-
-class Application(object):
-    @classmethod
-    def get_is_maya(cls):
-        _ = os.environ.get('MAYA_APP_DIR')
-        if _:
-            return True
-        return False
-    @classmethod
-    def get_is_houdini(cls):
-        _ = os.environ.get('HIP')
-        if _:
-            return True
-        return False
-    @classmethod
-    def get_is_katana(cls):
-        _ = os.environ.get('KATANA_ROOT')
-        if _:
-            return True
-        return False
-    @classmethod
-    def get_is_dcc(cls):
-        for i in [cls.get_is_maya(), cls.get_is_houdini(), cls.get_is_katana()]:
-            if i is True:
-                return True
-        return False
-    @classmethod
-    def get_current(cls):
-        if cls.get_is_maya():
-            return bsc_configure.Application.Maya
-        elif cls.get_is_houdini():
-            return bsc_configure.Application.Houdini
-        elif cls.get_is_katana():
-            return bsc_configure.Application.Katana
-        return bsc_configure.Application.Python
-
-
 class File(object):
     @classmethod
     def set_write(cls, file_path, raw):
@@ -936,9 +814,9 @@ class File(object):
 class PathMapper(object):
     def __init__(self, file_path):
         self._raw = File.set_read(file_path)
-        if System.get_is_windows():
+        if bsc_core.SystemMtd.get_is_windows() is True:
             p = 'windows'
-        elif System.get_is_linux():
+        elif bsc_core.SystemMtd.get_is_linux() is True:
             p = 'linux'
         else:
             raise TypeError()
@@ -972,16 +850,16 @@ class Path(object):
     @classmethod
     def set_map_to_platform(cls, path):
         if path is not None:
-            if System.get_is_windows():
+            if bsc_core.SystemMtd.get_is_windows():
                 return cls.set_map_to_windows(path)
-            elif System.get_is_linux():
+            elif bsc_core.SystemMtd.get_is_linux():
                 return cls.set_map_to_linux(path)
-            return bsc_core.StoragePathOpt(path).__str__()
+            return bsc_core.StgPathOpt(path).__str__()
         return path
     @classmethod
     def set_map_to_windows(cls, path):
-        path = bsc_core.StoragePathOpt(path).__str__()
-        if bsc_core.StoragePathMtd.get_path_is_linux(path):
+        path = bsc_core.StgPathOpt(path).__str__()
+        if bsc_core.StorageBaseMtd.get_path_is_linux(path):
             mapper_dict = cls.PATH_MAPPER._windows_dict
             for src_root, tgt_root in mapper_dict.items():
                 if path.startswith(src_root):
@@ -990,8 +868,8 @@ class Path(object):
         return path
     @classmethod
     def set_map_to_linux(cls, path):
-        path = bsc_core.StoragePathOpt(path).__str__()
-        if bsc_core.StoragePathMtd.get_path_is_windows(path):
+        path = bsc_core.StgPathOpt(path).__str__()
+        if bsc_core.StorageBaseMtd.get_path_is_windows(path):
             mapper_dict = cls.PATH_MAPPER._linux_dict
             for src_root, tgt_root in mapper_dict.items():
                 if path.startswith(src_root):
@@ -1019,7 +897,7 @@ class Path(object):
 
 class AppLauncher(object):
     # TODO fix 9.9.9
-    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_user_directory_path())
+    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_user_home_directory())
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
     #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
@@ -1038,7 +916,7 @@ class AppLauncher(object):
             project: <project-name>
             application: <application-name>
         """
-        if bsc_core.StoragePathOpt(self.LOCAL_ROOT).get_is_exists():
+        if bsc_core.StgPathOpt(self.LOCAL_ROOT).get_is_exists():
             self._root = Path.set_map_to_platform(self.LOCAL_ROOT)
         else:
             self._root = Path.set_map_to_platform(self.SERVER_ROOT)
@@ -1464,7 +1342,7 @@ Any boolean flag will take the following values as FALSE: off, no, false, or 0.
         self._option = option
 
     def get(self):
-        option_opt = bsc_core.KeywordArgumentsOpt(self._option)
+        option_opt = bsc_core.ArgDictStringOpt(self._option)
         cmd = r'-- Render -r arnold -rd {render_directory} -cam {camera} -rt 0 -ai:lve 3 -s {start_frame} -e {end_frame} {file} '.format(
             **option_opt.value
         )
@@ -1802,7 +1680,7 @@ class RvLauncher(object):
                         )
                     #
                     default_kwargs['input'] = ' '.join(map(lambda x: '"{}"'.format(x), input_))
-                elif isinstance(input_, (str, unicode)):
+                elif isinstance(input_, six.string_types):
                     if input_.endswith('.exr'):
                         cmd_args.extend(
                             ['-dlut "{lut_directory}"']
@@ -1817,11 +1695,11 @@ class RvLauncher(object):
 
 
 class History(object):
-    if System.get_is_windows():
+    if bsc_core.SystemMtd.get_is_windows():
         FILE_PATH = '{}/history.yml'.format(
             bsc_configure.UserDirectory.WINDOWS
         )
-    elif System.get_is_linux():
+    elif bsc_core.SystemMtd.get_is_linux():
         FILE_PATH = '{}/history.yml'.format(
             bsc_configure.UserDirectory.LINUX
         )
@@ -1829,9 +1707,9 @@ class History(object):
         raise SystemError()
     @classmethod
     def set_append(cls, key, value):
-        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
+        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is False:
-            bsc_core.StorageFileOpt(cls.FILE_PATH).set_write(
+            bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
         #
@@ -1850,9 +1728,9 @@ class History(object):
         return False
     @classmethod
     def set_extend(cls, key, values):
-        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
+        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is False:
-            bsc_core.StorageFileOpt(cls.FILE_PATH).set_write(
+            bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
         #
@@ -1872,9 +1750,9 @@ class History(object):
         return False
     @classmethod
     def get(cls, key):
-        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
+        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is False:
-            bsc_core.StorageFileOpt(cls.FILE_PATH).set_write(
+            bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
             return []
@@ -1885,7 +1763,7 @@ class History(object):
         return configure.get(key) or []
     @classmethod
     def get_latest(cls, key):
-        f_o = bsc_core.StoragePathOpt(cls.FILE_PATH)
+        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is True:
             configure = bsc_objects.Configure(
                 value=f_o.path
@@ -1895,112 +1773,46 @@ class History(object):
                 return _[-1]
 
 
-class SchemeHistories(object):
-    def __init__(self, scheme_key):
-        if System.get_is_windows():
-            self._file_path = '{}/scheme/{}.yml'.format(
-                bsc_configure.UserDirectory.WINDOWS,
-                scheme_key
-            )
-        elif System.get_is_linux():
-            self._file_path = '{}/scheme/{}.yml'.format(
-                bsc_configure.UserDirectory.LINUX,
-                scheme_key
-            )
+class Resources(object):
+    CACHE = {}
+    CACHE_ALL = {}
+    ENVIRON_KEY = 'LYNXI_RESOURCES'
+    @classmethod
+    def get_search_paths(cls):
+        return Environ.get_as_array(
+            cls.ENVIRON_KEY
+        )
+    @classmethod
+    def get(cls, key):
+        """
+        :param key: str, etc. "rsv-task-batchers/asset/gen-model-export-extra" or "*/gen-model-export-extra"
+        :return: str(path)
+        """
+        if key in cls.CACHE:
+            return cls.CACHE[key]
         else:
-            raise SystemError()
-        #
-        f_o = bsc_core.StoragePathOpt(self._file_path)
-        if f_o.get_is_exists() is False:
-            bsc_core.StorageFileOpt(self._file_path).set_write(
-                {}
-            )
-
-        self._configure = bsc_objects.Configure(
-            value=f_o.path
-        )
-
-
-class OslShaderMtd(object):
+            for i_path in cls.get_search_paths():
+                i_path_opt = bsc_core.StgPathOpt(i_path)
+                if i_path_opt.get_is_exists() is True:
+                    i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
+                    i_results = Path._get_stg_paths_by_parse_pattern_(
+                        i_glob_pattern
+                    )
+                    if i_results:
+                        # use first result
+                        value = i_results[0]
+                        cls.CACHE[key] = value
+                        return value
     @classmethod
-    def set_test(cls, dict_, j2_template):
-        pass
-    @classmethod
-    def set_katana_ui_template_create(cls, file_path, output_file_path):
-        output_file_opt = bsc_core.StorageFileOpt(output_file_path)
-        output_file_opt.set_directory_create()
-        info = bsc_core.OslShaderMtd.get_info(file_path)
-        if info:
-            j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template-v002.j2')
-            raw = j2_template.render(
-                **info
-            )
-            # print(raw)
-            output_file_opt.set_write(raw)
-    @classmethod
-    def set_maya_ui_template_create(cls, file_path, output_file_path):
-        output_file_opt = bsc_core.StorageFileOpt(output_file_path)
-        output_file_opt.set_directory_create()
-        info = bsc_core.OslShaderMtd.get_info(file_path)
-        if info:
-            j2_template = utl_configure.Jinja.ARNOLD.get_template('maya-ui-template-v002.j2')
-            raw = j2_template.render(
-                **info
-            )
-            # print(raw)
-            output_file_opt.set_write(raw)
-
-
-class HookMtd(object):
-    @classmethod
-    def set_cmd_run(cls, cmd):
-        import urllib
-        #
-        from lxbasic import bsc_core
-        #
-        unique_id = bsc_core.UuidMtd.get_new()
-        #
-        hook_yml_file_path = bsc_core.SystemMtd.get_user_session_file_path(unique_id=unique_id)
-        #
-        bsc_core.StorageFileOpt(hook_yml_file_path).set_write(
-            dict(
-                user=bsc_core.SystemMtd.get_user_name(),
-                tiame=bsc_core.SystemMtd.get_time(),
-                cmd=cmd,
-            )
-        )
-        #
-        urllib.urlopen(
-            'http://{host}:{port}/cmd-run?uuid={uuid}'.format(
-                **dict(
-                    host=utl_configure.Hook.HOST,
-                    port=utl_configure.Hook.PORT,
-                    uuid=unique_id
+    def get_all(cls, key):
+        for i_path in cls.get_search_paths():
+            i_path_opt = bsc_core.StgPathOpt(i_path)
+            if i_path_opt.get_is_exists() is True:
+                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
+                i_results = Path._get_stg_paths_by_parse_pattern_(
+                    i_glob_pattern
                 )
-            )
-        )
-
-
-def _plf__get_is_windows_():
-    return platform.system() == 'Windows'
-
-
-def _plf__get_is_linux_():
-    return platform.system() == 'Linux'
-
-
-def _app__get_is_maya_():
-    _ = os.environ.get('MAYA_APP_DIR')
-    if _:
-        return True
-    return False
-
-
-def _app__get_is_houdini_():
-    _ = os.environ.get('HIP')
-    if _:
-        return True
-    return False
+                return i_results
 
 
 def _debug_(fnc):
@@ -2021,7 +1833,7 @@ def _print_time_(fnc):
             fnc.__module__,
             fnc.__name__,
             time.strftime(
-                System.TIME_FORMAT,
+                bsc_core.TimeBaseMtd.TIME_FORMAT,
                 time.localtime(start_timestamp)
             )
         )
@@ -2034,7 +1846,7 @@ def _print_time_(fnc):
             fnc.__module__,
             fnc.__name__,
             time.strftime(
-                System.TIME_FORMAT,
+                bsc_core.TimeBaseMtd.TIME_FORMAT,
                 time.localtime(end_timestamp)
             ),
             (end_timestamp - start_timestamp)
@@ -2130,48 +1942,6 @@ def _print_fnc_completion_with_result_(fnc):
             )
             bsc_core.ExceptionMtd.set_print()
     return fnc_
-
-
-class Resources(object):
-    CACHE = {}
-    CACHE_ALL = {}
-    ENVIRON_KEY = 'LYNXI_RESOURCES'
-    @classmethod
-    def get_search_paths(cls):
-        return Environ.get_as_array(
-            cls.ENVIRON_KEY
-        )
-    @classmethod
-    def get(cls, key):
-        """
-        :param key: str, etc. "rsv-task-batchers/asset/gen-model-export-extra" or "*/gen-model-export-extra"
-        :return: str(path)
-        """
-        if key in cls.CACHE:
-            return cls.CACHE[key]
-        else:
-            for i_path in cls.get_search_paths():
-                i_path_opt = bsc_core.StoragePathOpt(i_path)
-                if i_path_opt.get_is_exists() is True:
-                    i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
-                    i_results = Path._get_stg_paths_by_parse_pattern_(
-                        i_glob_pattern
-                    )
-                    if i_results:
-                        # use first result
-                        value = i_results[0]
-                        cls.CACHE[key] = value
-                        return value
-    @classmethod
-    def get_all(cls, key):
-        for i_path in cls.get_search_paths():
-            i_path_opt = bsc_core.StoragePathOpt(i_path)
-            if i_path_opt.get_is_exists() is True:
-                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
-                i_results = Path._get_stg_paths_by_parse_pattern_(
-                    i_glob_pattern
-                )
-                return i_results
 
 
 if __name__ == '__main__':

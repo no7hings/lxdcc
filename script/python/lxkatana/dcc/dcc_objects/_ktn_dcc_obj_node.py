@@ -140,7 +140,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
 
     def set_colour_by_type_name(self):
         type_name = self.get_shader_type_name()
-        r, g, b = bsc_core.TextOpt(type_name).to_rgb(maximum=1)
+        r, g, b = bsc_core.RawTextOpt(type_name).to_rgb(maximum=1)
         attributes = self.ktn_obj.getAttributes()
         attributes['ns_colorr'] = r
         attributes['ns_colorg'] = g
@@ -391,7 +391,7 @@ class AndRamp(AndShader):
                 values = [strings.index(self.get_shader_port_value(dcc_port_key))]*int(count)
             elif dcc_port_key in ['ramp_Colors']:
                 _ = self.get_shader_port_value(dcc_port_key)
-                values = bsc_core.ListMtd.set_grid_to(_, 3)
+                values = bsc_core.RawListMtd.set_grid_to(_, 3)
             else:
                 values = self.get_shader_port_value(dcc_port_key)
 

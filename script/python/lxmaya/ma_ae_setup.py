@@ -50,6 +50,7 @@ def set_ae_proc_register(module_name, method_name, proc_name):
 
 #
 def set_ae_proc_load(module_name, method_name, nodeName):
+    # noinspection PyBroadException
     try:
         module = __import__(module_name, globals(), locals(), [], -1)
         # noinspection PyUnresolvedReferences
@@ -62,7 +63,7 @@ def set_ae_proc_load(module_name, method_name, nodeName):
             inst._doSetup(nodeName)
         else:
             print "AE Object %s has Invalid Type %s" % (method, type(method))
-    except Exception:
+    except Exception as e:
         print "Failed to Load Python Attribute Editor Template '%s.%s'" % (module_name, method_name)
         import traceback
         traceback.print_exc()

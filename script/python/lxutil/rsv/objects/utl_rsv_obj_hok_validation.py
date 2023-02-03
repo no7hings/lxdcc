@@ -46,10 +46,10 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             if j_texture.get_is_exists_as_tx() is False:
                                 j_check_results[2] = False
                             #
-                            if bsc_core.TextOpt(j_file_path).get_is_contain_chinese() is True:
+                            if bsc_core.RawTextOpt(j_file_path).get_is_contain_chinese() is True:
                                 j_check_results[3] = False
                             #
-                            if bsc_core.TextOpt(j_file_path).get_is_contain_space() is True:
+                            if bsc_core.RawTextOpt(j_file_path).get_is_contain_space() is True:
                                 j_check_results[4] = False
                             #
                             if bsc_core.SystemMtd.get_is_linux():
@@ -139,7 +139,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 i_k
             )
             i_check_p = i_p + '/{extra}'
-            i_check_p_opt = bsc_core.ParsePatternOpt(
+            i_check_p_opt = bsc_core.PtnParseOpt(
                 i_check_p
             )
             i_check_p_opt.set_update(
@@ -193,7 +193,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StoragePathMtd.get_is_writeable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageBaseMtd.get_is_writeable(i) is True]
         if unlocked_directory_paths:
             validation_checker.set_node_directories_result_register(
                 location,

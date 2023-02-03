@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import sys
 
 import os
@@ -10,6 +12,8 @@ import importlib
 import types
 
 import imp
+
+from lxbasic import bsc_core
 
 
 class PyModule(object):
@@ -25,24 +29,32 @@ class PyModule(object):
             else:
                 self._module = None
         #
+        self._module_name = None
+        self._file_path_pyc = None
+        self._file_path_py = None
+        #
         if self._module is not None:
-            self._name = self._module.__name__
+            self._module_name = self._module.__name__
             if hasattr(self._module, '__file__') is True:
-                self._file_path = self._module.__file__
-            else:
-                self._file_path = None
-        else:
-            self._name = None
-            self._file_path = None
+                self._file_path_pyc = self._module.__file__
+                self._file_path_py = self._get_py_(self._file_path_pyc)
     @property
     def module(self):
         return self._module
     @property
     def name(self):
-        return self._name
+        return self._module_name
     @property
-    def file_path(self):
-        return self._file_path
+    def file(self):
+        return self._file_path_pyc
+    @staticmethod
+    def _get_py_(file_path_pyc):
+        _ = os.path.splitext(file_path_pyc)
+        return '{}.py'.format(_[0])
+
+    def get_pyc_timestamp(self):
+        if os.path.isfile(self._file_path_pyc):
+            return os.stat(self._file_path_pyc).st_mtime
 
     def get_parent(self):
         if self.get_is_package() is True:
@@ -99,7 +111,12 @@ class PyModule(object):
             if _:
                 module = importlib.import_module(self.name)
                 imp.reload(module)
-                print '<python-module reload> module-path="{}"; file="{}"'.format(self.name, self.file_path)
+                #
+                bsc_core.LogMtd.trace_method_result(
+                    'python reload', 'module="{}", file="{}"'.format(
+                        self.name, self.file
+                    )
+                )
 
     def set_help_print(self):
         # noinspection PyUnresolvedReferences
@@ -109,7 +126,7 @@ class PyModule(object):
         if os.path.isdir(directory) is False:
             os.makedirs(directory)
         #
-        file_path = '{}/{}'.format(directory, self._name)
+        file_path = '{}/{}'.format(directory, self._module_name)
         out = sys.stdout
         sys.stdout = open(file_path, "w")
         # noinspection PyUnresolvedReferences
@@ -119,7 +136,6 @@ class PyModule(object):
 
     def _test(self):
         for i in self.get_child_modules():
-            print self.name, i.name
             i._test()
 
     def get_method(self, key):
@@ -133,7 +149,7 @@ class PyModule(object):
         return '{}(name="{}", file_path="{}")'.format(
             self.__class__.__name__,
             self.name,
-            self.file_path
+            self.file
         )
 
     def __repr__(self):
@@ -151,7 +167,7 @@ class PyModule(object):
 class PyReloader(object):
     def __init__(self, *args):
         _ = args[0]
-        if isinstance(_, (str, unicode)):
+        if isinstance(_, six.string_types):
             self._module_names = [_]
         elif isinstance(_, (tuple, list)):
             self._module_names = _

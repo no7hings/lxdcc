@@ -178,7 +178,7 @@ class AssetWorkspace(object):
     @classmethod
     def _get_look_pass_rgb_(cls, pass_index):
         h, s, v = 63 + pass_index * 15, .5, .5
-        return bsc_core.ColorMtd.hsv2rgb(
+        return bsc_core.RawColorMtd.hsv2rgb(
             h, s, v, maximum=1
         )
 

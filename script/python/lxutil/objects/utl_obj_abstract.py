@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import fnmatch
 
 import parse
@@ -20,7 +22,7 @@ class AbsContent(object):
     VARIANT_RE_PATTERN = r'[<](.*?)[>]'
     def __init__(self, key=None, value=None):
         self._key = key
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, six.string_types):
             _ = utl_core.File.set_read(value)
             if isinstance(_, dict):
                 self._value = _
@@ -151,7 +153,7 @@ class AbsContent(object):
 
     def _set_value_unfold_(self, key, keys):
         def _rcs_fnc(key_, value_):
-            if isinstance(value_, (str, unicode)):
+            if isinstance(value_, six.string_types):
                 _value_unfold = value_
                 _var_keys = re.findall(re.compile(self.VARIANT_RE_PATTERN, re.S), _value_unfold)
                 if _var_keys:
@@ -179,7 +181,7 @@ class AbsContent(object):
                             #
                             _v = _rcs_fnc(_var_key, _v)
                         #
-                        if isinstance(_v, (str, unicode)):
+                        if isinstance(_v, six.string_types):
                             _value_unfold = _value_unfold.replace('<{}>'.format(_var_key), _v)
                         elif isinstance(_v, (int, float, bool)):
                             _value_unfold = _value_unfold.replace('<{}>'.format(_var_key), str(_v))

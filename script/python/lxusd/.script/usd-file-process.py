@@ -18,7 +18,7 @@ def main(argv):
 
     usd_setup.UsdSetup.set_environs_setup()
     option = argv[1]
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     key = option_opt.get('method')
     if key == 'cache-hierarchy':
         print cache_hierarchy_fnc(option_opt)

@@ -16,6 +16,6 @@ d = utl_dcc_objects.OsDirectory_(d_p)
 for i_f_p in d.get_child_file_paths():
     i_f = utl_dcc_objects.OsFile(i_f_p)
     if i_f.ext == '.osl':
-        bsc_core.OslShaderMtd.set_compile(
+        bsc_core.OslFileMtd.set_compile(
             i_f.path
         )

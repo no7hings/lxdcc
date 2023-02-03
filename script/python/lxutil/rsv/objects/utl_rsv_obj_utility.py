@@ -55,13 +55,13 @@ class RsvAssetWorkspaceTextureOpt(object):
         if version == 'new':
             version = self.get_new_version_at(variant)
         #
-        bsc_core.StoragePathMtd.set_directory_create(
+        bsc_core.StorageBaseMtd.set_directory_create(
             self.get_directory_path_at(variant, version)
         )
-        bsc_core.StoragePathMtd.set_directory_create(
+        bsc_core.StorageBaseMtd.set_directory_create(
             self.get_src_directory_path_at(variant, version)
         )
-        bsc_core.StoragePathMtd.set_directory_create(
+        bsc_core.StorageBaseMtd.set_directory_create(
             self.get_tx_directory_path_at(variant, version)
         )
         #
@@ -125,7 +125,7 @@ class RsvAssetWorkspaceTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StoragePathMtd.get_is_writeable(i_result) is False:
+            if bsc_core.StorageBaseMtd.get_is_writeable(i_result) is False:
                 list_.append(i_variants['version'])
         return list_
 
@@ -136,7 +136,7 @@ class RsvAssetWorkspaceTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StoragePathMtd.get_is_writeable(i_result) is True:
+            if bsc_core.StorageBaseMtd.get_is_writeable(i_result) is True:
                 list_.append(i_variants['version'])
         return list_
 
@@ -158,7 +158,7 @@ class RsvAssetWorkspaceTextureOpt(object):
                 i_k
             )
             i_check_p = i_p + '/{extra}'
-            i_check_p_opt = bsc_core.ParsePatternOpt(
+            i_check_p_opt = bsc_core.PtnParseOpt(
                 i_check_p
             )
             i_check_p_opt.set_update(
@@ -183,7 +183,7 @@ class RsvAssetWorkspaceTextureOpt(object):
         directory_paths = self.get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StoragePathMtd.get_is_writeable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageBaseMtd.get_is_writeable(i) is True]
         if unlocked_directory_paths:
             with utl_core.log_progress_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
                 for _i in unlocked_directory_paths:

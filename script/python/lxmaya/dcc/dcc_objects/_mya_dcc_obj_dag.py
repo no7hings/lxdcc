@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
@@ -17,7 +18,7 @@ class Group(_mya_dcc_obj_obj.Node):
 
     def get_all_shape_paths(self, include_obj_type=None):
         if include_obj_type is not None:
-            if isinstance(include_obj_type, (str, unicode)):
+            if isinstance(include_obj_type, six.string_types):
                 _ = [include_obj_type]
             elif isinstance(include_obj_type, (tuple, list)):
                 _ = include_obj_type
@@ -28,7 +29,7 @@ class Group(_mya_dcc_obj_obj.Node):
 
     def get_all_paths(self, include_obj_type=None):
         if include_obj_type is not None:
-            if isinstance(include_obj_type, (str, unicode)):
+            if isinstance(include_obj_type, six.string_types):
                 _ = [include_obj_type]
             elif isinstance(include_obj_type, (tuple, list)):
                 _ = include_obj_type

@@ -43,7 +43,7 @@ def __set_help_print():
 def __set_run(option):
     from lxbasic import bsc_core
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
         __set_option_hook_run(option)
@@ -61,7 +61,7 @@ def __set_hook_run(option):
     #
     import lxsession.commands as ssn_commands
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     hook_key = option_opt.get('hook_key')
     hook_args = ssn_commands.get_hook_args(hook_key)
@@ -92,7 +92,7 @@ def __set_option_hook_run(option):
 
     import lxsession.commands as ssn_commands
 
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     hook_args = ssn_commands.get_option_hook_args(option)
     if hook_args:

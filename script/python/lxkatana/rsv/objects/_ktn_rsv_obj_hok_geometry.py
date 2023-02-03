@@ -86,7 +86,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 option=dict(
                     file_0=geometry_usd_var_file_path,
                     file_1=geometry_usd_var_file_path,
-                    display_color=bsc_core.TextOpt(step).to_rgb(maximum=1.0)
+                    display_color=bsc_core.RawTextOpt(step).to_rgb(maximum=1.0)
                 )
             ).set_run()
         else:

@@ -274,7 +274,7 @@ class DtbSqlTableOpt(AbsDtbSqlBaseOpt):
                     _i_c_ = ' in '
                 elif _i_c == 'startswith':
                     _i_c_ = ' like '
-                    if not isinstance(_i_v, (str, unicode)):
+                    if not isinstance(_i_v, six.string_types):
                         raise TypeError()
                     _i_v += '%'
                 else:

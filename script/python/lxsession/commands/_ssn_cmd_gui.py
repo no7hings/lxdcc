@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 
 
 def get_menu_content_by_hooks(hooks):
@@ -10,7 +11,7 @@ def get_menu_content_by_hooks(hooks):
 
     content = bsc_objects.Dict()
     for i_hook in hooks:
-        if isinstance(i_hook, (str, unicode)):
+        if isinstance(i_hook, six.string_types):
             i_hook_key = i_hook
             i_extra_kwargs = None
         elif isinstance(i_hook, dict):
@@ -165,7 +166,7 @@ def get_menu_content_by_hook_options_(hook_options):
 
     content = bsc_objects.Dict()
     for i_key in hook_options:
-        if isinstance(i_key, (str, unicode)):
+        if isinstance(i_key, six.string_types):
             i_hook_option = i_key
             i_extra_kwargs = None
         elif isinstance(i_key, dict):

@@ -134,7 +134,7 @@ class AbsFncDccMeshMatcher(object):
             tgt_paths_in_points = self._tgt_data.get(
                 'points.uuid.{}'.format(tgt_points_uuid)
             ) or []
-            uuid_matched_tgt_paths = bsc_core.ListMtd.get_intersection(
+            uuid_matched_tgt_paths = bsc_core.RawListMtd.get_intersection(
                 tgt_paths_in_face_vertices,
                 tgt_paths_in_points
             )
@@ -196,8 +196,8 @@ class AbsFncDccMeshMatcher(object):
                 'points.uuid.{}'.format(tgt_points_uuid)
             ) or []
             #
-            uuid_matched_tgt_paths = bsc_core.ListMtd.get_addition(
-                bsc_core.ListMtd.get_intersection(tgt_paths_in_face_vertices, tgt_paths_in_points) or [],
+            uuid_matched_tgt_paths = bsc_core.RawListMtd.get_addition(
+                bsc_core.RawListMtd.get_intersection(tgt_paths_in_face_vertices, tgt_paths_in_points) or [],
                 self._src_paths
             ) or []
             if uuid_matched_tgt_paths:
@@ -210,7 +210,7 @@ class AbsFncDccMeshMatcher(object):
             tgt_paths_in_face_vertices = self._tgt_data.get(
                 'face-vertices.uuid.{}'.format(tgt_face_vertices_uuid)
             ) or []
-            uuid_matched_tgt_paths = bsc_core.ListMtd.get_addition(
+            uuid_matched_tgt_paths = bsc_core.RawListMtd.get_addition(
                 tgt_paths_in_face_vertices,
                 self._src_paths
             ) or []
@@ -225,7 +225,7 @@ class AbsFncDccMeshMatcher(object):
             tgt_paths_in_points = self._tgt_data.get(
                 'points.uuid.{}'.format(tgt_points_uuid)
             ) or []
-            uuid_matched_tgt_paths = bsc_core.ListMtd.get_addition(
+            uuid_matched_tgt_paths = bsc_core.RawListMtd.get_addition(
                 tgt_paths_in_points,
                 self._src_paths
             ) or []
@@ -623,7 +623,7 @@ class AbsDotXgenDef(object):
         :param xgen_collection_file_path: str()
         :return:
         """
-        file_opt = bsc_core.StorageFileOpt(xgen_collection_file_path)
+        file_opt = bsc_core.StgFileOpt(xgen_collection_file_path)
         file_name_base = file_opt.name_base
         return file_name_base.split('__')[-1]
     @classmethod
@@ -634,13 +634,13 @@ class AbsDotXgenDef(object):
         :return:
         """
         file_paths_src = cls._get_xgen_collection_file_paths_(file_path_src)
-        file_opt_tgt = bsc_core.StorageFileOpt(file_path_tgt)
+        file_opt_tgt = bsc_core.StgFileOpt(file_path_tgt)
         file_name_base_tgt = file_opt_tgt.name_base
         file_directory_path_tgt = file_opt_tgt.directory_path
         replace_list = []
         #
         for i_file_path_src in file_paths_src:
-            i_file_opt_src = bsc_core.StorageFileOpt(i_file_path_src)
+            i_file_opt_src = bsc_core.StgFileOpt(i_file_path_src)
             i_file_name_src = i_file_opt_src.name
             i_xgen_collection_name = cls._get_xgen_collection_name_(i_file_path_src)
             i_file_name_tgt = '{}__{}.xgen'.format(file_name_base_tgt, i_xgen_collection_name)

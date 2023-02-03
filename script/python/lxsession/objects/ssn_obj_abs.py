@@ -1,9 +1,5 @@
 # coding:utf-8
-import collections
-
 import fnmatch
-
-from urllib import quote, unquote
 
 from lxbasic import bsc_configure, bsc_core
 
@@ -12,6 +8,8 @@ import lxbasic.objects as bsc_objects
 import lxresolver.commands as rsv_commands
 
 from lxutil import utl_core
+
+from lxsession import ssn_core
 
 import lxshotgun.objects as stg_objects
 
@@ -263,7 +261,7 @@ class AbsSsnObj(
         self._configure.set_flatten()
     @classmethod
     def set_cmd_run(cls, cmd):
-        utl_core.HookMtd.set_cmd_run(
+        ssn_core.SsnHookMtd.set_cmd_run(
             cmd
         )
 
@@ -461,7 +459,7 @@ class AbsSsnOptionGui(
 ):
     def __init__(self, *args, **kwargs):
         if 'option' in kwargs:
-            self._option_opt = bsc_core.KeywordArgumentsOpt(
+            self._option_opt = bsc_core.ArgDictStringOpt(
                 kwargs.pop('option')
             )
         else:
@@ -513,7 +511,7 @@ class AbsSsnOptionObj(AbsSsnObj):
         self._set_option_def_init_(kwargs['option'])
 
     def _set_option_def_init_(self, option):
-        self._option_opt = bsc_core.KeywordArgumentsOpt(
+        self._option_opt = bsc_core.ArgDictStringOpt(
             option
         )
         self.__set_option_completion_by_script_()
@@ -550,7 +548,7 @@ class AbsSsnOptionObj(AbsSsnObj):
                 if i_k not in i_script_dict:
                     i_script_dict[i_k] = i_v
             #
-            i_hook_option_opt = bsc_core.KeywordArgumentsOpt(i_script_dict)
+            i_hook_option_opt = bsc_core.ArgDictStringOpt(i_script_dict)
             i_hook_option_opt.set(
                 'option_hook_key', self.option_opt.get('option_hook_key')
             )
@@ -691,7 +689,7 @@ class AbsSsnOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StoragePathMtd.get_is_exists(file_path) is False:
+        if bsc_core.StorageBaseMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
@@ -701,7 +699,7 @@ class AbsSsnOptionMethod(
 
     def set_ddl_dependent_job_ids_find(self, hook_option):
         lis = []
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         main_key = hook_option_opt.get('option_hook_key')
@@ -712,7 +710,7 @@ class AbsSsnOptionMethod(
             'dependencies', as_array=True
         ) or []
         for i_key in dependent_option_hook_keys:
-            i_option_hook_key = bsc_core.SessionMtd.get_hook_abs_path(
+            i_option_hook_key = ssn_core.SsnHookFileMtd.get_hook_abs_path(
                 main_key, i_key
             )
             i_ddl_job_id = c.get(
@@ -723,7 +721,7 @@ class AbsSsnOptionMethod(
         return lis
 
     def set_ddl_job_id_find(self, hook_option):
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
@@ -742,7 +740,7 @@ class AbsSsnOptionMethod(
         )
 
     def set_ddl_result_update(self, hook_option, ddl_job_id):
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
@@ -839,7 +837,7 @@ class ValidationChecker(object):
 
     def _get_data_file_path_(self):
         file_path = self._session.option_opt.get('file')
-        return bsc_core.TemporaryYamlMtd.get_file_path(
+        return bsc_core.StgTmpYamlMtd.get_file_path(
             file_path, 'asset-validator'
         )
 
@@ -852,7 +850,7 @@ class ValidationChecker(object):
 
     def set_data_record(self):
         result_file_path = self._get_data_file_path_()
-        bsc_core.StorageFileOpt(
+        bsc_core.StgFileOpt(
             result_file_path
         ).set_write(
             dict(
@@ -863,7 +861,7 @@ class ValidationChecker(object):
     def get_data(self):
         result_file_path = self._get_data_file_path_()
         print result_file_path
-        raw = bsc_core.StorageFileOpt(
+        raw = bsc_core.StgFileOpt(
             result_file_path
         ).set_read()
         self._check_results = raw['check_results']
@@ -1010,7 +1008,7 @@ class AbsSsnRsvTaskOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StoragePathMtd.get_is_exists(file_path) is False:
+        if bsc_core.StorageBaseMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
@@ -1019,7 +1017,7 @@ class AbsSsnRsvTaskOptionMethod(
         return file_path
 
     def set_ddl_result_update(self, hook_option, ddl_job_id):
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
@@ -1043,7 +1041,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
 
     def set_ddl_job_id_find(self, hook_option):
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
@@ -1063,7 +1061,7 @@ class AbsSsnRsvTaskOptionMethod(
     @classmethod
     def get_dependencies(cls, hook_option):
         lis = []
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         main_key = hook_option_opt.get('option_hook_key')
@@ -1072,7 +1070,7 @@ class AbsSsnRsvTaskOptionMethod(
             'dependencies', as_array=True
         ) or []
         for i_key in dependent_option_hook_keys:
-            i_option_hook_key = bsc_core.SessionMtd.get_hook_abs_path(
+            i_option_hook_key = ssn_core.SsnHookFileMtd.get_hook_abs_path(
                 main_key, i_key
             )
             lis.append(i_option_hook_key)
@@ -1080,7 +1078,7 @@ class AbsSsnRsvTaskOptionMethod(
 
     def set_ddl_dependent_job_ids_find(self, hook_option):
         lis = []
-        hook_option_opt = bsc_core.KeywordArgumentsOpt(
+        hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
         main_key = hook_option_opt.get('option_hook_key')
@@ -1091,7 +1089,7 @@ class AbsSsnRsvTaskOptionMethod(
             'dependencies', as_array=True
         ) or []
         for i_key in dependent_option_hook_keys:
-            i_option_hook_key = bsc_core.SessionMtd.get_hook_abs_path(
+            i_option_hook_key = ssn_core.SsnHookFileMtd.get_hook_abs_path(
                 main_key, i_key
             )
             i_ddl_job_id = c.get(

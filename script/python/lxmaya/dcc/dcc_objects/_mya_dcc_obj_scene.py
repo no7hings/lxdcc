@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import os
 
 import types
@@ -489,7 +491,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 cls._set_viewport_light_display_mode_(viewport)
     @classmethod
     def set_window_delete(cls, window):
-        if isinstance(window, (str, unicode)):
+        if isinstance(window, six.string_types):
             if cmds.window(window, query=1, exists=1):
                 cmds.deleteUI(window, window=1)
     @classmethod

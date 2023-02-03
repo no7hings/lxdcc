@@ -6,10 +6,10 @@ def set_lib_asset_push(option):
     #
     import lxgui.fnc.methods as gui_fnc_methods
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
-    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    time_tag = option_opt.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
     #
     gui_fnc_methods.LibAssetPusher(
         project=option_opt.get('project'),
@@ -32,12 +32,12 @@ def set_lib_asset_pull(option):
     #
     import lxgui.fnc.methods as gui_fnc_methods
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
     user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
-    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    time_tag = option_opt.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
     #
     gui_fnc_methods.LibAssetPuller(
         project=project,
@@ -60,12 +60,12 @@ def set_lib_assets_push(option):
     #
     import lxgui.fnc.methods as gui_fnc_methods
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
     user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
-    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    time_tag = option_opt.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
     #
     start_index = option_opt.get('start_index')
     end_index = option_opt.get('end_index')
@@ -91,12 +91,12 @@ def set_lib_assets_pull(option):
     #
     import lxgui.fnc.methods as gui_fnc_methods
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     project = option_opt.get('project')
     assets = option_opt.get('assets', as_array=True)
     #
     user = option_opt.get('user') or bsc_core.SystemMtd.get_user_name()
-    time_tag = option_opt.get('time_tag') or bsc_core.SystemMtd.get_time_tag()
+    time_tag = option_opt.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
     #
     start_index = option_opt.get('start_index')
     end_index = option_opt.get('end_index')

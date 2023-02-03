@@ -1,6 +1,8 @@
 # coding:utf-8
 from __future__ import print_function
 
+import six
+
 import itertools
 
 import functools
@@ -83,7 +85,7 @@ class MtdBasic(object):
     @classmethod
     def _get_rsv_pattern_real_value_(cls, value, dic):
         def _rcs_fnc(v_):
-            if isinstance(v_, (str, unicode)):
+            if isinstance(v_, six.string_types):
                 _r = v_
                 _ks = re.findall(re.compile(cls.PATTERN_REF_RE_PATTERN, re.S), v_)
                 if _ks:
@@ -383,7 +385,7 @@ class AbsRsvMatcher(
             for key in keys:
                 if key in key_glob_pattern_dic:
                     # _i = key_glob_pattern_dic[key]
-                    # if isinstance(_i, (str, unicode)):
+                    # if isinstance(_i, six.string_types):
                     #     pass
                     # elif isinstance(_i, (tuple, list)):
                     #     pass
@@ -479,7 +481,7 @@ class AbsRsvMatcher(
                 for key in keys:
                     if key in variants:
                         v = variants[key]
-                        if isinstance(v, (str, unicode)):
+                        if isinstance(v, six.string_types):
                             c = len(patterns)
                             for i_index in range(c):
                                 if v != '*':
@@ -714,11 +716,11 @@ class AbsRsvObj(
 
     def _get_work_directory_is_enable_(self):
         directory_path = self.__get_src_directory_path_()
-        return bsc_core.StorageDirectoryOpt(directory_path).get_is_exists()
+        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _set_work_directory_open_(self):
         directory_path = self.__get_src_directory_path_()
-        bsc_core.StorageDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
 
     def _get_publish_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
@@ -732,19 +734,19 @@ class AbsRsvObj(
 
     def _get_publish_directory_is_enable_(self):
         directory_path = self._get_publish_directory_path_()
-        return bsc_core.StorageDirectoryOpt(directory_path).get_is_exists()
+        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _set_publish_directory_open_(self):
         directory_path = self._get_publish_directory_path_()
-        bsc_core.StorageDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
 
     def _get_output_directory_is_enable_(self):
         directory_path = self._get_output_directory_path_()
-        return bsc_core.StorageDirectoryOpt(directory_path).get_is_exists()
+        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _set_output_directory_open_(self):
         directory_path = self._get_output_directory_path_()
-        bsc_core.StorageDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
     @property
     def rsv_project(self):
         return self._rsv_project
@@ -935,8 +937,8 @@ class AbsRsvUnit(
     def get_exists_result(self, *args, **kwargs):
         result = self.get_result(*args, **kwargs)
         if result:
-            if isinstance(result, (str, unicode)):
-                if bsc_core.StoragePathMtd.get_is_exists(result):
+            if isinstance(result, six.string_types):
+                if bsc_core.StorageBaseMtd.get_is_exists(result):
                     return result
             elif isinstance(result, (tuple, list)):
                 return result
@@ -1130,7 +1132,7 @@ class AbsRsvUnitVersion(
 
     def _set_directory_open_(self):
         if self._result:
-            bsc_core.StoragePathOpt(self._result).set_open_in_system()
+            bsc_core.StgPathOpt(self._result).set_open_in_system()
 
 
 class AbsRsvTaskVersion(
@@ -1173,10 +1175,10 @@ class AbsRsvTask(
     def get_work_scene_src_directory_open_menu_raw(self):
         def add_fnc_(application_):
             def get_directory_is_exists_fnc_():
-                return bsc_core.StorageDirectoryOpt(_directory_path).get_is_exists()
+                return bsc_core.StgDirectoryOpt(_directory_path).get_is_exists()
 
             def set_directory_open_fnc_():
-                bsc_core.StorageDirectoryOpt(_directory_path).set_open_in_system()
+                bsc_core.StgDirectoryOpt(_directory_path).set_open_in_system()
             #
             _branch = self.properties.get('branch')
             _keyword = '{}-work-{}-scene-src-dir'.format(_branch, application_)
@@ -1661,7 +1663,7 @@ class AbsRsvProject(
 
     def _set_patterns_dict_update_(self, raw):
         for k, v in raw.items():
-            if isinstance(v, (str, unicode)):
+            if isinstance(v, six.string_types):
                 pattern = MtdBasic._get_rsv_pattern_real_value_(v, raw)
                 self._patterns_dict[k] = pattern
 
@@ -2325,12 +2327,12 @@ class AbsRsvProject(
     @staticmethod
     def __set_create_kwargs_completion_(kwargs, result, variants):
         update = bsc_core.TimeMtd.to_prettify_by_timestamp(
-            bsc_core.StorageFileOpt(
+            bsc_core.StgFileOpt(
                 result
             ).get_modify_timestamp(),
             language=1
         )
-        user = bsc_core.StoragePathOpt(
+        user = bsc_core.StgPathOpt(
             result
         ).get_user()
         kwargs['result'] = result
@@ -2573,7 +2575,7 @@ class AbsRsvRoot(
 
     def _set_patterns_dict_update_(self, raw):
         for k, v in raw.items():
-            if isinstance(v, (str, unicode)):
+            if isinstance(v, six.string_types):
                 pattern = MtdBasic._get_rsv_pattern_real_value_(v, raw)
                 self._patterns_dict[k] = pattern
     @classmethod
@@ -2951,9 +2953,9 @@ class AbsRsvRoot(
         ]
         for method in methods:
             # noinspection PyArgumentList
-            result = method(bsc_core.StoragePathOpt(file_path).get_path())
+            result = method(bsc_core.StgPathOpt(file_path).get_path())
             if result is not None:
-                # print(';'.join(['{}={}'.format(k, v) for k, v in result.value.items() if isinstance(v, (str, unicode))]))
+                # print(';'.join(['{}={}'.format(k, v) for k, v in result.value.items() if isinstance(v, six.string_types)]))
                 return result
     @classmethod
     def get_path_args(cls):

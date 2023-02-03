@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import fnmatch
 
 import parse
@@ -16,11 +18,6 @@ import subprocess
 from lxbasic import bsc_configure, bsc_core
 
 
-class ContentGian(object):
-    def __init__(self):
-        pass
-
-
 class AbsContent(object):
     DEFAULT_VALUE = collections.OrderedDict()
     PATHSEP = None
@@ -29,8 +26,8 @@ class AbsContent(object):
     def __init__(self, key=None, value=None):
         self._key = key
         self._file_path = None
-        if isinstance(value, (str, unicode)):
-            file_path_opt = bsc_core.StorageFileOpt(value)
+        if isinstance(value, six.string_types):
+            file_path_opt = bsc_core.StgFileOpt(value)
             if file_path_opt.get_is_exists():
                 self._file_path = value
                 _ = file_path_opt.set_read()
@@ -51,7 +48,7 @@ class AbsContent(object):
         self._unfold_excludes = []
 
     def set_save_to(self, file_path):
-        bsc_core.StorageFileOpt(
+        bsc_core.StgFileOpt(
             file_path
         ).set_write(
             self._value
@@ -200,7 +197,7 @@ class AbsContent(object):
 
     def _set_quote_unfold_(self, key, all_keys):
         value = self.get(key)
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, six.string_types):
             if fnmatch.filter([value], '$*'):
                 v_k = value[1:].lstrip()
                 if fnmatch.filter([v_k], '.*'):
@@ -221,7 +218,7 @@ class AbsContent(object):
 
     def _set_value_unfold_(self, key, all_keys):
         def rcs_fnc_(key_, value_):
-            if isinstance(value_, (str, unicode)):
+            if isinstance(value_, six.string_types):
                 _value_unfold = value_
                 # remove excludes, etc. "\\<A\\>"
                 _v_ks_0 = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
@@ -275,7 +272,7 @@ class AbsContent(object):
                                     #
                                     _i_v_2 = rcs_fnc_(_i_v_k_1, _i_v_2)
                                 #
-                                if isinstance(_i_v_2, (str, unicode)):
+                                if isinstance(_i_v_2, six.string_types):
                                     _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2)
                                 elif isinstance(_i_v_2, (int, float, bool)):
                                     _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), str(_i_v_2))
@@ -349,7 +346,7 @@ class AbsContent(object):
 
     def set_reload(self):
         if self._file_path is not None:
-            file_path_opt = bsc_core.StorageFileOpt(self._file_path)
+            file_path_opt = bsc_core.StgFileOpt(self._file_path)
             if file_path_opt.get_is_exists():
                 _ = file_path_opt.set_read()
                 if isinstance(_, dict):

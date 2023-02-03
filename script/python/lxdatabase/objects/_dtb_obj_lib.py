@@ -110,7 +110,7 @@ class DtbBaseOpt(object):
         #     raise RuntimeError()
 
         self._dtb_file_path = database
-        self._dtb_file_opt = bsc_core.StorageFileOpt(
+        self._dtb_file_opt = bsc_core.StgFileOpt(
             database
         )
         self._dtb_file_opt.set_directory_create()
@@ -239,7 +239,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
 
     def get_pattern_opt(self, keyword):
         p = self.get_pattern(keyword)
-        p_opt = bsc_core.ParsePatternOpt(p)
+        p_opt = bsc_core.PtnParseOpt(p)
         return p_opt.set_update_to(
             **self._dtb_pattern_kwargs
         )
@@ -280,7 +280,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             if 'gui_name' in i_kwargs:
                 i_gui_name = i_kwargs['gui_name']
             else:
-                i_gui_name = bsc_core.StrUnderlineOpt(i_name).to_prettify()
+                i_gui_name = bsc_core.RawStringUnderlineOpt(i_name).to_prettify()
 
             self.add_entity(
                 entity_type=i_entity_type,
@@ -299,7 +299,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 i_child_names = i_children.get('names') or []
                 i_child_options = i_children.get('options') or {}
                 for j_child_name in i_child_names:
-                    j_child_gui_name = bsc_core.StrUnderlineOpt(j_child_name).to_prettify()
+                    j_child_gui_name = bsc_core.RawStringUnderlineOpt(j_child_name).to_prettify()
                     self.add_entity(
                         entity_type=i_child_entity_type,
                         data=dict(

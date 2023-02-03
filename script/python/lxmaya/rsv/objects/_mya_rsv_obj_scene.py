@@ -104,7 +104,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         orig_file_path = '/l/resource/td/asset/maya/asset-camera.ma'
-        orig_file_path = bsc_core.StoragePathMtd.set_map_to_platform(orig_file_path)
+        orig_file_path = bsc_core.StorageBaseMtd.set_map_to_platform(orig_file_path)
 
         scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
@@ -307,7 +307,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             with_work_scene_src_link = self._hook_option_opt.get('with_work_scene_src_link') or False
             #
             mesh_paths = mya_group.get_all_shape_paths(include_obj_type='mesh')
-            bake_option_opt = bsc_core.KeywordArgumentsOpt(
+            bake_option_opt = bsc_core.ArgDictStringOpt(
                 option=dict(
                     option_hook_key=bake_option_hook_key,
                     #
@@ -329,7 +329,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             bake_ddl_job_id = bake_session.get_ddl_job_id()
             if bake_ddl_job_id:
-                bake_convert_option_opt = bsc_core.KeywordArgumentsOpt(
+                bake_convert_option_opt = bsc_core.ArgDictStringOpt(
                     option=dict(
                         option_hook_key=bake_convert_option_hook_key,
                         #
@@ -477,7 +477,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version='latest'
         )
         if latest_work_scene_src_file_path:
-            if bsc_core.StorageLinkMtd.get_is_link_source_to(
+            if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                     scene_file_path, latest_work_scene_src_file_path
             ) is False:
                 new_work_scene_src_file_path = work_scene_src_file_rsv_unit.get_result(

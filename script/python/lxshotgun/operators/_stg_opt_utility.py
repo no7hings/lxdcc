@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -6,7 +8,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 import os
 
 
-class ImageOpt(object):
+class ImgFileOpt(object):
     COLOR_SPACE_OPTION = {
         'ACEScg_sRGB': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/sRGB_for_ACEScg_Maya.csp',
         'ACEScg_Rec709': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/Rec.709_for_ACEScg_Maya.csp'
@@ -14,10 +16,10 @@ class ImageOpt(object):
     def __init__(self, obj):
         self._obj = obj
         #
-        if utl_core.System.get_is_windows():
+        if bsc_core.SystemMtd.get_is_windows():
             self._rv_io_path = 'C:/Program Files/Shotgun/*/bin/rvio_hw.exe'
             self._rv_ls_path = 'C:/Program Files/Shotgun/*/bin/rvls.exe'
-        elif utl_core.System.get_is_linux():
+        elif bsc_core.SystemMtd.get_is_linux():
             self._rv_io_path = '/opt/rv/bin/rvio'
             self._rv_ls_path = '/opt/rv/bin/rvls'
         else:
@@ -83,10 +85,10 @@ class StgImageOpt(object):
     def __init__(self, obj):
         self._obj = obj
         #
-        if utl_core.System.get_is_windows():
+        if bsc_core.SystemMtd.get_is_windows():
             self._rv_io_path = 'C:/Program Files/Shotgun/*/bin/rvio_hw.exe'
             self._rv_ls_path = 'C:/Program Files/Shotgun/*/bin/rvls.exe'
-        elif utl_core.System.get_is_linux():
+        elif bsc_core.SystemMtd.get_is_linux():
             self._rv_io_path = '/opt/rv/bin/rvio'
             self._rv_ls_path = '/opt/rv/bin/rvls'
         else:

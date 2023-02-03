@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import os
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
@@ -46,7 +48,7 @@ class SceneFile(object):
         :return: str(path)
         """
         _ = cmds.file(query=1, expandName=1)
-        if isinstance(_, (str, unicode)):
+        if isinstance(_, six.string_types):
             return _.replace('\\', '/')
     @classmethod
     def get_current_directory_path(cls):

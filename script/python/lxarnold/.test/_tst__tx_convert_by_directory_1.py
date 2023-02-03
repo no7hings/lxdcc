@@ -9,7 +9,7 @@ from lxutil import utl_core
 def setup_fnc_():
     from lxutil import utl_setup
     utl_setup.OcioSetup(
-        bsc_core.StoragePathMtd.set_map_to_platform(
+        bsc_core.StorageBaseMtd.set_map_to_platform(
             '/l/packages/pg/third_party/ocio/aces/1.2'
         )
     ).set_run()
@@ -50,8 +50,8 @@ with utl_core.log_progress_bar(maximum=len(file_paths), label='test') as l_p:
             search_directory_path=output_directory_path,
         )
         if i_cmd:
-            bsc_core.SPCmdThread.set_wait()
-            i_t = bsc_core.SPCmdThread.set_start(i_cmd, index=i_index)
+            bsc_core.PrcCmdThread.set_wait()
+            i_t = bsc_core.PrcCmdThread.set_start(i_cmd, index=i_index)
             i_t.finished.set_connect_to(
                 finished_fnc_
             )

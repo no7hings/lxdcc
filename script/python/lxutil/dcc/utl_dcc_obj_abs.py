@@ -95,7 +95,7 @@ class AbsOsDirectory(
             )
 
     def get_directory_paths(self):
-        return bsc_core.DirectoryMtd.get_directory_paths(
+        return bsc_core.StgDirectoryMtd.get_directory_paths(
             self.path
         )
 
@@ -140,7 +140,7 @@ class AbsOsFile(
     LOG = utl_core.Log
     def __init__(self, path):
         super(AbsOsFile, self).__init__(
-            bsc_core.StoragePathOpt(path).__str__()
+            bsc_core.StgPathOpt(path).__str__()
         )
         self._set_obj_gui_def_init_()
         #
@@ -336,7 +336,7 @@ class AbsOsFile(
         #
         if name_base != name_base_new:
             glob_pattern = pathsep.join([directory, name_base_new])
-            list_ = bsc_core.DirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
+            list_ = bsc_core.StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
             if list_:
                 list_.sort()
         else:
@@ -371,7 +371,7 @@ class AbsOsFile(
         #
         if name_base != name_base_new:
             glob_pattern = pathsep.join([directory_path, name_base_new])
-            list_ = bsc_core.DirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
+            list_ = bsc_core.StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
             if list_:
                 list_.sort()
         else:
@@ -394,7 +394,7 @@ class AbsOsFile(
         return [self.__class__(i) for i in self.get_exists_file_paths()]
 
     def get_permissions(self, *args, **kwargs):
-        return [bsc_core.StoragePathMtd.get_permission(i) for i in self.get_exists_file_paths()]
+        return [bsc_core.StorageBaseMtd.get_permission(i) for i in self.get_exists_file_paths()]
 
     def get_modify_timestamp(self, *args, **kwargs):
         exists_file_paths = self.get_exists_file_paths_(*args, **kwargs)
@@ -457,8 +457,8 @@ class AbsOsFile(
                 if ' ' in name:
                     name = name.replace(' ', '_')
             #
-            time_tag = bsc_core.IntegerOpt(int(timestamp)).set_encode_to_36()
-            size_tag = bsc_core.IntegerOpt(int(size)).set_encode_to_36()
+            time_tag = bsc_core.RawIntegerOpt(int(timestamp)).set_encode_to_36()
+            size_tag = bsc_core.RawIntegerOpt(int(size)).set_encode_to_36()
             file_path_tgt = u'{}/{}'.format(directory_path_tgt, name)
             file_path_dir_src = u'{}/{}'.format(directory_path_src, name)
             file_path_name_src = u'V-{}-{}.{}'.format(time_tag, size_tag, name)
@@ -475,12 +475,12 @@ class AbsOsFile(
             file_tgt = self.__class__(file_path_tgt)
             if file_tgt.get_is_exists_file() is True:
                 if replace is True:
-                    if bsc_core.StorageLinkMtd.get_is_link_source_to(
+                    if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                         file_path_src, file_path_tgt,
                     ) is False:
                         os.remove(file_tgt.path)
                         #
-                        bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_tgt.path)
+                        bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_tgt.path)
                         link_log = utl_core.Log.set_module_result_trace(
                             'link replace',
                             u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -509,7 +509,7 @@ class AbsOsFile(
             if file_tgt.get_is_exists() is False:
                 file_tgt.set_directory_create()
                 # link src to target
-                bsc_core.StorageLinkMtd.set_link_to(file_path_src, file_path_tgt)
+                bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_path_tgt)
                 link_log = utl_core.Log.set_module_result_trace(
                     'link create',
                     u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -599,7 +599,7 @@ class AbsOsFile(
                 )
 
     def get_is_link_source_to(self, file_path_tgt):
-        return bsc_core.StorageLinkMtd.get_is_link_source_to(
+        return bsc_core.StgPathLinkMtd.get_is_link_source_to(
             self.path, file_path_tgt,
         )
 
@@ -610,9 +610,9 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             if file_tgt.get_is_exists():
                 if replace is True:
-                    if bsc_core.StoragePathMtd.get_is_writeable(file_path_tgt) is True:
-                        if bsc_core.StorageLinkMtd.get_is_link(file_path_tgt) is True:
-                            if bsc_core.StorageLinkMtd.get_is_link_source_to(
+                    if bsc_core.StorageBaseMtd.get_is_writeable(file_path_tgt) is True:
+                        if bsc_core.StgPathLinkMtd.get_is_link(file_path_tgt) is True:
+                            if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                                 file_path_src, file_path_tgt,
                             ) is True:
                                 utl_core.Log.set_module_warning_trace(
@@ -622,7 +622,7 @@ class AbsOsFile(
                                 return
                             #
                             os.remove(file_path_tgt)
-                            bsc_core.StorageLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
+                            bsc_core.StgPathLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
                             utl_core.Log.set_module_result_trace(
                                 'file link replace',
                                 u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -630,7 +630,7 @@ class AbsOsFile(
                             return
                         #
                         os.remove(file_path_tgt)
-                        bsc_core.StorageLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
+                        bsc_core.StgPathLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
                         utl_core.Log.set_module_result_trace(
                             'file link replace',
                             u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -652,7 +652,7 @@ class AbsOsFile(
             if file_tgt.get_is_exists() is False:
                 file_tgt.set_directory_create()
                 #
-                bsc_core.StorageLinkMtd.set_file_link_to(
+                bsc_core.StgPathLinkMtd.set_file_link_to(
                     self.path, file_tgt.path
                 )
                 #
@@ -676,13 +676,13 @@ class AbsOsFile(
 
     def get_is_writeable(self):
         for i in self.get_exists_file_paths_():
-            if bsc_core.StoragePathMtd.get_is_writeable(i) is False:
+            if bsc_core.StorageBaseMtd.get_is_writeable(i) is False:
                 return False
         return True
 
     def get_is_readable(self):
         for i in self.get_exists_file_paths_():
-            if bsc_core.StoragePathMtd.get_is_readable(i) is False:
+            if bsc_core.StorageBaseMtd.get_is_readable(i) is False:
                 return False
         return True
 
@@ -755,7 +755,7 @@ class AbsOsTexture(AbsOsFile):
         if ext_any.lower() == '.tx':
             return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
         elif ext_any.lower() == '.exr':
-            file_opt = bsc_core.StorageFileOpt(file_path_src)
+            file_opt = bsc_core.StgFileOpt(file_path_src)
             if file_opt.get_is_match_name_pattern('*.z_disp.*.exr'):
                 return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
                     cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_tx_color_space(file_path_src)
@@ -861,7 +861,7 @@ class AbsOsTexture(AbsOsFile):
                     file_path_src, search_directory_path
                 )
             else:
-                return bsc_core.ImageOpt(
+                return bsc_core.ImgFileOpt(
                     file_path_src
                 ).get_create_cmd_as_ext_tgt(
                     ext_tgt,
@@ -873,7 +873,7 @@ class AbsOsTexture(AbsOsFile):
         path_base, ext_any = os.path.splitext(file_path)
         if ext_any != cls.JPG_EXT:
             if cls._get_unit_is_exists_as_ext_tgt_(file_path, ext_tgt=cls.JPG_EXT) is False:
-                return bsc_core.ImageOpt(file_path).get_jpg(width=2048, block=block)
+                return bsc_core.ImgFileOpt(file_path).get_jpg(width=2048, block=block)
         return True
     @classmethod
     def _create_unit_exr_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
@@ -1082,7 +1082,7 @@ class AbsOsTexture(AbsOsFile):
         return [self.__class__(i) for i in self.get_exists_file_paths_()]
 
     def get_permissions(self, with_tx=True):
-        return [bsc_core.StoragePathMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
+        return [bsc_core.StorageBaseMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
 
     def _get_tgt_ext_is_exists_(self, ext_tgt):
         # TODO: if ext is ".tx", "*.1001.exr" is exists and "*.1001.tx" is lost
@@ -1229,7 +1229,7 @@ class AbsOsTexture(AbsOsFile):
         _ = self._get_exists_file_paths_(self._path)
         if _:
             file_path = _[0]
-            return bsc_core.ImageOpt(
+            return bsc_core.ImgFileOpt(
                 file_path
             ).get_thumbnail()
 
@@ -1240,7 +1240,7 @@ class AbsOsTexture(AbsOsFile):
         pass
 
     def get_info(self):
-        return bsc_core.OiioImageOpt(self.path).info
+        return bsc_core.ImgFileOiioOpt(self.path).info
 
 
 class AbsObjScene(obj_abstract.AbsObjScene):

@@ -230,7 +230,7 @@ def set_maya_scene_info_export(option):
         'option="{}"'.format(option)
     )
 
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
 
     file_path = option_opt.get('file')
     root = option_opt.get('root')

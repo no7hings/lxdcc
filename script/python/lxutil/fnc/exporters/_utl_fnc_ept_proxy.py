@@ -54,7 +54,7 @@ class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             **self._option
         )
 
-        bsc_core.StorageFileOpt(file_path).set_write(
+        bsc_core.StgFileOpt(file_path).set_write(
             raw
         )
 

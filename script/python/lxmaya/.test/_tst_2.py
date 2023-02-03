@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import sys
 
 import types
@@ -118,7 +120,7 @@ class PyModule(object):
 class PyReloader(object):
     def __init__(self, *args):
         _ = args[0]
-        if isinstance(_, (str, unicode)):
+        if isinstance(_, six.string_types):
             self._module_names = [_]
         elif isinstance(_, (tuple, list)):
             self._module_names = _

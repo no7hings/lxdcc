@@ -20,7 +20,7 @@ class ScpTextureResourcesAddByQuixel(object):
         self._file_tags = set()
 
     def add_resources_from(self, directory_path_src):
-        json_files = bsc_core.StorageDirectoryOpt(
+        json_files = bsc_core.StgDirectoryOpt(
             directory_path_src
         ).get_all_file_paths(
             include_exts=['.json']
@@ -45,7 +45,7 @@ class ScpTextureResourcesAddByQuixel(object):
         :param quixel_json_file_path: <file-path>
         :return: None
         """
-        quixel_json_file_opt = bsc_core.StorageFileOpt(quixel_json_file_path)
+        quixel_json_file_opt = bsc_core.StgFileOpt(quixel_json_file_path)
         quixel_json_content = bsc_objects.Configure(
             value=quixel_json_file_path
         )
@@ -54,8 +54,8 @@ class ScpTextureResourcesAddByQuixel(object):
         category_group = quixel_json_content.get('semanticTags.asset_type')
 
         resource_id = quixel_json_file_opt.name_base
-        resource_key = bsc_core.TextMtd.set_clear_up_to(quixel_json_content.get('name').strip()).lower()
-        resource_gui_name = bsc_core.StrUnderlineOpt(resource_key).to_prettify()
+        resource_key = bsc_core.RawTextMtd.set_clear_up_to(quixel_json_content.get('name').strip()).lower()
+        resource_gui_name = bsc_core.RawStringUnderlineOpt(resource_key).to_prettify()
 
         resource_name = '{}_{}'.format(resource_key, resource_id)
         version_name = 'v0001'
@@ -131,7 +131,7 @@ class ScpTextureResourcesAddByQuixel(object):
     def __stg_add_resource_(self, pattern_kwargs):
         pattern_opt = self._dtb_opt.get_pattern_opt('resource-dir')
         path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
-        path_opt = bsc_core.StorageDirectoryOpt(path)
+        path_opt = bsc_core.StgDirectoryOpt(path)
         path_opt.set_create()
         return path
 
@@ -168,7 +168,7 @@ class ScpTextureResourcesAddByQuixel(object):
         keys = quixel_json_content.get_keys('assetCategories.*.*.*')
         for i_key in keys:
             i_args = i_key.split('.')
-            i_args = [bsc_core.TextMtd.set_clear_up_to(i).lower() for i in i_args]
+            i_args = [bsc_core.RawTextMtd.set_clear_up_to(i).lower() for i in i_args]
 
             i_types = i_args[1:]
 
@@ -211,7 +211,7 @@ class ScpTextureResourcesAddByQuixel(object):
             j_ = quixel_json_content.get('semanticTags.{}'.format(j_tag_group_name)) or ['other']
             if j_:
                 if isinstance(j_, list):
-                    j_tags = map(lambda x: bsc_core.TextMtd.set_clear_up_to(x.strip()).lower(), j_)
+                    j_tags = map(lambda x: bsc_core.RawTextMtd.set_clear_up_to(x.strip()).lower(), j_)
                     for k_tag in j_tags:
                         if k_tag:
                             if j_tag_group_name in ['color', 'environment', 'state']:
@@ -236,7 +236,7 @@ class ScpTextureResourcesAddByQuixel(object):
     def __stg_add_version_(self, pattern_kwargs):
         pattern_opt = self._dtb_opt.get_pattern_opt('version-dir')
         path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
-        path_opt = bsc_core.StorageDirectoryOpt(path)
+        path_opt = bsc_core.StgDirectoryOpt(path)
         path_opt.set_create()
         return path
 
@@ -326,7 +326,7 @@ class ScpTextureResourcesAddByQuixel(object):
         file_paths_src = glob.glob(file_path_glog_pattern_src)
         if file_paths_src:
             file_path_src = file_paths_src[0]
-            file_opt_src = bsc_core.StorageFileOpt(file_path_src)
+            file_opt_src = bsc_core.StgFileOpt(file_path_src)
             file_opt_src.set_copy_to_file(quixel_image_png_file_path)
             file_opt_src.set_copy_to_file(image_preview_png_file_path)
         return image_preview_png_file_path
@@ -336,7 +336,7 @@ class ScpTextureResourcesAddByQuixel(object):
         texture_original_src_file_p_opt = self._dtb_opt.get_pattern_opt('texture-original-src-file')
         #
         quixel_texture_directory_path = quixel_texture_directory_p_opt.set_update_to(**pattern_kwargs).get_value()
-        texture_pattern = bsc_core.ParsePatternOpt(
+        texture_pattern = bsc_core.PtnParseOpt(
             '{}/{}'.format(directory_path_src, self.TEXTURE_PATTERN),
             key_format=dict(texture_key='*', texture_size_tag='[0-9]K')
         )
@@ -348,18 +348,18 @@ class ScpTextureResourcesAddByQuixel(object):
                 j_file_path_src = i_texture_variants['result']
                 # fix texture tag
                 i_texture_type_tag = i_texture_variants['texture_type_tag']
-                i_texture_type_tag = bsc_core.TextMtd.set_clear_up_to(i_texture_type_tag).strip().lower()
+                i_texture_type_tag = bsc_core.RawTextMtd.set_clear_up_to(i_texture_type_tag).strip().lower()
                 i_texture_variants['texture_type_tag'] = i_texture_type_tag
                 self._file_tags.add(i_texture_type_tag)
 
                 i_pattern_kwargs.update(i_texture_variants)
 
-                bsc_core.StorageFileOpt(j_file_path_src).set_copy_to_directory(
+                bsc_core.StgFileOpt(j_file_path_src).set_copy_to_directory(
                     quixel_texture_directory_path
                 )
                 #
                 texture_original_src_file_path = texture_original_src_file_p_opt.set_update_to(**i_pattern_kwargs).get_value()
-                bsc_core.StorageFileOpt(j_file_path_src).set_copy_to_file(
+                bsc_core.StgFileOpt(j_file_path_src).set_copy_to_file(
                     texture_original_src_file_path
                 )
 
@@ -367,7 +367,7 @@ class ScpTextureResourcesAddByQuixel(object):
 
                 # self.__stg_add_version_file_(i_pattern_kwargs, version_path)
 
-                i_texture_size = bsc_core.OiioImageOpt(texture_original_src_file_path).get_size()
+                i_texture_size = bsc_core.ImgFileOiioOpt(texture_original_src_file_path).get_size()
                 texture_sizes.add(i_texture_size)
                 self._dtb_opt.add_entity(
                     entity_type=self._dtb_opt.EntityTypes.Tags,
@@ -475,16 +475,16 @@ class ScpTextureResourceData(object):
 
     def get_data(self):
         dict_ = {}
-        directory_opt = bsc_core.StorageDirectoryOpt(self._directory_path)
+        directory_opt = bsc_core.StgDirectoryOpt(self._directory_path)
 
         texture_paths = directory_opt.get_all_file_paths(include_exts=['.tx'])
 
-        p = bsc_core.ParsePatternOpt(
+        p = bsc_core.PtnParseOpt(
             '{name}.{key}'
         )
 
         for i_texture_path in texture_paths:
-            i_texture_opt = bsc_core.StorageFileOpt(i_texture_path)
+            i_texture_opt = bsc_core.StgFileOpt(i_texture_path)
             i_name_base = i_texture_opt.name_base
 
             i_variants = p.get_variants(i_name_base)

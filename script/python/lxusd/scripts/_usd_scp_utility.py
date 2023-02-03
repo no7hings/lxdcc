@@ -14,11 +14,11 @@ class ShotUsdCombine(object):
         self._location = location
     @classmethod
     def _get_tmp_file_(cls, file_path_src):
-        user_directory_path = bsc_core.TemporaryMtd.get_user_directory('shot-usd-combine')
+        user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('shot-usd-combine')
         return '{}/{}.usda'.format(
             user_directory_path,
             bsc_core.TimestampOpt(
-                bsc_core.StorageFileOpt(file_path_src).get_modify_timestamp()
+                bsc_core.StgFileOpt(file_path_src).get_modify_timestamp()
             ).get_as_tag_36()
         )
 
@@ -57,18 +57,18 @@ class ShotUsdCombine(object):
                     continue
                 i_file_path = i_port.Get().resolvedPath
 
-                i_yaml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(
+                i_yaml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(
                     i_file_path, 'usd-hierarchy-cacher'
                 )
-                i_yaml_file_opt = bsc_core.StorageFileOpt(i_yaml_file_path)
+                i_yaml_file_opt = bsc_core.StgFileOpt(i_yaml_file_path)
                 if i_yaml_file_opt.get_is_exists() is True:
                     i_list = i_yaml_file_opt.set_read()
                     list_.extend([i_path + j for j in i_list])
                 else:
-                    i_file_path_ = bsc_core.MultiplyFileMtd.set_convert_to(
+                    i_file_path_ = bsc_core.StgFileMultiplyMtd.set_convert_to(
                         i_file_path, ['*.####.{ext}']
                     )
-                    i_file_tile_paths = bsc_core.MultiplyFileMtd.get_exists_tiles(
+                    i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_tiles(
                         i_file_path_
                     )
                     i_list = []
@@ -80,7 +80,7 @@ class ShotUsdCombine(object):
                     i_list_ = list(set(i_list))
                     i_list_.sort(key=i_list.index)
                     #
-                    bsc_core.StorageFileOpt(i_yaml_file_path).set_write(
+                    bsc_core.StgFileOpt(i_yaml_file_path).set_write(
                         i_list_
                     )
                     #
@@ -220,9 +220,9 @@ class UsdMeshCompare(object):
         )
 
         # a_src = m_opt_src.get_face_vertex_indices()
-        # bsc_core.StorageFileOpt('/data/f/usd_uv_map_export_test/a_0.yml').set_write(a_src)
+        # bsc_core.StgFileOpt('/data/f/usd_uv_map_export_test/a_0.yml').set_write(a_src)
         # a_tgt = m_opt_tgt.get_face_vertex_indices()
-        # bsc_core.StorageFileOpt('/data/f/usd_uv_map_export_test/a_1.yml').set_write(a_tgt)
+        # bsc_core.StgFileOpt('/data/f/usd_uv_map_export_test/a_1.yml').set_write(a_tgt)
         print m_opt_src.get_face_vertices_as_uuid()
         print m_opt_tgt.get_face_vertices_as_uuid()
         print len(m_opt_src.get_face_vertex_counts())

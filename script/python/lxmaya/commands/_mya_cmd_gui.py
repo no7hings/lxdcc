@@ -8,7 +8,7 @@ from lxshotgun_gui.panel.pnl_widgets import _stg_pnl_wgt_validation
 
 # noinspection PyUnusedLocal
 def get_validation_window():
-    w = _mya_pnl_wdt_checker.SceneCheckerToolPanel()
+    w = _mya_pnl_wgt_checker.SceneCheckerToolPanel()
     return w
 
 

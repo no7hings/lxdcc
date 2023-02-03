@@ -730,7 +730,7 @@ class LxAssetAss(object):
                     'export.ass.output_file', output_ass_file_path
                 )
             elif scheme == 'dynamic':
-                output_ass_file = bsc_core.StorageFileOpt(output_ass_file_path)
+                output_ass_file = bsc_core.StgFileOpt(output_ass_file_path)
                 path_base = output_ass_file.path_base
                 ext = output_ass_file.ext
                 file_path = u'{}.%04d{}'.format(path_base, ext)
@@ -1148,7 +1148,7 @@ class LxCamera(object):
             #
             width, height = int(w*50*multipy), int(h*50*multipy)
             #
-            width_, height_ = bsc_core.SizeMtd.set_clamp_to(
+            width_, height_ = bsc_core.RawSizeMtd.set_clamp_to(
                 width, height, 2048, 512
             )
             #
@@ -1205,7 +1205,7 @@ class LxRenderer(object):
             'look_pass': 'lynxi_variants.look_pass',
             'light_pass': 'lynxi_variants.light_pass'
         }
-        combinations = bsc_core.VariablesMtd.get_all_combinations(
+        combinations = bsc_core.RawVariablesMtd.get_all_combinations(
             variants_dic
         )
         x, y = 0, 0

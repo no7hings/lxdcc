@@ -16,7 +16,7 @@ class AbsDdlQuery(object):
         )
     @classmethod
     def get_script_option(cls, **kwargs):
-        return bsc_core.KeywordArgumentsMtd.to_string(
+        return bsc_core.ArgDictStringMtd.to_string(
             **kwargs
         )
     #

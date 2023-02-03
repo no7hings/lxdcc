@@ -43,7 +43,7 @@ class AbsJobSender(object):
     option = property(get_option)
 
     def get_option_opt(self):
-        return bsc_core.KeywordArgumentsOpt(self.get_option())
+        return bsc_core.ArgDictStringOpt(self.get_option())
     option_opt = property(get_option_opt)
 
     def get_ddl_job_sender(self):
@@ -104,8 +104,8 @@ class AbsJobSender2(object):
         self._method_option = method_option
         self._script_option = script_option
         #
-        self._method_option_opt = bsc_core.KeywordArgumentsOpt(self._method_option)
-        self._script_option_opt = bsc_core.KeywordArgumentsOpt(self._script_option)
+        self._method_option_opt = bsc_core.ArgDictStringOpt(self._method_option)
+        self._script_option_opt = bsc_core.ArgDictStringOpt(self._script_option)
         # update user + time_tag
         user, time_tag = self._script_option_opt.get('user') or utl_core.System.get_user_name(), self._script_option_opt.get('time_tag') or utl_core.System.get_time_tag()
         #
@@ -132,7 +132,7 @@ class AbsJobSender2(object):
     method_option = property(get_method_option)
 
     def get_method_option_opt(self):
-        return bsc_core.KeywordArgumentsOpt(self.get_method_option())
+        return bsc_core.ArgDictStringOpt(self.get_method_option())
     method_option_opt = property(get_method_option_opt)
 
     def get_script_option(self):
@@ -140,7 +140,7 @@ class AbsJobSender2(object):
     script_option = property(get_script_option)
 
     def get_script_option_opt(self):
-        return bsc_core.KeywordArgumentsOpt(self.get_script_option())
+        return bsc_core.ArgDictStringOpt(self.get_script_option())
     script_option_opt = property(get_script_option_opt)
 
     def get_ddl_job_sender(self):

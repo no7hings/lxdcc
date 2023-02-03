@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import sys
 # noinspection PyUnresolvedReferences
 from Katana import Configuration, RenderManager, ScenegraphManager, KatanaFile, FarmAPI, CacheManager, Nodes3DAPI, NodegraphAPI
@@ -177,7 +179,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 look_pass_name
             )
         )
-        if isinstance(look_pass_node, (str, unicode)):
+        if isinstance(look_pass_node, six.string_types):
             look_pass_node = ktn_dcc_objects.Node(look_pass_node)
         #
         if look_pass_node.get_is_exists() is True:

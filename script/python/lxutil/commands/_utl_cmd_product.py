@@ -1,6 +1,8 @@
 # coding:utf-8
 from __future__ import print_function
 
+import six
+
 import os
 
 import re
@@ -90,7 +92,7 @@ class MtdBasic(object):
     @classmethod
     def _get_match_patterns_(cls, variant, dic):
         def _rcs_fnc(v_):
-            if isinstance(v_, (str, unicode)):
+            if isinstance(v_, six.string_types):
                 _r = v_
                 _ks = re.findall(re.compile(cls.REF_RE_PATTERN, re.S), v_)
                 if _ks:
@@ -271,7 +273,7 @@ class AssetTaskFileGain(object):
         # project
         self._project = project
         # asset
-        if isinstance(asset, (str, unicode)):
+        if isinstance(asset, six.string_types):
             self._assets = [asset]
         elif isinstance(asset, (tuple, list)):
             self._assets = asset
@@ -300,7 +302,7 @@ class AssetTaskFileGain(object):
                 asset_result, asset_variants = asset_matches[-1]
                 input_file_paths = []
                 output_file_paths = []
-                if isinstance(pattern_inputs, (str, unicode)):
+                if isinstance(pattern_inputs, six.string_types):
                     pattern_inputs = [pattern_inputs]
                 elif isinstance(pattern_inputs, (tuple, list)):
                     pattern_inputs = pattern_inputs

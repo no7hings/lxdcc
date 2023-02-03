@@ -16,7 +16,7 @@ utl_core.Environ.set_add(
 
 user = bsc_core.SystemMtd.get_user_name()
 
-# time_tag = bsc_core.SystemMtd.get_time_tag()
+# time_tag = bsc_core.TimeBaseMtd.get_time_tag()
 
 time_tag = '2022_0124_1916_14_184314'
 
@@ -28,7 +28,7 @@ for i_f in [
             ('rsv-task-batchers/asset/maya/model-export', {}),
         ]
     ):
-        j_option_opt = bsc_core.KeywordArgumentsOpt(
+        j_option_opt = bsc_core.ArgDictStringOpt(
             option=dict(
                 option_hook_key=j_option_hook_key,
                 #

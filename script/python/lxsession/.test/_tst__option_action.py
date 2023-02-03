@@ -12,7 +12,7 @@ import lxsession.commands as ssn_commands
 
 option_hook_key = 'actions/movie-open'
 
-o = bsc_core.KeywordArgumentsOpt(
+o = bsc_core.ArgDictStringOpt(
     dict(
         option_hook_key='actions/movie-open',
         file='/l/prod/cgm/output/assets/chr/nn_4y_test/mod/modeling/nn_4y_test.mod.modeling.v001/render/katana-images/main/close_up.master.all.ambocc.custom.mov'

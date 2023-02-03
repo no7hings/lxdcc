@@ -13,3 +13,5 @@ print rsv_project.get_rsv_resources(branch='asset', role='chr')
 print rsv_project.get_rsv_resources(branch='asset', role='ch*')
 print rsv_project.get_rsv_resources(asset='nn_gongshifu')
 print rsv_project.get_rsv_resources(asset='nn_gongshif*')
+
+

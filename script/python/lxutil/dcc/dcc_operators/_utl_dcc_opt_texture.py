@@ -415,7 +415,8 @@ class DccTexturesOpt(object):
         )
     @utl_core._debug_
     def _set_repath_post_run_(self):
-        if utl_core.Application.get_is_maya():
+
+        if bsc_core.ApplicationMtd.get_is_maya():
             import lxmaya.commands as mya_commands
             #
             mya_commands.set_texture_tiles_repair()
@@ -493,7 +494,7 @@ class DccTexturesOpt(object):
                     i_ext_key_src = i_ext_src.lower()
                     #
                     search_name_bases = search_dict.keys()
-                    name_base_fnmatch_pattern = bsc_core.MultiplyPatternMtd.to_fnmatch_style(i_name_base_src)
+                    name_base_fnmatch_pattern = bsc_core.PtnMultiplyFileMtd.to_fnmatch_style(i_name_base_src)
                     #
                     match_name_base_keys = fnmatch.filter(search_name_bases, name_base_fnmatch_pattern)
                     if match_name_base_keys:
@@ -694,11 +695,11 @@ class DccTexturesOpt(object):
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     stg_texture = utl_dcc_objects.OsTexture(j_file_path)
                     if target_platform is None:
-                        tgt_stg_texture_path = bsc_core.StoragePathMtd.set_map_to_platform(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StorageBaseMtd.set_map_to_platform(stg_texture.path)
                     elif target_platform == 'windows':
-                        tgt_stg_texture_path = bsc_core.StoragePathMtd.set_map_to_windows(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StorageBaseMtd.set_map_to_windows(stg_texture.path)
                     elif target_platform == 'linux':
-                        tgt_stg_texture_path = bsc_core.StoragePathMtd.set_map_to_linux(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StorageBaseMtd.set_map_to_linux(stg_texture.path)
                     else:
                         raise TypeError()
                     #

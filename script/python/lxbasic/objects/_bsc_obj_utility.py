@@ -1,10 +1,13 @@
 # coding:utf-8
 import collections
+
 import functools
 
 import re
 
 import os
+
+import sys
 
 import threading
 
@@ -177,7 +180,7 @@ class ProcessMonitor(object):
             self.__set_element_statuses_changed_()
     #
     def __set_logging_(self, text):
-        print text
+        sys.stdout.write(text+'\n')
         self.__set_emit_send_(self.logging, text)
     # status changed
     def __set_status_changed_(self):

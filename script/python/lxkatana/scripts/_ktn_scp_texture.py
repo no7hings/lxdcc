@@ -27,7 +27,7 @@ class ScpTextureImportFromDatabase(object):
             'option.resource', resource
         )
         self._cfg.set(
-            'option.time_tag', bsc_core.SystemMtd.get_time_tag_36_(multiply=100)
+            'option.time_tag', bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100)
         )
 
         self._texture_data = texture_data
@@ -154,7 +154,7 @@ class ScpTextureImportFromDatabase(object):
             sdr_path = self._cfg.get('node.arnold_surface_shader.path')
             sdr_obj_opt = ktn_core.NGObjOpt(sdr_path)
             x, y = sdr_obj_opt.get_position()
-            r, g, b = bsc_core.TextOpt(resource).to_rgb_(maximum=1.0, s_p=25, v_p=25)
+            r, g, b = bsc_core.RawTextOpt(resource).to_rgb_(maximum=1.0, s_p=25, v_p=25)
             attributes = dict(
                 x=x-w,
                 y=y,
@@ -233,7 +233,7 @@ class ScpTextureImportFromDatabase(object):
                 obj_opt.move_to_view_center()
             #
             obj_opt.set_attributes(dict(ns_viewState=0.0))
-            obj_opt.set_color(bsc_core.TextOpt(shader_type_name).to_rgb_(maximum=1.0, s_p=25, v_p=25))
+            obj_opt.set_color(bsc_core.RawTextOpt(shader_type_name).to_rgb_(maximum=1.0, s_p=25, v_p=25))
             #
             obj_opt.set_shader_parameters_by_data(
                 data.get('shader_parameters') or {},

@@ -410,12 +410,12 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     i_source_ktn_obj = i_source_ktn_port.getNode()
                     i_source_obj_name = i_source_ktn_obj.getName()
                     i_source_port_name = i_source_ktn_port.getName()
-                    i_source_atr_path = bsc_core.AtrPathMtd.get_atr_path(
+                    i_source_atr_path = bsc_core.DccAttrPathMtd.get_atr_path(
                         i_source_obj_name, i_source_port_name
                     )
                     target_obj_name = target_ktn_port.getNode().getName()
                     target_port_name = target_ktn_port.getName()
-                    target_atr_path = bsc_core.AtrPathMtd.get_atr_path(
+                    target_atr_path = bsc_core.DccAttrPathMtd.get_atr_path(
                         target_obj_name, target_port_name
                     )
                     lis.append(
@@ -563,7 +563,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     def set_colour_by_type_name(self):
         type_name = self.type_name
-        r, g, b = bsc_core.TextOpt(type_name).to_rgb(maximum=1)
+        r, g, b = bsc_core.RawTextOpt(type_name).to_rgb(maximum=1)
         attributes = self.ktn_obj.getAttributes()
         attributes['ns_colorr'] = r
         attributes['ns_colorg'] = g

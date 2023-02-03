@@ -13,13 +13,13 @@ p = r.get_rsv_project(
 
 
 def post_fnc():
-    t_e = bsc_core.SystemMtd.get_timestamp()
+    t_e = bsc_core.TimeBaseMtd.get_timestamp()
 
     # print p._rsv_obj_stack.get_objects()
     print 'Cost', t_e - t_s
 
 
-t_s = bsc_core.SystemMtd.get_timestamp()
+t_s = bsc_core.TimeBaseMtd.get_timestamp()
 for i in p.get_rsv_tags(
     branch='asset'
 ):

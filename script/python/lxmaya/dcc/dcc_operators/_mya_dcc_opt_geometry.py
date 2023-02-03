@@ -539,7 +539,7 @@ class MeshOpt(
         raw = self.get_points()
         if ordered is True:
             raw.sort()
-        raw = bsc_core.PointArrayOpt(raw).round_to(round_count)
+        raw = bsc_core.RawPointArrayOpt(raw).round_to(round_count)
         return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
 
     def get_face_vertices_as_uuid(self):

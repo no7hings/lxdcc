@@ -15,7 +15,7 @@ utl_core.Environ.set_add(
 
 user = bsc_core.SystemMtd.get_user_name()
 
-time_tag = bsc_core.SystemMtd.get_time_tag()
+time_tag = bsc_core.TimeBaseMtd.get_time_tag()
 
 for i_f in [
     # '/l/prod/xkt/publish/assets/chr/jiguang/srf/srf_anishading/jiguang.srf.srf_anishading.v006/scene/jiguang.ma',
@@ -27,7 +27,7 @@ for i_f in [
             ('rsv-task-methods/asset/maya/look-preview-export', {}),
         ]
     ):
-        j_option_opt = bsc_core.KeywordArgumentsOpt(
+        j_option_opt = bsc_core.ArgDictStringOpt(
             option=dict(
                 option_hook_key=j_option_hook_key,
                 #

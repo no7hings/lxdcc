@@ -1,6 +1,8 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
+from lxsession import ssn_core
+
 from lxutil.rsv import utl_rsv_obj_abstract
 
 from lxshotgun.rsv.objects import _stg_rsv_obj_utility
@@ -52,7 +54,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         extra_key = self._hook_option_opt.get('extra_key')
         create_shotgun_playlists = self._hook_option_opt.get_as_boolean('create_shotgun_playlists')
         if extra_key:
-            extra_data = bsc_core.SessionMtd.get_extra_data(extra_key)
+            extra_data = ssn_core.SsnHookFileMtd.get_extra_data(extra_key)
             if extra_data:
                 description = extra_data.get('description')
                 notice = extra_data.get('notice')
@@ -234,7 +236,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         mov_file_path = self._hook_option_opt.get('movie_file')
         if mov_file_path:
-            mov_file_opt = bsc_core.StorageFileOpt(mov_file_path)
+            mov_file_opt = bsc_core.StgFileOpt(mov_file_path)
             if mov_file_opt.get_is_exists() is True:
                 review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
                     keyword=keyword
@@ -259,7 +261,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         info_file_path = self._hook_option_opt.get('validation_info_file')
         if info_file_path:
-            info_file_opt = bsc_core.StorageFileOpt(info_file_path)
+            info_file_opt = bsc_core.StgFileOpt(info_file_path)
             if info_file_opt.get_is_exists() is True:
                 validation_info_file_rsv_unit = self._rsv_task.get_rsv_unit(
                     keyword=keyword
@@ -312,7 +314,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         review_katana_mov_file_path = review_katana_mov_file_rsv_unit.get_result(
             version=version
         )
-        review_katana_mov_file_opt = bsc_core.StorageFileOpt(
+        review_katana_mov_file_opt = bsc_core.StgFileOpt(
             review_katana_mov_file_path
         )
         if review_katana_mov_file_opt.get_is_exists() is True:

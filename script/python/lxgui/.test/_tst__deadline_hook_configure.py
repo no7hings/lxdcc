@@ -7,7 +7,7 @@ utl_core.Environ.set_add(
     utl_core.Resources.ENVIRON_KEY, '/data/e/myworkspace/td/lynxi/script/python/.resources'
 )
 
-option = bsc_core.KeywordArgumentsMtd.to_string(
+option = bsc_core.ArgDictStringMtd.to_string(
     **dict(
         # hook option
         option_hook_key='rsv-task-methods/asset/maya/geometry-export',

@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import os
 
 import json
@@ -64,7 +66,7 @@ class AbsContentDef(object):
 
     def set_variant_convert(self, variant):
         re_pattern = re.compile(r'[<](.*?)[>]', re.S)
-        if isinstance(variant, (str, unicode)):
+        if isinstance(variant, six.string_types):
             s = variant
             keys = re.findall(re_pattern, variant)
             if keys:
@@ -73,7 +75,7 @@ class AbsContentDef(object):
                     if v is None:
                         raise TypeError('key: "{}" is Non-exists'.format(i))
                     v = self.set_variant_convert(v)
-                    if isinstance(v, (str, unicode)):
+                    if isinstance(v, six.string_types):
                         s = s.replace('<{}>'.format(i), v)
                     elif isinstance(v, (tuple, list)):
                         return None
@@ -89,7 +91,7 @@ class AbsContentDef(object):
                         if isinstance(v, list):
                             v.reverse()
                             [lis.insert(index, self.set_variant_convert(i)) for i in v]
-                        elif isinstance(v, (str, unicode)):
+                        elif isinstance(v, six.string_types):
                             lis.append(self.set_variant_convert(v))
                 else:
                     lis.append(i)

@@ -41,18 +41,18 @@ with utl_core.log_progress_bar(maximum=len(cs), label='usd combine') as l_p:
         )
         i_file_path = i_port.Get().resolvedPath
 
-        i_yaml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(
+        i_yaml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(
             i_file_path, 'usd-hierarchy-cacher'
         )
-        i_yaml_file_opt = bsc_core.StorageFileOpt(i_yaml_file_path)
+        i_yaml_file_opt = bsc_core.StgFileOpt(i_yaml_file_path)
         if i_yaml_file_opt.get_is_exists() is True:
             i_list = i_yaml_file_opt.set_read()
             list_.extend([i_path + j for j in i_list])
         else:
-            i_file_path_ = bsc_core.MultiplyFileMtd.set_convert_to(
+            i_file_path_ = bsc_core.StgFileMultiplyMtd.set_convert_to(
                 i_file_path, ['*.####.{ext}']
             )
-            i_file_tile_paths = bsc_core.MultiplyFileMtd.get_exists_tiles(
+            i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_tiles(
                 i_file_path_
             )
             i_list = []
@@ -64,7 +64,7 @@ with utl_core.log_progress_bar(maximum=len(cs), label='usd combine') as l_p:
             i_list_ = list(set(i_list))
             i_list_.sort(key=i_list.index)
             #
-            bsc_core.StorageFileOpt(i_yaml_file_path).set_write(
+            bsc_core.StgFileOpt(i_yaml_file_path).set_write(
                 i_list_
             )
             #

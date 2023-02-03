@@ -17,19 +17,24 @@ class Configure(bsc_obj_abs.AbsContent):
 
 
 class Property(object):
-    def __init__(self, key, value):
+    def __init__(self, properties, key):
+        self._properties = properties
         self._key = key
-        self._value = value
     @property
     def key(self):
         return self._key
-    @property
-    def value(self):
-        return self._value
+
+    def get_value(self):
+        return self._properties.get(self._key)
+    value = property(get_value)
+
+    @value.setter
+    def value(self, value):
+        self._properties.get(self._key, value)
 
     def __str__(self):
         return '{} = {}'.format(
-            self._key, self._value
+            self._key, self.get_value()
         )
 
 
@@ -37,14 +42,14 @@ class Properties(bsc_obj_abs.AbsContent):
     PATHSEP = '.'
     PROPERTY_CLASS = Property
     def __init__(self, obj, raw=None):
+        self._obj = obj
+        #
         if raw is None:
             raw = collections.OrderedDict()
         super(Properties, self).__init__(value=raw)
-        #
-        self._obj = obj
 
     def get_property(self, key):
-        return self.PROPERTY_CLASS(key, self.get(key))
+        return self.PROPERTY_CLASS(self, key)
 
 
 class Dict(bsc_obj_abs.AbsContent):

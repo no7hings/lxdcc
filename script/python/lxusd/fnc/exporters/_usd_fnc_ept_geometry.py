@@ -1,9 +1,11 @@
 # coding:utf-8
+import six
+# noinspection PyUnresolvedReferences
+from pxr import Usd, Sdf, Vt, UsdGeom
+
 import copy
 
 import collections
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom
 
 from lxbasic import bsc_core
 
@@ -94,7 +96,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         self._output_stage_opt.set_default_prim(self._root)
         # create directory
-        # bsc_core.StorageFileOpt(self._file_path).set_directory_create()
+        # bsc_core.StgFileOpt(self._file_path).set_directory_create()
         #
         self._output_stage_opt.set_export_to(self._file_path)
         #
@@ -162,7 +164,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             label='geometry look property create'
         ) as l_p:
             display_color = self.get('display_color')
-            asset_color = bsc_core.TextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
+            asset_color = bsc_core.RawTextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
             for i_usd_prim_src in self._usd_stage_src.TraverseAll():
                 l_p.set_update()
                 #
@@ -204,7 +206,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                                     i_usd_mesh_opt_tgt.set_uv_map_create(j_uv_map_name, uv_map)
                         #
                         if self.get('with_shell_color') is True:
-                            i_offset = bsc_core.TextOpt(i_obj_path_opt.name).get_index()
+                            i_offset = bsc_core.RawTextOpt(i_obj_path_opt.name).get_index()
                             face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
                                 offset=i_offset, seed=self._color_seed
                             )
@@ -272,7 +274,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             maximum=count,
             label='geometry display-color create'
         ) as l_p:
-            asset_color = bsc_core.TextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
+            asset_color = bsc_core.RawTextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
             for i_index, i_usd_prim_src in enumerate(self._usd_stage_src.TraverseAll()):
                 i_obj_type_name = i_usd_prim_src.GetTypeName()
                 i_obj_path = i_usd_prim_src.GetPath().pathString
@@ -288,7 +290,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     i_usd_mesh_tgt = UsdGeom.Mesh(i_usd_prim_tgt)
                     i_usd_mesh_opt_tgt = usd_core.UsdMeshOpt(i_usd_mesh_tgt)
                     #
-                    if isinstance(color_scheme, (str, unicode)):
+                    if isinstance(color_scheme, six.string_types):
                         if color_scheme == 'object_color':
                             i_object_color = i_obj_path_opt.get_color_from_name(
                                 maximum=1.0, seed=self._color_seed

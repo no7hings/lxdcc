@@ -32,7 +32,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
             directory_path_src = directory_paths_src[0]
 
-            directory_path_opt_src = bsc_core.StorageDirectoryOpt(directory_path_src)
+            directory_path_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
             directory_path_opt_src.set_map_to_platform()
             if directory_path_opt_src.get_is_exists() is True:
                 directory_path_opt_src.set_copy_to_directory(
@@ -69,7 +69,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         file_paths_src = self._hook_option_opt.get_as_array('recycles_maya_files')
         if file_paths_src:
             file_path_src = file_paths_src[0]
-            file_path_opt_src = bsc_core.StorageFileOpt(file_path_src)
+            file_path_opt_src = bsc_core.StgFileOpt(file_path_src)
             file_path_opt_src.set_map_to_platform()
             if file_path_opt_src.get_is_exists() is True:
                 version = self._rsv_scene_properties.get('version')
@@ -140,7 +140,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             #
             directory_path_src = directory_paths_src[0]
-            directory_path_opt_src = bsc_core.StorageDirectoryOpt(directory_path_src)
+            directory_path_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
             directory_path_opt_src.set_map_to_platform()
             if directory_path_opt_src.get_is_exists() is True:
                 directory_path_opt_src.set_copy_to_directory(
@@ -178,7 +178,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version=version, extend_variants=dict(variant=variant)
             )
             for i_file_path_src in file_paths_src:
-                i_file_path_opt_src = bsc_core.StorageFileOpt(i_file_path_src)
+                i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
                 i_file_path_opt_src.set_map_to_platform()
                 if i_file_path_opt_src.get_is_exists() is True:
                     i_file_path_opt_src.set_copy_to_directory(
@@ -216,7 +216,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version=version, extend_variants=dict(variant=variant)
             )
             for i_file_path_src in file_paths_src:
-                i_file_path_opt_src = bsc_core.StorageFileOpt(i_file_path_src)
+                i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
                 # map path to current platform first
                 i_file_path_opt_src.set_map_to_platform()
                 if i_file_path_opt_src.get_is_exists() is True:
@@ -279,7 +279,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
-        if bsc_core.StorageDirectoryOpt(xgen_main_directory_path_tgt).get_is_exists() is False:
+        if bsc_core.StgDirectoryOpt(xgen_main_directory_path_tgt).get_is_exists() is False:
             directory_path_0 = xgen_main_directory_rsv_unit_tgt.get_exists_result(
                 version='latest', extend_variants=dict(variant=variant)
             )
@@ -507,7 +507,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         render_output_file_path_pattern = '{directory}/main/{camera}.{layer}.{light_pass}.{look_pass}.{quality}/{render_pass}.{frame}.exr'
 
-        p = bsc_core.ParsePatternOpt(render_output_file_path_pattern)
+        p = bsc_core.PtnParseOpt(render_output_file_path_pattern)
         p.set_update(directory=render_output_directory_path)
 
         dict_ = collections.OrderedDict()
@@ -519,8 +519,8 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             for j_match in i_matchers:
                 j_option = {}
                 j_file_path = j_match['result']
-                j_file_opt = bsc_core.StorageFileOpt(j_file_path)
-                i_f_name_new, i_frame = bsc_core.MultiplyFileMtd.get_match_args(
+                j_file_opt = bsc_core.StgFileOpt(j_file_path)
+                i_f_name_new, i_frame = bsc_core.StgFileMultiplyMtd.get_match_args(
                     j_file_opt.name, '*.%04d.exr'
                 )
                 i_f_new = '{}/{}'.format(j_file_opt.directory_path, i_f_name_new)
@@ -532,12 +532,12 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # resize use fit
         for k, i_v in dict_.items():
             i_f_src = k
-            i_f_opt_src = bsc_core.StorageFileOpt(k)
+            i_f_opt_src = bsc_core.StgFileOpt(k)
             i_f_tgt = '{}/resize/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
-            i_f_opt_tgt = bsc_core.StorageFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_resize'] = i_f_tgt
             i_f_opt_tgt.set_directory_create()
-            bsc_core.OiioMtd.set_fit_to(i_f_src, i_f_tgt, (2048, 2048))
+            bsc_core.ImgOiioMtd.set_fit_to(i_f_src, i_f_tgt, (2048, 2048))
             utl_core.Log.set_module_result_trace(
                 'image resize',
                 u'file="{}"'.format(
@@ -548,12 +548,12 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         for k, i_v in dict_.items():
             i_name = i_v['name']
             i_f_src = k
-            i_f_opt_src = bsc_core.StorageFileOpt(k)
+            i_f_opt_src = bsc_core.StgFileOpt(k)
             i_f_tgt = '{}/background/{}.exr'.format(i_f_opt_src.directory_path, i_name)
-            i_f_opt_tgt = bsc_core.StorageFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_background'] = i_f_tgt
             i_f_opt_tgt.set_directory_create()
-            bsc_core.OiioMtd.set_create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
+            bsc_core.ImgOiioMtd.set_create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
             utl_core.Log.set_module_result_trace(
                 'image background create',
                 u'file="{}"'.format(
@@ -563,14 +563,14 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # add background
         for k, i_v in dict_.items():
             i_f_src = k
-            i_f_opt_src = bsc_core.StorageFileOpt(k)
+            i_f_opt_src = bsc_core.StgFileOpt(k)
             i_f_tgt = '{}/base/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
-            i_f_opt_tgt = bsc_core.StorageFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_base'] = i_f_tgt
             i_resize = i_v['image_resize']
             i_background = i_v['image_background']
             i_f_opt_tgt.set_directory_create()
-            bsc_core.OiioMtd.set_over_by(i_resize, i_background, i_f_tgt, (0, 0))
+            bsc_core.ImgOiioMtd.set_over_by(i_resize, i_background, i_f_tgt, (0, 0))
             utl_core.Log.set_module_result_trace(
                 'image background add',
                 u'file="{}"'.format(
@@ -580,14 +580,14 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # add foreground
         for k, i_v in dict_.items():
             i_f_src = k
-            i_f_opt_src = bsc_core.StorageFileOpt(k)
+            i_f_opt_src = bsc_core.StgFileOpt(k)
             i_f_tgt = '{}/final/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
-            i_f_opt_tgt = bsc_core.StorageFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_final'] = i_f_tgt
             i_base = i_v['image_base']
             i_foreground = i_v['image_foreground']
             i_f_opt_tgt.set_directory_create()
-            bsc_core.OiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
+            bsc_core.ImgOiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
             utl_core.Log.set_module_result_trace(
                 'image foreground add',
                 u'file="{}"'.format(
@@ -597,7 +597,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         images_final = [v['image_final'] for k, v in dict_.items()]
 
-        bsc_core.RvioOpt(
+        bsc_core.VdoRvioOpt(
             option=dict(
                 input=' '.join(['"{}"'.format(i) for i in images_final]),
                 output=video_file_path

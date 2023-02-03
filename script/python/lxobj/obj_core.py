@@ -96,7 +96,7 @@ class DccPathDagMtd(object):
         return pathsep_tgt.join(cls.get_dag_args(path, pathsep=pathsep_src))
 
 
-class AtrPathMtd(object):
+class DccAttrPathMtd(object):
     @classmethod
     def set_atr_path_split(cls, path, pathsep=obj_configure.Port.PATHSEP):
         _ = path.split(pathsep)

@@ -1,4 +1,6 @@
 # coding:utf-8
+import six
+
 import types
 # noinspection PyUnresolvedReferences
 from Katana import Configuration, NodegraphAPI, KatanaFile
@@ -26,7 +28,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def get_current_file_path(cls):
         _ = NodegraphAPI.GetProjectFile()
-        if isinstance(_, (str, unicode)):
+        if isinstance(_, six.string_types):
             return _.replace('\\', '/')
     @classmethod
     def set_file_path(cls, file_path):
@@ -115,7 +117,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         NodegraphAPI.GetRootNode().getParameter('workingOutTime').setValue(end_frame, 0)
     @classmethod
     def get_objs_by_type(cls, obj_type_name):
-        if isinstance(obj_type_name, (str, unicode)):
+        if isinstance(obj_type_name, six.string_types):
             obj_type_names = [obj_type_name]
         elif isinstance(obj_type_name, (tuple, list)):
             obj_type_names = obj_type_name

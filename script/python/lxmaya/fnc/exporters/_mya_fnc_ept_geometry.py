@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
@@ -96,7 +97,7 @@ class GeometryAbcExporter(object):
     @classmethod
     def _get_location_(cls, raw):
         if raw is not None:
-            if isinstance(raw, (str, unicode)):
+            if isinstance(raw, six.string_types):
                 _ = [raw]
             elif isinstance(raw, (tuple, list)):
                 _ = list(raw)
@@ -115,7 +116,7 @@ class GeometryAbcExporter(object):
                 return ' '.join(lis)
     @classmethod
     def _get_data_format_(cls, data_format):
-        if isinstance(data_format, (str, unicode)):
+        if isinstance(data_format, six.string_types):
             if data_format in cls.DATA_FROAMTS:
                 return '-{0} {1}'.format(cls.DATA_FORMAT, data_format)
             return '-{0} {1}'.format(cls.DATA_FORMAT, cls.OGAWA)
@@ -134,7 +135,7 @@ class GeometryAbcExporter(object):
             return ' '.join(['-{0} {1}'.format(cls.ROOT, i) for i in lis])
     @classmethod
     def _get_exists_dcc_paths_(cls, obj_path_args):
-        if isinstance(obj_path_args, (str, unicode)):
+        if isinstance(obj_path_args, six.string_types):
             if cmds.objExists(obj_path_args):
                 return [cmds.ls(obj_path_args, long=1)[0]]
         elif isinstance(obj_path_args, (tuple, list)):
@@ -142,7 +143,7 @@ class GeometryAbcExporter(object):
     @classmethod
     def _get_strs_(cls, string, includes=None):
         lis = []
-        if isinstance(string, (str, unicode)):
+        if isinstance(string, six.string_types):
             if includes:
                 if string in includes:
                     lis = [string]
@@ -463,7 +464,7 @@ class GeometryUsdExporter_(object):
                                     )
                                 # export color use name
                                 if with_display_color is True:
-                                    color = bsc_core.TextOpt(i_mya_mesh.name).to_rgb_(
+                                    color = bsc_core.RawTextOpt(i_mya_mesh.name).to_rgb_(
                                         maximum=1
                                     )
                                     i_usd_mesh_opt.set_display_color_fill(
@@ -488,7 +489,7 @@ class GeometryUsdExporter_(object):
                                     counts, points, widths
                                 )
                                 if with_display_color is True:
-                                    color = bsc_core.TextOpt(i_mya_curve.name).to_rgb_(
+                                    color = bsc_core.RawTextOpt(i_mya_curve.name).to_rgb_(
                                         maximum=1
                                     )
                                     i_usd_curve_opt.set_display_color_fill(
@@ -509,7 +510,7 @@ class GeometryUsdExporter_(object):
                                 counts, points, widths
                             )
                             if with_display_color is True:
-                                color = bsc_core.TextOpt(i_mya_xgen_description.name).to_rgb_(
+                                color = bsc_core.RawTextOpt(i_mya_xgen_description.name).to_rgb_(
                                     maximum=1
                                 )
                                 i_usd_curve_opt.set_display_color_fill(
@@ -531,7 +532,7 @@ class GeometryUsdExporter_(object):
                     #             counts, points, widths
                     #         )
                     #         if with_display_color is True:
-                    #             color = bsc_core.TextOpt(i_mya_xgen_spline_guide.name).to_rgb_(
+                    #             color = bsc_core.RawTextOpt(i_mya_xgen_spline_guide.name).to_rgb_(
                     #                 maximum=1
                     #             )
                     #             i_usd_curve_opt.set_display_color_fill(
@@ -588,7 +589,7 @@ class DatabaseGeometryExport(object):
                 if mesh_opt.get_shell_count() == 1:
                     uv_maps = mesh_opt.get_uv_maps()
                     key = mesh_opt.get_face_vertices_as_uuid()
-                    if bsc_core.DatabaseGeometryUvMapMtd.set_value(
+                    if bsc_core.DtbGeometryUvMapFileMtd.set_value(
                         key=key,
                         value=uv_maps,
                         force=self._option['force']
@@ -692,11 +693,11 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         )
     @classmethod
     def _get_tmp_usd_file_(cls):
-        user_directory_path = bsc_core.TemporaryMtd.get_user_directory('usd-export')
+        user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('usd-export')
         return '{}/{}.usd'.format(
             user_directory_path,
             bsc_core.TimestampOpt(
-                bsc_core.SystemMtd.get_timestamp()
+                bsc_core.TimeBaseMtd.get_timestamp()
             ).get_as_tag_36()
         )
     @classmethod

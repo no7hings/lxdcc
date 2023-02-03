@@ -46,7 +46,7 @@ def main():
 def set_run_by_option(option):
     from lxbasic import bsc_core
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     start_server = option_opt.get('start_server') or False
     if start_server:
@@ -80,7 +80,7 @@ def set_cmd_run():
     unique_id = kwargs.get('uuid')
     if unique_id:
         hook_yml_file_path = bsc_core.SystemMtd.get_hook_file_path(unique_id=unique_id)
-        hook_yml_file = bsc_core.StorageFileOpt(hook_yml_file_path)
+        hook_yml_file = bsc_core.StgFileOpt(hook_yml_file_path)
         if hook_yml_file.get_is_exists() is True:
             raw = hook_yml_file.set_read()
             if raw:

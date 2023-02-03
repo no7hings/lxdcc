@@ -28,7 +28,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         super(AssetBuilder, self).__init__(option)
     @classmethod
     def _set_camera_build_(cls, option):
-        option_opt = bsc_core.KeywordArgumentsOpt(option)
+        option_opt = bsc_core.ArgDictStringOpt(option)
         rsv_task = rsv_commands.get_resolver().get_rsv_task(**option_opt.value)
         version = option_opt.get('version')
         cls._set_camera_build_by_abc_(rsv_task, version)

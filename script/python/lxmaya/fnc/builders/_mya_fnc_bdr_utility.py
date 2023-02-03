@@ -385,7 +385,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 light_ass_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-light-ass-file')
                 light_ass_file_path = light_ass_file_rsv_unit.get_result(version='latest')
                 if light_ass_file_path:
-                    light_ass_file_opt = bsc_core.StorageFileOpt(light_ass_file_path)
+                    light_ass_file_opt = bsc_core.StgFileOpt(light_ass_file_path)
                     obj = mya_dcc_objects.Shape(light_ass_file_opt.name_base)
                     if obj.get_is_exists() is False:
                         obj = obj.set_create('aiStandIn')
@@ -399,9 +399,9 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
     def _set_scene_save_(cls, rsv_asset, save_scene):
         if save_scene is True:
             if rsv_asset is not None:
-                user_directory_path = bsc_core.TemporaryMtd.get_user_directory('builder')
+                user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('builder')
                 # print user_directory_path
-                file_path = '{}/{}.ma'.format(user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.SystemMtd.get_time_tag()]))
+                file_path = '{}/{}.ma'.format(user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeBaseMtd.get_time_tag()]))
 
                 mya_dcc_objects.Scene.set_file_save_to(file_path)
     @classmethod

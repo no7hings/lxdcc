@@ -59,7 +59,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 variable_mapper[i_variable_key]
             )
         #
-        combinations = bsc_core.VariablesMtd.get_all_combinations(
+        combinations = bsc_core.RawVariablesMtd.get_all_combinations(
             variants_dic
         )
         render_ddl_job_ids = []
@@ -86,14 +86,14 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     i_render_frame_step = int(self._hook_option_opt.get_as_integer('render_asset_frame_step'))
                 #
                 if i_render_frame_step > 1:
-                    render_frame_range = bsc_core.TextOpt(i_render_frames).to_frame_range()
-                    i_render_frames_ = bsc_core.FrameRangeMtd.get(
+                    render_frame_range = bsc_core.RawTextOpt(i_render_frames).to_frame_range()
+                    i_render_frames_ = bsc_core.RawFrameRangeMtd.get(
                         render_frame_range, i_render_frame_step
                     )
                 else:
-                    i_render_frames_ = bsc_core.TextOpt(i_render_frames).to_frames()
+                    i_render_frames_ = bsc_core.RawTextOpt(i_render_frames).to_frames()
                 #
-                i_katana_render_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                i_katana_render_hook_option_opt = bsc_core.ArgDictStringOpt(
                     dict(
                         option_hook_key=katana_render_hook_key,
                         #
@@ -133,7 +133,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             render_output_directory_path,
                             i_variable_name
                         )
-                        i_movie_convert_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                        i_movie_convert_hook_option_opt = bsc_core.ArgDictStringOpt(
                             option=dict(
                                 option_hook_key=movie_convert_hook_key,
                                 #
@@ -166,7 +166,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         i_image_file_path_tgt = '{}/main/{}.png'.format(
                             render_output_directory_path, i_variable_name
                         )
-                        i_movie_convert_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                        i_movie_convert_hook_option_opt = bsc_core.ArgDictStringOpt(
                             option=dict(
                                 option_hook_key=image_convert_hook_key,
                                 #
@@ -192,7 +192,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             layers = self._hook_option_opt.get_as_array('layers')
             render_passes = self._hook_option_opt.get_as_array('render_passes')
             #
-            video_composite_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+            video_composite_hook_option_opt = bsc_core.ArgDictStringOpt(
                 option=dict(
                     option_hook_key=video_composite_hook_key,
                     #
@@ -217,7 +217,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if video_composite_ddl_job_id:
                 with_shotgun_qc_export = self._hook_option_opt.get_as_boolean('with_shotgun_qc_export')
                 if with_shotgun_qc_export is True:
-                    shotgun_qc_export_hook_option_opt = bsc_core.KeywordArgumentsOpt(
+                    shotgun_qc_export_hook_option_opt = bsc_core.ArgDictStringOpt(
                         option=dict(
                             option_hook_key=shotgun_qc_export_hook_key,
                             #

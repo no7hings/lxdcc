@@ -11,7 +11,7 @@ utl_core.Environ.set_add(
 
 user = bsc_core.SystemMtd.get_user_name()
 
-j_option_opt = bsc_core.KeywordArgumentsOpt(
+j_option_opt = bsc_core.ArgDictStringOpt(
     option=dict(
         option_hook_key='rsv-task-batchers/asset/maya/camera-export',
         #

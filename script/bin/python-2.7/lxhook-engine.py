@@ -53,7 +53,7 @@ def __set_help_print():
 def __set_run_by_option(option):
     from lxbasic import bsc_core
     #
-    option_opt = bsc_core.KeywordArgumentsOpt(option)
+    option_opt = bsc_core.ArgDictStringOpt(option)
     #
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
@@ -71,8 +71,8 @@ def __set_option_hook_run(hook_option):
     #
     from lxsession import ssn_core
     #
-    all_hook_engines = ssn_core.HookEngineMtd.get_all()
-    option_opt = bsc_core.KeywordArgumentsOpt(hook_option)
+    all_hook_engines = ssn_core.SsnHookEngineMtd.get_all()
+    option_opt = bsc_core.ArgDictStringOpt(hook_option)
     #
     project = option_opt.get('project')
     hook_engine = option_opt.get('hook_engine')
@@ -98,7 +98,7 @@ def __set_option_hook_run(hook_option):
             cmd_args.append(' '.join(extend_packages))
         #
         cmd_args.append(
-            ssn_core.HookEngineMtd.get_command(
+            ssn_core.SsnHookEngineMtd.get_command(
                 **kwargs
             )
         )

@@ -155,7 +155,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         file_ = utl_dcc_objects.OsFile(self._file_path)
         if file_.get_is_exists() is True:
             if self._name_join_time_tag is True:
-                time_tag = bsc_core.IntegerOpt(
+                time_tag = bsc_core.RawIntegerOpt(
                     int(file_.get_modify_timestamp())
                 ).set_encode_to_36()
             else:
@@ -694,7 +694,7 @@ class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
             obj_path_src, port_path_src = bsc_core.DccAttrPathOpt(atr_path_src).to_args()
             if obj_path_src in self._name_dict:
                 obj_path_src = self._name_dict[obj_path_src]
-            atr_path_src = bsc_core.AtrPathMtd.get_atr_path(obj_path_src, port_path_src)
+            atr_path_src = bsc_core.DccAttrPathMtd.get_atr_path(obj_path_src, port_path_src)
             ma_core.CmdPortOpt._set_connection_create_(atr_path_src, atr_path_tgt)
 
     def _set_obj_material_assign_create_(self, obj_path, material_assigns):

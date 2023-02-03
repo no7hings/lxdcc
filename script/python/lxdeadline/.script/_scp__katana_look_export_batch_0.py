@@ -35,7 +35,7 @@ for i_asset in assets:
     i_file_rsv_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
     i_file_path = i_file_rsv_unit.get_result(version='latest')
     if i_file_path:
-        i_option_opt_0 = bsc_core.KeywordArgumentsOpt(
+        i_option_opt_0 = bsc_core.ArgDictStringOpt(
             option=dict(
                 option_hook_key='rsv-task-methods/asset/katana/gen-look-export',
                 #
@@ -59,7 +59,7 @@ for i_asset in assets:
             option=i_option_opt_0.to_string()
         )
 
-        # i_option_opt_1 = bsc_core.KeywordArgumentsOpt(
+        # i_option_opt_1 = bsc_core.ArgDictStringOpt(
         #     option=dict(
         #         option_hook_key='rsv-task-methods/asset/katana/gen-geometry-export',
         #         #

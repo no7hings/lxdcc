@@ -24,7 +24,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
 
     def get_mesh_comparer_data(self, file_path):
         if file_path:
-            yml_file_path = bsc_core.TemporaryYamlMtd.get_file_path(file_path, 'mesh-comparer')
+            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'mesh-comparer')
             return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
         else:
             return bsc_objects.Content(value={})

@@ -36,7 +36,7 @@ for i_asset in assets:
     i_file_rsv_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
     i_file_path = i_file_rsv_unit.get_result(version='latest')
     if i_file_path:
-        i_option_opt = bsc_core.KeywordArgumentsOpt(
+        i_option_opt = bsc_core.ArgDictStringOpt(
             option=dict(
                 option_hook_key='rsv-task-batchers/asset/gen-surface-export',
                 #

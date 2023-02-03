@@ -603,7 +603,7 @@ class StgConnector(object):
         version_number = int(version[1:])
         #
         file_path = kwargs['file']
-        file_opt = bsc_core.StorageFileOpt(file_path)
+        file_opt = bsc_core.StgFileOpt(file_path)
         file_name = file_opt.get_name()
         file_ext = file_opt.get_ext()
         if 'file_type' in kwargs:
@@ -637,7 +637,7 @@ class StgConnector(object):
                         "task": stg_task,
                         "project": stg_project,
                         "entity": stg_entity,
-                        "path_cache": bsc_core.StoragePathMtd.set_map_to_platform(file_path),
+                        "path_cache": bsc_core.StorageBaseMtd.set_map_to_platform(file_path),
                         "version_number": version_number,
                      }
                 )

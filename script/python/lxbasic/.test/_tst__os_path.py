@@ -5,7 +5,7 @@ scene_file_path = "\l\prod\cjd\publish\assets\prp\cjdj_fengche\rig\rigging\cjdj_
 print scene_file_path
 print repr(scene_file_path)
 
-print bsc_core.StoragePathOpt(
+print bsc_core.StgPathOpt(
     scene_file_path
 ).get_path()
 

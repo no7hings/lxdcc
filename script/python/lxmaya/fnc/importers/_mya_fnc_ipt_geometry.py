@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 from maya import cmds, mel
 
@@ -40,7 +41,7 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
         self._usd_stage_opt = usd_core.UsdStageOpt()
         self._usd_stage = self._usd_stage_opt.usd_instance
         #
-        if bsc_core.StoragePathOpt(self._file_path).get_is_file() is True:
+        if bsc_core.StgPathOpt(self._file_path).get_is_file() is True:
             self._usd_stage_opt.set_sublayer_append(self._file_path)
             uv_map_file_path = self._option.get('uv_map_file')
             if uv_map_file_path is not None:
@@ -296,7 +297,7 @@ class GeometryXgenImporter(
         super(GeometryXgenImporter, self).__init__(option)
     @classmethod
     def set_glow_import(cls, grow_file, grow_location):
-        if isinstance(grow_file, (str, unicode)):
+        if isinstance(grow_file, six.string_types):
             file_paths = [grow_file]
         else:
             file_paths = grow_file
@@ -327,7 +328,7 @@ class GeometryXgenImporter(
         )
         group.set_dag_components_create()
         #
-        if isinstance(xgen_collection_file, (str, unicode)):
+        if isinstance(xgen_collection_file, six.string_types):
             file_paths = [xgen_collection_file]
         else:
             file_paths = xgen_collection_file
@@ -395,7 +396,7 @@ class DatabaseGeometryImporter(object):
                 mesh_opt = mya_dcc_operators.MeshOpt(mesh)
                 if mesh_opt.get_shell_count() == 1:
                     key = mesh_opt.get_face_vertices_as_uuid()
-                    uv_maps = bsc_core.DatabaseGeometryUvMapMtd.get_value(key)
+                    uv_maps = bsc_core.DtbGeometryUvMapFileMtd.get_value(key)
                     mesh_opt.set_uv_maps(uv_maps, clear=True)
             #
             g_p.set_stop()

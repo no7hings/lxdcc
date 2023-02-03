@@ -56,10 +56,10 @@ class MayaSetup(object):
         )
         lis = []
         for i in _:
-            path_opt = bsc_core.StoragePathOpt(i)
+            path_opt = bsc_core.StgPathOpt(i)
             if path_opt.get_is_exists() is True:
                 i_ae_path = '{}/ae'.format(path_opt.get_path())
-                if bsc_core.StoragePathOpt(i_ae_path).get_is_exists() is True:
+                if bsc_core.StgPathOpt(i_ae_path).get_is_exists() is True:
                     lis.append(i_ae_path)
         #
         if lis:

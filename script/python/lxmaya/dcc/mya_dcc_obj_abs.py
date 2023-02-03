@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 # noinspection PyUnresolvedReferences,PyPep8Naming
@@ -108,7 +109,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
         if self.get_is_exists() is True:
             if self.get_has_source() is False:
                 if self.type == 'string':
-                    if isinstance(value, (str, unicode)):
+                    if isinstance(value, six.string_types):
                         cmds.setAttr(self.path, value, type=self.type)
                     else:
                         utl_core.Log.set_module_warning_trace(
@@ -116,7 +117,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                             u'attribute="{}", value="{}" is not available'.format(self.path, value)
                         )
                 elif self.type == 'enum':
-                    if isinstance(value, (str, unicode)):
+                    if isinstance(value, six.string_types):
                         enumerate_strings = self._obj_atr_query.get_enumerate_strings()
                         index = enumerate_strings.index(value)
                         cmds.setAttr(self.path, index)

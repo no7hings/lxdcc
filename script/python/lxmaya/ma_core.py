@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 # noinspection PyUnresolvedReferences
 from maya import cmds, OpenMayaUI
 # noinspection PyUnresolvedReferences,PyPep8Naming
@@ -1723,7 +1724,7 @@ class CmdCustomizePortQueryOpt(object):
     pass
 
 
-class CmdObjQuery(object):
+class CmdObjQueryOpt(object):
     def __init__(self, obj_type_name):
         self._obj_type_name = obj_type_name
     #
@@ -1907,7 +1908,7 @@ class CmdPortOpt(object):
                             edit=1
                         )
                     #
-                    if isinstance(value, (str, unicode)):
+                    if isinstance(value, six.string_types):
                         enumerate_strings = self.get_port_query().get_enumerate_strings(self.get_obj_path())
                         index = enumerate_strings.index(value)
                         cmds.setAttr(self.get_path(), index)
@@ -1942,6 +1943,12 @@ class CmdPortOpt(object):
     def get_enumerate_strings(self):
         return self.get_port_query().get_enumerate_strings(
             self.get_obj_path()
+        )
+
+    def set_enumerate_strings(self, strings):
+        cmds.addAttr(
+            self._atr_path,
+            edit=1, enumName=':'.join(strings)
         )
 
     def get_has_source(self):
@@ -2032,7 +2039,7 @@ class CmdObjOpt(object):
         if _:
             self._obj_path = _[0]
             self._obj_type = cmds.nodeType(self._obj_path)
-            self._obj_query = CmdObjQuery(self._obj_type)
+            self._obj_query_opt = CmdObjQueryOpt(self._obj_type)
         else:
             raise RuntimeError()
     @classmethod
@@ -2154,7 +2161,7 @@ class CmdObjOpt(object):
                     cmds.removeMultiInstance('{}[{}]'.format(port.get_path(), array_index), b=True)
 
     def get_obj_query(self):
-        return self._obj_query
+        return self._obj_query_opt
 
     def get_type_name(self):
         return self._obj_type
@@ -2269,7 +2276,7 @@ class CmdObjOpt(object):
         # 'long2'
         obj_path = self.get_path()
         for i_port_path, i_value in attributes.items():
-            if isinstance(i_value, (str, unicode)):
+            if isinstance(i_value, six.string_types):
                 type_name = 'string'
             elif isinstance(i_value, bool):
                 type_name = 'bool'
@@ -2293,7 +2300,7 @@ class CmdObjOpt(object):
     def set_customize_attribute_create(self, port_path, value):
         if value is not None:
             obj_path = self.get_path()
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, six.string_types):
                 type_name = 'string'
             elif isinstance(value, bool):
                 type_name = 'bool'
@@ -2582,7 +2589,7 @@ class QtControlOpt(object):
         else:
             cmds.workspaceControl(
                 self._name,
-                label=bsc_core.StrUnderlineOpt(self._name).to_prettify(capitalize=False),
+                label=bsc_core.RawStringUnderlineOpt(self._name).to_prettify(capitalize=False),
                 dockToMainWindow=['right', False],
                 initialWidth=width, initialHeight=height,
                 widthProperty='free', heightProperty='free'

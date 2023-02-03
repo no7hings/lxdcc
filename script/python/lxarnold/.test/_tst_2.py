@@ -19,6 +19,6 @@ for i_f_p in d.get_child_file_paths():
         pass
 
 
-# print bsc_core.OslShaderMtd.set_compile(
+# print bsc_core.OslFileMtd.set_compile(
 #     '/data/f/osl-test/osl_file_path.osl'
 # )

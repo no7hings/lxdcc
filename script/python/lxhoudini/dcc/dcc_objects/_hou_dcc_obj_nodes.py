@@ -65,7 +65,7 @@ class AbsFileReferences(object):
                         port_path = attribute_path.split(PORT_PATHSEP)[-1]
                         node.set_file_port_path(port_path)
                         # file path
-                        reference_file_path = bsc_core.StoragePathOpt(plf_path).__str__()
+                        reference_file_path = bsc_core.StgPathOpt(plf_path).__str__()
                         node.set_file_path(reference_file_path)
                         if self._get_type_is_used(node.get_file().type):
                             lis.append(node)

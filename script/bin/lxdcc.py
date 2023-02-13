@@ -75,7 +75,7 @@ def main():
                 option = str(value).split(',')
         #
         if method == 'look-klf':
-            look_klf_method(method, project, asset, step, task, workspace, option)
+            pass
         elif method == 'scene-builder-gui':
             scene_builder_gui(method, project)
         elif method == 'katana':
@@ -83,33 +83,6 @@ def main():
 
     except getopt.GetoptError:
         print('argv error')
-
-
-def look_klf_method(method, project, asset, step, task, workspace, option):
-    from lxutil import utl_core, commands
-    #
-    e = commands.AssetTaskFileGain(project=project, asset=asset, step=step, task=task, workspace=workspace)
-    rs = e.get_look_file_export_args()
-    utl_core.Log.set_result_trace('method:"{}" is start.'.format(method))
-    for k, v in rs.items():
-        if v:
-            file_args = v[-1]
-            (geometry_file_path, hair_file_path, mtl_file_path), (look_file_path, source_katana_file_path) = file_args
-            if option is not None:
-                if 'ignore_exists' in option:
-                    if os.path.isfile(look_file_path) is True:
-                        utl_core.Log.set_result_trace('asset: "{}" is exists'.format(k))
-                        continue
-            utl_core.Log.set_result_trace('asset: "{}" is start.'.format(k))
-            #
-            cmd = 'rez-env lxdcc ktoa pgkatana katana -c "katana --script=$REZ_LXDCC_BASE/script/bin/look_klf_method.py {} {} {} {} {}"'.format(
-                geometry_file_path, hair_file_path, mtl_file_path, look_file_path, source_katana_file_path
-            )
-            sp = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            #
-            utl_core.Log.set_result_trace('asset: "{}" is complete.'.format(k))
-
-    utl_core.Log.set_result_trace('method: "{}" is complete.'.format(method))
 
 
 def scene_builder_gui(method, project):

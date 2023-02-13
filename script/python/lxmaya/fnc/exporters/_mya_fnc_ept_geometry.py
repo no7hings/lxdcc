@@ -17,7 +17,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxmaya import ma_configure, ma_core
 
-import lxobj.core_objects as core_objects
+import lxobj.objects as core_objects
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
@@ -405,7 +405,7 @@ class GeometryUsdExporter_(object):
                     )
                 )
                 c = len(mya_objs)
-                l_p = utl_core.log_progress_bar(maximum=c, label='geometry-usd export')
+                l_p = utl_core.LogProgressRunner.create_as_bar(maximum=c, label='geometry-usd export')
                 #
                 for i_mya_obj in mya_objs:
                     l_p.set_update()
@@ -697,7 +697,7 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         return '{}/{}.usd'.format(
             user_directory_path,
             bsc_core.TimestampOpt(
-                bsc_core.TimeBaseMtd.get_timestamp()
+                bsc_core.TimeMtd.get_timestamp()
             ).get_as_tag_36()
         )
     @classmethod

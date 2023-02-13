@@ -152,7 +152,7 @@ class RsvUsdAssetSetCreator(object):
             pass
         elif cur_workspace == 'output':
             comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
-                keyword='asset-output-shot_asset-component-registry-usd-file'
+                keyword='asset-temporary-shot_asset-component-registry-usd-file'
             )
             register_usd_file_path = comp_register_usd_file_rsv_unit.get_result(
                 version=cur_version,
@@ -235,7 +235,7 @@ class RsvUsdAssetSetCreator(object):
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
             if workspace in ['work']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-work-asset-set-usd-file'
+                    keyword='asset-source-asset-set-usd-file'
                 )
                 # debug for usd update error, auto update version
                 usd_file_path = usd_file_rsv_unit.get_result(version='new')
@@ -246,7 +246,7 @@ class RsvUsdAssetSetCreator(object):
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
             elif workspace in ['output']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-output-asset-set-usd-file'
+                    keyword='asset-temporary-asset-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
         else:
@@ -265,7 +265,7 @@ class RsvUsdAssetSetCreator(object):
             version = rsv_scene_properties.get('version')
             if workspace in ['work']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-work-shot-set-usd-file'
+                    keyword='asset-source-shot-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version='new',
@@ -285,7 +285,7 @@ class RsvUsdAssetSetCreator(object):
                 )
             elif workspace in ['output']:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
-                    keyword='asset-output-shot-set-usd-file'
+                    keyword='asset-temporary-shot-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version=version,
@@ -463,7 +463,7 @@ class RsvUsdAssetSetCreator(object):
                 )._set_geometry_uv_map_create_()
                 #
                 work_asset_geometry_uv_map_var_file_unit = cur_rsv_task.get_rsv_unit(
-                    keyword='asset-work-geometry-uv_map-usd-var-file'
+                    keyword='asset-source-geometry-uv_map-usd-var-file'
                 )
                 work_asset_geometry_uv_map_var_file_paths = work_asset_geometry_uv_map_var_file_unit.get_result(
                     version='all', extend_variants=dict(var='hi')
@@ -485,7 +485,7 @@ class RsvUsdAssetSetCreator(object):
                 dict_[i_version] = i_file_path
         elif cur_workspace == 'output':
             comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
-                keyword='asset-output-component-registry-usd-file'
+                keyword='asset-temporary-component-registry-usd-file'
             )
             register_usd_file_paths = comp_register_usd_file_rsv_unit.get_result(
                 version='all'
@@ -635,10 +635,10 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         root = self.get('root')
         work_asset_geometry_var_file_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-work-geometry-usd-var-file'
+            keyword='asset-source-geometry-usd-var-file'
         )
         work_asset_geometry_uv_map_var_file_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-work-geometry-uv_map-usd-var-file'
+            keyword='asset-source-geometry-uv_map-usd-var-file'
         )
         work_asset_geometry_hi_file_paths = work_asset_geometry_var_file_unit.get_result(
             version='all', extend_variants=dict(var=var_name)
@@ -682,15 +682,18 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_shot_asset_component_usd_create(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        #
         asset_shot = self._hook_option_opt.get('shot')
         shot_asset = self._hook_option_opt.get('shot_asset')
         #
         if workspace == 'publish':
             keyword = 'asset-shot_asset-component-usd-dir'
         elif workspace == 'output':
-            keyword = 'asset-output-shot_asset-component-usd-dir'
+            keyword = 'asset-temporary-shot_asset-component-usd-dir'
         else:
             raise TypeError()
         #
@@ -743,21 +746,23 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxusd.fnc.exporters as usd_fnc_exporters
         #
-        asset = self._rsv_scene_properties.get('asset')
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        asset = rsv_scene_properties.get('asset')
+        step = rsv_scene_properties.get('step')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == 'work':
-            keyword_0 = 'asset-work-geometry-usd-var-file'
-            keyword_1 = 'asset-work-geometry-user_property-usd-file'
+            keyword_0 = 'asset-source-geometry-usd-var-file'
+            keyword_1 = 'asset-source-geometry-user_property-usd-file'
         elif workspace == 'publish':
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-user_property-usd-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-geometry-usd-var-file'
-            keyword_1 = 'asset-output-geometry-user_property-usd-file'
+            keyword_0 = 'asset-temporary-geometry-usd-var-file'
+            keyword_1 = 'asset-temporary-geometry-user_property-usd-file'
         else:
             raise TypeError()
         #
@@ -810,22 +815,24 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         from lxusd import usd_core
 
         import lxusd.fnc.exporters as usd_fnc_exporter
+        #
+        rsv_scene_properties = self._rsv_scene_properties
 
-        asset = self._rsv_scene_properties.get('asset')
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
+        asset = rsv_scene_properties.get('asset')
+        step = rsv_scene_properties.get('step')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == 'work':
-            keyword_0 = 'asset-work-geometry-usd-var-file'
-            keyword_1 = 'asset-work-geometry-extra-usd-dir'
+            keyword_0 = 'asset-source-geometry-usd-var-file'
+            keyword_1 = 'asset-source-geometry-extra-usd-dir'
         elif workspace == 'publish':
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-extra-usd-dir'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-geometry-usd-var-file'
-            keyword_1 = 'asset-output-geometry-extra-usd-dir'
+            keyword_0 = 'asset-temporary-geometry-usd-var-file'
+            keyword_1 = 'asset-temporary-geometry-extra-usd-dir'
         else:
             raise TypeError()
         #
@@ -879,16 +886,18 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_component_usd_create(self):
         import lxutil.scripts as utl_scripts
         #
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        step = rsv_scene_properties.get('step')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'work':
-            keyword = 'asset-work-comp-usd-dir'
+            keyword = 'asset-source-comp-usd-dir'
         elif workspace == 'publish':
             keyword = 'asset-component-usd-dir'
         elif workspace == 'output':
-            keyword = 'asset-output-component-usd-dir'
+            keyword = 'asset-temporary-component-usd-dir'
         else:
             raise TypeError()
         #

@@ -20,15 +20,15 @@ option:
 main:
     directory:
         work-cache-directory:
-            keyword: asset-work-cache-dir
+            keyword: asset-source-cache-dir
             workspace: work
 
         task-version-directory:
-            keyword: asset-version-dir
+            keyword: asset-release-version-dir
             workspace: publish
 
         task-no-version-directory:
-            keyword: asset-no-version-dir
+            keyword: asset-release-no-version-dir
             workspace: publish
     #
     scene:
@@ -41,7 +41,7 @@ main:
             application: maya
             workspace: publish
         work-maya-src-file:
-            keyword: asset-work-maya-scene-src-file
+            keyword: asset-source-maya-scene-src-file
             application: maya
         houdini-file:
             keyword: asset-houdini-scene-file
@@ -82,7 +82,7 @@ main:
             workspace: publish
         #
         output-render-dir:
-            keyword: asset-output-katana-render-output-dir
+            keyword: asset-temporary-katana-render-output-dir
             workspace: publish
         #
         katana-scene-file:
@@ -146,7 +146,7 @@ geometries:
             version: latest
         #
         work-surface-hi-file:
-            keyword: asset-work-geometry-usd-hi-file
+            keyword: asset-source-geometry-usd-hi-file
             workspace: work
             step: <option.steps.surface>
             task: <option.tasks.surface>
@@ -175,27 +175,27 @@ geometries:
             version: latest
         #
         work-var-file:
-            keyword: asset-work-geometry-usd-var-file
+            keyword: asset-source-geometry-usd-var-file
             workspace: work
             version: latest
         #
         work-hi-file:
-            keyword: asset-work-geometry-usd-hi-file
+            keyword: asset-source-geometry-usd-hi-file
             workspace: work
             version: latest
         #
         work-lo-file:
-            keyword: asset-work-geometry-usd-lo-file
+            keyword: asset-source-geometry-usd-lo-file
             workspace: work
             version: latest
         #
         work-shape-file:
-            keyword: asset-work-geometry-usd-shape-file
+            keyword: asset-source-geometry-usd-shape-file
             workspace: work
             version: latest
         #
         work-temp-file:
-            keyword: asset-work-geometry-usd-temp-file
+            keyword: asset-source-geometry-usd-temp-file
             workspace: work
             version: latest
         #
@@ -280,7 +280,7 @@ looks:
             version: latest
         #
         work-file:
-            keyword: asset-work-look-ass-file
+            keyword: asset-source-look-ass-file
             workspace: work
             version: latest
         #
@@ -317,7 +317,7 @@ looks:
 
         #
         work-file:
-            keyword: asset-work-look-yml-file
+            keyword: asset-source-look-yml-file
             workspace: work
             version: latest
     klf:
@@ -353,7 +353,7 @@ textures:
             keyword: asset-texture-tgt-dir
             workspace: publish
         work_dir:
-            keyword: asset-work-texture-version-dir
+            keyword: asset-source-texture-version-dir
 #
 usds:
     geometry:

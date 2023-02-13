@@ -18,6 +18,10 @@ class Root(object):
     )
     BIN = '{}/bin'.format(MAIN)
     PYTHON = '{}/python'.format(MAIN)
+    CONFIGURE = '{}/configure'.format(MAIN)
+    @classmethod
+    def get_configure_file(cls, key):
+        return '{root}/{key}.yml'.format(**dict(root=Root.CONFIGURE, key=key))
 
 
 class UserDirectory(object):

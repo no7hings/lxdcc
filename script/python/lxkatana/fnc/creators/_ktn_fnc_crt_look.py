@@ -27,7 +27,7 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         if file_path:
             resolver = rsv_commands.get_resolver()
-            rsv_task = resolver.get_rsv_task_by_file_path(file_path)
+            rsv_task = resolver.get_rsv_task_by_any_file_path(file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_resource()
                 return rsv_asset

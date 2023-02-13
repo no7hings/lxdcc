@@ -11,7 +11,7 @@ if __name__ == '__main__':
         rsv_task = rsv_entity.get_rsv_task(step='srf', task='surfacing')
         if rsv_task is not None:
             src_exists_scene_file_path = rsv_task.get_rsv_unit(
-                keyword='asset-work-maya-scene-src-file', version='latest'
+                keyword='asset-source-maya-scene-src-file', version='latest'
             ).get_result()
             if src_exists_scene_file_path is not None:
                 src_file_obj = utl_dcc_objects.OsFile(src_exists_scene_file_path)

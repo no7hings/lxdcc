@@ -258,7 +258,7 @@ class LxAsset(object):
                 content = 'asset="{}" is not available'.format(rsv_asset_path)
         else:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
-            rsv_task = resolver.get_rsv_task_by_file_path(file_path)
+            rsv_task = resolver.get_rsv_task_by_any_file_path(file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_resource()
             else:
@@ -309,7 +309,7 @@ class LxAsset(object):
         #
         if any_scene_file_path:
             resolver = rsv_commands.get_resolver()
-            rsv_task = resolver.get_rsv_task_by_file_path(any_scene_file_path)
+            rsv_task = resolver.get_rsv_task_by_any_file_path(any_scene_file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_resource()
                 return rsv_asset
@@ -648,8 +648,8 @@ class LxAssetAss(object):
             keyword_0 = 'asset-look-ass-file'
             keyword_1 = 'asset-look-ass-sub-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-look-ass-file'
-            keyword_1 = 'asset-output-look-ass-sub-file'
+            keyword_0 = 'asset-temporary-look-ass-file'
+            keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:
             raise TypeError()
         #
@@ -779,7 +779,7 @@ class LxAssetAss(object):
             stat_frame, end_frame = obj_opt.get('export.start_frame'), obj_opt.get('export.end_frame')
             if stat_frame != end_frame:
                 frames = range(int(stat_frame), int(end_frame)+1)
-                with utl_core.log_progress_bar(maximum=len(frames), label='ass sequence export') as l_p:
+                with utl_core.LogProgressRunner.create_as_bar(maximum=len(frames), label='ass sequence export') as l_p:
                     for i_frame in frames:
                         ktn_core.NGObjOpt(
                             NodegraphAPI.GetRootNode()
@@ -1409,7 +1409,7 @@ class LxLight(object):
                 content = u'asset="{}" is not available'.format(rsv_asset_path)
         else:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
-            rsv_task = resolver.get_rsv_task_by_file_path(file_path)
+            rsv_task = resolver.get_rsv_task_by_any_file_path(file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_resource()
             else:

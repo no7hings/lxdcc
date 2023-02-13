@@ -71,7 +71,7 @@ def set_session_option_hooks_execute_by_deadline(session):
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
-    with utl_core.log_progress(
+    with utl_core.LogProgressRunner.create(
         maximum=len(option_hook_keys),
         label='option hooks execute by deadline',
         use_as_progress_bar=True,

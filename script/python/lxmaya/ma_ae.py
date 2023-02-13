@@ -79,7 +79,6 @@ def ae_py_to_mel_proc(py_object, args=(), return_type=None, proc_name=None, use_
     return d['proc_name']
 
 
-#
 def ae_callback(func):
     return ae_py_to_mel_proc(func, [('string', 'nodeName')], proc_prefix='AECallback')
 
@@ -992,18 +991,6 @@ class ControlBase(object):
         raise NotImplementedError()
 
 
-class SwatchControl(ControlBase):
-    @classmethod
-    def get_gui_label(cls, atr_path):
-        pass
-    @classmethod
-    def gui_new_fnc(cls, atr_path):
-        pass
-    @classmethod
-    def gui_replace_fnc(cls, atr_path):
-        pass
-
-
 class FileControl(ControlBase):
     @classmethod
     def gui_update_value(cls, atr_path):
@@ -1104,11 +1091,101 @@ class FileControl(ControlBase):
         cls.dcc_update_attribute_change_callback(atr_path)
 
 
-class ButtonControls(ControlBase):
-    ICON_DICT = {
-        'create': 'QR_add.png',
-        'refresh': 'QR_refresh.png'
-    }
+class EnumerateControl(ControlBase):
+    @classmethod
+    def get_dcc_values(cls, enumerate_option):
+        return enumerate_option.split('|')
+    @classmethod
+    def get_gui_values(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        return [cmds.menuItem(i, query=1, label=1) for i in cmds.optionMenuGrp(gui_key, query=1, itemListLong=1) or []]
+    @classmethod
+    def gui_build_and_update_value(cls, atr_path, enumerate_option):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        gui_values = cls.get_gui_values(atr_path)
+        values = cls.get_dcc_values(enumerate_option)
+        if values != gui_values:
+            [cmds.deleteUI(i) for i in cmds.optionMenuGrp(gui_key, query=1, itemListLong=1) or []]
+            for i_index, i_version in enumerate(values):
+                cmds.menuItem(
+                    label=i_version, data=i_index,
+                    parent=gui_key+'|OptionMenu'
+                )
+        #
+        cls.gui_update_value(atr_path)
+    @classmethod
+    def gui_update_value(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        values = cls.get_gui_values(atr_path)
+        value_current = cmds.getAttr(atr_path)
+        if value_current in values:
+            index = values.index(value_current)
+            cmds.optionMenuGrp(
+                gui_key,
+                edit=1,
+                select=index+1,
+                annotation='attribute="{}"'.format(atr_path)
+            )
+        else:
+            cmds.optionMenuGrp(
+                gui_key,
+                edit=1,
+                select=1,
+                annotation='attribute="{}"'.format(atr_path)
+            )
+    @classmethod
+    def gui_update_edit_callback(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.optionMenuGrp(
+            gui_key,
+            edit=1,
+            changeCommand=lambda x: cls.dcc_update_value(atr_path)
+        )
+    #
+    @classmethod
+    def dcc_update_value(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        items = cmds.optionMenuGrp(gui_key, query=1, itemListLong=1)
+        index = cmds.optionMenuGrp(gui_key, query=1, select=1)
+        value_current = cmds.getAttr(atr_path)
+        value_current_new = cmds.menuItem(items[index-1], query=1, label=1)
+        if value_current_new != value_current:
+            cmds.setAttr(
+                atr_path, value_current_new, type='string'
+            )
+    @classmethod
+    def dcc_update_attribute_change_callback(cls, atr_path):
+        gui_key = cls.get_gui_key(atr_path)
+        #
+        cmds.scriptJob(
+            parent=gui_key,
+            replacePrevious=True,
+            attributeChange=[
+                atr_path,
+                lambda: cls.gui_update_value(atr_path)
+            ]
+        )
+    #
+    @classmethod
+    def gui_new_fnc(cls, atr_path, label, enumerate_option):
+        gui_key = cls.get_gui_key(atr_path)
+        cmds.optionMenuGrp(
+            gui_key,
+            label=label
+        )
+        cls.gui_build_and_update_value(atr_path, enumerate_option)
+        cls.gui_update_edit_callback()
+        cls.dcc_update_attribute_change_callback(atr_path)
+    @classmethod
+    def gui_replace_fnc(cls, atr_path, enumerate_option):
+        cls.gui_build_and_update_value(atr_path, enumerate_option)
+        cls.gui_update_edit_callback()
+        cls.dcc_update_attribute_change_callback(atr_path)
+
+
+class IconButtonControls(ControlBase):
     @classmethod
     def execute_fnc(cls, *args, **kwargs):
         print args, kwargs
@@ -1210,7 +1287,7 @@ class TextControl(ControlBase):
         cls.dcc_update_attribute_change_callback(atr_path)
 
 
-class DataControl(ControlBase):
+class DataControls(ControlBase):
     @classmethod
     def get_dcc_value_data(cls, atr_path):
         raw = cmds.getAttr(
@@ -1473,25 +1550,11 @@ class AbsNodeTemplate_(pm.ui.AETemplate):
         # noinspection PyArgumentList
         self.endLayout()
 
-    def _add_swatch_control_(self):
-        self.addCustom(
-            'message',
-            lambda atr_path: SwatchControl.gui_new_fnc(atr_path),
-            lambda atr_path: SwatchControl.gui_replace_fnc(atr_path)
-        )
-
     def _add_text_control_(self, port_path, label, lock=False):
         self.addCustom(
             port_path,
             lambda atr_path: TextControl.gui_new_fnc(atr_path, label, lock),
             lambda atr_path: TextControl.gui_replace_fnc(atr_path)
-        )
-
-    def _add_data_controls_(self, port_path, build_port_path, build_key):
-        self.addCustom(
-            port_path,
-            lambda atr_path: DataControl.gui_new_fnc(atr_path, build_port_path, build_key),
-            lambda atr_path: DataControl.gui_replace_fnc(atr_path, build_port_path, build_key)
         )
 
     def _add_file_control_(self, port_path, label):
@@ -1501,11 +1564,11 @@ class AbsNodeTemplate_(pm.ui.AETemplate):
             lambda atr_path: FileControl.gui_replace_fnc(atr_path)
         )
 
-    def _add_button_controls_(self, keys, labels, icons, data_port_path):
+    def _add_enumerate_control_(self, port_path, label, enumerate_option):
         self.addCustom(
-            keys,
-            lambda atr_path: ButtonControls.gui_new_fnc(atr_path, labels, icons, data_port_path),
-            lambda atr_path: ButtonControls.gui_replace_fnc(atr_path, data_port_path)
+            port_path,
+            lambda atr_path: EnumerateControl.gui_new_fnc(atr_path, label, enumerate_option),
+            lambda atr_path: EnumerateControl.gui_replace_fnc(atr_path)
         )
 
     def _add_variant_control_(self, port_path, label, data_port_path):
@@ -1513,6 +1576,20 @@ class AbsNodeTemplate_(pm.ui.AETemplate):
             port_path,
             lambda atr_path: VariantControl.gui_new_fnc(atr_path, label, data_port_path),
             lambda atr_path: VariantControl.gui_replace_fnc(atr_path, data_port_path)
+        )
+
+    def _add_data_controls_(self, port_path, build_port_path, build_key):
+        self.addCustom(
+            port_path,
+            lambda atr_path: DataControls.gui_new_fnc(atr_path, build_port_path, build_key),
+            lambda atr_path: DataControls.gui_replace_fnc(atr_path, build_port_path, build_key)
+        )
+
+    def _add_button_controls_(self, keys, labels, icons, data_port_path):
+        self.addCustom(
+            keys,
+            lambda atr_path: IconButtonControls.gui_new_fnc(atr_path, labels, icons, data_port_path),
+            lambda atr_path: IconButtonControls.gui_replace_fnc(atr_path, data_port_path)
         )
     @staticmethod
     def addCustom(attr, newFunc, replaceFunc):

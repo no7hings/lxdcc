@@ -42,7 +42,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         content_0 = bsc_objects.Content(value={})
         c = len([i for i in stage.TraverseAll()])
         if c:
-            with utl_core.gui_progress(maximum=c, label='gain geometry-comparer data') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=c, label='gain geometry-comparer data') as g_p:
                 for i_prim in stage.TraverseAll():
                     g_p.set_update()
                     i_obj_type_name = i_prim.GetTypeName()

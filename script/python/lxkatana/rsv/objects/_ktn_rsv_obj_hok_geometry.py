@@ -13,15 +13,17 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'work':
-            keyword = 'asset-work-geometry-usd-var-file'
+            keyword = 'asset-source-geometry-usd-var-file'
         elif workspace == 'publish':
             keyword = 'asset-geometry-usd-var-file'
         elif workspace == 'output':
-            keyword = 'asset-output-geometry-usd-var-file'
+            keyword = 'asset-temporary-geometry-usd-var-file'
         else:
             raise TypeError()
 
@@ -50,20 +52,22 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxusd.fnc.exporters as usd_fnc_exporters
         #
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        step = rsv_scene_properties.get('step')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == 'work':
-            keyword_0 = 'asset-work-geometry-usd-var-file'
-            keyword_1 = 'asset-work-geometry-uv_map-usd-file'
+            keyword_0 = 'asset-source-geometry-usd-var-file'
+            keyword_1 = 'asset-source-geometry-uv_map-usd-file'
         elif workspace == 'publish':
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-uv_map-usd-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-geometry-usd-var-file'
-            keyword_1 = 'asset-output-geometry-uv_map-usd-file'
+            keyword_0 = 'asset-temporary-geometry-usd-var-file'
+            keyword_1 = 'asset-temporary-geometry-uv_map-usd-file'
         else:
             raise TypeError()
         #

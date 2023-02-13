@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxresolver import rsv_configure
+import lxbasic.objects as bsc_objects
 
-import lxutil.objects as utl_objects
+from lxresolver import rsv_configure
 
 import lxresolver.commands as rsv_commands
 
@@ -14,7 +14,7 @@ class AbsAssetQuery(object):
         self._task_properties = task_properties
         application = task_properties.get('application')
         #
-        self._file_configure = utl_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        self._file_configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
         self._file_configure.set('option.application', application)
         self._file_configure.set_flatten()
         self._resolver = rsv_commands.get_resolver()
@@ -520,12 +520,3 @@ class RsvAssetUsdQuery(AbsAssetQuery):
     def get_registry_file(self, **kwargs):
         sub_key = 'registry.file'
         return self.get(sub_key, **kwargs)
-
-
-class RsvAssetGroomQuery(AbsAssetQuery):
-    KEY = 'groom'
-    def __init__(self, task_properties):
-        super(RsvAssetGroomQuery, self).__init__(task_properties)
-
-    def get_geometry_xgen_file(self, **kwargs):
-        pass

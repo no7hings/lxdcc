@@ -14,7 +14,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
-import lxobj.core_objects as core_objects
+import lxobj.objects as core_objects
 
 import lxbasic.objects as bsc_objects
 
@@ -194,7 +194,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 (self.__set_look_assigns_create_, (geometry_and_objs,), self.get('with_assign'))
             ]
             if method_args:
-                with utl_core.gui_progress(maximum=len(method_args), label='execute look create method') as g_p:
+                with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute look create method') as g_p:
                     for i_method, i_args, i_enable in method_args:
                         g_p.set_update()
                         if i_enable is True:
@@ -228,7 +228,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def __set_look_materials_create_(self, material_and_objs):
         if material_and_objs:
-            with utl_core.gui_progress(maximum=len(material_and_objs), label='create material') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(material_and_objs), label='create material') as g_p:
                 for material_seq, material_and_obj in enumerate(material_and_objs):
                     g_p.set_update()
                     self.__set_look_material_create_(material_and_obj)
@@ -497,7 +497,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def __set_look_assigns_create_(self, geometry_and_objs):
         if geometry_and_objs:
-            with utl_core.gui_progress(maximum=len(geometry_and_objs), label='create assign') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(geometry_and_objs), label='create assign') as g_p:
                 for geometry_seq, geometry_and_obj in enumerate(geometry_and_objs):
                     g_p.set_update()
                     #

@@ -637,7 +637,7 @@ class StgConnector(object):
                         "task": stg_task,
                         "project": stg_project,
                         "entity": stg_entity,
-                        "path_cache": bsc_core.StorageBaseMtd.set_map_to_platform(file_path),
+                        "path_cache": bsc_core.StorageMtd.set_map_to_platform(file_path),
                         "version_number": version_number,
                      }
                 )

@@ -1,7 +1,7 @@
 # coding:utf-8
 import copy
 
-import lxobj.core_objects as core_dcc_objects
+import lxobj.objects as core_objects
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
@@ -33,7 +33,7 @@ class TextureExporter(
         self._location = self.get('location')
 
     def set_run(self):
-        root_dag_path = core_dcc_objects.ObjDagPath(self._location)
+        root_dag_path = core_objects.ObjDagPath(self._location)
         root_mya_dag_path = root_dag_path.set_translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )

@@ -62,7 +62,7 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
             if root_override is not None:
                 self._set_path_create_(root_override)
             #
-            with utl_core.log_progress_bar(maximum=c, label='usd import') as l_p:
+            with utl_core.LogProgressRunner.create_as_bar(maximum=c, label='usd import') as l_p:
                 for i_usd_prim in self._usd_stage.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.Xform:
@@ -86,7 +86,7 @@ class GeometryUsdImporter_(utl_fnc_obj_abs.AbsDccExporter):
     def set_meshes_uv_maps_import_run(self, uv_map_face_vertices_contrast=True):
         c = len([i for i in self._usd_stage.TraverseAll()])
         if c:
-            with utl_core.log_progress_bar(maximum=c, label='usd uv-map import') as l_p:
+            with utl_core.LogProgressRunner.create_as_bar(maximum=c, label='usd uv-map import') as l_p:
                 for i_usd_prim in self._usd_stage.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.Mesh:

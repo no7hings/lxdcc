@@ -17,16 +17,18 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-look-ass-file'
             keyword_1 = 'asset-look-ass-sub-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-look-ass-file'
-            keyword_1 = 'asset-output-look-ass-sub-file'
+            keyword_0 = 'asset-temporary-look-ass-file'
+            keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:
             raise TypeError()
         ktn_workspace = ktn_dcc_objects.AssetWorkspace()
@@ -73,15 +75,17 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-look-klf-file'
             keyword_1 = 'asset-look-json-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-look-klf-file'
-            keyword_1 = 'asset-output-look-json-file'
+            keyword_0 = 'asset-temporary-look-klf-file'
+            keyword_1 = 'asset-temporary-look-json-file'
         else:
             raise TypeError()
         #

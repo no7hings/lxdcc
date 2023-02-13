@@ -136,7 +136,7 @@ class RsvStgTaskOpt(object):
         stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
         #
         version_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword='{}-version-dir'.format(branch)
+            keyword='{}-release-version-dir'.format(branch)
         )
         version_directory_path = version_rsv_unit.get_result(version=version)
         #

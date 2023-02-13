@@ -106,7 +106,7 @@ class AbsSsnRsvApplication(object):
                     )
                 elif version_scheme == 'new':
                     version_rsv_unit = rsv_task.get_rsv_unit(
-                        keyword='{branch}-version-dir'
+                        keyword='{branch}-release-version-dir'
                     )
                     version = version_rsv_unit.get_new_version()
                     scene_src_file_path_tgt = scene_src_file_unit.get_result(
@@ -166,7 +166,7 @@ class AbsSsnRsvApplication(object):
                 application = rsv_scene_properties.get('application')
                 version = rsv_scene_properties.get('version')
                 output_scene_src_file_unit = rsv_task.get_rsv_unit(
-                    keyword='{branch}-output-{application}-scene-src-file'.format(
+                    keyword='{branch}-temporary-{application}-scene-src-file'.format(
                         **dict(branch=branch, application=application)
                     )
                 )
@@ -176,7 +176,7 @@ class AbsSsnRsvApplication(object):
                     )
                 elif version_scheme == 'new':
                     version_rsv_unit = rsv_task.get_rsv_unit(
-                        keyword='{branch}-output-version-dir'
+                        keyword='{branch}-temporary-version-dir'
                     )
                     version = version_rsv_unit.get_new_version()
                     scene_src_file_path_tgt = output_scene_src_file_unit.get_result(

@@ -137,7 +137,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._results = self._set_cmd_run_(**kwargs)
         if self._results:
             if self._texture_use_environ_map is True:
-                with utl_core.log_progress_bar(maximum=len(self._results), label='texture environ-map') as l_p:
+                with utl_core.LogProgressRunner.create_as_bar(maximum=len(self._results), label='texture environ-map') as l_p:
                     for i in self._results:
                         l_p.set_update()
                         #
@@ -790,7 +790,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
             'objs=[{}]'.format(', '.join(['"{}"'.format(i) for i in mya_mesh_paths]))
         )
         #
-        with utl_core.log_progress_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
+        with utl_core.LogProgressRunner.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
                 l_p.set_update()
                 #
@@ -835,7 +835,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
         mya_mesh_paths = mya_group.get_all_shape_paths(
             include_obj_type=['mesh']
         )
-        with utl_core.log_progress_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
+        with utl_core.LogProgressRunner.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
                 l_p.set_update()
                 #

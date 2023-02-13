@@ -9,7 +9,7 @@ from lxutil.dcc import utl_dcc_opt_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxobj.core_objects as core_objects
+import lxobj.objects as core_objects
 
 from lxmaya import ma_configure
 
@@ -38,7 +38,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                         'comparer-data build',
                         'file="{}"'.format(file_path)
                     )
-                    with utl_core.gui_progress(maximum=len(dcc_objs), label='build comparer-data') as g_p:
+                    with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='build comparer-data') as g_p:
                         for dcc_obj in dcc_objs:
                             g_p.set_update()
                             obj_type_name = dcc_obj.type.name
@@ -88,7 +88,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         content_0 = bsc_objects.Content(value={})
         dcc_objs = stage.get_objs()
         if dcc_objs:
-            with utl_core.gui_progress(maximum=len(dcc_objs), label='gain build comparer-data') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='gain build comparer-data') as g_p:
                 for dcc_obj in dcc_objs:
                     g_p.set_update()
                     obj_type_name = dcc_obj.type.name

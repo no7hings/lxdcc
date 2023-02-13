@@ -534,6 +534,22 @@ class RawTextMtd(object):
                 return _[0]
             return text[0]
         return ''
+    @classmethod
+    def find_spans(cls, content_str, keyword_str, match_case_flag=False, match_word_flag=False):
+        lis = []
+        if content_str and keyword_str:
+            if match_word_flag is True:
+                p = r'\b{}\b'.format(keyword_str)
+            else:
+                p = keyword_str
+
+            if match_case_flag is True:
+                r = re.finditer(p, content_str)
+            else:
+                r = re.finditer(p, content_str, re.I)
+            for i in r:
+                lis.append(i.span())
+        return lis
 
 
 class RawTextOpt(object):

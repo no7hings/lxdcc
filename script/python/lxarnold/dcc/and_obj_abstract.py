@@ -585,7 +585,7 @@ class AbsObjScene(
             'ass load',
             u'file="{}"'.format(file_path)
         )
-        with utl_core.log_progress_bar(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
+        with utl_core.LogProgressRunner.create_as_bar(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
             while not ai.AiNodeIteratorFinished(and_obj_iterator):
                 l_p.set_update()
                 and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)

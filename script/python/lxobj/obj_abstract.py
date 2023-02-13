@@ -1174,9 +1174,9 @@ class AbsObjGuiDef(object):
         #
         _ = p.split(pathsep)
         if len(_) > 6:
-            if bsc_core.StorageBaseMtd.get_path_is_windows(p):
+            if bsc_core.StorageMtd.get_path_is_windows(p):
                 return u'{0}{2}...{2}{1}'.format(pathsep.join(_[:3]), pathsep.join(_[-3:]), pathsep)
-            elif bsc_core.StorageBaseMtd.get_path_is_linux(p):
+            elif bsc_core.StorageMtd.get_path_is_linux(p):
                 return u'{0}{2}...{2}{1}'.format(pathsep.join(_[:2]), pathsep.join(_[-3:]), pathsep)
             else:
                 return p
@@ -1272,7 +1272,7 @@ class AbsObjOsDef(object):
         return new_path
 
     def _set_obj_os_def_init_(self):
-        self._root = bsc_core.StorageBaseMtd.get_root(
+        self._root = bsc_core.StorageMtd.get_root(
             self.path
         )
     @property
@@ -1342,13 +1342,13 @@ class AbsObjOsDef(object):
         return os.path.normpath(self.path) == os.path.normpath(file_path)
 
     def get_permission(self):
-        return bsc_core.StorageBaseMtd.get_permission(self.path)
+        return bsc_core.StorageMtd.get_permission(self.path)
 
     def get_is_writeable(self):
-        return bsc_core.StorageBaseMtd.get_is_writeable(self.path)
+        return bsc_core.StorageMtd.get_is_writeable(self.path)
 
     def get_is_readable(self):
-        return bsc_core.StorageBaseMtd.get_is_readable(self.path)
+        return bsc_core.StorageMtd.get_is_readable(self.path)
 
     def set_link_to(self, *args, **kwargs):
         pass
@@ -3567,8 +3567,8 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             file_tgt = self.__class__(file_path_tgt)
             if replace is True:
-                if bsc_core.StorageBaseMtd.get_is_exists(file_path_tgt) is True:
-                    if bsc_core.StorageBaseMtd.get_is_writeable(file_path_tgt) is True:
+                if bsc_core.StorageMtd.get_is_exists(file_path_tgt) is True:
+                    if bsc_core.StorageMtd.get_is_writeable(file_path_tgt) is True:
                         os.remove(file_tgt.path)
                         shutil.copy2(self.path, file_tgt.path)
                         return True, self.LOG.set_module_result_trace(

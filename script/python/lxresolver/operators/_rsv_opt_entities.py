@@ -1,8 +1,7 @@
 # coding:utf-8
+import lxbasic.objects as bsc_objects
+
 from lxresolver import rsv_configure
-
-import lxutil.objects as utl_objects
-
 import lxresolver.commands as rsv_commands
 
 
@@ -10,7 +9,7 @@ class AbsEntities(object):
     CONFIGURE_FILE_PATH = rsv_configure.Data.ENTITIES_CONFIGURE_PATH
     def __init__(self, project_properties):
         self._project_properties = project_properties
-        self._file_configure = utl_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        self._file_configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
         self._resolver = rsv_commands.get_resolver()
 
     def _get_result_(self, key, sub_key, **kwargs):

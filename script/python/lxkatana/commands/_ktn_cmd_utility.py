@@ -20,7 +20,7 @@ def set_surface_light_rig_update_(task_properties):
         rsv_task = resolver.get_rsv_task(**task_properties.value)
 
         render_dir = rsv_task.get_rsv_unit(
-            keyword='asset-work-render-dir',
+            keyword='asset-source-render-dir',
             workspace='output'
         )
         render_dir_path = render_dir.get_result()

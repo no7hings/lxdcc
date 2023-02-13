@@ -89,7 +89,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
         # to publish
         version_rsv_unit_qc = rsv_task_qc.get_rsv_unit(
-            keyword='asset-version-dir'
+            keyword='asset-release-version-dir'
         )
         version_qc = version_rsv_unit_qc.get_new_version()
         #
@@ -122,15 +122,17 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_link_export(self):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
-            keyword_0 = '{branch}-version-dir'
-            keyword_1 = '{branch}-no-version-dir'
+            keyword_0 = '{branch}-release-version-dir'
+            keyword_1 = '{branch}-release-no-version-dir'
         elif workspace == 'output':
-            keyword_0 = '{branch}-output-version-dir'
-            keyword_1 = '{branch}-output-no-version-dir'
+            keyword_0 = '{branch}-temporary-version-dir'
+            keyword_1 = '{branch}-temporary-no-version-dir'
         else:
             raise TypeError()
         #
@@ -153,16 +155,18 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def set_publish_file_export(self):
         import lxshotgun.objects as stg_objects
+        #
+        rsv_scene_properties = self._rsv_scene_properties
 
         stg_connector = stg_objects.StgConnector()
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = '{branch}-maya-scene-file'
         elif workspace == 'output':
-            keyword_0 = '{branch}-output-maya-scene-file'
+            keyword_0 = '{branch}-temporary-maya-scene-file'
         else:
             raise RuntimeError()
         #
@@ -224,13 +228,15 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         print stg_connector.get_stg_entity()
 
     def set_review_mov_export(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword = 'asset-review-mov-file'
         elif workspace == 'output':
-            keyword = 'asset-output-review-mov-file'
+            keyword = 'asset-temporary-review-mov-file'
         else:
             raise TypeError()
         #
@@ -249,13 +255,15 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_validation_info_export(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword = 'asset-validation-info-file'
         elif workspace == 'output':
-            keyword = 'asset-output-validation-info-file'
+            keyword = 'asset-temporary-validation-info-file'
         else:
             raise TypeError()
         #
@@ -278,15 +286,17 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         from lxutil import utl_core
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-review-mov-file'
             keyword_1 = 'asset-katana-render-video-all-mov-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-review-mov-file'
-            keyword_1 = 'asset-output-katana-render-video-all-mov-file'
+            keyword_0 = 'asset-temporary-review-mov-file'
+            keyword_1 = 'asset-temporary-katana-render-video-all-mov-file'
         else:
             raise TypeError()
 

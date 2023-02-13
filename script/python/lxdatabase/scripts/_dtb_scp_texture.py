@@ -29,7 +29,7 @@ class ScpTextureResourcesAddByQuixel(object):
         self._resource_dict = dict()
         self._file_tags = set()
 
-        with utl_core.log_progress_bar(maximum=len(json_files), label='add resource') as l_p:
+        with utl_core.LogProgressRunner.create_as_bar(maximum=len(json_files), label='add resource') as l_p:
             for i_json_file_path in json_files:
                 l_p.set_update()
                 #

@@ -1,16 +1,16 @@
 # coding:utf-8
 import collections
 
-from lxbasic.objects import bsc_obj_abs
+import lxbasic.abstracts as bsc_abstracts
 
 
-class Content(bsc_obj_abs.AbsContent):
+class Content(bsc_abstracts.AbsContent):
     PATHSEP = '.'
     def __init__(self, key=None, value=None):
         super(Content, self).__init__(key, value)
 
 
-class Configure(bsc_obj_abs.AbsContent):
+class Configure(bsc_abstracts.AbsContent):
     PATHSEP = '.'
     def __init__(self, key=None, value=None):
         super(Configure, self).__init__(key, value)
@@ -38,7 +38,7 @@ class Property(object):
         )
 
 
-class Properties(bsc_obj_abs.AbsContent):
+class Properties(bsc_abstracts.AbsContent):
     PATHSEP = '.'
     PROPERTY_CLASS = Property
     def __init__(self, obj, raw=None):
@@ -52,7 +52,7 @@ class Properties(bsc_obj_abs.AbsContent):
         return self.PROPERTY_CLASS(self, key)
 
 
-class Dict(bsc_obj_abs.AbsContent):
+class Dict(bsc_abstracts.AbsContent):
     PATHSEP = '.'
     def __init__(self):
         super(Dict, self).__init__(

@@ -7,7 +7,7 @@ from lxbasic.core import _bsc_cor_raw, _bsc_cor_pattern, _bsc_cor_dict, _bsc_cor
 class StgUserMtd(object):
     @classmethod
     def get_user_temporary_directory(cls, create=False):
-        date_tag = TimeBaseMtd.get_date_tag()
+        date_tag = TimeMtd.get_date_tag()
         if SystemMtd.get_is_windows():
             _ = '{}/temporary/{}'.format(
                 bsc_configure.UserDirectory.WINDOWS, date_tag
@@ -19,11 +19,11 @@ class StgUserMtd(object):
         else:
             raise SystemError()
         if create:
-            StorageBaseMtd.set_directory_create(_)
+            StorageMtd.set_directory_create(_)
         return _
     @classmethod
     def get_user_debug_directory(cls, tag=None, create=False):
-        date_tag = TimeBaseMtd.get_date_tag()
+        date_tag = TimeMtd.get_date_tag()
         if SystemMtd.get_is_windows():
             root = bsc_configure.UserDirectory.WINDOWS
             _ = '{}/debug/{}'.format(root, date_tag)
@@ -34,11 +34,11 @@ class StgUserMtd(object):
         if tag is not None:
             _ = '{}/{}'.format(_, tag)
         if create:
-            StorageBaseMtd.set_directory_create(_)
+            StorageMtd.set_directory_create(_)
         return _
     @classmethod
     def get_user_session_directory(cls, create=False):
-        date_tag = TimeBaseMtd.get_date_tag()
+        date_tag = TimeMtd.get_date_tag()
         if SystemMtd.get_is_windows():
             _ = '{}/.session/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
         elif SystemMtd.get_is_linux():
@@ -46,7 +46,7 @@ class StgUserMtd(object):
         else:
             raise SystemError()
         if create:
-            StorageBaseMtd.set_directory_create(_)
+            StorageMtd.set_directory_create(_)
         return _
     @classmethod
     def get_user_session_file(cls, unique_id=None):
@@ -94,6 +94,18 @@ class StgExtraMtd(object):
         )
         t_0.start()
         # t_0.join()
+    @classmethod
+    def get_paths_by_fnmatch_pattern(cls, pattern, sort_by='number'):
+        _ = glob.glob(pattern) or []
+        if _:
+            # fix windows path
+            if platform.system() == 'Windows':
+                _ = [i.replace('\\', '/') for i in _]
+            if len(_) > 1:
+                # sort by number
+                if sort_by == 'number':
+                    _.sort(key=lambda x: _bsc_cor_raw.RawTextMtd.to_number_embedded_args(x))
+        return _
 
 
 class StgPathLinkMtd(object):
@@ -454,7 +466,7 @@ class StgPathOpt(object):
     PATHSEP = '/'
     def __init__(self, path, cleanup=True):
         if cleanup is True:
-            self._path = StorageBaseMtd.set_pathsep_cleanup(path)
+            self._path = StorageMtd.set_pathsep_cleanup(path)
         else:
             self._path = path
         #
@@ -480,10 +492,10 @@ class StgPathOpt(object):
         return os.path.normcase(self._path)
 
     def get_is_windows(self):
-        return StorageBaseMtd.get_path_is_windows(self.get_path())
+        return StorageMtd.get_path_is_windows(self.get_path())
 
     def get_is_linux(self):
-        return StorageBaseMtd.get_path_is_linux(self.get_path())
+        return StorageMtd.get_path_is_linux(self.get_path())
 
     def get_is_exists(self):
         return os.path.exists(self.get_path())
@@ -505,7 +517,7 @@ class StgPathOpt(object):
         return os.stat(self._path).st_mtime
 
     def get_user(self):
-        return StorageBaseMtd.get_user(self.get_path())
+        return StorageMtd.get_user(self.get_path())
 
     def get_access_timestamp(self):
         return os.stat(self._path).st_atime
@@ -524,7 +536,7 @@ class StgPathOpt(object):
         return os.access(self._path, os.W_OK)
 
     def set_map_to_platform(self):
-        self._path = StorageBaseMtd.set_map_to_platform(self._path)
+        self._path = StorageMtd.set_map_to_platform(self._path)
 
     def __str__(self):
         return self._path
@@ -541,7 +553,7 @@ class StgFileSearchOpt(object):
         self._search_dict = collections.OrderedDict()
         for i in directory_paths:
             for j in StgDirectoryMtd.get_all_file_paths__(i):
-                j_directory_path, j_name_base, j_ext = StorageBaseMtd.get_file_args(j)
+                j_directory_path, j_name_base, j_ext = StorageMtd.get_file_args(j)
                 if self._ignore_name_case is True:
                     j_name_base = j_name_base.lower()
                 if self._ignore_ext_case is True:
@@ -558,7 +570,7 @@ class StgFileSearchOpt(object):
             _ = StgDirectoryMtd.get_file_paths__(directory_path)
 
         for i in _:
-            i_directory_path, i_name_base, i_ext = StorageBaseMtd.get_file_args(i)
+            i_directory_path, i_name_base, i_ext = StorageMtd.get_file_args(i)
             if self._ignore_name_case is True:
                 i_name_base = i_name_base.lower()
             if self._ignore_ext_case is True:
@@ -589,7 +601,7 @@ class StgFileSearchOpt(object):
         )
         if matches_0:
             file_path_tgt = self._search_dict[matches_0[-1]]
-            directory_path_tgt, name_base_tgt, ext_tgt = StorageBaseMtd.get_file_args(file_path_tgt)
+            directory_path_tgt, name_base_tgt, ext_tgt = StorageMtd.get_file_args(file_path_tgt)
             return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
         #
         if self._ignore_ext is True:
@@ -599,7 +611,7 @@ class StgFileSearchOpt(object):
             )
             if matches_1:
                 file_path_tgt = self._search_dict[matches_1[-1]]
-                directory_path_tgt, name_base_tgt, ext_tgt = StorageBaseMtd.get_file_args(file_path_tgt)
+                directory_path_tgt, name_base_tgt, ext_tgt = StorageMtd.get_file_args(file_path_tgt)
                 return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
 
 
@@ -608,7 +620,7 @@ class StgDirectoryOpt(StgPathOpt):
         super(StgDirectoryOpt, self).__init__(path)
 
     def set_create(self):
-        StorageBaseMtd.set_directory_create(
+        StorageMtd.set_directory_create(
             self.path
         )
 
@@ -672,7 +684,7 @@ class StgDirectoryOpt_(object):
         )
 
     def set_create(self):
-        StorageBaseMtd.set_directory_create(
+        StorageMtd.set_directory_create(
             self._path
         )
 
@@ -715,6 +727,24 @@ class StgFileOpt(StgPathOpt):
             return True
         return False
 
+    def set_read(self):
+        if os.path.exists(self.path):
+            if self.get_ext() in ['.json']:
+                with open(self.path) as j:
+                    raw = json.load(j, object_pairs_hook=collections.OrderedDict)
+                    j.close()
+                    return raw
+            elif self.get_ext() in ['.yml']:
+                with open(self.path) as y:
+                    raw = _bsc_cor_dict.OrderedYamlMtd.set_load(y)
+                    y.close()
+                    return raw
+            else:
+                with open(self.path) as f:
+                    raw = f.read()
+                    f.close()
+                    return raw
+
     def set_write(self, raw):
         directory = os.path.dirname(self.path)
         if os.path.isdir(directory) is False:
@@ -746,26 +776,8 @@ class StgFileOpt(StgPathOpt):
         with open(self.path, 'w') as f:
             f.write(raw)
 
-    def set_read(self):
-        if os.path.exists(self.path):
-            if self.get_ext() in ['.json']:
-                with open(self.path) as j:
-                    raw = json.load(j, object_pairs_hook=collections.OrderedDict)
-                    j.close()
-                    return raw
-            elif self.get_ext() in ['.yml']:
-                with open(self.path) as y:
-                    raw = _bsc_cor_dict.OrderedYamlMtd.set_load(y)
-                    y.close()
-                    return raw
-            else:
-                with open(self.path) as f:
-                    raw = f.read()
-                    f.close()
-                    return raw
-
     def set_directory_create(self):
-        StorageBaseMtd.set_directory_create(
+        StorageMtd.set_directory_create(
             self.get_directory_path()
         )
 
@@ -894,11 +906,11 @@ class StgTmpBaseMtd(object):
     ROOT = '/l/temp'
     @classmethod
     def get_user_directory(cls, tag):
-        return StorageBaseMtd.set_map_to_platform(
+        return StorageMtd.set_map_to_platform(
             u'{root}/temporary/{tag}/{date_tag}-{user}'.format(
                 **dict(
                     root=cls.ROOT,
-                    date_tag=TimeBaseMtd.get_date_tag(),
+                    date_tag=TimeMtd.get_date_tag(),
                     user=SystemMtd.get_user_name(),
                     tag=tag
                 )

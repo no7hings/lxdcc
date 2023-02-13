@@ -26,7 +26,7 @@ for i_f in [
                 #
                 file=i_f,
                 user=bsc_core.SystemMtd.get_user_name(),
-                time_tag=bsc_core.TimeBaseMtd.get_time_tag(),
+                time_tag=bsc_core.TimeMtd.get_time_tag(),
                 #
                 image_file='/l/prod/cgm/output/assets/chr/nn_14y_test/mod/modeling/nn_14y_test.mod.modeling.v002/render/katana-images/main/full_body.master.all.plastic.custom/beauty.####.exr',
                 movie_file='/l/prod/cgm/output/assets/chr/nn_14y_test/mod/modeling/nn_14y_test.mod.modeling.v002/render/katana-images/main/full_body.master.all.plastic.custom.mov',

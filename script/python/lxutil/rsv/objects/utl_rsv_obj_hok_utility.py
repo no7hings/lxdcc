@@ -18,7 +18,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         directory_paths_src = self._hook_option_opt.get_as_array('recycles_texture_directories')
         if directory_paths_src:
-            keyword = 'asset-work-texture-version-dir'
+            keyword = 'asset-source-texture-version-dir'
 
             variant = 'outsource'
             version = self._rsv_scene_properties.get('version')
@@ -65,7 +65,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         ma_core.set_stack_trace_enable(True)
 
-        keyword_0 = 'asset-work-maya-scene-src-file'
+        keyword_0 = 'asset-source-maya-scene-src-file'
         file_paths_src = self._hook_option_opt.get_as_array('recycles_maya_files')
         if file_paths_src:
             file_path_src = file_paths_src[0]
@@ -128,7 +128,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         variant = 'outsource'
         version = self._rsv_scene_properties.get('version')
 
-        keyword = 'asset-work-maya-xgen-cache-dir'
+        keyword = 'asset-source-maya-xgen-cache-dir'
 
         directory_paths_src = self._hook_option_opt.get_as_array('recycles_xgen_cache_directories')
         if directory_paths_src:
@@ -165,7 +165,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         from lxutil import utl_core
 
-        keyword = 'asset-work-sp-scene-src-dir'
+        keyword = 'asset-source-sp-scene-src-dir'
         file_paths_src = self._hook_option_opt.get_as_array('recycles_sp_files')
         if file_paths_src:
             variant = 'outsource'
@@ -203,7 +203,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         from lxutil import utl_core
 
-        keyword = 'asset-work-zb-scene-src-dir'
+        keyword = 'asset-source-zbrush-scene-src-dir'
         file_paths_src = self._hook_option_opt.get_as_array('recycles_zb_files')
         if file_paths_src:
             variant = 'outsource'
@@ -252,11 +252,11 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = self._rsv_scene_properties.get('version')
         step = self._rsv_scene_properties.get('step')
         if step == 'grm':
-            keyword_0 = 'asset-work-maya-xgen-cache-main-dir'
+            keyword_0 = 'asset-source-maya-xgen-cache-main-dir'
         else:
-            keyword_0 = 'asset-work-maya-xgen-cache-dir'
-        keyword_1 = 'asset-work-maya-scene-src-dir'
-        keyword_2 = 'asset-work-maya-scene-src-file'
+            keyword_0 = 'asset-source-maya-xgen-cache-dir'
+        keyword_1 = 'asset-source-maya-scene-src-dir'
+        keyword_2 = 'asset-source-maya-scene-src-file'
 
         xgen_main_directory_rsv_unit_tgt = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
@@ -322,7 +322,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         ma_core.set_stack_trace_enable(True)
 
-        keyword = 'asset-work-texture-dir'
+        keyword = 'asset-source-texture-dir'
 
         variant = 'outsource'
         version = self._rsv_scene_properties.get('version')
@@ -363,7 +363,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_maya_ass_export(self):
         import lxmaya.fnc.exporters as mya_fnc_exporters
 
-        keyword = 'asset-work-maya-ass-file'
+        keyword = 'asset-source-maya-ass-file'
 
         variant = 'outsource'
         version = self._rsv_scene_properties.get('version')
@@ -389,7 +389,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_katana_create(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-        keyword = 'asset-work-katana-scene-src-file'
+        keyword = 'asset-source-katana-scene-src-file'
 
         version = self._rsv_scene_properties.get('version')
 
@@ -426,7 +426,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         if rsv_task:
             rsv_unit = rsv_task.get_rsv_unit(
-                keyword='asset-work-katana-scene-src-file'
+                keyword='asset-source-katana-scene-src-file'
             )
             file_path = rsv_unit.get_result(
                 version='latest'
@@ -438,7 +438,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
             ]
 
-            with utl_core.gui_progress(maximum=len(ms), label='execute workspace load method') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(ms), label='execute workspace load method') as g_p:
                 for i_m, i_as in ms:
                     g_p.set_update()
                     if i_as:
@@ -449,7 +449,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_katana_import_ass(self):
         import lxkatana.fnc.importers as ktn_fnc_importers
 
-        keyword = 'asset-work-maya-ass-file'
+        keyword = 'asset-source-maya-ass-file'
 
         variant = 'outsource'
         version = self._rsv_scene_properties.get('version')
@@ -483,13 +483,15 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         from lxutil import utl_core
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-render-video-all-mov-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-render-video-all-mov-file'
+            keyword_0 = 'asset-temporary-katana-render-video-all-mov-file'
         else:
             raise TypeError()
 

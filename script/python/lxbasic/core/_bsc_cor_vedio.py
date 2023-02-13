@@ -188,7 +188,7 @@ class VdoFileOpt(object):
         pass
 
     def set_mov_create_from(self, image_file_path, width=1024, fps=24, block=False):
-        if StorageBaseMtd(self._file_path).get_is_exists() is False:
+        if StorageMtd(self._file_path).get_is_exists() is False:
             cmd_args = [
                 Bin.get_ffmpeg(),
                 '-i "{}"'.format(image_file_path),

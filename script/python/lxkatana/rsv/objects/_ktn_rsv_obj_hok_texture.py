@@ -13,15 +13,17 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxkatana.fnc.exporters as ktn_fnc_exporters
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-texture-src-dir'
             keyword_1 = 'asset-texture-tgt-dir'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-texture-src-dir'
-            keyword_1 = 'asset-output-texture-tgt-dir'
+            keyword_0 = 'asset-temporary-texture-src-dir'
+            keyword_1 = 'asset-temporary-texture-tgt-dir'
         else:
             raise TypeError()
         #

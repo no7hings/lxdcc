@@ -44,7 +44,7 @@ class AssetBatcher(object):
         self._option = option
         #
         self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.TimeBaseMtd.get_time_tag()
+        self._time_tag = bsc_core.TimeMtd.get_time_tag()
         #
         self._td_enable = True
         #
@@ -55,7 +55,7 @@ class AssetBatcher(object):
         surface_publish = self._option.get('surface_publish') or False
 
         if self._assets_tgt:
-            with utl_core.gui_progress(maximum=len(self._assets_tgt), label='execute batch') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(self._assets_tgt), label='execute batch') as g_p:
                 for i_asset_tgt in self._assets_tgt:
                     g_p.set_update()
                     #
@@ -76,7 +76,7 @@ class AssetBatcher(object):
             user = bsc_core.SystemMtd.get_user_name()
         #
         if time_tag is None:
-            time_tag = bsc_core.TimeBaseMtd.get_time_tag()
+            time_tag = bsc_core.TimeMtd.get_time_tag()
         #
         i_rsv_task = i_rsv_asset_tgt.get_rsv_task(step='srf', task='surfacing')
         if i_rsv_task:
@@ -179,19 +179,19 @@ class AbsLibMethodFileDef(object):
     @classmethod
     def _set_j_rsv_task_work_scene_src_file_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
-            'asset-work-maya-scene-src-file',
-            'asset-work-houdini-scene-src-file',
-            'asset-work-katana-scene-src-file',
-            'asset-work-nuke-scene-src-file',
+            'asset-source-maya-scene-src-file',
+            'asset-source-houdini-scene-src-file',
+            'asset-source-katana-scene-src-file',
+            'asset-source-nuke-scene-src-file',
         ]:
             cls._set_k_rsv_unit_scene_file_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
     @classmethod
     def _set_j_rsv_task_work_scene_src_file_link_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keywords in [
-            ('asset-maya-scene-file', 'asset-work-maya-scene-src-file'),
-            ('asset-katana-scene-file', 'asset-work-katana-scene-src-file'),
-            ('asset-houdini-scene-file', 'asset-work-houdini-scene-src-file'),
-            ('asset-nuke-scene-file', 'asset-work-nuke-scene-src-file'),
+            ('asset-maya-scene-file', 'asset-source-maya-scene-src-file'),
+            ('asset-katana-scene-file', 'asset-source-katana-scene-src-file'),
+            ('asset-houdini-scene-file', 'asset-source-houdini-scene-src-file'),
+            ('asset-nuke-scene-file', 'asset-source-nuke-scene-src-file'),
         ]:
             cls._set_k_rsv_unit_scene_file_link_to_(j_rsv_task_src, j_rsv_task_tgt, k_keywords)
     @classmethod
@@ -340,7 +340,7 @@ class AbsLibMethodSystemDef(object):
             #
             r = rsv_commands.get_resolver()
             #
-            j_task_directory_paths = r.get_rsv_entity_task_directory_paths(**j_task_kwargs)
+            j_task_directory_paths = r.get_rsv_resource_task_directory_paths(**j_task_kwargs)
             for k_task_directory_path in j_task_directory_paths:
                 k_task_directory = utl_dcc_objects.OsDirectory_(k_task_directory_path)
                 k_task_directory.set_create()
@@ -430,7 +430,7 @@ class LibAssetPusher(AbsLibMethod):
         self._project_tgt = 'lib'
         #
         self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.TimeBaseMtd.get_time_tag()
+        self._time_tag = bsc_core.TimeMtd.get_time_tag()
         #
         self._option = option
         #
@@ -459,7 +459,7 @@ class LibAssetPusher(AbsLibMethod):
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
             user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
-            time_tag = self._option.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
+            time_tag = self._option.get('time_tag') or bsc_core.TimeMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = self._get_lib_asset_(
@@ -509,7 +509,7 @@ class LibAssetPuller(AbsLibMethod):
         self._project_tgt = project
         #
         self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.TimeBaseMtd.get_time_tag()
+        self._time_tag = bsc_core.TimeMtd.get_time_tag()
         #
         self._option = option
         #
@@ -534,7 +534,7 @@ class LibAssetPuller(AbsLibMethod):
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
             user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
-            time_tag = self._option.get('time_tag') or bsc_core.TimeBaseMtd.get_time_tag()
+            time_tag = self._option.get('time_tag') or bsc_core.TimeMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = i_asset_src

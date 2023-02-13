@@ -7,7 +7,7 @@ import glob
 
 from lxbasic import bsc_core
 
-import lxobj.core_objects as core_objects
+import lxobj.objects as core_objects
 
 import lxresolver.commands as rsv_commands
 
@@ -522,7 +522,7 @@ class AbsFncDccGeometryComparer(object):
             self._set_scene_dcc_objs_update_
         ]
         if methods:
-            with utl_core.gui_progress(maximum=len(methods), label='execute geometry-comparer method') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(methods), label='execute geometry-comparer method') as g_p:
                 for method in methods:
                     g_p.set_update()
                     method()
@@ -531,7 +531,7 @@ class AbsFncDccGeometryComparer(object):
         tgt_dcc_geometries = self._scene_dcc_geometries
         #
         if src_dcc_geometries:
-            with utl_core.gui_progress(maximum=len(src_dcc_geometries), label='gain geometry-comparer result') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(src_dcc_geometries), label='gain geometry-comparer result') as g_p:
                 for i_src_geometry in src_dcc_geometries:
                     g_p.set_update()
                     if i_src_geometry.type_name == 'Mesh':
@@ -559,7 +559,7 @@ class AbsFncDccGeometryComparer(object):
             self._set_scene_dcc_objs_update_
         ]
         if methods:
-            with utl_core.gui_progress(maximum=len(methods), label='execute geometry-comparer method') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(methods), label='execute geometry-comparer method') as g_p:
                 for method in methods:
                     g_p.set_update()
                     method()
@@ -569,7 +569,7 @@ class AbsFncDccGeometryComparer(object):
         #
         dcc_geometry_paths = []
         if dcc_geometries_src:
-            with utl_core.gui_progress(maximum=len(dcc_geometries_src), label='gain geometry-comparer result') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(dcc_geometries_src), label='gain geometry-comparer result') as g_p:
                 for i_src_geometry in dcc_geometries_src:
                     g_p.set_update()
                     if i_src_geometry.type_name == 'Mesh':
@@ -713,7 +713,7 @@ class AbsDccTextureExport(object):
             copy_cache = []
             index_mapper = {}
             index_query = {}
-            with utl_core.log_progress_bar(maximum=len(dcc_objs), label='texture export') as l_p:
+            with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label='texture export') as l_p:
                 for i_dcc_obj in dcc_objs:
                     l_p.set_update()
                     for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
@@ -847,7 +847,7 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
         objs_tgt, data_tgt = self._comparer_data[1]
         #
         if objs_src:
-            with utl_core.gui_progress(maximum=len(objs_src), label='comparer geometry by data') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(objs_src), label='comparer geometry by data') as g_p:
                 for i_obj_src in objs_src:
                     if i_obj_src.type_name == 'Mesh':
                         i_path_src = i_obj_src.path
@@ -887,7 +887,7 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
             (self.__gain_result_fnc_, ())
         ]
         if ms:
-            with utl_core.gui_progress(maximum=len(ms), label='execute geometry-comparer method') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(ms), label='execute geometry-comparer method') as g_p:
                 for i_method, i_args in ms:
                     g_p.set_update()
                     i_method(*i_args)

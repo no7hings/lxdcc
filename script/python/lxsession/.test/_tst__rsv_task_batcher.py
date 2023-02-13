@@ -16,7 +16,7 @@ utl_core.Environ.set_add(
 
 user = bsc_core.SystemMtd.get_user_name()
 
-# time_tag = bsc_core.TimeBaseMtd.get_time_tag()
+# time_tag = bsc_core.TimeMtd.get_time_tag()
 
 time_tag = '2022_0124_1916_14_184314'
 

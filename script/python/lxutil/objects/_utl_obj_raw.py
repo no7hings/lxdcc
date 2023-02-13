@@ -5,57 +5,17 @@ import fnmatch
 
 import parse
 
-from lxutil import utl_configure, utl_core
-
 from lxbasic import bsc_core
 
-from lxbasic.objects import bsc_obj_abs
+import lxbasic.abstracts as bsc_abstracts
 
 import lxbasic.objects as bsc_objects
+
+from lxutil import utl_configure, utl_core
 
 import copy
 
 import os
-
-
-class Content(bsc_obj_abs.AbsContent):
-    PATHSEP = '.'
-    def __init__(self, key=None, value=None):
-        super(Content, self).__init__(key, value)
-
-
-class Configure(bsc_obj_abs.AbsContent):
-    PATHSEP = '.'
-    def __init__(self, key=None, value=None):
-        super(Configure, self).__init__(key, value)
-
-
-class Property(object):
-    def __init__(self, key, value):
-        self._key = key
-        self._value = value
-    @property
-    def key(self):
-        return self._key
-    @property
-    def value(self):
-        return self._value
-
-    def __str__(self):
-        return '{} = {}'.format(
-            self._key, self._value
-        )
-
-
-class Properties(bsc_obj_abs.AbsContent):
-    PATHSEP = '.'
-    PROPERTY_CLASS = Property
-    def __init__(self, obj, raw):
-        super(Properties, self).__init__(value=raw)
-        self._obj = obj
-
-    def get_property(self, key):
-        return self.PROPERTY_CLASS(key, self.get(key))
 
 
 class _Pattern(object):
@@ -82,7 +42,7 @@ class _Pattern(object):
         return self._fnmatch_pattern
 
 
-class DotAssReader(bsc_obj_abs.AbsFileReader):
+class DotAssReader(bsc_abstracts.AbsFileReader):
     def __init__(self, file_path):
         super(DotAssReader, self).__init__(file_path)
 
@@ -131,7 +91,7 @@ class DotAssReader(bsc_obj_abs.AbsFileReader):
         return self._get_file_paths_()
 
 
-class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
+class DotXgenFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n\n'
     FILE_REFERENCE_DICT = {
         'Palette': ['xgDataPath', 'xgProjectPath'],
@@ -401,7 +361,7 @@ class DotXgenFileReader(bsc_obj_abs.AbsFileReader):
         )
 
 
-class DotMaFileReader(bsc_obj_abs.AbsFileReader):
+class DotMaFileReader(bsc_abstracts.AbsFileReader):
     SEP = ';\n'
     FILE_REFERENCE_DICT = {
         'file': 'ftn',
@@ -599,10 +559,10 @@ class DotMaFileReader(bsc_obj_abs.AbsFileReader):
         return self._get_file_paths_()
 
 
-class DotMtlxFileReader(bsc_obj_abs.AbsFileReader):
+class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLASS = Properties
+    PROPERTIES_CLASS = bsc_objects.Properties
     def __init__(self, file_path):
         super(DotMtlxFileReader, self).__init__(file_path)
 
@@ -657,10 +617,10 @@ class DotMtlxFileReader(bsc_obj_abs.AbsFileReader):
         return lis
 
 
-class DotOslFileReader(bsc_obj_abs.AbsFileReader):
+class DotOslFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLASS = Properties
+    PROPERTIES_CLASS = bsc_objects.Properties
     def __init__(self, file_path):
         super(DotOslFileReader, self).__init__(file_path)
 

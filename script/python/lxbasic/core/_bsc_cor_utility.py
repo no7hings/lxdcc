@@ -163,7 +163,7 @@ class ApplicationMtd(object):
         ).strip()
 
 
-class TimeBaseMtd(object):
+class TimeMtd(object):
     TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
     #
     TIME_TAG_FORMAT = '%Y_%m%d_%H%M_%S_%f'
@@ -202,7 +202,7 @@ class TimeBaseMtd(object):
         )
 
 
-class SystemMtd(TimeBaseMtd):
+class SystemMtd(TimeMtd):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
     @classmethod
@@ -262,7 +262,7 @@ class SystemMtd(TimeBaseMtd):
     def get(cls, key):
         dic = {
             'user': cls.get_user_name,
-            'time_tag': TimeBaseMtd.get_time_tag
+            'time_tag': TimeMtd.get_time_tag
         }
         if key in dic:
             return dic[key]()
@@ -278,7 +278,7 @@ class SystemMtd(TimeBaseMtd):
         return sys.stderr.write(text+'\n')
 
 
-class StorageBaseMtd(object):
+class StorageMtd(object):
     PATHSEP = '/'
     @classmethod
     def get_path_is_windows(cls, path):
@@ -304,7 +304,7 @@ class StorageBaseMtd(object):
     @classmethod
     def set_map_to_nas(cls, path):
         path = cls.set_pathsep_cleanup(path)
-        if StorageBaseMtd.get_path_is_linux(path):
+        if StorageMtd.get_path_is_linux(path):
             src_root = path[:2]
             if src_root == '/l':
                 _ = '/ifs/data/cgdata' + path[len(src_root):]
@@ -317,7 +317,7 @@ class StorageBaseMtd(object):
     @classmethod
     def set_map_to_windows(cls, path):
         path = cls.set_pathsep_cleanup(path)
-        if StorageBaseMtd.get_path_is_linux(path):
+        if StorageMtd.get_path_is_linux(path):
             src_root = path[:2]
             src_root_name = src_root[-1]
             tgt_root = src_root_name + ':'
@@ -327,7 +327,7 @@ class StorageBaseMtd(object):
     @classmethod
     def set_map_to_linux(cls, path):
         path = cls.set_pathsep_cleanup(path)
-        if StorageBaseMtd.get_path_is_windows(path):
+        if StorageMtd.get_path_is_windows(path):
             src_root = path[:2]
             src_root_name = src_root[0]
             tgt_root = '/' + src_root_name.lower()
@@ -550,7 +550,7 @@ class UuidMtd(object):
         return cls.get_by_string(hash_value)
     @classmethod
     def get_by_file(cls, file_path):
-        check_file_path = StorageBaseMtd.set_map_to_linux(file_path)
+        check_file_path = StorageMtd.set_map_to_linux(file_path)
         if os.path.isfile(file_path):
             timestamp = os.stat(file_path).st_mtime
             size = os.path.getsize(file_path)
@@ -613,10 +613,10 @@ class ExceptionMtd(object):
         for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
             i_file_path, i_line, i_fnc, i_fnc_line = stk
             exc_texts.append(
-                u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
+                '    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
         if exc_texts:
-            print '\n'.join(exc_texts)
+            sys.stdout.write('\n'.join(exc_texts)+'\n')
     @classmethod
     def get_stack(cls):
         import sys
@@ -676,115 +676,6 @@ class CameraMtd(object):
         r_x, r_y, r_z = 0, 0, 0
         s_x, s_y, s_z = 1, 1, 1
         return (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z)
-
-
-class MeshFaceVertexIndicesOpt(object):
-    # print MeshFaceVertexIndicesOpt(
-    #     [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
-    # ).set_reverse_by_counts(
-    #     [4, 4, 4, 4, 4, 4, 4, 4, 4]
-    # )
-    # print MeshFaceVertexIndicesOpt(
-    #     [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14]
-    # ).set_reverse_by_start_indices(
-    #     [0, 4, 8, 12, 16, 20, 24, 28, 32, 36]
-    # )
-    def __init__(self, face_vertex_indices):
-        self._raw = face_vertex_indices
-
-    def set_reverse_by_counts(self, counts):
-        lis = []
-        vertex_index_start = 0
-        for i_count in counts:
-            vertex_index_end = vertex_index_start+i_count
-            for j in range(vertex_index_end - vertex_index_start):
-                lis.append(self._raw[vertex_index_end-j-1])
-            #
-            vertex_index_start += i_count
-        return lis
-
-    def set_reverse_by_start_indices(self, start_vertex_indices):
-        lis = []
-        for i in range(len(start_vertex_indices)):
-            if i > 0:
-                vertex_index_start = start_vertex_indices[i-1]
-                vertex_index_end = start_vertex_indices[i]
-                for j in range(vertex_index_end-vertex_index_start):
-                    lis.append(self._raw[vertex_index_end-j-1])
-        return lis
-
-
-class MeshFaceShellMtd(object):
-    @classmethod
-    def get_connected_face_indices(cls, face_to_vertex_dict, vertex_to_face_dict, face_index):
-        return set(j for i in face_to_vertex_dict[face_index] for j in vertex_to_face_dict[i])
-    @classmethod
-    def get_face_and_vertex_query_dict(cls, vertex_counts, vertex_indices):
-        face_to_vertex_dict = {}
-        vertex_to_face_dict = {}
-        vertex_index_start = 0
-        for i_face_index, i_vertex_count in enumerate(vertex_counts):
-            vertex_index_end = vertex_index_start + i_vertex_count
-            for j in range(vertex_index_end - vertex_index_start):
-                j_vertex_index = vertex_indices[vertex_index_start + j]
-                vertex_to_face_dict.setdefault(j_vertex_index, []).append(i_face_index)
-                face_to_vertex_dict.setdefault(i_face_index, []).append(j_vertex_index)
-            #
-            vertex_index_start += i_vertex_count
-        return face_to_vertex_dict, vertex_to_face_dict
-    @classmethod
-    def get_shell_dict_from_face_vertices(cls, vertex_counts, vertex_indices):
-        # StgFileOpt(
-        #     '/data/f/shell_id_test/input.json'
-        # ).set_write([vertex_counts, vertex_indices])
-        face_to_vertex_dict, vertex_to_face_dict = cls.get_face_and_vertex_query_dict(
-            vertex_counts, vertex_indices
-        )
-        #
-        _face_count = len(vertex_counts)
-        #
-        all_face_indices = set(range(_face_count))
-        #
-        _cur_shell_index = 0
-        #
-        shell_to_face_dict = {}
-        #
-        _less_face_indices = set(range(_face_count))
-        _cur_search_face_indices = set()
-        _cur_shell_face_indices = set()
-        c = 0
-        while _less_face_indices:
-            if c > _face_count:
-                break
-            #
-            if _less_face_indices == all_face_indices:
-                _cur_search_face_indices = cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, 0)
-                _cur_shell_face_indices = set()
-                _cur_shell_face_indices.update(_cur_search_face_indices)
-
-            _less_face_indices -= _cur_search_face_indices
-            #
-            cur_connected_face_indices = set()
-            [cur_connected_face_indices.update(cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, i)) for i in _cur_search_face_indices]
-
-            cur_int = cur_connected_face_indices & _cur_shell_face_indices
-            cur_dif = cur_connected_face_indices - _cur_shell_face_indices
-            if cur_int:
-                if cur_dif:
-                    _cur_shell_face_indices.update(cur_dif)
-                    _cur_search_face_indices = cur_dif
-                else:
-                    shell_to_face_dict[_cur_shell_index] = _cur_shell_face_indices
-                    if _less_face_indices:
-                        _cur_shell_index += 1
-                        #
-                        _cur_face_index = min(_less_face_indices)
-                        _cur_search_face_indices = cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, _cur_face_index)
-                        _cur_shell_face_indices = set()
-                        _cur_shell_face_indices.update(_cur_search_face_indices)
-            #
-            c += 1
-        return {i: k for k, v in shell_to_face_dict.items() for i in v}
 
 
 HEXDIG = '0123456789ABCDEFabcdef'

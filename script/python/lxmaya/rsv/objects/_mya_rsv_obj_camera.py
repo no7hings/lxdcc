@@ -16,10 +16,13 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def set_asset_camera_main_abc_export(self):
         key = 'camera main abc export'
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
-        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        #
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
+        pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
         location = '/camera_grp'
         #

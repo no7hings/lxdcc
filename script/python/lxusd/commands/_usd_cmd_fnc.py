@@ -1,9 +1,9 @@
 # coding:utf-8
 import collections
 
-from lxutil.dcc import dcc_objects
+import lxbasic.objects as bsc_objects
 
-import lxutil.objects as utl_objects
+from lxutil.dcc import dcc_objects
 
 from lxusd import usd_configure
 
@@ -25,8 +25,8 @@ def set_asset_work_set_usda_create(task_properties):
             asset = task_properties.get('asset')
             version = task_properties.get('version')
             #
-            configure = utl_objects.Configure(value=usd_configure.Data.SET_USDA_ARGUMENT_CONFIGURE_PATH)
-            set_usd_configure = utl_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
+            configure = bsc_objects.Configure(value=usd_configure.Data.SET_USDA_ARGUMENT_CONFIGURE_PATH)
+            set_usd_configure = bsc_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
             #
             configure.set('properties.asset', asset)
             #
@@ -64,7 +64,7 @@ def set_asset_work_set_usda_create(task_properties):
             var_names = ['hi', 'temp']
             for var_name in var_names:
                 work_geometry_usd_var_file = rsv_task.get_rsv_unit(
-                    keyword='asset-work-geometry-usd-{}-file'.format(var_name), workspace='work'
+                    keyword='asset-source-geometry-usd-{}-file'.format(var_name), workspace='work'
                 )
                 if work_geometry_usd_var_file:
                     work_geometry_usd_var_file_path = work_geometry_usd_var_file.get_result(version='latest')
@@ -80,7 +80,7 @@ def set_asset_work_set_usda_create(task_properties):
                 raw = j2_template.render(**configure.value)
                 #
                 set_usd_file = rsv_task.get_rsv_unit(
-                    keyword='asset-work-set-usd-{}-file'.format(i)
+                    keyword='asset-source-set-usd-{}-file'.format(i)
                 )
                 set_usd_file_path = set_usd_file.get_result(version=version)
                 #

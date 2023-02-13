@@ -109,7 +109,7 @@ class MtdBasic(object):
         return _rcs_fnc(variant)
 
 
-class RsvVersionKey(object):
+class VersionKey(object):
     ZFILL_COUNT = 3
     FNMATCH_PATTERN = 'v{}'.format('[0-9]'*ZFILL_COUNT)
     def __init__(self, text):
@@ -146,8 +146,8 @@ class RsvVersionKey(object):
         return self
 
 
-class RsvMatcher(MtdBasic):
-    RSV_TASK_VERSION_CLASS = RsvVersionKey
+class Matcher(MtdBasic):
+    RSV_TASK_VERSION_CLASS = VersionKey
     def __init__(self, pattern, format_variant=None):
         self._orig_parameter = format_variant
         self._rsv_pattern = self._current_pattern = pattern
@@ -196,12 +196,12 @@ class RsvMatcher(MtdBasic):
         results = self._get_results_(current_pattern, trim)
         #
         lis = []
-        for result in results:
+        for i_result in results:
             p = parse.parse(
-                orig_pattern, result
+                orig_pattern, i_result
             )
             if p:
-                lis.append((result, p.named))
+                lis.append((i_result, p.named))
         return lis
 
     def set_variant_update(self, format_variant):
@@ -296,7 +296,7 @@ class AssetTaskFileGain(object):
                 'project': self._project,
                 'asset': asset,
             }
-            file_pattern_src = RsvMatcher(self.ASSET_PATH_PATTERN, format_variant=format_variant)
+            file_pattern_src = Matcher(self.ASSET_PATH_PATTERN, format_variant=format_variant)
             asset_matches = file_pattern_src.get_matches()
             if asset_matches:
                 asset_result, asset_variants = asset_matches[-1]
@@ -315,14 +315,14 @@ class AssetTaskFileGain(object):
                             'task': task,
                         }
                     )
-                    input_file_pattern = RsvMatcher(input_pattern, input_variant)
+                    input_file_pattern = Matcher(input_pattern, input_variant)
                     input_file_matches = input_file_pattern.get_matches(trim=(-5, None))
                     if input_file_matches:
                         input_file_match = input_file_matches[-1]
                         input_file_result, input_file_variants = input_file_match
                         if output_patterns is not None:
                             for output_pattern in output_patterns:
-                                output_file_pattern = RsvMatcher(output_pattern, format_variant=input_file_variants)
+                                output_file_pattern = Matcher(output_pattern, format_variant=input_file_variants)
                                 output_file_paths.append(output_file_pattern.get_current())
                         #
                         input_file_paths.append(input_file_result)

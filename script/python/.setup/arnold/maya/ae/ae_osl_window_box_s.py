@@ -8,19 +8,18 @@ from lxmaya import ma_ae
 
 
 # build by lynxi
-class osl_window_box_s(ma_ae.AbsNodeTemplate):
+class osl_window_box_s(ma_ae.AbsNodeTemplate_):
     def setup(self):
         self._create_dict = {}
         with self.scroll_layout():
             with self.layout('osl window box s', collapse=False):
                 with self.layout('texture', collapse=False):
-                    # self.addControl('filename', useAsFileName=True)
-                    self.addControl('filename')
+                    self._add_file_control_('filename', 'file')
                     self.addControl('udim_maximum')
                     self.addControl('texture_flip')
                     self.addControl('texture_flop')
                 with self.layout('basic', collapse=False):
-                    self.addControl('space', enumerateOption='x|-x|y|-y|z|-z')
+                    self._add_enumerate_control_('space', 'space', 'x|-x|y|-y|z|-z')
                     self.addControl('rotation_x')
                     self.addControl('rotation_y')
                     self.addControl('rotation_z')

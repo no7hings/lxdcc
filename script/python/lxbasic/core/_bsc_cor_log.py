@@ -60,7 +60,41 @@ class LogMtd(object):
         sys.stdout.write(
             cls.get_error(text+'\n')
         )
-
+    #
+    @classmethod
+    def get_method_result(cls, name, text):
+        if isinstance(name, six.text_type):
+            name = name.encode('utf-8')
+        #
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        #
+        return cls.get_result(
+            '<{}> {}'.format(name, text)
+        )
+    @classmethod
+    def get_method_warning(cls, name, text):
+        if isinstance(name, six.text_type):
+            name = name.encode('utf-8')
+        #
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        #
+        return cls.get_warning(
+            '<{}> {}'.format(name, text)
+        )
+    @classmethod
+    def get_method_error(cls, name, text):
+        if isinstance(name, six.text_type):
+            name = name.encode('utf-8')
+        #
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        #
+        return cls.get_error(
+            '<{}> {}'.format(name, text)
+        )
+    #
     @classmethod
     def trace_method_result(cls, name, text):
         if isinstance(name, six.text_type):
@@ -111,9 +145,9 @@ class LogMtd(object):
 
 
 if __name__ == '__main__':
-    # print(LogMtd.get('Test'))
-    # print(LogMtd.get(u'测试'))
-    # print(LogMtd.get_result(u'测试'))
+    print(LogMtd.get('Test'))
+    print(LogMtd.get(u'测试'))
+    print(LogMtd.get_result(u'测试'))
 
     LogMtd.trace('Test')
     LogMtd.trace(u'测试 0')

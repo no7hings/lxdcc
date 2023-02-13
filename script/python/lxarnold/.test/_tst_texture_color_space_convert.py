@@ -44,11 +44,11 @@ if __name__ == '__main__':
     jpg_file_paths = d_original_src_opt.get_all_file_paths(
         include_exts=['.jpg']
     )
-    jpg_file_path_mapper = bsc_core.StorageBaseMtd.to_file_deduplication_mapper(jpg_file_paths)
+    jpg_file_path_mapper = bsc_core.StorageMtd.to_file_deduplication_mapper(jpg_file_paths)
     exr_file_paths = d_original_src_opt.get_all_file_paths(
         include_exts=['.exr']
     )
-    exr_file_path_mapper = bsc_core.StorageBaseMtd.to_file_deduplication_mapper(exr_file_paths)
+    exr_file_path_mapper = bsc_core.StorageMtd.to_file_deduplication_mapper(exr_file_paths)
 
     for k, v in jpg_file_path_mapper.items():
         if k in exr_file_path_mapper:

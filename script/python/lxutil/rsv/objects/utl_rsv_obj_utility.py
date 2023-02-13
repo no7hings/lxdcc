@@ -21,13 +21,13 @@ class RsvAssetWorkspaceTextureOpt(object):
         self._version = None
 
         self._work_texture_version_directory_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-work-texture-version-dir'
+            keyword='asset-source-texture-version-dir'
         )
         self._work_texture_src_directory_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-work-texture-src-dir'
+            keyword='asset-source-texture-src-dir'
         )
         self._work_texture_tx_directory_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-work-texture-tx-dir'
+            keyword='asset-source-texture-tx-dir'
         )
 
     def get_directory_path_at(self, variant, version):
@@ -55,13 +55,13 @@ class RsvAssetWorkspaceTextureOpt(object):
         if version == 'new':
             version = self.get_new_version_at(variant)
         #
-        bsc_core.StorageBaseMtd.set_directory_create(
+        bsc_core.StorageMtd.set_directory_create(
             self.get_directory_path_at(variant, version)
         )
-        bsc_core.StorageBaseMtd.set_directory_create(
+        bsc_core.StorageMtd.set_directory_create(
             self.get_src_directory_path_at(variant, version)
         )
-        bsc_core.StorageBaseMtd.set_directory_create(
+        bsc_core.StorageMtd.set_directory_create(
             self.get_tx_directory_path_at(variant, version)
         )
         #
@@ -125,7 +125,7 @@ class RsvAssetWorkspaceTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StorageBaseMtd.get_is_writeable(i_result) is False:
+            if bsc_core.StorageMtd.get_is_writeable(i_result) is False:
                 list_.append(i_variants['version'])
         return list_
 
@@ -136,18 +136,18 @@ class RsvAssetWorkspaceTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StorageBaseMtd.get_is_writeable(i_result) is True:
+            if bsc_core.StorageMtd.get_is_writeable(i_result) is True:
                 list_.append(i_variants['version'])
         return list_
 
     def get_all_directories(self, dcc_objs):
         rsv_project = self._rsv_task.get_rsv_project()
 
-        directory_keyword = 'asset-work-texture-version-dir'
+        directory_keyword = 'asset-source-texture-version-dir'
 
         file_keywords = [
-            'asset-work-texture-src-dir',
-            'asset-work-texture-tx-dir'
+            'asset-source-texture-src-dir',
+            'asset-source-texture-tx-dir'
         ]
 
         directory_pattern = rsv_project.get_pattern(directory_keyword)
@@ -183,9 +183,9 @@ class RsvAssetWorkspaceTextureOpt(object):
         directory_paths = self.get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageBaseMtd.get_is_writeable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writeable(i) is True]
         if unlocked_directory_paths:
-            with utl_core.log_progress_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
+            with utl_core.LogProgressRunner.create_as_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
                 for _i in unlocked_directory_paths:
                     self.set_directory_locked(_i)
                     g_p.set_update()
@@ -206,5 +206,5 @@ class RsvAssetWorkspaceTextureOpt(object):
         kwargs = self.get_kwargs_by_directory_path(directory_path)
         if kwargs:
             kwargs_0, kwargs_1 = copy.copy(kwargs), copy.copy(kwargs)
-            kwargs_0['keyword'], kwargs_1['keyword'] = 'asset-work-texture-src-dir', 'asset-work-texture-tx-dir'
+            kwargs_0['keyword'], kwargs_1['keyword'] = 'asset-source-texture-src-dir', 'asset-source-texture-tx-dir'
             return self._resolver.get_result(**kwargs_0), self._resolver.get_result(**kwargs_1)

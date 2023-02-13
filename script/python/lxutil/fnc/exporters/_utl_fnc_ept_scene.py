@@ -136,7 +136,7 @@ class DotXgenUsdaExporter(
                 #
                 c.set(
                     'asset.xgen.collections.{}.file'.format(i_xgen_collection_name),
-                    bsc_core.StorageBaseMtd.get_file_realpath(
+                    bsc_core.StorageMtd.get_file_realpath(
                         file_path, i_xgen_collection_file_path
                     )
                 )

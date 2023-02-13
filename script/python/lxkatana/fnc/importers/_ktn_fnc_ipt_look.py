@@ -203,7 +203,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             (self.__set_look_assigns_create_, (and_geometries, ))
         ]
         if method_args:
-            with utl_core.gui_progress(maximum=len(method_args), label='execute look create method') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute look create method') as g_p:
                 for i_method, i_args in method_args:
                     g_p.set_update()
                     #
@@ -236,7 +236,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def __set_look_materials_create_(self, and_geometries):
         if and_geometries:
             pass_name = self._pass_name
-            with utl_core.gui_progress(maximum=len(and_geometries), label='create material') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create material') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
                     self.__set_look_material_create_(i_and_geometry, pass_name)
@@ -446,7 +446,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             node_key = self._configure.get('node.{}.keyword'.format(key))
             dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
             dcc_group.clear_children()
-            with utl_core.gui_progress(maximum=len(and_geometries), label='create material-assign') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create material-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
                     self.__set_look_geometry_material_assign_create_(i_and_geometry)
@@ -456,7 +456,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
             dcc_group.clear_children()
             #
-            with utl_core.gui_progress(maximum=len(and_geometries), label='create property-assign') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create property-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
                     self.__set_look_geometry_properties_create_(i_and_geometry)

@@ -19,17 +19,19 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         force = False
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
-        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        rsv_scene_properties = self._rsv_scene_properties
+
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
+        pathsep = rsv_scene_properties.get('dcc.pathsep')
 
         if workspace == 'publish':
             keyword_0 = 'asset-look-ass-file'
             keyword_1 = 'asset-look-ass-sub-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-look-ass-file'
-            keyword_1 = 'asset-output-look-ass-sub-file'
+            keyword_0 = 'asset-temporary-look-ass-file'
+            keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:
             raise TypeError()
         #
@@ -99,15 +101,17 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
-        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        rsv_scene_properties = self._rsv_scene_properties
+
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
+        pathsep = rsv_scene_properties.get('dcc.pathsep')
 
         if workspace == 'publish':
             keyword = 'asset-look-yml-file'
         elif workspace == 'output':
-            keyword = 'asset-output-look-yml-file'
+            keyword = 'asset-temporary-look-yml-file'
         else:
             raise TypeError()
 

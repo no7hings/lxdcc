@@ -1,5 +1,6 @@
 # coding:utf-8
-from lxutil import objects
+import lxbasic.objects as bsc_objects
+
 d = {
     'option': {
         'x': 1,
@@ -9,7 +10,7 @@ d = {
     'x': '=(<option.x> + 2)*5'
 }
 
-c = objects.Configure(None, d)
+c = bsc_objects.Configure(None, d)
 c.set('asset_name', 'cc')
 c.set_flatten()
 

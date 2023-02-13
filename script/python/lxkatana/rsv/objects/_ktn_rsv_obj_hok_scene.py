@@ -13,17 +13,19 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxkatana.fnc.creators as ktn_fnc_creators
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-scene-src-file'
             keyword_1 = 'asset-look-ass-file'
             keyword_2 = 'asset-look-ass-sub-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-scene-src-file'
-            keyword_1 = 'asset-output-look-ass-file'
-            keyword_2 = 'asset-output-look-ass-sub-file'
+            keyword_0 = 'asset-temporary-katana-scene-src-file'
+            keyword_1 = 'asset-temporary-look-ass-file'
+            keyword_2 = 'asset-temporary-look-ass-sub-file'
         else:
             raise TypeError()
 
@@ -80,13 +82,15 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_scene_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = '{branch}-katana-scene-file'
         elif workspace == 'output':
-            keyword_0 = '{branch}-output-katana-scene-file'
+            keyword_0 = '{branch}-temporary-katana-scene-file'
         else:
             raise TypeError()
         #
@@ -100,13 +104,15 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         return scene_file_path
 
     def get_scene_src_file_path(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-scene-src-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-scene-src-file'
+            keyword_0 = 'asset-temporary-katana-scene-src-file'
         else:
             raise TypeError()
 
@@ -127,16 +133,18 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxkatana.fnc.creators as ktn_fnc_creators
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        step = self._rsv_scene_properties.get('step')
-        task = self._rsv_scene_properties.get('task')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        step = rsv_scene_properties.get('step')
+        task = rsv_scene_properties.get('task')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-scene-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-scene-file'
+            keyword_0 = 'asset-temporary-katana-scene-file'
         else:
             raise TypeError()
 
@@ -298,15 +306,17 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-scene-file'
             keyword_1 = 'asset-katana-scene-src-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-scene-file'
-            keyword_1 = 'asset-output-katana-scene-src-file'
+            keyword_0 = 'asset-temporary-katana-scene-file'
+            keyword_1 = 'asset-temporary-katana-scene-src-file'
         else:
             raise TypeError()
         #
@@ -320,7 +330,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         scene_src_file_path = scene_src_file_rsv_unit.get_result(version=version)
         #
-        if bsc_core.StorageBaseMtd.get_is_exists(scene_src_file_path) is False:
+        if bsc_core.StorageMtd.get_is_exists(scene_src_file_path) is False:
             utl_dcc_objects.OsFile(
                 scene_file_path
             ).set_link_to(
@@ -330,13 +340,15 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_white_disp_create(self):
         import lxkatana.fnc.importers as ktn_fnc_importers
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
 
         if workspace == 'publish':
             keyword_0 = 'asset-look-ass-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-look-ass-file'
+            keyword_0 = 'asset-temporary-look-ass-file'
         else:
             raise TypeError()
 
@@ -354,13 +366,15 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_white_zbrush_create(self):
         import lxkatana.fnc.importers as ktn_fnc_importers
 
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
 
         if workspace == 'publish':
             keyword_0 = 'asset-look-ass-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-look-ass-file'
+            keyword_0 = 'asset-temporary-look-ass-file'
         else:
             raise TypeError()
 

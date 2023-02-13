@@ -680,10 +680,9 @@ class AbsSGKtnObj(utl_abstract.AbsDccObj):
     @property
     def type(self):
         return ''
-
     @property
     def icon(self):
-        pass
+        return ''
 
     def get_is_file_reference(self):
         pass

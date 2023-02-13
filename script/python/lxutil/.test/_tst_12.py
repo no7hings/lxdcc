@@ -1,13 +1,13 @@
 # coding:utf-8
-from lxutil import utl_configure, utl_core
+import lxbasic.objects as bsc_objects
 
-import lxutil.objects as utl_objects
+from lxutil import utl_configure
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 task_dir_path = '/data/f/look_system_workspace'
 
-configure = utl_objects.Configure(None, utl_configure.Data.LOOK_SYSTEM_WORKSPACE_CONFIGURE_PATH)
+configure = bsc_objects.Configure(None, utl_configure.Data.LOOK_SYSTEM_WORKSPACE_CONFIGURE_PATH)
 configure.set('option.root', task_dir_path)
 configure.set_flatten()
 

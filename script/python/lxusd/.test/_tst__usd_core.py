@@ -29,7 +29,7 @@ prim_opt = usd_core.UsdPrimOpt(
 
 list_ = []
 cs = prim_opt.get_children()
-with utl_core.log_progress_bar(maximum=len(cs), label='usd combine') as l_p:
+with utl_core.LogProgressRunner.create_as_bar(maximum=len(cs), label='usd combine') as l_p:
     for i_prim in cs:
         l_p.set_update()
         #
@@ -76,7 +76,7 @@ output_file_opt = usd_core.UsdFileWriteOpt(
 
 output_file_opt.set_location_add(location)
 
-with utl_core.log_progress_bar(maximum=len(list_), label='usd create') as l_p:
+with utl_core.LogProgressRunner.create_as_bar(maximum=len(list_), label='usd create') as l_p:
     for i in list_:
         l_p.set_update()
         output_file_opt.set_obj_add(i)

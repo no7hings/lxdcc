@@ -394,7 +394,7 @@ class AbsOsFile(
         return [self.__class__(i) for i in self.get_exists_file_paths()]
 
     def get_permissions(self, *args, **kwargs):
-        return [bsc_core.StorageBaseMtd.get_permission(i) for i in self.get_exists_file_paths()]
+        return [bsc_core.StorageMtd.get_permission(i) for i in self.get_exists_file_paths()]
 
     def get_modify_timestamp(self, *args, **kwargs):
         exists_file_paths = self.get_exists_file_paths_(*args, **kwargs)
@@ -610,7 +610,7 @@ class AbsOsFile(
         if self.get_is_exists() is True:
             if file_tgt.get_is_exists():
                 if replace is True:
-                    if bsc_core.StorageBaseMtd.get_is_writeable(file_path_tgt) is True:
+                    if bsc_core.StorageMtd.get_is_writeable(file_path_tgt) is True:
                         if bsc_core.StgPathLinkMtd.get_is_link(file_path_tgt) is True:
                             if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                                 file_path_src, file_path_tgt,
@@ -676,13 +676,13 @@ class AbsOsFile(
 
     def get_is_writeable(self):
         for i in self.get_exists_file_paths_():
-            if bsc_core.StorageBaseMtd.get_is_writeable(i) is False:
+            if bsc_core.StorageMtd.get_is_writeable(i) is False:
                 return False
         return True
 
     def get_is_readable(self):
         for i in self.get_exists_file_paths_():
-            if bsc_core.StorageBaseMtd.get_is_readable(i) is False:
+            if bsc_core.StorageMtd.get_is_readable(i) is False:
                 return False
         return True
 
@@ -720,7 +720,7 @@ class AbsOsTexture(AbsOsFile):
             glob_pattern = u'{}.*'.format(path_base)
             #
             ext_src = cls._get_unit_name_base_same_ext_(
-                file_path_any, utl_core.Path._get_stg_paths_by_parse_pattern_(glob_pattern)
+                file_path_any, bsc_core.StgExtraMtd.get_paths_by_fnmatch_pattern(glob_pattern)
             )
             if ext_src is not None:
                 return ext_src
@@ -1082,7 +1082,7 @@ class AbsOsTexture(AbsOsFile):
         return [self.__class__(i) for i in self.get_exists_file_paths_()]
 
     def get_permissions(self, with_tx=True):
-        return [bsc_core.StorageBaseMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
+        return [bsc_core.StorageMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
 
     def _get_tgt_ext_is_exists_(self, ext_tgt):
         # TODO: if ext is ".tx", "*.1001.exr" is exists and "*.1001.tx" is lost

@@ -366,13 +366,13 @@ class AbsDdlJobSender(AbsDdlObj):
                     'ExtraInfoKeyValue{}'.format(seq),
                     '{}={}'.format(k, content.get(k))
                 )
-    @utl_core._print_time_
+    @utl_core.Modifier.time_trace
     def set_job_submit(self):
         self.properties.set_flatten()
         info = self.job_info.value
         plug = self.job_plug.value
         return self._set_job_submit_(info, plug)
-    @utl_core._print_time_
+    @utl_core.Modifier.time_trace
     def _set_job_submit_(self, info, plug):
         self._result = CON.Jobs.SubmitJob(info, plug)
         return self._result

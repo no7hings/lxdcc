@@ -15,7 +15,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
         check_dict = {}
-        with utl_core.gui_progress(maximum=len(dcc_objs), label='check texture') as g_p:
+        with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='check texture') as g_p:
             for i_obj in dcc_objs:
                 g_p.set_update()
                 #
@@ -129,8 +129,8 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         rsv_project = self._rsv_task.get_rsv_project()
 
         file_keywords = [
-            'asset-work-texture-src-dir',
-            'asset-work-texture-tx-dir'
+            'asset-source-texture-src-dir',
+            'asset-source-texture-tx-dir'
         ]
 
         check_pattern_opts = []
@@ -148,7 +148,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             check_pattern_opts.append(i_check_p_opt)
 
         check_dict = {}
-        with utl_core.gui_progress(maximum=len(dcc_objs), label='check texture workspace') as g_p:
+        with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='check texture workspace') as g_p:
             for i_obj in dcc_objs:
                 g_p.set_update()
                 #
@@ -193,7 +193,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageBaseMtd.get_is_writeable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writeable(i) is True]
         if unlocked_directory_paths:
             validation_checker.set_node_directories_result_register(
                 location,
@@ -317,7 +317,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         geometry_paths = sub_dc_location.get_all_shape_paths(include_obj_type=['mesh'])
         if geometry_paths:
-            with utl_core.gui_progress(maximum=len(geometry_paths), label='check geometry') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check geometry') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
                     g_p.set_update()
                     #
@@ -480,7 +480,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         geometry_paths = sub_dcc_location.get_all_shape_paths(include_obj_type=['mesh'])
         if geometry_paths:
-            with utl_core.gui_progress(maximum=len(geometry_paths), label='check look') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check look') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
                     g_p.set_update()
                     #

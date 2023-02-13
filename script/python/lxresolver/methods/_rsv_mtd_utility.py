@@ -213,20 +213,20 @@ class RsvPermissionMtd(AbsPermission):
         #
         r = rsv_commands.get_resolver()
         #
-        task_directory_paths = r.get_rsv_entity_task_directory_paths(**kwargs)
+        task_directory_paths = r.get_rsv_resource_task_directory_paths(**kwargs)
         for i_task_directory_path in task_directory_paths:
-            bsc_core.StorageBaseMtd.set_directory_create(i_task_directory_path)
+            bsc_core.StorageMtd.set_directory_create(i_task_directory_path)
             utl_core.Log.set_module_result_trace(
                 'directory create',
                 'directory="{}"'.format(i_task_directory_path)
             )
         #
-        step_directory_paths = r.get_rsv_entity_step_directory_paths(**kwargs)
+        step_directory_paths = r.get_rsv_resource_step_directory_paths(**kwargs)
         for i_step_directory_path in step_directory_paths:
             i_group_name = '{}_grp'.format(kwargs['step'])
             if i_group_name in cls.GROUP_ID_QUERY:
                 i_group_id = cls.GROUP_ID_QUERY[i_group_name]
-                i_path = bsc_core.StorageBaseMtd.set_map_to_nas(i_step_directory_path)
+                i_path = bsc_core.StorageMtd.set_map_to_nas(i_step_directory_path)
                 i_kwargs = dict(
                     group_id=i_group_id,
                     path=i_path
@@ -241,11 +241,11 @@ class RsvPermissionMtd(AbsPermission):
         #
         r = rsv_commands.get_resolver()
         #
-        step_directory_paths = r.get_rsv_entity_step_directory_paths(**kwargs)
+        step_directory_paths = r.get_rsv_resource_step_directory_paths(**kwargs)
         for i_step_directory_path in step_directory_paths:
             i_group_name = '{}_grp'.format(kwargs['step'])
             i_group_id = cls.GROUP_ID_QUERY[i_group_name]
-            i_path = bsc_core.StorageBaseMtd.set_map_to_nas(i_step_directory_path)
+            i_path = bsc_core.StorageMtd.set_map_to_nas(i_step_directory_path)
             i_kwargs = dict(
                 group_id=i_group_id,
                 path=i_path
@@ -260,11 +260,11 @@ class RsvPermissionMtd(AbsPermission):
         #
         r = rsv_commands.get_resolver()
         #
-        step_directory_paths = r.get_rsv_entity_step_directory_paths(**kwargs)
+        step_directory_paths = r.get_rsv_resource_step_directory_paths(**kwargs)
         for i_step_directory_path in step_directory_paths:
             i_group_name = '{}_grp'.format(kwargs['step'])
             i_group_id = cls.GROUP_ID_QUERY[i_group_name]
-            i_path = bsc_core.StorageBaseMtd.set_map_to_nas(i_step_directory_path)
+            i_path = bsc_core.StorageMtd.set_map_to_nas(i_step_directory_path)
             i_kwargs = dict(
                 group_id=i_group_id,
                 path=i_path
@@ -275,7 +275,7 @@ class RsvPermissionMtd(AbsPermission):
             cls._set_nas_cmd_run_(cmd)
     @classmethod
     def set_crate_by_step(cls, step, path):
-        path = bsc_core.StorageBaseMtd.set_map_to_nas(path)
+        path = bsc_core.StorageMtd.set_map_to_nas(path)
         group_name = '{}_grp'.format(step)
         group_id = bsc_core.SystemMtd.get_group_id(group_name)
         kwargs = dict(
@@ -289,7 +289,7 @@ class RsvPermissionMtd(AbsPermission):
     @classmethod
     def set_crate_by_group(cls, group_name, path):
         group_id = bsc_core.SystemMtd.get_group_id(group_name)
-        path = bsc_core.StorageBaseMtd.set_map_to_nas(path)
+        path = bsc_core.StorageMtd.set_map_to_nas(path)
         kwargs = dict(
             group_id=group_id,
             path=path
@@ -300,7 +300,7 @@ class RsvPermissionMtd(AbsPermission):
         cls._set_nas_cmd_run_(cmd)
     @classmethod
     def set_test(cls, path):
-        path = bsc_core.StorageBaseMtd.set_map_to_nas(path)
+        path = bsc_core.StorageMtd.set_map_to_nas(path)
         kwargs = dict(
             path=path
         )
@@ -311,7 +311,7 @@ class RsvPermissionMtd(AbsPermission):
     @classmethod
     def set_group_read_only(cls, group_name, path):
         group_id = bsc_core.SystemMtd.get_group_id(group_name)
-        path = bsc_core.StorageBaseMtd.set_map_to_nas(path)
+        path = bsc_core.StorageMtd.set_map_to_nas(path)
         kwargs = dict(
             group_id=group_id,
             path=path
@@ -343,7 +343,7 @@ class PathGroupPermission(AbsPermission):
 
     def __init__(self, path):
         self._path = path
-        self._nas_path = bsc_core.StorageBaseMtd.set_map_to_nas(path)
+        self._nas_path = bsc_core.StorageMtd.set_map_to_nas(path)
 
     def get_all_group_data(self):
         return self._get_all_group_data_(
@@ -462,7 +462,7 @@ class PathGroupPermission(AbsPermission):
 class PathPermissionOpt(AbsPermission):
     def __init__(self, path):
         self._path = path
-        self._nas_path = bsc_core.StorageBaseMtd.set_map_to_nas(path)
+        self._nas_path = bsc_core.StorageMtd.set_map_to_nas(path)
 
     def remove_all_group(self):
         group_data = self._get_all_group_data_1_(self._nas_path)

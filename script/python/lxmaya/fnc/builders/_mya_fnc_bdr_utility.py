@@ -265,7 +265,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 for var_name in geometry_var_names[:1]:
                     g_p.set_update()
                     #
-                    keyword = 'asset-work-geometry-usd-{}-file'.format(var_name)
+                    keyword = 'asset-source-geometry-usd-{}-file'.format(var_name)
                     work_surface_geometry_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
                     work_surface_geometry_hi_file_path = work_surface_geometry_hi_file.get_result(version='latest')
                     if work_surface_geometry_hi_file_path:
@@ -355,7 +355,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         if with_work_surface_look_preview is True:
             if rsv_task:
-                look_yml_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-work-look-yml-file')
+                look_yml_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-source-look-yml-file')
                 work_look_yml_file_path = look_yml_file_rsv_unit.get_result(version='latest')
                 if work_look_yml_file_path:
                     mya_fnc_importers.LookYamlImporter(
@@ -401,7 +401,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             if rsv_asset is not None:
                 user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('builder')
                 # print user_directory_path
-                file_path = '{}/{}.ma'.format(user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeBaseMtd.get_time_tag()]))
+                file_path = '{}/{}.ma'.format(user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()]))
 
                 mya_dcc_objects.Scene.set_file_save_to(file_path)
     @classmethod
@@ -494,7 +494,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             (self._set_scene_save_, (rsv_asset, save_scene)),
         ]
         if method_args:
-            with utl_core.gui_progress(maximum=len(method_args), label='execute geometry build method') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute geometry build method') as g_p:
                 for i_method, i_args in method_args:
                     g_p.set_update()
                     #

@@ -14,15 +14,15 @@ for p_str in [
 
     print 'current: ', p.path
 
-    print 'current-platform', bsc_core.StorageBaseMtd.set_map_to_platform(
+    print 'current-platform', bsc_core.StorageMtd.set_map_to_platform(
         p.path
     )
 
-    print 'linux', bsc_core.StorageBaseMtd.set_map_to_linux(
+    print 'linux', bsc_core.StorageMtd.set_map_to_linux(
         p.path
     )
 
-    print 'windows', bsc_core.StorageBaseMtd.set_map_to_windows(
+    print 'windows', bsc_core.StorageMtd.set_map_to_windows(
         p.path
     )
 

@@ -8,11 +8,11 @@ class Packages(object):
 
 
 def set_reload(modules=None):
-    import lxutil.objects as utl_objects
+    import lxbasic.objects as bsc_objects
     if isinstance(modules, (tuple, list)):
-        p = utl_objects.PyReloader(modules)
+        p = bsc_objects.PyReloader(modules)
     else:
-        p = utl_objects.PyReloader(
+        p = bsc_objects.PyReloader(
             [
                 'lxbasic', 'lxscheme', 'lxsession', 'lxdatabase', 'lxdeadline', 'lxobj', 'lxresolver', 'lxarnold',
                 'lxusd', 'lxusd_fnc',

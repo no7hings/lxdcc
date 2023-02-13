@@ -20,7 +20,7 @@ class SsnHookMtd(object):
         bsc_core.StgFileOpt(hook_yml_file_path).set_write(
             dict(
                 user=bsc_core.SystemMtd.get_user_name(),
-                tiame=bsc_core.TimeBaseMtd.get_time(),
+                tiame=bsc_core.TimeMtd.get_time(),
                 cmd=cmd,
             )
         )

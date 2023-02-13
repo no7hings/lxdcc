@@ -21,7 +21,7 @@ class TimeExtraMtd(object):
         return _bsc_cor_raw.RawIntegerOpt(int((s-c_s)*multiply)).set_encode_to_36()
 
 
-class TimeMtd(object):
+class TimePrettifyMtd(object):
     MONTH = [
         (u'01月', 'January'),
         (u'02月', 'February'),
@@ -147,4 +147,4 @@ class TimestampOpt(object):
         ).set_encode_to_36()
 
     def to_prettify(self, language):
-        return TimeMtd.to_prettify_by_timestamp(self._timestamp, language)
+        return TimePrettifyMtd.to_prettify_by_timestamp(self._timestamp, language)

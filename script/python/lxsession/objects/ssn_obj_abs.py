@@ -311,8 +311,9 @@ class AbsSsnShotgunDef(object):
 class AbsSsnRsvUnitDef(object):
     def _set_rsv_unit_def_init_(self, rsv_obj, configure):
         self._rsv_keyword = configure.get('resolver.rsv_unit.keyword')
+        #
         self._rsv_unit_version = configure.get('resolver.rsv_unit.version')
-        self._rsv_unit_extend_variants = configure.get('resolver.rsv_unit.extend_variants')
+        self._rsv_unit_extend_variants = configure.get('resolver.rsv_unit.extend_variants') or {}
         self._rsv_unit = None
         if self._rsv_keyword:
             variants = configure.get('variants')
@@ -320,6 +321,7 @@ class AbsSsnRsvUnitDef(object):
             self._rsv_unit = rsv_obj.get_rsv_unit(
                 keyword=self._rsv_keyword
             )
+            self._rsv_unit_extend_variants['user_extra'] = bsc_core.SystemMtd.get_user_name()
     @property
     def rsv_task(self):
         return self._rsv_unit.get_rsv_task()
@@ -689,7 +691,7 @@ class AbsSsnOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StorageBaseMtd.get_is_exists(file_path) is False:
+        if bsc_core.StorageMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
@@ -1008,7 +1010,7 @@ class AbsSsnRsvTaskOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StorageBaseMtd.get_is_exists(file_path) is False:
+        if bsc_core.StorageMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),

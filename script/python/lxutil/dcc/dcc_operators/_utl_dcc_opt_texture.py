@@ -11,7 +11,7 @@ from lxbasic import bsc_core
 
 from lxutil import utl_core
 
-from lxbasic.objects import bsc_obj_abs
+import lxbasic.abstracts as bsc_abstracts
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -143,7 +143,7 @@ class DccTexturesOpt(object):
     @classmethod
     def _set_tx_create_queue_run_(cls, queue):
         if queue:
-            with utl_core.log_progress(maximum=len(queue), label='texture-tx create') as l_p:
+            with utl_core.LogProgressRunner.create(maximum=len(queue), label='texture-tx create') as l_p:
                 for i_texture_src in queue:
                     l_p.set_update()
                     if i_texture_src.get_is_exists_as_tx() is False:
@@ -308,7 +308,7 @@ class DccTexturesOpt(object):
     @classmethod
     def _set_jpg_create_queue_run_(cls, queue):
         if queue:
-            with utl_core.log_progress(maximum=len(queue), label='texture-jpg create') as l_p:
+            with utl_core.LogProgressRunner.create(maximum=len(queue), label='texture-jpg create') as l_p:
                 for i_texture in queue:
                     l_p.set_update()
                     if i_texture.get_is_exists_as_tx() is False:
@@ -413,7 +413,7 @@ class DccTexturesOpt(object):
             'texture repath',
             'complete'
         )
-    @utl_core._debug_
+    @utl_core.Modifier.debug_trace
     def _set_repath_post_run_(self):
 
         if bsc_core.ApplicationMtd.get_is_maya():
@@ -695,11 +695,11 @@ class DccTexturesOpt(object):
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     stg_texture = utl_dcc_objects.OsTexture(j_file_path)
                     if target_platform is None:
-                        tgt_stg_texture_path = bsc_core.StorageBaseMtd.set_map_to_platform(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StorageMtd.set_map_to_platform(stg_texture.path)
                     elif target_platform == 'windows':
-                        tgt_stg_texture_path = bsc_core.StorageBaseMtd.set_map_to_windows(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StorageMtd.set_map_to_windows(stg_texture.path)
                     elif target_platform == 'linux':
-                        tgt_stg_texture_path = bsc_core.StorageBaseMtd.set_map_to_linux(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StorageMtd.set_map_to_linux(stg_texture.path)
                     else:
                         raise TypeError()
                     #
@@ -709,7 +709,7 @@ class DccTexturesOpt(object):
                     self._set_port_repath_(j_port, tgt_stg_texture)
 
 
-class TextureTxSubProcess(bsc_obj_abs.AbsProcess):
+class TextureTxSubProcess(bsc_abstracts.AbsProcess):
     LOGGER = utl_core.Log
     #
     def __init__(self, file_path):
@@ -734,7 +734,7 @@ class TextureTxSubProcess(bsc_obj_abs.AbsProcess):
         TextureTxMainProcess.PROCESS_COUNT = pre_count - 1
 
 
-class TextureTxMainProcess(bsc_obj_abs.AbsProcess):
+class TextureTxMainProcess(bsc_abstracts.AbsProcess):
     LOGGER = utl_core.Log
     #
     PROCESS_COUNT = 0
@@ -755,7 +755,7 @@ class TextureTxMainProcess(bsc_obj_abs.AbsProcess):
         return True
 
 
-class TextureJpgSubProcess(bsc_obj_abs.AbsProcess):
+class TextureJpgSubProcess(bsc_abstracts.AbsProcess):
     LOGGER = utl_core.Log
     #
     def __init__(self, file_path):
@@ -778,7 +778,7 @@ class TextureJpgSubProcess(bsc_obj_abs.AbsProcess):
         TextureJpgMainProcess.PROCESS_COUNT = pre_count - 1
 
 
-class TextureJpgMainProcess(bsc_obj_abs.AbsProcess):
+class TextureJpgMainProcess(bsc_abstracts.AbsProcess):
     LOGGER = utl_core.Log
     #
     PROCESS_COUNT = 0

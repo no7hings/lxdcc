@@ -58,7 +58,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_uv_map_export(self):
         display_color = self.get('display_color')
-        with utl_core.log_progress_bar(maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export') as l_p:
+        with utl_core.LogProgressRunner.create_as_bar(maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export') as l_p:
             for i_usd_prim in self._geometry_stage_0.TraverseAll():
                 l_p.set_update()
                 i_obj_type_name = i_usd_prim.GetTypeName()
@@ -159,7 +159,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def set_run(self):
         count = len([i for i in self._usd_stage_src.TraverseAll()])
-        with utl_core.log_progress_bar(
+        with utl_core.LogProgressRunner.create_as_bar(
             maximum=count,
             label='geometry look property create'
         ) as l_p:
@@ -270,7 +270,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def set_run(self):
         count = len([i for i in self._usd_stage_src.TraverseAll()])
         color_scheme = self.get('color_scheme')
-        with utl_core.log_progress_bar(
+        with utl_core.LogProgressRunner.create_as_bar(
             maximum=count,
             label='geometry display-color create'
         ) as l_p:
@@ -350,7 +350,7 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
 
         self._output_stage_opt = usd_core.UsdStageOpt()
 
-        with utl_core.log_progress_bar(
+        with utl_core.LogProgressRunner.create_as_bar(
             maximum=self._input_stage_opt.get_count(),
             label='face vertex indices reverse create'
         ) as l_p:

@@ -15,15 +15,17 @@ class AbsRsvObjHookOpt(object):
         return rsv_commands.get_resolver()
 
     def get_asset_katana_render_file(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-scene-file'
             keyword_1 = 'asset-katana-scene-src-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-scene-file'
-            keyword_1 = 'asset-output-katana-scene-src-file'
+            keyword_0 = 'asset-temporary-katana-scene-file'
+            keyword_1 = 'asset-temporary-katana-scene-src-file'
         else:
             raise TypeError()
 
@@ -44,13 +46,15 @@ class AbsRsvObjHookOpt(object):
                 return scene_src_file_path
 
     def get_asset_katana_render_output_directory(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-render-output-dir'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-render-output-dir'
+            keyword_0 = 'asset-temporary-katana-render-output-dir'
         else:
             raise TypeError()
 
@@ -63,13 +67,15 @@ class AbsRsvObjHookOpt(object):
         return rsv_render_output_directory_path
 
     def get_asset_katana_video_all_mov_file(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-katana-render-video-all-mov-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-katana-render-video-all-mov-file'
+            keyword_0 = 'asset-temporary-katana-render-video-all-mov-file'
         else:
             raise TypeError()
 
@@ -82,13 +88,15 @@ class AbsRsvObjHookOpt(object):
         return rsv_render_output_directory_path
 
     def get_exists_asset_review_mov_file(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'publish':
             keyword = 'asset-review-mov-file'
         elif workspace == 'output':
-            keyword = 'asset-output-review-mov-file'
+            keyword = 'asset-temporary-review-mov-file'
         else:
             raise TypeError()
         #
@@ -114,7 +122,7 @@ class AbsRsvObjHookOpt(object):
             if workspace == 'publish':
                 keyword = 'asset-{application}-scene-src-file'
             elif workspace == 'output':
-                keyword = 'asset-output-{application}-scene-src-file'
+                keyword = 'asset-temporary-{application}-scene-src-file'
             else:
                 raise TypeError()
 
@@ -142,16 +150,18 @@ class AbsRsvObjHookOpt(object):
 
         from lxbasic import bsc_core
         #
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        step = rsv_scene_properties.get('step')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'work':
             return ['default']
         elif workspace == 'publish':
             keyword = 'asset-look-klf-file'
         elif workspace == 'output':
-            keyword = 'asset-output-look-klf-file'
+            keyword = 'asset-temporary-look-klf-file'
         else:
             raise TypeError()
         #
@@ -169,15 +179,17 @@ class AbsRsvObjHookOpt(object):
         return ['default']
 
     def get_asset_exists_geometry_variant_names(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         #
         if workspace == 'work':
-            keyword = 'asset-work-geometry-usd-var-file'
+            keyword = 'asset-source-geometry-usd-var-file'
         elif workspace == 'publish':
             keyword = 'asset-geometry-usd-var-file'
         elif workspace == 'output':
-            keyword = 'asset-output-geometry-usd-var-file'
+            keyword = 'asset-temporary-geometry-usd-var-file'
         else:
             raise TypeError()
         #

@@ -47,10 +47,12 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         :return:
         """
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
-        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
+        pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
         if version_scheme == 'match':
             version = self._rsv_scene_properties.get('version')
@@ -65,17 +67,17 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         if dcc_root.get_is_exists() is True:
             if workspace == 'work':
-                keyword = 'asset-work-geometry-usd-var-file'
+                keyword = 'asset-source-geometry-usd-var-file'
             elif workspace == 'publish':
                 keyword = 'asset-geometry-usd-var-file'
             elif workspace == 'output':
-                keyword = 'asset-output-geometry-usd-var-file'
+                keyword = 'asset-temporary-geometry-usd-var-file'
             else:
                 raise TypeError()
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.gui_progress(maximum=len(location_names), label='export geometry in location') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(location_names), label='export geometry in location') as g_p:
                 for i_location_name in location_names:
                     g_p.set_update()
                     #
@@ -111,20 +113,22 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_geometry_uv_map_usd_export(self, version_scheme='match'):
         import lxusd.fnc.exporters as usd_fnc_exporters
         #
-        step = self._rsv_scene_properties.get('step')
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        step = rsv_scene_properties.get('step')
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == 'work':
-            keyword_0 = 'asset-work-geometry-usd-var-file'
-            keyword_1 = 'asset-work-geometry-uv_map-usd-file'
+            keyword_0 = 'asset-source-geometry-usd-var-file'
+            keyword_1 = 'asset-source-geometry-uv_map-usd-file'
         elif workspace == 'publish':
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-uv_map-usd-file'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-geometry-usd-var-file'
-            keyword_1 = 'asset-output-geometry-uv_map-usd-file'
+            keyword_0 = 'asset-temporary-geometry-usd-var-file'
+            keyword_1 = 'asset-temporary-geometry-uv_map-usd-file'
         else:
             raise TypeError()
         #
@@ -152,10 +156,12 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             ).set_run()
 
     def set_asset_geometry_abc_export(self, version_scheme='match'):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
-        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
+        pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
         if version_scheme == 'match':
             version = self._rsv_scene_properties.get('version')
@@ -170,17 +176,17 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         if dcc_root.get_is_exists() is True:
             if workspace == 'work':
-                keyword = 'asset-work-geometry-abc-var-file'
+                keyword = 'asset-source-geometry-abc-var-file'
             elif workspace == 'publish':
                 keyword = 'asset-geometry-abc-var-file'
             elif workspace == 'output':
-                keyword = 'asset-output-geometry-abc-var-file'
+                keyword = 'asset-temporary-geometry-abc-var-file'
             else:
                 raise TypeError()
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.gui_progress(maximum=len(location_names), label='export geometry in location') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(location_names), label='export geometry in location') as g_p:
                 for i_location_name in location_names:
                     g_p.set_update()
                     #
@@ -222,10 +228,12 @@ class RsvDccGeometryExtraHookOpt(
         :return:
         """
         #
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
-        root = self._rsv_scene_properties.get('dcc.root')
-        pathsep = self._rsv_scene_properties.get('dcc.pathsep')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        root = rsv_scene_properties.get('dcc.root')
+        pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
         if version_scheme == 'match':
             version = self._rsv_scene_properties.get('version')
@@ -240,11 +248,11 @@ class RsvDccGeometryExtraHookOpt(
         )
         if dcc_root.get_is_exists() is True:
             if workspace == 'work':
-                keyword = 'asset-work-geometry-usd-var-file'
+                keyword = 'asset-source-geometry-usd-var-file'
             elif workspace == 'publish':
                 keyword = 'asset-geometry-usd-var-file'
             elif workspace == 'output':
-                keyword = 'asset-output-geometry-usd-var-file'
+                keyword = 'asset-temporary-geometry-usd-var-file'
             else:
                 raise TypeError()
             #
@@ -252,7 +260,7 @@ class RsvDccGeometryExtraHookOpt(
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.gui_progress(maximum=len(location_names), label='export geometry-extra in location') as g_p:
+            with utl_core.GuiProgressesRunner.create(maximum=len(location_names), label='export geometry-extra in location') as g_p:
                 for i_location_name in location_names:
                     g_p.set_update()
                     #
@@ -273,15 +281,17 @@ class RsvDccShotGeometryHookOpt(
         super(RsvDccShotGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_shot_geometry_usd_export(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
         asset_shot = self._hook_option_opt.get('shot')
         shot_asset = self._hook_option_opt.get('shot_asset')
         #
         if workspace == 'publish':
             keyword_0 = 'asset-shot_asset-geometry-usd-var-dir'
         elif workspace == 'output':
-            keyword_0 = 'asset-output-shot_asset-geometry-usd-var-dir'
+            keyword_0 = 'asset-temporary-shot_asset-geometry-usd-var-dir'
         else:
             raise TypeError()
 
@@ -317,7 +327,7 @@ class RsvDccShotGeometryHookOpt(
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if shot_asset in reference_dict:
             namespace, root, obj = reference_dict[shot_asset]
-            with utl_core.log_progress_bar(maximum=len(location_names), label='usd export') as l_p:
+            with utl_core.LogProgressRunner.create_as_bar(maximum=len(location_names), label='usd export') as l_p:
                 for i_location_name in location_names:
                     i_location = '{}|{}:{}'.format(root, namespace, i_location_name)
                     if mya_dcc_objects.Node(i_location).get_is_exists() is True:
@@ -340,15 +350,18 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccShotHairHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_shot_xgen_export(self):
-        workspace = self._rsv_scene_properties.get('workspace')
-        version = self._rsv_scene_properties.get('version')
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        #
         asset_shot = self._hook_option_opt.get('shot')
         shot_asset = self._hook_option_opt.get('shot_asset')
         #
         if workspace == 'publish':
             keyword = 'asset-shot_asset-component-dir'
         elif workspace == 'output':
-            keyword = 'asset-output-shot_asset-component-dir'
+            keyword = 'asset-temporary-shot_asset-component-dir'
         else:
             raise TypeError()
         #
@@ -373,7 +386,7 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # noinspection PyUnresolvedReferences
         from pgmaya import exporters
 
-        with utl_core.module_resulter_log(
+        with utl_core.MethodLogging.create(
             'xgen export',
             u'directory="{}", root="{}", frames="{}-{}"'.format(
                 directory_path, root, start_frame, end_frame

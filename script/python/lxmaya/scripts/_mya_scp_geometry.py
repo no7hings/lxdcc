@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.cmds as cmds
 
-from lxobj import core_objects
+from lxobj import objects
 
 from lxmaya import ma_configure
 
@@ -13,11 +13,11 @@ from lxutil import utl_core
 
 class AttributeTranslator(object):
     def __init__(self, root_src, root_tgt):
-        root_src_dag_path = core_objects.ObjDagPath(root_src)
+        root_src_dag_path = objects.ObjDagPath(root_src)
         self._mya_root_src_dag_path = root_src_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
         self._mya_root_src_path = self._mya_root_src_dag_path.path
 
-        root_tgt_dag_path = core_objects.ObjDagPath(root_tgt)
+        root_tgt_dag_path = objects.ObjDagPath(root_tgt)
         self._mya_root_tgt_dag_path = root_tgt_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
         self._mya_root_tgt_path = self._mya_root_tgt_dag_path.path
 

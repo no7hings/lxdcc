@@ -63,7 +63,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             variants_dic
         )
         render_ddl_job_ids = []
-        with utl_core.log_progress(maximum=len(combinations), label='cmb-render-create') as l_p:
+        with utl_core.LogProgressRunner.create(maximum=len(combinations), label='cmb-render-create') as l_p:
             for i_seq, i_variants in enumerate(combinations):
                 l_p.set_update()
                 #

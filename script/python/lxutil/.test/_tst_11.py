@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxutil import objects
+import lxbasic.objects as bsc_objects
 
-c = objects.Content(None, {})
+c = bsc_objects.Content(None, {})
 
 c.set('test.a', 'a')
 

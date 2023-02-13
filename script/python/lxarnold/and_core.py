@@ -589,10 +589,10 @@ class AndTextureOpt(object):
             info['bit_depth'] = 8
             info['format'] = "unknown"
         return info
-    @utl_core._debug_
+    @utl_core.Modifier.debug_trace
     def get_resolution(self):
         return ai.AiTextureGetResolution(self._file_path)
-    @utl_core._debug_
+    @utl_core.Modifier.debug_trace
     def get_bit_depth(self):
         return ai.AiTextureGetBitDepth(self._file_path)
 
@@ -657,22 +657,22 @@ class AndTextureOpt(object):
             return False
 
 
-@utl_core._debug_
+@utl_core.Modifier.debug_trace
 def _get_resolution_(file_path):
     return ai.AiTextureGetResolution(file_path)
 
 
-@utl_core._debug_
+@utl_core.Modifier.debug_trace
 def _get_bit_(file_path):
     return ai.AiTextureGetBitDepth(file_path)
 
 
-@utl_core._debug_
+@utl_core.Modifier.debug_trace
 def _get_type_(file_path):
     return ai.AiTextureGetFormat(file_path)
 
 
-@utl_core._debug_
+@utl_core.Modifier.debug_trace
 def _get_channels_count_(file_path):
     return ai.AiTextureGetNumChannels(file_path)
 

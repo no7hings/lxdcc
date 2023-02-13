@@ -263,7 +263,7 @@ class AbsFileReferences(object):
         #
         cls._set_file_value_repair_(obj)
     @classmethod
-    @utl_core._debug_
+    @utl_core.Modifier.debug_trace
     def _set_file_value_repair_(cls, obj):
         if obj.type_name == 'file':
             port = obj.get_port('fileTextureName')

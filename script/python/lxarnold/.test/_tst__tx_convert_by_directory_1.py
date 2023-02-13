@@ -9,7 +9,7 @@ from lxutil import utl_core
 def setup_fnc_():
     from lxutil import utl_setup
     utl_setup.OcioSetup(
-        bsc_core.StorageBaseMtd.set_map_to_platform(
+        bsc_core.StorageMtd.set_map_to_platform(
             '/l/packages/pg/third_party/ocio/aces/1.2'
         )
     ).set_run()
@@ -42,7 +42,7 @@ def status_changed_fnc_(index, status):
     print index, status
 
 
-with utl_core.log_progress_bar(maximum=len(file_paths), label='test') as l_p:
+with utl_core.LogProgressRunner.create_as_bar(maximum=len(file_paths), label='test') as l_p:
     for i_index, i_file_path in enumerate(file_paths):
         l_p.set_update()
         i_cmd = utl_dcc_objects.OsTexture._get_unit_tx_create_cmd_by_src_(
@@ -50,8 +50,8 @@ with utl_core.log_progress_bar(maximum=len(file_paths), label='test') as l_p:
             search_directory_path=output_directory_path,
         )
         if i_cmd:
-            bsc_core.PrcCmdThread.set_wait()
-            i_t = bsc_core.PrcCmdThread.set_start(i_cmd, index=i_index)
+            bsc_core.TrdCmdProcess.set_wait()
+            i_t = bsc_core.TrdCmdProcess.set_start(i_cmd, index=i_index)
             i_t.finished.set_connect_to(
                 finished_fnc_
             )

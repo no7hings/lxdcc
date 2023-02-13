@@ -86,7 +86,7 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
             'build universe',
             'file="{}"'.format(file_path)
         )
-        with utl_core.gui_progress(maximum=len([i for i in self._usd_stage.TraverseAll()]), label='build universe') as l_p:
+        with utl_core.GuiProgressesRunner.create(maximum=len([i for i in self._usd_stage.TraverseAll()]), label='build universe') as l_p:
             for i_usd_prim in self._usd_stage.TraverseAll():
                 l_p.set_update()
                 self._set_obj_create_(i_usd_prim)

@@ -13,7 +13,7 @@ from lxutil.dcc import utl_dcc_obj_abs
 
 from lxobj import obj_configure
 
-import lxobj.core_objects as core_dcc_objects
+import lxobj.objects as core_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -132,7 +132,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         return lis
     #
     FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = core_dcc_objects.ObjUniverse
+    UNIVERSE_CLASS = core_objects.ObjUniverse
     def __init__(self, *args, **kwargs):
         super(Scene, self).__init__(*args, **kwargs)
 

@@ -1,34 +1,36 @@
 # coding:utf-8
-import lxobj.core_objects as core_objects
+import lxobj.objects as core_objects
 
-from lxresolver import rsv_configure, rsv_abstract
+from lxresolver import rsv_configure
+
+import lxresolver.abstracts as rsv_abstracts
 
 from lxresolver.objects import _rsv_obj_stack
 
 from lxbasic.objects import _bsc_obj_raw
 
 
-class RsvVersionKey(rsv_abstract.AbsRsvVersionKey):
+class RsvVersionKey(rsv_abstracts.AbsRsvVersionKey):
     def __init__(self, *args, **kwargs):
         super(RsvVersionKey, self).__init__(*args, **kwargs)
 
 
-class RsvPattern(rsv_abstract.AbsRsvPattern):
+class RsvMatchPattern(rsv_abstracts.AbsRsvPattern):
     def __init__(self, *args, **kwargs):
-        super(RsvPattern, self).__init__(*args, **kwargs)
+        super(RsvMatchPattern, self).__init__(*args, **kwargs)
 
 
-class RsvMatcher(rsv_abstract.AbsRsvMatcher):
+class RsvMatcher(rsv_abstracts.AbsRsvMatcher):
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
     #
-    RSV_PATTERN_CLASS = RsvPattern
+    RSV_MATCH_PATTERN_CLASS = RsvMatchPattern
     #
     RSV_VERSION_KEY_CLASS = RsvVersionKey
     def __init__(self, *args, **kwargs):
         super(RsvMatcher, self).__init__(*args, **kwargs)
 
 
-class RsvUnit(rsv_abstract.AbsRsvUnit):
+class RsvUnit(rsv_abstracts.AbsRsvUnit):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -36,7 +38,7 @@ class RsvUnit(rsv_abstract.AbsRsvUnit):
         super(RsvUnit, self).__init__(*args, **kwargs)
 
 
-class RsvTag(rsv_abstract.AbsRsvTag):
+class RsvTag(rsv_abstracts.AbsRsvTag):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -44,7 +46,7 @@ class RsvTag(rsv_abstract.AbsRsvTag):
         super(RsvTag, self).__init__(*args, **kwargs)
 
 
-class RsvResource(rsv_abstract.AbsRsvResource):
+class RsvResource(rsv_abstracts.AbsRsvResource):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -52,7 +54,7 @@ class RsvResource(rsv_abstract.AbsRsvResource):
         super(RsvResource, self).__init__(*args, **kwargs)
 
 
-class RsvStep(rsv_abstract.AbsRsvStep):
+class RsvStep(rsv_abstracts.AbsRsvStep):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -60,7 +62,7 @@ class RsvStep(rsv_abstract.AbsRsvStep):
         super(RsvStep, self).__init__(*args, **kwargs)
 
 
-class RsvTask(rsv_abstract.AbsRsvTask):
+class RsvTask(rsv_abstracts.AbsRsvTask):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -68,7 +70,7 @@ class RsvTask(rsv_abstract.AbsRsvTask):
         super(RsvTask, self).__init__(*args, **kwargs)
 
 
-class RsvTaskVersion(rsv_abstract.AbsRsvTaskVersion):
+class RsvTaskVersion(rsv_abstracts.AbsRsvTaskVersion):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -76,7 +78,7 @@ class RsvTaskVersion(rsv_abstract.AbsRsvTaskVersion):
         super(RsvTaskVersion, self).__init__(*args, **kwargs)
 
 
-class RsvUnitVersion(rsv_abstract.AbsRsvUnitVersion):
+class RsvUnitVersion(rsv_abstracts.AbsRsvUnitVersion):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
@@ -84,13 +86,13 @@ class RsvUnitVersion(rsv_abstract.AbsRsvUnitVersion):
         super(RsvUnitVersion, self).__init__(*args, **kwargs)
 
 
-class RsvProject(rsv_abstract.AbsRsvProject):
+class RsvProject(rsv_abstracts.AbsRsvProject):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
     #
     RSV_MATCHER_CLASS = RsvMatcher
-    RSV_PATTERN_CLASS = RsvPattern
+    RSV_MATCH_PATTERN_CLASS = RsvMatchPattern
     #
     RSV_OBJ_STACK_CLASS = _rsv_obj_stack.EntityStack
     #
@@ -106,10 +108,8 @@ class RsvProject(rsv_abstract.AbsRsvProject):
         super(RsvProject, self).__init__(*args, **kwargs)
 
 
-class RsvRoot(rsv_abstract.AbsRsvRoot):
+class RsvRoot(rsv_abstracts.AbsRsvRoot):
     PATHSEP = '/'
-    #
-    FILE_PATH = rsv_configure.Data.RESOLVER_BASIC_CONFIGURE_PATH
     #
     OBJ_UNIVERSE_CLASS = core_objects.ObjUniverse
     #
@@ -122,14 +122,4 @@ class RsvRoot(rsv_abstract.AbsRsvRoot):
 
 
 if __name__ == '__main__':
-    print(
-        RsvMatcher._get_match_patterns_(
-            '{project}/{role}/{step}/{task}',
-            dict(
-                project='lib',
-                role=['sdr', 'gmt'],
-                step=['mod', 'srf'],
-                test=['a', 'b', 'c']
-            )
-        )
-    )
+    pass

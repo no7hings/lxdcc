@@ -1,5 +1,4 @@
 # coding:utf-8
-# coding:utf-8
 import copy
 #
 import fnmatch
@@ -31,7 +30,7 @@ import lxutil.fnc.exporters as utl_fnc_exporters
 import lxutil_fnc.scripts as utl_fnc_scripts
 
 
-class AssetBatcher(object):
+class ScpAssetBatcher(object):
     OPTION = dict(
         surface_publish=False,
         surface_katana_publish=False,
@@ -168,7 +167,7 @@ class AssetBatcher(object):
                     i_export.set_run_with_deadline()
 
 
-class AbsLibMethodFileDef(object):
+class AbsScpLibFileDef(object):
     @classmethod
     def _set_j_rsv_task_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         cls._set_j_rsv_task_scene_file_copy_(j_rsv_task_src, j_rsv_task_tgt)
@@ -315,7 +314,7 @@ class AbsLibMethodFileDef(object):
             )
 
 
-class AbsLibMethodSystemDef(object):
+class AbsScpLibSystemDef(object):
     SHOTGUN_TEMPLATE_CONFIGURE = None
     @classmethod
     def _set_i_rsv_asset_system_create_(cls, i_project_tgt, i_role_tgt, i_asset_tgt):
@@ -354,7 +353,7 @@ class AbsLibMethodSystemDef(object):
             )
 
 
-class AbsLibMethodShotgunDef(object):
+class AbsScpLibShotgunDef(object):
     @classmethod
     def _set_i_rsv_asset_shotgun_create_(cls, i_rsv_asset_tgt):
         stg_connector = stg_objects.StgConnector()
@@ -389,10 +388,10 @@ class AbsLibMethodShotgunDef(object):
             )
 
 
-class AbsLibMethod(
-    AbsLibMethodFileDef,
-    AbsLibMethodSystemDef,
-    AbsLibMethodShotgunDef
+class AbsScpLib(
+    AbsScpLibFileDef,
+    AbsScpLibSystemDef,
+    AbsScpLibShotgunDef
 ):
     SHOTGUN_TEMPLATE_CONFIGURE = utl_configure.MainData.get_as_configure(
         'shotgun/template'
@@ -422,7 +421,7 @@ class AbsLibMethod(
         return 'ast_{}_{}'.format(project, asset)
 
 
-class LibAssetPusher(AbsLibMethod):
+class ScpAssetPusher(AbsScpLib):
     def __init__(self, project, assets, option=None):
         self._project_src = project
         self._assets_src = assets
@@ -495,13 +494,13 @@ class LibAssetPusher(AbsLibMethod):
                     self._set_i_rsv_asset_shotgun_create_(i_rsv_asset_tgt)
                 # surface-publish
                 if with_surface_publish is True:
-                    AssetBatcher._set_i_rsv_asset_surface_publish_(
+                    ScpAssetBatcher._set_i_rsv_asset_surface_publish_(
                         i_rsv_asset_tgt,
                         user, time_tag
                     )
 
 
-class LibAssetPuller(AbsLibMethod):
+class ScpAssetPuller(AbsScpLib):
     def __init__(self, project, assets, option=None):
         self._project_src = 'lib'
         self._assets_src = assets
@@ -567,13 +566,13 @@ class LibAssetPuller(AbsLibMethod):
                     self._set_i_rsv_asset_shotgun_create_(i_rsv_asset_tgt)
                 # surface-publish
                 if with_surface_publish is True:
-                    AssetBatcher._set_i_rsv_asset_surface_publish_(
+                    ScpAssetBatcher._set_i_rsv_asset_surface_publish_(
                         i_rsv_asset_tgt,
                         user, time_tag
                     )
 
 
 if __name__ == '__main__':
-    print AbsLibMethod._get_lib_asset_(
+    print AbsScpLib._get_lib_asset_(
         'cjd', 'ast_shl_cao_a'
     )

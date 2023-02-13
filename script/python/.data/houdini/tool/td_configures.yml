@@ -2,9 +2,7 @@ menu:
     label: TD-tool(s)
     tools:
         - scene_checker
-        - scene_build
         - separator
-        - scene_switcher
         - separator
         - scene_packager
         - separator
@@ -18,9 +16,9 @@ tool:
                 [
                     'lxscheme', 'lxobj', 'lxresolver',
                     'lxarnold', 'lxar2mtx',
-                    'lxutil', 'lxutil_prd', 'lxutil_fnc', 'lxutil_gui',
+                    'lxutil', 'lxutil_fnc', 'lxutil_gui',
                     'lxshotgun', 'lxshotgun_fnc', 'lxshotgun_gui',
-                    'lxhoudini', 'lxhoudini_prd', 'lxhoudini_fnc', 'lxhoudini_gui'
+                    'lxhoudini', 'lxhoudini_fnc', 'lxhoudini_gui'
                 ]);
             p.set_reload()"
         icon: None
@@ -28,14 +26,6 @@ tool:
         size:
             - 720
             - 560
-    scene_build:
-        chn_label: None
-        command: from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.SceneBuildToolPanel().set_window_show()
-        icon: None
-        label: Scene-build
-        size:
-            - 1280
-            - 720
     scene_packager:
         chn_label: None
         command: from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.ScenePackagerToolPanel().set_window_show()
@@ -43,14 +33,6 @@ tool:
         label: Scene-packager
         size:
             - 1280
-            - 720
-    scene_switcher:
-        chn_label: None
-        command: from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.SceneSwitcherToolPanel().set_window_show()
-        icon: None
-        label: Scene-switcher
-        size:
-            - 720
             - 720
     scene_checker:
         chn_label: null

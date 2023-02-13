@@ -73,38 +73,9 @@ def main():
                 workspace = value
             elif key in ('-o', '--option'):
                 option = str(value).split(',')
-        #
-        if method == 'look-klf':
-            pass
-        elif method == 'scene-builder-gui':
-            scene_builder_gui(method, project)
-        elif method == 'katana':
-            katana(method, project)
 
     except getopt.GetoptError:
         print('argv error')
-
-
-def scene_builder_gui(method, project):
-    import sys
-    #
-    from PySide2 import QtWidgets
-    #
-    from lxutil_gui.panel import utl_pnl_widgets
-    #
-    app = QtWidgets.QApplication(sys.argv)
-    w = utl_pnl_widgets.SceneBuildToolPanel()
-    #
-    w.set_window_show()
-    sys.exit(app.exec_())
-
-
-def katana(method, project):
-    from lxutil import utl_core
-    cmd = 'rez-env lxdcc ktoa pgkatana katana -c "katana"'.format()
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    [print(i) for i in p.stdout.readlines()]
-    utl_core.Log.set_result_trace('method: "{}" is start.'.format(method))
 
 
 if __name__ == '__main__':

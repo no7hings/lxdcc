@@ -1,0 +1,424 @@
+# utility
+/utl/animation_layer_custom:
+    # gui-icon
+    icon: None
+    # gui-label
+    label: Animation-layer(s)
+    # gui-descriptions
+    descriptions:
+        # Check Has Animation Layer in Scene, Animation Layer Must be Clear.
+        - Animation-layer is Not Allowed:
+            notes: None
+            repair:
+                description: Delete Animation-layer
+                note: None
+            ignore:
+                enable: True
+# display-layer
+/utl/display_layer_custom:
+    icon: None
+    label: Display-layer(s)
+    # check-description
+    descriptions:
+        - Display-layer is Not Allowed:
+            notes:
+                - 不允许使用“显示层”；
+                - 请删除。
+            repair:
+                description: Delete Display-layer
+            ignore:
+                enable: True
+#
+/utl/file_reference_custom:
+    icon: None
+    label: File(s)
+    descriptions:
+        #
+        - File-path/File-name has Space:
+            notes:
+                - “文件路径”或者“文件名”不允许存在空格；
+                - 请修改贴图路径或者贴图名字，并替换贴图。
+            repair:
+                description: File-path/File-name & Repath Node
+            ignore:
+                enable: True
+        - File-path is Non-exists:
+            notes:
+                - 当前文件不存在；
+                - 请找到丢失的文件，并替换贴图。
+            repair:
+                description: File-path/File-name & Repath Node
+            ignore:
+                enable: True
+# image-reference, etc: node-type: aiImage, file, ...
+/utl/image_reference_custom:
+    icon: None
+    label: Image(s)
+    descriptions:
+        # Check Texture-file name is Overlapping, etc: /a/texture.ext, /b/c/texture.ext
+        - Texture-file-name is Overlapping:
+            notes:
+                - 贴图的名字有重名；
+                - 请重命名贴图，并替换贴图。
+            repair:
+                description: Rename Texture-file-name & Repath Node
+            ignore:
+                enable: True
+# group
+/utl/group_custom:
+    icon: None
+    label: Group(s)
+    descriptions:
+        # Group-name Must Match *_grp etc: group_name_grp
+        - Group-name is Non-match *_grp:
+            repair:
+                description: Rename Group-name
+            ignore:
+                value: True
+                enable: True
+        # Empty Group
+        - Group is Empty:
+            repair:
+                description: Delete Group
+            ignore:
+                enable: True
+# namespace
+/utl/namespace_custom:
+    icon: None
+    label: Namespace(s)
+    descriptions:
+        - Namespace is Empty:
+            repair:
+                description: Delete Namespace
+            ignore:
+                enable: True
+        - Namespace is not from Reference:
+            repair:
+                description: Delete Namespace
+            ignore:
+                enable: True
+# node
+/utl/node_custom:
+    icon: None
+    label: Node(s)
+    descriptions:
+        - Node-type is Unknown:
+            repair:
+                description: Delete Node
+            ignore:
+                enable: True
+        - Node-name is Overlapping:
+            repair:
+                description: Rename Node-name
+            ignore:
+                enable: True
+# reference
+/utl/reference_custom:
+    icon: None
+    label: Reference(s)
+    descriptions:
+        # Check has Reference is Unload, All Reference Must Loaded.
+        - Reference is Unload:
+            repair:
+                description: Load Reference / Remove Reference
+            ignore:
+                enable: True
+# shape
+/utl/shape_custom:
+    icon: None
+    label: Shape(s)
+    descriptions:
+        # Shape-name Mush Match *Shape, etc: node_nameShape
+        - 'Shape-name is Non-match {self.NAMING_PATTERN}':
+            notes:
+                - 节点的Shape名字由Transform+"Shape"组成。
+            repair:
+                description: Rename Shape-name
+            ignore:
+                value: True
+                enable: True
+# alembic
+/utl/alembic_reference_custom:
+    icon: None
+    label: Alembic(s)
+    descriptions: []
+# asset reference
+/ett/asset_reference_custom:
+    icon: None
+    label: Asset-reference(s)
+    descriptions:
+        - Reference is Not Allowed:
+            repair:
+                description: Remove Reference / Import Reference
+            ignore:
+                enable: True
+# asset-group
+/ett/asset_group_custom:
+    icon: None
+    label: Asset-group(s)
+    descriptions:
+        - Step-group(s) is Non-exists:
+            repair:
+                description: Create Step-group(s)
+            ignore:
+                value: True
+                enable: True
+        - Group "base" is Not Allowed:
+            repair:
+                description: Delete Group
+            ignore:
+                enable: False
+# geometry
+/mod/geometry_custom:
+    icon: None
+    label: Geometry(s)
+    descriptions:
+        #
+        - Geometry-transform-name is Non-match *_geo:
+            repair:
+                description: Rename Geometry-transform-name
+            ignore:
+                enable: True
+        - Geometry-transform-transformation(Translate, Rotate, Scale) is Non-default:
+            repair:
+                description: Freeze & Reset Geometry-transform-transformation(Translate, Rotate, Scale)
+            ignore:
+                enable: True
+        - Geometry-instance is Not Allowed:
+            repair:
+                description: Convert Geometry-instance to Object
+            ignore:
+                enable: True
+        - Geometry-shape History is Non-clear:
+            repair:
+                description: Clear Geometry-shape History
+            ignore:
+                enable: True
+# mesh
+/mod/mesh_custom:
+    icon: None
+    label: Mesh(s)
+    descriptions:
+        - Mesh-vertex is Normal-locked:
+            repair:
+                description: Unlock Mesh-vertex
+            ignore:
+                enable: True
+#
+/mod/mesh_manifold_custom:
+    icon: None
+    label: Mesh-manifold(s)
+    descriptions:
+        - Mesh-edge is Non-manifold:
+            repair:
+                description: Fix Mesh-edge
+            ignore:
+                enable: True
+        - Mesh-vertex is Non-manifold:
+            repair:
+                description: Fix Mesh-vertex
+            ignore:
+                enable: True
+# mesh-map
+/mod/mesh_map_custom:
+    icon: None
+    label: Mesh-map(s)
+    descriptions:
+        - Mesh-map-face is Non-uv:
+            repair:
+                description: Create Mesh-map-face UV
+            ignore:
+                enable: True
+        - Mesh-map-face is Zero-area:
+            repair:
+                description: Modify Mesh-map-face UV
+            ignore:
+                enable: True
+# mesh-topology
+/mod/mesh_topology_custom:
+    icon: None
+    label: Mesh-topology(s)
+    descriptions:
+        - Mesh-face is Zero-area:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+        - Mesh-edge is Zero-length:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+        - Mesh-face is N-side:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+        - Mesh-face is Non-triangulable:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+        - Mesh-face is Holed:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+        - Mesh-face is Lamina:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+        - Mesh-edge is Open:
+            repair:
+                description: ''
+            ignore:
+                enable: True
+# asset-rig
+/rig/control_custom:
+    icon: None
+    label: Rig-control(s)
+    descriptions:
+        - Control has Animation-curve:
+            repair:
+                description: Clear Control Animation-curve
+            ignore:
+                enable: True
+        - Control-transformation(Translate, Rotate, Scale)  is Non-default:
+            repair:
+                description: Reset Control-transformation(Translate, Rotate, Scale)
+            ignore:
+                enable: True
+# skin
+/rig/skin_custom:
+    icon: None
+    label: Rig(s)
+    descriptions:
+        - Skin-cluster-envelope is off:
+            repair:
+                description: Set Skin-cluster-envelope on
+            ignore:
+                enable: True
+# xgen-description
+/grm/xgen_description_custom:
+    icon: None
+    label: XGen-description
+    descriptions:
+        - XGen-description-map / cache (*.ptx, ...)  is Non-exists:
+            repair:
+                description: Repath XGen-description-map / cache (*.ptx, ...)
+            ignore:
+                enable: True
+# xgen-grow-mesh
+/grm/xgen_grow_mesh_custom:
+    icon: None
+    label: XGen-grow-mesh(s)
+    descriptions:
+        - Painter-file-path is Non-exists:
+            repair:
+                description: Repath Painter-file-path
+            ignore:
+                enable: True
+# xgen-palette
+/grm/xgen_palette_custom:
+    icon: None
+    label: XGen-palette
+    descriptions:
+        - XGen-palette-cache(*.xgen) is Non-exists:
+            repair:
+                description: Repath XGen-palette-cache(*.xgen)
+            ignore:
+                enable: True
+# surface-texture
+/srf/texture_custom:
+    icon: None
+    label: Texture(s)
+    descriptions:
+        - File-path is Non-match *.tx:
+            notes:
+                - 贴图路径必须替换成“.tx”文件。
+            repair:
+                description: Repath File-path to *.tx
+            ignore:
+                enable: True
+        - Color-space has Disaccord:
+            notes:
+                - 一张贴图被重复使用，但是色彩空间不一致，在转tx的时候存在问题。
+            repair:
+                description: Copy & Repath File-path to new path
+            ignore:
+                enable: True
+
+# surface-material
+/srf/material_custom:
+    icon: None
+    label: Material(s)
+    descriptions:
+        - Material has Face-assign:
+            notes:
+                - 禁用给“面”上材质；
+                - 请使用“Mask”，“Layer-shader”或者“拆分模型”实现。
+            repair:
+                description: Reassign Material
+            ignore:
+                enable: True
+# constrain
+/ani/constrain_custom:
+    icon: None
+    label: Animation-constrain(s)
+    descriptions:
+        - Constrain is Not Allowed:
+            repair:
+                description: Clear Constrain
+            ignore:
+                enable: True
+# animation-display-layer
+/ani/display_layer_custom:
+    icon: None
+    label: Animation-display-layer(s)
+    descriptions:
+        - 'Display-layer is Not Allowed, except: {self.EXCEPT_DCC_PATHS}':
+            repair:
+                description: Delete Display-layer
+            ignore:
+                enable: True
+# temporary-node
+/ani/temporary_node_custom:
+    icon: None
+    label: Animation-temporary-node(s)
+    descriptions:
+        - 'Temporary-node Must Add to Display-layer: {self.DISPLAY_LAYER_PATHS}':
+            repair:
+                description: Delete Temporary-node / Add to Temporary-node in Display-layer
+            ignore:
+                enable: True
+# test
+# method tag
+# {tag}/{tag}
+/tst/test:
+    # gui-icon
+    icon: None
+    # gui-label
+    label: Test(s)
+    # gui-descriptions-english
+    descriptions:
+        # key = description
+        - Test 01 is Error:
+            # repair
+            repair:
+                # repair description
+                description: Repair 01
+            # ignore
+            ignore:
+                # ignore-enable
+                enable: True
+        - Test 02 is Error:
+            repair:
+                description: Repair 02
+            ignore:
+                enable: True
+        - Test 02 is Error:
+            repair:
+                description: Repair 03
+            ignore:
+                enable: True

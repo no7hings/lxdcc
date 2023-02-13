@@ -1,0 +1,8 @@
+# project
+project:
+    checker: []
+# shot
+shot:
+    checker:
+        - /utl/materialx_custom
+        - /sot/alembic_custom

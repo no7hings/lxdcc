@@ -1,0 +1,52 @@
+/utl/task_custom:
+    # gui-icon
+    icon: null
+    # gui-label-english
+    label: Task(s)
+    eng_description: null
+    # check-description-english
+    descriptions:
+        # Enter Check Description
+        - Task is Disable
+    eng_repair_descriptions:
+        # Enter Repair Description
+        - ''
+    # gui-label-chinese
+    chn_label: null
+    chn_description: null
+# test
+# method tag
+# {tag}/{tag}
+/tst/test:
+    # gui-icon
+    icon: null
+    # gui-label-english
+    label: Test(s)
+    # gui-description-english
+    eng_description: null
+    # gui-descriptions-english
+    descriptions:
+        # key = description-english
+        - Test 01 is Error:
+            # repair
+            repair:
+                # repair description-english
+                description: Repair 01
+            # ignore
+            ignore:
+                # ignore-enable
+                enable: true
+        - Test 02 is Error:
+            repair:
+                description: Repair 02
+            ignore:
+                enable: true
+        - Test 02 is Error:
+            repair:
+                description: Repair 03
+            ignore:
+                enable: true
+    # gui-label-chinese
+    chn_description: null
+    # gui-description-chinese
+    chn_label: null

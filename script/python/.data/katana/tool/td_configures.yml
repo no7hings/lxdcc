@@ -16,7 +16,7 @@ tool:
                 [
                     'lxscheme', 'lxobj', 'lxresolver',
                     'lxarnold', 'lxar2mtx',
-                    'lxutil', 'lxutil_gui', 'lxutil_prd', 'lxutil_fnc',
+                    'lxutil', 'lxutil_gui', 'lxutil_fnc',
                     'lxshotgun', 'lxshotgun_fnc',
                     'lxshotgun_gui',
                     'lxkatana'

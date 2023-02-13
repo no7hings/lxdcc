@@ -22,15 +22,6 @@ tool:
         label: Package-reloader
         icon: None
         command: import lxmaya;lxmaya.Packages.set_reload()
-    # builder
-    shot_builder:
-        chn_label: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneBuildToolPanel().set_window_show()
-        icon: None
-        label: Shot-builder
-        size:
-            - 1280
-            - 720
     # cleaner
     scene_cleaner:
         chn_label: None
@@ -40,15 +31,6 @@ tool:
         size:
             - 480
             - 240
-    #
-    scene_compose:
-        chn_label: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneComposePanel().set_window_show()
-        icon: None
-        label: Scene-compose
-        size:
-            - 720
-            - 576
     #
     asset_comparer:
         label: Asset-comparer

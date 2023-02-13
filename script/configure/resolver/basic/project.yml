@@ -963,9 +963,9 @@ include-asset-step-extra:
     - '{step}_tech'
 #
 root-step-choice:
-    work: {}
-    publish: {efx: 'root_secondary'}
-    output: {efx: 'root_secondary'}
+    source: {}
+    release: { efx: 'root_secondary' }
+    temporary: { efx: 'root_secondary' }
 
 # ******************************************************************************************************************** #
 # dcc rule

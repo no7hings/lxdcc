@@ -5,7 +5,7 @@ from lxutil.dcc import dcc_objects
 
 jinja_loader = jinja2.FileSystemLoader('/data/e/myworkspace/td/lynxi/script/python/lxusd/.data')
 
-env = jinja2.Environment(loader=jinja_loader)
+j2_env = jinja2.Environment(loader=jinja_loader)
 
 p = dict(
     properties=dict(
@@ -37,27 +37,27 @@ p = dict(
     ]
 )
 
-set_j2_template = env.get_template('set-usda-template.j2')
+set_j2_template = j2_env.get_template('set-usda-template.j2')
 set_file_path = '/l/prod/shl/work/assets/chr/nn_gongshifu/srf/surfacing/set/scene/set.usda'
 raw = set_j2_template.render(**p)
 dcc_objects.OsFile(set_file_path).set_write(raw)
 
 geometry_file_path = '/l/prod/shl/work/assets/chr/nn_gongshifu/srf/surfacing/set/scene/geometry.usda'
-geometry_j2_template = env.get_template('geometry-usda-template.j2')
+geometry_j2_template = j2_env.get_template('geometry-usda-template.j2')
 raw = geometry_j2_template.render(**p)
 dcc_objects.OsFile(geometry_file_path).set_write(raw)
 
 hair_file_path = '/l/prod/shl/work/assets/chr/nn_gongshifu/srf/surfacing/set/scene/hair.usda'
-hair_j2_template = env.get_template('hair-usda-template.j2')
+hair_j2_template = j2_env.get_template('hair-usda-template.j2')
 raw = hair_j2_template.render(**p)
 dcc_objects.OsFile(hair_file_path).set_write(raw)
 
 look_file_path = '/l/prod/shl/work/assets/chr/nn_gongshifu/srf/surfacing/set/scene/look.usda'
-look_j2_template = env.get_template('look-usda-template.j2')
+look_j2_template = j2_env.get_template('look-usda-template.j2')
 raw = look_j2_template.render(**p)
 dcc_objects.OsFile(look_file_path).set_write(raw)
 
 effect_file_path = '/l/prod/shl/work/assets/chr/nn_gongshifu/srf/surfacing/set/scene/effect.usda'
-effect_j2_template = env.get_template('effect-usda-template.j2')
+effect_j2_template = j2_env.get_template('effect-usda-template.j2')
 raw = effect_j2_template.render(**p)
 dcc_objects.OsFile(effect_file_path).set_write(raw)

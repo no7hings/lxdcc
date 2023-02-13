@@ -5,8 +5,8 @@ p = utl_dcc_objects.PyReloader(
         'lxscheme',
         'lxobj', 'lxresolver',
         'lxarnold', 'lxusd',
-        'lxutil', 'lxutil_fnc', 'lxutil_gui',
-        'lxmaya', 'lxmaya_fnc', 'lxmaya_gui',
+        'lxutil', 'lxutil_gui',
+        'lxmaya', 'lxmaya_gui',
         'publish'
     ]
 )

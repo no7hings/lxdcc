@@ -4,8 +4,6 @@ from maya import cmds
 
 from lxutil import utl_core
 
-from lxmaya_fnc import ma_fnc_configure, ma_fnc_core
-
 import lxmaya.modifiers as mya_modifiers
 
 from lxmaya import ma_configure, ma_core
@@ -31,86 +29,6 @@ import lxarnold.dcc.dcc_objects as and_dcc_objects
 import lxarnold.dcc.dcc_operators as and_dcc_operators
 
 from lxbasic import bsc_core
-
-
-class LookAssignImporter(object):
-    def __init__(self, file_path, root=None, look='default', root_lstrip=None):
-        self._file_path = file_path
-        self._root = root
-        self._look = look
-        self._path_lstrip = root_lstrip
-        #
-        self._raw_content = bsc_objects.Configure(value=self._file_path)
-        self._look_content = ma_fnc_core.LookContent(self._file_path)
-
-    def set_run(self):
-        g = mya_dcc_objects.Group(self._root)
-        #
-        var = 'geometry'
-        #
-        geometry_paths = g.get_all_shape_paths(include_obj_type=ma_fnc_configure.Look.GEOMETRY_TYPES)
-        for seq, geometry_path in enumerate(geometry_paths):
-            obj_type = mya_dcc_objects.Node(geometry_path).type
-            if obj_type == ma_configure.Util.MESH_TYPE:
-                mesh_obj = mya_dcc_objects.Mesh(geometry_path)
-                geometry_mtd = mya_dcc_operators.MeshOpt(mesh_obj)
-                look_opt = mya_dcc_operators.MeshLookOpt(mesh_obj)
-                #
-                points_uuid = geometry_mtd.get_points_as_uuid(ordered=True)
-                face_vertices_uuid = geometry_mtd.get_face_vertices_as_uuid()
-                key_dict = {
-                    ma_fnc_configure.Look.POINTS_UUID: points_uuid,
-                    ma_fnc_configure.Look.FACE_VERTICES_UUID: face_vertices_uuid,
-                }
-                material_assigns = self._look_content.get_material_assigns(self._look, var, key_dict)
-                if material_assigns:
-                    look_opt.set_material_assigns(material_assigns)
-                else:
-                    utl_core.Log.set_module_warning_trace(
-                        'look-assign-importer',
-                        'material-assigns: "{}" is Non-exists'.format(geometry_path)
-                    )
-                properties = self._look_content.get_properties(self._look, var, key_dict)
-                if properties:
-                    look_opt.set_properties(properties)
-                else:
-                    utl_core.Log.set_module_warning_trace(
-                        'look-assign-importer',
-                        'properties: "{}" is Non-exists'.format(geometry_path)
-                    )
-                visibilities = self._look_content.get_visibilities(self._look, var, key_dict)
-                if visibilities:
-                    look_opt.set_visibilities(visibilities)
-                else:
-                    utl_core.Log.set_module_warning_trace(
-                        'look-assign-importer',
-                        'visibilities: "{}" is Non-exists'.format(geometry_path)
-                    )
-        #
-        var = 'hair'
-        hair_paths = g.get_all_shape_paths(include_obj_type=ma_fnc_configure.Look.HAIR_TYPES)
-        for seq, hair_path in enumerate(hair_paths):
-            obj_type = mya_dcc_objects.Node(hair_path).type
-            if obj_type == ma_configure.Util.XGEN_DESCRIPTION:
-                xgen_description = mya_dcc_objects.XgenDescription(hair_path)
-                xgen_description_opt = mya_dcc_operators.XgenDescriptionOpt(xgen_description)
-                look_opt = mya_dcc_operators.XgenDescriptionLookMtd(xgen_description)
-                name = xgen_description_opt.get_name()
-                #
-                key_dict = {
-                    ma_fnc_configure.Look.NAME: name,
-                }
-                material_assigns = self._look_content.get_material_assigns(self._look, var, key_dict)
-                if material_assigns:
-                    look_opt.set_material_assigns(material_assigns)
-                #
-                properties = self._look_content.get_properties(self._look, var, key_dict)
-                if properties:
-                    look_opt.set_properties(properties)
-                #
-                visibilities = self._look_content.get_visibilities(self._look, var, key_dict)
-                if visibilities:
-                    look_opt.set_visibilities(visibilities)
 
 
 class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):

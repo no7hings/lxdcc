@@ -16,10 +16,10 @@ def set_reload(modules=None):
         p = bsc_objects.PyReloader(
             [
                 'lxbasic', 'lxscheme', 'lxsession', 'lxdatabase', 'lxdeadline', 'lxobj', 'lxresolver', 'lxarnold',
-                'lxusd', 'lxusd_fnc',
-                'lxutil', 'lxutil_fnc', 'lxutil_gui',
-                'lxshotgun', 'lxshotgun_fnc', 'lxshotgun_gui',
-                'lxkatana', 'lxkatana_fnc', 'lxkatana_gui'
+                'lxusd',
+                'lxutil', 'lxutil_gui',
+                'lxshotgun', 'lxshotgun_gui',
+                'lxkatana', 'lxkatana_gui'
             ]
         )
     p.set_reload()

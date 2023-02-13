@@ -11,8 +11,6 @@ tools = []
 
 requires = [
     'lxdcc_lib',
-    'lxdcc_prd',
-    'lxdcc_fnc',
     'lxdcc_gui',
     'lxdcc_rsc'
 ]
@@ -20,8 +18,8 @@ requires = [
 
 def commands():
     import platform
-    # module
-    env.PYTHONPATH.append('{root}/lib/python/module/python-2.7')
+    #
+    env.LXDCC_BASE = '{root}'
     # bin
     env.PATH.append('{root}/script/bin')
     if platform.system() == 'Linux':

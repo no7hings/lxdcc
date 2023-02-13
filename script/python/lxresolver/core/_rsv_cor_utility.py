@@ -42,7 +42,7 @@ class ResolverMtd(object):
 
 if __name__ == '__main__':
     import lxbasic.objects as bsc_objects
-    env = bsc_objects.Environ()
+    env = bsc_objects.PyEnviron_()
     env.LYNXI_RESOLVER_CONFIGURES += '/data/e/myworkspace/td/lynxi/script/configure/resolver/default'
     env.LYNXI_RESOLVER_CONFIGURES += '/data/e/myworkspace/td/lynxi/script/configure/resolver/new'
     print RsvConfigureMtd.get_basic_project_file()

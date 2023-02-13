@@ -14,6 +14,11 @@ variant-fnmatch-patterns:
     version_extra: '[0-9][0-9][0-9]'
     look_pass: '[A-Za-z]*'
     shot: '{sequence}*'
+#
+root-step-choice:
+    source: {}
+    release: {}
+    temporary: {}
 # <root>
 project-root-windows-dir: 'z:/shows'
 project-root-linux-dir: '/production/shows'
@@ -28,7 +33,7 @@ workspaces:
     source: team
     user: work
     release: shared
-    temporary: temporary
+    temporary: cache
 # asset steps
 asset_steps:
     concept: cpt

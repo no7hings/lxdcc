@@ -2010,12 +2010,13 @@ class AbsRsvProject(
         else:
             raise RuntimeError()
 
-    def _get_root_choice_(self, kwargs):
+    def _get_root_choice_(self, variants):
         root_choice = self._root_step_choice
         if root_choice:
-            if 'workspace' in kwargs and 'step' in kwargs:
+            if 'workspace' in variants and 'step' in variants:
+                workspace_key = self._project__get_workspace_key_by_variants_(variants)
                 root_choice = self._root_step_choice.get(
-                    '{}.{}'.format(kwargs['workspace'], kwargs['step'])
+                    '{}.{}'.format(workspace_key, variants['step'])
                 )
                 if root_choice is not None:
                     return root_choice

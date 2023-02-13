@@ -27,8 +27,6 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 #
 import lxutil.fnc.exporters as utl_fnc_exporters
 
-import lxutil_fnc.scripts as utl_fnc_scripts
-
 
 class ScpAssetBatcher(object):
     OPTION = dict(
@@ -70,6 +68,7 @@ class ScpAssetBatcher(object):
                             self._set_i_rsv_asset_surface_publish_(i_rsv_asset_tgt)
     @classmethod
     def _set_i_rsv_asset_surface_publish_(cls, i_rsv_asset_tgt, user=None, time_tag=None):
+        import lxutil_fnc.scripts as utl_fnc_scripts
         #
         if user is None:
             user = bsc_core.SystemMtd.get_user_name()

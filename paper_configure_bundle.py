@@ -18,9 +18,9 @@ environ_data = [
     #
     ('PATH', '{root}/script/bin', 'append_to_path'),
     #
-    ('PYTHON_PATH', '{root}/script/python', 'append_to_path'),
+    ('PYTHONPATH', '{root}/script/python', 'append_to_path'),
     # maya
-    ('PYTHON_PATH', '{root}/script/python/.setup/maya/scripts', 'append_to_path'),
+    ('PYTHONPATH', '{root}/script/python/.setup/maya/scripts', 'append_to_path'),
     # houdini
     ('HOUDINI_PATH', '{root}/script/python/.setup/houdini:&', 'append_to_path'),
     # katana

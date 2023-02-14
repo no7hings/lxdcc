@@ -23,10 +23,6 @@ def usage():
         '-a or --application: <application-name>\n'
         '-s or --script: <script-name>\n'
         '-o or --option: <option>\n'
-        'etc\n'
-        'lxscript -p cjd -a maya -s set_scene_export_by_any_scene_file -o "file=/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v014/scene/td_test.ma&with_scene=True"',
-        'lxscript -p cjd -a katana -s set_scene_export_by_any_scene_file -o "file=/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v014/scene/td_test.katana&with_scene=True"'
-        'lxscript -p cjd -a houdini -s set_geometry_uv_map_unify -o "file=/home/dongchangbao/.lynxi/temporary/2021_0903/test.usd"'
     )
 
 

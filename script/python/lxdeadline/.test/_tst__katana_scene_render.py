@@ -24,4 +24,4 @@ if __name__ == '__main__':
             render_katana_file_path
         ),
     )
-    katana_look_checker_export.set_run_with_deadline()
+    katana_look_checker_export.execute_with_deadline()

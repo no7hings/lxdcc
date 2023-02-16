@@ -1,11 +1,9 @@
 # coding:utf-8
 import lxobj.objects as core_objects
 
-from lxresolver import rsv_configure
-
 import lxresolver.abstracts as rsv_abstracts
 
-from lxresolver.objects import _rsv_obj_stack
+from lxresolver.objects import _rsv_obj_stack, _rsv_obj_launcher
 
 from lxbasic.objects import _bsc_obj_raw
 
@@ -104,6 +102,9 @@ class RsvProject(rsv_abstracts.AbsRsvProject):
     #
     RSV_UNIT_CLASS = RsvUnit
     RSV_UNIT_VERSION_CLASS = RsvUnitVersion
+    #
+    RSV_APP_DEFAULT_CLASS = _rsv_obj_launcher.RsvAppDefault
+    RSV_APP_NEW_CLASS = _rsv_obj_launcher.RsvAppNew
     def __init__(self, *args, **kwargs):
         super(RsvProject, self).__init__(*args, **kwargs)
 

@@ -689,6 +689,12 @@ class StgDirectoryOpt_(object):
         )
 
 
+class StgFileMtd(object):
+    @classmethod
+    def get_directory(cls, file_path):
+        return os.path.dirname(file_path)
+
+
 class StgFileOpt(StgPathOpt):
     def __init__(self, file_path, file_type=None):
         super(StgFileOpt, self).__init__(file_path)

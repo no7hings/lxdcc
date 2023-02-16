@@ -65,4 +65,4 @@ if rsv_task_properties:
             ]
         )
     )
-    maya_look_preview_export.set_run_with_deadline()
+    maya_look_preview_export.execute_with_deadline()

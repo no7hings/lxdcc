@@ -68,7 +68,7 @@ def set_script_run(project, engine, script, option):
     if engine == 'python':
         cmd_args = [
             r'-c "mayapy {}/script/bin/scp_utility_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -85,7 +85,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'maya-python':
         cmd_args = [
             r'-c "mayapy {}/script/bin/scp_maya_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -97,7 +97,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'houdini':
         cmd_args = [
             r'-c "hython {}/script/bin/scp_houdini_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -106,7 +106,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'houdini-python':
         cmd_args = [
             r'-c "hython {}/script/bin/scp_houdini_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -115,7 +115,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'katana':
         cmd_args = [
             r'-c "katana --script={}/script/bin/scp_katana_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -123,7 +123,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'katana-python':
         cmd_args = [
             r'-c "katana --script={}/script/bin/scp_katana_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -142,7 +142,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'shotgun':
         cmd_args = [
             r'-c "mayapy {}/script/bin/scp_shotgun_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )
@@ -156,7 +156,7 @@ def set_script_run(project, engine, script, option):
     elif engine == 'gui-python':
         cmd_args = [
             r'-c "mayapy {}/script/bin/scp_gui_run.py \"{}\" \"{}\""'.format(
-                os.environ.get('REZ_LXDCC_BASE'),
+                os.environ.get('LXDCC_BASE'),
                 script,
                 option
             )

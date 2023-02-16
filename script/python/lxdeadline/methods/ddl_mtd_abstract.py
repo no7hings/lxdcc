@@ -83,9 +83,9 @@ class AbsJobSender(object):
     ddl_job_id = property(get_ddl_job_id)
 
     def set_run(self, *args, **kwargs):
-        self.set_run_with_deadline(*args, **kwargs)
+        self.execute_with_deadline(*args, **kwargs)
 
-    def set_run_with_deadline(self, *args, **kwargs):
+    def execute_with_deadline(self, *args, **kwargs):
         raise NotImplementedError()
 
     def set_run_with_shell(self, with_result=False):
@@ -180,9 +180,9 @@ class AbsJobSender2(object):
     ddl_job_id = property(get_ddl_job_id)
 
     def set_run(self, *args, **kwargs):
-        self.set_run_with_deadline(*args, **kwargs)
+        self.execute_with_deadline(*args, **kwargs)
 
-    def set_run_with_deadline(self, *args, **kwargs):
+    def execute_with_deadline(self, *args, **kwargs):
         raise NotImplementedError()
 
     def set_run_with_shell(self, with_result=False):
@@ -196,11 +196,11 @@ class AbsJobSender2(object):
 
 class AbsHookExecutor(AbsJobSender2):
     DEADLINE_COMMAND_PATTERN = r'rez-env lxdcc -c \"lxscript -p {configure} -a {engine} -s {script} -o \\\"{script_option}&start_index=\<STARTFRAME\>&end_index=\<ENDFRAME\>\\\"\"'
-    SHELL_COMMAND_PATTERN = r'rez-env lxdcc -c "lxscript -p {configure} -a {engine} -s {script} -o \"{script_option}&start_index=\<STARTFRAME\>&end_index=\<ENDFRAME\>\\\"\"'
+    SHELL_COMMAND_PATTERN = r'rez-env lxdcc -c "lxscript -p {configure} -a {engine} -s {script} -o \"{script_option}&start_index=\<STARTFRAME\>&end_index=\<ENDFRAME\>\""'
     def __init__(self, method_option, script_option, job_dependencies):
         super(AbsHookExecutor, self).__init__(method_option, script_option, job_dependencies)
 
-    def set_run_with_deadline(self):
+    def execute_with_deadline(self):
         script_option_opt = self.get_script_option_opt()
         file_path = script_option_opt.get('file')
         #
@@ -267,7 +267,7 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
     def __init__(self, method_option, script_option, job_dependencies):
         super(AbsRsvTaskHookExecutor, self).__init__(method_option, script_option, job_dependencies)
 
-    def set_run_with_deadline(self):
+    def execute_with_deadline(self):
         script_option_opt = self.get_script_option_opt()
         scene_file_path = script_option_opt.get('file')
         resolver = rsv_commands.get_resolver()
@@ -340,7 +340,7 @@ class AbsDdlRsvTaskRender(AbsHookExecutor):
     def __init__(self, method_option, script_option, job_dependencies):
         super(AbsDdlRsvTaskRender, self).__init__(method_option, script_option, job_dependencies)
 
-    def set_run_with_deadline(self):
+    def execute_with_deadline(self):
         script_option_opt = self.get_script_option_opt()
         any_scene_file_path = script_option_opt.get('file')
         render_scene_file_path = script_option_opt.get('render_file')

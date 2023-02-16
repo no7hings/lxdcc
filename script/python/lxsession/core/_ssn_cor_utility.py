@@ -54,17 +54,17 @@ class SsnHookFileMtd(object):
     BRANCH = 'hooks'
     @classmethod
     def get_python(cls, key):
-        return utl_core.Resources.get(
+        return bsc_core.RscFileMtd.get(
             '{}/{}.py'.format(cls.BRANCH, key)
         )
     @classmethod
     def get_yaml(cls, key):
-        return utl_core.Resources.get(
+        return bsc_core.RscFileMtd.get(
             '{}/{}.yml'.format(cls.BRANCH, key)
         )
     @classmethod
     def get_command(cls, key):
-        return utl_core.Resources.get(
+        return bsc_core.RscFileMtd.get(
             '{}/{}.yml'.format(cls.BRANCH, key)
         )
     @classmethod
@@ -124,7 +124,7 @@ class SsnOptionHookFileMtd(SsnHookFileMtd):
     BRANCH = 'option-hooks'
 
 
-class SsnHookYamlFileMtd(object):
+class SsnHookServerMtd(object):
     @classmethod
     def get_key(cls, **kwargs):
         return bsc_core.UuidMtd.get_by_string(

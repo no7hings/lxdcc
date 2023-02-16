@@ -102,30 +102,40 @@ class PtnParseMtd(object):
         lis_1.sort(key=lis_0.index)
         return lis_1
     @classmethod
+    def get_value(cls, key, variants):
+        if '.' in key:
+            key_ = key.split('.')[0]
+            if key_ in variants:
+                value_ = variants[key_]
+                exec('{} = \'{}\''.format(key_, value_))
+                return eval(key)
+        if key in variants:
+            return variants[key]
+    @classmethod
     def set_update(cls, pattern, **kwargs):
         if pattern is not None:
             keys = cls.get_keys(pattern)
+            variants = kwargs
             s = pattern
             if keys:
-                for i_key in keys:
-                    if i_key in kwargs:
-                        v = kwargs[i_key]
-                        if v is not None and v != '*':
-                            s = s.replace('{{{}}}'.format(i_key), kwargs[i_key])
+                for i_k in keys:
+                    i_v = cls.get_value(i_k, variants)
+                    if i_v is not None and i_v != '*':
+                        s = s.replace('{{{}}}'.format(i_k), i_v)
             return s
         return pattern
     @classmethod
-    def get_as_fnmatch(cls, pattern, key_format=None):
+    def get_as_fnmatch(cls, pattern, variants=None):
         if pattern is not None:
             keys = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
             s = pattern
             if keys:
-                for i_key in keys:
+                for i_k in keys:
                     i_v = '*'
-                    if isinstance(key_format, dict):
-                        if i_key in key_format:
-                            i_v = key_format[i_key]
-                    s = s.replace('{{{}}}'.format(i_key), i_v)
+                    if isinstance(variants, dict):
+                        if i_k in variants:
+                            i_v = variants[i_k]
+                    s = s.replace('{{{}}}'.format(i_k), i_v)
             return s
         return pattern
 

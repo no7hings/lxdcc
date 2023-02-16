@@ -229,7 +229,7 @@ class SystemMtd(TimeMtd):
         return ApplicationMtd.get_current()
     #
     @classmethod
-    def get_user_home_directory(cls):
+    def get_home_directory(cls):
         if cls.get_is_windows():
             return os.environ.get('HOMEPATH')
         elif cls.get_is_linux():

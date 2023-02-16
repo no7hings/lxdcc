@@ -1,34 +1,28 @@
 # coding:utf-8
+import collections
+
 from lxbasic import bsc_configure, bsc_core
 
 
 class RsvConfigureMtd(object):
     ENVIRON_KEY = 'LYNXI_RESOLVER_CONFIGURES'
     @classmethod
-    def get_search_directories(cls):
-        return bsc_core.EnvironMtd.get_as_array(cls.ENVIRON_KEY)
+    def get_raw(cls, key):
+        raw = collections.OrderedDict()
+        for i_key in ['builtin', 'project', 'app']:
+            i_file = bsc_configure.Root.get_configure_file('resolver/{}/{}'.format(key, i_key))
+            i_raw = bsc_core.StgFileOpt(i_file).set_read() or {}
+            raw.update(i_raw)
+        return raw
     @classmethod
-    def get_basic_project_file(cls):
-        return bsc_configure.Root.get_configure_file('resolver/basic/project')
+    def get_basic_raw(cls):
+        return cls.get_raw('basic')
     @classmethod
-    def get_default_project_file(cls):
-        return bsc_configure.Root.get_configure_file('resolver/default/project')
-    @classmethod
-    def get_default_project_files(cls):
-        return [
-            bsc_configure.Root.get_configure_file('resolver/{}/project'.format(i)) for i in ['default', 'new']
-        ]
-    @classmethod
-    def get_all_project_files(cls):
+    def get_default_raws(cls):
         list_ = []
-        for i_path in cls.get_search_directories():
-            i_path_opt = bsc_core.StgPathOpt(i_path)
-            if i_path_opt.get_is_exists() is True:
-                i_glob_pattern = '{}/project.yml'.format(i_path_opt.path)
-                i_results = bsc_core.StgExtraMtd.get_paths_by_fnmatch_pattern(
-                    i_glob_pattern
-                )
-                list_.extend(i_results)
+        for i_key in ['default', 'new']:
+            i_raw = cls.get_raw(i_key)
+            list_.append(i_raw)
         return list_
 
 
@@ -40,11 +34,9 @@ class ResolverMtd(object):
         )
 
 
+class RsvBaseMtd(object):
+    pass
+
+
 if __name__ == '__main__':
-    import lxbasic.objects as bsc_objects
-    env = bsc_objects.PyEnviron_()
-    env.LYNXI_RESOLVER_CONFIGURES += '/data/e/myworkspace/td/lynxi/script/configure/resolver/default'
-    env.LYNXI_RESOLVER_CONFIGURES += '/data/e/myworkspace/td/lynxi/script/configure/resolver/new'
-    print RsvConfigureMtd.get_basic_project_file()
-    print RsvConfigureMtd.get_search_directories()
-    print RsvConfigureMtd.get_all_project_files()
+    print RsvConfigureMtd.get_basic_raw()

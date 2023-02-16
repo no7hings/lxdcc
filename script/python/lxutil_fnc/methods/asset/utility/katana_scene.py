@@ -95,4 +95,4 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     rez_beta=True,
                 ),
             )
-            katana_scene_export.set_run_with_deadline()
+            katana_scene_export.execute_with_deadline()

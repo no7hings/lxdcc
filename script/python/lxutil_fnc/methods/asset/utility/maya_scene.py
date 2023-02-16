@@ -111,4 +111,4 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 method_option=maya_scene_export_query.get_method_option(),
                 script_option=maya_scene_export_script_option
             )
-            maya_scene_export.set_run_with_deadline()
+            maya_scene_export.execute_with_deadline()

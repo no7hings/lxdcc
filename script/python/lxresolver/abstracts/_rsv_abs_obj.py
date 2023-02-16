@@ -31,13 +31,9 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxutil import utl_core
-
 from lxobj import obj_core, obj_abstract
 
 from lxresolver import rsv_configure, rsv_core
-
-from lxutil_gui import utl_gui_core
 
 THREAD_MAXIMUM = threading.Semaphore(1024)
 
@@ -200,10 +196,11 @@ class MtdBasic(object):
             name
         )
         if _:
-            utl_core.Log.set_module_warning_trace(
-                'name check',
-                u'{}-name="{}" is not available'.format(rsv_type, name)
-            )
+            if rsv_core.TRACE_WARNING_ENABLE is True:
+                bsc_core.LogMtd.trace_method_warning(
+                    'name check',
+                    u'{}-name="{}" is not available'.format(rsv_type, name)
+                )
             return False
         return True
     @classmethod
@@ -274,6 +271,20 @@ class RawOpt(object):
             else:
                 return default_value
         return v
+
+    def set(self, key_path, value):
+        ks = key_path.split(self.PATHSEP)
+        v = self._dict
+        #
+        maximum = len(ks) - 1
+        for seq, k in enumerate(ks):
+            if seq == maximum:
+                v[k] = value
+            else:
+                if k not in v:
+                    v[k] = collections.OrderedDict()
+                #
+                v = v[k]
 
     def unfold_value(self, value):
         def rcs_fnc_(v_):
@@ -544,7 +555,7 @@ class AbsRsvMatcher(
         for i in keys:
             if i not in format_dict:
                 raise RuntimeError(
-                    utl_core.Log.set_module_error_trace(
+                    bsc_core.LogMtd.trace_method_error(
                         'path resolver',
                         'key "{}" in pattern "{}" is not value assigned'.format(
                             i,
@@ -643,6 +654,7 @@ class AbsRsvDef(object):
 
 
 class AbsRsvObjDef(object):
+    PATHSEP = '/'
     def _set_obj_def_init_(self):
         self._rsv_properties = None
         self._rsv_path = None
@@ -671,9 +683,10 @@ class AbsRsvObjDef(object):
     @property
     def type_name(self):
         return self.type
-    @property
-    def name(self):
-        return obj_core.DccPathDagMtd.get_dag_name(self._rsv_path, pathsep='/')
+
+    def get_name(self):
+        return bsc_core.DccPathDagMtd.get_dag_name(self._rsv_path, pathsep=self.PATHSEP)
+    name = property(get_name)
     @property
     def pattern(self):
         return self._pattern
@@ -834,7 +847,7 @@ class AbsRsvObj(
         return self._rsv_project
     @property
     def icon(self):
-        return utl_gui_core.RscIconFile.get('file/folder')
+        return bsc_core.RscIconFileMtd.get('file/folder')
 
     def _set_dag_create_(self, path):
         return self.rsv_project._project__get_rsv_obj_(path)
@@ -1316,7 +1329,7 @@ class AbsRsvTask(
         return properties
     @property
     def icon(self):
-        return utl_gui_core.RscIconFile.get('file/file')
+        return bsc_core.RscIconFileMtd.get('file/file')
 
 
 # <rsv-step>
@@ -1366,7 +1379,7 @@ class AbsRsvResource(
         super(AbsRsvResource, self).__init__(*args, **kwargs)
     @property
     def icon(self):
-        return utl_gui_core.RscIconFile.get('resolver/asset')
+        return bsc_core.RscIconFileMtd.get('resolver/asset')
 
     def get_rsv_steps(self, **kwargs):
         self._completion_kwargs_from_parent_(self, kwargs)
@@ -1518,6 +1531,9 @@ class AbsRsvExtraDef(AbsRsvDef):
             raise TypeError(
                 'file="{}" is not found'.format(file_path)
             )
+    @classmethod
+    def _get_raw_opt_(cls, raw):
+        return RawOpt(raw)
     @staticmethod
     def _completion_keyword_by_variants_(variants):
         """
@@ -1717,7 +1733,10 @@ class AbsRsvProject(
     #
     RSV_UNIT_CLASS = None
     RSV_UNIT_VERSION_CLASS = None
-
+    #
+    RSV_APP_DEFAULT_CLASS = None
+    RSV_APP_NEW_CLASS = None
+    #
     PROPERTIES_CLASS = None
     def __init__(self, *args, **kwargs):
         self._set_obj_def_init_()
@@ -1914,7 +1933,23 @@ class AbsRsvProject(
         return self._rsv_path
     @property
     def icon(self):
-        return utl_gui_core.RscIconFile.get('resolver/project')
+        return bsc_core.RscIconFileMtd.get('resolver/project')
+
+    def get_rsv_app(self, application):
+        configure = bsc_objects.Configure(value=self._raw_opt.get('app-data'))
+        scheme = configure.get('scheme')
+        if scheme == 'default':
+            return self.RSV_APP_DEFAULT_CLASS(
+                project=self.properties.get('project'),
+                application=application,
+                configure=configure
+            )
+        elif scheme == 'new':
+            return self.RSV_APP_NEW_CLASS(
+                project=self.properties.get('project'),
+                application=application,
+                configure=configure
+            )
 
     def get_workspaces(self):
         return self._rsv_properties.get(
@@ -2785,7 +2820,8 @@ class AbsRsvProject(
     def _project__set_rsv_obj_add_(self, rsv_obj):
         self._rsv_obj_stack.set_object_add(rsv_obj)
         if rsv_core.TRACE_RESULT_ENABLE is True:
-            utl_core.Log.set_module_result_trace(
+
+            bsc_core.LogMtd.trace_method_result(
                 'resolver',
                 u'{}="{}"'.format(rsv_obj.type, rsv_obj.path)
             )
@@ -2931,9 +2967,7 @@ class AbsRsvRoot(
         self._rsv_project_stack = self.RSV_PROJECT_STACK_CLASS()
         self._obj_universe = self.OBJ_UNIVERSE_CLASS()
         #
-        raw = self._read_raw_(
-            rsv_core.RsvConfigureMtd.get_basic_project_file()
-        )
+        raw = rsv_core.RsvConfigureMtd.get_basic_raw()
         self.init_rsv_extra(raw)
         #
         self._default_root_to_project_dict = {}
@@ -2942,22 +2976,18 @@ class AbsRsvRoot(
         self._update_all_projects_()
 
     def _update_all_projects_(self):
-        file_paths = rsv_core.RsvConfigureMtd.get_all_project_files()
-        # add default configure
-        default_file_paths = rsv_core.RsvConfigureMtd.get_default_project_files()
-        for i_file_path in default_file_paths:
-            if i_file_path not in file_paths:
-                file_paths.insert(0, i_file_path)
-        #
-        for i_file_path in file_paths:
-            i_project_raw = self._read_raw_(
-                i_file_path
-            )
-            if 'key' in i_project_raw:
-                i_project = i_project_raw['key']
-                i_rsv_project = self._create_rsv_project_(i_project_raw, project=i_project)
-                i_root = i_rsv_project.properties.get('root')
-                self._default_root_to_project_dict[i_root] = i_rsv_project
+        default_raws = rsv_core.RsvConfigureMtd.get_default_raws()
+        for i_raw in default_raws:
+            i_project_raw_opt = self._get_raw_opt_(i_raw)
+            key = i_project_raw_opt.get('key')
+            if key is not None:
+                key_extras = i_project_raw_opt.get('key_extras') or []
+                for j_key in key_extras:
+                    j_project = j_key
+                    j_raw = copy.copy(i_raw)
+                    j_project_raw_opt = self._get_raw_opt_(j_raw)
+                    j_project_raw_opt.set('key', j_key)
+                    self._create_rsv_project_(j_raw, project=j_project)
     @property
     def type(self):
         return 'resolver'
@@ -2975,7 +3005,7 @@ class AbsRsvRoot(
         return ''
     @property
     def icon(self):
-        return utl_gui_core.RscIconFile.get('resolver/root')
+        return bsc_core.RscIconFileMtd.get('resolver/root')
 
     def _set_dag_create_(self, path):
         if path == self.path:
@@ -3095,23 +3125,12 @@ class AbsRsvRoot(
             rsv_project._project_update_static_variants_to_properties_()
             return rsv_project
         #
-        self._get_rsv_project_as_default_(**kwargs)
-        #
-        project = kwargs['project']
-        #
-        default_project = self._rsv_project_stack.get_object('/default')
-        default_project_raw = copy.copy(default_project._raw)
-        default_project_raw['key'] = project
-        return self._create_rsv_project_(default_project_raw, project=project)
-
-    def _get_rsv_project_as_default_(self, **kwargs):
-        project = kwargs['project']
-        search_roots = self._default_root_to_project_dict.keys()
-        for i_root in search_roots:
-            i_path = '{}/{}'.format(i_root, project)
-            if os.path.isdir(i_path):
-                pass
-                # print(self._default_root_to_project_dict[i_root])
+        # project = kwargs['project']
+        # #
+        # default_project = self._rsv_project_stack.get_object('/default')
+        # default_project_raw = copy.copy(default_project._raw)
+        # default_project_raw['key'] = project
+        # return self._create_rsv_project_(default_project_raw, project=project)
 
     def _root__set_rsv_project_create_(self, *args, **kwargs):
         rsv_project = self.RSV_PROJECT_CLASS(self, *args, **kwargs)
@@ -3121,7 +3140,7 @@ class AbsRsvRoot(
         obj_path = rsv_project.path
         self._rsv_project_stack.set_object_add(rsv_project)
         if rsv_core.TRACE_RESULT_ENABLE is True:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'resolver',
                 u'{}="{}"'.format(obj_type, obj_path)
             )
@@ -3221,10 +3240,11 @@ class AbsRsvRoot(
                 file_path
             )
         else:
-            utl_core.Log.set_module_warning_trace(
-                'project-resolver',
-                u'file="{}" is not available'.format(file_path)
-            )
+            if rsv_core.TRACE_WARNING_ENABLE is True:
+                bsc_core.LogMtd.trace_method_warning(
+                    'project-resolver',
+                    u'file="{}" is not available'.format(file_path)
+                )
         return None
 
     def get_rsv_task_by_any_file_path(self, file_path):
@@ -3234,10 +3254,11 @@ class AbsRsvRoot(
                 file_path
             )
         else:
-            utl_core.Log.set_module_warning_trace(
-                'project-resolver',
-                u'file="{}" is not available'.format(file_path)
-            )
+            if rsv_core.TRACE_WARNING_ENABLE is True:
+                bsc_core.LogMtd.trace_method_warning(
+                    'project-resolver',
+                    u'file="{}" is not available'.format(file_path)
+                )
         return None
     #
     def _resolver__get_rsv_project_use_default_(self, file_path):
@@ -3256,7 +3277,7 @@ class AbsRsvRoot(
                 i_project_properties = i_rsv_matcher._get_project_properties_by_default_(file_path)
                 i_project = i_project_properties.get('project')
                 if rsv_core.TRACE_RESULT_ENABLE is True:
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'resolver project create',
                         'project-name="{}", create use "default"'.format(i_project)
                     )
@@ -3267,10 +3288,11 @@ class AbsRsvRoot(
         if _ is not None:
             return _
         else:
-            utl_core.Log.set_module_warning_trace(
-                'work-scene-src-file-resolver',
-                u'file="{}" is not available'.format(file_path)
-            )
+            if rsv_core.TRACE_WARNING_ENABLE is True:
+                bsc_core.LogMtd.trace_method_warning(
+                    'work-scene-src-file-resolver',
+                    u'file="{}" is not available'.format(file_path)
+                )
         return None
     #
     def _get_rsv_task_properties_by_work_scene_src_file_path_(self, file_path):
@@ -3283,10 +3305,11 @@ class AbsRsvRoot(
         if _ is not None:
             return _
         else:
-            utl_core.Log.set_module_warning_trace(
-                'scene-src-file-resolver',
-                u'file="{}" is not available'.format(file_path)
-            )
+            if rsv_core.TRACE_WARNING_ENABLE is True:
+                bsc_core.LogMtd.trace_method_warning(
+                    'scene-src-file-resolver',
+                    u'file="{}" is not available'.format(file_path)
+                )
         return None
     #
     def _get_rsv_task_properties_by_scene_src_file_path_(self, file_path):

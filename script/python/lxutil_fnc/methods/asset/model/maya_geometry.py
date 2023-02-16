@@ -70,4 +70,4 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     user=user, time_tag=time_tag
                 )
             )
-            maya_geometry_export.set_run_with_deadline()
+            maya_geometry_export.execute_with_deadline()

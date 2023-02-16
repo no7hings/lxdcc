@@ -185,7 +185,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        katana_look_export.set_run_with_deadline()
+        katana_look_export.execute_with_deadline()
 
     def __set_katana_render_export_(self, user, time_tag):
         from lxdeadline import ddl_core
@@ -235,7 +235,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     ]
                 )
             )
-            katana_render_export.set_run_with_deadline()
+            katana_render_export.execute_with_deadline()
 
     def __set_maya_scene_export_(self, user, time_tag):
         from lxdeadline import ddl_core
@@ -284,7 +284,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        maya_scene_export.set_run_with_deadline()
+        maya_scene_export.execute_with_deadline()
 
     def __set_maya_look_export_(self, user, time_tag):
         from lxdeadline import ddl_core
@@ -329,7 +329,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        maya_look_export.set_run_with_deadline()
+        maya_look_export.execute_with_deadline()
 
     def __set_maya_look_preview_export_(self, user, time_tag):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -390,7 +390,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                             ]
                         )
                     )
-                    maya_look_preview_export.set_run_with_deadline()
+                    maya_look_preview_export.execute_with_deadline()
 
     def __set_maya_proxy_export_(self, user, time_tag):
         from lxdeadline import ddl_core
@@ -436,4 +436,4 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        maya_proxy_export.set_run_with_deadline()
+        maya_proxy_export.execute_with_deadline()

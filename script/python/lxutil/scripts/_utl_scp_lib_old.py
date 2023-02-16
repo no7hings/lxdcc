@@ -163,7 +163,7 @@ class ScpAssetBatcher(object):
                             user=self._user, time_tag=self._time_tag
                         )
                     )
-                    i_export.set_run_with_deadline()
+                    i_export.execute_with_deadline()
 
 
 class AbsScpLibFileDef(object):

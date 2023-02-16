@@ -196,7 +196,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                             user=user, time_tag=time_tag,
                         )
                     )
-                    maya_geometry_export.set_run_with_deadline()
+                    maya_geometry_export.execute_with_deadline()
                     # import geometry uv-map
                     if task in ['surfacing']:
                         resolver = rsv_commands.get_resolver()
@@ -234,7 +234,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                                         )
                                     )
                                     #
-                                    i_maya_geometry_import.set_run_with_deadline()
+                                    i_maya_geometry_import.execute_with_deadline()
                             else:
                                 utl_core.Log.set_module_warning_trace(
                                     'maya-geometry-uv-map-import',

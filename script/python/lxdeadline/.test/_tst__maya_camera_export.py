@@ -31,4 +31,4 @@ if __name__ == '__main__':
             user=user, time_tag=time_tag,
         )
     )
-    maya_camera_export.set_run_with_deadline()
+    maya_camera_export.execute_with_deadline()

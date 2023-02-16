@@ -156,7 +156,7 @@ class Scene(utl_abstract.AbsDccScene):
     @classmethod
     def get_default_file_path(cls):
         # /home/dongchangbao/untitled.hip
-        user_directory_path = bsc_core.SystemMtd.get_user_home_directory()
+        user_directory_path = bsc_core.SystemMtd.get_home_directory()
         return '{}/untitled.hip'.format(user_directory_path)
     @classmethod
     def get_is_default(cls):

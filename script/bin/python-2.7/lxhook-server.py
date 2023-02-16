@@ -12,15 +12,6 @@ argv = sys.argv
 app = Flask(__name__)
 
 
-def usage():
-    print (
-        '***** lxhook-python *****\n'
-        '\n'
-        #
-        '-h or --help: show help\n'
-    )
-
-
 def main():
     try:
         opts, args = getopt.getopt(
@@ -31,29 +22,37 @@ def main():
         option = [None] * 1
         for key, value in opts:
             if key in ('-h', '--help'):
-                usage()
+                __print_help()
                 sys.exit()
             elif key in ('-o', '--option'):
                 option = value
         #
         if option is not None:
-            set_run_by_option(option)
+            __execute_with_option(option)
     #
     except getopt.GetoptError:
-        print('argv error')
+        sys.stdout.write('argv error\n')
 
 
-def set_run_by_option(option):
+def __print_help():
+    sys.stdout.write(
+        '***** lxhook-server *****\n'
+        '\n'
+        #
+        '-h or --help: show help\n'
+    )
+
+
+def __execute_with_option(option):
     from lxbasic import bsc_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
-    start_server = option_opt.get('start_server') or False
-    if start_server:
-        set_server_start()
+    if option_opt.get('start_server') or False is True:
+        __start_server()
 
 
-def set_server_start():
+def __start_server():
     from lxutil import utl_configure
     #
     app.run(
@@ -74,12 +73,14 @@ def set_cmd_run():
     from lxbasic import bsc_core
     #
     from lxutil import utl_core
+
+    from lxsession import ssn_core
     #
     kwargs = request.args
     #
     unique_id = kwargs.get('uuid')
     if unique_id:
-        hook_yml_file_path = bsc_core.SystemMtd.get_hook_file_path(unique_id=unique_id)
+        hook_yml_file_path = ssn_core.SsnHookServerMtd.get_file_path(unique_id=unique_id)
         hook_yml_file = bsc_core.StgFileOpt(hook_yml_file_path)
         if hook_yml_file.get_is_exists() is True:
             raw = hook_yml_file.set_read()

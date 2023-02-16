@@ -18,21 +18,21 @@ def main():
         option = None
         for key, value in opts:
             if key in ('-h', '--help'):
-                __set_help_print()
+                __print_help()
                 #
                 sys.exit()
             elif key in ('-o', '--option'):
                 option = value
         #
         if option is not None:
-            __set_run(option)
+            __execute_with_option(option)
     #
     except getopt.GetoptError:
-        print('argv error')
+        sys.stdout.write('argv error\n')
 
 
-def __set_help_print():
-    print (
+def __print_help():
+    sys.stdout.write(
         '***** lxhook-command *****\n'
         '\n'
         #
@@ -40,21 +40,21 @@ def __set_help_print():
     )
 
 
-def __set_run(option):
+def __execute_with_option(option):
     from lxbasic import bsc_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
-        __set_option_hook_run(option)
+        __execute_option_hook(option)
     else:
         hook_key = option_opt.get('hook_key')
         if hook_key:
-            __set_hook_run(option)
+            __execute_hook(option)
 
 
 # hook
-def __set_hook_run(option):
+def __execute_hook(option):
     from lxbasic import bsc_core
     #
     from lxutil import utl_core
@@ -87,7 +87,7 @@ def __set_hook_run(option):
 
 
 # option hook
-def __set_option_hook_run(option):
+def __execute_option_hook(option):
     from lxbasic import bsc_core
 
     import lxsession.commands as ssn_commands

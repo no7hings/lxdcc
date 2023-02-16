@@ -21,7 +21,7 @@ class AbsHookExecutor(object):
         return self._session
     session = property(get_session)
 
-    def set_run_with_deadline(self):
+    def execute_with_deadline(self):
         session = self.get_session()
 
         name = session.get_type()
@@ -193,7 +193,7 @@ class AbsHookExecutor(object):
             )
 
     def set_run(self):
-        return self.set_run_with_deadline()
+        return self.execute_with_deadline()
 
     def get_shell_command(self):
         return self.REZ_SHELL_CMD_PATTERN.format(
@@ -214,7 +214,7 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
     def __init__(self, *args, **kwargs):
         super(AbsRsvTaskMethodHookExecutor, self).__init__(*args, **kwargs)
 
-    def set_run_with_deadline(self):
+    def execute_with_deadline(self):
         session = self.get_session()
         #
         hook_option_opt = session.get_option_opt()
@@ -222,14 +222,14 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
         scene_file_path = hook_option_opt.get('file')
         resolver = rsv_commands.get_resolver()
         #
-        rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(
+        rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
             file_path=scene_file_path
         )
-        if rsv_task_properties:
-            name = session._get_rsv_task_version_(rsv_task_properties)
+        if rsv_scene_properties:
+            name = session._get_rsv_task_version_(rsv_scene_properties)
             return self._set_deadline_submit_(
-                session, name, rsv_task_properties.value
+                session, name, rsv_scene_properties.value
             )
 
     def set_run(self):
-        return self.set_run_with_deadline()
+        return self.execute_with_deadline()

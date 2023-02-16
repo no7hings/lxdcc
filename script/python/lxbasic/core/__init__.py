@@ -21,6 +21,8 @@ from ._bsc_cor_thread import *
 
 from ._bsc_cor_storage import *
 
+from ._bsc_cor_resource import *
+
 from ._bsc_cor_database import *
 
 from ._bsc_cor_image import *

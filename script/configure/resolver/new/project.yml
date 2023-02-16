@@ -4,7 +4,8 @@
 #     keyword: str(pattern)
 #     if <keyword> in value auto resolve to final value
 # ******************************************************************************************************************** #
-key: nsa_dev
+key: new
+key_extras: [ 'nsa_dev', 'tnt' ]
 #
 variant-fnmatch-patterns:
     role: '[a-z][a-z][a-z]'

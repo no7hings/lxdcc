@@ -42,4 +42,4 @@ katana_cfx_look_export = ddl_methods.RsvTaskHookExecutor(
         user=user, time_tag=time_tag,
     )
 )
-katana_cfx_look_export.set_run_with_deadline()
+katana_cfx_look_export.execute_with_deadline()

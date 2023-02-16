@@ -6,6 +6,7 @@
 # ******************************************************************************************************************** #
 #
 key: basic
+key_extras: []
 # <key>
 root-path: '{root}'
 #
@@ -52,15 +53,6 @@ variant: '{variant}'
 #
 asset-shot-name: '{asset_shot}'
 shot-asset-name: '{shot_asset}'
-#
-path-project-keys: ['project']
-path-tag-keys: ['project', 'role', 'sequence' ]
-path-resource-keys: [ 'project', 'role', 'sequence', 'asset', 'shot' ]
-path-step-keys: [ 'project', 'role', 'sequence', 'asset', 'shot', 'step' ]
-path-task-keys: [ 'project', 'role', 'sequence', 'asset', 'shot', 'step', 'task' ]
-path-main-keys: [ 'project', 'role', 'sequence', 'asset', 'shot', 'step', 'task' ]
-path-version-keys_extend: [ 'workspace', 'version' ]
-path-unit-keys_extend: [ 'workspace', 'keyword' ]
 #
 variant-fnmatch-patterns:
     role: '[a-z][a-z][a-z]'

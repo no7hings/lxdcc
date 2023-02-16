@@ -864,7 +864,7 @@ class Path(object):
 
 class AppLauncher(object):
     # TODO fix 9.9.9
-    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_user_home_directory())
+    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_home_directory())
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
     #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
@@ -1482,16 +1482,6 @@ class KatanaLauncher(object):
             cmd
         )
 
-    def set_run(self):
-        args = [
-            '-- katana',
-        ]
-        cmd = ' '.join(args)
-        #
-        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
-            cmd
-        )
-
     def set_file_new(self, file_path):
         from lxkatana import ktn_configure
         create_args = [
@@ -1505,6 +1495,16 @@ class KatanaLauncher(object):
             cmd
         )
         self.set_file_open(file_path)
+
+    def set_run(self):
+        args = [
+            '-- katana',
+        ]
+        cmd = ' '.join(args)
+        #
+        AppLauncher(**self._kwargs).set_cmd_run_with_result_use_thread_as_rez(
+            cmd
+        )
 
     def get_rez_packages(self):
         return AppLauncher(
@@ -1759,48 +1759,6 @@ class History(object):
             _ = configure.get(key) or []
             if _:
                 return _[-1]
-
-
-class Resources(object):
-    CACHE = {}
-    CACHE_ALL = {}
-    ENVIRON_KEY = 'LYNXI_RESOURCES'
-    @classmethod
-    def get_search_directories(cls):
-        return Environ.get_as_array(
-            cls.ENVIRON_KEY
-        )
-    @classmethod
-    def get(cls, key):
-        """
-        :param key: str, etc. "rsv-task-batchers/asset/gen-model-export-extra" or "*/gen-model-export-extra"
-        :return: str(path)
-        """
-        if key in cls.CACHE:
-            return cls.CACHE[key]
-        else:
-            for i_path in cls.get_search_directories():
-                i_path_opt = bsc_core.StgPathOpt(i_path)
-                if i_path_opt.get_is_exists() is True:
-                    i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
-                    i_results = bsc_core.StgExtraMtd.get_paths_by_fnmatch_pattern(
-                        i_glob_pattern
-                    )
-                    if i_results:
-                        # use first result
-                        value = i_results[0]
-                        cls.CACHE[key] = value
-                        return value
-    @classmethod
-    def get_all(cls, key):
-        for i_path in cls.get_search_directories():
-            i_path_opt = bsc_core.StgPathOpt(i_path)
-            if i_path_opt.get_is_exists() is True:
-                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
-                i_results = bsc_core.StgExtraMtd.get_paths_by_fnmatch_pattern(
-                    i_glob_pattern
-                )
-                return i_results
 
 
 class Modifier(object):

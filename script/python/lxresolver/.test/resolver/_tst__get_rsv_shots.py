@@ -6,7 +6,6 @@ import lxresolver.commands as rsv_commands
 import lxbasic.objects as bsc_objects
 
 env = bsc_objects.PyEnviron_()
-# env.LYNXI_RESOLVER_CONFIGURES += '/data/e/myworkspace/td/lynxi/script/configure/resolver/default', '/data/e/myworkspace/td/lynxi/script/configure/resolver/new'
 
 utl_core.Log.TRACE_RESULT_ENABLE = False
 

@@ -18,21 +18,21 @@ def main(argv):
         option = None
         for key, value in opts:
             if key in ('-h', '--help'):
-                __set_help_print()
+                __print_help()
                 #
                 sys.exit()
             elif key in ('-o', '--option'):
                 option = value
         #
         if option is not None:
-            __set_run_by_option(option)
+            __execute_with_option(option)
     #
     except getopt.GetoptError:
-        print('argv error')
+        sys.stdout.write('argv error\n')
 
 
-def __set_help_print():
-    print (
+def __print_help():
+    sys.stdout.write(
         '***** lxhook-engine *****\n'
         '\n'
         'run command(s) by rez-env and application program\n'
@@ -50,17 +50,17 @@ def __set_help_print():
     )
 
 
-def __set_run_by_option(option):
+def __execute_with_option(option):
     from lxbasic import bsc_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
-        __set_option_hook_run(hook_option=option)
+        __execute_option_hook(hook_option=option)
 
 
-def __set_option_hook_run(hook_option):
+def __execute_option_hook(hook_option):
     """
     :param hook_option:
     :return:
@@ -87,7 +87,7 @@ def __set_option_hook_run(hook_option):
         kwargs = option_opt.value
         kwargs.update(
             dict(
-                lxdcc_root=os.environ.get('REZ_LXDCC_BASE'),
+                lxdcc_root=os.environ.get('LXDCC_BASE'),
                 hook_option=hook_option,
             )
         )

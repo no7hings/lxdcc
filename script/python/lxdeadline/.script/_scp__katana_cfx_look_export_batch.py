@@ -43,5 +43,5 @@ for i_asset in assets:
                 td_enable=True
             )
         )
-        i_export.set_run_with_deadline()
+        i_export.execute_with_deadline()
 

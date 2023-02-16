@@ -259,7 +259,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             method_option=maya_look_export_query.get_method_option(),
             script_option=maya_scene_export_script_option
         )
-        maya_look_export.set_run_with_deadline()
+        maya_look_export.execute_with_deadline()
 
     def __set_maya_look_preview_export_(self, user, time_tag):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -320,7 +320,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                             ]
                         )
                     )
-                    maya_look_preview_export.set_run_with_deadline()
+                    maya_look_preview_export.execute_with_deadline()
 
     def __set_maya_proxy_export_(self, user, time_tag):
         from lxdeadline import ddl_core
@@ -362,7 +362,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        maya_proxy_export.set_run_with_deadline()
+        maya_proxy_export.execute_with_deadline()
 
     def __set_katana_look_export_(self, user, time_tag):
         import lxdeadline.objects as ddl_objects
@@ -409,7 +409,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        katana_scene_export.set_run_with_deadline()
+        katana_scene_export.execute_with_deadline()
         # katana look export
         katana_look_export_query = ddl_objects.DdlRsvTaskQuery(
             'katana-look-export', rsv_task_properties
@@ -434,7 +434,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 ]
             )
         )
-        katana_look_export.set_run_with_deadline()
+        katana_look_export.execute_with_deadline()
 
     def __set_katana_cfx_look_export(self, user, time_tag):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -488,7 +488,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     ]
                 )
             )
-            katana_cfx_look_export.set_run_with_deadline()
+            katana_cfx_look_export.execute_with_deadline()
             #
             surface_cfx_maya_scene_src_file_path = rsv_operators.RsvAssetSceneQuery(
                 rsv_task_properties).get_surface_cfx_maya_src_file(
@@ -520,7 +520,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     ]
                 )
             )
-            maya_cfx_look_export.set_run_with_deadline()
+            maya_cfx_look_export.execute_with_deadline()
 
     def __set_katana_render_export_(self, user, time_tag):
         import lxdeadline.objects as ddl_objects
@@ -567,7 +567,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     ]
                 )
             )
-            katana_render_export.set_run_with_deadline()
+            katana_render_export.execute_with_deadline()
 
     def __set_maya_look_import_(self, user, time_tag):
         import copy
@@ -625,7 +625,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                             )
                         )
                         #
-                        i_maya_look_import.set_run_with_deadline()
+                        i_maya_look_import.execute_with_deadline()
                 else:
                     utl_core.Log.set_module_warning_trace(
                         'maya-geometry-uv-map-import',

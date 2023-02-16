@@ -50,7 +50,7 @@ def set_render_export_by_any_scene_file(option):
                         user=user, time_tag=time_tag
                     )
                 )
-                maya_camera_export.set_run_with_deadline()
+                maya_camera_export.execute_with_deadline()
             #
             create_scene = option_opt.get('create_scene') or False
             if create_scene is True:
@@ -75,7 +75,7 @@ def set_render_export_by_any_scene_file(option):
                         ]
                     )
                 )
-                katana_render_scene_create.set_run_with_deadline()
+                katana_render_scene_create.execute_with_deadline()
             #
             create_render = option_opt.get('create_render') or False
             if create_render is True:
@@ -111,7 +111,7 @@ def set_render_export_by_any_scene_file(option):
                         ]
                     )
                 )
-                katana_render_create.set_run_with_deadline()
+                katana_render_create.execute_with_deadline()
 
 
 # render scene export
@@ -304,7 +304,7 @@ def set_render_create_by_any_scene_file(option):
                         user=user, time_tag=time_tag,
                     )
                 )
-                i_katana_scene_render.set_run_with_deadline()
+                i_katana_scene_render.execute_with_deadline()
             # shotgun render
             with_shotgun_render = option_opt.get('with_shotgun_render') or False
             if with_shotgun_render is True:
@@ -331,4 +331,4 @@ def set_render_create_by_any_scene_file(option):
                         ]
                     )
                 )
-                shotgun_render_export.set_run_with_deadline()
+                shotgun_render_export.execute_with_deadline()

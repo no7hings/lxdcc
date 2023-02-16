@@ -280,7 +280,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                             user=user, time_tag=time_tag
                         )
                     )
-                    katana_geometry_exporter.set_run_with_deadline()
+                    katana_geometry_exporter.execute_with_deadline()
                     #
                     if step in ['srf']:
                         if task in ['surfacing']:
@@ -318,7 +318,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                                             )
                                         )
                                         #
-                                        i_maya_geometry_import.set_run_with_deadline()
+                                        i_maya_geometry_import.execute_with_deadline()
                                 else:
                                     utl_core.Log.set_module_warning_trace(
                                         'maya-geometry-uv-map-import',

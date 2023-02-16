@@ -48,4 +48,4 @@ for i_asset in assets:
                 user=user, time_tag=time_tag,
             )
         )
-        i_katana_look_checker_export.set_run_with_deadline()
+        i_katana_look_checker_export.execute_with_deadline()

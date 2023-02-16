@@ -67,4 +67,4 @@ def set_maya_camera_export(option):
                 user=user, time_tag=time_tag,
             )
         )
-        maya_camera_exporter.set_run_with_deadline()
+        maya_camera_exporter.execute_with_deadline()

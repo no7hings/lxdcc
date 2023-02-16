@@ -434,7 +434,7 @@ class AbsSsnOptionExecuteDef(object):
 
     def set_execute_by_deadline(self):
         executor = self.get_executor()
-        return executor.set_run_with_deadline()
+        return executor.execute_with_deadline()
 
     def set_ddl_job_id(self, ddl_job_id):
         self._ddl_job_id = ddl_job_id
@@ -999,14 +999,15 @@ class AbsSsnRsvTaskOptionMethod(
 
     def get_session_key(self):
         option_opt = self.get_option_opt()
-        return bsc_core.SessionYamlMtd.get_key(
+        return ssn_core.SsnHookServerMtd.get_key(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
 
     def get_batch_file_path(self):
         option_opt = self.get_option_opt()
-        file_path = bsc_core.SessionYamlMtd.get_file_path(
+
+        file_path = ssn_core.SsnHookServerMtd.get_file_path(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )

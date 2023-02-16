@@ -49,4 +49,4 @@ for i_asset in assets:
                 user=user, time_tag=time_tag,
             )
         )
-        i_maya_camera_export.set_run_with_deadline()
+        i_maya_camera_export.execute_with_deadline()

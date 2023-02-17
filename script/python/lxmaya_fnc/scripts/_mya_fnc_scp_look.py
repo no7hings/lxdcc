@@ -181,9 +181,9 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
 
 
 def set_asset_look_preview_yml_export(rsv_task_properties):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
-    #
-    import lxobj.objects as core_objects
     #
     import lxresolver.operators as rsv_operators
     #
@@ -200,7 +200,7 @@ def set_asset_look_preview_yml_export(rsv_task_properties):
     version = rsv_task_properties.get('version')
     #
     root = rsv_task_properties.get('dcc.root')
-    root_dcc_dag_path = core_objects.ObjDagPath(root)
+    root_dcc_dag_path = bsc_core.DccPathDagOpt(root)
     root_mya_dag_path = root_dcc_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
     root_mya_obj = mya_dcc_objects.Group(root_mya_dag_path.path)
     if root_mya_obj.get_is_exists() is True:

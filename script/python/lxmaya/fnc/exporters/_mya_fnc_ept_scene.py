@@ -50,7 +50,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         ext_extras = self.get('ext_extras')
         #
         os_file = utl_dcc_objects.OsFile(file_path)
-        os_file.set_directory_create()
+        os_file.create_directory()
         #
         option = dict(
             type=mya_dcc_objects.Scene._get_file_type_name_(file_path),

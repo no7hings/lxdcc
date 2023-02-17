@@ -15,7 +15,7 @@ from lxusd import usd_configure
 
 from lxutil import utl_core
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
 import os
 
@@ -374,7 +374,7 @@ class UsdFileWriteOpt(object):
 
     def set_save(self):
         file_opt = bsc_core.StgFileOpt(self._file_path)
-        file_opt.set_directory_create()
+        file_opt.create_directory()
         self._usd_stage.Export(self._file_path)
         utl_core.Log.set_module_result_trace(
             'usd-export',
@@ -485,13 +485,13 @@ class UsdPrimOpt(object):
     @classmethod
     def _set_customize_attribute_add_(cls, usd_obj, key, value):
         if isinstance(value, bool):
-            dcc_type_name = obj_configure.Type.CONSTANT_BOOLEAN
+            dcc_type_name = unr_configure.Type.CONSTANT_BOOLEAN
         elif isinstance(value, int):
-            dcc_type_name = obj_configure.Type.CONSTANT_INTEGER
+            dcc_type_name = unr_configure.Type.CONSTANT_INTEGER
         elif isinstance(value, float):
-            dcc_type_name = obj_configure.Type.CONSTANT_FLOAT
+            dcc_type_name = unr_configure.Type.CONSTANT_FLOAT
         elif isinstance(value, six.string_types):
-            dcc_type_name = obj_configure.Type.CONSTANT_STRING
+            dcc_type_name = unr_configure.Type.CONSTANT_STRING
         else:
             raise TypeError()
         #
@@ -528,15 +528,15 @@ class UsdVariantSetOpt(object):
 
 class UsdDataMapper(object):
     MAPPER = {
-        obj_configure.Type.CONSTANT_BOOLEAN: Sdf.ValueTypeNames.Bool,
-        obj_configure.Type.CONSTANT_INTEGER: Sdf.ValueTypeNames.Int,
-        obj_configure.Type.CONSTANT_FLOAT: Sdf.ValueTypeNames.Float,
-        obj_configure.Type.CONSTANT_STRING: Sdf.ValueTypeNames.String,
+        unr_configure.Type.CONSTANT_BOOLEAN: Sdf.ValueTypeNames.Bool,
+        unr_configure.Type.CONSTANT_INTEGER: Sdf.ValueTypeNames.Int,
+        unr_configure.Type.CONSTANT_FLOAT: Sdf.ValueTypeNames.Float,
+        unr_configure.Type.CONSTANT_STRING: Sdf.ValueTypeNames.String,
         #
-        obj_configure.Type.COLOR_COLOR3: Sdf.ValueTypeNames.Color3f,
-        obj_configure.Type.ARRAY_COLOR3: Sdf.ValueTypeNames.Color3fArray,
+        unr_configure.Type.COLOR_COLOR3: Sdf.ValueTypeNames.Color3f,
+        unr_configure.Type.ARRAY_COLOR3: Sdf.ValueTypeNames.Color3fArray,
         #
-        obj_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
+        unr_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
     }
     def __init__(self, dcc_type, dcc_value):
         self._dcc_type = dcc_type
@@ -617,7 +617,7 @@ class UsdGeometryOpt(object):
             p.Set(dcc_value)
 
     def set_customize_port_create_(self, port_path, type_path, dcc_value):
-        category_name, type_name = type_path.split(obj_configure.Type.PATHSEP)
+        category_name, type_name = type_path.split(unr_configure.Type.PATHSEP)
         key = category_name, type_name
         if key in UsdDataMapper.MAPPER:
             usd_type = UsdDataMapper.MAPPER[key]
@@ -628,7 +628,7 @@ class UsdGeometryOpt(object):
             p.Set(dcc_value)
 
     def set_customize_port_create_as_face_color(self, port_path, type_path, usd_value):
-        category_name, type_name = type_path.split(obj_configure.Type.PATHSEP)
+        category_name, type_name = type_path.split(unr_configure.Type.PATHSEP)
         key = category_name, type_name
         if key in UsdDataMapper.MAPPER:
             usd_type = UsdDataMapper.MAPPER[key]

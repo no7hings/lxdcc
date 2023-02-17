@@ -12,8 +12,6 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
-import lxobj.objects as core_objects
-
 import lxbasic.objects as bsc_objects
 
 from lxutil.fnc import utl_fnc_obj_abs
@@ -129,7 +127,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         obj_universe = geometry_and_obj.universe
         if geometry_and_obj is not None:
             geometry_and_obj_path = geometry_and_obj.path
-            geometry_dcc_dag_path = core_objects.ObjDagPath(geometry_and_obj_path).set_translate_to(
+            geometry_dcc_dag_path = bsc_core.DccPathDagOpt(geometry_and_obj_path).set_translate_to(
                 ma_configure.Util.OBJ_PATHSEP
             )
             geometry_and_obj_opt = and_dcc_operators.ShapeLookOpt(geometry_and_obj)
@@ -420,7 +418,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     g_p.set_update()
                     #
                     geometry_and_obj_path = geometry_and_obj.path
-                    geometry_dcc_dag_path = core_objects.ObjDagPath(geometry_and_obj_path).set_translate_to(
+                    geometry_dcc_dag_path = bsc_core.DccPathDagOpt(geometry_and_obj_path).set_translate_to(
                         ma_configure.Util.OBJ_PATHSEP
                     )
                     geometry_dcc_obj = mya_dcc_objects.Geometry(geometry_dcc_dag_path.path)

@@ -4,8 +4,6 @@
 #     keyword: str(pattern)
 #     if <keyword> in value auto resolve to final value
 # ******************************************************************************************************************** #
-key: default
-key_extras: [ 'cgm', 'cjd', 'shl', 'cg7', 'lib', 'lib_bck' ]
 # <root>
 project-root-windows-dir: 'l:/prod'
 project-root-linux-dir: '/l/prod'

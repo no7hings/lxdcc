@@ -33,7 +33,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_location
         )
         if mya_group.get_is_exists() is True:
-            if workspace == 'publish':
+            if workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword = 'asset-camera-main-abc-file'
             else:
                 raise RuntimeError(

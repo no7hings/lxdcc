@@ -795,7 +795,7 @@ class File(object):
 
 class PathMapper(object):
     def __init__(self, file_path):
-        self._raw = File.set_read(file_path)
+        self._raw = bsc_core.StgFileOpt(file_path).set_read()
         if bsc_core.SystemMtd.get_is_windows() is True:
             p = 'windows'
         elif bsc_core.SystemMtd.get_is_linux() is True:
@@ -827,9 +827,7 @@ class Path(object):
     PATHSEP = '/'
     #
     PATH_MAPPER = PathMapper(
-        file_path=bsc_configure.Root.get_configure_file(
-            'storage/path-mapper'
-        )
+        file_path=bsc_core.CfgFileMtd.get_yaml('storage/path-mapper')
     )
     @classmethod
     def set_map_to_platform(cls, path):

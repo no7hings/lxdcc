@@ -23,10 +23,10 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-look-ass-file'
             keyword_1 = 'asset-look-ass-sub-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-look-ass-file'
             keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:
@@ -80,10 +80,10 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-look-klf-file'
             keyword_1 = 'asset-look-json-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-look-klf-file'
             keyword_1 = 'asset-temporary-look-json-file'
         else:

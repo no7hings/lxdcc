@@ -53,12 +53,12 @@ def __execute_with_option(option):
 
 
 def __start_server():
-    from lxutil import utl_configure
+    from lxsession import ssn_configure
     #
     app.run(
         host="0.0.0.0",
         debug=1,
-        port=utl_configure.Hook.PORT
+        port=ssn_configure.Hook.PORT
     )
 
 

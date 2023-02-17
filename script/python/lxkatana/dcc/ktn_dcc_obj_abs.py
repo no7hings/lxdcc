@@ -6,7 +6,7 @@ from Katana import CacheManager
 
 from lxbasic import bsc_core
 
-from lxobj import obj_configure, obj_core
+from lxuniverse import unr_configure
 
 from lxutil import utl_core, utl_abstract
 
@@ -23,11 +23,11 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         super(AbsKtnPort, self).__init__(node, name, port_assign)
 
     def _get_ktn_port_(self):
-        if self.port_assign == obj_configure.PortAssign.VARIANTS:
+        if self.port_assign == unr_configure.PortAssign.VARIANTS:
             return NodegraphAPI.GetNode(self.obj.name).getParameter(self.port_path)
-        elif self.port_assign == obj_configure.PortAssign.INPUTS:
+        elif self.port_assign == unr_configure.PortAssign.INPUTS:
             return NodegraphAPI.GetNode(self.obj.name).getInputPort(self.port_path)
-        elif self.port_assign == obj_configure.PortAssign.OUTPUTS:
+        elif self.port_assign == unr_configure.PortAssign.OUTPUTS:
             return NodegraphAPI.GetNode(self.obj.name).getOutputPort(self.port_path)
         raise TypeError()
 
@@ -52,7 +52,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 
     def set_create(self, *args):
         ktn_port = self._get_ktn_port_()
-        parent = obj_core.PortPathMethod.get_dag_parent(
+        parent = bsc_core.DccPortPathMtd.get_dag_parent(
             path=self._port_path, pathsep=self.PATHSEP
         )
         if ktn_port is None:
@@ -60,7 +60,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                 'port create',
                 'attribute="{}"'.format(self.path)
             )
-            if self.port_assign == obj_configure.PortAssign.VARIANTS:
+            if self.port_assign == unr_configure.PortAssign.VARIANTS:
                 if parent is not None:
                     parent_ktn_port = self.ktn_obj.getParameter(parent)
                 else:
@@ -70,9 +70,9 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                     type_, value = args[:2]
                     if type_ == 'string':
                         parent_ktn_port.createChildString(self.port_name, str(value))
-            elif self.port_assign == obj_configure.PortAssign.INPUTS:
+            elif self.port_assign == unr_configure.PortAssign.INPUTS:
                 return self.ktn_obj.addInputPort(self.port_name)
-            elif self.port_assign == obj_configure.PortAssign.OUTPUTS:
+            elif self.port_assign == unr_configure.PortAssign.OUTPUTS:
                 return self.ktn_obj.addOutputPort(self.port_name)
 
     def set_attributes(self, attributes):
@@ -184,11 +184,11 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         self._set_connect_(output_port, self, validation)
 
     def set_disconnect(self):
-        if self.port_assign == obj_configure.PortAssign.INPUTS:
+        if self.port_assign == unr_configure.PortAssign.INPUTS:
             source = self.get_source()
             if source is not None:
                 self._set_disconnect_(source, self)
-        elif self.port_assign == obj_configure.PortAssign.OUTPUTS:
+        elif self.port_assign == unr_configure.PortAssign.OUTPUTS:
             targets = self.get_targets()
             for i_target in targets:
                 self._set_disconnect_(self, i_target)

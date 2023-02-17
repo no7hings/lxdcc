@@ -11,8 +11,6 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         #
         from lxutil import utl_configure, utl_core
         #
-        import lxobj.objects as core_objects
-        #
         import lxresolver.operators as rsv_operators
         #
         from lxmaya import ma_configure
@@ -29,7 +27,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         #
         sub_root = '{}/hi'.format(root)
         #
-        sub_root_dag_path = core_objects.ObjDagPath(sub_root)
+        sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
         sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
         #
         sub_root_mya_obj = mya_dcc_objects.Group(sub_root_mya_dag_path.path)
@@ -114,9 +112,9 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 gp.set_stop()
 
     def set_repair_run(self):
+        from lxbasic import bsc_core
+
         from lxutil import utl_core
-        #
-        import lxobj.objects as core_objects
         #
         from lxmaya import ma_configure
         #
@@ -130,7 +128,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         #
         sub_root = '{}/hi'.format(root)
         #
-        sub_root_dag_path = core_objects.ObjDagPath(sub_root)
+        sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
         sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
         #
         sub_root_mya_obj = mya_dcc_objects.Group(sub_root_mya_dag_path.path)

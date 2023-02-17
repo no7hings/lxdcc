@@ -11,9 +11,9 @@ from lxutil import utl_core
 
 from lxutil.dcc import utl_dcc_obj_abs
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
-import lxobj.objects as core_objects
+import lxuniverse.objects as unv_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -63,7 +63,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def set_file_save_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
-        file_obj.set_directory_create()
+        file_obj.create_directory()
         utl_core.Log.set_module_result_trace(
             'katana-file save-to',
             u'file="{}" is started'.format(file_path)
@@ -132,7 +132,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         return lis
     #
     FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = core_objects.ObjUniverse
+    UNIVERSE_CLASS = unv_objects.ObjUniverse
     def __init__(self, *args, **kwargs):
         super(Scene, self).__init__(*args, **kwargs)
 
@@ -148,7 +148,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             tvl.next()
 
     def _set_obj_create_(self, obj_type_name, obj_path):
-        obj_category_name = obj_configure.ObjCategory.LYNXI
+        obj_category_name = unr_configure.ObjCategory.LYNXI
         #
         obj_category = self.universe.set_obj_category_create(obj_category_name)
         obj_type = obj_category.set_type_create(obj_type_name)
@@ -197,7 +197,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             cls.set_file_new()
             #
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
             #
             pos_method_run_fnc_()
             #
@@ -207,7 +207,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             cls.set_file_new()
             #
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
             #
             pos_method_run_fnc_()
             #

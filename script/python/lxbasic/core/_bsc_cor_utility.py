@@ -11,6 +11,8 @@ import json
 
 import six
 
+import xmlrpclib
+
 import getpass
 
 import time
@@ -417,7 +419,7 @@ class StorageMtd(object):
                 return group_name
         return None
     @classmethod
-    def set_directory_create(cls, directory_path):
+    def create_directory(cls, directory_path):
         if os.path.isdir(directory_path) is False:
             os.makedirs(directory_path)
     @classmethod

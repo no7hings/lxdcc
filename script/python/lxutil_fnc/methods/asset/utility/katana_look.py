@@ -362,7 +362,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                         version='new'
                     )
                     #
-                    utl_dcc_objects.OsFile(scene_src_maya_file_path).set_directory_create()
+                    utl_dcc_objects.OsFile(scene_src_maya_file_path).create_directory()
                     #
                     maya_look_export_query = ddl_objects.DdlRsvTaskQuery(
                         'maya-look-preview-export', rsv_task_properties

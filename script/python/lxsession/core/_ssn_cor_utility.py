@@ -3,7 +3,9 @@ import fnmatch
 
 from lxbasic import bsc_core
 
-from lxutil import utl_configure, utl_core
+import lxbasic.objects as bsc_objects
+
+from lxsession import ssn_configure
 
 
 class SsnHookMtd(object):
@@ -28,8 +30,8 @@ class SsnHookMtd(object):
         urllib.urlopen(
             'http://{host}:{port}/cmd-run?uuid={uuid}'.format(
                 **dict(
-                    host=utl_configure.Hook.HOST,
-                    port=utl_configure.Hook.PORT,
+                    host=ssn_configure.Hook.HOST,
+                    port=ssn_configure.Hook.PORT,
                     uuid=unique_id
                 )
             )
@@ -37,7 +39,9 @@ class SsnHookMtd(object):
 
 
 class SsnHookEngineMtd(object):
-    CONFIGURE = utl_configure.MainData.get_as_configure('hook/engine')
+    CONFIGURE = bsc_objects.Configure(
+        value=bsc_core.CfgFileMtd.get_yaml('session/hook-engine')
+    )
     CONFIGURE.set_flatten()
     @classmethod
     def get_all(cls):

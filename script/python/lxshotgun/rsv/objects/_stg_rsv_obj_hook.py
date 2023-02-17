@@ -127,10 +127,10 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = '{branch}-release-version-dir'
             keyword_1 = '{branch}-release-no-version-dir'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = '{branch}-temporary-version-dir'
             keyword_1 = '{branch}-temporary-no-version-dir'
         else:
@@ -163,9 +163,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = '{branch}-maya-scene-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = '{branch}-temporary-maya-scene-file'
         else:
             raise RuntimeError()
@@ -233,9 +233,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-review-mov-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-review-mov-file'
         else:
             raise TypeError()
@@ -260,9 +260,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-validation-info-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-validation-info-file'
         else:
             raise TypeError()
@@ -291,10 +291,10 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-review-mov-file'
             keyword_1 = 'asset-katana-render-video-all-mov-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-review-mov-file'
             keyword_1 = 'asset-temporary-katana-render-video-all-mov-file'
         else:

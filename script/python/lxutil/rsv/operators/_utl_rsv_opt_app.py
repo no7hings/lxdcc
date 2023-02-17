@@ -44,7 +44,7 @@ class RsvMayaOpt(AbsRsvAppOpt):
 
     def open_file(self, file_path):
         cmd = self._rsv_app.get_command(
-            args_extend=[
+            args_execute=[
                 '-- maya',
                 r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open_as_project(\\\"{}\\\")\")"'.format(
                     file_path
@@ -60,7 +60,7 @@ class RsvKatanaOpt(AbsRsvAppOpt):
 
     def open_file(self, file_path):
         cmd = self._rsv_app.get_command(
-            args_extend=[
+            args_execute=[
                 '-- katana',
                 '"{}"'.format(
                     file_path

@@ -12,6 +12,7 @@ argv = sys.argv
 
 def main():
     try:
+        sys.stdout.write('execute lxhook-python from: "{}"\n'.format(__file__))
         opts, args = getopt.getopt(
             argv[1:],
             'ho:',

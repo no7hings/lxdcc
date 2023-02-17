@@ -9,9 +9,9 @@ from maya import cmds, mel
 
 from lxbasic import bsc_core
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
-import lxobj.objects as core_objects
+import lxuniverse.objects as unv_objects
 
 from lxutil import utl_core, utl_abstract
 
@@ -74,7 +74,7 @@ class Namespace(
 
 class Scene(utl_dcc_obj_abs.AbsObjScene):
     FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = core_objects.ObjUniverse
+    UNIVERSE_CLASS = unv_objects.ObjUniverse
     #
     NAMESPACE_CLASS = Namespace
     RENDER_ATTR_DICT = {
@@ -258,7 +258,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def set_file_path(cls, file_path, with_create_directory=False):
         if with_create_directory is True:
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
         #
         cmds.file(rename=file_path)
     @classmethod
@@ -278,7 +278,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             cls.set_file_new()
             #
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
             #
             pos_method_run_fnc_()
             #
@@ -288,7 +288,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             cls.set_file_new()
             #
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
             #
             pos_method_run_fnc_()
             #
@@ -348,7 +348,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def set_file_save_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
-        file_obj.set_directory_create()
+        file_obj.create_directory()
         #
         cmds.file(rename=file_path)
         cmds.file(
@@ -516,7 +516,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def _set_load_by_root_(self, root, include_obj_type):
         self.set_restore()
         #
-        root_dag_path = core_objects.ObjDagPath(root)
+        root_dag_path = bsc_core.DccPathDagOpt(root)
         root_mya_dag_path = root_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
         mya_root = _mya_dcc_obj_dag.Group(root_mya_dag_path.path)
         if mya_root.get_is_exists() is True:
@@ -529,10 +529,10 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                     self._set_obj_create_(mya_obj)
 
     def _set_obj_create_(self, mya_obj):
-        obj_category_name = obj_configure.ObjCategory.MAYA
+        obj_category_name = unr_configure.ObjCategory.MAYA
         obj_type_name = mya_obj.type
         mya_obj_path = mya_obj.path
-        mya_dag_path = core_objects.ObjDagPath(mya_obj_path)
+        mya_dag_path = bsc_core.DccPathDagOpt(mya_obj_path)
         dcc_dag_path = mya_dag_path.set_translate_to('/')
         dcc_obj_path = dcc_dag_path.path
         #

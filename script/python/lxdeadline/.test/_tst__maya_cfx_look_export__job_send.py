@@ -29,7 +29,7 @@ version = rsv_task_properties.get('version')
 surface_cfx_katana_scene_src_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_surface_cfx_katana_src_file(
     version=version
 )
-utl_dcc_objects.OsFile(surface_cfx_katana_scene_src_file_path).set_directory_create()
+utl_dcc_objects.OsFile(surface_cfx_katana_scene_src_file_path).create_directory()
 katana_cfx_look_export_query = ddl_objects.DdlRsvTaskQuery(
     'katana-cfx-look-export'
 )

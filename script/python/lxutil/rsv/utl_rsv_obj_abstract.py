@@ -20,10 +20,10 @@ class AbsRsvObjHookOpt(object):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-katana-scene-file'
             keyword_1 = 'asset-katana-scene-src-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-katana-scene-file'
             keyword_1 = 'asset-temporary-katana-scene-src-file'
         else:
@@ -51,9 +51,9 @@ class AbsRsvObjHookOpt(object):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-katana-render-output-dir'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-katana-render-output-dir'
         else:
             raise TypeError()
@@ -72,9 +72,9 @@ class AbsRsvObjHookOpt(object):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-katana-render-video-all-mov-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-katana-render-video-all-mov-file'
         else:
             raise TypeError()
@@ -93,9 +93,9 @@ class AbsRsvObjHookOpt(object):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-review-mov-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-review-mov-file'
         else:
             raise TypeError()
@@ -119,9 +119,9 @@ class AbsRsvObjHookOpt(object):
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             #
-            if workspace == 'publish':
+            if workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword = 'asset-{application}-scene-src-file'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword = 'asset-temporary-{application}-scene-src-file'
             else:
                 raise TypeError()
@@ -156,11 +156,11 @@ class AbsRsvObjHookOpt(object):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'work':
+        if workspace == rsv_scene_properties.get('workspaces.source'):
             return ['default']
-        elif workspace == 'publish':
+        elif workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-look-klf-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-look-klf-file'
         else:
             raise TypeError()
@@ -184,11 +184,11 @@ class AbsRsvObjHookOpt(object):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'work':
+        if workspace == rsv_scene_properties.get('workspaces.source'):
             keyword = 'asset-source-geometry-usd-var-file'
-        elif workspace == 'publish':
+        elif workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-geometry-usd-var-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-geometry-usd-var-file'
         else:
             raise TypeError()

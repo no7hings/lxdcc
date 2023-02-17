@@ -9,8 +9,6 @@ from lxutil.dcc import utl_dcc_opt_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxobj.objects as core_objects
-
 from lxmaya import ma_configure
 
 
@@ -46,7 +44,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                                 dcc_path = dcc_obj.path
                                 dcc_obj_name = dcc_obj.name
                                 #
-                                dcc_path_dag_opt = core_objects.ObjDagPath(dcc_path)
+                                dcc_path_dag_opt = bsc_core.DccPathDagOpt(dcc_path)
                                 mya_path_dag_opt = dcc_path_dag_opt.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
                                 mya_obj_path = mya_path_dag_opt.path
                                 mya_mesh = _mya_dcc_obj_geometry.Mesh(mya_obj_path)

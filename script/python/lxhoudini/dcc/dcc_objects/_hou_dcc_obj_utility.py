@@ -95,7 +95,7 @@ class Scene(utl_abstract.AbsDccScene):
             hou.hipFile.clear(suppress_save_prompt=True)
             #
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
             #
             pos_method_run_fnc_()
             #
@@ -105,7 +105,7 @@ class Scene(utl_abstract.AbsDccScene):
             hou.hipFile.clear(suppress_save_prompt=True)
             #
             f = utl_dcc_objects.OsFile(file_path)
-            f.set_directory_create()
+            f.create_directory()
             #
             pos_method_run_fnc_()
             #

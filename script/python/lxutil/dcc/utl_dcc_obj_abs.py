@@ -11,11 +11,9 @@ import fnmatch
 
 from lxbasic import bsc_core
 
-from lxobj import obj_abstract
-
 from lxutil import utl_core
 
-from lxutil_gui import utl_gui_core
+import lxuniverse.abstracts as unr_abstracts
 
 import lxutil.configures as utl_configures
 
@@ -40,8 +38,8 @@ class AbsStorageGuiDef(object):
 
 
 class AbsOsDirectory(
-    obj_abstract.AbsOsDirectory,
-    obj_abstract.AbsObjGuiDef,
+    unr_abstracts.AbsOsDirectory,
+    unr_abstracts.AbsObjGuiDef,
     AbsStorageGuiDef
 ):
     LOG = utl_core.Log
@@ -63,7 +61,7 @@ class AbsOsDirectory(
 
     def set_create(self):
         if self.get_is_exists() is False:
-            os.makedirs(self.path)
+            bsc_core.StorageMtd.create_directory(self.path)
             utl_core.Log.set_module_result_trace(
                 'directory create',
                 u'directory-path="{}"'.format(self.path)
@@ -104,10 +102,10 @@ class AbsOsDirectory(
 
 
 class AbsOsFile(
-    obj_abstract.AbsOsFile,
-    obj_abstract.AbsObjGuiDef,
+    unr_abstracts.AbsOsFile,
+    unr_abstracts.AbsObjGuiDef,
     AbsStorageGuiDef,
-    obj_abstract.AbsOsFilePackageDef
+    unr_abstracts.AbsOsFilePackageDef
 ):
     ICON_DICT = {
         '.ma': 'ma',
@@ -507,7 +505,7 @@ class AbsOsFile(
                     )
             #
             if file_tgt.get_is_exists() is False:
-                file_tgt.set_directory_create()
+                file_tgt.create_directory()
                 # link src to target
                 bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_path_tgt)
                 link_log = utl_core.Log.set_module_result_trace(
@@ -650,7 +648,7 @@ class AbsOsFile(
                     return
             #
             if file_tgt.get_is_exists() is False:
-                file_tgt.set_directory_create()
+                file_tgt.create_directory()
                 #
                 bsc_core.StgPathLinkMtd.set_file_link_to(
                     self.path, file_tgt.path
@@ -1243,7 +1241,7 @@ class AbsOsTexture(AbsOsFile):
         return bsc_core.ImgFileOiioOpt(self.path).info
 
 
-class AbsObjScene(obj_abstract.AbsObjScene):
+class AbsObjScene(unr_abstracts.AbsObjScene):
     def __init__(self, *args, **kwargs):
         super(AbsObjScene, self).__init__(*args, **kwargs)
 

@@ -9,15 +9,11 @@ import copy
 
 from lxbasic import bsc_core
 
-from lxobj import obj_core
-
 from lxutil import utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxmaya import ma_configure, ma_core
-
-import lxobj.objects as core_objects
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
@@ -281,7 +277,7 @@ class GeometryUsdExporter(object):
 
     def set_run(self):
         os_file = utl_dcc_objects.OsFile(self._file_path)
-        os_file.set_directory_create()
+        os_file.create_directory()
         #
         usd_option = self._get_usd_option_(self._option)
         kwargs = dict(
@@ -337,7 +333,7 @@ class GeometryUsdExporter1(object):
     def set_run(self):
         # noinspection PyUnresolvedReferences
         from papyUsd.maya import MayaUsdExport
-        root = obj_core.DccPathDagMtd.get_dag_pathsep_replace(self._root, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP)
+        root = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(self._root, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP)
         s_r = root
         r = '|'.join(s_r.split('|')[:-1])
         MayaUsdExport.MayaUsdExport().subTree(r, s_r, self._file_path)
@@ -387,7 +383,7 @@ class GeometryUsdExporter_(object):
         #
         if self._root.startswith('|'):
             self._root = self._root.replace('|', '/')
-        root_dag_path = core_objects.ObjDagPath(self._root)
+        root_dag_path = bsc_core.DccPathDagOpt(self._root)
         root_mya_dag_path = root_dag_path.set_translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )

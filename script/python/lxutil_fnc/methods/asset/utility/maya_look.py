@@ -7,8 +7,6 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         super(Method, self).__init__(properties)
 
     def set_check_run(self):
-        import lxobj.objects as core_objects
-        #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
@@ -26,7 +24,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         #
         sub_root = '{}/hi'.format(root)
         #
-        sub_root_dag_path = core_objects.ObjDagPath(sub_root)
+        sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
         sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
@@ -135,9 +133,9 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             )
 
     def set_repair_run(self):
+        from lxbasic import bsc_core
+
         import lxutil.dcc.dcc_operators as utl_dcc_operators
-        #
-        import lxobj.objects as core_objects
         #
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
         #
@@ -151,7 +149,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         root = self.task_properties.get('dcc.root')
         sub_root = '{}/hi'.format(root)
         #
-        sub_root_dag_path = core_objects.ObjDagPath(sub_root)
+        sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
         sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
@@ -292,7 +290,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                         version='new'
                     )
                     #
-                    utl_dcc_objects.OsFile(scene_src_maya_file_path).set_directory_create()
+                    utl_dcc_objects.OsFile(scene_src_maya_file_path).create_directory()
                     #
                     maya_look_preview_export_query = ddl_objects.DdlRsvTaskQuery(
                         'maya-look-preview-export', rsv_task_properties
@@ -458,7 +456,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             ).get_surface_cfx_katana_src_file(
                 version=version
             )
-            utl_dcc_objects.OsFile(surface_cfx_katana_scene_src_file_path).set_directory_create()
+            utl_dcc_objects.OsFile(surface_cfx_katana_scene_src_file_path).create_directory()
             katana_cfx_look_export_query = ddl_objects.DdlRsvTaskQuery(
                 'katana-cfx-look-export', rsv_task_properties
             )
@@ -494,7 +492,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 rsv_task_properties).get_surface_cfx_maya_src_file(
                 version=version
             )
-            utl_dcc_objects.OsFile(surface_cfx_maya_scene_src_file_path).set_directory_create()
+            utl_dcc_objects.OsFile(surface_cfx_maya_scene_src_file_path).create_directory()
             maya_cfx_look_export_query = ddl_objects.DdlRsvTaskQuery(
                 'maya-cfx-look-export', rsv_task_properties
             )

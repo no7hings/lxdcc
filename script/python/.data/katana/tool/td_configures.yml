@@ -14,7 +14,7 @@ tool:
             "import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects);
             p = utl_dcc_objects.PyReloader(
                 [
-                    'lxscheme', 'lxobj', 'lxresolver',
+                    'lxscheme', 'lxuniverse', 'lxresolver',
                     'lxarnold', 'lxar2mtx',
                     'lxutil', 'lxutil_gui', 'lxutil_fnc',
                     'lxshotgun', 'lxshotgun_fnc',

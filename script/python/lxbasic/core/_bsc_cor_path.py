@@ -231,10 +231,32 @@ class DccPathDagOpt(object):
         return self._path
 
 
+class DccPortPathMtd(object):
+    @classmethod
+    def get_dag_args(cls, path, pathsep='.'):
+        return path.split(pathsep)
+    @classmethod
+    def get_dag_name(cls, path, pathsep='.'):
+        return cls.get_dag_args(path, pathsep)[-1]
+    @classmethod
+    def get_dag_parent(cls, path, pathsep):
+        dag_args = cls.get_dag_args(path, pathsep)
+        if len(dag_args) == 1:
+            return None
+        elif len(dag_args) == 2:
+            return pathsep
+        else:
+            return pathsep.join(dag_args[:-1])
+
+
 class DccAttrPathMtd(object):
     @classmethod
     def get_atr_path(cls, obj_path, port_path, port_pathsep='.'):
         return port_pathsep.join([obj_path, port_path])
+    @classmethod
+    def set_atr_path_split(cls, path, pathsep='.'):
+        _ = path.split(pathsep)
+        return _[0], pathsep.join(_[1:])
 
 
 class DccAttrPathOpt(object):

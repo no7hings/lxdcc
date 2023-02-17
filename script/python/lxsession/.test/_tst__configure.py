@@ -1,8 +1,6 @@
 # coding:utf-8
-from lxutil import utl_configure
+from lxbasic import bsc_core
 
-configure = utl_configure.MainData.get_as_configure('hook/engine')
+print bsc_core.CfgFileMtd.get_yaml('session/hook-engine')
 
-configure.set_flatten()
-
-print configure
+print bsc_core.CfgFileMtd.get_yaml('resolver/basic/app')

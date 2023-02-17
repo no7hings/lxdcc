@@ -3,6 +3,8 @@ from ._bsc_cor_utility import *
 
 from ._bsc_cor_raw import *
 
+from ._bsc_cor_path import *
+
 from ._bsc_cor_pattern import *
 
 from ._bsc_cor_arg import *
@@ -21,6 +23,8 @@ from ._bsc_cor_thread import *
 
 from ._bsc_cor_storage import *
 
+from ._bsc_cor_configure import *
+
 from ._bsc_cor_resource import *
 
 from ._bsc_cor_database import *
@@ -32,8 +36,6 @@ from ._bsc_cor_vedio import *
 from ._bsc_cor_osl import *
 
 from ._bsc_cor_color_space import *
-
-from ._bsc_cor_dcc import *
 
 from ._bsc_cor_gui import *
 

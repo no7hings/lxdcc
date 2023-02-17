@@ -488,9 +488,9 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-katana-render-video-all-mov-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-katana-render-video-all-mov-file'
         else:
             raise TypeError()
@@ -538,7 +538,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_f_tgt = '{}/resize/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
             i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_resize'] = i_f_tgt
-            i_f_opt_tgt.set_directory_create()
+            i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_fit_to(i_f_src, i_f_tgt, (2048, 2048))
             utl_core.Log.set_module_result_trace(
                 'image resize',
@@ -554,7 +554,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_f_tgt = '{}/background/{}.exr'.format(i_f_opt_src.directory_path, i_name)
             i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_background'] = i_f_tgt
-            i_f_opt_tgt.set_directory_create()
+            i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
             utl_core.Log.set_module_result_trace(
                 'image background create',
@@ -571,7 +571,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_v['image_base'] = i_f_tgt
             i_resize = i_v['image_resize']
             i_background = i_v['image_background']
-            i_f_opt_tgt.set_directory_create()
+            i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_over_by(i_resize, i_background, i_f_tgt, (0, 0))
             utl_core.Log.set_module_result_trace(
                 'image background add',
@@ -588,7 +588,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_v['image_final'] = i_f_tgt
             i_base = i_v['image_base']
             i_foreground = i_v['image_foreground']
-            i_f_opt_tgt.set_directory_create()
+            i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
             utl_core.Log.set_module_result_trace(
                 'image foreground add',

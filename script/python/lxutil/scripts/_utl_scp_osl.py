@@ -8,7 +8,7 @@ class ScpOslFile(object):
     @classmethod
     def set_katana_ui_template_create(cls, file_path, output_file_path):
         output_file_opt = bsc_core.StgFileOpt(output_file_path)
-        output_file_opt.set_directory_create()
+        output_file_opt.create_directory()
         info = bsc_core.OslFileMtd.get_info(file_path)
         if info:
             j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template-v002.j2')
@@ -20,7 +20,7 @@ class ScpOslFile(object):
     @classmethod
     def set_maya_ui_template_create(cls, file_path, output_file_path):
         output_file_opt = bsc_core.StgFileOpt(output_file_path)
-        output_file_opt.set_directory_create()
+        output_file_opt.create_directory()
         info = bsc_core.OslFileMtd.get_info(file_path)
         if info:
             j2_template = utl_configure.Jinja.ARNOLD.get_template('maya-ui-template-v002.j2')

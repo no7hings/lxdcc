@@ -5,7 +5,7 @@ import yaml
 
 import collections
 
-from lxobj import obj_abstract
+import lxuniverse.abstracts as unr_abstracts
 
 from lxutil import utl_configure, utl_core
 
@@ -580,9 +580,9 @@ class AbsChecker(
 
 
 class AbsConfigureDef(
-    obj_abstract.AbsObjDef,
-    obj_abstract.AbsObjDagDef,
-    obj_abstract.AbsObjGuiDef
+    unr_abstracts.AbsObjDef,
+    unr_abstracts.AbsObjDagDef,
+    unr_abstracts.AbsObjGuiDef
 ):
     PATHSEP = '/'
     PROPERTIES_CLASS = None

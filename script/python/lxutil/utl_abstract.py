@@ -9,7 +9,7 @@ import fnmatch
 
 from lxbasic import bsc_core
 
-from lxobj import obj_configure, obj_core, obj_abstract
+import lxuniverse.abstracts as unr_abstracts
 
 from . import utl_core
 
@@ -291,10 +291,10 @@ class AbsDccObjSourceDef(object):
         connection_raw = self._get_source_connection_raw_(*args, **kwargs)
         pathsep = self.CONNECTION_CLASS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
-            source_obj_path, source_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
+            source_obj_path, source_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
             )
-            target_obj_path, target_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
+            target_obj_path, target_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
                 target_atr_path, pathsep=pathsep
             )
             source = source_obj_cls(source_obj_path).get_port(source_port_path)
@@ -386,10 +386,10 @@ class AbsDccObjTargetDef(object):
         connection_raw = self._get_target_connection_raw_(*args, **kwargs)
         pathsep = self.CONNECTION_CLASS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
-            source_obj_path, source_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
+            source_obj_path, source_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
             )
-            target_obj_path, target_port_path = obj_core.DccAttrPathMtd.set_atr_path_split(
+            target_obj_path, target_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
                 target_atr_path, pathsep=pathsep
             )
             source = self.__class__(source_obj_path).get_port(source_port_path)
@@ -454,8 +454,8 @@ class AbsDccObj(
     AbsDccObjDef,
     AbsDccObjSourceDef,
     AbsDccObjTargetDef,
-    obj_abstract.AbsObjDagDef,
-    obj_abstract.AbsObjGuiDef,
+    unr_abstracts.AbsObjDagDef,
+    unr_abstracts.AbsObjGuiDef,
     # AbsObjGuiDef
 ):
     # attribute
@@ -484,7 +484,7 @@ class AbsDccObj(
     def icon(self):
         raise NotImplementedError()
     # attribute ****************************************************************************************************** #
-    def get_port(self, port_path, port_assign=obj_configure.PortAssign.VARIANTS):
+    def get_port(self, port_path, port_assign=unr_configure.PortAssign.VARIANTS):
         if self.PORT_CLASS is not None:
             return self.PORT_CLASS(
                 self,
@@ -501,13 +501,13 @@ class AbsDccObj(
     def get_input_port(self, port_path):
         return self.get_port(
             port_path,
-            port_assign=obj_configure.PortAssign.INPUTS
+            port_assign=unr_configure.PortAssign.INPUTS
         )
 
     def get_output_port(self, port_path):
         return self.get_port(
             port_path,
-            port_assign=obj_configure.PortAssign.OUTPUTS
+            port_assign=unr_configure.PortAssign.OUTPUTS
         )
 
     def get_ports(self):

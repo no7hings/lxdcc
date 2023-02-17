@@ -7,7 +7,9 @@ from lxbasic import bsc_core
 
 from lxutil import utl_core
 
-from lxobj import obj_configure, obj_core, obj_abstract
+from lxuniverse import unr_configure
+
+import lxuniverse.abstracts as unr_abstracts
 
 from lxutil.objects import _utl_obj_raw
 
@@ -63,7 +65,7 @@ class AbsDotMtlxDef(object):
 
 
 class AbsObjScene(
-    obj_abstract.AbsObjScene,
+    unr_abstracts.AbsObjScene,
     AbsDotAssDef,
     AbsDotMtlxDef
 ):
@@ -218,7 +220,7 @@ class AbsObjScene(
                         r = v[self._platform]
                         dcc_port_raw = r + dcc_port_raw[len(k):]
         #
-        dcc_input_port = dcc_obj.set_port_create(dcc_type, and_port_name, obj_configure.PortAssign.INPUTS)
+        dcc_input_port = dcc_obj.set_port_create(dcc_type, and_port_name, unr_configure.PortAssign.INPUTS)
         dcc_input_port.set_custom(is_custom)
         #
         dcc_input_port.set(dcc_port_raw)
@@ -257,7 +259,7 @@ class AbsObjScene(
 
         dcc_category_name, dcc_type_name = and_core.AndTypeMtd(and_output_type).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe._get_type_force_(dcc_category_name, dcc_type_name)
-        dcc_output = dcc_obj.set_port_create(dcc_type, dcc_output_port_name, obj_configure.PortAssign.OUTPUTS)
+        dcc_output = dcc_obj.set_port_create(dcc_type, dcc_output_port_name, unr_configure.PortAssign.OUTPUTS)
         # output channel
         self._set_dcc_port_channels_build_(
             and_obj_mtd=and_obj_mtd,
@@ -392,7 +394,7 @@ class AbsObjScene(
         and_type_is_array = False
         dcc_category_name, dcc_type_name = and_core.AndTypeMtd(ai.AI_TYPE_BOOLEAN).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe._get_type_force_(dcc_category_name, dcc_type_name)
-        dcc_port = dcc_obj.set_port_create(dcc_type, dcc_port_name, obj_configure.PortAssign.INPUTS)
+        dcc_port = dcc_obj.set_port_create(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
         dcc_port.set(dcc_port_raw)
         dcc_port.set_default(True)
         return dcc_port
@@ -403,7 +405,7 @@ class AbsObjScene(
         dcc_type = self.universe._get_type_force_(dcc_category_name, dcc_type_name)
         dcc_port_name = and_configure.GeometryPort.MATERIAL
         #
-        _dcc_material_port = dcc_obj.set_port_create(dcc_type, dcc_port_name, obj_configure.PortAssign.INPUTS)
+        _dcc_material_port = dcc_obj.set_port_create(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
         _dcc_material_port.set(dcc_port_raw)
         _dcc_material_port.set_default(dcc_port_raw_default)
     # curve
@@ -552,7 +554,7 @@ class AbsObjScene(
         and_type_is_array = False
         dcc_category_name, dcc_type_name = and_core.AndTypeMtd(ai.AI_TYPE_CLOSURE).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe._get_type_force_(dcc_category_name, dcc_type_name)
-        dcc_port = dcc_obj.set_port_create(dcc_type, dcc_port_name, obj_configure.PortAssign.INPUTS)
+        dcc_port = dcc_obj.set_port_create(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
         if dcc_port_raw is not None:
             shader_obj_path = '/{}'.format(dcc_port_raw)
         else:

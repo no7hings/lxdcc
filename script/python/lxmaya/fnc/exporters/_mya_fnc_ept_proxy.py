@@ -56,7 +56,7 @@ class ProxyGpuExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         file_ = utl_dcc_objects.OsFile(file_path)
         #
-        file_.set_directory_create()
+        file_.create_directory()
         #
         args = []
         kwargs = dict(

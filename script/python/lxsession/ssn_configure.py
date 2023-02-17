@@ -11,3 +11,8 @@ class Root(object):
     RESOURCES = '{}/.resources'.format(MAIN)
     #
     HOOKS = '{}/hooks'.format(RESOURCES)
+
+
+class Hook(object):
+    HOST = 'localhost'
+    PORT = 9527

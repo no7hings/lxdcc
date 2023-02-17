@@ -1,9 +1,9 @@
 # coding:utf-8
-from .. import obj_abstract
+import lxuniverse.abstracts as unr_abstracts
 
 
 # category
-class CategoryStack(obj_abstract.AbsObjStack):
+class CategoryStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(CategoryStack, self).__init__()
 
@@ -12,7 +12,7 @@ class CategoryStack(obj_abstract.AbsObjStack):
 
 
 # type
-class TypeStack(obj_abstract.AbsObjStack):
+class TypeStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(TypeStack, self).__init__()
 
@@ -21,7 +21,7 @@ class TypeStack(obj_abstract.AbsObjStack):
 
 
 # port channel
-class PortChannelStack(obj_abstract.AbsObjStack):
+class PortChannelStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(PortChannelStack, self).__init__()
 
@@ -30,7 +30,7 @@ class PortChannelStack(obj_abstract.AbsObjStack):
 
 
 # port element
-class PortElementStack(obj_abstract.AbsObjStack):
+class PortElementStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(PortElementStack, self).__init__()
 
@@ -38,7 +38,7 @@ class PortElementStack(obj_abstract.AbsObjStack):
         return obj.index
 
 
-class PortQueryStack(obj_abstract.AbsObjStack):
+class PortQueryStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(PortQueryStack, self).__init__()
 
@@ -47,7 +47,7 @@ class PortQueryStack(obj_abstract.AbsObjStack):
 
 
 # port
-class PrxPortStack(obj_abstract.AbsObjStack):
+class PrxPortStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(PrxPortStack, self).__init__()
 
@@ -56,7 +56,7 @@ class PrxPortStack(obj_abstract.AbsObjStack):
 
 
 # connection
-class ObjConnectionStack(obj_abstract.AbsObjStack):
+class ObjConnectionStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ObjConnectionStack, self).__init__()
 
@@ -64,7 +64,7 @@ class ObjConnectionStack(obj_abstract.AbsObjStack):
         return obj._get_stack_key_()
 
 
-class ObjBindStack(obj_abstract.AbsObjStack):
+class ObjBindStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ObjBindStack, self).__init__()
 
@@ -73,7 +73,7 @@ class ObjBindStack(obj_abstract.AbsObjStack):
 
 
 # node type
-class ObjCategoryStack(obj_abstract.AbsObjStack):
+class ObjCategoryStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ObjCategoryStack, self).__init__()
 
@@ -82,7 +82,7 @@ class ObjCategoryStack(obj_abstract.AbsObjStack):
 
 
 # type
-class ObjTypeStack(obj_abstract.AbsObjStack):
+class ObjTypeStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ObjTypeStack, self).__init__()
 
@@ -91,7 +91,7 @@ class ObjTypeStack(obj_abstract.AbsObjStack):
 
 
 # obj
-class ObjStack(obj_abstract.AbsObjStack):
+class ObjStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ObjStack, self).__init__()
 
@@ -100,7 +100,7 @@ class ObjStack(obj_abstract.AbsObjStack):
 
 
 # obj
-class ObjStackTest(obj_abstract.AbsObjStack):
+class ObjStackTest(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ObjStackTest, self).__init__()
 

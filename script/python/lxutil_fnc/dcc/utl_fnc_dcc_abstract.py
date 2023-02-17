@@ -1,8 +1,10 @@
 # coding:utf-8
-from lxobj import obj_configure, obj_abstract
+from lxuniverse import unr_configure
+
+import lxuniverse.abstracts as unr_abstracts
 
 
-class AbsObjScene(obj_abstract.AbsObjScene):
+class AbsObjScene(unr_abstracts.AbsObjScene):
     CONFIGURE_CLASS = None
     def __init__(self):
         super(AbsObjScene, self).__init__()
@@ -42,7 +44,7 @@ class AbsObjScene(obj_abstract.AbsObjScene):
         pass
 
     def _set_obj_create_(self, obj_type_name, obj_path, obj_properties, obj_attributes=None):
-        obj_category_name = obj_configure.ObjCategory.LYNXI
+        obj_category_name = unr_configure.ObjCategory.LYNXI
         obj_category = self.universe.set_obj_category_create(obj_category_name)
         obj_type = obj_category.set_type_create(obj_type_name)
         obj = obj_type.set_obj_create(obj_path)

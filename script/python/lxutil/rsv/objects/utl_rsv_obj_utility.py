@@ -55,13 +55,13 @@ class RsvAssetWorkspaceTextureOpt(object):
         if version == 'new':
             version = self.get_new_version_at(variant)
         #
-        bsc_core.StorageMtd.set_directory_create(
+        bsc_core.StorageMtd.create_directory(
             self.get_directory_path_at(variant, version)
         )
-        bsc_core.StorageMtd.set_directory_create(
+        bsc_core.StorageMtd.create_directory(
             self.get_src_directory_path_at(variant, version)
         )
-        bsc_core.StorageMtd.set_directory_create(
+        bsc_core.StorageMtd.create_directory(
             self.get_tx_directory_path_at(variant, version)
         )
         #

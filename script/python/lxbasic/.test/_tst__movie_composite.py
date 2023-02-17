@@ -36,7 +36,7 @@ for k, i_v in dict_.items():
     i_f_tgt = '{}/resize/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
     i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
     i_v['image_resize'] = i_f_tgt
-    i_f_opt_tgt.set_directory_create()
+    i_f_opt_tgt.create_directory()
     # bsc_core.ImgOiioMtd.set_fit_to(i_f_src, i_f_tgt, (2048, 2048))
 # create background
 for k, i_v in dict_.items():
@@ -46,7 +46,7 @@ for k, i_v in dict_.items():
     i_f_tgt = '{}/background/{}.exr'.format(i_f_opt_src.directory_path, i_name)
     i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
     i_v['image_background'] = i_f_tgt
-    i_f_opt_tgt.set_directory_create()
+    i_f_opt_tgt.create_directory()
     # bsc_core.ImgOiioMtd.set_create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
 # add background
 for k, i_v in dict_.items():
@@ -57,7 +57,7 @@ for k, i_v in dict_.items():
     i_v['image_base'] = i_f_tgt
     i_resize = i_v['image_resize']
     i_background = i_v['image_background']
-    i_f_opt_tgt.set_directory_create()
+    i_f_opt_tgt.create_directory()
     # bsc_core.ImgOiioMtd.set_over_by(i_resize, i_background, i_f_tgt, (0, 0))
 # add foreground
 for k, i_v in dict_.items():
@@ -67,7 +67,7 @@ for k, i_v in dict_.items():
     i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
     i_base = i_v['image_base']
     i_foreground = i_v['image_foreground']
-    i_f_opt_tgt.set_directory_create()
+    i_f_opt_tgt.create_directory()
     # bsc_core.ImgOiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
 
 vedio_path = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v025/render/katana-images/main/'

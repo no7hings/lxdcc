@@ -10,7 +10,7 @@ import getopt
 
 def main(argv):
     try:
-        args_opt, args_extend = __get_opt_args(argv[1:])
+        args_opt, args_execute = __get_opt_args(argv[1:])
         opt_kwargs, opt_args = getopt.getopt(
             args_opt,
             'ha:o:',
@@ -38,7 +38,7 @@ def main(argv):
             #
             if opt_args:
                 packages_extend = opt_args
-                args_extend = args_extend
+                args_execute = args_execute
         else:
             if opt_args:
                 launcher = opt_args[0]
@@ -53,10 +53,10 @@ def main(argv):
                 packages_extend = opt_args[1:]
                 #
                 option = 'project={}&application={}'.format(project, application)
-                args_extend = ['-- {}'.format(application)]
+                args_execute = ['-- {}'.format(application)]
         #
         if option is not None:
-            __execute_with_option(option, args_extend, packages_extend)
+            __execute_with_option(option, args_execute, packages_extend)
     #
     except getopt.GetoptError:
         # import traceback
@@ -69,14 +69,14 @@ def __get_opt_args(args):
         idx = args.index('-c')
         args_opt = args[:idx]
         args_e = args[idx+1:]
-        args_extend = '-c "{}"'.format(' '.join(map(lambda x: x.replace('"', '\\\"'), args_e)))
-        return args_opt, [args_extend]
+        args_execute = '-c "{}"'.format(' '.join(map(lambda x: x.replace('"', '\\\"'), args_e)))
+        return args_opt, [args_execute]
     elif '--' in args:
         idx = args.index('--')
         args_opt = args[:idx]
         args_e = args[idx+1:]
-        args_extend = '-- {}'.format(' '.join(args_e))
-        return args_opt, [args_extend]
+        args_execute = '-- {}'.format(' '.join(args_e))
+        return args_opt, [args_execute]
     return args, None
 
 
@@ -94,7 +94,7 @@ def __print_help():
     )
 
 
-def __execute_with_option(option, args_extend, package_extend):
+def __execute_with_option(option, args_execute, package_extend):
     from lxbasic import bsc_core
     #
     import lxresolver.commands as rsv_commands
@@ -122,10 +122,10 @@ def __execute_with_option(option, args_extend, package_extend):
             '\033[32m'
             '{}'
             '\033[0m\n'
-        ).format(rsv_launcher.get_command(args_extend, package_extend))
+        ).format(rsv_launcher.get_command(args_execute, package_extend))
     )
-    if args_extend:
-        rsv_launcher.execute_command(args_extend, package_extend)
+    if args_execute:
+        rsv_launcher.execute_command(args_execute, package_extend)
 
 
 if __name__ == '__main__':

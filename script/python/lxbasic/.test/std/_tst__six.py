@@ -3,6 +3,8 @@ from __future__ import print_function
 
 import six
 
+print(six.__file__)
+
 if __name__ == '__main__':
     ss = [u'a', 'a']
     for i in ss:

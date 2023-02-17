@@ -198,11 +198,6 @@ class Jinja(object):
         )
 
 
-class Hook(object):
-    HOST = 'localhost'
-    PORT = 9527
-
-
 class Session(object):
     pass
 

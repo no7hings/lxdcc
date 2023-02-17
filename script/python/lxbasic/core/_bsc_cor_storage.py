@@ -1,7 +1,7 @@
 # coding:utf-8
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_pattern, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
+from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_log, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
 
 
 class StgUserMtd(object):
@@ -19,7 +19,7 @@ class StgUserMtd(object):
         else:
             raise SystemError()
         if create:
-            StorageMtd.set_directory_create(_)
+            StorageMtd.create_directory(_)
         return _
     @classmethod
     def get_user_debug_directory(cls, tag=None, create=False):
@@ -34,7 +34,7 @@ class StgUserMtd(object):
         if tag is not None:
             _ = '{}/{}'.format(_, tag)
         if create:
-            StorageMtd.set_directory_create(_)
+            StorageMtd.create_directory(_)
         return _
     @classmethod
     def get_user_session_directory(cls, create=False):
@@ -46,7 +46,7 @@ class StgUserMtd(object):
         else:
             raise SystemError()
         if create:
-            StorageMtd.set_directory_create(_)
+            StorageMtd.create_directory(_)
         return _
     @classmethod
     def get_user_session_file(cls, unique_id=None):
@@ -54,6 +54,61 @@ class StgUserMtd(object):
         if unique_id is None:
             unique_id = UuidMtd.get_new()
         return '{}/{}.yml'.format(directory_path, unique_id)
+
+
+class StgRpcMtd(object):
+    RPC_SERVER = '10.10.152.74'
+    RPC_PORT = 58888
+    PATHSEP = '/'
+    @classmethod
+    def get_client(cls, port_addition=0):
+        return xmlrpclib.ServerProxy(
+            'http://{0}:{1}'.format(cls.RPC_SERVER, cls.RPC_PORT+port_addition)
+        )
+    @classmethod
+    def create_directories(cls, directory_path, mode='1777'):
+        units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(directory_path)
+        units.reverse()
+        list_ = []
+        for i_path in units:
+            if i_path != cls.PATHSEP:
+                if os.path.exists(i_path) is False:
+                    list_.append(i_path)
+        #
+        for i in list_:
+            cls.create_directory(i, mode)
+    @classmethod
+    def create_directory(cls, directory_path, mode='1777'):
+        # noinspection PyUnresolvedReferences
+        from cosmos.rpc import client
+        clt = client.generate_client()
+        timeout = 25
+        start_time = time.time()
+        if os.path.isdir(directory_path) is False:
+            clt.makedirs(directory_path, mode)
+            cost_time = 0
+            parent_path = StgPathMtd.get_parent(directory_path)
+            while os.path.isdir(directory_path) is False:
+                cost_time = int(time.time() - start_time)
+                if cost_time > timeout:
+                    raise RuntimeError(
+                        _bsc_cor_log.LogMtd.trace_method_error(
+                            'create-directory by rpc',
+                            'directory="{}" is timeout, cost time {}s'.format(directory_path, cost_time)
+                        )
+                    )
+                #
+                time.sleep(1)
+                #
+                # subprocess.Popen(
+                #     'ls {}'.format(parent_path), shell=True
+                # )
+            #
+            _bsc_cor_log.LogMtd.trace_method_result(
+                'rpc create-directory',
+                'directory="{}" is cost time {}s'.format(directory_path, cost_time)
+            )
+        return True
 
 
 class StgExtraMtd(object):
@@ -106,6 +161,17 @@ class StgExtraMtd(object):
                 if sort_by == 'number':
                     _.sort(key=lambda x: _bsc_cor_raw.RawTextMtd.to_number_embedded_args(x))
         return _
+    @classmethod
+    def create_directory(cls, directory_path):
+        if os.path.isdir(directory_path) is False:
+            os.makedirs(directory_path)
+            _bsc_cor_log.LogMtd.trace_method_result(
+                'create-directory',
+                'directory="{}"'.format(directory_path)
+            )
+    @classmethod
+    def create_directory_use_rpc(cls, directory_path, mode='1777'):
+        StgRpcMtd.create_directories(directory_path, mode)
 
 
 class StgPathLinkMtd(object):
@@ -462,6 +528,14 @@ class StgDirectoryMultiplyMtd(object):
         return dic
 
 
+class StgPathMtd(StorageMtd):
+    @classmethod
+    def get_parent(cls, path):
+        return _bsc_cor_path.DccPathDagMtd.get_dag_parent(
+            path
+        )
+
+
 class StgPathOpt(object):
     PATHSEP = '/'
     def __init__(self, path, cleanup=True):
@@ -620,7 +694,7 @@ class StgDirectoryOpt(StgPathOpt):
         super(StgDirectoryOpt, self).__init__(path)
 
     def set_create(self):
-        StorageMtd.set_directory_create(
+        StorageMtd.create_directory(
             self.path
         )
 
@@ -646,7 +720,7 @@ class StgDirectoryOpt(StgPathOpt):
             i_file_opt_tgt = StgFileOpt(i_file_path_tgt)
             if i_file_opt_tgt.get_is_exists() is False:
                 # create target directory first
-                i_file_opt_tgt.set_directory_create()
+                i_file_opt_tgt.create_directory()
                 #
                 _bsc_cor_thread.TrdMethod.set_wait()
                 _bsc_cor_thread.TrdMethod.set_start(
@@ -684,7 +758,7 @@ class StgDirectoryOpt_(object):
         )
 
     def set_create(self):
-        StorageMtd.set_directory_create(
+        StorageMtd.create_directory(
             self._path
         )
 
@@ -782,8 +856,8 @@ class StgFileOpt(StgPathOpt):
         with open(self.path, 'w') as f:
             f.write(raw)
 
-    def set_directory_create(self):
-        StorageMtd.set_directory_create(
+    def create_directory(self):
+        StorageMtd.create_directory(
             self.get_directory_path()
         )
 

@@ -14,7 +14,7 @@ def set_reload(modules=None):
     else:
         p = bsc_objects.PyReloader(
             [
-                'lxscheme', 'lxsession', 'lxdatabase', 'lxdeadline', 'lxbasic', 'lxobj', 'lxresolver', 'lxarnold',
+                'lxscheme', 'lxsession', 'lxdatabase', 'lxdeadline', 'lxbasic', 'lxuniverse', 'lxresolver', 'lxarnold',
                 'lxusd',
                 'lxutil', 'lxutil_gui',
                 'lxshotgun', 'lxshotgun_gui',

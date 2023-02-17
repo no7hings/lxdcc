@@ -58,7 +58,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def __set_file_export_(self, source_port, file_path, frame, camera_location):
         file_obj = utl_dcc_objects.OsFile(file_path)
         #
-        file_obj.set_directory_create()
+        file_obj.create_directory()
         #
         path_base = file_obj.path_base
         ext = file_obj.ext

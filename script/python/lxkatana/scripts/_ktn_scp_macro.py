@@ -122,7 +122,7 @@ class LxRenderSettings(object):
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
                 v = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/stats.####.json'.format(
                     render_output_directory_path)
-                utl_dcc_objects.OsFile(v).set_directory_create()
+                utl_dcc_objects.OsFile(v).create_directory()
                 #
                 obj_opt.set_port_raw(
                     'arnold_render_settings.stats_file',
@@ -152,7 +152,7 @@ class LxRenderSettings(object):
                 render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
                 v = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/profile.####.json'.format(
                     render_output_directory_path)
-                utl_dcc_objects.OsFile(v).set_directory_create()
+                utl_dcc_objects.OsFile(v).create_directory()
                 #
                 obj_opt.set_port_raw(
                     'arnold_render_settings.profile_file',
@@ -644,10 +644,10 @@ class LxAssetAss(object):
     def _get_output_ass_file_(cls, rsv_scene_properties, rsv_task, look_pass_name):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-look-ass-file'
             keyword_1 = 'asset-look-ass-sub-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-look-ass-file'
             keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:

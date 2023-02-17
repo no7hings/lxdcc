@@ -4,7 +4,7 @@ import maya.cmds as cmds
 
 from lxbasic import bsc_core
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
 from lxmaya import ma_core
 
@@ -19,7 +19,7 @@ class XgenDescriptionOpt(utl_dcc_opt_abs.AbsObjOpt):
         # remove namespace, use transform path
         raw = ma_core._ma_obj_path__get_with_namespace_clear_(self._obj.transform.path)
         # replace pathsep
-        raw = raw.replace(self._obj.PATHSEP, obj_configure.Obj.PATHSEP)
+        raw = raw.replace(self._obj.PATHSEP, unr_configure.Obj.PATHSEP)
         # strip path
         if lstrip is not None:
             if raw.startswith(lstrip):

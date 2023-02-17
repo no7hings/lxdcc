@@ -92,7 +92,7 @@ class ImgFileOpt(object):
         file_path_src_opt = self._file_path_opt
         file_path_tgt_opt = _bsc_cor_storage.StgFileOpt(self._file_path).set_ext_repath_to(ext)
         if file_path_src_opt.get_is_file() is True:
-            file_path_tgt_opt.set_directory_create()
+            file_path_tgt_opt.create_directory()
         #
         if directory_path is not None:
             file_path_tgt_opt = file_path_tgt_opt.set_directory_repath_to(directory_path)

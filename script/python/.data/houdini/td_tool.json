@@ -19,7 +19,7 @@
 			"chn_label": "",
 			"icon": "",
 			"size": [720, 560],
-        	"command": "import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects); p = utl_dcc_objects.PyReloader(['lxscheme', 'lxobj', 'lxutil', 'lxhoudini']); p.set_reload()"
+        	"command": "import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects); p = utl_dcc_objects.PyReloader(['lxscheme', 'lxuniverse', 'lxutil', 'lxhoudini']); p.set_reload()"
 		}
 	},
 	"menu": {

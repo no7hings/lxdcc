@@ -420,20 +420,6 @@ class DdlRsvTaskRenderJobSender(DdlMethodJobSender):
         super(DdlRsvTaskRenderJobSender, self).__init__(**kwargs)
 
 
-class DdlSubmiter(ddl_obj_abs.AbsDdlSubmiter):
-    CON = CON
-    CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file('deadline/submiter')
-    def __init__(self, *args, **kwargs):
-        super(DdlSubmiter, self).__init__(*args, **kwargs)
-
-
-class DdlRsvTaskSubmiter(ddl_obj_abs.AbsDdlSubmiter):
-    CON = CON
-    CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file('deadline/rsv-task-submiter')
-    def __init__(self, *args, **kwargs):
-        super(DdlRsvTaskSubmiter, self).__init__(*args, **kwargs)
-
-
 class Signal(object):
     def __init__(self, *args, **kwargs):
         pass

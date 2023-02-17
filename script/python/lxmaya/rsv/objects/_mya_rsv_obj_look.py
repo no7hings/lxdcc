@@ -26,10 +26,10 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
 
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-look-ass-file'
             keyword_1 = 'asset-look-ass-sub-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-look-ass-file'
             keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:
@@ -108,9 +108,9 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
 
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-look-yml-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-look-yml-file'
         else:
             raise TypeError()

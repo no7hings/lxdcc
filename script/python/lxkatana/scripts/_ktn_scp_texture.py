@@ -18,7 +18,7 @@ class ScpTextureImportFromDatabase(object):
     def __init__(self, root, resource, texture_data):
         self._root_opt = ktn_core.NGObjOpt(root)
         self._cfg = bsc_objects.Configure(
-            value=ktn_configure.DataFile.TEXTURE_RESOURCE_SHADER_GROUP_CONFIGURE
+            value=bsc_core.CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
         )
         self._cfg.set(
             'option.root', self._root_opt.get_path(),

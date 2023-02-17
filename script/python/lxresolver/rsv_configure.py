@@ -41,12 +41,24 @@ class Applications(object):
     Katana = 'katana'
     Clarisse = 'clarisse'
     Nuke = 'nuke'
-    All = [
+    Python = 'python'
+    Lynxi = 'lynxi'
+    #
+    DCCS = [
         Maya,
         Houdini,
         Katana,
         Clarisse,
         Nuke
+    ]
+    All = [
+        Maya,
+        Houdini,
+        Katana,
+        Clarisse,
+        Nuke,
+        Python,
+        Lynxi
     ]
     #
     PATHSEP_DICT = {

@@ -18,11 +18,11 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'work':
+        if workspace == rsv_scene_properties.get('workspaces.source'):
             keyword = 'asset-source-geometry-usd-var-file'
-        elif workspace == 'publish':
+        elif workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-geometry-usd-var-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-geometry-usd-var-file'
         else:
             raise TypeError()
@@ -59,13 +59,13 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         #
-        if workspace == 'work':
+        if workspace == rsv_scene_properties.get('workspaces.source'):
             keyword_0 = 'asset-source-geometry-usd-var-file'
             keyword_1 = 'asset-source-geometry-uv_map-usd-file'
-        elif workspace == 'publish':
+        elif workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-uv_map-usd-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-geometry-usd-var-file'
             keyword_1 = 'asset-temporary-geometry-uv_map-usd-file'
         else:

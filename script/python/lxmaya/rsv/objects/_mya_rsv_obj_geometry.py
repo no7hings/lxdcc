@@ -66,11 +66,11 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_root_dag_opt.get_value()
         )
         if dcc_root.get_is_exists() is True:
-            if workspace == 'work':
+            if workspace == rsv_scene_properties.get('workspaces.source'):
                 keyword = 'asset-source-geometry-usd-var-file'
-            elif workspace == 'publish':
+            elif workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword = 'asset-geometry-usd-var-file'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword = 'asset-temporary-geometry-usd-var-file'
             else:
                 raise TypeError()
@@ -120,13 +120,13 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         #
-        if workspace == 'work':
+        if workspace == rsv_scene_properties.get('workspaces.source'):
             keyword_0 = 'asset-source-geometry-usd-var-file'
             keyword_1 = 'asset-source-geometry-uv_map-usd-file'
-        elif workspace == 'publish':
+        elif workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-uv_map-usd-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-geometry-usd-var-file'
             keyword_1 = 'asset-temporary-geometry-uv_map-usd-file'
         else:
@@ -175,11 +175,11 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_root_dag_opt.get_value()
         )
         if dcc_root.get_is_exists() is True:
-            if workspace == 'work':
+            if workspace == rsv_scene_properties.get('workspaces.source'):
                 keyword = 'asset-source-geometry-abc-var-file'
-            elif workspace == 'publish':
+            elif workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword = 'asset-geometry-abc-var-file'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword = 'asset-temporary-geometry-abc-var-file'
             else:
                 raise TypeError()
@@ -247,11 +247,11 @@ class RsvDccGeometryExtraHookOpt(
             mya_root_dag_opt.get_value()
         )
         if dcc_root.get_is_exists() is True:
-            if workspace == 'work':
+            if workspace == rsv_scene_properties.get('workspaces.source'):
                 keyword = 'asset-source-geometry-usd-var-file'
-            elif workspace == 'publish':
+            elif workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword = 'asset-geometry-usd-var-file'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword = 'asset-temporary-geometry-usd-var-file'
             else:
                 raise TypeError()
@@ -288,9 +288,9 @@ class RsvDccShotGeometryHookOpt(
         asset_shot = self._hook_option_opt.get('shot')
         shot_asset = self._hook_option_opt.get('shot_asset')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-shot_asset-geometry-usd-var-dir'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-shot_asset-geometry-usd-var-dir'
         else:
             raise TypeError()
@@ -358,9 +358,9 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         asset_shot = self._hook_option_opt.get('shot')
         shot_asset = self._hook_option_opt.get('shot_asset')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-shot_asset-component-dir'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-shot_asset-component-dir'
         else:
             raise TypeError()

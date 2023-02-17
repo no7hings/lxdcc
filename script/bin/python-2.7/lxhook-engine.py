@@ -10,6 +10,7 @@ import getopt
 
 def main(argv):
     try:
+        sys.stdout.write('execute lxhook-engine from: "{}"\n'.format(__file__))
         opts, args = getopt.getopt(
             argv[1:],
             'ho:',
@@ -67,74 +68,94 @@ def __execute_option_hook(hook_option):
     """
     from lxbasic import bsc_core
     #
+    import lxresolver.commands as rsv_commands
+    #
     from lxutil import utl_core
     #
     from lxsession import ssn_core
+    #
+    resolver = rsv_commands.get_resolver()
     #
     all_hook_engines = ssn_core.SsnHookEngineMtd.get_all()
     option_opt = bsc_core.ArgDictStringOpt(hook_option)
     #
     project = option_opt.get('project')
+    rsv_project = resolver.get_rsv_project(project=project)
+    if rsv_project is None:
+        raise RuntimeError()
+    #
     hook_engine = option_opt.get('hook_engine')
     # check engine is in configure
-    if hook_engine in all_hook_engines:
-        rez_beta = option_opt.get('rez_beta') or False
-        if rez_beta is True:
-            bsc_core.EnvironMtd.set(
-                'REZ_BETA', '1'
-            )
-        #
-        kwargs = option_opt.value
-        kwargs.update(
-            dict(
-                lxdcc_root=os.environ.get('LXDCC_BASE'),
-                hook_option=hook_option,
-            )
-        )
-        cmd_args = []
-        # add extend packages
-        extend_packages = option_opt.get('extend_packages', as_array=True)
-        if extend_packages:
-            cmd_args.append(' '.join(extend_packages))
-        #
-        cmd_args.append(
-            ssn_core.SsnHookEngineMtd.get_command(
-                **kwargs
-            )
-        )
-        #
-        application = hook_engine.split('-')[0]
-        #
-        use_thread = option_opt.get('use_thread') or False
-        # add extend environs
-        extend_environs = {}
-        #
-        _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
-        if _:
-            extend_environs['LYNXI_RESOURCES'] = _
-        #
-        if use_thread is True:
-            utl_core.AppLauncher(
-                project=project,
-                application=application
-            ).set_cmd_run_with_result_use_thread(
-                ' '.join(cmd_args),
-                extend_environs=extend_environs
-            )
-        else:
-            utl_core.AppLauncher(
-                project=project,
-                application=application
-            ).set_cmd_run_with_result(
-                ' '.join(cmd_args),
-                extend_environs=extend_environs
-            )
-    else:
-        raise TypeError(
+    if hook_engine not in all_hook_engines:
+        raise RuntimeError(
             utl_core.Log.set_module_error_trace(
                 'hook-run',
                 u'engine="{}" is not available'.format(hook_engine)
             )
+        )
+    #
+    rez_beta = option_opt.get('rez_beta') or False
+    if rez_beta is True:
+        bsc_core.EnvironMtd.set(
+            'REZ_BETA', '1'
+        )
+    #
+    kwargs = option_opt.value
+    kwargs.update(
+        dict(
+            lxdcc_root=os.environ.get('LXDCC_BASE'),
+            hook_option=hook_option,
+        )
+    )
+    engine_args_execute = []
+    engine_packages_extend = []
+    # add extend packages
+    hook_package_extend = option_opt.get('extend_packages', as_array=True)
+    if hook_package_extend:
+        engine_packages_extend.extend(
+            hook_package_extend
+        )
+    #
+    engine_args_execute.append(
+        ssn_core.SsnHookEngineMtd.get_command(
+            **kwargs
+        )
+    )
+    #
+    application = hook_engine.split('-')[0]
+    #
+    rsv_app = rsv_project.get_rsv_app(
+        application=application
+    )
+    if rsv_app is None:
+        raise RuntimeError()
+    #
+    use_thread = option_opt.get('use_thread') or False
+    # add extend environs
+    environs_extend = {}
+    #
+    _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+    if _:
+        environs_extend['LYNXI_RESOURCES'] = _
+    #
+    frame_scheme = rsv_project.get_frame_scheme()
+    if frame_scheme == 'new':
+        engine_packages_extend.extend(
+            ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        )
+    #
+    command = rsv_app.get_command(
+        args_execute=engine_args_execute,
+        packages_extend=engine_packages_extend
+    )
+    #
+    if use_thread is True:
+        rsv_app.execute_with_result_use_thread(
+            command, extend_environs=environs_extend
+        )
+    else:
+        rsv_app.execute_with_result(
+            command, extend_environs=environs_extend
         )
 
 

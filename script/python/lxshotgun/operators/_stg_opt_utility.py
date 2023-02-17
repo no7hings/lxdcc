@@ -37,7 +37,7 @@ class ImgFileOpt(object):
             #
             output_file = utl_dcc_objects.OsFile(output_file_path)
             output_ext = output_file.ext
-            output_file.set_directory_create()
+            output_file.create_directory()
             #
             arguments += [
                 '"{}"'.format(input_file_path),

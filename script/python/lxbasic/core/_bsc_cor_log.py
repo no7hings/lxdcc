@@ -50,16 +50,19 @@ class LogMtd(object):
         sys.stdout.write(
             cls.get_result(text+'\n')
         )
+        return text
     @classmethod
     def trace_warning(cls, text):
         sys.stdout.write(
             cls.get_warning(text+'\n')
         )
+        return text
     @classmethod
     def trace_error(cls, text):
         sys.stdout.write(
             cls.get_error(text+'\n')
         )
+        return text
     #
     @classmethod
     def get_method_result(cls, name, text):

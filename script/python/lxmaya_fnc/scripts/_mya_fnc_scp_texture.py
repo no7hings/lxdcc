@@ -2,11 +2,9 @@
 
 
 def set_asset_texture_tx_export(task_properties, force=False):
-    import lxobj.objects as core_objects
+    from lxbasic import bsc_core
     #
     import lxresolver.operators as rsv_operators
-    #
-    import lxutil.dcc.dcc_operators as utl_dcc_operators
     #
     import lxmaya.dcc.dcc_objects as mya_dcc_objects
     #
@@ -26,7 +24,7 @@ def set_asset_texture_tx_export(task_properties, force=False):
         #
         sub_root = '{}/hi'.format(root)
         #
-        sub_root_dag_path = core_objects.ObjDagPath(sub_root)
+        sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
         sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
@@ -66,7 +64,7 @@ def set_asset_texture_tx_export(task_properties, force=False):
 
 
 def set_asset_texture_export(task_properties, force=False):
-    import lxobj.objects as core_objects
+    from lxbasic import bsc_core
     #
     import lxresolver.operators as rsv_operators
     #
@@ -90,7 +88,7 @@ def set_asset_texture_export(task_properties, force=False):
         #
         sub_root = '{}/hi'.format(root)
         #
-        sub_root_dag_path = core_objects.ObjDagPath(sub_root)
+        sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
         sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )

@@ -20,6 +20,7 @@ def commands():
     import platform
     #
     env.LXDCC_BASE = '{root}'
+    env.LYNXI_CONFIGURES.append('{root}/script/configure')
     # bin
     env.PATH.append('{root}/script/bin')
     if platform.system() == 'Linux':

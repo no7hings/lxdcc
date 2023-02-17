@@ -22,7 +22,7 @@ from lxutil import utl_core
 
 import lxutil.configures as utl_configures
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
 from lxarnold import and_configure
 
@@ -53,12 +53,12 @@ class AndTypeMtd(object):
 
     def get_dcc_type_args(self, is_array):
         dcc_type_name = and_configure.Type.get_name(self.and_instance)
-        dcc_category_name = obj_configure.Type.get_category_name(dcc_type_name, is_array)
+        dcc_category_name = unr_configure.Type.get_category_name(dcc_type_name, is_array)
         return dcc_category_name, dcc_type_name
 
     def get_dcc_channel_names(self):
         dcc_type_name = and_configure.Type.get_name(self.and_instance)
-        return obj_configure.Type.get_channel_names(dcc_type_name)
+        return unr_configure.Type.get_channel_names(dcc_type_name)
 
 
 class AndArrayMtd(object):

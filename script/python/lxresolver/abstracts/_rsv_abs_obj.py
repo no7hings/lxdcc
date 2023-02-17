@@ -31,7 +31,7 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxobj import obj_core, obj_abstract
+import lxuniverse.abstracts as unr_abstracts
 
 from lxresolver import rsv_configure, rsv_core
 
@@ -719,9 +719,9 @@ class AbsRsvObj(
     AbsRsvDef,
     AbsRsvObjDef,
     AbsRsvPropertiesDef,
-    obj_abstract.AbsObjDagDef,
+    unr_abstracts.AbsObjDagDef,
     # gui
-    obj_abstract.AbsObjGuiDef
+    unr_abstracts.AbsObjGuiDef
 ):
     @classmethod
     def _completion_kwargs_from_parent_(cls, rsv_parent, kwargs):
@@ -1154,6 +1154,9 @@ class AbsRsvTask(
         #         ]
         #     ]
         # )
+    @property
+    def icon(self):
+        return bsc_core.RscIconFileMtd.get('file/file')
 
     def get_work_scene_src_directory_open_menu_raw(self):
         def add_fnc_(application_):
@@ -1172,7 +1175,7 @@ class AbsRsvTask(
             )
 
         list_ = []
-        for application in self.Applications.All:
+        for application in self.Applications.DCCS:
             add_fnc_(application)
         return list_
 
@@ -1222,17 +1225,17 @@ class AbsRsvTask(
     def _get_properties_by_scene_file_path_(self, file_path, key_format, override_variants, file_path_keys):
         if file_path is not None:
             branch = self.properties.get('branch')
-            for application in self.Applications.All:
+            for i_application in self.Applications.DCCS:
                 keyword = key_format.format(
-                    **dict(branch=branch, application=application)
+                    **dict(branch=branch, application=i_application)
                 )
                 rsv_task_unit = self.get_rsv_unit(
                     keyword=keyword,
-                    application=application
+                    application=i_application
                 )
                 task_unit_properties = rsv_task_unit.get_properties_by_result(file_path, override_variants)
                 if task_unit_properties:
-                    task_unit_properties.set('application', application)
+                    task_unit_properties.set('application', i_application)
                     task_unit_properties.set('user', bsc_core.SystemMtd.get_user_name())
                     task_unit_properties.set('time', bsc_core.TimeMtd.get_time())
                     task_unit_properties.set('time_tag', bsc_core.TimeMtd.get_time_tag())
@@ -1246,13 +1249,13 @@ class AbsRsvTask(
                     task_unit_properties.set('dcc.root_name', 'master')
                     task_unit_properties.set('dcc.sub_root', '/master/hi')
                     #
-                    task_unit_properties.set('dcc.pathsep', self.Applications.get_pathsep(application))
+                    task_unit_properties.set('dcc.pathsep', self.Applications.get_pathsep(i_application))
                     return task_unit_properties
     #
     def get_rsv_scene_properties_by_any_scene_file_path(self, file_path):
         if file_path is not None:
             branch = self.properties.get('branch')
-            for i_application in self.Applications.All:
+            for i_application in self.Applications.DCCS:
                 for j_keyword_format, scene_type in [
                     # source
                     ('{branch}-source-{application}-scene-src-file', 'source-scene-src'),
@@ -1327,9 +1330,20 @@ class AbsRsvTask(
             'user', bsc_core.SystemMtd.get_user_name()
         )
         return properties
-    @property
-    def icon(self):
-        return bsc_core.RscIconFileMtd.get('file/file')
+
+    def create_directory(self, workspace_key):
+        variants = self.properties.get_copy_value()
+        variants['workspace_key'] = workspace_key
+        keyword = '{branch}-{workspace_key}-task-dir'.format(
+            **variants
+        )
+        rsv_unit = self.get_rsv_unit(keyword=keyword)
+        directory_path = rsv_unit.get_result()
+        storage_scheme = self.get_rsv_project().get_storage_scheme()
+        if storage_scheme == 'default':
+            bsc_core.StgExtraMtd.create_directory(directory_path)
+        elif storage_scheme == 'rpc':
+            bsc_core.StgExtraMtd.create_directory_use_rpc(directory_path)
 
 
 # <rsv-step>
@@ -1718,8 +1732,8 @@ class AbsRsvExtraDef(AbsRsvDef):
 class AbsRsvProject(
     AbsRsvObjDef,
     AbsRsvExtraDef,
-    obj_abstract.AbsObjGuiDef,
-    obj_abstract.AbsObjDagDef,
+    unr_abstracts.AbsObjGuiDef,
+    unr_abstracts.AbsObjDagDef,
 ):
     RSV_MATCHER_CLASS = None
     #
@@ -1935,8 +1949,17 @@ class AbsRsvProject(
     def icon(self):
         return bsc_core.RscIconFileMtd.get('resolver/project')
 
+    def get_frame_scheme(self):
+        return self._raw_opt.get('frame-data.scheme')
+
+    def get_storage_scheme(self):
+        return self._raw_opt.get('storage-data.scheme')
+
+    def get_frame_configure(self):
+        return bsc_objects.Configure(value=self._raw_opt.get('frame-data'))
+
     def get_rsv_app(self, application):
-        configure = bsc_objects.Configure(value=self._raw_opt.get('app-data'))
+        configure = self.get_frame_configure()
         scheme = configure.get('scheme')
         if scheme == 'default':
             return self.RSV_APP_DEFAULT_CLASS(
@@ -2950,8 +2973,8 @@ class AbsRsvProject(
 # <resolver>
 class AbsRsvRoot(
     AbsRsvExtraDef,
-    obj_abstract.AbsObjGuiDef,
-    obj_abstract.AbsObjDagDef,
+    unr_abstracts.AbsObjGuiDef,
+    unr_abstracts.AbsObjDagDef,
 ):
     OBJ_UNIVERSE_CLASS = None
     #
@@ -2981,12 +3004,11 @@ class AbsRsvRoot(
             i_project_raw_opt = self._get_raw_opt_(i_raw)
             key = i_project_raw_opt.get('key')
             if key is not None:
-                key_extras = i_project_raw_opt.get('key_extras') or []
-                for j_key in key_extras:
-                    j_project = j_key
+                projects = i_project_raw_opt.get('projects-include') or []
+                for j_project in projects:
                     j_raw = copy.copy(i_raw)
                     j_project_raw_opt = self._get_raw_opt_(j_raw)
-                    j_project_raw_opt.set('key', j_key)
+                    j_project_raw_opt.set('key', j_project)
                     self._create_rsv_project_(j_raw, project=j_project)
     @property
     def type(self):

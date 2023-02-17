@@ -8,7 +8,7 @@ class Packages(object):
         #
         p = bsc_objects.PyReloader(
             [
-                'lxbasic', 'lxscheme', 'lxobj', 'lxresolver', 'lxshotgun', 'lxarnold', 'lxusd',
+                'lxbasic', 'lxscheme', 'lxuniverse', 'lxresolver', 'lxshotgun', 'lxarnold', 'lxusd',
                 'lxutil', 'lxutil_gui',
                 'lxmaya', 'lxmaya_gui'
             ]

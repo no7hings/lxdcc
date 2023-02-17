@@ -5,14 +5,14 @@ from lxbasic import bsc_configure, bsc_core
 
 
 class RsvConfigureMtd(object):
-    ENVIRON_KEY = 'LYNXI_RESOLVER_CONFIGURES'
     @classmethod
     def get_raw(cls, key):
         raw = collections.OrderedDict()
-        for i_key in ['builtin', 'project', 'app']:
-            i_file = bsc_configure.Root.get_configure_file('resolver/{}/{}'.format(key, i_key))
-            i_raw = bsc_core.StgFileOpt(i_file).set_read() or {}
-            raw.update(i_raw)
+        for i_key in ['builtin', 'main', 'frame', 'project', 'storage']:
+            i_file = bsc_core.CfgFileMtd.get_yaml('resolver/{}/{}'.format(key, i_key))
+            if i_file is not None:
+                i_raw = bsc_core.StgFileOpt(i_file).set_read() or {}
+                raw.update(i_raw)
         return raw
     @classmethod
     def get_basic_raw(cls):

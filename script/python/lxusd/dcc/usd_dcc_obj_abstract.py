@@ -2,14 +2,18 @@
 # noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, UsdGeom
 
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 from lxusd import usd_configure
 
-from lxobj import obj_configure, obj_core, obj_abstract
+from lxuniverse import unr_configure
+
+import lxuniverse.abstracts as unr_abstracts
 
 
-class AbsUsdObjScene(obj_abstract.AbsObjScene):
+class AbsUsdObjScene(unr_abstracts.AbsObjScene):
     FILE_CLASS = None
     UNIVERSE_CLASS = None
     def __init__(self):
@@ -50,7 +54,7 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
         #
         usd_root = self._usd_stage.GetPseudoRoot()
         if self._root is not None:
-            dag_path_comps = obj_core.DccPathDagMtd.get_dag_component_paths(self._root, pathsep=usd_configure.Obj.PATHSEP)
+            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(self._root, pathsep=usd_configure.Obj.PATHSEP)
             if dag_path_comps:
                 dag_path_comps.reverse()
             for i in dag_path_comps:
@@ -73,7 +77,7 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
         #
         usd_root = self._usd_stage.GetPseudoRoot()
         if self._root is not None:
-            dag_path_comps = obj_core.DccPathDagMtd.get_dag_component_paths(self._root, pathsep=usd_configure.Obj.PATHSEP)
+            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(self._root, pathsep=usd_configure.Obj.PATHSEP)
             if dag_path_comps:
                 dag_path_comps.reverse()
             for i in dag_path_comps:
@@ -92,7 +96,7 @@ class AbsUsdObjScene(obj_abstract.AbsObjScene):
                 self._set_obj_create_(i_usd_prim)
 
     def _set_obj_create_(self, usd_prim):
-        obj_category_name = obj_configure.ObjCategory.USD
+        obj_category_name = unr_configure.ObjCategory.USD
         obj_type_name = usd_prim.GetTypeName()
         obj_path = usd_prim.GetPath().pathString
         #

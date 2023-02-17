@@ -7,8 +7,6 @@ import glob
 
 from lxbasic import bsc_core
 
-import lxobj.objects as core_objects
-
 import lxresolver.commands as rsv_commands
 
 import lxresolver.operators as rsv_operators
@@ -48,7 +46,7 @@ class AbsDccExporter(object):
         #
         self._root = root
         if root is not None:
-            self._root_dat_opt = core_objects.ObjDagPath(root)
+            self._root_dat_opt = bsc_core.DccPathDagOpt(root)
         else:
             self._root_dat_opt = None
         #

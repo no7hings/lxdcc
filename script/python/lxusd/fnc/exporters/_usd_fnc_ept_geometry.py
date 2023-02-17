@@ -11,8 +11,6 @@ from lxbasic import bsc_core
 
 from lxusd import usd_configure, usd_core
 
-from lxobj import obj_core
-
 from lxutil import utl_core
 
 import lxbasic.objects as bsc_objects
@@ -96,7 +94,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         self._output_stage_opt.set_default_prim(self._root)
         # create directory
-        # bsc_core.StgFileOpt(self._file_path).set_directory_create()
+        # bsc_core.StgFileOpt(self._file_path).create_directory()
         #
         self._output_stage_opt.set_export_to(self._file_path)
         #
@@ -389,7 +387,7 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
             i_obj_type_name = prim.GetTypeName()
             obj_path = prim.GetPath().pathString
             #
-            obj_path_ = obj_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, lstrip)
+            obj_path_ = bsc_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, lstrip)
             if obj_path_:
                 obj_properties = bsc_objects.Content(value=collections.OrderedDict())
                 #
@@ -460,7 +458,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._set_location_create_(self._output_stage, self._location_path)
     @classmethod
     def _set_location_create_(cls, stage, location):
-        dag_path_comps = obj_core.DccPathDagMtd.get_dag_component_paths(location, pathsep=usd_configure.Obj.PATHSEP)
+        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(location, pathsep=usd_configure.Obj.PATHSEP)
         if dag_path_comps:
             dag_path_comps.reverse()
         #

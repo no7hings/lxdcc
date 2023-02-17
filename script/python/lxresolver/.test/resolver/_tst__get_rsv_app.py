@@ -23,4 +23,4 @@ for i_project in [
         application='maya'
     )
 
-    print i_rsv_launcher.get_command(args_extend=['-- maya'], packages_extend=['lxdcc', 'lxdcc_gui', 'lxdcc_lib', 'lxdcc_rsc', 'paper_extend_usd'])
+    print i_rsv_launcher.get_command(args_execute=['-c maya -c'], packages_extend=['lxdcc', 'lxdcc_gui', 'lxdcc_lib', 'lxdcc_rsc', 'paper_extend_usd'])

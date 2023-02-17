@@ -24,7 +24,7 @@ from lxmaya_fnc import ma_fnc_configure, ma_fnc_core
 
 from lxmaya.modifiers import _mya_mdf_utility
 
-from lxobj import obj_configure, obj_core
+from lxuniverse import unr_configure
 
 import lxutil.scripts as utl_scripts
 
@@ -55,7 +55,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._camera = self.get('camera')
         self._texture_use_environ_map = self.get('texture_use_environ_map')
         #
-        self._root = obj_core.DccPathDagMtd.get_dag_pathsep_replace(
+        self._root = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
             self._location, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP
         )
         #
@@ -187,7 +187,7 @@ class LookMtlxExporter(object):
             if obj.type == ma_configure.Util.MESH_TYPE:
                 mesh_dcc_path = obj.path
                 mesh_dcc_obj = mya_dcc_objects.Mesh(mesh_dcc_path)
-                key = mesh_dcc_path.replace(ma_configure.Util.OBJ_PATHSEP, obj_configure.Obj.PATHSEP)
+                key = mesh_dcc_path.replace(ma_configure.Util.OBJ_PATHSEP, unr_configure.Obj.PATHSEP)
                 value = mesh_dcc_obj.get_display_smooth_iterations()
                 if value > 0:
                     self._mesh_subdivision_dict[key] = value

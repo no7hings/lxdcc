@@ -4,7 +4,7 @@ import arnold as ai
 
 import os
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
 import lxbasic.objects as bsc_objects
 
@@ -35,34 +35,34 @@ class Type(object):
     #
     NAME_DICT = {
         # <category-constant>
-        ai.AI_TYPE_STRING: obj_configure.Type.STRING,
-        ai.AI_TYPE_ENUM: obj_configure.Type.STRING,
+        ai.AI_TYPE_STRING: unr_configure.Type.STRING,
+        ai.AI_TYPE_ENUM: unr_configure.Type.STRING,
         #
-        ai.AI_TYPE_BYTE: obj_configure.Type.INTEGER,
-        ai.AI_TYPE_INT: obj_configure.Type.INTEGER,
-        ai.AI_TYPE_UINT: obj_configure.Type.INTEGER,
+        ai.AI_TYPE_BYTE: unr_configure.Type.INTEGER,
+        ai.AI_TYPE_INT: unr_configure.Type.INTEGER,
+        ai.AI_TYPE_UINT: unr_configure.Type.INTEGER,
         #
-        ai.AI_TYPE_FLOAT: obj_configure.Type.FLOAT,
-        ai.AI_TYPE_BOOLEAN: obj_configure.Type.BOOLEAN,
+        ai.AI_TYPE_FLOAT: unr_configure.Type.FLOAT,
+        ai.AI_TYPE_BOOLEAN: unr_configure.Type.BOOLEAN,
         #
-        ai.AI_TYPE_RGB: obj_configure.Type.COLOR3,
-        ai.AI_TYPE_RGBA: obj_configure.Type.COLOR4,
+        ai.AI_TYPE_RGB: unr_configure.Type.COLOR3,
+        ai.AI_TYPE_RGBA: unr_configure.Type.COLOR4,
         #
-        ai.AI_TYPE_VECTOR2: obj_configure.Type.VECTOR2,
-        ai.AI_TYPE_VECTOR: obj_configure.Type.VECTOR3,
-        ai.AI_TYPE_MATRIX: obj_configure.Type.MATRIX44,
-        ai.AI_TYPE_NODE: obj_configure.Type.NODE,
+        ai.AI_TYPE_VECTOR2: unr_configure.Type.VECTOR2,
+        ai.AI_TYPE_VECTOR: unr_configure.Type.VECTOR3,
+        ai.AI_TYPE_MATRIX: unr_configure.Type.MATRIX44,
+        ai.AI_TYPE_NODE: unr_configure.Type.NODE,
         #
-        ai.AI_TYPE_CLOSURE: obj_configure.Type.CLOSURE,
+        ai.AI_TYPE_CLOSURE: unr_configure.Type.CLOSURE,
         #
-        ai.AI_TYPE_UNDEFINED: obj_configure.Type.UNDEFINED,
-        ai.AI_TYPE_NONE: obj_configure.Type.NONE,
+        ai.AI_TYPE_UNDEFINED: unr_configure.Type.UNDEFINED,
+        ai.AI_TYPE_NONE: unr_configure.Type.NONE,
     }
     @classmethod
     def get_name(cls, and_type):
         if and_type in cls.NAME_DICT:
             return cls.NAME_DICT[and_type]
-        return obj_configure.Type.NONE
+        return unr_configure.Type.NONE
     @classmethod
     def get_is_ar_array(cls, and_type):
         return and_type == ai.AI_TYPE_ARRAY
@@ -120,29 +120,29 @@ class Node(object):
     #
     OUTPUT_PORT_NAME_DICT = {
         # <category-constant>
-        ai.AI_TYPE_STRING: obj_configure.OutputPort.STRING,
-        ai.AI_TYPE_ENUM: obj_configure.OutputPort.STRING,
-        ai.AI_TYPE_INT: obj_configure.OutputPort.INTEGER,
-        ai.AI_TYPE_UINT: obj_configure.OutputPort.INTEGER,
-        ai.AI_TYPE_BYTE: obj_configure.OutputPort.INTEGER,
-        ai.AI_TYPE_FLOAT: obj_configure.OutputPort.FLOAT,
-        ai.AI_TYPE_BOOLEAN: obj_configure.OutputPort.BOOLEAN,
+        ai.AI_TYPE_STRING: unr_configure.OutputPort.STRING,
+        ai.AI_TYPE_ENUM: unr_configure.OutputPort.STRING,
+        ai.AI_TYPE_INT: unr_configure.OutputPort.INTEGER,
+        ai.AI_TYPE_UINT: unr_configure.OutputPort.INTEGER,
+        ai.AI_TYPE_BYTE: unr_configure.OutputPort.INTEGER,
+        ai.AI_TYPE_FLOAT: unr_configure.OutputPort.FLOAT,
+        ai.AI_TYPE_BOOLEAN: unr_configure.OutputPort.BOOLEAN,
         # <category-vector>
-        ai.AI_TYPE_VECTOR2: obj_configure.OutputPort.VECTOR2,
-        ai.AI_TYPE_VECTOR: obj_configure.OutputPort.VECTOR3,
+        ai.AI_TYPE_VECTOR2: unr_configure.OutputPort.VECTOR2,
+        ai.AI_TYPE_VECTOR: unr_configure.OutputPort.VECTOR3,
         #
-        ai.AI_TYPE_RGB: obj_configure.OutputPort.COLOR3,
-        ai.AI_TYPE_RGBA: obj_configure.OutputPort.COLOR4,
+        ai.AI_TYPE_RGB: unr_configure.OutputPort.COLOR3,
+        ai.AI_TYPE_RGBA: unr_configure.OutputPort.COLOR4,
         #
-        ai.AI_TYPE_MATRIX: obj_configure.OutputPort.MATRIX44,
+        ai.AI_TYPE_MATRIX: unr_configure.OutputPort.MATRIX44,
         #
-        ai.AI_TYPE_NODE: obj_configure.OutputPort.NODE,
+        ai.AI_TYPE_NODE: unr_configure.OutputPort.NODE,
         #
-        ai.AI_TYPE_UNDEFINED: obj_configure.OutputPort.NONE,
-        ai.AI_TYPE_NONE: obj_configure.OutputPort.NONE,
+        ai.AI_TYPE_UNDEFINED: unr_configure.OutputPort.NONE,
+        ai.AI_TYPE_NONE: unr_configure.OutputPort.NONE,
         #
-        ai.ai_params.AI_TYPE_POINTER: obj_configure.OutputPort.POINTER,
-        ai.AI_TYPE_CLOSURE: obj_configure.OutputPort.CLOSURE,
+        ai.ai_params.AI_TYPE_POINTER: unr_configure.OutputPort.POINTER,
+        ai.AI_TYPE_CLOSURE: unr_configure.OutputPort.CLOSURE,
     }
     @classmethod
     def get_output_name(cls, and_type):

@@ -113,7 +113,7 @@ class DtbBaseOpt(object):
         self._dtb_file_opt = bsc_core.StgFileOpt(
             database
         )
-        self._dtb_file_opt.set_directory_create()
+        self._dtb_file_opt.create_directory()
 
         self._dtb_opt = dtb_core.DtbSqlConnectionOpt.create_from_database(
             self._dtb_file_opt.get_path()

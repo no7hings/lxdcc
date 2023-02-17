@@ -130,7 +130,7 @@ def set_asset_geometry_uv_map_usd_link_export(rsv_task_properties):
         current_geometry_usd_uv_map_file_path = asset_geometry_rsv_query.get_usd_uv_map_file(
             version=version
         )
-        utl_dcc_objects.OsFile(current_geometry_usd_uv_map_file_path).set_directory_create()
+        utl_dcc_objects.OsFile(current_geometry_usd_uv_map_file_path).create_directory()
         utl_dcc_objects.OsFile(surface_geometry_usd_uv_map_file_path).set_link_to(
             current_geometry_usd_uv_map_file_path, replace=True
         )

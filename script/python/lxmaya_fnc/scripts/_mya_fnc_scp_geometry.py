@@ -82,8 +82,6 @@ def set_asset_geometry_usd_export(rsv_task_properties):
     #
     from lxutil import utl_core
     #
-    import lxobj.objects as core_objects
-    #
     import lxresolver.operators as rsv_operators
     #
     import lxmaya.fnc.exporters as mya_fnc_exporters
@@ -126,7 +124,7 @@ def set_asset_geometry_usd_export(rsv_task_properties):
                     raise TypeError()
                 #
                 i_location = '{}/{}'.format(root, i_location_name)
-                i_sub_root_dag_path = core_objects.ObjDagPath(i_location)
+                i_sub_root_dag_path = bsc_core.DccPathDagOpt(i_location)
                 i_mya_sub_root_dag_path = i_sub_root_dag_path.set_translate_to(
                     pathsep=ma_configure.Util.OBJ_PATHSEP
                 )
@@ -151,11 +149,11 @@ def set_asset_geometry_usd_export(rsv_task_properties):
 
 
 def set_asset_work_geometry_usd_export(rsv_task_properties):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
     #
     import lxresolver.commands as rsv_commands
-    #
-    import lxobj.objects as core_objects
     #
     import lxmaya.fnc.exporters as mya_fnc_exporters
     #
@@ -176,7 +174,7 @@ def set_asset_work_geometry_usd_export(rsv_task_properties):
             g_p.set_update()
             #
             i_sub_root = '{}/{}'.format(root, i_var_name)
-            i_sub_root_dag_path = core_objects.ObjDagPath(i_sub_root)
+            i_sub_root_dag_path = bsc_core.DccPathDagOpt(i_sub_root)
             i_mya_sub_root_dag_path = i_sub_root_dag_path.set_translate_to(
                 pathsep=ma_configure.Util.OBJ_PATHSEP
             )

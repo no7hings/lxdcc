@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 import arnold as ai
 
-import lxobj.objects as core_objects
+import lxuniverse.objects as unv_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 #
@@ -16,6 +16,6 @@ class Scene(and_obj_abstract.AbsObjScene):
     ]
     #
     FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = core_objects.ObjUniverse
+    UNIVERSE_CLASS = unv_objects.ObjUniverse
     def __init__(self, option=None):
         super(Scene, self).__init__(option=option)

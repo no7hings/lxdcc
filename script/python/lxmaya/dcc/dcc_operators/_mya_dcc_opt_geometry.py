@@ -16,7 +16,7 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxobj import obj_configure
+from lxuniverse import unr_configure
 
 from lxutil import utl_core, utl_configure
 
@@ -516,7 +516,7 @@ class MeshOpt(
         # remove namespace, use transform path
         raw = ma_core._ma_obj_path__get_with_namespace_clear_(self._obj.transform.path)
         # replace pathsep
-        raw = raw.replace(self._obj.PATHSEP, obj_configure.Obj.PATHSEP)
+        raw = raw.replace(self._obj.PATHSEP, unr_configure.Obj.PATHSEP)
         # strip path
         if lstrip is not None:
             if raw.startswith(lstrip):

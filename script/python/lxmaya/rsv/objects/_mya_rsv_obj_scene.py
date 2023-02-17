@@ -42,9 +42,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_location
         )
         if mya_group.get_is_exists() is True:
-            if workspace == 'publish':
+            if workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword_0 = 'asset-maya-scene-file'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword_0 = 'asset-temporary-maya-scene-file'
             else:
                 raise TypeError()
@@ -100,9 +100,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-maya-scene-src-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-maya-scene-src-file'
         else:
             raise TypeError()
@@ -173,10 +173,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-preview-mov-file'
             keyword_1 = 'asset-review-mov-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-preview-mov-file'
             keyword_1 = 'asset-temporary-review-mov-file'
         else:
@@ -226,9 +226,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-maya-scene-src-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-maya-scene-src-file'
         else:
             raise TypeError()
@@ -261,9 +261,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-maya-scene-src-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-maya-scene-src-file'
         else:
             raise TypeError()
@@ -385,9 +385,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             #
-            if workspace == 'publish':
+            if workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword_0 = 'asset-texture-tgt-dir'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword_0 = 'asset-temporary-texture-tgt-dir'
             else:
                 raise RuntimeError()
@@ -431,10 +431,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             #
-            if workspace == 'publish':
+            if workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword_0 = 'asset-maya-scene-file'
                 keyword_1 = 'asset-texture-tgt-dir'
-            elif workspace == 'output':
+            elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword_0 = 'asset-temporary-maya-scene-file'
                 keyword_1 = 'asset-temporary-texture-tgt-dir'
             else:
@@ -472,10 +472,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-maya-scene-file'
             keyword_1 = 'asset-source-maya-scene-src-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-maya-scene-file'
             keyword_1 = 'asset-source-maya-scene-src-file'
         else:
@@ -530,9 +530,9 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         asset_shot = self._hook_option_opt.get('shot')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-shot-maya-scene-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-shot-maya-scene-file'
         else:
             raise TypeError()
@@ -561,9 +561,9 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-shot-maya-scene-src-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-shot-maya-scene-src-file'
         else:
             raise TypeError()
@@ -606,11 +606,11 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == 'publish':
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-shot-maya-scene-src-file'
             keyword_1 = 'asset-shot-maya-scene-file'
             keyword_2 = 'asset-maya-scene-file'
-        elif workspace == 'output':
+        elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-shot-maya-scene-src-file'
             keyword_1 = 'asset-temporary-shot-maya-scene-file'
             keyword_2 = 'asset-temporary-maya-scene-file'

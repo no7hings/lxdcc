@@ -1,23 +1,46 @@
 # coding:utf-8
 import copy
+
 import fnmatch
+
+import threading
 
 import os
 
 import subprocess
 
+import functools
+
 from lxbasic import bsc_core
+
+from lxresolver import rsv_configure
 
 import lxbasic.objects as bsc_objects
 
 
 class AbsRsvAppDef(object):
+    Applications = rsv_configure.Applications
     CACHE = dict()
     BIN = None
     def __init__(self, project, application, configure):
         self._project = project
         self._platform = bsc_core.SystemMtd.get_platform()
-        self._application = application
+        #
+        if application == 'python':
+            self._application = 'maya'
+        elif application == 'shotgun':
+            self._application = 'maya'
+        elif application == 'usd':
+            self._application = 'maya'
+        elif application == 'gui':
+            self._application = 'maya'
+        elif application == 'rv':
+            self._application = 'maya'
+        elif application == 'rv-movie-convert':
+            self._application = 'maya'
+        else:
+            self._application = application
+        #
         self._configure = configure
         #
         self._variants = dict(
@@ -146,17 +169,35 @@ class AbsRsvAppDef(object):
     def get_packages(self):
         pass
 
-    def get_command(self, args_extend=None, packages_extend=None):
+    def get_command(self, args_execute=None, packages_extend=None):
         raise NotImplementedError()
 
-    def execute_command(self, args_extend=None, packages_extend=None):
-        cmd = self.get_command(args_extend, packages_extend)
+    def execute_command(self, args_execute=None, packages_extend=None):
+        cmd = self.get_command(args_execute, packages_extend)
         if cmd:
             bsc_core.LogMtd.trace_method_result(
                 'execute app command',
                 'command=`{}` is started'.format(cmd)
             )
             bsc_core.SubProcessMtd.set_run_with_result(cmd)
+    @classmethod
+    def execute_with_result(cls, command, **sub_progress_kwargs):
+        bsc_core.LogMtd.trace_method_result(
+            'execute app command',
+            'command=`{}` is started'.format(command)
+        )
+        bsc_core.SubProcessMtd.set_run_with_result(command, **sub_progress_kwargs)
+    @classmethod
+    def execute_with_result_use_thread(cls, command, **sub_progress_kwargs):
+        t_0 = threading.Thread(
+            target=functools.partial(
+                cls.execute_with_result,
+                cmd=command,
+                **sub_progress_kwargs
+            )
+        )
+        t_0.start()
+        # t_0.join()
 
     def _test_(self):
         print self.get_package('pglauncher')
@@ -175,6 +216,9 @@ class AbsRsvAppDefault(AbsRsvAppDef):
         super(AbsRsvAppDefault, self).__init__(project, application, configure)
     
     def get_args(self, packages_extend=None):
+        if self._application == self.Applications.Lynxi:
+            return ['lxdcc']
+
         key = self.get_key()
         if key in self.__class__.CACHE:
             return self.__class__.CACHE[key]
@@ -202,11 +246,11 @@ class AbsRsvAppDefault(AbsRsvAppDef):
             return _
         return []
 
-    def get_command(self, args_extend=None, packages_extend=None):
+    def get_command(self, args_execute=None, packages_extend=None):
         args = self.get_args(packages_extend)
         if args:
-            if isinstance(args_extend, (set, tuple, list)):
-                args.extend(args_extend)
+            if isinstance(args_execute, (set, tuple, list)):
+                args.extend(args_execute)
             return ' '.join([self.BIN] + list(args))
 
     def _test_(self):
@@ -222,7 +266,7 @@ class PackageContextNew(object):
 
         self._exclude_packages = []
 
-    def _get_resolved_packages_data(self):
+    def get_resolved_packages_data(self):
         results = bsc_core.SubProcessMtd.set_run_as_block('{} {} -v'.format(self._app.BIN_SOURCE, self._cmd))
         package_start_index = None
         package_end_index = None
@@ -352,7 +396,7 @@ class PackageContextNew(object):
 
     def _get_packages(self):
         list_ = []
-        resolved_packages = self._get_resolved_packages_data()
+        resolved_packages = self.get_resolved_packages_data()
         #
         for i_p in resolved_packages:
             i_replace_package = self._get_replace_package(i_p)
@@ -379,6 +423,9 @@ class AbsRsvAppNew(AbsRsvAppDef):
         super(AbsRsvAppNew, self).__init__(project, application, configure)
 
     def get_args(self, packages_extend=None):
+        if self._application == self.Applications.Lynxi:
+            return ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        #
         key = self.get_key()
         if key in self.__class__.CACHE:
             return self.__class__.CACHE[key]
@@ -406,12 +453,18 @@ class AbsRsvAppNew(AbsRsvAppDef):
             return _
         return []
 
-    def get_command(self, args_extend=None, packages_extend=None):
-        args_extend = map(lambda x: ' '.join(map(lambda y: '--join-cmd' if y in '--' else y, x.split(' '))), args_extend)
+    def get_command(self, args_execute=None, packages_extend=None):
+        if isinstance(args_execute, (set, tuple, list)):
+            args_execute = [
+                '--join-cmd' if x_seq == 0 and y_seq == 0 and y in ['--', '-c'] else y
+                for x_seq, x in enumerate(args_execute)
+                for y_seq, y in enumerate(x.split(' '))
+            ]
+        #
         args = self.get_args(packages_extend)
         if args:
-            if isinstance(args_extend, (set, tuple, list)):
-                args.extend(args_extend)
+            if isinstance(args_execute, (set, tuple, list)):
+                args.extend(args_execute)
             return ' '.join([self.BIN] + list(args))
 
     def _test_(self):

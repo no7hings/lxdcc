@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, UsdGeom
 
-from lxobj import obj_core
+from lxbasic import bsc_core
 
 from lxusd import usd_configure
 
@@ -21,7 +21,7 @@ class AbsUsdScene(object):
     def _set_reference_add_(cls, stage, file_path, root):
         usd_root = stage.GetPseudoRoot()
         if root is not None:
-            dag_path_comps = obj_core.DccPathDagMtd.get_dag_component_paths(root, pathsep=usd_configure.Obj.PATHSEP)
+            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(root, pathsep=usd_configure.Obj.PATHSEP)
             if dag_path_comps:
                 dag_path_comps.reverse()
             for i in dag_path_comps:

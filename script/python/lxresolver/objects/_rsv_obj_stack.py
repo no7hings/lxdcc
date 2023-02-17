@@ -1,9 +1,9 @@
 # coding:utf-8
-from lxobj import obj_abstract
+import lxuniverse.abstracts as unr_abstracts
 
 
 # <stack-project>
-class ProjectStack(obj_abstract.AbsObjStack):
+class ProjectStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(ProjectStack, self).__init__()
 
@@ -12,7 +12,7 @@ class ProjectStack(obj_abstract.AbsObjStack):
 
 
 # <stack-task>
-class EntityStack(obj_abstract.AbsObjStack):
+class EntityStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(EntityStack, self).__init__()
 
@@ -21,7 +21,7 @@ class EntityStack(obj_abstract.AbsObjStack):
 
 
 # <stack-task>
-class TaskStack(obj_abstract.AbsObjStack):
+class TaskStack(unr_abstracts.AbsObjStack):
     def __init__(self):
         super(TaskStack, self).__init__()
 

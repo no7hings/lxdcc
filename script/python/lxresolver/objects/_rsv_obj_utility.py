@@ -1,5 +1,5 @@
 # coding:utf-8
-import lxobj.objects as core_objects
+import lxuniverse.objects as unv_objects
 
 import lxresolver.abstracts as rsv_abstracts
 
@@ -112,7 +112,7 @@ class RsvProject(rsv_abstracts.AbsRsvProject):
 class RsvRoot(rsv_abstracts.AbsRsvRoot):
     PATHSEP = '/'
     #
-    OBJ_UNIVERSE_CLASS = core_objects.ObjUniverse
+    OBJ_UNIVERSE_CLASS = unv_objects.ObjUniverse
     #
     RSV_PROJECT_STACK_CLASS = _rsv_obj_stack.ProjectStack
     RSV_PROJECT_CLASS = RsvProject

@@ -3,13 +3,13 @@ from lxutil import utl_abstract
 
 from lxutil_gui import utl_gui_core
 
-from lxobj import obj_abstract
+import lxuniverse.abstracts as unr_abstracts
 
 
 class Obj(
     utl_abstract.AbsDccObjDef,
-    obj_abstract.AbsObjDagDef,
-    obj_abstract.AbsObjGuiDef
+    unr_abstracts.AbsObjDagDef,
+    unr_abstracts.AbsObjGuiDef
 ):
     PATHSEP = '/'
     def __init__(self, path):

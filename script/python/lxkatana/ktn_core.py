@@ -19,8 +19,6 @@ import lxkatana.modifiers as ktn_modifiers
 
 from lxutil import utl_core
 
-from lxobj import obj_core
-
 import fnmatch
 
 import sys
@@ -889,10 +887,10 @@ class NGObjOpt(object):
 
     def set_port_create(self, port_path, port_type, default_value):
         _ = self.get_port(port_path)
-        port_parent = obj_core.PortPathMethod.get_dag_parent(
+        port_parent = bsc_core.DccPortPathMtd.get_dag_parent(
             path=port_path, pathsep=self.PORT_PATHSEP
         )
-        port_name = obj_core.PortPathMethod.get_dag_name(
+        port_name = bsc_core.DccPortPathMtd.get_dag_name(
             path=port_path, pathsep=self.PORT_PATHSEP
         )
         if _ is None:

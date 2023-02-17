@@ -215,7 +215,7 @@ class RsvPermissionMtd(AbsPermission):
         #
         task_directory_paths = r.get_rsv_resource_task_directory_paths(**kwargs)
         for i_task_directory_path in task_directory_paths:
-            bsc_core.StorageMtd.set_directory_create(i_task_directory_path)
+            bsc_core.StorageMtd.create_directory(i_task_directory_path)
             utl_core.Log.set_module_result_trace(
                 'directory create',
                 'directory="{}"'.format(i_task_directory_path)

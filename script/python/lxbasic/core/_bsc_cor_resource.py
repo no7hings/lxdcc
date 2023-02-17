@@ -6,7 +6,6 @@ from lxbasic.core import _bsc_cor_environ, _bsc_cor_storage
 
 class RscFileMtd(object):
     CACHE = {}
-    CACHE_ALL = {}
     ENVIRON_KEY = 'LYNXI_RESOURCES'
     @classmethod
     def get_search_directories(cls):

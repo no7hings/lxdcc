@@ -1,5 +1,6 @@
 # coding:utf-8
 import fnmatch
+
 import re
 
 import types
@@ -26,7 +27,7 @@ from lxresolver import rsv_configure
 
 
 class AssetWorkspace(object):
-    CONFIGURE_FILE_PATH = ktn_configure.Data.LOOK_KATANA_WORKSPACE_CONFIGURE_PATH
+    CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default')
     GEOMETRY_TYPES = [
         'subdmesh',
         'renderer procedural',
@@ -846,7 +847,7 @@ class AssetWorkspace(object):
             dcc_obj.get_port('saveTo').set(file_path)
             #
             os_file = utl_dcc_objects.OsFile(file_path)
-            os_file.set_directory_create()
+            os_file.create_directory()
             dcc_obj.ktn_obj.WriteToLookFile(None, file_path)
             #
             if geometry_settings.get_is_exists() is True:

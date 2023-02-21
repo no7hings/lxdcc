@@ -1333,9 +1333,6 @@ class AbsRsvTask(
                             j_rsv_scene_properties.set(
                                 'dcc', self._rsv_project.get_dcc_data(i_application)
                             )
-                            print(
-
-                            )
                             return j_rsv_scene_properties
     # tag
     def get_rsv_tag(self):

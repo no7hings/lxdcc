@@ -1,17 +1,20 @@
 # coding:utf-8
 import locale
+
 import os
 
 from lxbasic import bsc_core
 
 from lxutil import utl_core
 
+import lxutil.extra.methods as utl_etr_methods
+
 import lxresolver.commands as rsv_commands
 
 
 class AbsHookExecutor(object):
-    REZ_SHELL_CMD_PATTERN = 'rez-env lxdcc -c \"lxhook-engine -o \\\"{option}\\\"\"'
-    REZ_DEADLINE_CMD_PATTERN = 'rez-env lxdcc -- lxhook-engine -o "{option}&start_index=<STARTFRAME>&end_index=<ENDFRAME>"'
+    SHELL_PATTERN = '-- lxhook-engine -o "{option}"'
+    DEADLINE_PATTERN = '-- lxhook-engine -o "{option}&start_index=<STARTFRAME>&end_index=<ENDFRAME>"'
     #
     SUBMITTER_CLASS = None
     def __init__(self, session):
@@ -175,39 +178,53 @@ class AbsHookExecutor(object):
 
     def set_run_with_shell(self, block=False):
         #
-        extend_environs = {}
+        environs_extend = {}
         #
         _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
         if _:
-            extend_environs['LYNXI_RESOURCES'] = _
+            environs_extend['LYNXI_RESOURCES'] = _
         #
         cmd = self.get_shell_command()
         #
         if block is True:
             utl_core.SubProcessRunner.set_run_with_result(
-                cmd, extend_environs=extend_environs
+                cmd, environs_extend=environs_extend
             )
         else:
             utl_core.SubProcessRunner.set_run_with_result_use_thread(
-                cmd, extend_environs=extend_environs
+                cmd, environs_extend=environs_extend
             )
 
     def set_run(self):
         return self.execute_with_deadline()
 
     def get_shell_command(self):
-        return self.REZ_SHELL_CMD_PATTERN.format(
-            **dict(option=self.get_session().get_option())
+        etr_utility = utl_etr_methods.EtrUtility
+        command = etr_utility.get_base_command(
+            args_execute=[
+                self.SHELL_PATTERN.format(
+                    **dict(option=self.get_session().get_option())
+                )
+            ],
+            packages_extend=etr_utility.get_base_packages_extend()
         )
+        return command
 
     def get_deadline_command(self):
-        return self.REZ_DEADLINE_CMD_PATTERN.format(
-            **dict(option=self.get_session().get_option())
-        ).replace(
-            '<', '\\<'
-        ).replace(
-            '>', '\\>'
+        etr_utility = utl_etr_methods.EtrUtility
+        command = etr_utility.get_base_command(
+            args_execute=[
+                self.DEADLINE_PATTERN.format(
+                    **dict(option=self.get_session().get_option())
+                ).replace(
+                    '<', '\\<'
+                ).replace(
+                    '>', '\\>'
+                )
+            ],
+            packages_extend=etr_utility.get_base_packages_extend()
         )
+        return command
 
 
 class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):

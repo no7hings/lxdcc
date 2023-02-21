@@ -270,7 +270,7 @@ class AbsSsnObj(
             'hook_option.engine'
         )
 
-    def get_rez_extend_packages(self):
+    def get_packages_extend(self):
         return self._configure.get(
             'hook_option.rez.extend_packages'
         ) or []

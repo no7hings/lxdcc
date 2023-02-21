@@ -1,10 +1,10 @@
 # coding:utf-8
-from lxsession.objects import ssn_obj_eng_abs
+import lxsession.abstracts as ssn_abstracts
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 
-class SsnRsvApplication(ssn_obj_eng_abs.AbsSsnRsvApplication):
+class SsnRsvApplication(ssn_abstracts.AbsSsnRsvApplication):
     def __init__(self):
         super(SsnRsvApplication, self).__init__()
 

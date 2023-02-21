@@ -21,7 +21,7 @@ def main(file, movie_file='', description=''):
 
     description = quote(description.encode('utf-8'))
     description = description.replace('%', r'///')
-
+    # todo: use new fnc
     cmd = r'rez-env lxdcc -c "lxhook-command -o \"option_hook_key=rsv-task-batchers/asset/gen-model-export-extra&choice_scheme=asset-maya-publish&file={file}&movie_file={movie_file}&user={user}&description={description}&td_enable={td_enable}&rez_beta={rez_beta}&deadline_enable={deadline_enable}\""'.format(
         file=file,
         description=description,

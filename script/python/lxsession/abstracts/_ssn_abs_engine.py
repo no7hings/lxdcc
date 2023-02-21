@@ -1,6 +1,5 @@
 # coding:utf-8
 import lxutil.fnc.exporters as utl_fnc_exporters
-from lxutil import utl_core
 
 import lxresolver.commands as rsv_commands
 

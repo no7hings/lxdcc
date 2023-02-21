@@ -60,6 +60,8 @@ def __execute_hook(option):
     #
     from lxutil import utl_core
     #
+    import lxutil.extra.methods as utl_etr_methods
+    #
     import lxsession.commands as ssn_commands
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
@@ -69,21 +71,24 @@ def __execute_hook(option):
     if hook_args:
         session, fnc = hook_args
         #
+        packages_extend = utl_etr_methods.EtrUtility.get_base_packages_extend()
         # add extend packages
-        extend_packages = session.get_rez_extend_packages()
+        opt_packages_extend = session.get_packages_extend()
+        if opt_packages_extend:
+            packages_extend.extend(opt_packages_extend)
         #
-        if extend_packages:
-            cmd = 'rez-env lxdcc {} -- lxhook-python -o "{}"'.format(' ' .join(extend_packages), option)
-        else:
-            cmd = 'rez-env lxdcc -- lxhook-python -o "{}"'.format(option)
+        cmd = utl_etr_methods.EtrUtility.get_base_command(
+                args_execute=['-- lxhook-python -o "{}"'.format(option)],
+                packages_extend=packages_extend
+            )
         #
-        extend_environs = {}
+        environs_extend = {}
         _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
         if _:
-            extend_environs['LYNXI_RESOURCES'] = _
+            environs_extend['LYNXI_RESOURCES'] = (_, 'prepend')
         # run cmd by subprocess
         utl_core.SubProcessRunner.set_run_with_result_use_thread(
-            cmd, extend_environs=extend_environs
+            cmd, environs_extend=environs_extend
         )
 
 

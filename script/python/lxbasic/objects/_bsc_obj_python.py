@@ -38,6 +38,8 @@ class PyModule(object):
             if hasattr(self._module, '__file__') is True:
                 self._file_path_pyc = self._module.__file__
                 self._file_path_py = self._get_py_(self._file_path_pyc)
+    def get_module(self):
+        return self._module
     @property
     def module(self):
         return self._module

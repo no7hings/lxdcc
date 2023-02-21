@@ -886,7 +886,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def create_set_asset_component_usd(self):
         import lxutil.scripts as utl_scripts
 
-        import lxutil.etr.scripts as utl_etr_scripts
+        import lxutil.extra.methods as utl_etr_methods
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -973,8 +973,9 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
             #
             if workspace in [rsv_scene_properties.get('workspaces.release')]:
+                m = utl_etr_methods.get_module(framework_scheme)
+                register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
                 if framework_scheme == 'default':
-                    register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
-                    utl_etr_scripts.ScpUsd.registry_set(
+                    m.EtrUsd.registry_set(
                         register_file_path
                     )

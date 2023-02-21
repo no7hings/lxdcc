@@ -11,8 +11,8 @@ package-data:
         linux: [ '{home}/packages' ]
     #
     package-pre_release-root-patterns:
-        windows: [ 'x:/PLE/workspace/pre_release' ]
-        linux: [ '/job/PLE/workspace/pre_release' ]
+        windows: [ 'x:/PLE/workspace/pre_release/packages' ]
+        linux: [ '/job/PLE/workspace/pre_release/packages' ]
     #
     package-release-root-patterns:
         windows: [ 'x:/PLE/bundle/internal', 'x:/PLE/bundle/thirdparty' ]

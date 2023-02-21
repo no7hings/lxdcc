@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 from ._bsc_cor_utility import *
 
 from lxbasic.core import _bsc_cor_environ
@@ -40,15 +41,34 @@ class SubProcessMtd(object):
                 # env=cls.ENVIRON_MARK
             )
         else:
-            extend_environs = kwargs.get('extend_environs', {})
-            if extend_environs:
+            environs_extend = kwargs.get('environs_extend', {})
+            if environs_extend:
                 environs = dict(os.environ)
                 environs = {str(k): str(v) for k, v in environs.items()}
-                environs_opt = _bsc_cor_environ.EnvironsOpt(environs)
+                env_opt = _bsc_cor_environ.EnvironsOpt(environs)
                 for k, v in environs.items():
-                    environs_opt.set_add(
+                    env_opt.set_add(
                         k, v
                     )
+                for k, v in environs_extend.items():
+                    if isinstance(v, six.text_type):
+                        env_opt.set(
+                            k, v
+                        )
+                    elif isinstance(v, tuple):
+                        i_v, i_opt = v
+                        if i_opt == 'set':
+                            env_opt.set(
+                                k, v
+                            )
+                        elif i_opt == 'append':
+                            env_opt.append(
+                                k, i_v
+                            )
+                        elif i_opt == 'prepend':
+                            env_opt.prepend(
+                                k, i_v
+                            )
                 #
                 s_p = subprocess.Popen(
                     cmd,
@@ -121,15 +141,34 @@ class SubProcessMtd(object):
                 # env=cls.ENVIRON_MARK
             )
         else:
-            extend_environs = kwargs.get('extend_environs', {})
-            if extend_environs:
+            environs_extend = kwargs.get('environs_extend', {})
+            if environs_extend:
                 environs = dict(os.environ)
                 environs = {str(k): str(v) for k, v in environs.items()}
-                environs_opt = _bsc_cor_environ.EnvironsOpt(environs)
+                env_opt = _bsc_cor_environ.EnvironsOpt(environs)
                 for k, v in environs.items():
-                    environs_opt.set_add(
+                    env_opt.set_add(
                         k, v
                     )
+                for k, v in environs_extend.items():
+                    if isinstance(v, six.text_type):
+                        env_opt.set(
+                            k, v
+                        )
+                    elif isinstance(v, tuple):
+                        i_v, i_opt = v
+                        if i_opt == 'set':
+                            env_opt.set(
+                                k, v
+                            )
+                        elif i_opt == 'append':
+                            env_opt.append(
+                                k, i_v
+                            )
+                        elif i_opt == 'prepend':
+                            env_opt.prepend(
+                                k, i_v
+                            )
                 #
                 s_p = subprocess.Popen(
                     cmd,

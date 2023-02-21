@@ -93,6 +93,22 @@ class EnvironsOpt(object):
         else:
             self._environs[key] = value
 
+    def append(self, key, value):
+        if key in self._environs:
+            v = self._environs[key]
+            if value not in v:
+                self._environs[key] += os.pathsep+value
+        else:
+            self._environs[key] = value
+
+    def prepend(self, key, value):
+        if key in self._environs:
+            v = self._environs[key]
+            if value not in v:
+                self._environs[key] = value+os.pathsep+self._environs[key]
+        else:
+            self._environs[key] = value
+
 
 class EnvExtraMtd(EnvironMtd):
     SCHEME_KEY = 'LYNXI_SCHEME'

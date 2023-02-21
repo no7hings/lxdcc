@@ -24,7 +24,7 @@ class TrdSignal(object):
 class TrdCmdProcess(threading.Thread):
     STACK = []
     # MAXIMUM = int(CPU_COUNT*.75)
-    MAXIMUM = 6
+    MAXIMUM = 8
     EVENT = threading.Event()
     LOCK = threading.Lock()
     #

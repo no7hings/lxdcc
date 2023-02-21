@@ -5,6 +5,8 @@ import functools
 
 from lxbasic import bsc_core
 
+import lxutil.extra.methods as utl_etr_methods
+
 
 class AbsRsvAppOpt(object):
     def __init__(self, rsv_app):
@@ -22,7 +24,7 @@ class AbsRsvAppOpt(object):
         )
         bsc_core.LogMtd.trace_method_result(
             'sub-progress run with result',
-            'command=`{}` is completed'.format(cmd)
+            'command=`{}` is completed'.format(cmd.decode('utf-8'))
         )
     @classmethod
     def _execute_command_use_thread_(cls, cmd, **sub_progress_kwargs):
@@ -35,21 +37,46 @@ class AbsRsvAppOpt(object):
         )
         t_0.start()
 
+    def get_environs_extend(self):
+        framework_scheme = self._rsv_project.get_framework_scheme()
+        m = utl_etr_methods.get_module(framework_scheme)
+        return m.EtrUtility.get_project_environs_extend(
+            self._rsv_project.get_name()
+        )
+
+    def open(self):
+        raise NotImplementedError()
+
     def open_file(self, *args, **kwargs):
         raise NotImplementedError()
 
+    def get_packages_extend(self):
+        framework_scheme = self._rsv_project.get_framework_scheme()
+        if framework_scheme == 'default':
+            return []
+        elif framework_scheme == 'new':
+            return ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        return []
+
 
 class RsvMayaOpt(AbsRsvAppOpt):
-    def __init__(self, rsv_app):
-        super(RsvMayaOpt, self).__init__(rsv_app)
+    def __init__(self, *args, **kwargs):
+        super(RsvMayaOpt, self).__init__(*args, **kwargs)
+
+    def open(self):
+        cmd = self._rsv_app.get_command(
+            args_execute=[
+                '-- maya',
+            ],
+            packages_extend=self.get_packages_extend()
+        )
+        self._execute_command_use_thread_(
+            cmd,
+            # clear_environ=True,
+            environs_extend=self.get_environs_extend()
+        )
 
     def open_file(self, file_path):
-        scheme = bsc_core.EnvExtraMtd.get_scheme()
-        if scheme == 'new':
-            packages_extend = ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
-        else:
-            packages_extend = []
-        #
         cmd = self._rsv_app.get_command(
             args_execute=[
                 '-- maya',
@@ -57,22 +84,54 @@ class RsvMayaOpt(AbsRsvAppOpt):
                     file_path
                 )
             ],
-            packages_extend=packages_extend
+            packages_extend=self.get_packages_extend()
         )
-        self._execute_command_use_thread_(cmd, clear_environ=True)
+        self._execute_command_use_thread_(
+            cmd,
+            # clear_environ=True,
+            environs_extend=self.get_environs_extend()
+        )
+
+
+class RsvHoudiniOpt(AbsRsvAppOpt):
+    def __init__(self, *args, **kwargs):
+        super(RsvHoudiniOpt, self).__init__(*args, **kwargs)
+
+    def open(self):
+        cmd = self._rsv_app.get_command(
+            args_execute=[
+                '-- houdini',
+            ],
+            packages_extend=self.get_packages_extend()
+        )
+        self._execute_command_use_thread_(
+            cmd,
+            # clear_environ=True,
+            environs_extend=self.get_environs_extend()
+        )
+
+    def open_file(self, file_path):
+        pass
 
 
 class RsvKatanaOpt(AbsRsvAppOpt):
-    def __init__(self, rsv_app):
-        super(RsvKatanaOpt, self).__init__(rsv_app)
+    def __init__(self, *args, **kwargs):
+        super(RsvKatanaOpt, self).__init__(*args, **kwargs)
+
+    def open(self):
+        cmd = self._rsv_app.get_command(
+            args_execute=[
+                '-- katana',
+            ],
+            packages_extend=self.get_packages_extend()
+        )
+        self._execute_command_use_thread_(
+            cmd,
+            # clear_environ=True,
+            environs_extend=self.get_environs_extend()
+        )
 
     def open_file(self, file_path):
-        scheme = bsc_core.EnvExtraMtd.get_scheme()
-        if scheme == 'new':
-            packages_extend = ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
-        else:
-            packages_extend = []
-        #
         cmd = self._rsv_app.get_command(
             args_execute=[
                 '-- katana',
@@ -80,6 +139,10 @@ class RsvKatanaOpt(AbsRsvAppOpt):
                     file_path
                 )
             ],
-            packages_extend=packages_extend
+            packages_extend=self.get_packages_extend()
         )
-        self._execute_command_use_thread_(cmd)
+        self._execute_command_use_thread_(
+            cmd,
+            # clear_environ=True,
+            environs_extend=self.get_environs_extend()
+        )

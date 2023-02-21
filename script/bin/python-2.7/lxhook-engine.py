@@ -151,11 +151,11 @@ def __execute_option_hook(hook_option):
     #
     if use_thread is True:
         rsv_app.execute_with_result_use_thread(
-            command, extend_environs=environs_extend
+            command, environs_extend=environs_extend
         )
     else:
         rsv_app.execute_with_result(
-            command, extend_environs=environs_extend
+            command, environs_extend=environs_extend
         )
 
 

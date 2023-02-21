@@ -19,8 +19,6 @@ for i_project in [
 
     i_rsv_project = r.get_rsv_project(project=i_project)
 
-    print i_rsv_project.get_value('schemes')
-
     i_rsv_launcher = i_rsv_project.get_rsv_app(
         application='maya'
     )

@@ -7,8 +7,6 @@ import lxbasic.objects as bsc_objects
 
 import lxresolver.commands as rsv_commands
 
-from lxutil import utl_core
-
 from lxsession import ssn_core
 
 import lxshotgun.objects as stg_objects
@@ -205,14 +203,14 @@ class AbsSsnObj(
         #     exec (f.read())
         #
         # use for python 2
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'option-hook execute', 'file="{}" is started'.format(
                 file_path
             )
         )
         kwargs['__name__'] = '__main__'
         execfile(file_path, kwargs)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'option-hook execute', 'file="{}" is completed'.format(
                 file_path
             )
@@ -687,7 +685,8 @@ class AbsSsnOptionMethod(
 
     def get_batch_file_path(self):
         option_opt = self.get_option_opt()
-        file_path = bsc_core.SessionYamlMtd.get_file_path(
+
+        file_path = ssn_core.SsnHookServerMtd.get_file_path(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
@@ -696,7 +695,11 @@ class AbsSsnOptionMethod(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
             )
-            utl_core.File.set_write(file_path, raw)
+            bsc_core.StgFileOpt(file_path).set_write(raw)
+            bsc_core.LogMtd.trace_method_result(
+                'hook batch-file write',
+                'file="{}"'.format(file_path)
+            )
         return file_path
 
     def set_ddl_dependent_job_ids_find(self, hook_option):
@@ -1016,7 +1019,11 @@ class AbsSsnRsvTaskOptionMethod(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
             )
-            utl_core.File.set_write(file_path, raw)
+            bsc_core.StgFileOpt(file_path).set_write(raw)
+            bsc_core.LogMtd.trace_method_result(
+                'hook batch-file write',
+                'file="{}"'.format(file_path)
+            )
         return file_path
 
     def set_ddl_result_update(self, hook_option, ddl_job_id):

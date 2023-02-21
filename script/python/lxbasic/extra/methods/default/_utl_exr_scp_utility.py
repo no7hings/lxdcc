@@ -3,44 +3,48 @@ import six
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
-
-import lxutil.extra.abstracts as utl_etr_abstracts
+import lxbasic.extra.abstracts as bsc_etr_abstracts
 
 
-class EtrUtility(utl_etr_abstracts.AbsEtrUtility):
+class EtrUtility(bsc_etr_abstracts.AbsEtrUtility):
     @classmethod
     def get_base_packages_extend(cls):
-        return ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        return ['lxdcc']
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
-        return bsc_objects.PackageContextNew(
-            None
-        ).get_command(
-            args_execute=args_execute, packages_extend=packages_extend
-        )
+        args = [
+            'rez-env',
+            ' '.join(packages_extend or []),
+            ' '.join(args_execute or [])
+        ]
+        return ' '.join(args)
     @classmethod
     def get_project_environs_extend(cls, project):
         return dict(
-            PAPER_SHOW_NAME=project.upper(),
-            PAPER_DB_NAME='production'
+            PG_SHOW=project.upper(),
         )
     @classmethod
     def set_project(cls, project):
         bsc_core.EnvExtraMtd.set(
-            'PAPER_SHOW_NAME', project.upper()
-        )
-        bsc_core.EnvExtraMtd.set(
-            'PAPER_DB_NAME', 'production'
+            'PG_SHOW', project.upper()
         )
     @classmethod
     def get_project(cls):
         return (bsc_core.EnvExtraMtd.get(
-            'PAPER_SHOW_NAME'
+            'PG_SHOW'
         ) or '').lower()
 
 
-class EtrRv(utl_etr_abstracts.AbsEtrRv):
+class EtrIde(bsc_etr_abstracts.AbsEtrIde):
+    @classmethod
+    def open_file(cls, file_path):
+        cmd = 'rez-env sublime_text -- sublime_text "{}"'.format(
+            file_path
+        )
+        bsc_core.SubProcessMtd.set_run(cmd)
+
+
+class EtrRv(bsc_etr_abstracts.AbsEtrRv):
     @classmethod
     def open_file(cls, file_path):
         bsc_core.SubProcessMtd.set_run_with_result_use_thread(
@@ -104,7 +108,10 @@ class EtrRv(utl_etr_abstracts.AbsEtrRv):
         )
 
 
-class EtrUsd(utl_etr_abstracts.AbsEtrUsd):
+class EtrUsd(bsc_etr_abstracts.AbsEtrUsd):
     @classmethod
     def registry_set(cls, file_path):
-        pass
+        # noinspection PyUnresolvedReferences
+        import production.gen.record_set_registry as pgs
+        pgs.run(file_path)
+

@@ -1,9 +1,9 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 import lxutil.fnc.exporters as utl_fnc_exporters
 
 import lxresolver.commands as rsv_commands
-
-import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 
 class AbsSsnRsvApplication(object):
@@ -92,11 +92,11 @@ class AbsSsnRsvApplication(object):
                 workspace_key=workspace_key_cur
             )
             #
-            scene_src_file_src = utl_dcc_objects.OsFile(scene_src_file_path_src)
-            if scene_src_file_src.get_is_exists() is True:
-                scene_src_file_tgt = utl_dcc_objects.OsFile(scene_src_file_path_tgt)
-                if scene_src_file_tgt.get_is_exists() is False:
-                    scene_src_file_src.set_copy_to_file(scene_src_file_path_tgt)
+            scene_src_file_opt_src = bsc_core.StgFileOpt(scene_src_file_path_src)
+            if scene_src_file_opt_src.get_is_exists() is True:
+                scene_src_file_opt_tgt = bsc_core.StgFileOpt(scene_src_file_path_tgt)
+                if scene_src_file_opt_tgt.get_is_exists() is False:
+                    scene_src_file_opt_src.set_copy_to_file(scene_src_file_path_tgt)
                     if application == 'maya':
                         utl_fnc_exporters.DotMaExporter(
                             option=dict(
@@ -107,9 +107,9 @@ class AbsSsnRsvApplication(object):
                     #
                     if ext_extras:
                         for i_ext in ext_extras:
-                            i_src = '{}.{}'.format(scene_src_file_src.path_base, i_ext)
-                            i_tgt = '{}.{}'.format(scene_src_file_tgt.path_base, i_ext)
-                            utl_dcc_objects.OsFile(i_src).set_copy_to_file(i_tgt)
+                            i_src = '{}.{}'.format(scene_src_file_opt_src.path_base, i_ext)
+                            i_tgt = '{}.{}'.format(scene_src_file_opt_tgt.path_base, i_ext)
+                            bsc_core.StgFileOpt(i_src).set_copy_to_file(i_tgt)
                     return scene_src_file_path_tgt
                 else:
                     return scene_src_file_path_tgt
@@ -177,11 +177,11 @@ class AbsSsnRsvApplication(object):
                 workspace_key=workspace_key_cur
             )
             #
-            scene_src_file_src = utl_dcc_objects.OsFile(scene_src_file_path_src)
-            if scene_src_file_src.get_is_exists() is True:
-                scene_src_file_tgt = utl_dcc_objects.OsFile(scene_src_file_path_tgt)
-                if scene_src_file_tgt.get_is_exists() is False:
-                    scene_src_file_src.set_copy_to_file(scene_src_file_path_tgt)
+            scene_src_file_opt_src = bsc_core.StgFileOpt(scene_src_file_path_src)
+            if scene_src_file_opt_src.get_is_exists() is True:
+                scene_src_file_opt_tgt = bsc_core.StgFileOpt(scene_src_file_path_tgt)
+                if scene_src_file_opt_tgt.get_is_exists() is False:
+                    scene_src_file_opt_src.set_copy_to_file(scene_src_file_path_tgt)
                     if application == 'maya':
                         utl_fnc_exporters.DotMaExporter(
                             option=dict(
@@ -192,9 +192,9 @@ class AbsSsnRsvApplication(object):
                     #
                     if ext_extras:
                         for i_ext in ext_extras:
-                            i_src = '{}.{}'.format(scene_src_file_src.path_base, i_ext)
-                            i_tgt = '{}.{}'.format(scene_src_file_tgt.path_base, i_ext)
-                            utl_dcc_objects.OsFile(i_src).set_copy_to_file(i_tgt)
+                            i_src = '{}.{}'.format(scene_src_file_opt_src.path_base, i_ext)
+                            i_tgt = '{}.{}'.format(scene_src_file_opt_tgt.path_base, i_ext)
+                            bsc_core.StgFileOpt(i_src).set_copy_to_file(i_tgt)
                     return scene_src_file_path_tgt
                 else:
                     return scene_src_file_path_tgt

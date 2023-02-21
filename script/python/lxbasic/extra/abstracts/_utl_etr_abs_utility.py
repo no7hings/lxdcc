@@ -19,6 +19,12 @@ class AbsEtrUtility(object):
         raise NotImplementedError()
 
 
+class AbsEtrIde(object):
+    @classmethod
+    def open_file(cls, file_path):
+        raise NotImplementedError()
+
+
 class AbsEtrRv(object):
     @classmethod
     def open_file(cls, file_path):

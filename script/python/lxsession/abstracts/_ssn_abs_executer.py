@@ -1,13 +1,9 @@
 # coding:utf-8
 import locale
 
-import os
-
 from lxbasic import bsc_core
 
-from lxutil import utl_core
-
-import lxutil.extra.methods as utl_etr_methods
+import lxbasic.extra.methods as bsc_etr_methods
 
 import lxresolver.commands as rsv_commands
 
@@ -156,7 +152,7 @@ class AbsHookExecutor(object):
         exists_ddl_job_id = session.set_ddl_job_id_find(hook_option)
         if exists_ddl_job_id:
             session._ddl_job_id = exists_ddl_job_id
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.LogMtd.trace_method_warning(
                 'option-hook execute by deadline', 'option-hook="{}", job-id="{}" is exists'.format(
                     option_hook_key, exists_ddl_job_id
                 )
@@ -169,7 +165,7 @@ class AbsHookExecutor(object):
                 session.set_ddl_result_update(
                     hook_option, ddl_job_id
                 )
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'option-hook execute by deadline', 'option-hook="{}", job-id="{}"'.format(
                         option_hook_key, ddl_job_id
                     )
@@ -187,11 +183,11 @@ class AbsHookExecutor(object):
         cmd = self.get_shell_command()
         #
         if block is True:
-            utl_core.SubProcessRunner.set_run_with_result(
+            bsc_core.SubProcessMtd.set_run_with_result(
                 cmd, environs_extend=environs_extend
             )
         else:
-            utl_core.SubProcessRunner.set_run_with_result_use_thread(
+            bsc_core.SubProcessMtd.set_run_with_result_use_thread(
                 cmd, environs_extend=environs_extend
             )
 
@@ -199,7 +195,7 @@ class AbsHookExecutor(object):
         return self.execute_with_deadline()
 
     def get_shell_command(self):
-        etr_utility = utl_etr_methods.EtrUtility
+        etr_utility = bsc_etr_methods.EtrUtility
         command = etr_utility.get_base_command(
             args_execute=[
                 self.SHELL_PATTERN.format(
@@ -211,7 +207,7 @@ class AbsHookExecutor(object):
         return command
 
     def get_deadline_command(self):
-        etr_utility = utl_etr_methods.EtrUtility
+        etr_utility = bsc_etr_methods.EtrUtility
         command = etr_utility.get_base_command(
             args_execute=[
                 self.DEADLINE_PATTERN.format(

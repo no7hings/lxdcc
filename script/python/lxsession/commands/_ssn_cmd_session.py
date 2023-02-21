@@ -11,8 +11,6 @@ def set_session_option_hooks_execute_by_deadline(session):
     from lxsession.commands import _ssn_cmd_hook
     #
     from lxbasic import bsc_core
-
-    from lxutil import utl_core
     #
     def run_branch_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
         _batch_hook_option_opt = bsc_core.ArgDictStringOpt(batch_hook_option_)
@@ -51,8 +49,9 @@ def set_session_option_hooks_execute_by_deadline(session):
                     _batch_choice_scheme,
                     _choice_scheme_includes
             ) is False:
-                utl_core.Log.set_module_warning_trace(
-                    'scheme choice', 'option-hook="{}" is ignore'.format(option_hook_key_)
+                bsc_core.LogMtd.trace_method_warning(
+                    'scheme choice',
+                    'option-hook="{}" is ignore'.format(option_hook_key_)
                 )
                 return
         #
@@ -71,7 +70,7 @@ def set_session_option_hooks_execute_by_deadline(session):
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
-    with utl_core.LogProgressRunner.create(
+    with bsc_core.LogProgress.create(
         maximum=len(option_hook_keys),
         label='option hooks execute by deadline',
         use_as_progress_bar=True,

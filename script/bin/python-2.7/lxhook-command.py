@@ -60,7 +60,7 @@ def __execute_hook(option):
     #
     from lxutil import utl_core
     #
-    import lxutil.extra.methods as utl_etr_methods
+    import lxbasic.extra.methods as utl_etr_methods
     #
     import lxsession.commands as ssn_commands
     #

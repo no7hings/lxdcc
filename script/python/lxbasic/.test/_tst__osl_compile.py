@@ -3,10 +3,6 @@ from lxbasic import bsc_core
 
 from lxarnold import and_setup
 
-import lxutil.scripts as utl_scripts
-
-from lxutil import utl_core
-
 and_setup.MtoaSetup('/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019').set_run()
 
 d_p = '/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders'

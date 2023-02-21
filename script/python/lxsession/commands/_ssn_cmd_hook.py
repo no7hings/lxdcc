@@ -11,8 +11,6 @@ def get_hook_args(key):
     #
     import lxbasic.objects as bsc_objects
     #
-    import lxutil.dcc.dcc_objects as utl_dcc_objects
-    #
     from lxsession import ssn_core
     #
     import lxsession.objects as ssn_objects
@@ -20,10 +18,10 @@ def get_hook_args(key):
     yaml_file_path = ssn_core.SsnHookFileMtd.get_yaml(key)
     if yaml_file_path:
         python_file_path = ssn_core.SsnHookFileMtd.get_python(key)
-        python_file = utl_dcc_objects.OsPythonFile(python_file_path)
-        yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
-        if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
-            configure = bsc_objects.Configure(value=yaml_file.path)
+        python_file_opt = bsc_core.StgFileOpt(python_file_path)
+        yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
+        if python_file_opt.get_is_exists() is True and yaml_file_opt.get_is_exists() is True:
+            configure = bsc_objects.Configure(value=yaml_file_opt.path)
             type_name = configure.get('option.type')
             session = None
             if type_name == 'application':
@@ -79,13 +77,13 @@ def get_hook_args(key):
                 raise TypeError()
             #
             if session is not None:
-                session.set_hook_yaml_file(yaml_file.path)
-                session.set_hook_python_file(python_file.path)
+                session.set_hook_yaml_file(yaml_file_opt.path)
+                session.set_hook_python_file(python_file_opt.path)
                 return session, execute_fnc
 
 
 def set_hook_execute(key):
-    from lxutil import utl_core
+    from lxbasic import bsc_core
     #
     hook_args = get_hook_args(key)
     if hook_args is not None:
@@ -93,7 +91,7 @@ def set_hook_execute(key):
         execute_fnc()
         return session
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.LogMtd.trace_method_warning(
             'hook execute',
             'hook_key="{}" is not found'.format(key)
         )
@@ -109,10 +107,6 @@ def get_option_hook_args(option):
     #
     import lxbasic.objects as bsc_objects
     #
-    from lxutil import utl_core
-    #
-    import lxutil.dcc.dcc_objects as utl_dcc_objects
-    #
     from lxsession import ssn_core
     #
     import lxsession.objects as ssn_objects
@@ -124,10 +118,10 @@ def get_option_hook_args(option):
     yaml_file_path = ssn_core.SsnOptionHookFileMtd.get_yaml(option_hook_key)
     if yaml_file_path:
         python_file_path = ssn_core.SsnOptionHookFileMtd.get_python(option_hook_key)
-        python_file = utl_dcc_objects.OsPythonFile(python_file_path)
-        yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
-        if python_file.get_is_exists() is True and yaml_file.get_is_exists() is True:
-            configure = bsc_objects.Configure(value=yaml_file.path)
+        python_file_opt = bsc_core.StgFileOpt(python_file_path)
+        yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
+        if python_file_opt.get_is_exists() is True and yaml_file_opt.get_is_exists() is True:
+            configure = bsc_objects.Configure(value=yaml_file_opt.path)
             type_name = configure.get('option.type')
             #
             session = None
@@ -202,7 +196,7 @@ def get_option_hook_args(option):
             return session, execute_fnc
     else:
         raise RuntimeError(
-            utl_core.Log.set_module_error_trace(
+            bsc_core.LogMtd.trace_method_error(
                 'option-hook gain',
                 'option-hook key="{}" configue (.yml) is not found'.format(option_hook_key)
             )
@@ -214,8 +208,6 @@ def get_option_hook_configure(option):
     #
     import lxbasic.objects as bsc_objects
     #
-    import lxutil.dcc.dcc_objects as utl_dcc_objects
-    #
     from lxsession import ssn_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
@@ -224,9 +216,9 @@ def get_option_hook_configure(option):
     #
     yaml_file_path = ssn_core.SsnOptionHookFileMtd.get_yaml(option_hook_key)
     if yaml_file_path:
-        yaml_file = utl_dcc_objects.OsFile(yaml_file_path)
-        if yaml_file.get_is_exists() is True:
-            return bsc_objects.Configure(value=yaml_file.path)
+        yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
+        if yaml_file_opt.get_is_exists() is True:
+            return bsc_objects.Configure(value=yaml_file_opt.path)
 
 
 def set_option_hook_execute(option):

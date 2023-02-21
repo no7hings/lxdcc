@@ -1,10 +1,10 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-import lxsession.abstracts as ssn_abstracts
+import lxutil.ssn.abstracts as utl_ssn_abstracts
 
 
-class SsnRsvApplication(ssn_abstracts.AbsSsnRsvApplication):
+class SsnRsvApplication(utl_ssn_abstracts.AbsSsnRsvApplication):
     def __init__(self):
         super(SsnRsvApplication, self).__init__()
 

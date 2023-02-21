@@ -1,15 +1,9 @@
 # coding:utf-8
 from __future__ import print_function
 
-import six
+from lxbasic.core._bsc_cor_utility import *
 
-import sys
-
-import time
-
-import fnmatch
-
-from lxbasic.core import _bsc_cor_pattern
+from lxbasic.core import _bsc_cor_raw, _bsc_cor_pattern
 
 
 class LogMtd(object):
@@ -147,6 +141,88 @@ class LogMtd(object):
         return '\n'.join(lines)
 
 
+class LogProgress(object):
+    @classmethod
+    def create(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
+    @classmethod
+    def create_as_bar(cls, *args, **kwargs):
+        kwargs['use_as_progress_bar'] = True
+        return cls.create(*args, **kwargs)
+
+    def __init__(self, maximum, label, use_as_progress_bar=False):
+        self._maximum = maximum
+        self._value = 0
+        self._label = label
+        self._use_as_progress_bar = use_as_progress_bar
+        #
+        self._start_timestamp = TimeMtd.get_timestamp()
+        self._pre_timestamp = TimeMtd.get_timestamp()
+        #
+        self._p = 0
+        #
+        LogMtd.trace_method_result(
+            self._label,
+            'is started'
+        )
+
+    def set_update(self, sub_label=None):
+        self._value += 1
+        cur_timestamp = TimeMtd.get_timestamp()
+        cost_timestamp = cur_timestamp - self._pre_timestamp
+        self._pre_timestamp = cur_timestamp
+        #
+        percent = float(self._value) / float(self._maximum)
+        # trace when value is integer
+        p = '%3d' % (int(percent*100))
+        if self._p != p:
+            self._p = p
+            if self._use_as_progress_bar is True:
+                LogMtd.trace_method_result(
+                    u'{}'.format(self._label),
+                    u'is running {} {}%, cost time {}'.format(
+                        self._get_progress_bar_string_(percent),
+                        p,
+                        _bsc_cor_raw.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
+
+                    )
+                )
+            else:
+                LogMtd.trace_method_result(
+                    u'{}'.format(self._label),
+                    u'is running {}%, cost time {}'.format(
+                        p,
+                        _bsc_cor_raw.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
+                    )
+                )
+    @classmethod
+    def _get_progress_bar_string_(cls, percent):
+        c = 20
+        p = int(percent*c)
+        p = max(p, 1)
+        return u'{}{}'.format(
+            p*u'■', (c-p)*u'□'
+        )
+
+    def set_stop(self):
+        self._value = 0
+        self._maximum = 0
+        #
+        cost_timestamp = TimeMtd.get_timestamp() - self._start_timestamp
+        LogMtd.trace_method_result(
+            self._label,
+            'is completed, cost time {}'.format(
+                _bsc_cor_raw.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
+            )
+        )
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.set_stop()
+
+
 if __name__ == '__main__':
     print(LogMtd.get('Test'))
     print(LogMtd.get(u'测试'))
@@ -171,4 +247,9 @@ if __name__ == '__main__':
 2023-02-02 18:02:04  error  | <测试> 测试
         '''
     ))
+
+    c = 100
+    with LogProgress.create_as_bar(maximum=c, label='test') as l_p:
+        for i in range(c):
+            l_p.set_update()
 

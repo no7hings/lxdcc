@@ -6,7 +6,7 @@ import lxbasic.objects as bsc_objects
 
 def get_module(framework_scheme):
     return bsc_objects.PyModule(
-        'lxutil.extra.methods.{}'.format(framework_scheme)
+        'lxbasic.extra.methods.{}'.format(framework_scheme)
     ).get_module()
 
 

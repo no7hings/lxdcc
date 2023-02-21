@@ -22,8 +22,10 @@ class AbsRsvAppDef(object):
     Applications = rsv_configure.Applications
     CACHE = dict()
     BIN = None
-    def __init__(self, project, application, configure):
-        self._project = project
+    def __init__(self, rsv_project, application, configure):
+        self._rsv_project = rsv_project
+        #
+        self._project = rsv_project.get_name()
         self._platform = bsc_core.SystemMtd.get_platform()
         #
         if application == 'python':
@@ -212,8 +214,8 @@ class PackageContextDefault(object):
 
 class AbsRsvAppDefault(AbsRsvAppDef):
     BIN = 'rez-env'
-    def __init__(self, project, application, configure):
-        super(AbsRsvAppDefault, self).__init__(project, application, configure)
+    def __init__(self, *args, **kwargs):
+        super(AbsRsvAppDefault, self).__init__(*args, **kwargs)
     
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:
@@ -227,7 +229,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
         configure_file_path = self._get_configure_file()
         if configure_file_path:
             bsc_core.LogMtd.trace_method_result(
-                'resolved app',
+                'app resolved',
                 'app="{project}.{application}"'.format(
                     **dict(project=self._project, application=self._application)
                 )
@@ -258,6 +260,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
 
 
 class PackageContextNew(object):
+    CACHE = dict()
     def __init__(self, app, cmd, packages_extend):
         self._app = app
         self._cmd = cmd
@@ -307,7 +310,7 @@ class PackageContextNew(object):
                     i_package = '{}@{}'.format(package_name, i_package_directory_path)
                     return i_package, i_package_variants
     @classmethod
-    def _get_virtual_version_(cls, version):
+    def _get_virtual_version(cls, version):
         """
         etc. convert master-1 to 0.0.1
         :param version:
@@ -320,7 +323,7 @@ class PackageContextNew(object):
 
     def _get_replace_package(self, package):
         package_name, package_version = package.split('@')
-        package_virtual_version = self._get_virtual_version_(package_version)
+        package_virtual_version = self._get_virtual_version(package_version)
         package_data = {}
         package_user_roots = self._app.get_package_user_roots()
         package_pre_release_roots = self._app.get_package_pre_release_roots()
@@ -342,7 +345,7 @@ class PackageContextNew(object):
                             k_package_directory = bsc_core.StgFileMtd.get_directory(k_package_file)
                             k_package_variants = j_p_opt.get_variants(k_package_file)
                             k_package_version = k_package_variants['version']
-                            k_package_virtual_version = self._get_virtual_version_(k_package_version)
+                            k_package_virtual_version = self._get_virtual_version(k_package_version)
                             k_key = '{}.{}'.format(k_package_virtual_version, i_index)
                             k_package = '{}@{}'.format(package_name, k_package_directory)
                             package_data[k_key] = k_package
@@ -379,7 +382,7 @@ class PackageContextNew(object):
                                 k_package_directory = bsc_core.StgFileMtd.get_directory(k_package_file)
                                 k_package_variants = j_p_opt.get_variants(k_package_file)
                                 k_package_version = k_package_variants['version']
-                                k_package_virtual_version = self._get_virtual_version_(k_package_version)
+                                k_package_virtual_version = self._get_virtual_version(k_package_version)
                                 k_key = '{}.{}'.format(k_package_virtual_version, i_index)
                                 if i_package_root in package_release_roots:
                                     k_package = '{}@{}'.format(package_name, k_package_version)
@@ -401,6 +404,10 @@ class PackageContextNew(object):
         for i_p in resolved_packages:
             i_replace_package = self._get_replace_package(i_p)
             if i_replace_package is not None:
+                bsc_core.LogMtd.trace_method_result(
+                    'package replaced',
+                    'package="{}"'.format(i_replace_package)
+                )
                 list_.append(i_replace_package)
             else:
                 list_.append(i_p)
@@ -409,6 +416,10 @@ class PackageContextNew(object):
             for i_p in self._packages_extend:
                 i_package = self._get_package(i_p)
                 if i_package is not None:
+                    bsc_core.LogMtd.trace_method_result(
+                        'package resolved',
+                        'package="{}"'.format(i_package)
+                    )
                     list_.append(i_package)
         return list_
 
@@ -419,8 +430,8 @@ class PackageContextNew(object):
 class AbsRsvAppNew(AbsRsvAppDef):
     BIN_SOURCE = '/job/PLE/support/wrappers/paper-bin'
     BIN = '/job/PLE/support/wrappers/paper-bin'
-    def __init__(self, project, application, configure):
-        super(AbsRsvAppNew, self).__init__(project, application, configure)
+    def __init__(self, *args, **kwargs):
+        super(AbsRsvAppNew, self).__init__(*args, **kwargs)
 
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:
@@ -434,7 +445,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
         configure_file_path = self._get_configure_file()
         if configure_file_path:
             bsc_core.LogMtd.trace_method_result(
-                'resolved app',
+                'app resolved',
                 'app="{project}.{application}"'.format(
                     **dict(project=self._project, application=self._application)
                 )

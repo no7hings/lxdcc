@@ -7,6 +7,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_scene_src_create(self):
+        from lxbasic import bsc_core
+
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxkatana.fnc.importers as ktn_fnc_importers
@@ -72,7 +74,12 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                 ).set_run()
         else:
-            raise RuntimeError()
+            raise RuntimeError(
+                bsc_core.LogMtd.trace_method_error(
+                    'scene create',
+                    'file="{}" is non-exists'.format(look_ass_file_path)
+                )
+            )
 
         # self.set_front_camera_for_assess()
 

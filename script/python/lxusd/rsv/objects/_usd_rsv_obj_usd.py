@@ -175,7 +175,7 @@ class RsvUsdAssetSetCreator(object):
         )
         for i_rsv_shot in rsv_shots:
             i_rsv_shot_set_task = i_rsv_shot.get_rsv_task(
-                workspace='publish', step='set', task='registry'
+                step='set', task='registry'
             )
             if i_rsv_shot_set_task is not None:
                 i_rsv_shot_set_usd_file = i_rsv_shot_set_task.get_rsv_unit(
@@ -203,7 +203,7 @@ class RsvUsdAssetSetCreator(object):
     @classmethod
     def _get_asset_set_dress_file_path_(cls, rsv_asset):
         rsv_asset_set_task = rsv_asset.get_rsv_task(
-            workspace='publish', step='set', task='registry'
+            step='set', task='registry'
         )
         if rsv_asset_set_task is not None:
             asset_set_dress_usd_file_rsv_unit = rsv_asset_set_task.get_rsv_unit(
@@ -215,7 +215,7 @@ class RsvUsdAssetSetCreator(object):
     @classmethod
     def _get_shot_set_dress_file_path_(cls, rsv_shot):
         rsv_shot_set_task = rsv_shot.get_rsv_task(
-            workspace='publish', step='set', task='registry'
+            step='set', task='registry'
         )
         if rsv_shot_set_task is not None:
             shot_set_dress_usd_file_rsv_unit = rsv_shot_set_task.get_rsv_unit(
@@ -226,29 +226,29 @@ class RsvUsdAssetSetCreator(object):
             )
     @classmethod
     def _get_asset_usd_file_path_(cls, rsv_asset, rsv_scene_properties):
-        usd_file_path = None
-        #
         if rsv_scene_properties:
             resolver = rsv_commands.get_resolver()
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
-            if workspace in ['work']:
+            if workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-asset-set-usd-file'
                 )
                 # debug for usd update error, auto update version
                 usd_file_path = usd_file_rsv_unit.get_result(version='new')
-            elif workspace in ['publish']:
+            elif workspace in [rsv_scene_properties.get('workspaces.release')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-asset-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
-            elif workspace in ['output']:
+            elif workspace in [rsv_scene_properties.get('workspaces.temporary')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-temporary-asset-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
+            else:
+                raise RuntimeError()
         else:
             usd_file_path = '{}{}.usda'.format(
                 bsc_core.StgUserMtd.get_user_temporary_directory(),
@@ -263,7 +263,7 @@ class RsvUsdAssetSetCreator(object):
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
-            if workspace in ['work']:
+            if workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-shot-set-usd-file'
                 )
@@ -273,7 +273,7 @@ class RsvUsdAssetSetCreator(object):
                         asset_shot=rsv_shot.get('shot')
                     )
                 )
-            elif workspace in ['publish']:
+            elif workspace in [rsv_scene_properties.get('workspaces.release')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-shot-set-usd-file'
                 )
@@ -283,7 +283,7 @@ class RsvUsdAssetSetCreator(object):
                         asset_shot=rsv_shot.get('shot')
                     )
                 )
-            elif workspace in ['output']:
+            elif workspace in [rsv_scene_properties.get('workspaces.temporary')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-temporary-shot-set-usd-file'
                 )
@@ -456,7 +456,7 @@ class RsvUsdAssetSetCreator(object):
         #
         cur_workspace = rsv_scene_properties.get('workspace')
         cur_step = cur_rsv_task.get('step')
-        if cur_workspace == rsv_scene_properties.get('workspaces.source'):
+        if cur_workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
             if cur_step in ['srf']:
                 RsvTaskOverrideUsdCreator(
                     cur_rsv_task
@@ -531,7 +531,7 @@ class RsvUsdAssetSetCreator(object):
         new_raw = t.render(
             c.value
         )
-
+        #
         bsc_core.StgFileOpt(
             asset_set_usd_file_path
         ).set_write(
@@ -681,7 +681,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_shot_asset_component_usd_create(self):
+    def create_asset_shot_asset_component_usd(self):
         rsv_scene_properties = self._rsv_scene_properties
         #
         workspace = rsv_scene_properties.get('workspace')
@@ -738,10 +738,10 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     i_raw
                 )
 
-    def set_asset_shot_set_usd_create(self):
+    def create_set_asset_shot_set_usd(self):
         pass
 
-    def set_asset_user_property_usd_create(self):
+    def create_asset_user_property_usd(self):
         from lxusd import usd_core
 
         import lxusd.fnc.exporters as usd_fnc_exporters
@@ -809,7 +809,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         ).set_run()
 
-    def set_asset_display_color_usd_create(self):
+    def create_set_asset_display_color_usd(self):
         from lxutil import utl_core
 
         from lxusd import usd_core
@@ -883,17 +883,21 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             ).set_run()
 
-    def set_asset_component_usd_create(self):
+    def create_set_asset_component_usd(self):
         import lxutil.scripts as utl_scripts
+
+        import lxutil.etr.scripts as utl_etr_scripts
         #
         rsv_scene_properties = self._rsv_scene_properties
+        #
+        framework_scheme = rsv_scene_properties.get('schemes.framework')
         #
         step = rsv_scene_properties.get('step')
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
         if workspace == rsv_scene_properties.get('workspaces.source'):
-            keyword = 'asset-source-comp-usd-dir'
+            keyword = 'asset-source-component-usd-dir'
         elif workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-component-usd-dir'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
@@ -968,8 +972,9 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             i_raw
                         )
             #
-            if workspace in ['publish']:
-                # noinspection PyUnresolvedReferences
-                import production.gen.record_set_registry as pgs
-                register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
-                pgs.run(register_file_path)
+            if workspace in [rsv_scene_properties.get('workspaces.release')]:
+                if framework_scheme == 'default':
+                    register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
+                    utl_etr_scripts.ScpUsd.registry_set(
+                        register_file_path
+                    )

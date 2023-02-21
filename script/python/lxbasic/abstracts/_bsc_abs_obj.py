@@ -18,11 +18,88 @@ import subprocess
 from lxbasic import bsc_configure, bsc_core
 
 
+class _ContentMtd(object):
+    _RE_PATTERN = r'[\\][<](.*?)[\\][>]'
+    VARIANT_RE_PATTERN = r'[<](.*?)[>]'
+    @classmethod
+    def unfold_fnc(cls, key, keys_all, keys_exclude, get_fnc):
+        def rcs_fnc_(key_, value_):
+            if isinstance(value_, six.string_types):
+                _value_unfold = value_
+                # remove excludes, etc. "\\<A\\>"
+                _v_ks_0 = re.findall(re.compile(cls._RE_PATTERN, re.S), _value_unfold)
+                if _v_ks_0:
+                    for _i_v_k_0 in _v_ks_0:
+                        keys_exclude.append(_i_v_k_0)
+                        _value_unfold = _value_unfold.replace('\\<', '<').replace('\\>', '>')
+                # etc. "<A>"
+                else:
+                    _v_ks_1 = re.findall(re.compile(cls.VARIANT_RE_PATTERN, re.S), _value_unfold)
+                    if _v_ks_1:
+                        for _i_v_k_1 in set(_v_ks_1):
+                            if '|' in _i_v_k_1:
+                                _i_v_ks_2 = map(lambda x: x.lstrip().rstrip(), _i_v_k_1.split('|'))
+                                for _j_v_k_2 in _i_v_ks_2:
+                                    _j_v = get_fnc(_j_v_k_2)
+                                    if _j_v is not None:
+                                        _value_unfold = _j_v
+                                        break
+                            else:
+                                # catch value
+                                if fnmatch.filter([_i_v_k_1], '*.key'):
+                                    _ = _i_v_k_1.split('.')
+                                    _i_c_2 = len([i for i in _ if i == ''])
+                                    _i_v_2 = key_.split('.')[-_i_c_2]
+                                elif fnmatch.filter([_i_v_k_1], '.*'):
+                                    # etc. key=nodes.asset.name, key=<.label>, result=nodes.asset.label
+                                    _ = _i_v_k_1.split('.')
+                                    _i_c_2 = len([i for i in _ if i == ''])
+                                    _i_k_p_2 = '.'.join(key_.split('.')[:-_i_c_2])
+                                    if _i_k_p_2:
+                                        _i_k_2 = '{}.{}'.format(_i_k_p_2, '.'.join(_[_i_c_2:]))
+                                    else:
+                                        _i_k_2 = '.'.join(_[_i_c_2:])
+                                    #
+                                    if _i_k_2 in keys_exclude:
+                                        continue
+                                    #
+                                    if _i_k_2 not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_i_k_2))
+                                    _i_v_2 = get_fnc(_i_k_2)
+                                    #
+                                    _i_v_2 = rcs_fnc_(_i_k_2, _i_v_2)
+                                else:
+                                    #
+                                    if _i_v_k_1 in keys_exclude:
+                                        continue
+                                    if _i_v_k_1 not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_i_v_k_1))
+                                    _i_v_2 = get_fnc(_i_v_k_1)
+                                    #
+                                    _i_v_2 = rcs_fnc_(_i_v_k_1, _i_v_2)
+                                #
+                                if isinstance(_i_v_2, six.string_types):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2)
+                                elif isinstance(_i_v_2, (int, float, bool)):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), str(_i_v_2))
+                    else:
+                        _v_ks_0 = re.findall(re.compile(cls._RE_PATTERN, re.S), _value_unfold)
+                # etc: "=0+1"
+                if fnmatch.filter([_value_unfold], '=*'):
+                    cmd = _value_unfold[1:]
+                    _value_unfold = eval(cmd)
+                return _value_unfold
+            elif isinstance(value_, (tuple, list)):
+                return [rcs_fnc_(key_, _i) for _i in value_]
+            return value_
+        #
+        value = get_fnc(key)
+        return rcs_fnc_(key, value)
+
+
 class AbsContent(object):
     DEFAULT_VALUE = collections.OrderedDict()
     PATHSEP = None
-    _RE_PATTERN = r'[\\][<](.*?)[\\][>]'
-    VARIANT_RE_PATTERN = r'[<](.*?)[>]'
     def __init__(self, key=None, value=None):
         self._key = key
         self._file_path = None
@@ -216,80 +293,6 @@ class AbsContent(object):
                 # need use copy
                 self.set(key, copy.copy(self.get(k_2)))
 
-    def _set_value_unfold_(self, key, all_keys):
-        def rcs_fnc_(key_, value_):
-            if isinstance(value_, six.string_types):
-                _value_unfold = value_
-                # remove excludes, etc. "\\<A\\>"
-                _v_ks_0 = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
-                if _v_ks_0:
-                    for _i_v_k_0 in _v_ks_0:
-                        self._unfold_excludes.append(_i_v_k_0)
-                        _value_unfold = _value_unfold.replace('\\<', '<').replace('\\>', '>')
-                # etc. "<A>"
-                else:
-                    _v_ks_1 = re.findall(re.compile(self.VARIANT_RE_PATTERN, re.S), _value_unfold)
-                    if _v_ks_1:
-                        for _i_v_k_1 in set(_v_ks_1):
-                            if '|' in _i_v_k_1:
-                                _i_v_ks_2 = map(lambda x: x.lstrip().rstrip(), _i_v_k_1.split('|'))
-                                for _j_v_k_2 in _i_v_ks_2:
-                                    _j_v = self.get(_j_v_k_2)
-                                    if _j_v is not None:
-                                        _value_unfold = _j_v
-                                        break
-                            else:
-                                # catch value
-                                if fnmatch.filter([_i_v_k_1], '*.key'):
-                                    _ = _i_v_k_1.split('.')
-                                    _i_c_2 = len([i for i in _ if i == ''])
-                                    _i_v_2 = key_.split('.')[-_i_c_2]
-                                elif fnmatch.filter([_i_v_k_1], '.*'):
-                                    # etc. key=nodes.asset.name, key=<.label>, result=nodes.asset.label
-                                    _ = _i_v_k_1.split('.')
-                                    _i_c_2 = len([i for i in _ if i == ''])
-                                    _i_k_p_2 = '.'.join(key_.split('.')[:-_i_c_2])
-                                    if _i_k_p_2:
-                                        _i_k_2 = '{}.{}'.format(_i_k_p_2, '.'.join(_[_i_c_2:]))
-                                    else:
-                                        _i_k_2 = '.'.join(_[_i_c_2:])
-                                    #
-                                    if _i_k_2 in self._unfold_excludes:
-                                        continue
-                                    #
-                                    if _i_k_2 not in all_keys:
-                                        raise KeyError('key="{}" is Non-exists'.format(_i_k_2))
-                                    _i_v_2 = self.get(_i_k_2)
-                                    #
-                                    _i_v_2 = rcs_fnc_(_i_k_2, _i_v_2)
-                                else:
-                                    #
-                                    if _i_v_k_1 in self._unfold_excludes:
-                                        continue
-                                    if _i_v_k_1 not in all_keys:
-                                        raise KeyError('key="{}" is Non-exists'.format(_i_v_k_1))
-                                    _i_v_2 = self.get(_i_v_k_1)
-                                    #
-                                    _i_v_2 = rcs_fnc_(_i_v_k_1, _i_v_2)
-                                #
-                                if isinstance(_i_v_2, six.string_types):
-                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2)
-                                elif isinstance(_i_v_2, (int, float, bool)):
-                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), str(_i_v_2))
-                    else:
-                        _v_ks_0 = re.findall(re.compile(self._RE_PATTERN, re.S), _value_unfold)
-                # etc: "=0+1"
-                if fnmatch.filter([_value_unfold], '=*'):
-                    cmd = _value_unfold[1:]
-                    _value_unfold = eval(cmd)
-                return _value_unfold
-            elif isinstance(value_, (tuple, list)):
-                return [rcs_fnc_(key_, _i) for _i in value_]
-            return value_
-        #
-        value = self.get(key)
-        return rcs_fnc_(key, value)
-
     def get_key_is_exists(self, key):
         return key in self._get_all_keys_()
 
@@ -325,17 +328,22 @@ class AbsContent(object):
         print self.get_str_as_yaml_style()
 
     def set_flatten(self):
-        all_keys = self.get_keys()
-        for i_key in all_keys:
+        keys_all = self.get_keys()
+        for i_key in keys_all:
             i_value = self.get(i_key)
             if isinstance(i_value, dict) is False:
-                self._set_quote_unfold_(i_key, all_keys)
+                self._set_quote_unfold_(i_key, keys_all)
         #
-        all_keys = self.get_keys()
-        for i_key in all_keys:
+        keys_all = self.get_keys()
+        for i_key in keys_all:
             i_value = self.get(i_key)
             if isinstance(i_value, dict) is False:
-                i_value = self._set_value_unfold_(i_key, all_keys)
+                i_value = _ContentMtd.unfold_fnc(
+                    i_key,
+                    keys_all=keys_all,
+                    keys_exclude=self._unfold_excludes,
+                    get_fnc=self.get
+                )
                 self.set(i_key, i_value)
 
     def get_is_empty(self):
@@ -353,12 +361,6 @@ class AbsContent(object):
                     self._value = _
                 else:
                     raise TypeError()
-
-
-class AbsConfigure(AbsContent):
-    PATHSEP = None
-    def __init__(self, key, value):
-        super(AbsConfigure, self).__init__(key, value)
 
 
 class AbsFileReader(object):

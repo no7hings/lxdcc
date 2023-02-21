@@ -728,7 +728,6 @@ class System(object):
 
 class Environ(object):
     TD_ENABLE_KEY = 'LYNXI_TD_ENABLE'
-    DATA_PATH_KEY = 'LYNXI_DATA_PATH'
     #
     TRUE = 'true'
     FALSE = 'false'
@@ -1660,16 +1659,7 @@ class RvLauncher(object):
 
 
 class History(object):
-    if bsc_core.SystemMtd.get_is_windows():
-        FILE_PATH = '{}/history.yml'.format(
-            bsc_configure.UserDirectory.WINDOWS
-        )
-    elif bsc_core.SystemMtd.get_is_linux():
-        FILE_PATH = '{}/history.yml'.format(
-            bsc_configure.UserDirectory.LINUX
-        )
-    else:
-        raise SystemError()
+    FILE_PATH = bsc_core.StgUserMtd.get_user_history_file()
     @classmethod
     def set_append(cls, key, value):
         f_o = bsc_core.StgPathOpt(cls.FILE_PATH)

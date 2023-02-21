@@ -1,4 +1,5 @@
-#
+# ******************************************************************************************************************** #
+# object build configure
 path-project-keys: ['project']
 path-tag-keys: ['project', 'role', 'sequence' ]
 path-resource-keys: [ 'project', 'role', 'sequence', 'asset', 'shot' ]

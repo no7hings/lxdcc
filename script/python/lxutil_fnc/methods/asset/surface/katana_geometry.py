@@ -112,18 +112,9 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     self.set_obj_files_check_result_at(obj.path, file_paths=file_paths_6, check_tag='error', index=6)
 
     def _set_old_repair_run_(self):
-        import lxusd.commands as usd_commands
-
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-        #
-        task_properties = self.task_properties
-        #
-        results = usd_commands.set_asset_work_set_usda_create(task_properties)
-        if results:
-            work_set_usd_file_path = results[0]
-            ktn_dcc_objects.AssetWorkspace().set_set_usd_import(
-                work_set_usd_file_path
-            )
+        raise RuntimeError(
+            'old framework is unused'
+        )
 
     def _set_new_check_run_(self):
         from lxutil import utl_configure

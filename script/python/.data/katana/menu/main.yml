@@ -91,16 +91,16 @@ tools:
       type: item
       name: Utility Toolkit
       icon: None
-      command: import lxmaya_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.UtilityToolkitPanel().set_window_show()
+      command: import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.UtilityToolkitPanel().set_window_show()
   #
     asset_toolkit:
       type: item
       name: Asset Toolkit
       icon: None
-      command: import lxmaya_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.AssetToolkitPanel().set_window_show()
+      command: import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.AssetToolkitPanel().set_window_show()
   #
     asset_surface_toolkit:
       type: item
       name: Asset-surface Toolkit
       icon: None
-      command: import lxmaya_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SurfaceToolkitPanel().set_window_show()
+      command: import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SurfaceToolkitPanel().set_window_show()

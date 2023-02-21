@@ -5,11 +5,24 @@ from lxbasic import bsc_configure, bsc_core
 
 
 class RsvConfigureMtd(object):
+    MainKeys = [
+        'builtin',
+        'variant',
+        'main',
+        'framework',
+        'project',
+        'storage',
+        'dcc'
+    ]
+    MainSchemes = [
+        'default',
+        'new'
+    ]
     @classmethod
-    def get_raw(cls, key):
+    def get_raw(cls, scheme):
         raw = collections.OrderedDict()
-        for i_key in ['builtin', 'main', 'frame', 'project', 'storage']:
-            i_file = bsc_core.CfgFileMtd.get_yaml('resolver/{}/{}'.format(key, i_key))
+        for i_key in cls.MainKeys:
+            i_file = bsc_core.CfgFileMtd.get_yaml('resolver/{}/{}'.format(scheme, i_key))
             if i_file is not None:
                 i_raw = bsc_core.StgFileOpt(i_file).set_read() or {}
                 raw.update(i_raw)
@@ -20,22 +33,18 @@ class RsvConfigureMtd(object):
     @classmethod
     def get_default_raws(cls):
         list_ = []
-        for i_key in ['default', 'new']:
-            i_raw = cls.get_raw(i_key)
+        for i_scheme in cls.MainSchemes:
+            i_raw = cls.get_raw(i_scheme)
             list_.append(i_raw)
         return list_
 
 
-class ResolverMtd(object):
+class RsvBaseMtd(object):
     @classmethod
     def set_rsv_obj_sort(cls, rsv_objs):
         rsv_objs.sort(
             key=lambda x: bsc_core.RawTextMtd.to_number_embedded_args(x.path)
         )
-
-
-class RsvBaseMtd(object):
-    pass
 
 
 if __name__ == '__main__':

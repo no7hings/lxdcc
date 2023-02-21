@@ -231,7 +231,7 @@ class AbsHookExecutor(AbsJobSender2):
             self._ddl_job_sender.job_info.set('ResumeOnCompleteDependencies', True)
         #
         o_td_enable = script_option_opt.get('td_enable') or False
-        td_enable = utl_core.Environ.get_td_enable()
+        td_enable = bsc_core.EnvExtraMtd.get_td_enable()
         if td_enable is True or o_td_enable is True:
             self._ddl_job_sender.job_info.set(
                 'Pool', 'td'
@@ -304,7 +304,7 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                 self._ddl_job_sender.job_info.set('ResumeOnCompleteDependencies', True)
             #
             o_td_enable = script_option_opt.get('td_enable') or False
-            td_enable = utl_core.Environ.get_td_enable()
+            td_enable = bsc_core.EnvExtraMtd.get_td_enable()
             if td_enable is True or o_td_enable is True:
                 self._ddl_job_sender.job_info.set(
                     'Pool', 'td'
@@ -401,7 +401,7 @@ class AbsDdlRsvTaskRender(AbsHookExecutor):
                 self._ddl_job_sender.job_info.set('ResumeOnCompleteDependencies', True)
             #
             o_td_enable = script_option_opt.get('td_enable') or False
-            td_enable = utl_core.Environ.get_td_enable()
+            td_enable = bsc_core.EnvExtraMtd.get_td_enable()
             if td_enable is True or o_td_enable is True:
                 self._ddl_job_sender.job_info.set(
                     'Pool', 'td'

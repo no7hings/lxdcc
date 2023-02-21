@@ -55,10 +55,10 @@ class AbsSsnRezDef(object):
         pass
     @classmethod
     def get_td_enable(cls):
-        return bsc_core.EnvironMtd.get_td_enable()
+        return bsc_core.EnvExtraMtd.get_td_enable()
     @classmethod
     def get_rez_beta(cls):
-        return bsc_core.EnvironMtd.get_rez_beta()
+        return bsc_core.EnvExtraMtd.get_rez_beta()
 
 
 class AbsSsnObj(

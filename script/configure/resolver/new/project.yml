@@ -173,6 +173,8 @@ asset-source-nuke-scene-src-file: <asset-source-nuke-scene-src-dir>/<task_extra-
 asset-user-nuke-dir: <asset-user-task-dir>/nuke
 asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>/scenes
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<task_extra-name>/<asset-version_extra-name>.nk
+# extra area
+asset-source-shared_area-dir: <asset-source-task-dir>/shared_area
 # shot =============================================================================================================== #
 shot-branch-dir: <project-dir>/sequences
 #

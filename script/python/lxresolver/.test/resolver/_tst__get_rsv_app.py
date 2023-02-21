@@ -19,8 +19,10 @@ for i_project in [
 
     i_rsv_project = r.get_rsv_project(project=i_project)
 
+    print i_rsv_project.get_value('schemes')
+
     i_rsv_launcher = i_rsv_project.get_rsv_app(
         application='maya'
     )
 
-    print i_rsv_launcher.get_command(args_execute=['-c maya -c'], packages_extend=['lxdcc', 'lxdcc_gui', 'lxdcc_lib', 'lxdcc_rsc', 'paper_extend_usd'])
+    print i_rsv_launcher.get_command(args_execute=['-c maya'], packages_extend=['lxdcc', 'lxdcc_gui', 'lxdcc_lib', 'lxdcc_rsc', 'paper_extend_usd'])

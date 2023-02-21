@@ -27,7 +27,7 @@ from lxresolver import rsv_configure
 
 
 class AssetWorkspace(object):
-    CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default')
+    CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default-v1')
     GEOMETRY_TYPES = [
         'subdmesh',
         'renderer procedural',

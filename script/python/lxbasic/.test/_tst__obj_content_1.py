@@ -6,7 +6,7 @@ from lxbasic import bsc_core
 import lxbasic.objects as bsc_objects
 
 c = bsc_objects.Configure(
-    value=bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default')
+    value=bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default-v1')
 )
 c.set_flatten()
 print c

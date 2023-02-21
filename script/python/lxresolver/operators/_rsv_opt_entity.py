@@ -8,6 +8,7 @@ import lxresolver.commands as rsv_commands
 import copy
 
 
+# todo: old method need clear or replace
 class AbsAssetQuery(object):
     CONFIGURE_FILE_PATH = rsv_configure.Data.ASSET_CONFIGURE_PATH
     def __init__(self, task_properties):

@@ -162,8 +162,6 @@ class LxRenderSettings(object):
     def set_render_output(self):
         import lxresolver.commands as rsv_commands
         #
-        import lxresolver.operators as rsv_operators
-        #
         from lxkatana import ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -172,14 +170,19 @@ class LxRenderSettings(object):
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
-            rsv_task_properties = rsv_commands.get_resolver().get_task_properties_by_any_scene_file_path(
+            resolver = rsv_commands.get_resolver()
+            rsv_task = resolver.get_rsv_task_by_any_file_path(
                 f
             )
-            if rsv_task_properties:
-                rsv_asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
-                render_output_directory_path = rsv_asset_scene_query.get_output_render_dir()
+            if rsv_task:
+                # todo: use user render output instance
+                rsv_unit = rsv_task.get_rsv_unit(keyword='asset-temporary-katana-render-output-dir')
+                result = rsv_unit.get_result(
+                    version='new'
+                )
                 v = '{}/main/<camera>.<layer>.<light-pass>.<look-pass>.<quality>/<render-pass>.####.exr'.format(
-                    render_output_directory_path)
+                    result
+                )
                 #
                 obj_opt.set_port_raw(
                     'lynxi_settings.render_output', v

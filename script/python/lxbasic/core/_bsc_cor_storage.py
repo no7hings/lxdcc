@@ -6,45 +6,61 @@ from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor
 
 class StgUserMtd(object):
     @classmethod
-    def get_user_temporary_directory(cls, create=False):
-        date_tag = TimeMtd.get_date_tag()
+    def get_windows_user_directory(cls):
+        return '{}/{}/.lynxi'.format(
+            os.environ.get('HOMEDRIVE', 'c:'),
+            os.environ.get('HOMEPATH', '/temp')
+        ).replace('\\', '/')
+    @classmethod
+    def get_linux_user_directory(cls):
+        return '{}/.lynxi'.format(
+            os.environ.get('HOME', '/temp')
+        )
+    @classmethod
+    def get_user_directory(cls):
         if SystemMtd.get_is_windows():
-            _ = '{}/temporary/{}'.format(
-                bsc_configure.UserDirectory.WINDOWS, date_tag
-            )
+            return cls.get_windows_user_directory()
         elif SystemMtd.get_is_linux():
-            _ = '{}/temporary/{}'.format(
-                bsc_configure.UserDirectory.LINUX, date_tag
-            )
+            return cls.get_linux_user_directory()
         else:
             raise SystemError()
+    @classmethod
+    def get_user_temporary_directory(cls, create=False):
+        date_tag = TimeMtd.get_date_tag()
+        _ = '{}/temporary/{}'.format(
+            cls.get_user_directory(), date_tag
+        )
         if create:
             StorageMtd.create_directory(_)
         return _
     @classmethod
     def get_user_debug_directory(cls, tag=None, create=False):
         date_tag = TimeMtd.get_date_tag()
-        if SystemMtd.get_is_windows():
-            root = bsc_configure.UserDirectory.WINDOWS
-            _ = '{}/debug/{}'.format(root, date_tag)
-        elif SystemMtd.get_is_linux():
-            _ = '{}/debug/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)
-        else:
-            raise SystemError()
+        _ = '{}/debug/{}'.format(
+            cls.get_user_directory(), date_tag
+        )
         if tag is not None:
             _ = '{}/{}'.format(_, tag)
         if create:
             StorageMtd.create_directory(_)
         return _
     @classmethod
+    def get_log_directory(cls):
+        date_tag = TimeMtd.get_date_tag()
+        return '{}/log/{}.log'.format(
+            cls.get_user_directory(), date_tag
+        )
+    @classmethod
+    def get_user_history_file(cls):
+        return '{}/history.yml'.format(
+            cls.get_user_directory()
+        )
+    @classmethod
     def get_user_session_directory(cls, create=False):
         date_tag = TimeMtd.get_date_tag()
-        if SystemMtd.get_is_windows():
-            _ = '{}/.session/{}'.format(bsc_configure.UserDirectory.WINDOWS, date_tag)
-        elif SystemMtd.get_is_linux():
-            _ = '{}/.session/{}'.format(bsc_configure.UserDirectory.LINUX, date_tag)
-        else:
-            raise SystemError()
+        _ = '{}/.session/{}'.format(
+            cls.get_user_directory(), date_tag
+        )
         if create:
             StorageMtd.create_directory(_)
         return _

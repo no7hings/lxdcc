@@ -234,7 +234,7 @@ def set_usd_create_by_any_scene_file(option):
             #
             with_component_usd = option_opt.get('with_component_usd') or False
             if with_component_usd is True:
-                set_asset_component_usd_create(rsv_version)
+                create_set_asset_component_usd(rsv_version)
             #
             stg_fnc_scripts.set_version_log_module_result_trace(
                 rsv_task_properties,
@@ -248,7 +248,7 @@ def set_usd_create_by_any_scene_file(option):
         )
 
 
-def set_asset_component_usd_create(rsv_version):
+def create_set_asset_component_usd(rsv_version):
     from lxutil import utl_configure
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects

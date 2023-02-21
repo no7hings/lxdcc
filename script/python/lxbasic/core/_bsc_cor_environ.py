@@ -3,9 +3,6 @@ from ._bsc_cor_utility import *
 
 
 class EnvironMtd(object):
-    TD_ENABLE_KEY = 'LYNXI_TD_ENABLE'
-    DATA_PATH_KEY = 'LYNXI_DATA_PATH'
-    #
     TEMPORARY_ROOT_KEY = 'LYNXI_TEMPORARY_ROOT'
     TEMPORARY_ROOT_DEFAULT = '/l/resource/temporary/.lynxi'
     #
@@ -18,23 +15,12 @@ class EnvironMtd(object):
     TRUE = 'true'
     FALSE = 'false'
     @classmethod
-    def get_td_enable(cls):
-        _ = cls.get(cls.TD_ENABLE_KEY)
-        if _ == cls.TRUE:
-            return True
-        return False
-    @classmethod
-    def set_td_enable(cls, boolean):
-        if boolean is True:
-            cls.set(cls.TD_ENABLE_KEY, cls.TRUE)
-        else:
-            cls.set(cls.TD_ENABLE_KEY, cls.FALSE)
-    @classmethod
     def get_rez_beta(cls):
         _ = cls.get('REZ_BETA')
         if _ == '1':
             return True
         return False
+    #
     @classmethod
     def get_temporary_root(cls):
         _ = cls.get(cls.TEMPORARY_ROOT_KEY)
@@ -106,3 +92,36 @@ class EnvironsOpt(object):
                 self._environs[key] += os.pathsep + value
         else:
             self._environs[key] = value
+
+
+class EnvExtraMtd(EnvironMtd):
+    SCHEME_KEY = 'LYNXI_SCHEME'
+    BETA_ENABLE_KEY = 'LYNXI_BETA_ENABLE'
+    TD_ENABLE_KEY = 'LYNXI_TD_ENABLE'
+    @classmethod
+    def get_scheme(cls):
+        return cls.get(cls.SCHEME_KEY)
+    @classmethod
+    def get_beta_enable(cls):
+        _ = cls.get(cls.BETA_ENABLE_KEY)
+        if _ == cls.TRUE:
+            return True
+        return False
+    @classmethod
+    def set_beta_enable(cls, boolean):
+        if boolean is True:
+            cls.set(cls.BETA_ENABLE_KEY, cls.TRUE)
+        else:
+            cls.set(cls.BETA_ENABLE_KEY, cls.FALSE)
+    @classmethod
+    def get_td_enable(cls):
+        _ = cls.get(cls.TD_ENABLE_KEY)
+        if _ == cls.TRUE:
+            return True
+        return False
+    @classmethod
+    def set_td_enable(cls, boolean):
+        if boolean is True:
+            cls.set(cls.TD_ENABLE_KEY, cls.TRUE)
+        else:
+            cls.set(cls.TD_ENABLE_KEY, cls.FALSE)

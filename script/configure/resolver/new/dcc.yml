@@ -1,0 +1,41 @@
+# ******************************************************************************************************************** #
+dcc-data:
+    maya:
+        pathsep: '|'
+        root_name: 'master'
+        root: '/master'
+        location: '/'
+        #
+        high_location: '<.root>/mod/hi'
+    #
+    houdini:
+        pathsep: '/'
+        root_name: 'master'
+        root: '/master'
+        location: '/'
+        #
+        high_location: '<.root>/hi'
+    #
+    katana:
+        pathsep: '/'
+        root_name: 'master'
+        root: '/master'
+        location: '/root/world/geo'
+        #
+        high_location: '<.root>/hi'
+    #
+    clarisse:
+        pathsep: '/'
+        root_name: 'master'
+        root: '/master'
+        location: '/'
+        #
+        high_location: '<.root>/hi'
+    #
+    nuke:
+        pathsep: '/'
+        root_name: 'master'
+        root: '/master'
+        location: '/'
+        #
+        high_location: '<.root>/hi'

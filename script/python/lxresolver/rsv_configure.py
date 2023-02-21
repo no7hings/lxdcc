@@ -14,14 +14,8 @@ class Root(object):
 class Data(object):
     ROOT = os.path.dirname(__file__.replace('\\', '/'))
     DATA_PATH = '{}/.data'.format(ROOT)
-    RESOLVER_BASIC_CONFIGURE_PATH = '{}/resolver-basic.yml'.format(DATA_PATH)
-    @classmethod
-    def get_project_configure_path(cls, project):
-        return '{}/.data/resolver-{}.yml'.format(cls.ROOT, project)
     #
     GEOMETRY_USD_CONFIGURE_PATH = '{}/set-usd-configure.yml'.format(DATA_PATH)
-    #
-    ENTITIES_CONFIGURE_PATH = '{}/entities-configure.yml'.format(DATA_PATH)
     #
     ASSET_CONFIGURE_PATH = '{}/asset-configure.yml'.format(DATA_PATH)
 
@@ -130,6 +124,7 @@ class VariantTypes(object):
 
 
 class VariantsKeys(object):
+    Schemes = 'schemes'
     Roles = 'roles'
     Workspaces = 'workspaces'
     #
@@ -139,6 +134,7 @@ class VariantsKeys(object):
     ShotSteps = 'shot_steps'
     #
     All = [
+        Schemes,
         Roles,
         Workspaces,
         AssetSteps, SequenceSteps, ShotSteps

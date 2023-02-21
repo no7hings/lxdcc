@@ -3,23 +3,15 @@ import sys
 
 import os
 
-import platform
-
 import fnmatch
 
 from lxbasic import bsc_core
 
+from lxuniverse import unr_configure
+
 import lxuniverse.abstracts as unr_abstracts
 
-from . import utl_core
-
-
-def get_is_linux():
-    return platform.system() == 'Linux'
-
-
-def get_is_windows():
-    return platform.system() == 'Windows'
+from lxutil import utl_core
 
 
 class AbsObjGuiDef(object):

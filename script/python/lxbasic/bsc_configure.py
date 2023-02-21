@@ -24,38 +24,6 @@ class Root(object):
         return '{root}/{key}.yml'.format(**dict(root=Root.CONFIGURE, key=key))
 
 
-class UserDirectory(object):
-    user_name = getpass.getuser()
-    WINDOWS = '{}/{}/.lynxi'.format(
-        os.environ.get('HOMEDRIVE', 'c:'),
-        os.environ.get('HOMEPATH', '/temp')
-    ).replace('\\', '/')
-    LINUX = '{}/.lynxi'.format(
-        os.environ.get('HOME', '/temp')
-    )
-
-
-class LogDirectory(object):
-    date_tag = time.strftime('%Y_%m%d', time.localtime(time.time()))
-    WINDOWS = '{}/log/{}.log'.format(UserDirectory.WINDOWS, date_tag)
-    LINUX = '{}/log/{}.log'.format(UserDirectory.LINUX, date_tag)
-
-
-class CacheDirectory(object):
-    WINDOWS = '{}/cache'.format(UserDirectory.WINDOWS)
-    LINUX = '{}/cache'.format(UserDirectory.LINUX)
-
-
-class HookDirectory(object):
-    WINDOWS = '{}/hook'.format(UserDirectory.WINDOWS)
-    LINUX = '{}/hook'.format(UserDirectory.LINUX)
-
-
-class TemporaryDirectory(object):
-    WINDOWS = '{}/temporary'.format(UserDirectory.WINDOWS)
-    LINUX = '{}/temporary'.format(UserDirectory.LINUX)
-
-
 class ColorSpace(object):
     SRGB = 'sRGB'
     LINEAR = 'linear'

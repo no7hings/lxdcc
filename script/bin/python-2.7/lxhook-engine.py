@@ -138,8 +138,8 @@ def __execute_option_hook(hook_option):
     if _:
         environs_extend['LYNXI_RESOURCES'] = _
     #
-    frame_scheme = rsv_project.get_frame_scheme()
-    if frame_scheme == 'new':
+    framework_scheme = rsv_project.get_framework_scheme()
+    if framework_scheme == 'new':
         engine_packages_extend.extend(
             ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
         )

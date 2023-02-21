@@ -29,6 +29,8 @@ import threading
 
 from lxbasic import bsc_core
 
+from lxbasic.abstracts import _bsc_abs_obj
+
 import lxbasic.objects as bsc_objects
 
 import lxuniverse.abstracts as unr_abstracts
@@ -255,9 +257,29 @@ class RawOpt(object):
     PATTERN_REF_RE_PATTERN = r'[<](.*?)[>]'
     def __init__(self, dict_):
         self._dict = dict_
+        self._keys_exclude = []
 
-    def get_keys(self, pattern):
-        return fnmatch.filter(self._dict.keys(), pattern)
+    def get_all_keys(self):
+        def rcs_fnc_(k_, v_):
+            for _k, _v in v_.items():
+                if k_ is not None:
+                    _key = '{}.{}'.format(k_, _k)
+                else:
+                    _key = _k
+                #
+                lis.append(_key)
+                if isinstance(_v, dict):
+                    rcs_fnc_(_key, _v)
+        #
+        lis = []
+        rcs_fnc_(None, self._dict)
+        return lis
+
+    def get_keys(self, pattern=None):
+        _ = self.get_all_keys()
+        if pattern is not None:
+            return fnmatch.filter(_, pattern)
+        return _
 
     def get(self, key_path, default_value=None):
         ks = key_path.split(self.PATHSEP)
@@ -295,6 +317,7 @@ class RawOpt(object):
                     for _k in set(_ks):
                         if _k not in self._dict:
                             raise KeyError(u'keyword: "{}" is non-registered'.format(_k))
+                        #
                         _v = self._dict[_k]
                         #
                         _v = rcs_fnc_(_v)
@@ -304,9 +327,20 @@ class RawOpt(object):
             return v_
         return rcs_fnc_(value)
 
+    def get_content_as_unfold(self, key):
+        c = bsc_objects.Configure(value=collections.OrderedDict())
+        keys = self.get_keys('{}.*'.format(key))
+        for i_key in keys:
+            i_value = self.get_as_unfold(i_key)
+            i_key_ = i_key[len(key)+1:]
+            c.set(i_key_, i_value)
+        return c
+
     def get_as_unfold(self, key):
-        value = self.get(key)
-        return self.unfold_value(value)
+        keys_all = self.get_all_keys()
+        return _bsc_abs_obj._ContentMtd.unfold_fnc(
+            key, keys_all, self._keys_exclude, self.get
+        )
 
 
 # <rev-version>
@@ -757,11 +791,20 @@ class AbsRsvObj(
         elif self.type_name in self.VariantTypes.Branches:
             self.set_gui_menu_raw(
                 [
-                    ('{}-directory'.format(self.type_name), ),
-                    ('Open Source Directory', 'file/folder', (self._get_source_directory_is_enable_, self._open_source_directory_open_, False)),
-                    ('Open User Directory', 'file/folder', (self._get_user_directory_is_enable_, self._open_user_directory_open_, False)),
-                    ('Open Release Directory', 'file/folder', (self._get_release_directory_is_enable_, self._open_release_directory_open_, False)),
-                    ('Open Temporary Directory', 'file/folder', (self._get_temporary_directory_is_enable_, self._open_temporary_directory_open_, False)),
+                    [
+                        'Open Directory', 'file/folder',
+                        [
+                            ('{}-directory'.format(self.type_name),),
+                            ('Source', 'file/folder',
+                             (self._get_source_directory_is_enable_, self._open_source_directory_open_, False)),
+                            ('User', 'file/folder',
+                             (self._get_user_directory_is_enable_, self._open_user_directory_open_, False)),
+                            ('Release', 'file/folder',
+                             (self._get_release_directory_is_enable_, self._open_release_directory_open_, False)),
+                            ('Temporary', 'file/folder',
+                             (self._get_temporary_directory_is_enable_, self._open_temporary_directory_open_, False)),
+                        ]
+                    ]
                 ]
             )
         #
@@ -1136,7 +1179,7 @@ class AbsRsvTaskVersion(
         )
 
     def get_directory_path(self):
-        return self.properties.get('location')
+        return self.properties.get('result')
 
 
 # <rsv-task>
@@ -1180,8 +1223,8 @@ class AbsRsvTask(
         return list_
 
     def get_directory_path(self):
-        return self.properties.get('location')
-    # for work
+        return self.properties.get('result')
+    # todo: remove old fnc, use "get_rsv_scene_properties_by_any_scene_file_path"
     def get_properties_by_work_scene_src_file_path(self, file_path):
         return self._get_properties_by_scene_file_path_(
             file_path,
@@ -1263,7 +1306,7 @@ class AbsRsvTask(
                     # release
                     ('{branch}-{application}-scene-src-file', 'release-scene-src'),
                     ('{branch}-{application}-scene-file', 'release-scene'),
-                    # pre-release
+                    # temporary
                     ('{branch}-temporary-{application}-scene-src-file', 'temporary-scene-src'),
                     ('{branch}-temporary-{application}-scene-file', 'temporary-scene'),
                 ]:
@@ -1287,11 +1330,12 @@ class AbsRsvTask(
                             j_rsv_scene_properties.set('extra.user', bsc_core.SystemMtd.get_user_name())
                             j_rsv_scene_properties.set('extra.time_tag', bsc_core.TimeMtd.get_time_tag())
                             #
-                            j_rsv_scene_properties.set('dcc.root', '/master')
-                            j_rsv_scene_properties.set('dcc.root_name', 'master')
-                            j_rsv_scene_properties.set('dcc.sub_root', '/master/hi')
-                            #
-                            j_rsv_scene_properties.set('dcc.pathsep', self.Applications.get_pathsep(i_application))
+                            j_rsv_scene_properties.set(
+                                'dcc', self._rsv_project.get_dcc_data(i_application)
+                            )
+                            print(
+
+                            )
                             return j_rsv_scene_properties
     # tag
     def get_rsv_tag(self):
@@ -1360,7 +1404,7 @@ class AbsRsvStep(
         )
 
     def get_directory_path(self):
-        return self.properties.get('location')
+        return self.properties.get('result')
 
     def get_source_directory_path(self):
         keyword = self._rsv_project._get_step_keyword_(
@@ -1667,7 +1711,6 @@ class AbsRsvExtraDef(AbsRsvDef):
         user = bsc_core.StgPathOpt(result).get_user()
         #
         kwargs['result'] = result
-        kwargs['location'] = result
         kwargs['update'] = update
         kwargs['user'] = user
         #
@@ -1685,7 +1728,6 @@ class AbsRsvExtraDef(AbsRsvDef):
         ).get_user()
         #
         kwargs['result'] = result
-        kwargs['location'] = result
         kwargs['update'] = update
         kwargs['user'] = user
         kwargs.update(variants)
@@ -1718,6 +1760,9 @@ class AbsRsvExtraDef(AbsRsvDef):
         if keyword not in self._patterns_dict:
             raise KeyError(u'keyword: "{}" is Non-registered'.format(keyword))
         return self._patterns_dict[keyword]
+    # todo: remove this method
+    def get_value(self, key):
+        return self._raw_opt.get(key)
 
     def get_rsv_pattern(self, keyword):
         return self.RSV_MATCH_PATTERN_CLASS(self.get_pattern(keyword))
@@ -1948,31 +1993,6 @@ class AbsRsvProject(
     @property
     def icon(self):
         return bsc_core.RscIconFileMtd.get('resolver/project')
-
-    def get_frame_scheme(self):
-        return self._raw_opt.get('frame-data.scheme')
-
-    def get_storage_scheme(self):
-        return self._raw_opt.get('storage-data.scheme')
-
-    def get_frame_configure(self):
-        return bsc_objects.Configure(value=self._raw_opt.get('frame-data'))
-
-    def get_rsv_app(self, application):
-        configure = self.get_frame_configure()
-        scheme = configure.get('scheme')
-        if scheme == 'default':
-            return self.RSV_APP_DEFAULT_CLASS(
-                project=self.properties.get('project'),
-                application=application,
-                configure=configure
-            )
-        elif scheme == 'new':
-            return self.RSV_APP_NEW_CLASS(
-                project=self.properties.get('project'),
-                application=application,
-                configure=configure
-            )
 
     def get_workspaces(self):
         return self._rsv_properties.get(
@@ -2836,6 +2856,36 @@ class AbsRsvProject(
         rsv_task = self.get_rsv_task(**kwargs)
         if rsv_task is not None:
             return rsv_task.get_rsv_version(**kwargs)
+    # app
+    def get_rsv_app(self, application):
+        configure = bsc_objects.Configure(value=self.get_package_data())
+        scheme = configure.get('scheme')
+        if scheme == 'default':
+            return self.RSV_APP_DEFAULT_CLASS(
+                rsv_project=self,
+                application=application,
+                configure=configure
+            )
+        elif scheme == 'new':
+            return self.RSV_APP_NEW_CLASS(
+                rsv_project=self,
+                application=application,
+                configure=configure
+            )
+
+    def get_framework_scheme(self):
+        return self._raw_opt.get('schemes.framework')
+
+    def get_package_data(self):
+        return self._raw_opt.get('package-data')
+
+    def get_storage_scheme(self):
+        return self._raw_opt.get('schemes.storage')
+
+    def get_dcc_data(self, application):
+        return self._raw_opt.get_content_as_unfold(
+            'dcc-data.{}'.format(application)
+        ).get_value()
 
     def _get_rsv_obj_exists_(self, rsv_obj_path):
         return self._rsv_obj_stack.get_object_exists(rsv_obj_path)

@@ -9,6 +9,7 @@ from lxbasic import bsc_core
 class AbsRsvAppOpt(object):
     def __init__(self, rsv_app):
         self._rsv_app = rsv_app
+        self._rsv_project = rsv_app._rsv_project
 
     @classmethod
     def _execute_command_(cls, cmd, **sub_progress_kwargs):
@@ -43,13 +44,20 @@ class RsvMayaOpt(AbsRsvAppOpt):
         super(RsvMayaOpt, self).__init__(rsv_app)
 
     def open_file(self, file_path):
+        scheme = bsc_core.EnvExtraMtd.get_scheme()
+        if scheme == 'new':
+            packages_extend = ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        else:
+            packages_extend = []
+        #
         cmd = self._rsv_app.get_command(
             args_execute=[
                 '-- maya',
                 r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open_as_project(\\\"{}\\\")\")"'.format(
                     file_path
                 )
-            ]
+            ],
+            packages_extend=packages_extend
         )
         self._execute_command_use_thread_(cmd, clear_environ=True)
 
@@ -59,12 +67,19 @@ class RsvKatanaOpt(AbsRsvAppOpt):
         super(RsvKatanaOpt, self).__init__(rsv_app)
 
     def open_file(self, file_path):
+        scheme = bsc_core.EnvExtraMtd.get_scheme()
+        if scheme == 'new':
+            packages_extend = ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        else:
+            packages_extend = []
+        #
         cmd = self._rsv_app.get_command(
             args_execute=[
                 '-- katana',
                 '"{}"'.format(
                     file_path
                 )
-            ]
+            ],
+            packages_extend=packages_extend
         )
         self._execute_command_use_thread_(cmd)

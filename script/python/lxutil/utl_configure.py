@@ -51,18 +51,6 @@ class MainData(_AbsData):
         return '{}/{}.md'.format(cls.ROOT, key)
 
 
-class UtilityToolData(_AbsData):
-    ROOT = '{}/tool'.format(Root.UTILITY_DATA)
-
-
-class UtilityToolkitData(_AbsData):
-    ROOT = '{}/toolkit'.format(Root.UTILITY_DATA)
-
-
-class UtilityProductData(_AbsData):
-    ROOT = '{}/product'.format(Root.UTILITY_DATA)
-
-
 class MayaToolkitData(_AbsData):
     ROOT = '{}/toolkit'.format(Root.MAYA_DATA)
 
@@ -106,15 +94,6 @@ class GeometryData(object):
     POINTS = 'points'
 
 
-class GuiSize(object):
-    item_height = 20
-
-
-class App(object):
-    HOUDINI = 'houdini'
-    MAYA = 'maya'
-
-
 class DccMeshCheckStatus(object):
     NON_CHANGED = 'non-changed'
     #
@@ -147,30 +126,6 @@ class DccMeshCheckStatus(object):
     ]
 
 
-class DccMeshCheckStatus_(enum.IntEnum):
-    NonChanged = 0
-    Deletion = 1
-    Addition = 2
-    #
-    NameChanged = 3
-    PathChanged = 4
-    PathExchanged = 5
-    #
-    FaceVerticesChanged = 6
-    PointsChanged = 7
-    #
-    GeometryChanged = 8
-
-
-class GuiSectorChartMode(enum.IntEnum):
-    Completion = 0
-    Error = 1
-
-
-class EnvironKey(object):
-    SOURCE_PATHS = 'LYNXI_SOURCE_PATHS'
-
-
 class Jinja(object):
     ROOT = MainData.get_directory('jinja')
     #
@@ -196,14 +151,6 @@ class Jinja(object):
         return bsc_objects.Configure(
             value='{}/{}.yml'.format(cls.ROOT, key)
         )
-
-
-class Session(object):
-    pass
-
-
-class Aces(object):
-    LUT = '/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp'
 
 
 if __name__ == '__main__':

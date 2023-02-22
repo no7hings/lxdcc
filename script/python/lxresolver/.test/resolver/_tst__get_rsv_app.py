@@ -12,9 +12,9 @@ utl_core.Log.TRACE_RESULT_ENABLE = False
 r = rsv_commands.get_resolver()
 
 for i_project in [
-    'cgm',
+    # 'cgm',
     'nsa_dev',
-    'tnt'
+    # 'tnt'
 ]:
 
     i_rsv_project = r.get_rsv_project(project=i_project)

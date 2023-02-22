@@ -264,6 +264,7 @@ class SystemMtd(TimeMtd):
     def get(cls, key):
         dic = {
             'user': cls.get_user_name,
+            'host': cls.get_host,
             'time_tag': TimeMtd.get_time_tag
         }
         if key in dic:

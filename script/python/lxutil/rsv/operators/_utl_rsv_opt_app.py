@@ -40,7 +40,7 @@ class AbsRsvAppOpt(object):
     def get_environs_extend(self):
         framework_scheme = self._rsv_project.get_framework_scheme()
         m = bsc_etr_methods.get_module(framework_scheme)
-        return m.EtrUtility.get_project_environs_extend(
+        return m.EtrBase.get_project_environs_extend(
             self._rsv_project.get_name()
         )
 

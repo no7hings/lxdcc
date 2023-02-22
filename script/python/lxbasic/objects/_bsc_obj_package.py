@@ -155,7 +155,7 @@ class PackageContextNew(object):
                 package_roots += pre_release_package_roots
             #
             release_package_roots = self.get_release_package_roots()
-            package_roots += pre_release_package_roots
+            package_roots += release_package_roots
             package_file_patterns = self._get_package_file_patterns()
             #
             for i_index, i_package_root in enumerate(package_roots):
@@ -190,6 +190,7 @@ class PackageContextNew(object):
 
     def _get_packages(self, packages_extend=None, beta_enable=False):
         list_ = []
+        #
         resolved_packages = self.get_resolved_packages_data()
         #
         for i_p in resolved_packages:

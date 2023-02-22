@@ -5,6 +5,8 @@ from lxbasic import bsc_configure, bsc_core
 
 import lxbasic.objects as bsc_objects
 
+import lxbasic.extra.methods as bsc_etr_methods
+
 import lxresolver.commands as rsv_commands
 
 from lxsession import ssn_core
@@ -97,6 +99,7 @@ class AbsSsnObj(
         self._configure.set_flatten()
         #
         self._user = bsc_core.SystemMtd.get_user_name()
+        self._host = bsc_core.SystemMtd.get_host()
         self._platform = bsc_core.SystemMtd.get_platform()
         self._application = bsc_core.SystemMtd.get_application()
         self._system = bsc_core.SystemMtd.get_current()
@@ -106,6 +109,7 @@ class AbsSsnObj(
             ) or []
         )
         self._variants['user'] = self._user
+        self._variants['host'] = self._host
         self._variants['platform'] = self._platform
         self._variants['application'] = self._application
         #
@@ -243,16 +247,14 @@ class AbsSsnObj(
         return self._hook_yaml_file
 
     def set_hook_python_file_open(self):
-        cmd = 'rez-env sublime_text -- sublime_text "{}"'.format(
+        bsc_etr_methods.EtrBase.open_ide(
             self._hook_python_file
         )
-        bsc_core.SubProcessMtd.set_run(cmd)
 
     def set_hook_yaml_file_open(self):
-        cmd = 'rez-env sublime_text -- sublime_text "{}"'.format(
+        bsc_etr_methods.EtrBase.open_ide(
             self._hook_yaml_file
         )
-        bsc_core.SubProcessMtd.set_run(cmd)
 
     def set_reload(self):
         self._configure.set_reload()
@@ -658,6 +660,11 @@ class AbsSsnOptionMethod(
     AbsSsnOptionObj,
     AbsSsnOptionExecuteDef
 ):
+    STD_KEYS = [
+        'user',
+        'host',
+        'time_tag',
+    ]
     def __init__(self, *args, **kwargs):
         super(AbsSsnOptionMethod, self).__init__(*args, **kwargs)
         self._set_system_option_completion_()
@@ -679,7 +686,7 @@ class AbsSsnOptionMethod(
 
     def _set_system_option_completion_(self):
         option_opt = self.get_option_opt()
-        for i_key in ['user', 'time_tag']:
+        for i_key in self.STD_KEYS:
             if option_opt.get(i_key) is None:
                 option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
 
@@ -985,7 +992,7 @@ class AbsSsnRsvTaskOptionMethod(
 
     def _set_system_option_completion_(self):
         option_opt = self.get_option_opt()
-        for i_key in ['user', 'time_tag']:
+        for i_key in self.STD_KEYS:
             if option_opt.get(i_key) is None:
                 option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
 

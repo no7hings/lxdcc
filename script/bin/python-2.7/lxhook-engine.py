@@ -67,6 +67,8 @@ def __execute_option_hook(hook_option):
     :return:
     """
     from lxbasic import bsc_core
+
+    import lxbasic.extra.methods as bsc_etr_methods
     #
     import lxresolver.commands as rsv_commands
     #
@@ -107,16 +109,16 @@ def __execute_option_hook(hook_option):
             hook_option=hook_option,
         )
     )
-    engine_args_execute = []
-    engine_packages_extend = []
+    opt_args_execute = []
+    opt_packages_extend = []
     # add extend packages
-    hook_package_extend = option_opt.get('extend_packages', as_array=True)
-    if hook_package_extend:
-        engine_packages_extend.extend(
-            hook_package_extend
+    hook_packages_extend = option_opt.get('extend_packages', as_array=True)
+    if hook_packages_extend:
+        opt_packages_extend.extend(
+            hook_packages_extend
         )
     #
-    engine_args_execute.append(
+    opt_args_execute.append(
         ssn_core.SsnHookEngineMtd.get_command(
             **kwargs
         )
@@ -139,14 +141,14 @@ def __execute_option_hook(hook_option):
         environs_extend['LYNXI_RESOURCES'] = _
     #
     framework_scheme = rsv_project.get_framework_scheme()
-    if framework_scheme == 'new':
-        engine_packages_extend.extend(
-            ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
-        )
+    m = bsc_etr_methods.get_module(framework_scheme)
+    framework_packages_extend = m.EtrBase.get_base_packages_extend()
+    if framework_packages_extend:
+        opt_packages_extend.extend(framework_packages_extend)
     #
     command = rsv_app.get_command(
-        args_execute=engine_args_execute,
-        packages_extend=engine_packages_extend
+        args_execute=opt_args_execute,
+        packages_extend=opt_packages_extend
     )
     #
     if use_thread is True:

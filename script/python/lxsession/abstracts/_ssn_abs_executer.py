@@ -116,15 +116,21 @@ class AbsHookExecutor(object):
             dependent_ddl_job_ids_string_old = self._ddl_submiter.job_info.get('JobDependencies')
             dependent_ddl_job_id_extend_string = ','.join(dependent_ddl_job_id_extend)
             if dependent_ddl_job_ids_string_old:
-                self._ddl_submiter.job_info.set('JobDependencies', ','.join(
-                    [dependent_ddl_job_ids_string_old, dependent_ddl_job_id_extend_string]))
-                self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
+                self._ddl_submiter.job_info.set(
+                    'JobDependencies',
+                    ','.join([dependent_ddl_job_ids_string_old, dependent_ddl_job_id_extend_string])
+                )
+                self._ddl_submiter.job_info.set(
+                    'ResumeOnCompleteDependencies',
+                    True
+                )
             else:
-                dependent_ddl_job_ids_string_new = '{},{}'.format(dependent_ddl_job_ids_string_old,
-                                                                  dependent_ddl_job_id_extend_string)
+                dependent_ddl_job_ids_string_new = '{},{}'.format(
+                    dependent_ddl_job_ids_string_old, dependent_ddl_job_id_extend_string
+                )
                 self._ddl_submiter.job_info.set('JobDependencies', dependent_ddl_job_ids_string_new)
                 self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
-        #
+        # td enable
         td_enable = hook_option_opt.get('td_enable') or False
         if td_enable is True:
             self._ddl_submiter.job_info.set(
@@ -136,7 +142,7 @@ class AbsHookExecutor(object):
             self._ddl_submiter.job_info.set(
                 'Whitelist', bsc_core.SystemMtd.get_host()
             )
-        #
+        # localhost enable
         localhost_enable = hook_option_opt.get('localhost_enable') or False
         if localhost_enable is True:
             self._ddl_submiter.job_info.set(
@@ -195,7 +201,7 @@ class AbsHookExecutor(object):
         return self.execute_with_deadline()
 
     def get_shell_command(self):
-        etr_utility = bsc_etr_methods.EtrUtility
+        etr_utility = bsc_etr_methods.EtrBase
         command = etr_utility.get_base_command(
             args_execute=[
                 self.SHELL_PATTERN.format(
@@ -207,7 +213,7 @@ class AbsHookExecutor(object):
         return command
 
     def get_deadline_command(self):
-        etr_utility = bsc_etr_methods.EtrUtility
+        etr_utility = bsc_etr_methods.EtrBase
         command = etr_utility.get_base_command(
             args_execute=[
                 self.DEADLINE_PATTERN.format(

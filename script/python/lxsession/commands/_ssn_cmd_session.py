@@ -22,15 +22,17 @@ def set_session_option_hooks_execute_by_deadline(session):
                 batch_file=_batch_hook_option_opt.get('batch_file'),
                 # python option
                 file=_batch_hook_option_opt.get('file'),
-                #
-                user=_batch_hook_option_opt.get('user'), time_tag=_batch_hook_option_opt.get('time_tag'),
+                # standard keys
+                user=_batch_hook_option_opt.get('user'),
+                host=_batch_hook_option_opt.get('host'),
+                time_tag=_batch_hook_option_opt.get('time_tag'),
                 #
                 choice_scheme=_batch_hook_option_opt.get('choice_scheme'),
                 #
-                rez_beta=_batch_hook_option_opt.get('rez_beta') or False,
+                rez_beta=_batch_hook_option_opt.get_as_boolean('rez_beta'),
                 #
-                td_enable=_batch_hook_option_opt.get('td_enable') or False,
-                localhost_enable=_batch_hook_option_opt.get('localhost_enable') or False,
+                td_enable=_batch_hook_option_opt.get_as_boolean('td_enable'),
+                localhost_enable=_batch_hook_option_opt.get_as_boolean('localhost_enable'),
             )
         )
         #
@@ -41,7 +43,6 @@ def set_session_option_hooks_execute_by_deadline(session):
         _dependencies = _hook_option_opt.get('dependencies') or []
         _dependencies.append(batch_option_hook_key_)
         _hook_option_opt.set('dependencies', _dependencies)
-        # _hook_option_opt.set('dependency_job_ids', )
         #
         _choice_scheme_includes = _hook_option_opt.get('choice_scheme_includes', as_array=True)
         if _choice_scheme_includes:
@@ -70,23 +71,22 @@ def set_session_option_hooks_execute_by_deadline(session):
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
-    with bsc_core.LogProgress.create(
+    with bsc_core.LogProgress.create_as_bar(
         maximum=len(option_hook_keys),
-        label='option hooks execute by deadline',
-        use_as_progress_bar=True,
+        label='option-hooks execute by deadline',
     ) as g_p:
-        for i in option_hook_keys:
+        for i_args in option_hook_keys:
             g_p.set_update()
-            if isinstance(i, six.string_types):
-                i_sub_key = i
+            if isinstance(i_args, six.string_types):
+                i_sub_key = i_args
                 run_branch_fnc_(
                     main_key,
                     i_sub_key,
                     session.option,
                     {}
                 )
-            elif isinstance(i, dict):
-                for i_k, i_v in i.items():
+            elif isinstance(i_args, dict):
+                for i_k, i_v in i_args.items():
                     i_sub_key = i_k
                     i_script_option = i_v
                     run_branch_fnc_(

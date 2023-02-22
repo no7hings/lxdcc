@@ -1,7 +1,7 @@
 # coding:utf-8
 
 
-class AbsEtrUtility(object):
+class AbsEtrBase(object):
     @classmethod
     def get_base_packages_extend(cls):
         raise NotImplementedError()
@@ -16,6 +16,9 @@ class AbsEtrUtility(object):
         raise NotImplementedError()
     @classmethod
     def get_project(cls):
+        raise NotImplementedError()
+    @classmethod
+    def open_ide(cls, file_path):
         raise NotImplementedError()
 
 

@@ -1,7 +1,7 @@
 # coding:utf-8
 
-import lxbasic.extra.methods as bsc_etr_methods
+import lxutil.extra.methods as utl_etr_methods
 
-m = bsc_etr_methods.get_module('default')
+m = utl_etr_methods.get_module('default')
 
 print m.EtrUsd

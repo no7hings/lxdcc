@@ -3,8 +3,6 @@ import collections
 
 import parse
 
-from lxutil import utl_core
-
 from lxbasic import bsc_core
 
 
@@ -93,7 +91,7 @@ class AbsPermission(object):
     def _set_nas_cmd_run_(cls, cmd):
         import paramiko
         #
-        run_log = utl_core.Log.set_module_result_trace(
+        run_log = bsc_core.LogMtd.trace_method_result(
             'nas-cmd-run',
             'command=`{}`'.format(cmd)
         )
@@ -216,7 +214,7 @@ class RsvPermissionMtd(AbsPermission):
         task_directory_paths = r.get_rsv_resource_task_directory_paths(**kwargs)
         for i_task_directory_path in task_directory_paths:
             bsc_core.StorageMtd.create_directory(i_task_directory_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'directory create',
                 'directory="{}"'.format(i_task_directory_path)
             )

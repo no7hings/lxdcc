@@ -2,7 +2,7 @@
 import six
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_environ
+from lxbasic.core import _bsc_cor_log, _bsc_cor_environ
 
 
 class SubProcessMtd(object):
@@ -18,13 +18,50 @@ class SubProcessMtd(object):
     def __init__(self):
         pass
     @classmethod
+    def get_environs(cls, **kwargs):
+        environs_extend = kwargs.get('environs_extend', {})
+        if environs_extend:
+            environs = dict(os.environ)
+            environs = {str(k): str(v) for k, v in environs.items()}
+            env_opt = _bsc_cor_environ.EnvironsOpt(environs)
+            for k, v in environs_extend.items():
+                if isinstance(v, six.string_types):
+                    env_opt.set(
+                        k, v
+                    )
+                    _bsc_cor_log.LogMtd.trace_method_result(
+                        'sub-process execute',
+                        'environ set: "{}"="{}"'.format(k, v)
+                    )
+                elif isinstance(v, tuple):
+                    i_v, i_opt = v
+                    if i_opt == 'set':
+                        env_opt.set(
+                            k, v
+                        )
+                        _bsc_cor_log.LogMtd.trace_method_result(
+                            'sub-process execute',
+                            'environ set: "{}"="{}"'.format(k, v)
+                        )
+                    elif i_opt == 'append':
+                        env_opt.append(
+                            k, i_v
+                        )
+                        _bsc_cor_log.LogMtd.trace_method_result(
+                            'sub-process execute',
+                            'environ append: "{}"="{}"'.format(k, i_v)
+                        )
+                    elif i_opt == 'prepend':
+                        env_opt.prepend(
+                            k, i_v
+                        )
+                        _bsc_cor_log.LogMtd.trace_method_result(
+                            'sub-process execute',
+                            'environ prepend: "{}"="{}"'.format(k, i_v)
+                        )
+            return environs
+    @classmethod
     def set_run_with_result_in_windows(cls, cmd, **kwargs):
-        # must reload, output error
-        # import sys
-        # reload(sys)
-        # if hasattr(sys, 'setdefaultencoding'):
-        #     sys.setdefaultencoding('utf-8')
-        #
         cmd = cmd.replace("&", "^&")
         #
         clear_environ = kwargs.get('kwargs', False)
@@ -43,33 +80,7 @@ class SubProcessMtd(object):
         else:
             environs_extend = kwargs.get('environs_extend', {})
             if environs_extend:
-                environs = dict(os.environ)
-                environs = {str(k): str(v) for k, v in environs.items()}
-                env_opt = _bsc_cor_environ.EnvironsOpt(environs)
-                for k, v in environs.items():
-                    env_opt.set_add(
-                        k, v
-                    )
-                for k, v in environs_extend.items():
-                    if isinstance(v, six.text_type):
-                        env_opt.set(
-                            k, v
-                        )
-                    elif isinstance(v, tuple):
-                        i_v, i_opt = v
-                        if i_opt == 'set':
-                            env_opt.set(
-                                k, v
-                            )
-                        elif i_opt == 'append':
-                            env_opt.append(
-                                k, i_v
-                            )
-                        elif i_opt == 'prepend':
-                            env_opt.prepend(
-                                k, i_v
-                            )
-                #
+                environs = cls.get_environs(**kwargs)
                 s_p = subprocess.Popen(
                     cmd,
                     shell=True,
@@ -109,24 +120,9 @@ class SubProcessMtd(object):
         if retcode:
             raise subprocess.CalledProcessError(retcode, cmd)
         #
-        # return_code = s_p.wait()
-        # if return_code:
-        #     ExceptionMtd.set_print()
-        #     ExceptionMtd.set_stack_print()
-        #     #
-        #     raise subprocess.CalledProcessError(
-        #         return_code, s_p
-        #     )
-        #
         s_p.stdout.close()
     @classmethod
     def set_run_with_result_in_linux(cls, cmd, **kwargs):
-        # must reload, output error
-        # import sys
-        # reload(sys)
-        # if hasattr(sys, 'setdefaultencoding'):
-        #     sys.setdefaultencoding('utf-8')
-        #
         clear_environ = kwargs.get('kwargs', False)
         #
         if clear_environ is True:
@@ -143,33 +139,7 @@ class SubProcessMtd(object):
         else:
             environs_extend = kwargs.get('environs_extend', {})
             if environs_extend:
-                environs = dict(os.environ)
-                environs = {str(k): str(v) for k, v in environs.items()}
-                env_opt = _bsc_cor_environ.EnvironsOpt(environs)
-                for k, v in environs.items():
-                    env_opt.set_add(
-                        k, v
-                    )
-                for k, v in environs_extend.items():
-                    if isinstance(v, six.text_type):
-                        env_opt.set(
-                            k, v
-                        )
-                    elif isinstance(v, tuple):
-                        i_v, i_opt = v
-                        if i_opt == 'set':
-                            env_opt.set(
-                                k, v
-                            )
-                        elif i_opt == 'append':
-                            env_opt.append(
-                                k, i_v
-                            )
-                        elif i_opt == 'prepend':
-                            env_opt.prepend(
-                                k, i_v
-                            )
-                #
+                environs = cls.get_environs(**kwargs)
                 s_p = subprocess.Popen(
                     cmd,
                     shell=True,
@@ -209,15 +179,6 @@ class SubProcessMtd(object):
         retcode = s_p.poll()
         if retcode:
             raise subprocess.CalledProcessError(retcode, cmd)
-        #
-        # return_code = s_p.wait()
-        # if return_code:
-        #     ExceptionMtd.set_print()
-        #     ExceptionMtd.set_stack_print()
-        #     #
-        #     raise subprocess.CalledProcessError(
-        #         return_code, s_p
-        #     )
         #
         s_p.stdout.close()
     @classmethod

@@ -114,6 +114,7 @@ class EnvExtraMtd(EnvironMtd):
     SCHEME_KEY = 'LYNXI_SCHEME'
     BETA_ENABLE_KEY = 'LYNXI_BETA_ENABLE'
     TD_ENABLE_KEY = 'LYNXI_TD_ENABLE'
+    LOG_ROOT_KEY = 'LYNXI_LOG_ROOT'
     @classmethod
     def get_scheme(cls):
         return cls.get(cls.SCHEME_KEY)
@@ -141,3 +142,22 @@ class EnvExtraMtd(EnvironMtd):
             cls.set(cls.TD_ENABLE_KEY, cls.TRUE)
         else:
             cls.set(cls.TD_ENABLE_KEY, cls.FALSE)
+    @classmethod
+    def get_log_root(cls):
+        return cls.get(cls.LOG_ROOT_KEY)
+    @classmethod
+    def get_user_debug_directory(cls, tag, create=False):
+        root = cls.get_log_root()
+        if root:
+            if os.path.exists(root):
+                variants = dict(
+                    root=root,
+                    tag=tag,
+                    date_tag=TimeMtd.get_date_tag(),
+                    user=SystemMtd.get_user_name()
+                )
+                _ = '{root}/debuggers/lynxi/{date_tag}/{user}/{tag}'.format(**variants)
+                if create is True:
+                    if os.path.exists(_) is False:
+                        os.makedirs(_)
+                return _

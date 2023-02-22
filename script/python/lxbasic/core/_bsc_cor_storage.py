@@ -392,8 +392,9 @@ class StgDirectoryMtd(object):
     def get_file_relative_path(cls, directory_path, file_path):
         return os.path.relpath(file_path, directory_path)
     @classmethod
-    def set_copy_to(cls, src_directory_path, tgt_directory_path):
+    def set_copy_to(cls, src_directory_path, tgt_directory_path, excludes=None):
         def copy_fnc_(src_file_path_, tgt_file_path_):
+            print src_file_path_, tgt_file_path_
             shutil.copy2(src_file_path_, tgt_file_path_)
         #
         src_directory_path = src_directory_path
@@ -403,18 +404,28 @@ class StgDirectoryMtd(object):
         for i_src_file_path in file_paths:
             i_local_file_path = i_src_file_path[len(src_directory_path):]
             #
-            i_tgt_file_path = tgt_directory_path + i_local_file_path
-            if os.path.exists(i_tgt_file_path) is False:
-                i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
-                if os.path.exists(i_tgt_dir_path) is False:
-                    os.makedirs(i_tgt_dir_path)
+            if isinstance(excludes, (tuple, list)):
+                is_match = False
+                for j in excludes:
+                    if fnmatch.filter([i_local_file_path], j):
+                        is_match = True
+                        break
                 #
-                i_thread = PyThread(
-                    copy_fnc_, i_src_file_path, i_tgt_file_path
-                )
-                threads.append(i_thread)
-                i_thread.start()
-                # i_thread.join()
+                if is_match is True:
+                    continue
+            #
+            i_tgt_file_path = tgt_directory_path + i_local_file_path
+            print i_tgt_file_path
+            # if os.path.exists(i_tgt_file_path) is False:
+            #     i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
+            #     if os.path.exists(i_tgt_dir_path) is False:
+            #         os.makedirs(i_tgt_dir_path)
+            #     #
+            #     i_thread = PyThread(
+            #         copy_fnc_, i_src_file_path, i_tgt_file_path
+            #     )
+            #     threads.append(i_thread)
+            #     i_thread.start()
         #
         [i.join() for i in threads]
     @classmethod

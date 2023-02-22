@@ -156,14 +156,14 @@ class AbsRsvAppDef(object):
     def get_command(self, args_execute=None, packages_extend=None):
         raise NotImplementedError()
 
-    def execute_command(self, args_execute=None, packages_extend=None):
+    def execute_command(self, args_execute=None, packages_extend=None, **sub_progress_kwargs):
         cmd = self.get_command(args_execute, packages_extend)
         if cmd:
             bsc_core.LogMtd.trace_method_result(
                 'execute app command',
                 'command=`{}` is started'.format(cmd)
             )
-            bsc_core.SubProcessMtd.set_run_with_result(cmd)
+            bsc_core.SubProcessMtd.set_run_with_result(cmd, **sub_progress_kwargs)
     @classmethod
     def execute_with_result(cls, command, **sub_progress_kwargs):
         bsc_core.LogMtd.trace_method_result(

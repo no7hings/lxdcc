@@ -16,6 +16,7 @@ platform_name = platform.system().lower()
 environ_data = [
     ('LXDCC_BASE', '{root}', 'set'),
     ('LYNXI_SCHEME', 'new', 'set'),
+    ('LYNXI_LOG_ROOT', '/job/PLE/resource/logs', 'set'),
     ('LYNXI_CONFIGURES', '{root}/script/configure', 'append_to_path'),
     #
     ('PATH', '{root}/script/bin', 'append_to_path'),

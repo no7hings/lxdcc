@@ -10,6 +10,7 @@ import getopt
 
 def main(argv):
     try:
+        sys.stdout.write('execute lxapp from: "{}"\n'.format(__file__))
         args_opt, args_execute = __get_opt_args(argv[1:])
         opt_kwargs, opt_args = getopt.getopt(
             args_opt,
@@ -97,6 +98,8 @@ def __print_help():
 def __execute_with_option(option, args_execute, package_extend):
     from lxbasic import bsc_core
     #
+    import lxbasic.extra.methods as bsc_etr_methods
+    #
     import lxresolver.commands as rsv_commands
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
@@ -114,7 +117,15 @@ def __execute_with_option(option, args_execute, package_extend):
     if not application:
         return
     #
-    rsv_launcher = rsv_project.get_rsv_app(application=application)
+    opt_packages_extend = []
+    #
+    framework_scheme = rsv_project.get_framework_scheme()
+    m = bsc_etr_methods.get_module(framework_scheme)
+    framework_packages_extend = m.EtrBase.get_base_packages_extend()
+    if framework_packages_extend:
+        opt_packages_extend.extend(framework_packages_extend)
+    #
+    rsv_app = rsv_project.get_rsv_app(application=application)
     sys.stdout.write(
         (
             '\033[34m'
@@ -122,10 +133,21 @@ def __execute_with_option(option, args_execute, package_extend):
             '\033[32m'
             '{}'
             '\033[0m\n'
-        ).format(rsv_launcher.get_command(args_execute, package_extend))
+        ).format(
+            rsv_app.get_command(
+                args_execute=args_execute,
+                package_extend=opt_packages_extend
+            )
+        )
     )
     if args_execute:
-        rsv_launcher.execute_command(args_execute, package_extend)
+        framework_environs_extend = m.EtrBase.get_project_environs_extend()
+        rsv_app.execute_command(
+            args_execute=args_execute,
+            package_extend=opt_packages_extend,
+            #
+            environs_extend=framework_environs_extend
+        )
 
 
 if __name__ == '__main__':

@@ -202,6 +202,7 @@ class AbsHookExecutor(object):
 
     def get_shell_command(self):
         etr_utility = bsc_etr_methods.EtrBase
+        # todo: use release packages?
         command = etr_utility.get_base_command(
             args_execute=[
                 self.SHELL_PATTERN.format(
@@ -214,6 +215,7 @@ class AbsHookExecutor(object):
 
     def get_deadline_command(self):
         etr_utility = bsc_etr_methods.EtrBase
+        # todo: use release packages?
         command = etr_utility.get_base_command(
             args_execute=[
                 self.DEADLINE_PATTERN.format(

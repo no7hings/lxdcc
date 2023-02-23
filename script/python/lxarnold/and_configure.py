@@ -14,14 +14,6 @@ class Data(object):
     DATA_ROOT = '{}/.data'.format(ROOT)
     #
     DCC_IMPORTER_CONFIGURE_PATH = '{}/dcc-importer-configure.yml'.format(DATA_ROOT)
-    DCC_IMPORTER_CONFIGURE = bsc_objects.Configure(value=DCC_IMPORTER_CONFIGURE_PATH)
-    DCC_IMPORTER_CONFIGURE.set_flatten()
-    #
-    OBJ_CONFIGURE_PATH = '{}/obj-configure.yml'.format(DATA_ROOT)
-    OBJ_CONFIGURE = bsc_objects.Configure(value=OBJ_CONFIGURE_PATH)
-    OBJ_CONFIGURE.set_flatten()
-    #
-    ACES_COLOR_PATH = '{}/aces-color.yml'.format(DATA_ROOT)
 
 
 class Category(object):

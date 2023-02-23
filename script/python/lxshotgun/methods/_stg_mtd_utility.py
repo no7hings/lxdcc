@@ -66,39 +66,6 @@ class StgTaskMtd(object):
             #
             gp.set_stop()
     @classmethod
-    def set_create_by_rsv_entity(cls, rsv_entity):
-        stg_connector = stg_objects.StgConnector()
-        #
-        rsv_entity_properties = rsv_entity.properties
-        branch = rsv_entity_properties.get('branch')
-        if branch == 'asset':
-            entity_kwargs = rsv_entity_properties.value
-            stg_connector.set_stg_entity_create(
-                **entity_kwargs
-            )
-            role = rsv_entity_properties.get('role')
-            template = role
-            task_keys = cls.SHOTGUN_TEMPLATE_CONFIGURE.get(
-                'task-templates.{}.task-keys'.format(template)
-            )
-            if task_keys is None:
-                task_keys = cls.SHOTGUN_TEMPLATE_CONFIGURE.get(
-                    'task-templates.default.task-keys'
-                )
-            #
-            if task_keys:
-                for i_task_key in task_keys:
-                    i_task_kwargs = copy.copy(rsv_entity_properties.value)
-                    i_step, i_task = i_task_key.split('/')
-                    i_task_kwargs['step'] = i_step
-                    i_task_kwargs['task'] = i_task
-                    #
-                    stg_connector.set_stg_task_create(
-                        **i_task_kwargs
-                    )
-            #
-            cls.set_entity_directories_create(**entity_kwargs)
-    @classmethod
     def set_asset_create(cls, project, asset, role):
         entity_kwargs = dict(
             project=project,
@@ -136,9 +103,6 @@ class StgTaskMtd(object):
         #
         # cls.set_entity_directories_create(**entity_kwargs)
     @classmethod
-    def set_entities_create_by_template_(cls, project, entity_keys, task_template):
-        pass
-    @classmethod
     def set_entity_directories_create(cls, **kwargs):
         """
         :param kwargs:
@@ -162,28 +126,4 @@ class StgTaskMtd(object):
 
 
 if __name__ == '__main__':
-    import lxmaya
-
-    lxmaya.set_reload()
-
-    import lxshotgun.methods as stg_methods
-
-    stg_methods.StgTaskMtd.set_entities_create_by_template(
-        project='lib',
-        entities=[
-            'ast_cg7_dad',
-        ],
-        task_template='chr'
-    )
-    #
-    if __name__ == '__main__':
-        import lxmaya
-
-        lxmaya.set_reload()
-
-        import lxshotgun.methods as stg_methods
-
-        stg_methods.StgTaskMtd.set_entity_directories_create(
-            project='cjd',
-            asset='qunzhongnan_c'
-        )
+    pass

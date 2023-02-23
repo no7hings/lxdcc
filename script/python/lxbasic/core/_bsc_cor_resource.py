@@ -6,7 +6,7 @@ from lxbasic.core import _bsc_cor_environ, _bsc_cor_storage
 
 class RscFileMtd(object):
     CACHE = {}
-    ENVIRON_KEY = 'LYNXI_RESOURCES'
+    ENVIRON_KEY = 'PAPER_EXTEND_RESOURCES'
     @classmethod
     def get_search_directories(cls):
         return _bsc_cor_environ.EnvironMtd.get_as_array(
@@ -15,7 +15,7 @@ class RscFileMtd(object):
     @classmethod
     def get(cls, key):
         """
-        :param key: str, etc. "rsv-task-batchers/asset/gen-model-export-extra" or "*/gen-model-export-extra"
+        :param key: str
         :return: str(path)
         """
         if key in cls.CACHE:
@@ -60,3 +60,7 @@ class RscIconFileMtd(object):
         )
         if _:
             cls.get(_)
+
+
+if __name__ == '__main__':
+    print RscFileMtd.get('fonts/Arial.ttf')

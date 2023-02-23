@@ -5,6 +5,8 @@ import arnold as ai
 
 from lxbasic import bsc_core
 
+import lxbasic.objects as bsc_objects
+
 from lxutil import utl_core
 
 from lxuniverse import unr_configure
@@ -100,6 +102,11 @@ class AbsObjScene(
         self._index_dict = {}
         #
         self._platform = bsc_core.PlatformMtd.get_current()
+
+        self._node_configure = bsc_objects.Configure(
+            value=bsc_core.CfgFileMtd.get_yaml('arnold/node')
+        )
+        self._node_configure.set_flatten()
     @property
     def ar_universe(self):
         return self._and_universe
@@ -379,7 +386,7 @@ class AbsObjScene(
     # geometry-properties
     def _set_dcc_geometry_obj_properties_build_(self, and_obj_mtd, dcc_obj, blacklist):
         dcc_obj_type_name = dcc_obj.type.name
-        includes = and_configure.Data.OBJ_CONFIGURE.get('properties.{}'.format(dcc_obj_type_name))
+        includes = self._node_configure.get('properties.{}'.format(dcc_obj_type_name))
         self._set_dcc_obj_input_ports_build_(
             and_obj_mtd, dcc_obj,
             include=includes

@@ -51,9 +51,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._assign_selection_enable = self.get('assign_selection')
         self._name_join_time_tag = self.get('name_join_time_tag')
         #
-        self._dcc_importer_configure = bsc_objects.Configure(
-            value=and_configure.Data.DCC_IMPORTER_CONFIGURE_PATH
+        self._convert_configure = bsc_objects.Configure(
+            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
         )
+        self._convert_configure.set_flatten()
         #
         is_plug_loaded = cmds.pluginInfo(self.PLUG_NAME, query=True, loaded=True)
         if is_plug_loaded is False:
@@ -188,7 +189,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     else:
                         key = 'output-ports.to-maya.{}'.format(i_shader_and_source_and_port_path)
 
-                    source_dcc_port_path = self._dcc_importer_configure.get(key)
+                    source_dcc_port_path = self._convert_configure.get(key)
 
                     shader_dcc_obj.get_port(source_dcc_port_path).set_target(
                         material_dcc_obj.get_port(i_shader_dcc_bind_port_name)
@@ -258,7 +259,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         else:
             key = 'output-ports.to-maya.{}'.format(source_and_port_path)
         #
-        source_dcc_port_path = self._dcc_importer_configure.get(key)
+        source_dcc_port_path = self._convert_configure.get(key)
         #
         if target_and_port.get_is_channel():
             a, b = target_and_port_path.split('.')
@@ -266,22 +267,22 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         else:
             target_dcc_port_path = bsc_objects.StrUnderline(target_and_port_path).to_camelcase()
         #
-        and_obj_type_names = self._dcc_importer_configure.get_branch_keys(
+        and_obj_type_names = self._convert_configure.get_branch_keys(
             'input-ports.to-maya'
         )
         if target_and_obj_type_name in and_obj_type_names:
-            and_port_names = self._dcc_importer_configure.get_branch_keys(
+            and_port_names = self._convert_configure.get_branch_keys(
                 'input-ports.to-maya.{}'.format(target_and_obj_type_name)
             )
             if target_and_port_path in and_port_names:
                 if target_and_port.get_is_channel():
                     a, b = target_and_port_path.split('.')
-                    a = self._dcc_importer_configure.get(
+                    a = self._convert_configure.get(
                         'input-ports.to-maya.{}.{}'.format(target_and_obj_type_name, target_and_port_path)
                     )
                     target_dcc_port_path = '{0}.{0}{1}'.format(a, b.upper())
                 else:
-                    target_dcc_port_path = self._dcc_importer_configure.get(
+                    target_dcc_port_path = self._convert_configure.get(
                         'input-ports.to-maya.{}.{}'.format(target_and_obj_type_name, target_and_port_path)
                     )
 
@@ -334,7 +335,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def __set_shader_create_(self, and_obj):
         and_obj_type_name = and_obj.type.name
         all_and_obj_types = mya_dcc_objects.AndShader.CATEGORY_DICT.keys()
-        dcc_type = self._dcc_importer_configure.get('shaders.to-maya.{}'.format(and_obj_type_name))
+        dcc_type = self._convert_configure.get('shaders.to-maya.{}'.format(and_obj_type_name))
         if dcc_type is not None:
             and_obj_name = and_obj.name
             dcc_obj_name = and_obj_name
@@ -371,7 +372,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     #
     def __set_shader_ports_(self, and_obj, dcc_obj):
         and_obj_type_name = and_obj.type.name
-        and_obj_type_names = self._dcc_importer_configure.get_branch_keys(
+        and_obj_type_names = self._convert_configure.get_branch_keys(
             'input-ports.to-maya'
         )
         for and_port in and_obj.get_input_ports():
@@ -381,11 +382,11 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 dcc_port_name = bsc_objects.StrUnderline(and_port_name).to_camelcase()
                 #
                 if and_obj_type_name in and_obj_type_names:
-                    and_port_names = self._dcc_importer_configure.get_branch_keys(
+                    and_port_names = self._convert_configure.get_branch_keys(
                         'input-ports.to-maya.{}'.format(and_obj_type_name)
                     )
                     if and_port_name in and_port_names:
-                        dcc_port_name = self._dcc_importer_configure.get(
+                        dcc_port_name = self._convert_configure.get(
                             'input-ports.to-maya.{}.{}'.format(and_obj_type_name, and_port_name)
                         )
                 #

@@ -496,18 +496,18 @@ class ScpTextureResourceData(object):
 
 
 if __name__ == '__main__':
-    # import lxdatabase.objects as dtb_objects
-    # scp = ScpTextureResourcesAddByQuixel(
-    #     database_opt=dtb_objects.DtbResourceLibraryOpt(
-    #         '/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/dtb-library-basic.yml'
-    #     )
-    # )
-    # scp.add_resources_from(
-    #     '/l/resource/srf/tex_lib/surfaces'
-    # )
-
-    scp = ScpTextureResourceData(
-        '/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/acescg/tx'
+    import lxdatabase.objects as dtb_objects
+    scp = ScpTextureResourcesAddByQuixel(
+        database_opt=dtb_objects.DtbResourceLibraryOpt(
+            '/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/dtb-library-basic.yml'
+        )
+    )
+    scp.add_resources_from(
+        '/l/resource/srf/tex_lib/surfaces'
     )
 
-    print scp.get_data()
+    # scp = ScpTextureResourceData(
+    #     '/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/acescg/tx'
+    # )
+    #
+    # print scp.get_data()

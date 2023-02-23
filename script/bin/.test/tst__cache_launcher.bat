@@ -95,7 +95,7 @@ set PYTHONPATH=%HOMEPATH%\packages\lxdcc_fnc\99.99.99/lib/python/site-packages;%
 REM
 REM commands from package lxdcc_rsc-99.99.99[]
 REM --------------------------------------------------------------------------------
-set LYNXI_RESOURCES=%HOMEPATH%\packages\lxdcc_rsc\99.99.99/script/python/.resources
+set PAPER_EXTEND_RESOURCES=%HOMEPATH%\packages\lxdcc_rsc\99.99.99/script/python/.resources
 REM
 REM commands from package lxdcc_gui-99.99.99[]
 REM --------------------------------------------------------------------------------

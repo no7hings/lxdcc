@@ -21,7 +21,7 @@ def commands():
     #
     env.LXDCC_BASE = '{root}'
     env.LYNXI_SCHEME = 'default'
-    env.LYNXI_CONFIGURES.append('{root}/script/configure')
+    env.PAPER_EXTEND_CONFIGURES.append('{root}/script/configure')
     # bin
     env.PATH.append('{root}/script/bin')
     if platform.system() == 'Linux':
@@ -31,7 +31,7 @@ def commands():
     # script
     env.PYTHONPATH.append('{root}/script/python')
     # resouces
-    # env.LYNXI_RESOURCES.append('{root}/script/python/.resources')
+    # env.PAPER_EXTEND_RESOURCES.append('{root}/script/python/.resources')
     # startup in dcc
     # maya
     env.PYTHONPATH.append('{root}/script/python/.setup/maya/scripts')

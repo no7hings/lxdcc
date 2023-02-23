@@ -136,9 +136,9 @@ def __execute_option_hook(hook_option):
     # add extend environs
     environs_extend = {}
     #
-    _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+    _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
     if _:
-        environs_extend['LYNXI_RESOURCES'] = _
+        environs_extend['PAPER_EXTEND_RESOURCES'] = _
     #
     framework_scheme = rsv_project.get_framework_scheme()
     m = bsc_etr_methods.get_module(framework_scheme)

@@ -1,6 +1,10 @@
 # coding:utf-8
 import collections
 
+from lxbasic import bsc_core
+
+import lxbasic.objects as bsc_objects
+
 from lxarnold import and_configure
 
 
@@ -19,6 +23,16 @@ class ShapeLookOpt(AbsLookOpt):
     def __init__(self, *args):
         super(ShapeLookOpt, self).__init__(*args)
 
+        self._node_configure = bsc_objects.Configure(
+            value=bsc_core.CfgFileMtd.get_yaml('arnold/node')
+        )
+        self._node_configure.set_flatten()
+
+        self._convert_configure = bsc_objects.Configure(
+            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
+        )
+        self._convert_configure.set_flatten()
+
     def get_material_assigns(self):
         material_assigns = collections.OrderedDict()
         material_paths = self.get_material_paths()
@@ -30,7 +44,7 @@ class ShapeLookOpt(AbsLookOpt):
     def get_properties(self):
         properties = collections.OrderedDict()
         obj_type_name = self.obj.type.name
-        keys = and_configure.Data.OBJ_CONFIGURE.get('properties.{}'.format(obj_type_name))
+        keys = self._node_configure.get('properties.{}'.format(obj_type_name))
         for key in keys:
             port = self.obj.get_input_port(key)
             if port is not None:
@@ -44,7 +58,7 @@ class ShapeLookOpt(AbsLookOpt):
     def set_properties_convert_to(self, application):
         dic = collections.OrderedDict()
         dic_ = self.get_properties()
-        convert_dict = and_configure.Data.DCC_IMPORTER_CONFIGURE.get(
+        convert_dict = self._convert_configure.get(
             'properties.to-{}.{}'.format(application, self.obj.type.name)
         )
         for k, v in convert_dict.items():
@@ -54,7 +68,7 @@ class ShapeLookOpt(AbsLookOpt):
 
     def get_visibilities(self):
         visibilities = collections.OrderedDict()
-        keys = and_configure.Data.OBJ_CONFIGURE.get('visibilities')
+        keys = self._node_configure.get('visibilities')
         for key in keys:
             port = self.obj.get_input_port(key)
             if port is not None:
@@ -64,7 +78,7 @@ class ShapeLookOpt(AbsLookOpt):
     def set_visibilities_convert_to(self, application):
         dic = collections.OrderedDict()
         dic_ = self.get_visibilities()
-        convert_dict = and_configure.Data.DCC_IMPORTER_CONFIGURE.get(
+        convert_dict = self._convert_configure.get(
             'visibilities.to-{}'.format(application)
         )
         for k, v in convert_dict.items():

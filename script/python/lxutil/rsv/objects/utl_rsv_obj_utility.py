@@ -85,7 +85,7 @@ class RsvAssetWorkspaceTextureOpt(object):
         )
     @classmethod
     def set_directory_locked(cls, directory_path):
-        rsv_methods.PathPermissionOpt(
+        bsc_core.StgPathSshOpt(
             directory_path
         ).set_just_read_only_for(
             ['cg_group', 'coop_grp']

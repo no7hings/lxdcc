@@ -16,3 +16,8 @@ if __name__ == '__main__':
         print CfgFileMtd.get_yaml('session/deadline/rsv-task-submiter')
         print CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
 
+        print CfgFileMtd.get_yaml('colorspace/aces-color')
+
+        print CfgFileMtd.get_yaml('arnold/node')
+        print CfgFileMtd.get_yaml('arnold/convert')
+

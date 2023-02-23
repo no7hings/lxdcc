@@ -27,7 +27,7 @@ from lxuniverse import unr_configure
 from lxarnold import and_configure
 
 ACES_COLOR_CONFIGURE = bsc_objects.Properties(
-    None, and_configure.Data.ACES_COLOR_PATH
+    None, bsc_core.CfgFileMtd.get_yaml('colorspace/aces-color')
 )
 
 if platform.system().lower() == 'windows':

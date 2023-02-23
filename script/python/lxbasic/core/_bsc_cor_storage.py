@@ -4,6 +4,321 @@ from ._bsc_cor_utility import *
 from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_log, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
 
 
+class StgRpcMtd(object):
+    RPC_SERVER = '10.10.152.74'
+    RPC_PORT = 58888
+    PATHSEP = '/'
+    @classmethod
+    def get_client(cls, port_addition=0):
+        return xmlrpclib.ServerProxy(
+            'http://{0}:{1}'.format(cls.RPC_SERVER, cls.RPC_PORT+port_addition)
+        )
+    @classmethod
+    def create_directories(cls, directory_path, mode='1777'):
+        units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(directory_path)
+        units.reverse()
+        list_ = []
+        for i_path in units:
+            if i_path != cls.PATHSEP:
+                if os.path.exists(i_path) is False:
+                    list_.append(i_path)
+        #
+        for i in list_:
+            cls.create_directory(i, mode)
+    @classmethod
+    def create_directory(cls, directory_path, mode='1777'):
+        # noinspection PyUnresolvedReferences
+        from cosmos.rpc import client
+        clt = client.generate_client()
+        timeout = 25
+        start_time = time.time()
+        if os.path.isdir(directory_path) is False:
+            clt.makedirs(directory_path, mode)
+            cost_time = 0
+            parent_path = StgPathMtd.get_parent(directory_path)
+            while os.path.isdir(directory_path) is False:
+                cost_time = int(time.time() - start_time)
+                if cost_time > timeout:
+                    raise RuntimeError(
+                        _bsc_cor_log.LogMtd.trace_method_error(
+                            'create-directory by rpc',
+                            'directory="{}" is timeout, cost time {}s'.format(directory_path, cost_time)
+                        )
+                    )
+                #
+                time.sleep(1)
+                #
+                # subprocess.Popen(
+                #     'ls {}'.format(parent_path), shell=True
+                # )
+            #
+            _bsc_cor_log.LogMtd.trace_method_result(
+                'rpc create-directory',
+                'directory="{}" is cost time {}s'.format(directory_path, cost_time)
+            )
+        return True
+
+
+class StgSshMtd(object):
+    GROUP_ID_QUERY = {
+        'cg_group': 20002,
+        # 'cg_grp': 20002,
+        'ani_grp': 20017,
+        'rlo_grp': 20025,
+        'flo_grp': 20026,
+        'art_grp': 20010,
+        'stb_grp': 20027,
+        'cfx_grp': 20015,
+        'efx_grp': 20016,
+        'dmt_grp': 20020,
+        'lgt_grp': 20018,
+        'mod_grp': 20011,
+        'grm_grp': 20012,
+        'rig_grp': 20013,
+        'srf_grp': 20014,
+        'set_grp': 20023,
+        'plt_grp': 20024,
+        'edt_grp': 20028,
+        #
+        'coop_grp': 20032,
+        #
+        'td_grp': 20004,
+    }
+    CMD_QUERY = {
+        'deny': 'chmod -R +a group {group_id} deny dir_gen_write,std_delete,delete_child,object_inherit,container_inherit "{path}"',
+        'allow': 'chmod -R +a group {group_id} allow dir_gen_all,object_inherit,container_inherit "{path}"',
+        'read_only': 'chmod -R +a group {group_id} allow dir_gen_read,dir_gen_execute,object_inherit,container_inherit "{path}"',
+        'read_only-0': 'chmod -R +a group {group_id} allow dir_gen_read,dir_gen_execute,object_inherit,container_inherit "{path}"',
+        'show_grp': 'ls -led "{path}"',
+        'remove_grp': 'chmod -R -a# {index} "{path}"',
+        'file_allow': 'chmod -R +a group {group_id} allow file_gen_all,object_inherit,container_inherit "{path}"',
+    }
+    GROUP_PATTERN = r' {index}: group:DIEZHI\{group} {context}'
+    USER_PATTERN = r' {index}: user:DIEZHI\{user} {context}'
+    #
+    HOST = 'isilon.diezhi.local'
+    USER = 'root'
+    # noinspection PyAugmentAssignment
+    class MakePassword(object):
+        def __init__(self, key, s):
+            self.key = key
+            self.s = s
+
+        def encrypt(self):
+            b = bytearray(str(self.s).encode("utf-8"))
+            n = len(b)
+            c = bytearray(n * 2)
+            j = 0
+            for i in range(0, n):
+                b1 = b[i]
+                b2 = b1 ^ self.key
+                c1 = b2 % 16
+                c2 = b2 // 16
+                c1 = c1 + 65
+                c2 = c2 + 65
+                c[j] = c1
+                c[j + 1] = c2
+                j = j + 2
+            return c.decode("utf-8")
+
+        def decrypt(self):
+            c = bytearray(str(self.s).encode("utf-8"))
+            n = len(c)
+            if n % 2 != 0:
+                return ""
+            n = n // 2
+            b = bytearray(n)
+            j = 0
+            for i in range(0, n):
+                c1 = c[j]
+                c2 = c[j + 1]
+                j = j + 2
+                c1 = c1 - 65
+                c2 = c2 - 65
+                b2 = c2 * 16 + c1
+                b1 = b2 ^ self.key
+                b[i] = b1
+            try:
+                return b.decode("utf-8")
+            except:
+                return "failed"
+    @classmethod
+    def _set_nas_cmd_run_(cls, cmd):
+        import paramiko
+        #
+        _bsc_cor_log.LogMtd.trace_method_result(
+            'nas-cmd-run',
+            'command=`{}`'.format(cmd)
+        )
+        #
+        password = StgSshMtd.MakePassword(120, 'KBHBOCCCMDMBKEBDCBKBLAKA')
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(
+            hostname=cls.HOST,
+            username=cls.USER,
+            password=password.decrypt().encode('utf-8'),
+            timeout=10,
+            allow_agent=False,
+            look_for_keys=False
+        )
+        stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
+        result = stdout.read()
+        ssh.close()
+        return result
+    @classmethod
+    def _get_all_group_data_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        dict_ = collections.OrderedDict()
+        if result is not None:
+            for i in result.split('\n'):
+                i_p = parse.parse(r' {index}: group:DIEZHI\{group} {context}', i)
+                if i_p:
+                    i_dict = i_p.named
+                    if i_dict:
+                        dict_[i_dict['group']] = (i_dict['index'], i_dict['context'])
+        return dict_
+    @classmethod
+    def _get_all_group_data_1_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        list_ = []
+        if result is not None:
+            for i in result.split('\n'):
+                i_p = parse.parse(cls.GROUP_PATTERN, i)
+                if i_p:
+                    i_dict = i_p.named
+                    if i_dict:
+                        list_.append(
+                            (i_dict['group'], i_dict['index'], i_dict['context'])
+                        )
+        return list_
+    @classmethod
+    def _get_all_user_data_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        list_ = []
+        if result is not None:
+            for i in result.split('\n'):
+                i_p = parse.parse(cls.USER_PATTERN, i)
+                if i_p:
+                    i_dict = i_p.named
+                    if i_dict:
+                        list_.append(
+                            (i_dict['user'], i_dict['index'], i_dict['context'])
+                        )
+        return list_
+    @classmethod
+    def _get_all_data_(cls, nas_path):
+        kwargs = dict(
+            path=nas_path
+        )
+        cmd = cls.CMD_QUERY['show_grp'].format(
+            **kwargs
+        )
+        result = cls._set_nas_cmd_run_(cmd)
+        print result
+        list_ = []
+        if result is not None:
+            for i in result.split('\n'):
+                i_p_0 = parse.parse(cls.USER_PATTERN, i)
+                if i_p_0:
+                    i_dict = i_p_0.named
+                    if i_dict:
+                        list_.append(
+                            (i_dict['user'], i_dict['index'], i_dict['context'])
+                        )
+                else:
+                    i_p_1 = parse.parse(cls.GROUP_PATTERN, i)
+                    if i_p_1:
+                        i_dict = i_p_1.named
+                        if i_dict:
+                            list_.append(
+                                (i_dict['group'], i_dict['index'], i_dict['context'])
+                            )
+        return list_
+
+
+class StgPathSshOpt(StgSshMtd):
+    def __init__(self, path):
+        self._path = path
+        self._nas_path = StorageMtd.set_map_to_nas(path)
+
+    def remove_all_group(self):
+        group_data = self._get_all_group_data_1_(self._nas_path)
+        group_data.reverse()
+        for i_group_name, i_index, i_content in group_data:
+            if i_group_name in self.GROUP_ID_QUERY:
+                i_kwargs = dict(
+                    path=self._nas_path,
+                    index=i_index
+                )
+                i_cmd = self.CMD_QUERY['remove_grp'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
+    def set_read_only_for_groups(self, group_names):
+        for i_group_name in group_names:
+            if i_group_name in self.GROUP_ID_QUERY:
+                i_group_id = self.GROUP_ID_QUERY[i_group_name]
+                i_kwargs = dict(
+                    group_id=i_group_id,
+                    path=self._nas_path,
+                )
+                i_cmd = self.CMD_QUERY['read_only'].format(
+                    **i_kwargs
+                )
+                self._set_nas_cmd_run_(i_cmd)
+
+    def set_just_read_only_for(self, group_names):
+        self.remove_all_group()
+        self.remove_all_user()
+        self.set_read_only_for_groups(group_names)
+
+    def get_all_group_data(self):
+        return self._get_all_group_data_1_(self._nas_path)
+
+    def get_all_user_data(self):
+        return self._get_all_user_data_(self._nas_path)
+
+    def remove_all_user(self):
+        user_data = self._get_all_user_data_(self._nas_path)
+        user_data.reverse()
+        for i_user_name, i_index, i_content in user_data:
+            print i_user_name, i_index
+            i_kwargs = dict(
+                path=self._nas_path,
+                index=i_index
+            )
+            i_cmd = self.CMD_QUERY['remove_grp'].format(
+                **i_kwargs
+            )
+            self._set_nas_cmd_run_(i_cmd)
+
+    def get_all_data(self):
+        return self._get_all_data_(self._nas_path)
+
+
 class StgUserMtd(object):
     @classmethod
     def get_windows_user_directory(cls):
@@ -70,61 +385,6 @@ class StgUserMtd(object):
         if unique_id is None:
             unique_id = UuidMtd.get_new()
         return '{}/{}.yml'.format(directory_path, unique_id)
-
-
-class StgRpcMtd(object):
-    RPC_SERVER = '10.10.152.74'
-    RPC_PORT = 58888
-    PATHSEP = '/'
-    @classmethod
-    def get_client(cls, port_addition=0):
-        return xmlrpclib.ServerProxy(
-            'http://{0}:{1}'.format(cls.RPC_SERVER, cls.RPC_PORT+port_addition)
-        )
-    @classmethod
-    def create_directories(cls, directory_path, mode='1777'):
-        units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(directory_path)
-        units.reverse()
-        list_ = []
-        for i_path in units:
-            if i_path != cls.PATHSEP:
-                if os.path.exists(i_path) is False:
-                    list_.append(i_path)
-        #
-        for i in list_:
-            cls.create_directory(i, mode)
-    @classmethod
-    def create_directory(cls, directory_path, mode='1777'):
-        # noinspection PyUnresolvedReferences
-        from cosmos.rpc import client
-        clt = client.generate_client()
-        timeout = 25
-        start_time = time.time()
-        if os.path.isdir(directory_path) is False:
-            clt.makedirs(directory_path, mode)
-            cost_time = 0
-            parent_path = StgPathMtd.get_parent(directory_path)
-            while os.path.isdir(directory_path) is False:
-                cost_time = int(time.time() - start_time)
-                if cost_time > timeout:
-                    raise RuntimeError(
-                        _bsc_cor_log.LogMtd.trace_method_error(
-                            'create-directory by rpc',
-                            'directory="{}" is timeout, cost time {}s'.format(directory_path, cost_time)
-                        )
-                    )
-                #
-                time.sleep(1)
-                #
-                # subprocess.Popen(
-                #     'ls {}'.format(parent_path), shell=True
-                # )
-            #
-            _bsc_cor_log.LogMtd.trace_method_result(
-                'rpc create-directory',
-                'directory="{}" is cost time {}s'.format(directory_path, cost_time)
-            )
-        return True
 
 
 class StgExtraMtd(object):
@@ -394,8 +654,11 @@ class StgDirectoryMtd(object):
     @classmethod
     def set_copy_to(cls, src_directory_path, tgt_directory_path, excludes=None):
         def copy_fnc_(src_file_path_, tgt_file_path_):
-            print src_file_path_, tgt_file_path_
             shutil.copy2(src_file_path_, tgt_file_path_)
+            _bsc_cor_log.LogMtd.trace_method_result(
+                'file copy',
+                'file="{}" >> "{}"'.format(src_file_path_, tgt_file_path_)
+            )
         #
         src_directory_path = src_directory_path
         file_paths = cls.get_all_file_paths__(src_directory_path)
@@ -415,17 +678,16 @@ class StgDirectoryMtd(object):
                     continue
             #
             i_tgt_file_path = tgt_directory_path + i_local_file_path
-            print i_tgt_file_path
-            # if os.path.exists(i_tgt_file_path) is False:
-            #     i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
-            #     if os.path.exists(i_tgt_dir_path) is False:
-            #         os.makedirs(i_tgt_dir_path)
-            #     #
-            #     i_thread = PyThread(
-            #         copy_fnc_, i_src_file_path, i_tgt_file_path
-            #     )
-            #     threads.append(i_thread)
-            #     i_thread.start()
+            if os.path.exists(i_tgt_file_path) is False:
+                i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
+                if os.path.exists(i_tgt_dir_path) is False:
+                    os.makedirs(i_tgt_dir_path)
+                #
+                i_thread = PyThread(
+                    copy_fnc_, i_src_file_path, i_tgt_file_path
+                )
+                threads.append(i_thread)
+                i_thread.start()
         #
         [i.join() for i in threads]
     @classmethod
@@ -937,6 +1199,7 @@ class StgFileOpt(StgPathOpt):
         )
 
 
+# compress
 class StgGzipFileOpt(StgFileOpt):
     def __init__(self, *args, **kwargs):
         super(StgGzipFileOpt, self).__init__(*args, **kwargs)

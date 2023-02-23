@@ -182,9 +182,9 @@ class AbsHookExecutor(object):
         #
         environs_extend = {}
         #
-        _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+        _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
         if _:
-            environs_extend['LYNXI_RESOURCES'] = _
+            environs_extend['PAPER_EXTEND_RESOURCES'] = _
         #
         cmd = self.get_shell_command()
         #

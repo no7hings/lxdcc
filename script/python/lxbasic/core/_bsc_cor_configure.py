@@ -6,7 +6,7 @@ from lxbasic.core import _bsc_cor_environ, _bsc_cor_storage
 
 class CfgFileMtd(object):
     CACHE = {}
-    ENVIRON_KEY = 'LYNXI_CONFIGURES'
+    ENVIRON_KEY = 'PAPER_EXTEND_CONFIGURES'
     @classmethod
     def get_search_directories(cls):
         return _bsc_cor_environ.EnvironMtd.get_as_array(

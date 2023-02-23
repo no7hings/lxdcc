@@ -86,9 +86,9 @@ def __execute_hook(option):
         )
         #
         environs_extend = {}
-        _ = bsc_core.EnvironMtd.get('LYNXI_RESOURCES')
+        _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
         if _:
-            environs_extend['LYNXI_RESOURCES'] = (_, 'prepend')
+            environs_extend['PAPER_EXTEND_RESOURCES'] = (_, 'prepend')
         # run opt_cmd by subprocess
         utl_core.SubProcessRunner.set_run_with_result_use_thread(
             opt_cmd, environs_extend=environs_extend

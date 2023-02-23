@@ -136,15 +136,15 @@ def __execute_with_option(option, args_execute, package_extend):
         ).format(
             rsv_app.get_command(
                 args_execute=args_execute,
-                package_extend=opt_packages_extend
+                packages_extend=opt_packages_extend
             )
         )
     )
     if args_execute:
-        framework_environs_extend = m.EtrBase.get_project_environs_extend()
+        framework_environs_extend = m.EtrBase.get_project_environs_extend(project)
         rsv_app.execute_command(
             args_execute=args_execute,
-            package_extend=opt_packages_extend,
+            packages_extend=opt_packages_extend,
             #
             environs_extend=framework_environs_extend
         )

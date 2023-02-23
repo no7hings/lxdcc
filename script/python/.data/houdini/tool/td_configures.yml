@@ -1,9 +1,6 @@
 menu:
     label: TD-tool(s)
     tools:
-        - scene_checker
-        - separator
-        - separator
         - scene_packager
         - separator
         - package_reloader
@@ -34,11 +31,3 @@ tool:
         size:
             - 1280
             - 720
-    scene_checker:
-        chn_label: null
-        command: from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.SceneCheckerToolPanel().set_window_show()
-        icon: null
-        label: Scene-checker
-        size:
-            - 720
-            - 576

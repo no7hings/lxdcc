@@ -149,9 +149,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._pass_name = self.get('look_pass')
         self._material_root = self.get('material_root')
         #
-        self._dcc_importer_configure = bsc_objects.Configure(
-            value=and_configure.Data.DCC_IMPORTER_CONFIGURE_PATH
+        self._convert_configure = bsc_objects.Configure(
+            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
         )
+        self._convert_configure.set_flatten()
         #
         self._with_properties = self.get('with_properties') or False
         self._with_visibilities = self.get('with_visibilities') or False
@@ -394,7 +395,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
     def __set_shader_ports_(self, and_obj, dcc_obj):
         and_obj_type_name = and_obj.type.name
-        convert_and_obj_type_names = self._dcc_importer_configure.get_branch_keys(
+        convert_and_obj_type_names = self._convert_configure.get_branch_keys(
             'input-ports.to-katana'
         )
         for i_and_port in and_obj.get_input_ports():
@@ -402,11 +403,11 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 i_and_port_name = i_and_port.port_name
                 dcc_port_key = i_and_port_name
                 if and_obj_type_name in convert_and_obj_type_names:
-                    convert_and_port_names = self._dcc_importer_configure.get_branch_keys(
+                    convert_and_port_names = self._convert_configure.get_branch_keys(
                         'input-ports.to-katana.{}'.format(and_obj_type_name)
                     )
                     if i_and_port_name in convert_and_port_names:
-                        dcc_port_key = self._dcc_importer_configure.get(
+                        dcc_port_key = self._convert_configure.get(
                             'input-ports.to-katana.{}.{}'.format(and_obj_type_name, i_and_port_name)
                         )
                 #

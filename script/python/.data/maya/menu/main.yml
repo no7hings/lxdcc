@@ -1,13 +1,7 @@
 option:
     name: TD-tool(s)
     tool:
-        - scene_checker
-        - separator
-        #
         - asset_comparer
-        - separator
-        #
-        - scene_method_runner
         - separator
         #
         - scene_cleaner
@@ -40,23 +34,11 @@ tools:
         icon: None
         command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.AssetComparerPanel().set_window_show()
     #
-    scene_method_runner:
-        type: item
-        name: Scene-method-runner
-        icon: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneMethodRunnerPanel().set_window_show()
-    #
     scene_packager:
         type: item
         name: Scene-packager
         icon: None
         command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.ScenePackagerToolPanel().set_window_show()
-    #
-    scene_checker:
-        type: item
-        name: Scene-checker
-        icon: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneCheckerToolPanel().set_window_show()
     #
     package_reloader:
         type: item

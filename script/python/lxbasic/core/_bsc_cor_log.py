@@ -94,6 +94,11 @@ class LogMtd(object):
     #
     @classmethod
     def trace_method_result(cls, name, text):
+        """
+        :param name: str/unicode
+        :param text: str/unicode
+        :return:
+        """
         if isinstance(name, six.text_type):
             name = name.encode('utf-8')
         #

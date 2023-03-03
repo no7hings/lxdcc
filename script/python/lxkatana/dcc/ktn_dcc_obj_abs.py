@@ -12,8 +12,6 @@ from lxutil import utl_core, utl_abstract
 
 from lxkatana import ktn_core
 
-from lxkatana.modifiers import _ktn_mdf_utility
-
 import lxbasic.objects as bsc_objects
 
 
@@ -398,8 +396,8 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
         return lis
 
     def _get_source_connection_raw_(self, **kwargs):
-        inward = kwargs.get('inward') or False
-        # print inward
+        inner = kwargs.get('inner') or False
+        # print inner
         lis = []
         ktn_obj = self._get_ktn_obj_()
         _ = ktn_obj.getInputPorts() or []
@@ -444,7 +442,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
     #
     def get_sources(self):
         pass
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_source_objs_layout(self, layout=('r-l', 't-b'), size=(320, 960)):
         def rcs_fnc_(obj_, column_):
             _source_objs = obj_.get_source_objs()
@@ -610,7 +608,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     def __get_ktn_port_(self, port_path):
         return NodegraphAPI.GetNode(self.path).getParameter(port_path)
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_customize_attributes_create(self, attributes):
         ktn_core.NGObjCustomizePortOpt(self._get_ktn_obj_()).set_ports_add(attributes)
 

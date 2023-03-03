@@ -1699,15 +1699,19 @@ class AbsRsvExtraDef(AbsRsvDef):
         kwargs['category'] = rsv_category
         kwargs['type'] = rsv_type
         kwargs['path'] = rsv_path
-        update = bsc_core.TimePrettifyMtd.to_prettify_by_timestamp(
-            bsc_core.StgFileOpt(
-                result
-            ).get_modify_timestamp(),
-            language=1
-        )
         user = bsc_core.StgPathOpt(result).get_user()
         #
         kwargs['result'] = result
+        if bsc_core.StgFileOpt(result).get_is_exists() is True:
+            update = bsc_core.TimePrettifyMtd.to_prettify_by_timestamp(
+                bsc_core.StgFileOpt(
+                    result
+                ).get_modify_timestamp(),
+                language=1
+            )
+        else:
+            update = 'non-exists'
+        #
         kwargs['update'] = update
         kwargs['user'] = user
         #
@@ -2414,9 +2418,9 @@ class AbsRsvProject(
         rsv_type = self.VariantTypes.Step
         branch = self._guess_branch_(**kwargs)
         search_patterns = self._project_get_search_patterns_(branch, rsv_type)
-        for i_workspace_key, i_pattern in search_patterns.items():
+        for i_workspace_key, i_pattern_args in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
-            i_kwargs_over['pattern'] = i_pattern
+            i_kwargs_over['pattern'] = i_pattern_args
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
             i_rsv_matcher = self._project__create_main_rsv_matcher_(
                 i_kwargs_over
@@ -2427,7 +2431,7 @@ class AbsRsvProject(
                 j_kwargs_over = self._copy_variants_as_branches_(i_kwargs_over)
                 j_kwargs_over.update(j_variants)
                 j_kwargs_over['resolver_workspace_key'] = i_workspace_key
-                j_kwargs_over['resolver_pattern'] = i_pattern
+                j_kwargs_over['resolver_pattern'] = i_pattern_args
                 j_kwargs_over['resolver_result'] = j_result
                 j_rsv_step = self._resource__get_rsv_step_(**j_kwargs_over)
                 if j_rsv_step is not None:
@@ -2473,9 +2477,9 @@ class AbsRsvProject(
         rsv_type = self.VariantTypes.Step
         branch = self._guess_branch_(**kwargs)
         search_patterns = self._project_get_search_patterns_(branch, rsv_type)
-        for i_workspace_key, i_pattern in search_patterns.items():
+        for i_workspace_key, i_pattern_args in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
-            i_kwargs_over['pattern'] = i_pattern
+            i_kwargs_over['pattern'] = i_pattern_args
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
             i_rsv_matcher = self._project__create_main_rsv_matcher_(
                 i_kwargs_over
@@ -2486,7 +2490,7 @@ class AbsRsvProject(
                 j_kwargs_over = self._copy_variants_as_branches_(i_kwargs_over)
                 j_kwargs_over.update(j_variants)
                 j_kwargs_over['resolver_workspace_key'] = i_workspace_key
-                j_kwargs_over['resolver_pattern'] = i_pattern
+                j_kwargs_over['resolver_pattern'] = i_pattern_args
                 j_kwargs_over['resolver_result'] = j_result
                 j_rsv_step = self._project__create_rsv_step_(**j_kwargs_over)
                 if j_rsv_step is not None:
@@ -2593,9 +2597,9 @@ class AbsRsvProject(
         rsv_type = self.VariantTypes.Task
         branch = self._guess_branch_(**kwargs)
         search_patterns = self._project_get_search_patterns_(branch, rsv_type)
-        for i_workspace_key, i_pattern in search_patterns.items():
+        for i_workspace_key, i_pattern_args in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
-            i_kwargs_over['pattern'] = i_pattern
+            i_kwargs_over['pattern'] = i_pattern_args
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
             i_rsv_matcher = self._project__create_main_rsv_matcher_(
                 i_kwargs_over
@@ -2606,7 +2610,7 @@ class AbsRsvProject(
                 j_kwargs_over = self._copy_variants_as_branches_(i_kwargs_over)
                 j_kwargs_over.update(j_variants)
                 j_kwargs_over['resolver_workspace_key'] = i_workspace_key
-                j_kwargs_over['resolver_pattern'] = i_pattern
+                j_kwargs_over['resolver_pattern'] = i_pattern_args
                 j_kwargs_over['resolver_result'] = j_result
                 j_rsv_task = self._project__create_rsv_task_(**j_kwargs_over)
                 if j_rsv_task is not None:
@@ -2762,10 +2766,15 @@ class AbsRsvProject(
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
     # unit
-    def get_rsv_unit(self, **kwargs):
+    def get_rsv_task_unit(self, **kwargs):
         rsv_task = self.get_rsv_task(**kwargs)
         if rsv_task is not None:
             return rsv_task.get_rsv_unit(**kwargs)
+
+    def get_rsv_unit(self, **kwargs):
+        return self._project__get_rsv_unit_(
+            self, **kwargs
+        )
 
     def _project__get_rsv_unit_(self, rsv_obj, **kwargs):
         kwargs_over = collections.OrderedDict()

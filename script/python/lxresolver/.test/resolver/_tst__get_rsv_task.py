@@ -15,10 +15,10 @@ if __name__ == '__main__':
     ]:
         i_rsv_project = r.get_rsv_project(project=i_project)
 
-        i_rsv_asset = i_rsv_project.get_rsv_resource(asset=i_asset)
-        print i_rsv_asset
-
-        i_rsv_task = i_rsv_asset.get_rsv_task(step='mod', task='modeling')
-        print i_rsv_task
-
-        print i_rsv_task._get_user_directory_path_()
+        # i_rsv_asset = i_rsv_project.get_rsv_resource(asset=i_asset)
+        # print i_rsv_asset
+        #
+        # i_rsv_task = i_rsv_asset.get_rsv_task(step='mod', task='modeling')
+        # print i_rsv_task
+        #
+        # print i_rsv_task._get_user_directory_path_()

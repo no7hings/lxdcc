@@ -6,14 +6,10 @@ import os
 
 from lxuniverse import unr_configure
 
-import lxbasic.objects as bsc_objects
-
 
 class Data(object):
     ROOT = os.path.dirname(__file__.replace('\\', '/'))
     DATA_ROOT = '{}/.data'.format(ROOT)
-    #
-    DCC_IMPORTER_CONFIGURE_PATH = '{}/dcc-importer-configure.yml'.format(DATA_ROOT)
 
 
 class Category(object):

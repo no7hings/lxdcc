@@ -1,0 +1,47 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'variant_register'
+    type_abr: 'vrn_rgt'
+    description:
+        |-
+        register variant here
+    variant_key: ''
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'VariableSwitch'
+    path: '<option.root>/<option.type>'
+    output: '<.path>.out'
+    #
+    clear_start: 'extra'
+    #
+    attributes:
+        ns_offsetX: 800
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+    #
+    input_ports: []
+    #
+    output_ports: []
+    #
+    ports:
+        extra/variant_key:
+            widget: enumerate
+            value: ['resource', 'camera', 'look', 'light', 'layer', 'quality']
+            tool_tip: '...'
+
+        extra/register_variable:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspVariantRegister(node).register_variable()'
+            tool_tip: '...'
+    #
+    expressions:
+        variableName: 'extra.variant_key'

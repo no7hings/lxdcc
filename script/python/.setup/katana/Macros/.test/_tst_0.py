@@ -13,7 +13,7 @@ s = NodegraphAPI.GetNode('OpScript')
 
 ktn_core.NGMacro(
     n
-).set_create_by_configure_file(
+).create_by_configure_file(
     f
 )
 

@@ -2,6 +2,8 @@ option:
     root: ''
     resource: ''
     time_tag: ''
+    #
+    unique_name: '<.resource>__<.time_tag>'
 #
 node:
     material_group:
@@ -19,88 +21,89 @@ node:
         input_ports:
             # geometry
             #   normal
-            - 'texture.geometry.normal_invert_x'
-            - 'texture.geometry.normal_invert_y'
-            - 'texture.geometry.normal_invert_z'
-            - 'texture.geometry.normal_strength'
+            - 'inputs.texture.geometry.normal_invert_x'
+            - 'inputs.texture.geometry.normal_invert_y'
+            - 'inputs.texture.geometry.normal_invert_z'
+            - 'inputs.texture.geometry.normal_strength'
             #   displacement
-            - 'texture.geometry.displacement_zero'
-            - 'texture.geometry.displacement_strength'
+            - 'inputs.texture.geometry.displacement_zero'
+            - 'inputs.texture.geometry.displacement_strength'
             # texture
             #   basic
-            - 'texture.basic.mode'
+            - 'inputs.texture.basic.mode'
             #   uv-map
-            - 'texture.uv_map.uv_map_coords'
             #       uv-map basic
-            - 'texture.uv_map.uv_map_translate'
-            - 'texture.uv_map.uv_map_rotate'
-            - 'texture.uv_map.uv_map_scale'
-            - 'texture.uv_map.uv_map_pivot'
-            - 'texture.uv_map.uv_map_coverage'
+            - 'inputs.texture.uv_map.uv_map_coords'
+            #       uv-map transform
+            - 'inputs.texture.uv_map.uv_map_translate'
+            - 'inputs.texture.uv_map.uv_map_rotate'
+            - 'inputs.texture.uv_map.uv_map_scale'
+            - 'inputs.texture.uv_map.uv_map_pivot'
+            - 'inputs.texture.uv_map.uv_map_coverage'
             #       uv-map frame transform
-            - 'texture.uv_map.uv_map_frame_translate'
-            - 'texture.uv_map.uv_map_frame_rotate'
-            - 'texture.uv_map.uv_map_frame_scale'
-            - 'texture.uv_map.uv_map_frame_pivot'
-            - 'texture.uv_map.uv_map_frame_wrap_u'
-            - 'texture.uv_map.uv_map_frame_wrap_v'
+            - 'inputs.texture.uv_map.uv_map_frame_translate'
+            - 'inputs.texture.uv_map.uv_map_frame_rotate'
+            - 'inputs.texture.uv_map.uv_map_frame_scale'
+            - 'inputs.texture.uv_map.uv_map_frame_pivot'
+            - 'inputs.texture.uv_map.uv_map_frame_wrap_u'
+            - 'inputs.texture.uv_map.uv_map_frame_wrap_v'
             #   triplanar
+            #       triplanar basic
+            - 'inputs.texture.triplanar.triplanar_coord_space'
+            - 'inputs.texture.triplanar.triplanar_pref_name'
             #       triplanar transform
-            - 'texture.triplanar.triplanar_translate'
-            - 'texture.triplanar.triplanar_rotate'
-            - 'texture.triplanar.triplanar_scale'
-            - 'texture.triplanar.triplanar_blend'
-            #
-            - 'texture.triplanar.triplanar_coord_space'
-            - 'texture.triplanar.triplanar_pref_name'
+            - 'inputs.texture.triplanar.triplanar_translate'
+            - 'inputs.texture.triplanar.triplanar_rotate'
+            - 'inputs.texture.triplanar.triplanar_scale'
+            - 'inputs.texture.triplanar.triplanar_blend'
             #       triplanar cell
-            - 'texture.triplanar.triplanar_cell_enable'
-            - 'texture.triplanar.triplanar_cell_rotate'
-            - 'texture.triplanar.triplanar_cell_blend'
+            - 'inputs.texture.triplanar.triplanar_cell_enable'
+            - 'inputs.texture.triplanar.triplanar_cell_rotate'
+            - 'inputs.texture.triplanar.triplanar_cell_blend'
         #
         output_ports:
             # texture
             #   base
-            - 'texture.base.metalness'
+            - 'outputs.texture.base.metalness'
             #   diffuse
-            - 'texture.diffuse.diffuse_color'
-            - 'texture.diffuse.diffuse_roughness'
+            - 'outputs.texture.diffuse.diffuse_color'
+            - 'outputs.texture.diffuse.diffuse_roughness'
             #   specular
-            - 'texture.specular.specular_color'
-            - 'texture.specular.specular_roughness'
+            - 'outputs.texture.specular.specular_color'
+            - 'outputs.texture.specular.specular_roughness'
             #   transmission
-            - 'texture.transmission.transmission_color'
-            - 'texture.transmission.transmission_roughness'
+            - 'outputs.texture.transmission.transmission_color'
+            - 'outputs.texture.transmission.transmission_roughness'
             #   subsurface
-            - 'texture.subsurface.subsurface_color'
+            - 'outputs.texture.subsurface.subsurface_color'
             #   geometry
-            - 'texture.geometry.normal'
-            - 'texture.geometry.bump'
-            - 'texture.geometry.opacity'
-            - 'texture.geometry.displacement'
+            - 'outputs.texture.geometry.normal'
+            - 'outputs.texture.geometry.bump'
+            - 'outputs.texture.geometry.opacity'
+            - 'outputs.texture.geometry.displacement'
             #   uv_map
-            - 'texture.extra.uv_map_proxy'
+            - 'outputs.texture.extra.uv_map_proxy'
             #   triplanar
-            - 'texture.extra.triplanar_proxy'
+            - 'outputs.texture.extra.triplanar_proxy'
             # shader
             #   arnold
-            - 'arnold_shader.arnold_surface'
-            - 'arnold_shader.arnold_displacement'
+            - 'outputs.arnold_shader.arnold_surface'
+            - 'outputs.arnold_shader.arnold_displacement'
             #   usd
-            - 'usd_shader.usd_surface'
-            - 'usd_shader.usd_displacement'
+            - 'outputs.usd_shader.usd_surface'
+            - 'outputs.usd_shader.usd_displacement'
         #
         connections:
-            - '<.path>.arnold_shader.arnold_surface'
+            - '<.path>.outputs.arnold_shader.arnold_surface'
             - '<..material.path>.arnoldSurface'
             #
-            - '<.path>.arnold_shader.arnold_displacement'
+            - '<.path>.outputs.arnold_shader.arnold_displacement'
             - '<..material.path>.arnoldDisplacement'
             #
-            - '<.path>.usd_shader.usd_surface'
+            - '<.path>.outputs.usd_shader.usd_surface'
             - '<..material.path>.usdSurface'
             #
-            - '<.path>.usd_shader.usd_displacement'
+            - '<.path>.outputs.usd_shader.usd_displacement'
             - '<..material.path>.usdDisplacement'
     #
     node_backdrop:
@@ -124,26 +127,181 @@ node:
         path: '<..node_group.path>/<.tag>__<option.time_tag>_DOT'
         #
         input_ports:
-            - 'texture.uv_map.coords_input'
+            # texture
+            #   uv-map
+            #       uv-map basic
+            - 'inputs.texture.uv_map.uv_map_coords'
+            #       uv-map transform
+            - 'inputs.texture.uv_map.uv_map_translate'
+            - 'inputs.texture.uv_map.uv_map_rotate'
+            - 'inputs.texture.uv_map.uv_map_scale'
+            - 'inputs.texture.uv_map.uv_map_pivot'
+            - 'inputs.texture.uv_map.uv_map_coverage'
+            #       uv-map frame transform
+            - 'inputs.texture.uv_map.uv_map_frame_translate'
+            - 'inputs.texture.uv_map.uv_map_frame_rotate'
+            - 'inputs.texture.uv_map.uv_map_frame_scale'
+            - 'inputs.texture.uv_map.uv_map_frame_pivot'
+            - 'inputs.texture.uv_map.uv_map_frame_wrap_u'
+            - 'inputs.texture.uv_map.uv_map_frame_wrap_v'
+            #   triplanar
+            #       triplanar basic
+            - 'inputs.texture.triplanar.triplanar_coord_space'
+            - 'inputs.texture.triplanar.triplanar_pref_name'
+            #       triplanar transform
+            - 'inputs.texture.triplanar.triplanar_translate'
+            - 'inputs.texture.triplanar.triplanar_rotate'
+            - 'inputs.texture.triplanar.triplanar_scale'
+            - 'inputs.texture.triplanar.triplanar_blend'
+            #       triplanar cell
+            - 'inputs.texture.triplanar.triplanar_cell_enable'
+            - 'inputs.texture.triplanar.triplanar_cell_rotate'
+            - 'inputs.texture.triplanar.triplanar_cell_blend'
         #
         output_ports:
-            - 'texture.uv_map.coords_output'
+            # texture
+            #   uv-map
+            #       uv-map basic
+            - 'outputs.texture.uv_map.uv_map_coords'
+            #       uv-map transform
+            - 'outputs.texture.uv_map.uv_map_translate'
+            - 'outputs.texture.uv_map.uv_map_rotate'
+            - 'outputs.texture.uv_map.uv_map_scale'
+            - 'outputs.texture.uv_map.uv_map_pivot'
+            - 'outputs.texture.uv_map.uv_map_coverage'
+            #       uv-map frame transform
+            - 'outputs.texture.uv_map.uv_map_frame_translate'
+            - 'outputs.texture.uv_map.uv_map_frame_rotate'
+            - 'outputs.texture.uv_map.uv_map_frame_scale'
+            - 'outputs.texture.uv_map.uv_map_frame_pivot'
+            - 'outputs.texture.uv_map.uv_map_frame_wrap_u'
+            - 'outputs.texture.uv_map.uv_map_frame_wrap_v'
+            #   triplanar
+            #       triplanar basic
+            - 'outputs.texture.triplanar.triplanar_coord_space'
+            - 'outputs.texture.triplanar.triplanar_pref_name'
+            #       triplanar transform
+            - 'outputs.texture.triplanar.triplanar_translate'
+            - 'outputs.texture.triplanar.triplanar_rotate'
+            - 'outputs.texture.triplanar.triplanar_scale'
+            - 'outputs.texture.triplanar.triplanar_blend'
+            #       triplanar cell
+            - 'outputs.texture.triplanar.triplanar_cell_enable'
+            - 'outputs.texture.triplanar.triplanar_cell_rotate'
+            - 'outputs.texture.triplanar.triplanar_cell_blend'
         #
         shader_parameters:
             attribute: '<...key>'
         #
         connections:
-            - '<.path>.texture.uv_map.coords_input'
-            - '<.path>.texture.uv_map.coords_output'
-            #
-            - '<..node_group.path>.texture.uv_map.uv_map_coords'
-            - '<.path>.texture.uv_map.coords_input'
+            # connections from "self-node"
+            #   uv-map
+            #       uv-map basic
+            - '<.path>.inputs.texture.uv_map.uv_map_coords'
+            - '<.path>.outputs.texture.uv_map.uv_map_coords'
+            #       uv-map transform
+            - '<.path>.inputs.texture.uv_map.uv_map_translate'
+            - '<.path>.outputs.texture.uv_map.uv_map_translate'
+            - '<.path>.inputs.texture.uv_map.uv_map_rotate'
+            - '<.path>.outputs.texture.uv_map.uv_map_rotate'
+            - '<.path>.inputs.texture.uv_map.uv_map_scale'
+            - '<.path>.outputs.texture.uv_map.uv_map_scale'
+            - '<.path>.inputs.texture.uv_map.uv_map_pivot'
+            - '<.path>.outputs.texture.uv_map.uv_map_pivot'
+            - '<.path>.inputs.texture.uv_map.uv_map_coverage'
+            - '<.path>.outputs.texture.uv_map.uv_map_coverage'
+            #       uv-map frame transform
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_translate'
+            - '<.path>.outputs.texture.uv_map.uv_map_frame_translate'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_rotate'
+            - '<.path>.outputs.texture.uv_map.uv_map_frame_rotate'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_scale'
+            - '<.path>.outputs.texture.uv_map.uv_map_frame_scale'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_pivot'
+            - '<.path>.outputs.texture.uv_map.uv_map_frame_pivot'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_wrap_u'
+            - '<.path>.outputs.texture.uv_map.uv_map_frame_wrap_u'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_wrap_v'
+            - '<.path>.outputs.texture.uv_map.uv_map_frame_wrap_v'
+            #   triplanar
+            #       triplanar basic
+            - '<.path>.inputs.texture.triplanar.triplanar_coord_space'
+            - '<.path>.outputs.texture.triplanar.triplanar_coord_space'
+            - '<.path>.inputs.texture.triplanar.triplanar_pref_name'
+            - '<.path>.outputs.texture.triplanar.triplanar_pref_name'
+            #       triplanar transform
+            - '<.path>.inputs.texture.triplanar.triplanar_translate'
+            - '<.path>.outputs.texture.triplanar.triplanar_translate'
+            - '<.path>.inputs.texture.triplanar.triplanar_rotate'
+            - '<.path>.outputs.texture.triplanar.triplanar_rotate'
+            - '<.path>.inputs.texture.triplanar.triplanar_scale'
+            - '<.path>.outputs.texture.triplanar.triplanar_scale'
+            - '<.path>.inputs.texture.triplanar.triplanar_blend'
+            - '<.path>.outputs.texture.triplanar.triplanar_blend'
+            #       triplanar cell
+            - '<.path>.inputs.texture.triplanar.triplanar_cell_enable'
+            - '<.path>.outputs.texture.triplanar.triplanar_cell_enable'
+            - '<.path>.inputs.texture.triplanar.triplanar_cell_rotate'
+            - '<.path>.outputs.texture.triplanar.triplanar_cell_rotate'
+            - '<.path>.inputs.texture.triplanar.triplanar_cell_blend'
+            - '<.path>.outputs.texture.triplanar.triplanar_cell_blend'
+            # connections from "node-group"
+            #   uv-map
+            #       uv-map basic
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_coords'
+            - '<.path>.inputs.texture.uv_map.uv_map_coords'
+            #       uv-map transform
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_translate'
+            - '<.path>.inputs.texture.uv_map.uv_map_translate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_rotate'
+            - '<.path>.inputs.texture.uv_map.uv_map_rotate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_scale'
+            - '<.path>.inputs.texture.uv_map.uv_map_scale'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_pivot'
+            - '<.path>.inputs.texture.uv_map.uv_map_pivot'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_coverage'
+            - '<.path>.inputs.texture.uv_map.uv_map_coverage'
+            #       uv-map frame transform
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_translate'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_translate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_rotate'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_rotate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_scale'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_scale'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_pivot'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_pivot'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_wrap_u'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_wrap_u'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_wrap_v'
+            - '<.path>.inputs.texture.uv_map.uv_map_frame_wrap_v'
+            #   triplanar
+            #       triplanar basic
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_coord_space'
+            - '<.path>.inputs.texture.triplanar.triplanar_coord_space'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_pref_name'
+            - '<.path>.inputs.texture.triplanar.triplanar_pref_name'
+            #       triplanar transform
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_translate'
+            - '<.path>.inputs.texture.triplanar.triplanar_translate'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_rotate'
+            - '<.path>.inputs.texture.triplanar.triplanar_rotate'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_scale'
+            - '<.path>.inputs.texture.triplanar.triplanar_scale'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_blend'
+            - '<.path>.inputs.texture.triplanar.triplanar_blend'
+            #       triplanar cell
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_cell_enable'
+            - '<.path>.inputs.texture.triplanar.triplanar_cell_enable'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_cell_rotate'
+            - '<.path>.inputs.texture.triplanar.triplanar_cell_rotate'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_cell_blend'
+            - '<.path>.inputs.texture.triplanar.triplanar_cell_blend'
     # arnold shader
     arnold_surface_shader:
         tag: 'surface'
         type: 'ArnoldShadingNode'
         shader_type: 'standard_surface'
-        path: '<..material_group.path>/<.tag>__<option.time_tag>_AND_SDR'
+        path: '<..material_group.path>/<option.resource>__<.tag>__<option.time_tag>_AND_SDR'
         #
         connections:
             - '<.path>.out'
@@ -157,9 +315,9 @@ node:
         #
         connections:
             - '<.path>.surface'
-            - '<..node_group.path>.usd_shader.usd_surface'
+            - '<..node_group.path>.outputs.usd_shader.usd_surface'
             - '<.path>.displacement'
-            - '<..node_group.path>.usd_shader.usd_displacement'
+            - '<..node_group.path>.outputs.usd_shader.usd_displacement'
     # texture
     #   basic
     arnold_texture_basic_mode:
@@ -172,10 +330,10 @@ node:
             attribute: '<...key>'
         #
         shader_hints:
-            default: '{"options__order": ["use uv map", "use triplaner"], "label": "mode", "widget": "mapper", "options": {"use uv map": 0.0, "use triplaner": 1.0}, "page": "basic"}'
+            default: '{"page": "basic", "label": "mode", "dstPage": "<option.unique_name>.basic", "dstName": "<option.unique_name>__basic_mode", "options__order": ["use uv map", "use triplaner"], "widget": "mapper", "options": {"use uv map": 0.0, "use triplaner": 1.0}}'
         #
         connections:
-            - '<..node_group.path>.texture.basic.mode'
+            - '<..node_group.path>.inputs.texture.basic.mode'
             - '<.path>.default'
     # triplanar
     arnold_texture_uv_map_proxy:
@@ -186,49 +344,50 @@ node:
         path: '<..node_group.path>/<.name>'
         #
         shader_hints:
-            translate_frame: '{"label": "translate", "page": "uv-map frame transform"}'
-            rotate_frame: '{"label": "rotate", "page": "uv-map frame transform"}'
-            scale_frame: '{"label": "scale", "page": "uv-map frame transform"}'
-            pivot_frame: '{"label": "pivot", "page": "uv-map frame transform"}'
-            wrap_frame_u: '{"label": "wrap U", "page": "uv-map frame transform"}'
-            wrap_frame_v: '{"label": "wrap V", "page": "uv-map frame transform"}'
-            #
-            offset: '{"label": "translate", "page": "uv-map transform"}'
-            rotate: '{"label": "rotate", "page": "uv-map transform"}'
-            repeat: '{"label": "scale", "page": "uv-map transform"}'
-            pivot: '{"label": "pivot", "page": "uv-map transform"}'
-            coverage: '{"label": "coverage", "page": "uv-map transform"}'
+            # frame transform
+            translate_frame: '{"page": "uv-map frame transform", "label": "translate", "dstPage": "<option.unique_name>.uv-map frame transform", "dstName": "<option.unique_name>__uv_map__frame_translate"}'
+            rotate_frame: '{"page": "uv-map frame transform", "label": "rotate", "dstPage": "<option.unique_name>.uv-map frame transform", "dstName": "<option.unique_name>__uv_map__frame_rotate"}'
+            scale_frame: '{"page": "uv-map frame transform", "label": "scale", "dstPage": "<option.unique_name>.uv-map frame transform", "dstName": "<option.unique_name>__uv_map__frame_scale"}'
+            pivot_frame: '{"page": "uv-map frame transform", "label": "pivot", "dstPage": "<option.unique_name>.uv-map frame transform", "dstName": "<option.unique_name>__uv_map__frame_pivot"}'
+            wrap_frame_u: '{"page": "uv-map frame transform", "label": "wrap U", "dstPage": "<option.unique_name>.uv-map frame transform", "dstName": "<option.unique_name>__uv_map__frame_wrap_u"}'
+            wrap_frame_v: '{"page": "uv-map frame transform", "label": "wrap V", "dstPage": "<option.unique_name>.uv-map frame transform", "dstName": "<option.unique_name>__uv_map__frame_wrap_v"}'
+            # transform
+            offset: '{"page": "uv-map transform", "label": "translate", "dstPage": "<option.unique_name>.uv-map transform", "dstName": "<option.unique_name>__uv_map__translate"}'
+            rotate: '{"page": "uv-map transform", "label": "rotate", "dstPage": "<option.unique_name>.uv-map transform", "dstName": "<option.unique_name>__uv_map__rotate"}'
+            repeat: '{"page": "uv-map transform", "label": "scale", "dstPage": "<option.unique_name>.uv-map transform", "dstName": "<option.unique_name>__uv_map__scale"}'
+            pivot: '{"page": "uv-map transform", "label": "pivot", "dstPage": "<option.unique_name>.uv-map transform", "dstName": "<option.unique_name>__uv_map__pivot"}'
+            coverage: '{"page": "uv-map transform", "label": "coverage", "dstPage": "<option.unique_name>.uv-map transform", "dstName": "<option.unique_name>__uv_map__coverage"}'
         #
         connections:
             - '<.path>.out'
-            - '<..node_group.path>.texture.extra.uv_map_proxy'
+            - '<..node_group.path>.outputs.texture.extra.uv_map_proxy'
             # frame transform
             #   basic
-            - '<..node_group.path>.texture.uv_map.uv_map_frame_translate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_translate'
             - '<.path>.translate_frame'
-            - '<..node_group.path>.texture.uv_map.uv_map_frame_rotate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_rotate'
             - '<.path>.rotate_frame'
-            - '<..node_group.path>.texture.uv_map.uv_map_frame_scale'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_scale'
             - '<.path>.scale_frame'
-            - '<..node_group.path>.texture.uv_map.uv_map_frame_pivot'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_pivot'
             - '<.path>.pivot_frame'
             #   extra
-            - '<..node_group.path>.texture.uv_map.uv_map_frame_wrap_u'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_wrap_u'
             - '<.path>.wrap_frame_u'
-            - '<..node_group.path>.texture.uv_map.uv_map_frame_wrap_v'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_frame_wrap_v'
             - '<.path>.wrap_frame_v'
             # transform
             #   basic
-            - '<..node_group.path>.texture.uv_map.uv_map_translate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_translate'
             - '<.path>.offset'
-            - '<..node_group.path>.texture.uv_map.uv_map_rotate'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_rotate'
             - '<.path>.rotate'
-            - '<..node_group.path>.texture.uv_map.uv_map_scale'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_scale'
             - '<.path>.repeat'
-            - '<..node_group.path>.texture.uv_map.uv_map_pivot'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_pivot'
             - '<.path>.pivot'
             #   extra
-            - '<..node_group.path>.texture.uv_map.uv_map_coverage'
+            - '<..node_group.path>.inputs.texture.uv_map.uv_map_coverage'
             - '<.path>.coverage'
     # triplanar
     arnold_texture_triplanar_proxy:
@@ -242,41 +401,42 @@ node:
             coord_space: '2'
         #
         shader_hints:
-            coord_space: '{"label": "coord space", "page": "triplanar basic"}'
-            pref_name: '{"label": "pref name", "page": "triplanar basic"}'
+            # basic
+            coord_space: '{"page": "triplanar basic", "label": "coord space", "dstPage": "<option.unique_name>.triplanar basic", "dstName": "<option.unique_name>__triplanar_basic__coord_space"}'
+            pref_name: '{"page": "triplanar basic", "label": "pref name", "dstPage": "<option.unique_name>.triplanar basic", "dstName": "<option.unique_name>__triplanar_basic__pref_name"}'
             # transform
-            offset: '{"label": "translate", "page": "triplanar transform"}'
-            rotate: '{"label": "rotate", "page": "triplanar transform"}'
-            scale: '{"label": "scale", "page": "triplanar transform"}'
-            blend: '{"label": "blend", "page": "triplanar transform"}'
+            offset: '{"page": "triplanar transform", "label": "translate", "dstPage": "<option.unique_name>.triplanar transform", "dstName": "<option.unique_name>__triplanar_transform__translate"}'
+            rotate: '{"page": "triplanar transform", "label": "rotate", "dstPage": "<option.unique_name>.triplanar transform", "dstName": "<option.unique_name>__triplanar_transform__rotate"}'
+            scale: '{"page": "triplanar transform", "label": "scale", "dstPage": "<option.unique_name>.triplanar transform", "dstName": "<option.unique_name>__triplanar_transform__scale"}'
+            blend: '{"page": "triplanar transform", "label": "blend", "dstPage": "<option.unique_name>.triplanar transform", "dstName": "<option.unique_name>__triplanar_transform__blend"}'
             # cell
-            cell: '{"label": "enable", "page": "triplanar cell"}'
-            cell_rotate: '{"label": "rotate", "page": "triplanar cell"}'
-            cell_blend: '{"label": "blend", "page": "triplanar cell"}'
+            cell: '{"page": "triplanar cell", "label": "enable", "dstPage": "<option.unique_name>.triplanar cell", "dstName": "<option.unique_name>__triplanar_cell__enable"}'
+            cell_rotate: '{"page": "triplanar cell", "label": "rotate", "dstPage": "<option.unique_name>.triplanar cell", "dstName": "<option.unique_name>__triplanar_cell__rotate"}'
+            cell_blend: '{"page": "triplanar cell", "label": "blend", "dstPage": "<option.unique_name>.triplanar cell", "dstName": "<option.unique_name>__triplanar_cell__blend"}'
         #
         connections:
             - '<.path>.out'
-            - '<..node_group.path>.texture.extra.triplanar_proxy'
+            - '<..node_group.path>.outputs.texture.extra.triplanar_proxy'
             #
-            - '<..node_group.path>.texture.triplanar.triplanar_translate'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_translate'
             - '<.path>.offset'
-            - '<..node_group.path>.texture.triplanar.triplanar_rotate'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_rotate'
             - '<.path>.rotate'
-            - '<..node_group.path>.texture.triplanar.triplanar_scale'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_scale'
             - '<.path>.scale'
-            - '<..node_group.path>.texture.triplanar.triplanar_blend'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_blend'
             - '<.path>.blend'
             #
-            - '<..node_group.path>.texture.triplanar.triplanar_coord_space'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_coord_space'
             - '<.path>.coord_space'
-            - '<..node_group.path>.texture.triplanar.triplanar_pref_name'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_pref_name'
             - '<.path>.pref_name'
             #
-            - '<..node_group.path>.texture.triplanar.triplanar_cell_enable'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_cell_enable'
             - '<.path>.cell'
-            - '<..node_group.path>.texture.triplanar.triplanar_cell_rotate'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_cell_rotate'
             - '<.path>.cell_rotate'
-            - '<..node_group.path>.texture.triplanar.triplanar_cell_blend'
+            - '<..node_group.path>.inputs.texture.triplanar.triplanar_cell_blend'
             - '<.path>.cell_blend'
     #
     arnold_texture_triplanar_translate:
@@ -341,7 +501,7 @@ arnold_texture:
                     ignore_missing_textures: True
                 #
                 connections:
-                    - '<node.node_passthrough.path>.texture.uv_map.coords_output'
+                    - '<node.node_passthrough.path>.outputs.texture.uv_map.uv_map_coords'
                     - '<.path>.uvcoords'
             # use uv-map transform
             uv_map:
@@ -350,20 +510,21 @@ arnold_texture:
                 path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_AND_NOD'
                 #
                 shader_expressions:
+                    offset: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
+                    rotate: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
+                    repeat: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
+                    pivot: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
+                    coverage: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
+                    #
                     translate_frame: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
                     rotate_frame: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
                     scale_frame: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
                     pivot_frame: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
                     wrap_frame_u: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
                     wrap_frame_v: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
-                    #
-                    offset: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
-                    rotate: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
-                    repeat: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
-                    pivot: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
-                    coverage: 'getNode("<node.arnold_texture_uv_map_proxy.name>").parameters.<.key>.value'
                 #
                 connections:
+                    # connections from "image"
                     - '<..image.path>.out'
                     - '<.path>.passthrough'
             # use tri-planar when no uv-map
@@ -414,9 +575,9 @@ arnold_texture:
         connections:
             # connect node to group
             - '<.node_graph.mode_switch.path>.out'
-            - '<node.node_group.path>.texture.diffuse.diffuse_color'
+            - '<node.node_group.path>.outputs.texture.diffuse.diffuse_color'
             # connect node-group to shader
-            - '<node.node_group.path>.texture.diffuse.diffuse_color'
+            - '<node.node_group.path>.outputs.texture.diffuse.diffuse_color'
             - '<node.arnold_surface_shader.path>.base_color'
     # specular
     roughness:
@@ -434,9 +595,9 @@ arnold_texture:
         connections:
             # connect node to group
             - '<.node_graph.mode_switch.path>.out'
-            - '<node.node_group.path>.texture.specular.specular_roughness'
+            - '<node.node_group.path>.outputs.texture.specular.specular_roughness'
             # connect node-group to shader
-            - '<node.node_group.path>.texture.specular.specular_roughness'
+            - '<node.node_group.path>.outputs.texture.specular.specular_roughness'
             - '<node.arnold_surface_shader.path>.specular_roughness'
     # geometry
     normal:
@@ -456,34 +617,35 @@ arnold_texture:
                 tag: 'texture_normal'
                 type: 'ArnoldShadingNode'
                 shader_type: 'normal_map'
-                path: '<node.node_group.path>/<..key>__<option.time_tag>_AND_NOD'
+                path: '<node.node_group.path>/texture_<..key>__<option.time_tag>_AND_NOD'
                 #
                 shader_hints:
-                    invert_x: '{"label": "invert X", "page": "normal invert"}'
-                    invert_y: '{"label": "invert Y", "page": "normal invert"}'
-                    invert_z: '{"label": "invert Z", "page": "normal invert"}'
-                    #
-                    strength: '{"label": "strength", "page": "normal basic"}'
+                    # basic
+                    strength: '{"page": "normal basic", "label": "strength", "dstPage": "<option.unique_name>.normal basic", "dstName": "<option.unique_name>__normal_basic__strength"}'
+                    # invert
+                    invert_x: '{"page": "normal invert", "label": "invert X", "dstPage": "<option.unique_name>.normal invert", "dstName": "<option.unique_name>__normal_invert__invert_x"}'
+                    invert_y: '{"page": "normal invert", "label": "invert Y", "dstPage": "<option.unique_name>.normal invert", "dstName": "<option.unique_name>__normal_invert__invert_y"}'
+                    invert_z: '{"page": "normal invert", "label": "invert Z", "dstPage": "<option.unique_name>.normal invert", "dstName": "<option.unique_name>__normal_invert__invert_z"}'
                 #
                 connections:
                     - '<..mode_switch.path>.out'
                     - '<.path>.input'
                     #
-                    - '<node.node_group.path>.texture.geometry.normal_invert_x'
+                    - '<node.node_group.path>.inputs.texture.geometry.normal_invert_x'
                     -  '<.path>.invert_x'
-                    - '<node.node_group.path>.texture.geometry.normal_invert_y'
+                    - '<node.node_group.path>.inputs.texture.geometry.normal_invert_y'
                     -  '<.path>.invert_y'
-                    - '<node.node_group.path>.texture.geometry.normal_invert_z'
+                    - '<node.node_group.path>.inputs.texture.geometry.normal_invert_z'
                     -  '<.path>.invert_z'
-                    - '<node.node_group.path>.texture.geometry.normal_strength'
+                    - '<node.node_group.path>.inputs.texture.geometry.normal_strength'
                     -  '<.path>.strength'
         #
         connections:
             # connect node to group
             - '<.node_graph.normal.path>.out'
-            - '<node.node_group.path>.texture.geometry.normal'
+            - '<node.node_group.path>.outputs.texture.geometry.normal'
             # connect node-group to shader
-            - '<node.node_group.path>.texture.geometry.normal'
+            - '<node.node_group.path>.outputs.texture.geometry.normal'
             - '<node.arnold_surface_shader.path>.normal'
     # geometry opacity
     translucency:
@@ -502,9 +664,9 @@ arnold_texture:
         connections:
             # connect node to group
             - '<.node_graph.mode_switch.path>.out'
-            - '<node.node_group.path>.texture.geometry.opacity'
+            - '<node.node_group.path>.outputs.texture.geometry.opacity'
             # connect node-group to shader
-            - '<node.node_group.path>.texture.geometry.opacity'
+            - '<node.node_group.path>.outputs.texture.geometry.opacity'
             - '<node.arnold_surface_shader.path>.opacity'
     #
     displacement:
@@ -523,32 +685,33 @@ arnold_texture:
             displacement:
                 type: 'ArnoldShadingNode'
                 shader_type: 'range'
-                path: '<node.node_group.path>/<..key>__<option.time_tag>_AND_NOD'
+                path: '<node.node_group.path>/texture_<..key>__<option.time_tag>_AND_NOD'
                 #
                 shader_parameters:
                     input_min: 0.5
                     output_max: 0.1
                 #
                 shader_hints:
-                    input_min: '{"label": "zero", "page": "displacement basic"}'
-                    output_max: '{"label": "strength", "page": "displacement basic"}'
+                    # basic
+                    input_min: '{"page": "displacement basic", "label": "zero", "dstPage": "<option.unique_name>.displacement basic", "dstName": "<option.unique_name>__displacement_basic__zero"}'
+                    output_max: '{"page": "displacement basic", "label": "strength", "dstPage": "<option.unique_name>.displacement basic", "dstName": "<option.unique_name>__displacement_basic__strength"}'
                 #
                 connections:
                     - '<..mode_switch.path>.out'
                     - '<.path>.input'
                     #
-                    - '<node.node_group.path>.texture.geometry.displacement_zero'
+                    - '<node.node_group.path>.inputs.texture.geometry.displacement_zero'
                     -  '<.path>.input_min'
                     #
-                    - '<node.node_group.path>.texture.geometry.displacement_strength'
+                    - '<node.node_group.path>.inputs.texture.geometry.displacement_strength'
                     -  '<.path>.output_max'
         #
         connections:
             # connect node to group
             - '<.node_graph.displacement.path>.out'
-            - '<node.node_group.path>.texture.geometry.displacement'
+            - '<node.node_group.path>.outputs.texture.geometry.displacement'
             - '<.node_graph.displacement.path>.out'
-            - '<node.node_group.path>.arnold_shader.arnold_displacement'
+            - '<node.node_group.path>.outputs.arnold_shader.arnold_displacement'
 
 usd_texture:
     albedo:

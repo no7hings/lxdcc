@@ -11,7 +11,7 @@ m = ktn_core.NGMacro(
     NodegraphAPI.GetNode('cameras')
 )
 
-m.set_create_by_configure_file(
+m.create_by_configure_file(
     f, 'cameras'
 )
 

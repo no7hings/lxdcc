@@ -354,7 +354,7 @@ class GeometryXgenImporter(
             ).get_all_paths(include_obj_type=['xgmSplineGuide']):
                 mya_dcc_objects.Node(i_xgen_guide).set('width', .01)
             #
-            if ma_core._get_is_ui_mode_() is True:
+            if ma_core.get_is_ui_mode() is True:
                 mel.eval('XgCreateDescriptionEditor;')
                 de = xgg.DescriptionEditor
                 de.clearCacheAction.setChecked(True)

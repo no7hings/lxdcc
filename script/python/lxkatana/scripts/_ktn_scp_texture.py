@@ -5,9 +5,7 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
-from lxkatana import ktn_configure, ktn_core
-
-import lxkatana.modifiers as ktn_modifiers
+from lxkatana import ktn_core
 
 
 class ScpTextureImportFromDatabase(object):
@@ -24,14 +22,14 @@ class ScpTextureImportFromDatabase(object):
             'option.root', self._root_opt.get_path(),
         )
         self._cfg.set(
-            'option.resource', resource
+            'option.resource', resource.lower()
         )
         self._cfg.set(
             'option.time_tag', bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100)
         )
 
         self._texture_data = texture_data
-    @ktn_modifiers.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def create_auto(self):
         def post_fnc_():
             self.gui_layout_nodes()
@@ -330,7 +328,7 @@ class ScpTextureImportFromDatabase(object):
 
     def gui_layout_nodes(self):
         sdr_path = self._cfg.get('node.arnold_surface_shader.path')
-        ktn_core.NGObjOpt(sdr_path).set_gui_layout(
+        ktn_core.NGObjOpt(sdr_path).gui_layout_shader_graph(
             size=(320, 80), shader_view_state=0.0
         )
 

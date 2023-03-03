@@ -286,7 +286,7 @@ class AbsFileReferences(object):
                         #
                         port.set(exists_file_paths[0])
                 # crash error for close
-                if ma_core._get_is_ui_mode_():
+                if ma_core.get_is_ui_mode():
                     mel.eval('generateUvTilePreview {}'.format(obj.path))
             else:
                 utl_core.Log.set_module_warning_trace(

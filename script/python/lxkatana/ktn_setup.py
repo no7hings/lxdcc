@@ -41,7 +41,7 @@ class KatanaEventSetup(object):
     @classmethod
     def set_run(cls):
         from lxkatana import ktn_core
-        ktn_core.EventMethod.set_events_register()
+        ktn_core.EventMtd.set_events_register()
 
 
 class KatanaCallbackSetup(object):
@@ -50,4 +50,4 @@ class KatanaCallbackSetup(object):
     @classmethod
     def set_run(cls):
         from lxkatana import ktn_core
-        ktn_core.CallbackMethod.set_callbacks_add()
+        ktn_core.CallbackMtd.set_callbacks_add()

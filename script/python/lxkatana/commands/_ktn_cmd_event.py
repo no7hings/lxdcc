@@ -11,7 +11,7 @@ import fnmatch
 import sys
 
 
-class EventMethod(object):
+class EventMtd(object):
     @classmethod
     def set_port_value(cls, *args, **kwargs):
         event_type, event_id = args
@@ -151,4 +151,4 @@ if __name__ == '__main__':
     import lxkatana
     lxkatana.set_reload()
     import lxkatana.commands as ktn_cmds
-    ktn_cmds.EventMethod.set_events_register()
+    ktn_cmds.EventMtd.set_events_register()

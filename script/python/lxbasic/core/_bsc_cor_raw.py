@@ -524,6 +524,12 @@ class RawTextMtd(object):
             ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
         )
     @classmethod
+    def to_integer(cls, string):
+        _ = re.sub(
+            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '0', string
+        ).lower()
+        return int(_, 36)
+    @classmethod
     def get_first_word(cls, text):
         if text:
             _ = re.findall(
@@ -590,6 +596,18 @@ class RawTextOpt(object):
         if string:
             d = 1000.0
             a = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
+            h = float(a % (360+seed)*d)/d
+            s = float(s_p+a % s_p)/100.0
+            v = float(v_p+a % v_p)/100.0
+            # print h, s, v
+            return RawColorMtd.hsv2rgb(h, s, v, maximum)
+        return 0, 0, 0
+
+    def to_rgb__(self, maximum=255, seed=0, s_p=45, v_p=45):
+        string = self._raw
+        if string:
+            d = 1000.0
+            a = RawTextMtd.to_integer(string)
             h = float(a % (360+seed)*d)/d
             s = float(s_p+a % s_p)/100.0
             v = float(v_p+a % v_p)/100.0

@@ -296,6 +296,8 @@ asset-source-nuke-scene-tmp-file: <asset-source-nuke-tmp-dir>/<asset-version-nam
 asset-user-nuke-dir: <asset-user-task-dir>/nuke
 asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<asset-version-name>.nk
+#
+asset-user-app-render-image-dir: <asset-user-task-dir>/render/<app-name>/<asset-version-name>
 # shared area
 asset-source-shared_area-dir: <asset-source-task-dir>
     # zbrush

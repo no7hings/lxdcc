@@ -4,7 +4,7 @@ import NodegraphAPI
 
 import re
 
-import lxkatana.modifiers as ktn_modifiers
+from lxkatana import ktn_core
 
 
 class LookAssignsReplace(object):
@@ -40,7 +40,7 @@ class LookAssignsReplace(object):
                 value = '({})'.format(' '.join(values))
             print value
             # p.setValue(value, 0)
-    @ktn_modifiers.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_run(self):
         for i in self._get_ktn_objs_(self.INCLUDE_DCC_TYPES):
             i_p = i.getParameter('CEL')

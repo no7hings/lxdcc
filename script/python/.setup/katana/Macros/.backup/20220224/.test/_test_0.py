@@ -11,7 +11,7 @@ m = ktn_core.NGMacro(
     NodegraphAPI.GetNode('plastic__look')
 )
 
-m.set_create_by_configure_file(
+m.create_by_configure_file(
     f
 )
 

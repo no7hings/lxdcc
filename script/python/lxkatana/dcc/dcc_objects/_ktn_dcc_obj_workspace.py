@@ -21,8 +21,6 @@ from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node, _k
 
 from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
 
-from lxkatana.modifiers import _ktn_mdf_utility
-
 from lxresolver import rsv_configure
 
 
@@ -239,7 +237,7 @@ class AssetWorkspace(object):
                 if not i_port_path in ['orig']:
                     lis.append(i_port_path)
         return lis
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_look_pass_add(self, pass_name=None):
         pass_names = self.get_look_pass_names()
         pass_count = len(pass_names)
@@ -975,7 +973,7 @@ class AssetWorkspace(object):
         if dcc_obj.get_is_exists() is True:
             s = ktn_core.KtnSGStageOpt(dcc_obj.ktn_obj)
             print s.get_obj_exists('/root/world/geo/master')
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_light_rig_update(self):
         configure = self.get_configure()
         key = 'light_rigs'

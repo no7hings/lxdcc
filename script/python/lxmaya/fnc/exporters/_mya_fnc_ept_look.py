@@ -658,7 +658,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(mya_mesh)
         mya_mesh_look_opt.set_material(material.path)
-        if ma_core._get_is_ui_mode_() is True:
+        if ma_core.get_is_ui_mode() is True:
             mel.eval('generateUvTilePreview {}'.format(image.path))
     @classmethod
     def _set_arnold_options_create_(cls):

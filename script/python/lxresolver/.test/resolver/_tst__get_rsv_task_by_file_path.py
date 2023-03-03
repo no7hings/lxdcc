@@ -8,11 +8,12 @@ if __name__ == '__main__':
 
     r = rsv_commands.get_resolver()
     for i_file_path in [
-        '/l/prod/cgm/work/assets/chr/ast_cg7_dad/mod/modeling/maya/scenes/ast_cg7_dad.mod.modeling.v001.ma',
+        # '/l/prod/cgm/work/assets/chr/ast_cg7_dad/mod/modeling/maya/scenes/ast_cg7_dad.mod.modeling.v001.ma',
         # '/production/shows/nsa_dev/assets/chr/td_test/user/team.mod/maya/scenes/modeling/td_test.mod.modeling.modeling.v000_001.ma',
         # '/production/shows/nsa_dev/assets/chr/td_test/user/work.dongchangbao/maya/scenes/modeling/td_test.mod.modeling.modeling.v000_001.ma',
-        '/production/shows/nsa_dev/assets/env/neighborhood/shared/srf/surface/neighborhood.srf.surface.v002/preview/house_test.srf.surfacing.v003.mov',
-        '/production/shows/nsa_dev/assets/chr/momo/user/work.slash/maya/scenes/modeling/momo.mod.modeling.modeling.v000_001.ma'
+        # '/production/shows/nsa_dev/assets/env/neighborhood/shared/srf/surface/neighborhood.srf.surface.v002/preview/house_test.srf.surfacing.v003.mov',
+        # '/production/shows/nsa_dev/assets/chr/momo/user/work.slash/maya/scenes/modeling/momo.mod.modeling.modeling.v000_001.ma',
+        '/production/shows/nsa_dev/assets/chr/td_test/shared/set/registry/td_test.set.registry.v002/cache/usd/td_test.usda'
     ]:
-
+        print r.get_rsv_project_by_any_file_path(i_file_path)
         print r.get_rsv_task_by_any_file_path(i_file_path)

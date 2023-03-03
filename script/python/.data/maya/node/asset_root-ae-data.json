@@ -66,16 +66,15 @@
             ["shot_animation_version", "animation"],
             ["shot_character_effect_version", "character effect"],
             ["shot_effect_version", "effect"],
-            ["shot_light_version", "light"],
-            ["shot_camera_version", "camera"]
+            ["shot_camera_version", "camera"],
+            ["shot_light_version", "light"]
         ],
         "shot_version_override": [
             ["shot_animation_version_override", "animation"],
             ["shot_character_effect_version_override", "character effect"],
             ["shot_effect_version_override", "effect"],
-            ["shot_light_version_override", "light"],
-            ["shot_camera_version_override", "camera"]
-
+            ["shot_camera_version_override", "camera"],
+            ["shot_light_version_override", "light"]
         ]
     }
 }

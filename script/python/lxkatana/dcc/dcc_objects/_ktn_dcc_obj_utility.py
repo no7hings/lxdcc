@@ -20,7 +20,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 from lxutil_gui.qt import utl_gui_qt_core
 
 
-def _get_is_ui_mode_():
+def get_is_ui_mode():
     return Configuration.get('KATANA_UI_MODE') == '1'
 
 
@@ -154,7 +154,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         obj_type = obj_category.set_type_create(obj_type_name)
         _obj = obj_type.set_obj_create(obj_path)
         #
-        if _get_is_ui_mode_() is True:
+        if get_is_ui_mode() is True:
             _obj.set_gui_attribute(
                 'icon', utl_gui_qt_core.QtKatanaMtd.get_qt_icon(obj_type_name)
             )

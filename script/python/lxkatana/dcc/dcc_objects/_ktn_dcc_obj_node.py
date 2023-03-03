@@ -8,13 +8,11 @@ from lxbasic import bsc_core
 #
 from lxutil import utl_core
 #
-from lxkatana import ktn_configure
+from lxkatana import ktn_configure, ktn_core
 #
 from lxkatana.dcc import ktn_dcc_obj_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
-
-from lxkatana.modifiers import _ktn_mdf_utility
 
 import lxbasic.objects as bsc_objects
 
@@ -35,48 +33,6 @@ class Node(ktn_dcc_obj_abs.AbsKtnObj):
     CONNECTION_CLASS = Connection
     def __init__(self, path):
         super(Node, self).__init__(path)
-
-
-def set_obj_source_layout(name):
-    def rcs_fnc_(obj_, column_):
-        _source_objs = obj_.get_source_objs()
-        if _source_objs:
-            _ktn_obj = obj_.ktn_obj
-            column_ += 1
-            if column_ not in ktn_obj_in_column_dict:
-                _i_ktn_objs = []
-                ktn_obj_in_column_dict[column_] = _i_ktn_objs
-            else:
-                _i_ktn_objs = ktn_obj_in_column_dict[column_]
-            #
-            for _row, _i in enumerate(_source_objs):
-                _i_ktn_obj = _i.ktn_obj
-                if not _i_ktn_obj in ktn_obj_stack:
-                    ktn_obj_stack.append(_i_ktn_obj)
-                    _i_ktn_objs.append(_i_ktn_obj)
-                    rcs_fnc_(_i, column_)
-    #
-    ktn_obj_stack = []
-    ktn_obj_in_column_dict = collections.OrderedDict()
-    column_count_dict = {}
-    w, h = 320, 960
-    node = Node(name)
-    children = node.get_children()
-    for i in children:
-        if i.type == 'NetworkMaterial':
-            rcs_fnc_(i, 0)
-
-    for column, v in ktn_obj_in_column_dict.items():
-        x = -column*w*2
-        y = -len(v)*h/2
-        for seq, i_ktn_obj in enumerate(v):
-            i_x = x
-            i_y = y+seq*h
-            i_atr = dict(
-                x=i_x,
-                y=i_y,
-            )
-            i_ktn_obj.setAttributes(i_atr)
 
 
 class FileReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
@@ -190,7 +146,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
 class AndStandardSurface(AndShader):
     def __init__(self, path):
         super(AndStandardSurface, self).__init__(path)
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_port_user_data_create(self, data_type_name, port_name, attribute_name, default_value):
         name = self.name
         parent_path = self.get_parent_path()

@@ -8,11 +8,12 @@ class Setup(object):
 
     def run(self):
         print 'lx-dcc menu setup: is started'
-        from lxclarisse import crs_concifgure, crs_setup
+        from lxbasic import bsc_core
+
+        from lxclarisse import crs_setup
+
         crs_setup.MenuBuilder._create_by_yaml_(
-            '{}/menus.yml'.format(
-                crs_concifgure.Root.DATA
-            )
+            bsc_core.CfgFileMtd.get_yaml('clarisse/gui/menu')
         )
         print 'lx-dcc menu setup: is completed'
 

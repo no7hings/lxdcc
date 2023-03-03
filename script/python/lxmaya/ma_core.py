@@ -89,7 +89,7 @@ def _ma_obj_path__get_with_namespace_clear_(obj_path):
     return obj_pathsep.join([_ma_obj_name__get_with_namespace_clear_(i) for i in obj_path.split(obj_pathsep)])
 
 
-def _get_is_ui_mode_():
+def get_is_ui_mode():
     return not cmds.about(batch=1)
 
 

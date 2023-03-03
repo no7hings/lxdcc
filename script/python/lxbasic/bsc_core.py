@@ -7,17 +7,29 @@ if __name__ == '__main__':
     #     s_p=10, v_p=10
     # )
     #
-    if __name__ == '__main__':
-        import os
+    # os.environ['LYNXI_CONFIGURES'] = '/data/e/myworkspace/td/lynxi/script/configure'
+    # print CfgFileMtd.get_yaml('storage/path-mapper')
+    # print CfgFileMtd.get_yaml('session/deadline/submiter')
+    # print CfgFileMtd.get_yaml('session/deadline/rsv-task-submiter')
+    # print CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
+    #
+    # print CfgFileMtd.get_yaml('colorspace/aces-color')
+    #
+    # print CfgFileMtd.get_yaml('arnold/node')
+    # print CfgFileMtd.get_yaml('arnold/convert')
+    #
+    # print CfgFileMtd.get_yaml('clarisse/gui/menu')
+    #
+    # print CfgFileMtd.get_yaml('database/library/basic')
+    #
+    # print CfgFileMtd.get_yaml('storage/asset-system-workspace')
 
-        # os.environ['LYNXI_CONFIGURES'] = '/data/e/myworkspace/td/lynxi/script/configure'
-        print CfgFileMtd.get_yaml('storage/path-mapper')
-        print CfgFileMtd.get_yaml('session/deadline/submiter')
-        print CfgFileMtd.get_yaml('session/deadline/rsv-task-submiter')
-        print CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
+    print RawTextMtd.to_integer(
+        'merge'
+    )
+    print RawTextOpt('abc').to_rgb_()
 
-        print CfgFileMtd.get_yaml('colorspace/aces-color')
-
-        print CfgFileMtd.get_yaml('arnold/node')
-        print CfgFileMtd.get_yaml('arnold/convert')
+    print RscFileMtd.get(
+        'lua-scripts'
+    )
 

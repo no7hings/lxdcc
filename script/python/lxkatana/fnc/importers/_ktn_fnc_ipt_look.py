@@ -19,7 +19,7 @@ import lxarnold.dcc.dcc_objects as and_dcc_objects
 
 import lxarnold.dcc.dcc_operators as and_dcc_operators
 
-from lxkatana.modifiers import _ktn_mdf_utility
+from lxkatana import ktn_core
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -515,7 +515,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 self._set_geometry_visibility_ports_(and_geometry_opt, dcc_properties_assign)
             #
             self.__set_tags_add_(dcc_properties_assign, and_geometry.path)
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_run(self):
         self.__set_obj_universe_create_()
         #

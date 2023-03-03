@@ -76,6 +76,14 @@ class EnvironMtd(object):
         if ApplicationMtd.get_is_maya():
             return False
         return True
+    @classmethod
+    def append_lua_path(cls, path):
+        key = 'LUA_PATH'
+        value = cls.get(key)
+        if value:
+            if path not in value:
+                value += path+';'
+                cls.set(key, value)
 
 
 class EnvironsOpt(object):
@@ -156,7 +164,7 @@ class EnvExtraMtd(EnvironMtd):
                     date_tag=TimeMtd.get_date_tag(),
                     user=SystemMtd.get_user_name()
                 )
-                _ = '{root}/debuggers/lynxi/{date_tag}/{user}/{tag}'.format(**variants)
+                _ = '{root}/debuggers/lynxi/{user}/{date_tag}/{tag}'.format(**variants)
                 if create is True:
                     if os.path.exists(_) is False:
                         os.makedirs(_)

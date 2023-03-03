@@ -16,7 +16,7 @@ class _MacroMtd(object):
         from lxkatana import ktn_core
         #
         if contents:
-            if ktn_core._get_is_ui_mode_():
+            if ktn_core.get_is_ui_mode():
                 utl_core.DialogWindow.set_create(
                     label,
                     content=u'\n'.join(contents),
@@ -273,7 +273,7 @@ class LxAsset(object):
                 self.__set_rsv_asset_shots_(rsv_asset)
 
         if content is not None:
-            if ktn_core._get_is_ui_mode_():
+            if ktn_core.get_is_ui_mode():
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
@@ -439,7 +439,7 @@ class LxAsset(object):
                 )
                 shot_assets = [i for i in shot_asset_main_dict.keys()]
                 shot_assets.append('None')
-                obj_opt.set_port_enumerate_raw(
+                obj_opt.set_enumerate_strings(
                     'usd.variants.shot_asset', shot_assets
                 )
                 #
@@ -448,7 +448,7 @@ class LxAsset(object):
                 )
                 shot_assets_override = [i for i in shot_asset_override_dict.keys()]
                 shot_assets_override.append('None')
-                obj_opt.set_port_enumerate_raw(
+                obj_opt.set_enumerate_strings(
                     'usd.variants.shot_asset_override', shot_assets_override
                 )
                 #
@@ -533,7 +533,7 @@ class LxAsset(object):
             self.__set_asset_usd_create_(rsv_asset)
         #
         if content is not None:
-            if ktn_core._get_is_ui_mode_():
+            if ktn_core.get_is_ui_mode():
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
@@ -587,7 +587,7 @@ class LxAsset(object):
                 content = u'asset="{}" shot(s) is non-exists'.format(rsv_asset.path)
         #
         if content is not None:
-            if ktn_core._get_is_ui_mode_():
+            if ktn_core.get_is_ui_mode():
                 utl_core.DialogWindow.set_create(
                     'Shot Asset Loader',
                     content=content,
@@ -765,7 +765,7 @@ class LxAssetAss(object):
         rss.interactiveOutputs = True
         rss.interactiveMode = True
         #
-        if not ktn_core._get_is_ui_mode_():
+        if not ktn_core.get_is_ui_mode():
             Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
         #
         if scheme == 'static':

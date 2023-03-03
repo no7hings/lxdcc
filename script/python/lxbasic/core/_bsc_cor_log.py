@@ -34,10 +34,11 @@ class LogMtd(object):
         return cls.get(''' error  | {}'''.format(text))
     #
     @classmethod
-    def trace(cls, text):
-        sys.stdout.write(
-            cls.get(text+'\n')
-        )
+    def result(cls, text):
+        sys.stdout.write(text+'\n')
+    @classmethod
+    def error(cls, text):
+        sys.stderr.write(text+'\n')
     #
     @classmethod
     def trace_result(cls, text):
@@ -53,7 +54,7 @@ class LogMtd(object):
         return text
     @classmethod
     def trace_error(cls, text):
-        sys.stdout.write(
+        sys.stderr.write(
             cls.get_error(text+'\n')
         )
         return text
@@ -233,8 +234,8 @@ if __name__ == '__main__':
     print(LogMtd.get(u'测试'))
     print(LogMtd.get_result(u'测试'))
 
-    LogMtd.trace('Test')
-    LogMtd.trace(u'测试 0')
+    LogMtd.result('Test')
+    LogMtd.result(u'测试 0')
     #
     LogMtd.trace_result(u'测试 1')
     LogMtd.trace_warning(u'测试 2')

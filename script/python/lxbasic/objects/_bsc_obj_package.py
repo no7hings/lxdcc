@@ -197,7 +197,7 @@ class PackageContextNew(object):
             i_replace_package = self._get_replace_package(i_p, beta_enable=beta_enable)
             if i_replace_package is not None:
                 bsc_core.LogMtd.trace_method_result(
-                    'package replaced',
+                    'package replace',
                     'package="{}"'.format(i_replace_package)
                 )
                 list_.append(i_replace_package)
@@ -208,7 +208,7 @@ class PackageContextNew(object):
             i_package = self._get_valid_package(i_p, beta_enable=beta_enable)
             if i_package is not None:
                 bsc_core.LogMtd.trace_method_result(
-                    'package resolved',
+                    'package resolve',
                     'package="{}"'.format(i_package)
                 )
                 list_.append(i_package)

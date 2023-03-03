@@ -67,20 +67,6 @@ class MayaMenuData(_AbsData):
     ROOT = '{}/menu'.format(Root.MAYA_DATA)
 
 
-class Data(object):
-    ROOT = os.path.dirname(__file__.replace('\\', '/'))
-    DATA_PATH = '{}/.data'.format(ROOT)
-    #
-    LOOK_SYSTEM_WORKSPACE_CONFIGURE_PATH = '{}/look-system-workspace-configure.yml'.format(DATA_PATH)
-    #
-    PATH_MAPPER_CONFIGURE_PATH = '{}/path-mapper-configure.yml'.format(DATA_PATH)
-    #
-    UTILITY_ROOT = '{}/utility'.format(ROOT)
-    MAYA_ROOT = '{}/maya'.format(ROOT)
-    HOUDINI_ROOT = '{}/houdini'.format(ROOT)
-    KATANA_ROOT = '{}/katana'.format(ROOT)
-
-
 class Port(object):
     VALIDATION_IGNORES = 'lx_validation_ignore'
     VALIDATION_CHECK_IGNORES = 'lx_validation_check_ignore'

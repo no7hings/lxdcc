@@ -26,48 +26,62 @@ class _ContentMtd(object):
         def rcs_fnc_(key_, value_):
             if isinstance(value_, six.string_types):
                 _value_unfold = value_
-                # remove excludes, etc. "\\<A\\>"
+                # collection excludes, etc. "\\<a\\>"
                 _v_ks_0 = re.findall(re.compile(cls._RE_PATTERN, re.S), _value_unfold)
                 if _v_ks_0:
                     for _i_v_k_0 in _v_ks_0:
                         keys_exclude.append(_i_v_k_0)
                         _value_unfold = _value_unfold.replace('\\<', '<').replace('\\>', '>')
-                # etc. "<A>"
+                # etc. "<a>"
                 else:
                     _v_ks_1 = re.findall(re.compile(cls.VARIANT_RE_PATTERN, re.S), _value_unfold)
                     if _v_ks_1:
                         for _i_v_k_1 in set(_v_ks_1):
+                            # etc. <a | b>, value=a or b
                             if '|' in _i_v_k_1:
-                                _i_v_ks_2 = map(lambda x: x.lstrip().rstrip(), _i_v_k_1.split('|'))
+                                _i_v_ks_2 = map(lambda x: x.strip(), _i_v_k_1.split('|'))
                                 for _j_v_k_2 in _i_v_ks_2:
+                                    if _j_v_k_2 not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_j_v_k_2))
                                     _j_v = get_fnc(_j_v_k_2)
                                     if _j_v is not None:
                                         _value_unfold = _j_v
                                         break
+                            # etc. <a % str(x).lower()>, value=str(a).lower()
+                            elif '%' in _i_v_k_1:
+                                _i_v_ks_2 = map(lambda x: x.strip(), _i_v_k_1.split('%'))
+                                _i_v_k_2 = _i_v_ks_2[0]
+                                if _i_v_k_2 not in keys_all:
+                                    raise KeyError('key="{}" is non-exists'.format(_i_v_k_2))
+                                _i_v_2 = get_fnc(_i_v_k_2)
+                                _i_v_2_fnc = eval('lambda x: {}'.format(_i_v_ks_2[1]))
+                                _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2_fnc(_i_v_2))
+                            # etc. <a>, value=a
                             else:
                                 # catch value
+                                # etc. <a.key>
                                 if fnmatch.filter([_i_v_k_1], '*.key'):
                                     _ = _i_v_k_1.split('.')
                                     _i_c_2 = len([i for i in _ if i == ''])
                                     _i_v_2 = key_.split('.')[-_i_c_2]
+                                # etc. <.a>
                                 elif fnmatch.filter([_i_v_k_1], '.*'):
-                                    # etc. key=nodes.asset.name, key=<.label>, result=nodes.asset.label
                                     _ = _i_v_k_1.split('.')
                                     _i_c_2 = len([i for i in _ if i == ''])
                                     _i_k_p_2 = '.'.join(key_.split('.')[:-_i_c_2])
                                     if _i_k_p_2:
-                                        _i_k_2 = '{}.{}'.format(_i_k_p_2, '.'.join(_[_i_c_2:]))
+                                        _i_v_k_2 = '{}.{}'.format(_i_k_p_2, '.'.join(_[_i_c_2:]))
                                     else:
-                                        _i_k_2 = '.'.join(_[_i_c_2:])
+                                        _i_v_k_2 = '.'.join(_[_i_c_2:])
                                     #
-                                    if _i_k_2 in keys_exclude:
+                                    if _i_v_k_2 in keys_exclude:
                                         continue
                                     #
-                                    if _i_k_2 not in keys_all:
-                                        raise KeyError('key="{}" is non-exists'.format(_i_k_2))
-                                    _i_v_2 = get_fnc(_i_k_2)
+                                    if _i_v_k_2 not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_i_v_k_2))
+                                    _i_v_2 = get_fnc(_i_v_k_2)
                                     #
-                                    _i_v_2 = rcs_fnc_(_i_k_2, _i_v_2)
+                                    _i_v_2 = rcs_fnc_(_i_v_k_2, _i_v_2)
                                 else:
                                     #
                                     if _i_v_k_1 in keys_exclude:
@@ -114,7 +128,11 @@ class AbsContent(object):
                     self._value = collections.OrderedDict()
                     # raise TypeError()
             else:
-                raise OSError()
+                raise OSError(
+                    bsc_core.LogMtd.trace_error(
+                        'file="{}" is non-exists'.format(value)
+                    )
+                )
         #
         elif isinstance(value, dict):
             self._value = value
@@ -289,9 +307,9 @@ class AbsContent(object):
                     k_2 = v_k
                 #
                 if k_2 not in all_keys:
-                    raise KeyError('key="{}" is Non-exists'.format(k_2))
+                    raise KeyError('key="{}" is non-exists'.format(k_2))
                 # need use copy
-                self.set(key, copy.copy(self.get(k_2)))
+                self.set(key, copy.deepcopy(self.get(k_2)))
 
     def get_key_is_exists(self, key):
         return key in self._get_all_keys_()

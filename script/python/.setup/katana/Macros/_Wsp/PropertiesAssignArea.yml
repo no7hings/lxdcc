@@ -1,0 +1,240 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'properties_assign_area'
+    type_abr: 'prt_asn_ara'
+    description:
+        |-
+        Properties Assign Area
+        - create new "arnold properties-assign" in "properties_assigns__customize#"
+        - modify parameters in "properties_assign_standard#"
+    variant_key: 'look'
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'Group'
+    path: '<option.root>/<option.type>'
+    input: '<.path>.input'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_pin: 1.0
+        ns_offsetX: 480
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment:
+            |-
+            group for arnold properties-assign work
+    #
+    input_ports:
+        - input
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        reset_node:
+            widget: button
+            value: ''
+            tool_tip: '...'
+        # workspace
+        workspace/declare_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        workspace/register/variant_key:
+            widget: string
+            value: '<option.variant_key>'
+            tool_tip: '...'
+            lock: True
+
+        workspace/register/properties_assign_extra:
+            widget: string
+            value: ''
+            tool_tip: '...'
+            lock: True
+        # info
+        info/category:
+            widget: string
+            value: '<option.category>'
+            tool_tip: '...'
+            lock: True
+
+        info/type:
+            widget: string
+            value: '<option.type>'
+            tool_tip: '...'
+            lock: True
+#
+node:
+    # backdrop
+    backdrop:
+        type: Backdrop
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        attributes:
+            x: 0
+            y: 380
+            ns_text: '<option.description>'
+            ns_fontScale: 1.5
+            ns_sizeX: 480
+            ns_sizeY: 480
+            ns_colorr: <main.attributes.ns_colorr>
+            ns_colorg: <main.attributes.ns_colorg>
+            ns_colorb: <main.attributes.ns_colorb>
+            ns_stickyLock: 1
+    # customize
+    customize:
+        type: 'GroupStack'
+        path: '<main.path>/<option.type>__<..key>'
+        input: '<.path>.in'
+        output: '<.path>.out'
+        #
+        connections:
+            #
+            - '<main.input>'
+            - '<.input>'
+        #
+        child:
+            type: 'ArnoldObjectSettings'
+            #
+            path_pattern: '{parent}/<option.type>_{key}'
+            #
+            nodes: {}
+    #
+    standard:
+        type: 'GroupStack'
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        connections:
+            #
+            - '<..customize.output>'
+            - '<.path>.in'
+        #
+        child:
+            type: 'ArnoldObjectSettings'
+            #
+            path_pattern: '{parent}/<option.type_abr>__{key}'
+            #
+            nodes:
+                subdiv:
+                    arnold_geometry_properties:
+                        smoothing: True
+                        subdiv_type: 'catclark'
+                        subdiv_iterations: 2
+                        subdiv_smooth_derivs: True
+                    attributes:
+                        comment:
+                            |-
+                            put subdiv geometry in here
+
+                no_subdiv:
+                    arnold_geometry_properties:
+                        smoothing: True
+                        subdiv_type: 'none'
+                    attributes:
+                        comment:
+                            |-
+                            put non-subdiv geometry in here
+
+                displacemenet:
+                    arnold_geometry_properties:
+                        smoothing: True
+                        subdiv_type: 'catclark'
+                        subdiv_iterations: 3
+                        subdiv_smooth_derivs: True
+                        disp_padding: 1
+                        disp_autobump: True
+                    attributes:
+                        comment:
+                            |-
+                            put displacemenet geometry in here
+
+                opacity:
+                    arnold_geometry_properties:
+                        opaque: False
+                    attributes:
+                        comment:
+                            |-
+                            put opacity geometry in here
+
+                sss:
+                    arnold_geometry_properties:
+                        sss_setname: sss
+                    attributes:
+                        comment:
+                            |-
+                            put sss geometry in here
+    # merge
+    merge:
+        type: Merge
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - default
+        #
+        connections:
+            #
+            - '<..standard.output>'
+            - '<.path>.default'
+    # register
+    data_register:
+        type: 'OpScript'
+        path: '<main.path>/<option.type>__<..key>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        ports:
+            user/data_1:
+                widget: string2
+                value: [ 'look.declare', '' ]
+                tool_tip: '...'
+                lock: True
+            user/data_2:
+                widget: string2
+                value: [ 'look.properties_assign_area_declare', '' ]
+                tool_tip: '...'
+                lock: True
+            user/data_3:
+                widget: string2
+                value: [ 'look.properties_assign_extra', '' ]
+                tool_tip: '...'
+                lock: True
+        #
+        parameters:
+            CEL: '/root'
+            script/lua:
+                |-
+                local m = require('wsp_op_script')
+
+                local location = Interface.GetInputLocationPath()
+                local user_attribute = Interface.GetOpArg('user')
+                
+                function main()
+                    m.register_by_data(m.get_data_for_register(location, user_attribute))
+                end
+                
+                main()
+        #
+        expressions:
+            user/data_1/i1: 'getParent().getNodeName()'
+            user/data_2/i1: 'getParent().getNodeName()'
+            user/data_3/i1: 'getParent().workspace.register.properties_assign_extra'
+        #
+        connections:
+            - '<..merge.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

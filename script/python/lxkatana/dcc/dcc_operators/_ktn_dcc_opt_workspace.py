@@ -1,11 +1,11 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
+from lxkatana import ktn_core
+
 from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_node
 
 from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
-
-from lxkatana.modifiers import _ktn_mdf_utility
 
 
 class AssetWorkspaceOpt(object):
@@ -41,7 +41,7 @@ class AssetWorkspaceOpt(object):
     def __init__(self, workspace):
         self._workspace = workspace
     #
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_auto_ambocc_assign(self, pass_name='default'):
         configure = self._workspace.get_configure(pass_name)
         # geometry_root = configure.get('option.geometry_root')
@@ -205,7 +205,7 @@ class AssetWorkspaceOpt(object):
         )
         dcc_shader_opt.set('opacity', [0.0, 0.0, 0.0])
     #
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_auto_white_disp_assign(self, pass_name='default'):
         configure = self._workspace.get_configure(pass_name)
         # geometry_root = configure.get('option.geometry_root')
@@ -349,7 +349,7 @@ class AssetWorkspaceOpt(object):
         if dcc_surface_shader:
             cls._set_white_create_(dcc_material, dcc_shader_path)
     #
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_auto_white_zbrush_assign(self, pass_name='default'):
         configure = self._workspace.get_configure(pass_name)
         # geometry_root = configure.get('option.geometry_root')
@@ -423,7 +423,7 @@ class AssetWorkspaceOpt(object):
                 elif geometry_type_name in ['subdmesh']:
                     self._set_convert_to_white_zbrush_(dcc_material, shader_dcc_path)
     #
-    @_ktn_mdf_utility.set_undo_mark_mdf
+    @ktn_core.Modifier.undo_debug_run
     def set_auto_geometry_properties_assign(self, pass_name='default', geometry_properties=None):
         geometries = self._workspace.get_sg_geometries(pass_name)
         self._workspace.set_ng_property_assigns_cache_update()

@@ -5,16 +5,27 @@ from Katana import Callbacks
 
 class Setup(object):
     @classmethod
-    def set_menu_setup(cls):
+    def build_menu(cls):
         print 'lx-katana-menu-setup: start'
         from lxkatana import ktn_setup
         ktn_setup.KatanaMenuSetup().set_setup()
         print 'lx-katana-menu-setup: complete'
     @classmethod
+    def build_lua(cls):
+        from lxbasic import bsc_core
+        bsc_core.EnvExtraMtd.append_lua_path(
+            '{}/?.lua'.format(
+                bsc_core.RscFileMtd.get(
+                    'lua-scripts'
+                )
+            )
+        )
+    @classmethod
     def set_run(cls, *args, **kwargs):
         print '*'*40
         print 'lx-katana-setup: start'
-        cls.set_menu_setup()
+        cls.build_menu()
+        cls.build_lua()
         print 'lx-katana-setup: complete'
         print '*' * 40
 

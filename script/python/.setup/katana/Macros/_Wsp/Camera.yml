@@ -1,0 +1,378 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'camera'
+    type_abr: 'cmr'
+    description: 'Cameras'
+    variant_key: 'camera'
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'Group'
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 480
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+    #
+    input_ports:
+        - join
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        reset_node:
+            widget: button
+            value: ''
+            tool_tip: '...'
+        # option
+        option/passthrough_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        option/scheme:
+            widget: enumerate
+            value: ['asset', 'shot']
+            tool_tip: '...'
+
+        option/render_resolution:
+            widget: resolution
+            value: '2048x2048'
+            tool_tip: '...'
+
+        cache/asset_abc/enable:
+            widget: boolean
+            value: False
+#            value: True
+            tool_tip: '...'
+
+        cache/asset_abc/file:
+            widget: file
+            value: ''
+#            value: '/l/prod/cgm/publish/assets/chr/nsa_momo/cam/camera/nsa_momo.cam.camera.v003/camera/abc/main.abc'
+            tool_tip: '...'
+
+        cache/asset_abc/location:
+            widget: path
+            value: '/root/world/cam'
+            tool_tip: '...'
+            lock: True
+
+        cache/asset_abc/root:
+            widget: path
+            value: '/root/world/cam/renderCamera'
+            tool_tip: '...'
+            lock: True
+
+        cache/asset_abc/default:
+            widget: path
+            value: '/root/world/cam/renderCamera/defaultCamera/defaultCameraLeft/defaultCameraLeftShape'
+            tool_tip: '...'
+            lock: True
+
+        cache/asset_abc/shape_from:
+            widget: path
+#            value: ''
+            value: '/root/world/cam/cam_closeUp/cam_closeUpShape'
+            tool_tip: '...'
+
+        cache/asset_abc/frame_from:
+            widget: integer
+            value: 4
+            tool_tip: '...'
+        # setting
+        setting/screen_modify/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/screen_modify/mode:
+            widget: enumerate
+            value: ['horizontal', 'vertical', 'fill']
+            tool_tip: '...'
+        #   turn around
+        extra/turn_around/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        extra/turn_around/root:
+            widget: path
+            value: '/root/world/cam/renderCamera'
+            tool_tip: '...'
+
+        extra/turn_around/direction:
+            widget: enumerate
+            value: ['clockwise', 'anticlockwise']
+            tool_tip: '...'
+
+        extra/turn_around/start_frame:
+            widget: integer
+            value: 1
+            tool_tip: '...'
+
+        extra/turn_around/end_frame:
+            widget: integer
+            value: 60
+            tool_tip: '...'
+
+        extra/turn_around/frame_offset:
+            widget: integer
+            value: 0
+            tool_tip: '...'
+
+        extra/turn_around/pivot_locator:
+            widget: path
+            value: '/root/world/loc/camera_pivot'
+            tool_tip: '...'
+            lock: True
+
+        extra/turn_around/axis:
+            widget: enumerate
+            value: ['X', 'Y', 'Z']
+            default: 'Y'
+            tool_tip: '...'
+        # workspace
+        workspace/declare_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        #   register
+        workspace/register/variant_key:
+            widget: string
+            value: '<option.variant_key>'
+            tool_tip: '...'
+            lock: True
+
+        workspace/register/camera_from:
+            widget: path
+            value: '/root/world/camera'
+            tool_tip: '...'
+
+        workspace/register/camera_extra:
+            widget: string
+            value: ''
+            tool_tip: '...'
+            lock: True
+        #   usd create
+        cache/load_abc:
+            widget: button
+            value: ''
+            tool_tip: '...'
+        # info
+        info/category:
+            widget: string
+            value: '<option.category>'
+            tool_tip: '...'
+            lock: True
+
+        info/type:
+            widget: string
+            value: '<option.type>'
+            tool_tip: '...'
+            lock: True
+#
+node:
+    # asset
+    default:
+        type: 'CameraCreate'
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        expressions:
+            name: 'getParent().cache.asset_abc.default'
+    #   camera
+    placeholder:
+        type: 'CameraCreate'
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        parameters:
+            transform/translate: [0, 0, 10]
+        #
+        expressions:
+            name: 'getParent().cache.asset_abc.default'
+    #   abc
+    asset_abc:
+        type: 'Alembic_In'
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        parameters:
+            timing/mode: 'Hold Frame'
+            timing/holdTime: 4
+        #
+        expressions:
+            abcAsset: 'getParent().cache.asset_abc.file'
+            name: 'getParent().cache.asset_abc.location'
+            #
+            timing/holdTime: 'getParent().cache.asset_abc.frame_from'
+    #
+    asset_abc_copy_transform:
+        type: HierarchyCopy
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        expressions:
+            copies/copy1/sourceLocation:
+                |-
+                '/'.join(str(getParent().cache.asset_abc.shape_from).split('/')[:-1])
+            copies/copy1/destinationLocations/i0:
+                |-
+                '/'.join(str(getParent().cache.asset_abc.default).split('/')[:-1])
+        #
+        connections:
+            - '<..asset_abc.output>'
+            - '<.path>.in'
+    #
+    asset_abc_rename_shape:
+        type: Rename
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        parameters:
+            locationTypes: 'camera'
+        #
+        expressions:
+            rootLocation:
+                |-
+                '/'.join(str(getParent().cache.asset_abc.default).split('/')[:-1])
+            pattern:
+                |-
+                str(getParent().cache.asset_abc.shape_from).split('/')[-1]
+            replace:
+                |-
+                str(getParent().cache.asset_abc.default).split('/')[-1]
+
+        #
+        connections:
+            - '<..asset_abc_copy_transform.output>'
+            - '<.path>.in'
+    #   abc enable
+    asset_abc_enable:
+        type: Switch
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'off'
+            - 'on'
+        #
+        expressions:
+            in: '1 if getParent().cache.asset_abc.enable else 0'
+        #
+        connections:
+            # off
+            - '<..placeholder.output>'
+            - '<.path>.off'
+            # on
+            - '<..asset_abc_rename_shape.output>'
+            - '<.path>.on'
+    # merge
+    merge:
+        type: Merge
+        path: '<main.path>/<option.type>__<..key>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - join
+            - asset_abc
+            - default
+        #
+        connections:
+            # join
+            - '<main.path>.join'
+            - '<.path>.join'
+            # camera abc
+            - '<..asset_abc_enable.output>'
+            - '<.path>.asset_abc'
+            # camera default
+            - '<..default.output>'
+            - '<.path>.default'
+    # extra
+    #   turn around op
+    turn_around_op:
+        type: TurnAroundOp_Wsp
+        path: '<main.path>/<option.type>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        expressions:
+            option/enable: 'getParent().extra.turn_around.enable'
+            option/root: 'getParent().extra.turn_around.root'
+            option/direction: 'getParent().extra.turn_around.direction'
+            option/start_frame: 'getParent().extra.turn_around.start_frame'
+            option/end_frame: 'getParent().extra.turn_around.end_frame'
+            option/frame_offset: 'getParent().extra.turn_around.frame_offset'
+            option/pivot_locator: 'getParent().extra.turn_around.pivot_locator'
+            option/axis: 'getParent().extra.turn_around.axis'
+        #
+        connections:
+            #
+            - '<..merge.output>'
+            - '<.input>'
+    # register
+    data_register:
+        type: 'OpScript'
+        path: '<main.path>/<option.type>__<..key>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        ports:
+            #
+            user/data_1:
+                widget: string2
+                value: [ 'camera_declare_node', '' ]
+                tool_tip: '...'
+                lock: True
+            #
+            user/data_2:
+                widget: string2
+                value: [ 'camera_extra', '' ]
+                tool_tip: '...'
+                lock: True
+            #
+            user/data_3:
+                widget: string2
+                value: [ 'camera_from', '' ]
+                tool_tip: '...'
+                lock: True
+        #
+        parameters:
+            CEL: '/root'
+            script/lua:
+                |-
+                local m = require('wsp_op_script')
+
+                local location = Interface.GetInputLocationPath()
+                local user_attribute = Interface.GetOpArg('user')
+                
+                function main()
+                    m.register_by_data(m.get_data_for_register(location, user_attribute))
+                end
+                
+                main()
+        #
+        expressions:
+            user/data_1/i1: 'getParent().getNodeName()'
+            user/data_2/i1: 'getParent().workspace.register.material_extra'
+            user/data_3/i1: 'getParent().workspace.register.material_root'
+        #
+        connections:
+            - '<..turn_around_op.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

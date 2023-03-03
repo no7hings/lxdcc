@@ -256,7 +256,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         location = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
         #
-        if ma_core._get_is_ui_mode_() is True:
+        if ma_core.get_is_ui_mode() is True:
             file_path = mya_dcc_objects.Scene.get_current_file_path()
             if mya_dcc_objects.Scene.get_scene_is_dirty():
                 w = utl_core.DialogWindow.set_create(
@@ -579,7 +579,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             raise NotImplementedError()
         #
-        if ktn_core._get_is_ui_mode_() is True:
+        if ktn_core.get_is_ui_mode() is True:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
             if ktn_dcc_objects.Scene.get_scene_is_dirty():
                 w = utl_core.DialogWindow.set_create(

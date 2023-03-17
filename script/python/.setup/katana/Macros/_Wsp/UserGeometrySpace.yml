@@ -1,0 +1,70 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'user_geometry_space'
+    type_abr: 'usr_gmt_spc'
+    create_type: 'UserGeometrySpace_Wsp'
+    description:
+        |-
+        User Geometry Space
+        - include all geometry per variant
+    variant_key: 'camera'
+    #
+    auto_color: False
+    #
+    size:
+        w_s: 240
+        h_s: 80
+        #
+        w: 1280
+        h: 480
+    #
+    position:
+        x_start: =-<option.size.w>/2-<option.size.w_s>/2
+        y_start: =<option.size.h>/2-<option.size.h_s>/2
+#
+main:
+    type: GeometrySpace_Wsp
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    clear_ports: False
+    clear_children: False
+    force_update: True
+    #
+    attributes:
+        comment: '<option.description>'
+    #
+    parameters:
+        type: '<option.create_type>'
+#
+record_update:
+    backdrop:
+        attributes:
+            ns_text: '<option.description>'
+#
+node_add:
+    asset__geometry:
+        index_y: 1
+        tag: 'GMT'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: Geometry_Wsp
+        name: '<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.join_other'
+        output: '<.path>.output'
+        #
+        attributes:
+            x: =<option.position.x_start>+<option.size.w_s>*<..index_y>
+            y: =<option.position.y_start>
+        #
+        force_connections:
+            - '{upstream_merge}.out'
+            - '<.input>'
+            #
+            - '<.output>'
+            - '{variant_register}.<.variant>'
+

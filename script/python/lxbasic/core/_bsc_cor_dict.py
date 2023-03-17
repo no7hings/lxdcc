@@ -48,18 +48,26 @@ class DictMtd(object):
             default_flow_style=False
         )
     @classmethod
-    def set_key_sort_to(cls, dict_):
-        dic = collections.OrderedDict()
+    def sort_key_to(cls, dict_):
+        dict_1 = collections.OrderedDict()
         keys = dict_.keys()
         keys.sort()
         for i_key in keys:
-            dic[i_key] = dict_[i_key]
-        return dic
+            dict_1[i_key] = dict_[i_key]
+        return dict_1
     @classmethod
-    def set_string_key_sort_to(cls, dict_):
-        dic = collections.OrderedDict()
+    def sort_string_key_to(cls, dict_):
+        dict_1 = collections.OrderedDict()
         keys = dict_.keys()
         keys = _bsc_cor_raw.RawTextsMtd.set_sort_to(keys)
         for i_key in keys:
-            dic[i_key] = dict_[i_key]
-        return dic
+            dict_1[i_key] = dict_[i_key]
+        return dict_1
+    @classmethod
+    def deduplication_value_to(cls, dict_):
+        dict_1 = {}
+        for k, v_0 in dict_.items():
+            v_1 = list(set(v_0))
+            v_1.sort(key=v_0.index)
+            dict_1[k] = v_1
+        return dict_1

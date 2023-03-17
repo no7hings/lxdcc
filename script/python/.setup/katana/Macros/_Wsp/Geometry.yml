@@ -3,10 +3,13 @@ option:
     category: 'workspace'
     type: 'geometry'
     type_abr: 'gmt'
+    create_type: 'Geometry_Wsp'
     description:
         |-
-        load geometry here
+        for geometry load
     variant_key: 'geometry'
+    #
+    auto_color: False
     #
     color:
         r: 0
@@ -14,9 +17,9 @@ option:
         b: 0
 #
 main:
-    type: 'Group'
+    type: Group
     path: '<option.root>/<option.type>'
-    input: '<.path>.join'
+    input: '<.path>.join_other'
     output: '<.path>.output'
     #
     attributes:
@@ -26,24 +29,33 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
     #
     input_ports:
-        - join
+        - join_other
     #
     output_ports:
         - output
     #
     ports:
-        reset_node:
-            widget: button
-            value: ''
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
             tool_tip: '...'
-        # option
-        option/passthrough_enable:
-            widget: boolean
-            value: False
+            lock: True
+        # preset
+        preset/name:
+            widget: enumerate
+            value: ['default', 'test_0']
             tool_tip: '...'
 
+        preset/load:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspGeometry(node).load_preset()'
+            tool_tip: '...'
+        # option
         option/scheme:
             widget: enumerate
             value: ['asset', 'shot']
@@ -63,181 +75,195 @@ main:
             widget: button
             value: ''
             tool_tip: '...'
+
+        option/location:
+            widget: path
+            value: '/root/world/geo'
+            tool_tip: '...'
+
+        option/root:
+            widget: path
+            value: '/root/world/geo/master'
+            tool_tip: '...'
+
+        option/default:
+            widget: path
+            value: '/root/world/geo/master/hi/pony/ponyShape'
+            tool_tip: '...'
         # cache
         #   asset usd
         cache/asset_usd/enable:
             widget: boolean
             value: False
-#            value: True
             tool_tip: '...'
 
         cache/asset_usd/file:
             widget: file
             value: ''
-#            value: '/production/shows/nsa_dev/assets/chr/td_test/shared/mod/modeling/td_test.mod.modeling.v004/set/usd/td_test.usda'
-            tool_tip: '...'
-
-        cache/asset_usd/location:
-            widget: path
-            value: '/root/world/geo'
-            tool_tip: '...'
-
-        cache/asset_usd/root:
-            widget: path
-            value: '/root/world/geo/master'
-            tool_tip: '...'
-
-        cache/asset_usd/default:
-            widget: path
-            value: '/root/world/geo/master/hi/mesh'
             tool_tip: '...'
         #   usd create
         cache/create_usd:
             widget: button
             value: ''
             tool_tip: '...'
+        # variant
+        #   asset version main
+        usd_variant/asset_version_main/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        usd_variant/asset_version_main/model:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_main/groom:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_main/rig:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_main/effect:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_main/surface:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_main/light:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+        #   asset version override
+        usd_variant/asset_version_override/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        usd_variant/asset_version_override/model:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_override/groom:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_override/rig:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_override/effect:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_override/surface:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/asset_version_override/light:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+        #   shot asset
+        usd_variant/shot_asset:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+        #   shot version main
+        usd_variant/shot_version_main/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        usd_variant/shot_version_main/animation:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/shot_version_main/character_effect:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/shot_version_main/effect:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/shot_version_main/light:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+        #   shot version override
+        usd_variant/shot_version_override/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        usd_variant/shot_version_override/animation:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/shot_version_override/character_effect:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/shot_version_override/effect:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+
+        usd_variant/shot_version_override/light:
+            widget: enumerate
+            value: [ 'None' ]
+            tool_tip: '...'
+        #   usd variant update
+        usd_variant/update_variant:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspGeometry(node).update_usd_variant()'
+            tool_tip: '...'
         #   setting
         setting/resolver_look_file_enable:
             widget: boolean
             value: False
             tool_tip: '...'
+        #
+        setting/ignore_default_usd_variants_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
         #   debugger
+        #       reverse face vertex
         debugger/reverse_face_vertex_enable:
             widget: boolean
             value: False
             tool_tip: '...'
-        # variant
-        #   asset version main
-        variant/asset_version_main/enable:
+        #       turn off xform origin
+        debugger/turn_off_subcomponent_xform_origin_enable:
             widget: boolean
-            value: False
-            tool_tip: '...'
-
-        variant/asset_version_main/model:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_main/groom:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_main/rig:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_main/effect:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_main/surface:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_main/light:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-        #   asset version override
-        variant/asset_version_override/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        variant/asset_version_override/model:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_override/groom:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_override/rig:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_override/effect:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_override/surface:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/asset_version_override/light:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-        #   shot asset
-        variant/shot_asset:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-        #   shot version main
-        variant/shot_version_main/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        variant/shot_version_main/animation:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/shot_version_main/character_effect:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/shot_version_main/effect:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/shot_version_main/light:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-        #   shot version override
-        variant/shot_version_override/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        variant/shot_version_override/animation:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/shot_version_override/character_effect:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/shot_version_override/effect:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-
-        variant/shot_version_override/light:
-            widget: enumerate
-            value: [ 'None' ]
-            tool_tip: '...'
-        #   usd variant update
-        variant/update_variant:
-            widget: button
-            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspGeometry(node).update_variant()'
+            value: True
             tool_tip: '...'
         # extra
+        # user data
+        extra/user_data/copy_from_usd_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
         #   translate
         extra/translate/enable:
             widget: boolean
@@ -246,7 +272,7 @@ main:
 
         extra/translate/root:
             widget: path
-            value: '/root/world/geo/master'
+            value: '/root/world/geo/master/hi'
             tool_tip: '...'
 
         extra/translate/value:
@@ -263,44 +289,44 @@ main:
             widget: button
             value: ''
             tool_tip: '...'
-        #   turn around
-        extra/turn_around/enable:
+        #   turntable
+        extra/turntable/enable:
             widget: boolean
             value: False
             tool_tip: '...'
 
-        extra/turn_around/root:
+        extra/turntable/root:
             widget: path
             value: '/root/world/geo/master'
             tool_tip: '...'
 
-        extra/turn_around/direction:
+        extra/turntable/direction:
             widget: enumerate
             value: ['clockwise', 'anticlockwise']
             tool_tip: '...'
 
-        extra/turn_around/start_frame:
+        extra/turntable/start_frame:
             widget: integer
             value: 1
             tool_tip: '...'
 
-        extra/turn_around/end_frame:
+        extra/turntable/end_frame:
             widget: integer
             value: 60
             tool_tip: '...'
 
-        extra/turn_around/frame_offset:
+        extra/turntable/frame_offset:
             widget: integer
             value: 0
             tool_tip: '...'
 
-        extra/turn_around/pivot_locator:
+        extra/turntable/pivot_locator:
             widget: path
-            value: '/root/world/loc/geometry_pivot'
+            value: '/root/world/loc/turntable/pivot_locator_for_geometry'
             tool_tip: '...'
             lock: True
 
-        extra/turn_around/axis:
+        extra/turntable/axis:
             widget: enumerate
             value: ['X', 'Y', 'Z']
             default: 'Y'
@@ -316,86 +342,44 @@ main:
             value: '<option.variant_key>'
             tool_tip: '...'
             lock: True
-
-        workspace/register/geometry_scheme:
-            widget: enumerate
-            value: ['default', 'effect']
-            tool_tip: '...'
-
-        workspace/register/geometry_root:
-            widget: path
-            value: '/root/world/geo/master'
-            tool_tip: '...'
-
-        workspace/register/geometry_extra:
-            widget: string
-            value: ''
-            tool_tip: '...'
-            lock: True
-        # info
-        info/category:
-            widget: string
-            value: '<option.category>'
-            tool_tip: '...'
-            lock: True
-
-        info/type:
-            widget: string
-            value: '<option.type>'
+        # record
+        record/variant_data_opt:
+            widget: node
+            value: '<node.variant_data_opt.name>'
             tool_tip: '...'
             lock: True
 #
 node:
     # asset
     asset_placeholder:
-        type: 'PonyCreate'
-        path: '<main.path>/<option.type>__<..key>'
+        type: PonyCreate
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         expressions:
-            name: 'getParent().cache.asset_usd.default'
+            name: 'getParent().option.default'
     #   usd
     asset_usd:
-        type: 'DollarUsdIn'
-        path: '<main.path>/<option.type>__<..key>'
+        type: DollarUsdIn
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.o0'
         #
         expressions:
             usd/fileName: 'getParent().cache.asset_usd.file'
-            usd/location: 'getParent().cache.asset_usd.location'
-    #   usd enable
-    asset_usd_enable:
-        type: Switch
-        path: '<main.path>/<option.type>__<..key>'
-        output: '<.path>.output'
-        #
-        input_ports:
-            - 'off'
-            - 'on'
-        #
-        expressions:
-            in: '1 if getParent().cache.asset_usd.enable else 0'
-        #
-        connections:
-            # off
-            - '<..asset_placeholder.output>'
-            - '<.path>.off'
-            # on
-            - '<..asset_usd.output>'
-            - '<.path>.on'
+            usd/location: 'getParent().option.location'
     #   variant
     #       asset version main
     asset_version_main:
-        type: 'GroupStack'
-        path: '<main.path>/<option.type>__<..key>'
+        type: GroupStack
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         connections:
-            - '<..asset_usd_enable.output>'
+            - '<..asset_usd.output>'
             - '<.path>.in'
         #
         child:
-            type: 'UsdInVariantSelect'
+            type: UsdInVariantSelect
             #
             path_pattern: '{parent}/<option.type_abr>__<...key>__{key}'
             #
@@ -408,8 +392,8 @@ node:
                         args/variantSelection/value: 'None'
                     #
                     expressions:
-                        location: 'getParent().getParent().cache.asset_usd.root'
-                        args/variantSelection/value: 'getParent().getParent().variant.asset_version_main.<...key>'
+                        location: 'getParent().getParent().option.root'
+                        args/variantSelection/value: 'getParent().getParent().usd_variant.asset_version_main.<...key>'
                 groom: '$.model'
                 rig: '$.model'
                 effect: '$.model'
@@ -418,7 +402,7 @@ node:
     #       asset version main enable
     asset_version_main_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -426,19 +410,19 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().variant.asset_version_main.enable else 0'
+            in: '1 if getParent().usd_variant.asset_version_main.enable else 0'
         #
         connections:
             # off
-            - '<..asset_usd_enable.output>'
+            - '<..asset_usd.output>'
             - '<.path>.off'
             # on
             - '<..asset_version_main.output>'
             - '<.path>.on'
     #       asset version override
     asset_version_override:
-        type: 'GroupStack'
-        path: '<main.path>/<option.type>__<..key>'
+        type: GroupStack
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         connections:
@@ -446,7 +430,7 @@ node:
             - '<.path>.in'
         #
         child:
-            type: 'UsdInVariantSelect'
+            type: UsdInVariantSelect
             #
             path_pattern: '{parent}/<option.type_abr>__<...key>__{key}'
             #
@@ -459,8 +443,8 @@ node:
                         args/variantSelection/value: 'None'
                     #
                     expressions:
-                        location: 'getParent().getParent().cache.asset_usd.root'
-                        args/variantSelection/value: 'getParent().getParent().variant.asset_version_override.<...key>'
+                        location: 'getParent().getParent().option.root'
+                        args/variantSelection/value: 'getParent().getParent().usd_variant.asset_version_override.<...key>'
                 groom: '$.model'
                 rig: '$.model'
                 effect: '$.model'
@@ -469,7 +453,7 @@ node:
     #       asset version override enable
     asset_version_override_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -477,7 +461,7 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().variant.asset_version_override.enable else 0'
+            in: '1 if getParent().usd_variant.asset_version_override.enable else 0'
         #
         connections:
             # off
@@ -488,8 +472,8 @@ node:
             - '<.path>.on'
     #       shot version main
     shot_version_main:
-        type: 'GroupStack'
-        path: '<main.path>/<option.type>__<..key>'
+        type: GroupStack
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         connections:
@@ -497,7 +481,7 @@ node:
             - '<.path>.in'
         #
         child:
-            type: 'UsdInVariantSelect'
+            type: UsdInVariantSelect
             #
             path_pattern: '{parent}/<option.type_abr>__<...key>__{key}'
             #
@@ -510,15 +494,15 @@ node:
                         args/variantSelection/value: 'None'
                     #
                     expressions:
-                        location: 'getParent().getParent().cache.asset_usd.root'
-                        args/variantSelection/value: 'getParent().getParent().variant.shot_version_main.<...key>'
+                        location: 'getParent().getParent().option.root'
+                        args/variantSelection/value: 'getParent().getParent().usd_variant.shot_version_main.<...key>'
                 character_effect: '$.animation'
                 effect: '$.animation'
                 light: '$.animation'
     #       shot version main enable
     shot_version_main_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -526,7 +510,7 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().variant.shot_version_main.enable else 0'
+            in: '1 if getParent().usd_variant.shot_version_main.enable else 0'
         #
         connections:
             # off
@@ -537,8 +521,8 @@ node:
             - '<.path>.on'
     #       shot version override
     shot_version_override:
-        type: 'GroupStack'
-        path: '<main.path>/<option.type>__<..key>'
+        type: GroupStack
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         connections:
@@ -546,7 +530,7 @@ node:
             - '<.path>.in'
         #
         child:
-            type: 'UsdInVariantSelect'
+            type: UsdInVariantSelect
             #
             path_pattern: '{parent}/<option.type_abr>__<...key>__{key}'
             #
@@ -559,15 +543,15 @@ node:
                         args/variantSelection/value: 'None'
                     #
                     expressions:
-                        location: 'getParent().getParent().cache.asset_usd.root'
-                        args/variantSelection/value: 'getParent().getParent().variant.shot_version_override.<...key>'
+                        location: 'getParent().getParent().option.root'
+                        args/variantSelection/value: 'getParent().getParent().usd_variant.shot_version_override.<...key>'
                 character_effect: '$.animation'
                 effect: '$.animation'
                 light: '$.animation'
     #       shot version override enable
     shot_version_override_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -575,7 +559,7 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().variant.shot_version_override.enable else 0'
+            in: '1 if getParent().usd_variant.shot_version_override.enable else 0'
         #
         connections:
             # off
@@ -587,8 +571,8 @@ node:
     #   setting
     #       resolver look file
     resolver_look_file:
-        type: 'DollarLookFile'
-        path: '<main.path>/<option.type>__<..key>'
+        type: DollarLookFile
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.o0'
         #
         connections:
@@ -598,7 +582,7 @@ node:
     #       resolver look file enable
     resolver_look_file_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -615,11 +599,61 @@ node:
             # on
             - '<..resolver_look_file.output>'
             - '<.path>.on'
+    #
+    ignore_default_usd_variants:
+        type: GroupStack
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.out'
+        #
+        connections:
+            - '<..resolver_look_file_enable.output>'
+            - '<.path>.in'
+        #
+        child:
+            type: UsdInVariantSelect
+            #
+            path_pattern: '{parent}/<option.type_abr>__default_usd_variant__{key}'
+            #
+            nodes:
+                modeling:
+                    parameters:
+                        args/variantSetName/enable: 1
+                        args/variantSetName/value: '<...key>'
+                        args/variantSelection/enable: 1
+                        args/variantSelection/value: 'None'
+                    #
+                    expressions:
+                        location: 'getParent().getParent().option.root'
+                groom: '$.modeling'
+                rig: '$.modeling'
+                effect: '$.modeling'
+                surfacing: '$.modeling'
+                animation: '$.modeling'
+    #
+    ignore_default_usd_variants_enable:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'off'
+            - 'on'
+        #
+        expressions:
+            in: '1 if getParent().setting.ignore_default_usd_variants_enable else 0'
+        #
+        connections:
+            # off
+            - '<..resolver_look_file_enable.output>'
+            - '<.path>.off'
+            # on
+            - '<..ignore_default_usd_variants.output>'
+            - '<.path>.on'
     #   debugger
     #       reverse face vertex
     reverse_face_vertex:
-        type: 'OpScript'
-        path: '<main.path>/<option.type>__<..key>'
+        type: OpScript
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         parameters:
@@ -631,15 +665,15 @@ node:
         expressions:
             CEL:
                 |-
-                '(({}//*{{attr("type") == "subdmesh"}}))'.format(getParent().cache.asset_usd.root)
+                '(({}//*{{attr("type") == "subdmesh"}}))'.format(getParent().option.root)
         #
         connections:
-            - '<..resolver_look_file_enable.output>'
+            - '<..ignore_default_usd_variants_enable.output>'
             - '<.path>.i0'
-    #           reverse face vertex enable
+    #       reverse face vertex enable
     reverse_face_vertex_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -651,33 +685,125 @@ node:
         #
         connections:
             # off
-            - '<..resolver_look_file_enable.output>'
+            - '<..ignore_default_usd_variants_enable.output>'
             - '<.path>.off'
             # on
             - '<..reverse_face_vertex.output>'
             - '<.path>.on'
-    # merge
-    merge:
-        type: 'Merge'
-        path: '<main.path>/<option.type>__<..key>'
+    #       turn off xform origin
+    turn_off_subcomponent_xform_origin:
+        type: AttributeSet
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.out'
+        #
+        parameters:
+            mode: 'CEL'
+            celSelection: '/root/world/geo/master//*{attr("type")=="subcomponent"}'
+            attributeName: 'xform.origin'
+            numberValue: { size: 1, tuple_size: 1, value: [ 0 ] }
+        #
+        connections:
+            - '<..reverse_face_vertex_enable.output>'
+            - '<.path>.A'
+
+    turn_off_subcomponent_xform_origin_enable:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'off'
+            - 'on'
+        #
+        expressions:
+            in: '1 if getParent().debugger.turn_off_subcomponent_xform_origin_enable else 0'
+        #
+        connections:
+            # off
+            - '<..reverse_face_vertex_enable.output>'
+            - '<.path>.off'
+            # on
+            - '<..turn_off_subcomponent_xform_origin.output>'
+            - '<.path>.on'
+    #   usd enable
+    asset_usd_enable:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'off'
+            - 'on'
+        #
+        expressions:
+            in: '1 if getParent().cache.asset_usd.enable else 0'
+        #
+        connections:
+            # off
+            - '<..asset_placeholder.output>'
+            - '<.path>.off'
+            # on
+            - '<..turn_off_subcomponent_xform_origin_enable.output>'
+            - '<.path>.on'
+    # join other dot
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream_merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
         output: '<.path>.out'
         #
         input_ports:
             - 'geometry'
-            - 'join'
+            - 'join_other'
         #
         connections:
             # geometry
-            - '<..reverse_face_vertex_enable.output>'
+            - '<..asset_usd_enable.output>'
             - '<.path>.geometry'
-            # join
-            - '<main.path>.join'
-            - '<.path>.join'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
     # extra
+    #   user data
+    user_data_opt:
+        type: UserDataOpt_Wsp
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        expressions:
+            user/enable: '1 if getParent().extra.user_data.copy_from_usd_enable else 0'
+        #
+        parameters:
+            CEL:
+                |-
+                /root/world/geo/master//*{attr("type") == "subdmesh" or attr("type") == "renderer procedural"}
+            #
+            user/copy/enable: True
+            user/copy/root: 'self.getParent().option.root'
+            user/copy/from: 'userProperties'
+            user/copy/to: 'geometry.arbitrary'
+            user/copy/pattern: 'pg_*'
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
     #   translate
     translate:
-        type: 'AttributeSet'
-        path: '<main.path>/<option.type>__<..key>'
+        type: AttributeSet
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         #
         parameters:
@@ -692,12 +818,12 @@ node:
             numberValue/i2: 'self.getParent().extra.translate.value.i2'
         #
         connections:
-            - '<..merge.output>'
+            - '<..user_data_opt.output>'
             - '<.path>.A'
     #   translate enable
     translate_enable:
         type: Switch
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
         input_ports:
@@ -709,82 +835,64 @@ node:
         #
         connections:
             # off
-            - '<..merge.output>'
+            - '<..user_data_opt.output>'
             - '<.path>.off'
             # on
             - '<..translate.output>'
             - '<.path>.on'
-    #   turn around op
-    turn_around_op:
-        type: TurnAroundOp_Wsp
-        path: '<main.path>/<option.type>__<..key>'
-        input: '<.path>.input'
+    #   turntable
+    turntable:
+        tag: 'TTB'
+        type: Turntable_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.join_upstream'
         output: '<.path>.output'
         #
         expressions:
-            option/enable: 'getParent().extra.turn_around.enable'
-            option/root: 'getParent().extra.turn_around.root'
-            option/direction: 'getParent().extra.turn_around.direction'
-            option/start_frame: 'getParent().extra.turn_around.start_frame'
-            option/end_frame: 'getParent().extra.turn_around.end_frame'
-            option/frame_offset: 'getParent().extra.turn_around.frame_offset'
-            option/pivot_locator: 'getParent().extra.turn_around.pivot_locator'
-            option/axis: 'getParent().extra.turn_around.axis'
+            option/enable: 'getParent().extra.turntable.enable'
+            option/target: 'getParent().extra.turntable.root'
+            option/direction: 'getParent().extra.turntable.direction'
+            option/start_frame: 'getParent().extra.turntable.start_frame'
+            option/end_frame: 'getParent().extra.turntable.end_frame'
+            option/frame_offset: 'getParent().extra.turntable.frame_offset'
+            option/pivot_locator: 'getParent().extra.turntable.pivot_locator'
+            option/axis: 'getParent().extra.turntable.axis'
         #
         connections:
             #
             - '<..translate_enable.output>'
             - '<.input>'
-    # register
-    data_register:
-        type: 'OpScript'
-        path: '<main.path>/<option.type>__<..key>'
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
         input: '<.path>.i0'
         output: '<.path>.out'
         #
-        ports:
-            #
-            user/data_1:
-                widget: string2
-                value: [ 'geometry.declare', '' ]
-                tool_tip: '...'
-                lock: True
-            #
-            user/data_2:
-                widget: string2
-                value: [ 'geometry.scheme', '' ]
-                tool_tip: '...'
-                lock: True
-            #
-            user/data_3:
-                widget: string2
-                value: [ 'geometry.root', '' ]
-                tool_tip: '...'
-                lock: True
-        #
         parameters:
-            CEL: '/root'
-            script/lua:
-                |-
-                local m = require('wsp_op_script')
-
-                local location = Interface.GetInputLocationPath()
-                local user_attribute = Interface.GetOpArg('user')
-                
-                function main()
-                    m.register_by_data(m.get_data_for_register(location, user_attribute))
-                end
-                
-                main()
+            user/data_1/i0: '<option.variant_key>.current'
+            user/data_2/i0: '<option.variant_key>.scheme'
+            user/data_3/i0: '<option.variant_key>.root'
+            user/data_4/i0: '<option.variant_key>.default'
         #
         expressions:
             user/data_1/i1: 'getParent().getNodeName()'
-            user/data_2/i1: 'getParent().workspace.register.geometry_scheme'
-            user/data_3/i1: 'getParent().workspace.register.geometry_root'
+            user/data_2/i1: 'getParent().option.scheme'
+            user/data_3/i1: 'getParent().option.root'
+            user/data_4/i1: 'getParent().option.default'
         #
         connections:
-            - '<..turn_around_op.output>'
+            - '<..turntable.output>'
             - '<.input>'
             # output
             - '<.output>'
             - '<main.output>'
+#
+preset:
+    test_1:
+        cache/asset_usd/enable: True
+        cache/asset_usd/file: '/l/prod/cgm/work/assets/chr/nn_4y/srf/surfacing/set/scene/v037/nn_4y.usda'
+

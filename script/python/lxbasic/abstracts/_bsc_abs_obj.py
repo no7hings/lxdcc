@@ -22,6 +22,28 @@ class _ContentMtd(object):
     _RE_PATTERN = r'[\\][<](.*?)[\\][>]'
     VARIANT_RE_PATTERN = r'[<](.*?)[>]'
     @classmethod
+    def get_absolute_key_name(cls, relative_key, key_local):
+        _ = relative_key.split('.')
+        es = len([i for i in _ if i == ''])
+        return key_local.split('.')[-es]
+    @classmethod
+    def get_absolute_key_index(cls, relative_key, key_local, keys_all):
+        _ = relative_key.split('.')
+        es = len([i for i in _ if i == ''])
+        k = '.'.join(key_local.split('.')[:-es+1])
+        p = '.'.join(key_local.split('.')[:-es])
+        cs = bsc_core.DccPathDagMtd.get_dag_children(p, keys_all, pathsep='.')
+        return cs.index(k)
+    @classmethod
+    def get_absolute_key(cls, relative_key, key_local):
+        _ = relative_key.split('.')
+        es = len([i for i in _ if i == ''])
+        p = '.'.join(key_local.split('.')[:-es])
+        if p:
+            return '{}.{}'.format(p, '.'.join(_[es:]))
+        else:
+            return '.'.join(_[es:])
+    @classmethod
     def unfold_fnc(cls, key, keys_all, keys_exclude, get_fnc):
         def rcs_fnc_(key_, value_):
             if isinstance(value_, six.string_types):
@@ -51,9 +73,23 @@ class _ContentMtd(object):
                             elif '%' in _i_v_k_1:
                                 _i_v_ks_2 = map(lambda x: x.strip(), _i_v_k_1.split('%'))
                                 _i_v_k_2 = _i_v_ks_2[0]
-                                if _i_v_k_2 not in keys_all:
-                                    raise KeyError('key="{}" is non-exists'.format(_i_v_k_2))
-                                _i_v_2 = get_fnc(_i_v_k_2)
+                                if fnmatch.filter([_i_v_k_2], '*.key'):
+                                    _i_v_2 = cls.get_absolute_key_name(_i_v_k_2, key_)
+                                elif fnmatch.filter([_i_v_k_2], '*.key_index'):
+                                    _i_v_2 = cls.get_absolute_key_index(_i_v_k_2, key_, keys_all)
+                                elif fnmatch.filter([_i_v_k_2], '.*'):
+                                    _i_v_k_2_ = cls.get_absolute_key(_i_v_k_2, key_)
+                                    if _i_v_k_2_ in keys_exclude:
+                                        continue
+                                    #
+                                    if _i_v_k_2_ not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_i_v_k_2_))
+                                    #
+                                    _i_v_2 = get_fnc(_i_v_k_2_)
+                                else:
+                                    if _i_v_k_2 not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_i_v_k_2))
+                                    _i_v_2 = get_fnc(_i_v_k_2)
                                 _i_v_2_fnc = eval('lambda x: {}'.format(_i_v_ks_2[1]))
                                 _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2_fnc(_i_v_2))
                             # etc. <a>, value=a
@@ -61,41 +97,36 @@ class _ContentMtd(object):
                                 # catch value
                                 # etc. <a.key>
                                 if fnmatch.filter([_i_v_k_1], '*.key'):
-                                    _ = _i_v_k_1.split('.')
-                                    _i_c_2 = len([i for i in _ if i == ''])
-                                    _i_v_2 = key_.split('.')[-_i_c_2]
+                                    _i_v_1 = cls.get_absolute_key_name(_i_v_k_1, key_)
+                                elif fnmatch.filter([_i_v_k_1], '*.key_index'):
+                                    _i_v_1 = cls.get_absolute_key_index(_i_v_k_1, key_, keys_all)
                                 # etc. <.a>
                                 elif fnmatch.filter([_i_v_k_1], '.*'):
-                                    _ = _i_v_k_1.split('.')
-                                    _i_c_2 = len([i for i in _ if i == ''])
-                                    _i_k_p_2 = '.'.join(key_.split('.')[:-_i_c_2])
-                                    if _i_k_p_2:
-                                        _i_v_k_2 = '{}.{}'.format(_i_k_p_2, '.'.join(_[_i_c_2:]))
-                                    else:
-                                        _i_v_k_2 = '.'.join(_[_i_c_2:])
+                                    _i_v_k_1_ = cls.get_absolute_key(_i_v_k_1, key_)
                                     #
-                                    if _i_v_k_2 in keys_exclude:
+                                    if _i_v_k_1_ in keys_exclude:
                                         continue
                                     #
-                                    if _i_v_k_2 not in keys_all:
-                                        raise KeyError('key="{}" is non-exists'.format(_i_v_k_2))
-                                    _i_v_2 = get_fnc(_i_v_k_2)
+                                    if _i_v_k_1_ not in keys_all:
+                                        raise KeyError('key="{}" is non-exists'.format(_i_v_k_1_))
+
+                                    _i_v_1 = get_fnc(_i_v_k_1_)
                                     #
-                                    _i_v_2 = rcs_fnc_(_i_v_k_2, _i_v_2)
+                                    _i_v_1 = rcs_fnc_(_i_v_k_1_, _i_v_1)
                                 else:
                                     #
                                     if _i_v_k_1 in keys_exclude:
                                         continue
                                     if _i_v_k_1 not in keys_all:
                                         raise KeyError('key="{}" is non-exists'.format(_i_v_k_1))
-                                    _i_v_2 = get_fnc(_i_v_k_1)
+                                    _i_v_1 = get_fnc(_i_v_k_1)
                                     #
-                                    _i_v_2 = rcs_fnc_(_i_v_k_1, _i_v_2)
+                                    _i_v_1 = rcs_fnc_(_i_v_k_1, _i_v_1)
                                 #
-                                if isinstance(_i_v_2, six.string_types):
-                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_2)
-                                elif isinstance(_i_v_2, (int, float, bool)):
-                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), str(_i_v_2))
+                                if isinstance(_i_v_1, six.string_types):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), _i_v_1)
+                                elif isinstance(_i_v_1, (int, float, bool)):
+                                    _value_unfold = _value_unfold.replace('<{}>'.format(_i_v_k_1), str(_i_v_1))
                     else:
                         _v_ks_0 = re.findall(re.compile(cls._RE_PATTERN, re.S), _value_unfold)
                 # etc: "=0+1"
@@ -290,7 +321,7 @@ class AbsContent(object):
         #
         es.append(value)
 
-    def _set_quote_unfold_(self, key, all_keys):
+    def _set_quote_unfold_(self, key, keys_all):
         value = self.get(key)
         if isinstance(value, six.string_types):
             if fnmatch.filter([value], '$*'):
@@ -306,10 +337,31 @@ class AbsContent(object):
                 else:
                     k_2 = v_k
                 #
-                if k_2 not in all_keys:
+                if k_2 not in keys_all:
                     raise KeyError('key="{}" is non-exists'.format(k_2))
                 # need use copy
                 self.set(key, copy.deepcopy(self.get(k_2)))
+
+    def _set_inherit_and_override_unfold_(self, key, keys_all):
+        if fnmatch.filter([key], '*$'):
+            value = self.get(key)
+            if fnmatch.filter([value], '.*'):
+                key_inherit = _ContentMtd.get_absolute_key(value, key)
+            else:
+                key_inherit = value
+            if key_inherit not in keys_all:
+                raise KeyError('key="{}" is non-exists'.format(key_inherit))
+            #
+            k = '.'.join(key.split('.')[:-1])
+            inherit_dict = copy.deepcopy(
+                self.get(key_inherit)
+            )
+            override_dict = copy.deepcopy(
+                self.get(k)
+            )
+            override_dict.pop('$')
+            inherit_dict.update(override_dict)
+            self.set(k, inherit_dict)
 
     def get_key_is_exists(self, key):
         return key in self._get_all_keys_()
@@ -351,6 +403,11 @@ class AbsContent(object):
             i_value = self.get(i_key)
             if isinstance(i_value, dict) is False:
                 self._set_quote_unfold_(i_key, keys_all)
+        #
+        for i_key in keys_all:
+            i_value = self.get(i_key)
+            if isinstance(i_value, dict) is False:
+                self._set_inherit_and_override_unfold_(i_key, keys_all)
         #
         keys_all = self.get_keys()
         for i_key in keys_all:

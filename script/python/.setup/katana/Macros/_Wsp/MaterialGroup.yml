@@ -1,0 +1,79 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'material_group'
+    type_abr: 'mtl_grp'
+    create_type: 'MaterialGroup_Wsp'
+    description:
+        |-
+        group for material create
+    variant_key: 'look'
+    #
+    auto_color: False
+    #
+    color_hsv:
+        h: 180
+        s: .25
+        v: .25
+    #
+    color:
+        r: .125
+        g: .375
+        b: .25
+#
+main:
+    type: GroupMerge
+    path: '<option.root>/<option.type>'
+    input: '<.path>.input'
+    output: '<.path>.output'
+    #
+    clear_start: 'user'
+    #
+    attributes:
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports: []
+    #
+    output_ports: []
+    #
+    ports:
+        # basic
+        user/type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        #
+        user/option/material_root:
+            widget: path
+            value: '/root/materials'
+            tool_tip: '...'
+            lock: True
+        #
+        user/build/ass_file:
+            widget: file
+            value: ''
+            tool_tip: '...'
+
+        user/build/ececute:
+            widget: button
+            value: ''
+            tool_tip: '...'
+        # extra
+        user/extra/texture_directory:
+            widget: file
+            value: '/texture_directory'
+            tool_tip: '...'
+    #
+    child:
+        type: Material_Wsp
+        #
+        tag: 'MTL'
+        #
+        path_pattern: '{parent}/<.tag>_{key}'
+        #
+        nodes: {}

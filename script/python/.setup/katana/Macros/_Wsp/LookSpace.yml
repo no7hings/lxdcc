@@ -1,0 +1,69 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'look_space'
+    type_abr: 'lok_spc'
+    create_type: 'LookSpace_Wsp'
+    description:
+        |-
+        Look Space
+        - include all look per variant
+    variant_key: 'look'
+    #
+    auto_color: False
+    #
+    color_use_variant: True
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+    #
+    size:
+        w: 1280
+        h: 480
+#
+main:
+    type: Space_Wsp
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    clear_ports: False
+    clear_children: False
+    force_update: True
+    #
+    attributes:
+        ns_pin: 1.0
+        ns_offsetX: =<option.size.w>/2+320
+        ns_offsetY: =<option.size.h>/2+72
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    port_hints:
+        variant/key: {readOnly: True}
+        extra/default_name: {options: ['default']}
+    #
+    parameters:
+        type: '<option.create_type>'
+        option/color: [<option.color.r>, <option.color.g>, <option.color.b>]
+        variant/key: <option.variant_key>
+        extra/default_name: 'default'
+#
+record_update:
+    backdrop:
+        attributes:
+            ns_text: '<option.description>'
+            ns_fontScale: 1.5
+            x: 0
+            y: =<option.size.h>/2+120
+            ns_sizeX: =<option.size.w>
+            ns_sizeY: =<option.size.h>
+            ns_colorr: <option.color.r>
+            ns_colorg: <option.color.g>
+            ns_colorb: <option.color.b>
+            ns_stickyLock: 1

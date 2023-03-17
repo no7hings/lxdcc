@@ -1,0 +1,314 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'workspace'
+    type_abr: 'wsp'
+    create_type: 'Workspace_Wsp'
+    description:
+        |-
+        for workspace build
+    variant_key: ''
+    #
+    auto_color: False
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'Group'
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 720
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # preset
+        preset/name:
+            widget: enumerate
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        preset/load:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).load_preset()'
+            tool_tip: '...'
+
+        option/project:
+            widget: string
+            value: ''
+            tool_tip: '...'
+
+        option/resource:
+            widget: string
+            value: ''
+            tool_tip: '...'
+
+        option/guess_option:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).guess_option()'
+            tool_tip: '...'
+
+        variant/keys:
+            widget: capsule_list
+            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            tool_tip: '...'
+
+        variant/register:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).register_variable()'
+            tool_tip: '...'
+        # build
+        build/time_tag:
+            widget: string
+            value: ''
+            tool_tip: '...'
+            lock: True
+
+        build/geometry/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        build/geometry/scheme:
+            widget: capsule_string
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        build/geometry/load:
+            widget: button
+            value: ''
+            tool_tip: '...'
+
+        build/camera/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        build/camera/scheme:
+            widget: capsule_string
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        build/camera/load:
+            widget: button
+            value: ''
+            tool_tip: '...'
+
+        build/look/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        build/look/scheme:
+            widget: capsule_string
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        build/look/load:
+            widget: button
+            value: ''
+            tool_tip: '...'
+
+        build/light/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        build/light/scheme:
+            widget: capsule_string
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        build/light/load:
+            widget: button
+            value: ''
+            tool_tip: '...'
+
+        build/quality/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        build/quality/scheme:
+            widget: capsule_string
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        build/quality/load:
+            widget: button
+            value: ''
+            tool_tip: '...'
+
+        build/layer/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        build/layer/scheme:
+            widget: capsule_string
+            value: ['default', 'utility', 'user']
+            default: 'user'
+            tool_tip: '...'
+
+        build/layer/load:
+            widget: button
+            value: ''
+            tool_tip: '...'
+
+        build/execute:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).build()'
+            tool_tip: '...'
+        #   render override
+        setting/render_override/properties/builtin_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        setting/render_override/properties/builtin:
+            widget: script
+            value: ''
+            tool_tip: '...'
+
+        setting/render_override/properties/arnold_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        setting/render_override/properties/arnold:
+            widget: script
+            value: ''
+            tool_tip: '...'
+
+        record/geometry:
+            widget: node
+            value: ''
+            tool_tip: '...'
+            lock: True
+
+        record/camera:
+            widget: node
+            value: ''
+            tool_tip: '...'
+            lock: True
+
+        record/look:
+            widget: node
+            value: ''
+            tool_tip: '...'
+            lock: True
+
+        record/light:
+            widget: node
+            value: ''
+            tool_tip: '...'
+            lock: True
+
+        record/quality:
+            widget: node
+            value: ''
+            tool_tip: '...'
+            lock: True
+
+        record/layer:
+            widget: node
+            value: ''
+            tool_tip: '...'
+            lock: True
+#
+node:
+    # dot
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.input>'
+            - '<.input>'
+    #
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    # user render properties
+    override__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        expressions:
+            user/properties/builtin_enable: 'getParent().setting.render_override.properties.builtin_enable'
+            user/properties/builtin: 'getParent().setting.render_override.properties.builtin'
+            user/properties/arnold_enable: 'getParent().setting.render_override.properties.arnold_enable'
+            user/properties/arnold: 'getParent().setting.render_override.properties.arnold'
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

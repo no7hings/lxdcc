@@ -24,12 +24,13 @@ if __name__ == '__main__':
     #
     # print CfgFileMtd.get_yaml('storage/asset-system-workspace')
 
-    print RawTextMtd.to_integer(
-        'merge'
-    )
-    print RawTextOpt('abc').to_rgb_()
-
-    print RscFileMtd.get(
-        'lua-scripts'
-    )
+    # print RawTextMtd.to_integer(
+    #     'merge'
+    # )
+    # print RawTextOpt('abc').to_rgb_()
+    #
+    # print RscFileMtd.get(
+    #     'lua-scripts'
+    # )
+    print CameraMtd.get_project_pos(25, 1, 'horizontal', (1024, 512))
 

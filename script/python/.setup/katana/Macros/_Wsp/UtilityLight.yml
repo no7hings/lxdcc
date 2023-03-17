@@ -1,0 +1,120 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'utility_light'
+    type_abr: 'utl_lgt'
+    create_type: 'UtilityLight_Wsp'
+    description:
+        |-
+        utility light
+    variant_key: 'light'
+    #
+    auto_color: False
+    #
+    color:
+        r: .5
+        g: .5
+        b: .5
+#
+main:
+    # create form self
+    type: UtilityLight_Wsp
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    clear_children: False
+    #
+    attributes:
+        ns_offsetX: 720
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # option
+        option/background_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        option/background_color:
+            widget: color3
+            value: [0.18, 0.18, 0.18]
+            tool_tip: '...'
+
+        option/ground_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+#
+node:
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.input>'
+            - '<.input>'
+    # join other dot
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream_merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    #
+    placeholder:
+        type: 'LiveGroup'
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        parameters:
+            source: '/l/resource/td/asset/live-group/custom.livegroup'
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.path>.input'

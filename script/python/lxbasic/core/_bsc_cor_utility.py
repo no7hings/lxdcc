@@ -1,4 +1,6 @@
 # coding:utf-8
+from __future__ import division
+
 import sys
 
 import os
@@ -679,6 +681,25 @@ class CameraMtd(object):
         r_x, r_y, r_z = 0, 0, 0
         s_x, s_y, s_z = 1, 1, 1
         return (t_x, t_y, t_z), (r_x, r_y, r_z), (s_x, s_y, s_z)
+    @classmethod
+    def get_project_pos(cls, size, scale_percent, margin_percent, camera_fov, camera_screen_mode, render_resolution):
+        # s = 1, x = y = -0
+        # s = .5, x = y = -.25
+        # s = .25, x = y = -.375
+        # x = y = -(0.5 - s/2)
+        # a/b=tan(camera_fov/2)
+        b = (size/2)/math.tan(math.radians(camera_fov/2))
+        x, y = 1, 1
+        w, h = render_resolution
+        if camera_screen_mode == 'horizontal':
+            x, y = 1, h/w
+        elif camera_screen_mode == 'vertical':
+            x, y = w/h, 1
+        s_s = min(x, y)
+        s = scale_percent*s_s
+        t_x, t_y, t_z = -(0.5*x-s/2)+margin_percent, -(0.5*y-s/2)+margin_percent, -b
+        s_x, s_y, s_z = s, s, s
+        return (t_x, t_y, t_z), (s_x, s_y, s_z)
 
 
 HEXDIG = '0123456789ABCDEFabcdef'

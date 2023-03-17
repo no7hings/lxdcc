@@ -773,7 +773,7 @@ class AbsRsvObj(
         self._rsv_project = rsv_project
         #
         self._set_rsv_obj_def_init_(
-            self.PROPERTIES_CLASS(self, bsc_core.DictMtd.set_key_sort_to(kwargs))
+            self.PROPERTIES_CLASS(self, bsc_core.DictMtd.sort_key_to(kwargs))
         )
         self._set_obj_dag_def_init_(self._rsv_path)
         self._set_obj_gui_def_init_()
@@ -809,7 +809,7 @@ class AbsRsvObj(
             )
         #
         self.set_description(
-            u'\n'.join([u'{} : {}'.format(k, v) for k, v in bsc_core.DictMtd.set_key_sort_to(kwargs).items()])
+            u'\n'.join([u'{} : {}'.format(k, v) for k, v in bsc_core.DictMtd.sort_key_to(kwargs).items()])
         )
 
     def get_rsv_project(self):
@@ -1132,13 +1132,13 @@ class AbsRsvUnit(
         return list_
 
     def get_rsv_task(self):
-        return self.get_parent()
-
-    def get_rsv_step(self):
         return self.get_parent().get_parent()
 
-    def get_rsv_resource(self):
+    def get_rsv_step(self):
         return self.get_parent().get_parent().get_parent()
+
+    def get_rsv_resource(self):
+        return self.get_parent().get_parent().get_parent().get_parent()
 
 
 class AbsRsvUnitVersion(
@@ -1810,7 +1810,7 @@ class AbsRsvProject(
         self._rsv_obj_stack = self.RSV_OBJ_STACK_CLASS()
         #
         self._set_rsv_obj_def_init_(
-            self.PROPERTIES_CLASS(self, bsc_core.DictMtd.set_key_sort_to(kwargs))
+            self.PROPERTIES_CLASS(self, bsc_core.DictMtd.sort_key_to(kwargs))
         )
         self._set_obj_dag_def_init_(self._rsv_path)
         self._set_obj_gui_def_init_()

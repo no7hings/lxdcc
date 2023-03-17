@@ -1,0 +1,450 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'layer'
+    type_abr: 'lyr'
+    create_type: 'Layer_Wsp'
+    description:
+        |-
+        for layer
+    variant_key: 'layer'
+    #
+    auto_color: False
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    #
+    type: Group
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 720
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # option
+        option/scheme:
+            widget: enumerate
+            value: ['master', 'renderable', 'shape', 'all']
+            default: 'master'
+            tool_tip: '...'
+        #  root
+        option/root:
+            widget: path
+            value: '/root/world/geo/master'
+            tool_tip: '...'
+        # renderable
+        option/renderable_root:
+            widget: path
+            value: '/root/world/geo/master'
+            tool_tip: '...'
+
+        option/renderable/model:
+            widget: path
+            value: '/root/world/geo/master/hi'
+            tool_tip: '...'
+
+        option/renderable/groom:
+            widget: path
+            value: '/root/world/geo/master/hair'
+            tool_tip: '...'
+
+        option/renderable/character_effect:
+            widget: path
+            value: '/root/world/geo/master/cfx'
+            tool_tip: '...'
+
+        option/renderable/effect:
+            widget: path
+            value: '/root/world/geo/master/efx'
+            tool_tip: '...'
+
+        option/renderable/rig:
+            widget: path
+            value: '/root/world/geo/master/rig'
+            tool_tip: '...'
+
+        option/renderable/surface:
+            widget: path
+            value: '/root/world/geo/master/look'
+            tool_tip: '...'
+
+        option/renderable/light:
+            widget: path
+            value: '/root/world/geo/master/lgt'
+            tool_tip: '...'
+
+        option/renderable/extend:
+            widget: path
+            value: '/root/world/geo/master/etd'
+            tool_tip: '...'
+        # shape
+        option/shape_root:
+            widget: path
+            value: '/root/world/geo/master/shape'
+            tool_tip: '...'
+
+        option/shape/model:
+            widget: path
+            value: '/root/world/geo/master/shape/mod_shapegrp'
+            tool_tip: '...'
+
+        option/shape/groom:
+            widget: path
+            value: '/root/world/geo/master/shape/grm_shapegrp'
+            tool_tip: '...'
+
+        option/shape/character_effect:
+            widget: path
+            value: '/root/world/geo/master/shape/cfx_shapegrp'
+            tool_tip: '...'
+
+        option/shape/effect:
+            widget: path
+            value: '/root/world/geo/master/shape/efx_shapegrp'
+            tool_tip: '...'
+
+        option/shape/rig:
+            widget: path
+            value: '/root/world/geo/master/shape/rig_shapegrp'
+            tool_tip: '...'
+
+        option/shape/surface:
+            widget: path
+            value: '/root/world/geo/master/shape/srf_shapegrp'
+            tool_tip: '...'
+
+        option/shape/light:
+            widget: path
+            value: '/root/world/geo/master/shape/rig_shapegrp'
+            tool_tip: '...'
+
+        option/shape/extend:
+            widget: path
+            value: '/root/world/geo/master/shape/etd_shapegrp'
+            tool_tip: '...'
+        # setting
+        #   renderable
+        setting/renderable_all:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/model:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/groom:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/character_effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/rig:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/surface:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/light:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/renderable/extend:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        #   shape
+        setting/shape_all:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/model:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/groom:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/character_effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/rig:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/surface:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/light:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        setting/shape/extend:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        # record
+        record/variant_data_opt:
+            widget: node
+            value: '<node.variant_data_opt.name>'
+            tool_tip: '...'
+            lock: True#
+#
+node:
+    # dot
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_upstream'
+            - '<.input>'
+    #
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    # renderable
+    renderable_prune:
+        type: Prune
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.A'
+        output: '<.path>.out'
+        #
+        e_0:
+            |-
+            ' - (( {{}}))'.format(getParent().option.renderable.{k}) if (getParent().setting.renderable_all and getParent().setting.renderable.{k}) else ''
+        #
+        expressions:
+            cel:
+                |-
+                '(( {}/*))'.format(getParent().option.root) + (
+                    ' + (( {}/*))'.format(getParent().option.renderable_root)
+                ) + (
+                    ' - (( {}))'.format(getParent().option.renderable_root)
+                ) + (
+                    <..e_0 % str(x).format(k='model')>
+                ) + (
+                    <..e_0 % str(x).format(k='groom')>
+                ) + (
+                    <..e_0 % str(x).format(k='character_effect')>
+                ) + (
+                    <..e_0 % str(x).format(k='effect')>
+                ) + (
+                    <..e_0 % str(x).format(k='rig')>
+                ) + (
+                    <..e_0 % str(x).format(k='surface')>
+                ) + (
+                    <..e_0 % str(x).format(k='light')>
+                ) + (
+                    <..e_0 % str(x).format(k='extend')>
+                )
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+    # shape
+    shape_usd_active:
+        type: UsdInActivationSet
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.in'
+        output: '<.path>.out'
+        #
+        parameters:
+            locations: ['']
+            active: True
+        #
+        expressions:
+            locations/i0: 'getParent().option.shape_root'
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+
+    shape_prune:
+        type: Prune
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.A'
+        output: '<.path>.out'
+        #
+        e_0:
+            |-
+            ' - (( {{}}))'.format(getParent().option.shape.{k}) if (getParent().setting.shape_all and getParent().setting.shape.{k}) else ''
+        #
+        expressions:
+            cel:
+                |-
+                '(( {}/*))'.format(getParent().option.root) + (
+                    ' + (( {}/*))'.format(getParent().option.shape_root)
+                ) + (
+                    ' - (( {}))'.format(getParent().option.shape_root)
+                ) + (
+                    <..e_0 % str(x).format(k='model')>
+                ) + (
+                    <..e_0 % str(x).format(k='groom')>
+                ) + (
+                    <..e_0 % str(x).format(k='character_effect')>
+                ) + (
+                    <..e_0 % str(x).format(k='effect')>
+                ) + (
+                    <..e_0 % str(x).format(k='rig')>
+                ) + (
+                    <..e_0 % str(x).format(k='surface')>
+                ) + (
+                    <..e_0 % str(x).format(k='light')>
+                ) + (
+                    <..e_0 % str(x).format(k='extend')>
+                )
+        #
+        connections:
+            - '<..shape_usd_active.output>'
+            - '<.input>'
+    # all
+    all_merge:
+        type: Merge
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'renderable'
+            - 'shape'
+        #
+        connections:
+            # renderable
+            - '<..renderable_prune.output>'
+            - '<.path>.renderable'
+            # shape
+            - '<..shape_prune.output>'
+            - '<.path>.shape'
+    #
+    scheme_switch:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports: ['master', 'renderable', 'shape', 'all']
+        #
+        expressions:
+            in:
+                |-
+                <..input_ports % str(x)>.index(getParent().option.scheme)
+        #
+        connections:
+            # master
+            - '<..upstream_merge.output>'
+            - '<.path>.master'
+            # renderable
+            - '<..renderable_prune.output>'
+            - '<.path>.renderable'
+            # shape
+            - '<..shape_prune.output>'
+            - '<.path>.shape'
+            # all
+            - '<..all_merge.output>'
+            - '<.path>.all'
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/data_1/i0: '<option.variant_key>.current'
+            user/data_2/i0: '<option.variant_key>.scheme'
+        #
+        expressions:
+            user/data_1/i1: 'getParent().getNodeName()'
+            user/data_2/i1: 'getParent().option.scheme'
+        #
+        connections:
+            - '<..scheme_switch.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

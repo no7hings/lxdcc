@@ -242,10 +242,11 @@ class NetworkMaterialCreateEditor(NetworkMaterialBaseEditor):
         # add extra
         nmc = networkMaterialNode.getParent()
         if nmc:
-            # add extra for texture directory
-            extraParameter = nmc.getParameter('extra')
-            if extraParameter:
-                self._addParameterWidget(parametersTab, extraParameter)
+            # add customize
+            for i in ['user', 'extra']:
+                i_p = nmc.getParameter(i)
+                if i_p:
+                    self._addParameterWidget(parametersTab, i_p)
 
         if defaultsTabUsed:
             self.__defaultsTab = self._addTab(self._tabWidget, 'Defaults')

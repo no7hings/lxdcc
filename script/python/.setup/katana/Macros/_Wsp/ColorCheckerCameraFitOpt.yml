@@ -1,0 +1,112 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'color_check_attach_fit_opt'
+    type_abr: 'clr_ckr_cmr_fit_opt'
+    create_type: 'ColorCheckerCameraFitOpt_Wsp'
+    description:
+        |-
+        for camera attach fit operator
+    variant_key: ''
+    #
+    auto_color: False
+    #
+    color:
+        r: .5
+        g: .125
+        b: .125
+#
+main:
+    type: OpScript
+    path: '<option.root>/<option.type>'
+    input: '<.path>.i0'
+    output: '<.path>.out'
+    #
+    clear_start: 'user'
+    #
+    attributes:
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports: []
+    #
+    output_ports: []
+    #
+    ports:
+        # basic
+        user/type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        #
+        user/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+        #
+        user/scale_percent:
+            widget: float
+            value: 0.125
+            tool_tip: '...'
+
+        user/margin_percent:
+            widget: float
+            value: .0125
+            tool_tip: '...'
+        # camera
+        user/camera/fov:
+            widget: float
+            value: 35
+            tool_tip: '...'
+
+        user/camera/screen_mode:
+            widget: enumerate
+            value: ['horizontal', 'vertical', 'fill']
+            tool_tip: '...'
+        # render
+        user/render/resolution:
+            widget: resolution
+            value: '2048x2048'
+            tool_tip: '...'
+    #
+    parameters:
+        CEL: '/root/world/etr/color_checker/attach_group/ass'
+        script/lua:
+            |-
+            local location = Interface.GetInputLocationPath()
+            
+            function fit_fnc(size, scale_percent, margin_percent, camera_fov, camera_screen_mode, render_resolution)
+                local b = (size/2)/math.tan(math.rad(camera_fov/2))
+                local x, y = 1, 1
+                local r = ResolutionTable.GetResolution(render_resolution)
+                local w, h = r:getXRes(), r:getYRes()
+                if camera_screen_mode == 'horizontal' then
+                    x, y = 1, h/w
+                elseif camera_screen_mode == 'vertical' then
+                    x, y = w/h, 1
+                end
+                local s_s = math.min(x, y)
+                local s = scale_percent*s_s
+                local t_x, t_y, t_z = -(0.5*x-s/2)+margin_percent, -(0.5*y-s/2)+margin_percent, -b
+                local s_x, s_y, s_z = s, s, s
+                Interface.SetAttr('xform.interactive.translate', DoubleAttribute({t_x, t_y, t_z}, 3))
+                Interface.SetAttr('xform.interactive.scale', DoubleAttribute({s_x, s_y, s_z}, 3))
+            end
+            
+            function main()
+                if (Interface.GetOpArg('user.enable'):getValue() == 1) then
+                    local size = 1.0
+                    local scale_percent = Interface.GetOpArg('user.scale_percent'):getValue()
+                    local margin_percent = Interface.GetOpArg('user.margin_percent'):getValue()
+                    local camera_fov = Interface.GetOpArg('user.camera.fov'):getValue()
+                    local camera_screen_mode = Interface.GetOpArg('user.camera.screen_mode'):getValue()
+                    local render_resolution = Interface.GetOpArg('user.render.resolution'):getValue()
+                    fit_fnc(size, scale_percent, margin_percent, camera_fov, camera_screen_mode, render_resolution)
+                end
+            end
+            
+            main()

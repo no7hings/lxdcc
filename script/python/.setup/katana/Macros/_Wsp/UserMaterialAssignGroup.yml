@@ -1,0 +1,38 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'user_material_assign_group'
+    type_abr: 'usr_mtl_asn_grp'
+    create_type: 'UserMaterialAssignGroup_Wsp'
+    description:
+        |-
+        group for user material assign create
+    variant_key: 'look'
+    #
+    auto_color: False
+#
+main:
+    type: MaterialAssignGroup_Wsp
+    base_type: GroupStack
+    path: '<option.root>/<option.type>'
+    input: '<.path>.input'
+    output: '<.path>.output'
+    #
+    clear_ports: False
+    #
+    attributes:
+        comment: '<option.description>'
+    #
+    parameters:
+        # basic
+        user/type: '<option.create_type>'
+    #
+    child:
+        type: MaterialAssign_Wsp
+        #
+        tag: 'MTL'
+        #
+        path_pattern: '{parent}/<.tag>_{key}'
+        #
+        nodes: {}
+

@@ -1,0 +1,338 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'light'
+    type_abr: 'lgt'
+    create_type: 'Light_Wsp'
+    description:
+        |-
+        for light
+    variant_key: 'light'
+    #
+    auto_color: False
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'Group'
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 720
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # preset
+        preset/name:
+            widget: enumerate
+            value: ['default', 'test_0']
+            tool_tip: '...'
+
+        preset/load:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspLight(node).load_preset()'
+            tool_tip: '...'
+        # option
+        option/scheme:
+            widget: enumerate
+            value: ['asset', 'shot']
+            tool_tip: '...'
+
+        option/location:
+            widget: path
+            value: '/root/world/lgt'
+            tool_tip: '...'
+
+        option/root:
+            widget: path
+            value: '/root/world/lgt/gaffer'
+            tool_tip: '...'
+        # cache
+        cache/light_rig/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        cache/light_rig/scheme:
+            widget: enumerate
+            value: ['asset', 'shot']
+            default: 'asset'
+            tool_tip: '...'
+
+        cache/light_rig/project:
+            widget: enumerate
+            value: ['current', 'cgm', 'nsa_dev']
+            default: 'current'
+            tool_tip: '...'
+
+        cache/light_rig/resource:
+            widget: enumerate
+            value: ['None']
+            default: 'None'
+            tool_tip: '...'
+
+        cache/light_rig/guess_option:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspLight(node).guess_light_rig_option()'
+            tool_tip: '...'
+
+        cache/load_light_rig:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspLight(node).load_light_rig()'
+            tool_tip: '...'
+        # setting
+        setting/background_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        setting/background_color:
+            widget: color3
+            value: [0.18, 0.18, 0.18]
+            tool_tip: '...'
+
+        setting/ground_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+        # extra
+        #   turntable
+        extra/turntable/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        extra/turntable/scheme:
+            widget: enumerate
+            value: ['light', 'geometry']
+            default: 'light'
+            tool_tip: '...'
+
+        extra/turntable/geometry_root:
+            widget: path
+            value: '/root/world/geo/master'
+            tool_tip: '...'
+            lock: True
+
+        extra/turntable/direction:
+            widget: enumerate
+            value: ['clockwise', 'anticlockwise']
+            tool_tip: '...'
+
+        extra/turntable/start_frame:
+            widget: integer
+            value: 61
+            tool_tip: '...'
+
+        extra/turntable/end_frame:
+            widget: integer
+            value: 120
+            tool_tip: '...'
+
+        extra/turntable/frame_offset:
+            widget: integer
+            value: 0
+            tool_tip: '...'
+
+        extra/turntable/pivot_locator:
+            widget: path
+            value: '/root/world/loc/turntable/pivot_locator_for_light'
+            tool_tip: '...'
+            lock: True
+
+        extra/turntable/axis:
+            widget: enumerate
+            value: ['X', 'Y', 'Z']
+            default: 'Y'
+            tool_tip: '...'
+        # workspace
+        workspace/declare_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        #   register
+        workspace/register/variant_key:
+            widget: string
+            value: '<option.variant_key>'
+            tool_tip: '...'
+            lock: True
+        # record
+        record/variant_data_opt:
+            widget: node
+            value: '<node.variant_data_opt.name>'
+            tool_tip: '...'
+            lock: True
+
+        record/light_rig:
+            widget: node
+            value: '<node.light_rig.name>'
+#
+node:
+    # dot
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.input>'
+            - '<.input>'
+    #
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    # utility
+    utility:
+        type: UtilityLight_Wsp
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.join_upstream'
+        output: '<.path>.output'
+        #
+        expressions:
+            option/background_enable: 'getParent().setting.background_enable'
+            option/background_color: 'getParent().setting.background_color'
+            option/ground_enable: 'getParent().setting.ground_enable'
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+    # light_rig
+    light_rig:
+        type: LightRig_Wsp
+        name: '<option.type_abr>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.join_upstream'
+        output: '<.path>.output'
+        #
+        expressions:
+            option/scheme: 'getParent().cache.light_rig.scheme'
+            option/project: 'getParent().cache.light_rig.project'
+            option/resource: 'getParent().cache.light_rig.resource'
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+    # cache
+    #   light rig enable
+    light_rig_enable:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'off'
+            - 'on'
+        #
+        expressions:
+            in: '1 if getParent().cache.light_rig.enable else 0'
+        #
+        connections:
+            # off
+            - '<..utility.output>'
+            - '<.path>.off'
+            # on
+            - '<..light_rig.output>'
+            - '<.path>.on'
+    # extra
+    #   turntable
+    turntable:
+        tag: 'TTB'
+        type: Turntable_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.join_upstream'
+        output: '<.path>.output'
+        #
+        expressions:
+            option/enable: 'getParent().extra.turntable.enable'
+            option/target:
+                |-
+                getParent().option.root if getParent().extra.turntable.scheme == 'light' else getParent().extra.turntable.geometry_root
+            option/direction: 'getParent().extra.turntable.direction'
+            option/start_frame: 'getParent().extra.turntable.start_frame'
+            option/end_frame: 'getParent().extra.turntable.end_frame'
+            option/frame_offset: 'getParent().extra.turntable.frame_offset'
+            option/pivot_locator: 'getParent().extra.turntable.pivot_locator'
+            option/axis: 'getParent().extra.turntable.axis'
+        #
+        connections:
+            #
+            - '<..light_rig_enable.output>'
+            - '<.input>'
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/data_1/i0: '<option.variant_key>.current'
+            user/data_2/i0: '<option.variant_key>.scheme'
+            user/data_3/i0: '<option.variant_key>.root'
+        #
+        expressions:
+            user/data_1/i1: 'getParent().getNodeName()'
+            user/data_2/i1: 'getParent().option.scheme'
+            user/data_3/i1: 'getParent().option.root'
+        #
+        connections:
+            - '<..turntable.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

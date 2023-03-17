@@ -128,16 +128,20 @@ class VariantsKeys(object):
     Roles = 'roles'
     Workspaces = 'workspaces'
     #
-    Steps = 'steps'
     AssetSteps = 'asset_steps'
     SequenceSteps = 'sequence_steps'
     ShotSteps = 'shot_steps'
+    #
+    AssetTasks = 'asset_tasks'
+    SequenceTasks = 'sequence_tasks'
+    ShotTasks = 'shot_tasks'
     #
     All = [
         Schemes,
         Roles,
         Workspaces,
-        AssetSteps, SequenceSteps, ShotSteps
+        AssetSteps, SequenceSteps, ShotSteps,
+        AssetTasks, SequenceTasks, ShotTasks
     ]
 
 

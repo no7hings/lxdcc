@@ -1,0 +1,419 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'quality'
+    type_abr: 'qlt'
+    create_type: 'Quality_Wsp'
+    description:
+        |-
+        for quality load
+    variant_key: 'quality'
+    #
+    auto_color: False
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'Group'
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 720
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        #
+        option/scheme:
+            widget: enumerate
+            value: ['custom', 'low', 'medium', 'high']
+            default: 'custom'
+            tool_tip: '...'
+
+        setting/render_default/properties/builtin:
+            widget: script
+            value:
+                |-
+                interactiveOutputs=
+            tool_tip: '...'
+        #   render default
+        setting/render_default/properties/arnold:
+            widget: script
+            value:
+                |-
+                enable_adaptive_sampling=0
+                enable_progressive_render=1
+                AA_progressive_samples_min=-1
+                sss_use_autobump=1
+                abort_on_error=0
+                bucket_size=32
+                texture_max_memory_MB=20480
+            tool_tip: '...'
+        #   render override
+        setting/render_override/properties/builtin_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        setting/render_override/properties/builtin:
+            widget: script
+            value: ''
+            tool_tip: '...'
+
+        setting/render_override/properties/arnold_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        setting/render_override/properties/arnold:
+            widget: script
+            value: ''
+            tool_tip: '...'
+        #
+        extra/render_resolution/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        extra/render_resolution/percent:
+            widget: capsule_string
+            value: ['25%', '50%', '75%', '100%', '125%', '150%', '175%', '200%']
+            default: '100%'
+            tool_tip: '...'
+        # workspace
+        workspace/declare_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        workspace/register/variant_key:
+            widget: string
+            value: '<option.variant_key>'
+            tool_tip: '...'
+            lock: True
+        # record
+        record/variant_data_opt:
+            widget: node
+            value: '<node.variant_data_opt.name>'
+            tool_tip: '...'
+            lock: True
+#
+node:
+    # dot
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.input>'
+            - '<.input>'
+    #
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    #
+    default__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/properties/builtin_enable: True
+            user/properties/arnold_enable: True
+        #
+        expressions:
+            user/properties/builtin: 'getParent().setting.render_default.properties.builtin'
+            user/properties/arnold: 'getParent().setting.render_default.properties.arnold'
+        #
+        connections:
+            #
+            - '<..upstream_merge.output>'
+            - '<.input>'
+    #
+    custom__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/properties/arnold_enable: True
+            user/properties/arnold:
+                |-
+                AA_samples=5
+            
+                GI_diffuse_samples=2
+                GI_specular_samples=2
+                GI_transmission_samples=2
+                GI_volume_samples=0
+                GI_sss_samples=3
+
+                GI_total_depth=14
+                GI_diffuse_depth=2
+                GI_specular_depth=3
+                GI_transmission_depth=5
+                GI_volume_depth=0
+        #
+        connections:
+            #
+            - '<..default__render_properties_opt.output>'
+            - '<.input>'
+    #
+    low__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/properties/arnold_enable: True
+            user/properties/arnold:
+                |-
+                AA_samples=5
+            
+                GI_diffuse_samples=2
+                GI_specular_samples=2
+                GI_transmission_samples=2
+                GI_volume_samples=0
+                GI_sss_samples=3
+
+                GI_total_depth=14
+                GI_diffuse_depth=2
+                GI_specular_depth=3
+                GI_transmission_depth=5
+                GI_volume_depth=0
+        #
+        connections:
+            #
+            - '<..default__render_properties_opt.output>'
+            - '<.input>'
+    #
+    medium__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/properties/arnold_enable: True
+            user/properties/arnold:
+                |-
+                AA_samples=5
+            
+                GI_diffuse_samples=2
+                GI_specular_samples=2
+                GI_transmission_samples=2
+                GI_volume_samples=0
+                GI_sss_samples=3
+
+                GI_total_depth=14
+                GI_diffuse_depth=2
+                GI_specular_depth=3
+                GI_transmission_depth=5
+                GI_volume_depth=0
+        #
+        connections:
+            #
+            - '<..default__render_properties_opt.output>'
+            - '<.input>'
+    #
+    high__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/properties/arnold_enable: True
+            user/properties/arnold:
+                |-
+                AA_samples=10
+            
+                GI_diffuse_samples=2
+                GI_specular_samples=3
+                GI_transmission_samples=2
+                GI_volume_samples=0
+                GI_sss_samples=4
+
+                GI_total_depth=14
+                GI_diffuse_depth=2
+                GI_specular_depth=3
+                GI_transmission_depth=8
+                GI_volume_depth=0
+        #
+        connections:
+            #
+            - '<..default__render_properties_opt.output>'
+            - '<.input>'
+
+    scheme_switch:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'custom'
+            - 'low'
+            - 'medium'
+            - 'high'
+        #
+        expressions:
+            in:
+                |-
+                ['custom', 'low', 'medium', 'high'].index(getParent().option.scheme)
+        #
+        connections:
+            # custom
+            - '<..custom__render_properties_opt.output>'
+            - '<.path>.custom'
+            # low
+            - '<..low__render_properties_opt.output>'
+            - '<.path>.low'
+            # medium
+            - '<..medium__render_properties_opt.output>'
+            - '<.path>.medium'
+            # high
+            - '<..high__render_properties_opt.output>'
+            - '<.path>.high'
+    # user render properties
+    override__render_properties_opt:
+        tag: 'RPO'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        expressions:
+            user/properties/builtin_enable: 'getParent().setting.render_override.properties.builtin_enable'
+            user/properties/builtin: 'getParent().setting.render_override.properties.builtin'
+            user/properties/arnold_enable: 'getParent().setting.render_override.properties.arnold_enable'
+            user/properties/arnold: 'getParent().setting.render_override.properties.arnold'
+        #
+        connections:
+            #
+            - '<..scheme_switch.output>'
+            - '<.input>'
+    # render resolution
+    render_resolution_opt:
+        tag: 'RRO'
+        type: RenderResolutionOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        expressions:
+            user/enable: 'getParent().extra.render_resolution.enable'
+            user/percent: 'getParent().extra.render_resolution.percent'
+        #
+        connections:
+            #
+            - '<..override__render_properties_opt.output>'
+            - '<.input>'
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/data_1/i0: '<option.variant_key>.current'
+            user/data_2/i0: '<option.variant_key>.scheme'
+            user/data_3/i0: '<option.variant_key>.render_resolution_percent'
+        #
+        expressions:
+            user/data_1/i1: 'getParent().getNodeName()'
+            user/data_2/i1: 'getParent().option.scheme'
+            user/data_3/i1: 'getParent().extra.render_resolution.percent'
+        #
+        connections:
+            - '<..render_resolution_opt.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

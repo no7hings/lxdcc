@@ -1,0 +1,206 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'space'
+    type_abr: 'spc'
+    create_type: 'Space_Wsp'
+    description:
+        |-
+        Space
+        - include all variable node per variant
+    variant_key: ''
+    #
+    auto_color: False
+    #
+    color_hsv:
+        h: 270
+        s: .25
+        v: .25
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+    #
+    size:
+        w_s: 320
+        h_s: 80
+        #
+        w: 1280
+        h: 480
+#
+main:
+    type: Group
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_pin: 1.0
+        ns_offsetX: =-(<option.size.w>/2+320)
+        ns_offsetY: =<option.size.h>/2+72
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - join_upstream
+        - join_other
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        #
+        option/color:
+            widget: color3
+            value: [.21875, .1875, .25]
+            tool_tip: '...'
+
+        option/set_color:
+            widget: button
+            value: ''
+            tool_tip: '...'
+        # variant
+        variant/key:
+            widget: enumerate
+            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            tool_tip: '...'
+
+        variant/register:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspSpace(node).register_variable()'
+            tool_tip: '...'
+        # extra
+        extra/default_name:
+            widget: enumerate
+            value: ['None']
+            default: 'None'
+            tool_tip: '...'
+
+        extra/add_default:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspSpace(node).add_default()'
+            tool_tip: '...'
+
+        extra/customize_name:
+            widget: string
+            value: ''
+            tool_tip: '...'
+
+        extra/add_customize:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspSpace(node).add_customize()'
+            tool_tip: '...'
+        # record
+        record/upstream_merge:
+            widget: node
+            value: '<node.upstream_merge.name>'
+            tool_tip: '...'
+            lock: True
+
+        record/backdrop:
+            widget: node
+            value: '<node.backdrop.name>'
+            tool_tip: '...'
+            lock: True
+
+        record/variant_register:
+            widget: node
+            value: '<node.variant_register.name>'
+            tool_tip: '...'
+            lock: True
+#
+node:
+    # join upstream dot
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        attributes:
+            x: =-(<option.size.w_s>)
+            y: =<option.size.h>+<option.size.h_s>
+        #
+        connections:
+            # input
+            - '<main.path>.join_upstream'
+            - '<.input>'
+    # join other dot
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        attributes:
+            x: =<option.size.w_s>
+            y: =<option.size.h>+<option.size.h_s>
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    #
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        attributes:
+            x: 0
+            y: =<option.size.h>
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    # backdrop
+    backdrop:
+        tag: 'BDP'
+        type: Backdrop
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        attributes:
+            ns_text: '<option.description>'
+            ns_fontScale: 1.5
+            x: 0
+            y: =<option.size.h>/2+120
+            ns_sizeX: =<option.size.w>
+            ns_sizeY: =<option.size.h>
+            ns_colorr: <option.color.r>
+            ns_colorg: <option.color.g>
+            ns_colorb: <option.color.b>
+            ns_stickyLock: 1
+    # variant register
+    variant_register:
+        tag: 'VRT'
+        type: VariantRegister_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        expressions:
+            user/variant/key: 'getParent().variant.key'
+        #
+        connections:
+            # output
+            - '<.output>'
+            - '<main.output>'

@@ -1,0 +1,250 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'light_rig'
+    type_abr: 'lrg'
+    create_type: 'LightRig_Wsp'
+    description:
+        |-
+        for light rig load
+    variant_key: 'light'
+    #
+    auto_color: False
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: 'Group'
+    path: '<option.root>/<option.type>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 360
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # option
+        option/scheme:
+            widget: enumerate
+            value: ['asset', 'shot']
+            default: 'asset'
+            tool_tip: '...'
+
+        option/location:
+            widget: path
+            value: '/root/world/lgt'
+            tool_tip: '...'
+            lock: True
+
+        option/root:
+            widget: path
+            value: '/root/world/lgt/gaffer'
+            tool_tip: '...'
+            lock: True
+
+        option/project:
+            widget: enumerate
+            value: ['current', 'cgm', 'nsa_dev']
+            default: 'current'
+            tool_tip: '...'
+
+        option/resource:
+            widget: enumerate
+            value: ['None']
+            default: 'None'
+            tool_tip: '...'
+
+        option/guess_option:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspLightRig(node).guess_option()'
+            tool_tip: '...'
+        #   live_group
+        option/live_group/placeholder:
+            widget: file
+            value: '/l/resource/td/asset/live-group/asset-standard.livegroup'
+            tool_tip: '...'
+            lock: True
+
+        option/live_group/current:
+            widget: enumerate
+            value: ['None']
+            tool_tip: '...'
+
+        option/live_group/refresh:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspLightRig(node).refresh_live_group()'
+            tool_tip: '...'
+
+        option/load_light_rig:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspLightRig(node).load_light_rig()'
+            tool_tip: '...'
+        # extra
+        #   turntable
+        extra/turntable/enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        extra/turntable/scheme:
+            widget: enumerate
+            value: ['light', 'geometry']
+            default: 'light'
+            tool_tip: '...'
+
+        extra/turntable/geometry_root:
+            widget: path
+            value: '/root/world/geo/master'
+            tool_tip: '...'
+            lock: True
+
+        extra/turntable/direction:
+            widget: enumerate
+            value: ['clockwise', 'anticlockwise']
+            tool_tip: '...'
+
+        extra/turntable/start_frame:
+            widget: integer
+            value: 61
+            tool_tip: '...'
+
+        extra/turntable/end_frame:
+            widget: integer
+            value: 120
+            tool_tip: '...'
+
+        extra/turntable/frame_offset:
+            widget: integer
+            value: 0
+            tool_tip: '...'
+
+        extra/turntable/pivot_locator:
+            widget: path
+            value: '/root/world/loc/turntable/pivot_locator_for_light'
+            tool_tip: '...'
+            lock: True
+
+        extra/turntable/axis:
+            widget: enumerate
+            value: ['X', 'Y', 'Z']
+            default: 'Y'
+            tool_tip: '...'
+        # record
+        record/live_group:
+            widget: node
+            value: '<node.live_group.name>'
+            tool_tip: '...'
+#
+node:
+    # upstream merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<main.path>.join_upstream'
+            - '<.path>.join_upstream'
+            # join other
+            - '<main.path>.join_other'
+            - '<.path>.join_other'
+    # live group
+    live_group:
+        type: 'LiveGroup'
+        name: '<option.type_abr>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.i0'
+        output: '<.path>.o0'
+        #
+        parameters:
+            source: '/l/resource/td/asset/live-group/asset-standard.livegroup'
+        #
+        expressions:
+            source:
+                |-
+                getParent().option.live_group.current if getParent().option.live_group.current != 'None' else getParent().option.live_group.placeholder
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+    # extra
+    #   turntable
+    turntable:
+        tag: 'TTB'
+        type: Turntable_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.join_upstream'
+        output: '<.path>.output'
+        #
+        expressions:
+            option/enable: 'getParent().extra.turntable.enable'
+            option/target:
+                |-
+                getParent().option.root if getParent().extra.turntable.scheme == 'light' else getParent().extra.turntable.geometry_root
+            option/direction: 'getParent().extra.turntable.direction'
+            option/start_frame: 'getParent().extra.turntable.start_frame'
+            option/end_frame: 'getParent().extra.turntable.end_frame'
+            option/frame_offset: 'getParent().extra.turntable.frame_offset'
+            option/pivot_locator: 'getParent().extra.turntable.pivot_locator'
+            option/axis: 'getParent().extra.turntable.axis'
+        #
+        connections:
+            #
+            - '<..live_group.output>'
+            - '<.input>'
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/data_1/i0: '<option.variant_key>.light_rig.current'
+            user/data_2/i0: '<option.variant_key>.light_rig.live_group'
+        #
+        expressions:
+            user/data_1/i1: 'getParent().getNodeName()'
+            user/data_2/i1:
+                |-
+                getParam('<node.live_group.name>.source')
+        #
+        connections:
+            - '<..turntable.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

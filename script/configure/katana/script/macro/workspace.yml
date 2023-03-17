@@ -1,0 +1,172 @@
+option:
+    path: ''
+    root: ''
+    time_tag: ''
+    #
+    position:
+        x: 0
+        y: 0
+    #
+    size:
+        w_s: 240
+        h_s: 320
+    #
+    keys: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+#
+build:
+    geometry:
+        default:
+            main:
+                index_x: -1
+                index_y: 5
+                tag: 'geometry_space'
+                type: GeometrySpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: UserGeometrySpace_Wsp
+    #
+    camera:
+        default:
+            main:
+                index_x: -1
+                index_y: 4
+                tag: 'camera_space'
+                type: CameraSpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: UserCameraSpace_Wsp
+    #
+    look:
+        default:
+            main:
+                index_x: 1
+                index_y: 3
+                tag: 'look_space'
+                type: LookSpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: UserLookSpace_Wsp
+    #
+    light:
+        default:
+            main:
+                index_x: -1
+                index_y: 3
+                tag: 'light_space'
+                type: LightSpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: UserLightSpace_Wsp
+    #
+    quality:
+        default:
+            main:
+                index_x: -1
+                index_y: 2
+                tag: 'quality_space'
+                type: QualitySpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: UserQualitySpace_Wsp
+    #
+    layer:
+        default:
+            main:
+                index_x: -1
+                index_y: 1
+                tag: 'layer_space'
+                type: LayerSpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: UserLayerSpace_Wsp
+#
+preset:
+    default:
+        build/geometry/scheme: 'default'
+        build/camera/scheme: 'default'
+        build/look/scheme: 'default'
+        build/light/scheme: 'default'
+        build/quality/scheme: 'default'
+        build/layer/scheme: 'default'
+    #
+    utility:
+        build/geometry/scheme: 'utility'
+        build/camera/scheme: 'utility'
+        build/look/scheme: 'utility'
+        build/light/scheme: 'utility'
+        build/quality/scheme: 'utility'
+        build/layer/scheme: 'utility'
+    #
+    user:
+        build/geometry/scheme: 'user'
+        build/camera/scheme: 'user'
+        build/look/scheme: 'user'
+        build/light/scheme: 'user'
+        build/quality/scheme: 'user'
+        build/layer/scheme: 'user'

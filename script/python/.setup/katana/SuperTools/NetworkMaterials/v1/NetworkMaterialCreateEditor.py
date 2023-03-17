@@ -197,10 +197,11 @@ class NetworkMaterialCreateEditor(NetworkMaterialBaseEditor):
         # add extra
         nmc = networkMaterialNode.getParent()
         if nmc:
-            # add extra for texture directory
-            extraParameter = nmc.getParameter('extra')
-            if extraParameter:
-                self._addParameterWidget(nodeParametersTab, extraParameter)
+            # add customize
+            for i in ['user', 'extra']:
+                i_p = nmc.getParameter(i)
+                if i_p:
+                    self._addParameterWidget(nodeParametersTab, i_p)
 
         materialEditNode = GetNodeFromParam(networkMaterialNode, '__node_materialEdit')
         if materialEditNode:

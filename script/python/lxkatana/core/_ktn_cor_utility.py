@@ -6,8 +6,8 @@ import collections
 import threading
 #
 import time
-
-from Katana import NodegraphAPI, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, UserNodes
+# noinspection PyUnresolvedReferences
+from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, UserNodes
 # noinspection PyUnresolvedReferences
 from UI4 import App
 
@@ -24,6 +24,21 @@ import sys
 
 def get_is_ui_mode():
     return Configuration.get('KATANA_UI_MODE') == '1'
+
+
+class ResolutionOpt(object):
+    def __init__(self, string):
+        r = ResolutionTable.GetResolutionTable().getResolution(string)
+        self._x, self._y = r.xres(), r.yres()
+    @property
+    def x(self):
+        return self._x
+    @property
+    def y(self):
+        return self._y
+
+    def get(self):
+        return self._x, self._y
 
 
 class GuiNodeGraphBase(object):

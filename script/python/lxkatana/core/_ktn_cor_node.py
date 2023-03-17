@@ -1,4 +1,5 @@
 # coding:utf-8
+import six
 from ._ktn_cor_utility import *
 
 
@@ -12,7 +13,6 @@ class KtnSGObjOpt(object):
     def get_port(self, port_path, use_global=False):
         tvl = self._traversal
         if tvl.valid():
-            # print dir(tvl.getLocationData())
             if use_global is True:
                 attrs = tvl.getLocationData().getAttrs()
             else:
@@ -57,8 +57,7 @@ class KtnSGStageOpt(object):
         )
 
     def _test_(self, location):
-        tvl = self._get_traversal_(location)
-        # print dir(tvl)
+        pass
 
     def get_obj_exists(self, obj_path):
         t = self._get_traversal_(obj_path)
@@ -249,19 +248,29 @@ class NGLayoutOpt(object):
         BottomToTop = 'b-t'
 
     def __init__(self, graph_data, scheme=(Orientation.Horizontal, Direction.RightToLeft, Direction.TopToBottom), size=(320, 80), option=None):
-        self._source_dict, self._index_dict, self._graph_dict = graph_data
+        # branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
+        self._branch_leaf_names_dict, self._leaf_branch_names_dict, self._size_dict, self._graph_dict = graph_data
+        self._branch_leaf_names_dict = bsc_core.DictMtd.deduplication_value_to(self._branch_leaf_names_dict)
+        self._leaf_branch_names_dict = bsc_core.DictMtd.deduplication_value_to(self._leaf_branch_names_dict)
         self._scheme = scheme
         self._size = size
         self._option = option or {}
-        self._data_dict = self._get_data_query_()
+        self._y_query_dict = self._get_y_query_()
 
-    def _get_data_query_(self):
+    def _get_y_query_(self):
         dict_ = {}
-        for i_key, i_data in self._graph_dict.items():
-            i_start_name, i_depth, i_index = i_key
-            i_count = len(i_data)
-            for j_sub_index, j_name in enumerate(i_data):
-                dict_[j_name] = i_count, i_index, j_sub_index
+        for i_key, i_data in self._size_dict.items():
+            i_indices = i_data.keys()
+            i_indices.sort()
+            i_hs = [i_data[j] for j in i_indices]
+            if i_key not in dict_:
+                i_h_dict = {}
+                dict_[i_key] = i_h_dict
+            else:
+                i_h_dict = dict_[i_key]
+            #
+            for j_index in i_indices:
+                i_h_dict[j_index] = sum(i_hs[:j_index])
         return dict_
 
     def _layout_fnc_(self, name, position):
@@ -287,13 +296,15 @@ class NGLayoutOpt(object):
             if isinstance(shader_view_state, (int, float)):
                 obj_opt.set_shader_view_state(float(shader_view_state))
 
-    def _get_position_(self, x, y, w, h, count, index, sub_index):
+    def _get_position_(self, x, y, w, h, root_index, branch_index, root_name, count, leaf_index):
+        size_key = (root_index, root_name)
+        y_dict = self._y_query_dict[size_key]
         ort, drt_h, drt_v = self._scheme
         if ort == self.Orientation.Horizontal:
             if drt_h == 'r-l':
-                s_x = x - index * w * 2
+                s_x = x - branch_index * w * 2
             elif drt_h == 'l-r':
-                s_x = x + index * w * 2
+                s_x = x + branch_index * w * 2
             else:
                 raise ValueError()
             #
@@ -306,17 +317,19 @@ class NGLayoutOpt(object):
             #
             j_x = s_x
             if drt_v == 't-b':
-                j_y = s_y - sub_index * h
+                j_y = s_y - leaf_index * h
             elif drt_v == 'b-t':
-                j_y = s_y + sub_index * h
+                j_y = s_y + leaf_index * h
             else:
                 raise ValueError()
             return j_x, j_y
         elif ort == self.Orientation.Vertical:
+            # _y = branch_index * h
+            _y = y_dict[branch_index]
             if drt_v == 't-b':
-                s_y_ = y - index * h * 2
+                s_y_ = y - _y * 2
             elif drt_v == 'b-t':
-                s_y_ = y + index * h * 2
+                s_y_ = y + _y * 2
             else:
                 raise ValueError()
             #
@@ -329,12 +342,23 @@ class NGLayoutOpt(object):
             #
             j_y_ = s_y_
             if drt_h == 'r-l':
-                j_x_ = s_x_ - sub_index * w
+                j_x_ = s_x_ - leaf_index * w
             elif drt_h == 'l-r':
-                j_x_ = s_x_ + sub_index * w
+                j_x_ = s_x_ + leaf_index * w
             else:
                 raise ValueError()
             return j_x_, j_y_
+
+    def _get_leaf_branch_name_(self, root_index, leaf_branch_names):
+        for i_leaf_branch_name in leaf_branch_names:
+            i_leaf_branch_key = (root_index, i_leaf_branch_name)
+            i_branch_leaf_names = self._branch_leaf_names_dict.get(i_leaf_branch_key, set())
+            if len(i_branch_leaf_names) > 1:
+                return None
+
+        c = len(leaf_branch_names)
+        mid = int(c/2)
+        return leaf_branch_names[mid]
 
     def run(self, depth_maximum=-1):
         if not self._graph_dict:
@@ -344,35 +368,56 @@ class NGLayoutOpt(object):
         ort, drt_h, drt_v = self._scheme
         #
         position_dict = {}
-        for i_key, i_data in self._graph_dict.items():
-            i_start_name, i_depth, i_index = i_key
-            if i_depth > 0:
+        keys = self._graph_dict.keys()
+        keys.sort()
+        for i_key in keys:
+            i_data = self._graph_dict[i_key]
+            i_root_index, i_branch_index, i_root_name = i_key
+            if i_root_index > 0:
+                # node is in group, use origin
                 x, y = 0, 0
             else:
-                x, y = NGObjOpt(i_start_name).get_position()
+                x, y = NGObjOpt(i_root_name).get_position()
             #
             if i_data:
                 i_count = len(i_data)
-                for j_sub_index, j_name in enumerate(i_data):
+                for j_leaf_index, j_leaf_name in enumerate(i_data):
                     j_x, j_y = self._get_position_(
-                        x, y, w, h, i_count, i_index, j_sub_index
+                        x, y, w, h, i_root_index, i_branch_index, i_root_name, i_count, j_leaf_index
                     )
-                    if NGObjOpt(j_name).get_type_name() in ['Dot']:
-                        i_source_name = self._source_dict[j_name]
-                        if i_source_name in self._index_dict:
-                            j_count_, j_index_, j_sub_index_ = self._data_dict[i_source_name]
-                            j_x_, j_y_ = self._get_position_(
-                                x, y, w, h, j_count_, j_index_, j_sub_index_
-                            )
-                            if ort == self.Orientation.Horizontal:
-                                j_y = j_y_
-                            elif ort == self.Orientation.Vertical:
-                                j_x = j_x_
-                    position_dict[j_name] = (j_x, j_y)
+                    # check tree is one branch and one leaf in current root
+                    j_leaf_key = (i_root_index, j_leaf_name)
+                    j_leaf_branch_names = self._leaf_branch_names_dict[j_leaf_key]
+                    j_c = len(j_leaf_branch_names)
+                    if j_c == 1:
+                        j_leaf_branch_name = j_leaf_branch_names[0]
+                        j_leaf_branch_key = (i_root_index, j_leaf_branch_name)
+                        j_branch_leaf_names = self._branch_leaf_names_dict.get(j_leaf_branch_key, set())
+                        if len(j_branch_leaf_names) == 1:
+                            if j_leaf_branch_key in position_dict:
+                                j_x_, j_y_ = position_dict[j_leaf_branch_key]
+                                if ort == self.Orientation.Horizontal:
+                                    j_y = j_y_
+                                elif ort == self.Orientation.Vertical:
+                                    j_x = j_x_
+                    else:
+                        j_leaf_branch_name = self._get_leaf_branch_name_(i_root_index, j_leaf_branch_names)
+                        if j_leaf_branch_name is not None:
+                            j_leaf_branch_key = (i_root_index, j_leaf_branch_name)
+                            if j_leaf_branch_key in position_dict:
+                                j_x_, j_y_ = position_dict[j_leaf_branch_key]
+                                if ort == self.Orientation.Horizontal:
+                                    j_y = j_y_
+                                elif ort == self.Orientation.Vertical:
+                                    j_x = j_x_
+                    #
+                    position_dict[j_leaf_key] = (j_x, j_y)
         #
         if position_dict:
             for k, v in position_dict.items():
-                self._layout_fnc_(k, v)
+                i_root_index, i_name = k
+                i_position = v
+                self._layout_fnc_(i_name, i_position)
 
 
 class NGObjOpt(object):
@@ -442,6 +487,9 @@ class NGObjOpt(object):
                 if name_ktn_port is not None:
                     name_ktn_port.setValue(str(name), 0)
                 #
+                if hasattr(ktn_obj, 'checkDynamicParameters'):
+                    ktn_obj.checkDynamicParameters()
+                #
                 ktn_obj.setName(name)
                 return ktn_obj, True
             else:
@@ -499,7 +547,7 @@ class NGObjOpt(object):
                 ktn_obj.checkDynamicParameters()
         return ktn_obj, is_create
     @classmethod
-    def _create_connections_by_data_(cls, connections_data, extend_kwargs=None):
+    def _create_connections_by_data_(cls, connections_data, extend_kwargs=None, create_source=False, create_target=False):
         """
         :param connections_data: etc. [
             'node_a.a.b',
@@ -536,32 +584,38 @@ class NGObjOpt(object):
                     source_mtd, target_mtd = 'getSendPort', 'getReturnPort'
                 else:
                     i_condition = (
-                        cls._get_is_parent_for_(i_obj_src, i_obj_tgt),
-                        cls._get_is_parent_for_(i_obj_tgt, i_obj_src)
+                        #
+                        cls._get_is_parent_for_(i_obj_src, i_obj_tgt), cls._get_is_parent_for_(i_obj_tgt, i_obj_src)
                     )
+                    # same index
                     if i_condition == (False, False):
-                        #
                         source_mtd, target_mtd = 'getOutputPort', 'getInputPort'
+                    # parent to children
                     elif i_condition == (True, False):
-                        #
                         source_mtd, target_mtd = 'getSendPort', 'getInputPort'
+                    # children to parent
                     elif i_condition == (False, True):
-                        #
                         source_mtd, target_mtd = 'getOutputPort', 'getReturnPort'
                     else:
                         raise RuntimeError()
                 #
                 i_port_src = i_obj_src.__getattribute__(source_mtd)(i_port_path_src)
                 if i_port_src is None:
-                    raise RuntimeError(
-                        'method="{}", attribute="{}" is non-exists'.format(source_mtd, i_source_attr_path)
-                    )
+                    if create_source is True:
+                        i_port_src = i_obj_src.addOutputPort(i_port_path_src)
+                    else:
+                        raise RuntimeError(
+                            'method="{}", attribute="{}" is non-exists'.format(source_mtd, i_source_attr_path)
+                        )
                 #
                 i_port_tgt = i_obj_tgt.__getattribute__(target_mtd)(i_port_path_tgt)
                 if i_port_tgt is None:
-                    raise RuntimeError(
-                        'method="{}", attribute="{}" is non-exists'.format(target_mtd, i_target_attr_path)
-                    )
+                    if create_target is True:
+                        i_port_tgt = i_obj_tgt.addInputPort(i_port_path_tgt)
+                    else:
+                        raise RuntimeError(
+                            'method="{}", attribute="{}" is non-exists'.format(target_mtd, i_target_attr_path)
+                        )
                 #
                 i_port_src.connect(
                     i_port_tgt
@@ -705,83 +759,132 @@ class NGObjOpt(object):
         rcs_fnc_(list_, self._ktn_obj)
         return list_
 
-    def get_graph_data(self, **kwargs):
-        def rcs_fnc_(ktn_obj_, start_name_, source_name_, depth_, index_):
+    def get_gui_layout_data(self, **kwargs):
+        def rcs_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
             if hasattr(ktn_obj_, 'getChildren'):
-                _source_name = ktn_obj_.getName()
-                outer_fnc_(ktn_obj_, start_name_, _source_name, depth_, index_)
+                _branch_name = ktn_obj_.getName()
+                outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
                 # inner
                 if inner is True:
-                    _group_name = ktn_obj_.getName()
-                    inner_fnc_(ktn_obj_, _group_name, _source_name, depth_, index_)
+                    # reset start to 0
+                    _root_name = ktn_obj_.getName()
+                    _start_index = 0
+                    inner_fnc_(ktn_obj_, _root_name, _branch_name, root_index_, _start_index)
             else:
-                _source_name = ktn_obj_.getName()
-                outer_fnc_(ktn_obj_, start_name_, _source_name, depth_, index_)
+                _branch_name = ktn_obj_.getName()
+                outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
         #
-        def outer_fnc_(ktn_obj_, start_name_, source_name_, depth_, index_):
+        def outer_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
             _source_ktn_objs = self.__class__(ktn_obj_).get_source_objs()
             #
             if _source_ktn_objs:
-                index_ += 1
-                add_fnc_(_source_ktn_objs, start_name_, source_name_, depth_, index_)
+                branch_index_ += 1
+                add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
         #
-        def inner_fnc_(ktn_obj_, start_name_, source_name_, depth_, index_):
-            depth_ += 1
+        def inner_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
+            root_index_ += 1
             #
             _source_ktn_objs = self._get_source_objs_inner_(ktn_obj_)
             if _source_ktn_objs:
-                #
-                index_ += 1
-                add_fnc_(_source_ktn_objs, start_name_, source_name_, depth_, index_)
+                branch_index_ += 1
+                add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
         #
-        def add_fnc_(source_ktn_objs_, start_name_, source_name_, depth_, index_):
-            _index_cur = (start_name_, depth_, index_)
-            if _index_cur not in graph_dict:
-                _data_in_index_cur = []
-                graph_dict[_index_cur] = _data_in_index_cur
-            else:
-                _data_in_index_cur = graph_dict[_index_cur]
+        def add_fnc_(ktn_objs_, root_name_, branch_name_, root_index_, branch_index_):
+            _graph_key_cur = (root_index_, branch_index_, root_name_)
+            _size_key_cur = (root_index_, root_name_)
             #
-            for _row, _i_ktn_obj in enumerate(source_ktn_objs_):
+            if _size_key_cur not in size_dict:
+                _h_in_cur = {}
+                size_dict[_size_key_cur] = _h_in_cur
+            else:
+                _h_in_cur = size_dict[_size_key_cur]
+            #
+            if _graph_key_cur not in graph_dict:
+                _graph_data_in_cur = []
+                graph_dict[_graph_key_cur] = _graph_data_in_cur
+            else:
+                _graph_data_in_cur = graph_dict[_graph_key_cur]
+            #
+            _branch_key = (root_index_, branch_name_)
+            for _i_sub_index, _i_ktn_obj in enumerate(ktn_objs_):
+                _i_ktn_obj_opt = NGObjOpt(_i_ktn_obj)
                 _i_type_name = _i_ktn_obj.getType()
-                _i_name = _i_ktn_obj.getName()
-                if _i_name not in source_dict:
-                    source_dict[_i_name] = source_name_
-                _i_index_cur = _index_cur
+                _i_leaf_name = _i_ktn_obj.getName()
+                _i_w = _i_ktn_obj_opt.get('gui_layout.size.w') or w
+                _i_h = _i_ktn_obj_opt.get('gui_layout.size.h') or h
+                #
+                if branch_index_ in _h_in_cur:
+                    _i_h_pre = _h_in_cur[branch_index_]
+                    if _i_h > _i_h_pre:
+                        _h_in_cur[branch_index_] = _i_h
+                else:
+                    _h_in_cur[branch_index_] = _i_h
+                #
+                _i_branch_index_key_cur = (root_index_, _i_leaf_name)
+                if _i_branch_index_key_cur not in leaf_branch_name_dict:
+                    leaf_branch_name_dict[_i_branch_index_key_cur] = branch_name_
+                #
+                _i_graph_key_cur = _graph_key_cur
                 # break the self-cycle
-                if _i_name != start_name_:
+                if _i_leaf_name != root_name_:
                     # try move to end
-                    if _i_name in index_dict:
-                        _i_index_pre = index_dict[_i_name]
-                        if _i_index_pre != _i_index_cur:
-                            if _i_index_pre in graph_dict:
-                                _data_in_index_pre = graph_dict[_i_index_pre]
-                                _data_in_index_pre.remove(_i_name)
-                                _data_in_index_cur.append(_i_name)
-                                index_dict[_i_name] = _i_index_cur
+                    _i_leaf_key = (root_index_, _i_leaf_name)
+                    leaf_branch_names_dict.setdefault(
+                        _i_leaf_key, []
+                    ).append(branch_name_)
+                    branch_leaf_names_dict.setdefault(
+                        _branch_key, []
+                    ).append(_i_leaf_name)
+                    if _i_leaf_key in leaf_branch_index_dict:
+                        _i_branch_index_cur = branch_index_
+                        _i_index_pre = leaf_branch_index_dict[_i_leaf_key]
+                        if _i_index_pre < _i_branch_index_cur:
+                            _i_graph_key_pre = (root_index_, _i_index_pre, root_name_)
+                            if _i_graph_key_pre in graph_dict:
+                                _graph_data_in_index_pre = graph_dict[_i_graph_key_pre]
+                                _graph_data_in_index_pre.remove(_i_leaf_name)
+                                _graph_data_in_cur.append(_i_leaf_name)
+                                leaf_branch_index_dict[_i_leaf_key] = _i_branch_index_cur
                     else:
-                        index_dict[_i_name] = _i_index_cur
-                        _data_in_index_cur.append(_i_name)
+                        leaf_branch_index_dict[_i_leaf_key] = branch_index_
+                        #
+                        _graph_data_in_cur.append(_i_leaf_name)
                     #
-                    rcs_fnc_(_i_ktn_obj, start_name_, source_name_, depth_, index_)
+                    rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
         #
         inner = kwargs.get('inner', False)
+        w, h = kwargs.get('size', [320, 40])
         #
-        source_dict = {}
-        index_dict = {}
-        #
-        name = self._ktn_obj.getName()
-        depth = 0
-        #
-        graph_dict = {
-            # (start_name, depth, index): [name, ...]
+        leaf_branch_name_dict = {
+            # (root_index, leaf_name): branch_name
         }
         #
-        rcs_fnc_(self._ktn_obj, name, name, depth, 0)
-        return source_dict, index_dict, graph_dict
+        branch_leaf_names_dict = {
+            # (root_index, branch_name): [leaf_name, ...]
+        }
+        leaf_branch_names_dict = {
+            # (root_index, leaf_name): [branch_name, ...]
+        }
+        #
+        leaf_branch_index_dict = {
+            # (root_index, leaf_name): branch_index
+        }
+        size_dict = {
+
+        }
+        graph_dict = {
+            # (root_index, branch_index, root_name): [name, ...]
+        }
+        #
+        name = self._ktn_obj.getName()
+        start_depth = 0
+        start_index = 0
+        #
+        rcs_fnc_(self._ktn_obj, name, start_depth, start_index)
+        return branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
 
     def gui_layout_shader_graph(self, scheme=(NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
-        graph_dara = self.get_graph_data(inner=True)
+        graph_dara = self.get_gui_layout_data(inner=True, size=size)
         #
         NGLayoutOpt(
             graph_dara,
@@ -795,14 +898,12 @@ class NGObjOpt(object):
         ).run()
     @Modifier.undo_debug_run
     def gui_layout_node_graph(self, scheme=(NGLayoutOpt.Orientation.Vertical, NGLayoutOpt.Direction.LeftToRight, NGLayoutOpt.Direction.BottomToTop), size=(320, 40)):
-        graph_dara = self.get_graph_data(inner=True)
+        graph_dara = self.get_gui_layout_data(inner=True, size=size)
         NGLayoutOpt(
             graph_dara,
             scheme=scheme,
             size=size,
-        ).run(
-            depth_maximum=1
-        )
+        ).run()
 
     def get_port_raw(self, port_path):
         port = self.ktn_obj.getParameter(port_path)
@@ -906,6 +1007,14 @@ class NGObjOpt(object):
     def set_expressions_by_data(self, data, extend_kwargs=None):
         for i_port_path, i_expression in data.items():
             i_port_path = i_port_path.replace('/', '.')
+            #
+            i_p = self.ktn_obj.getParameter(i_port_path)
+            if i_p is None:
+                bsc_core.LogMtd.trace_warning(
+                    'port="{}" is non-exists'.format(i_port_path)
+                )
+                continue
+            #
             if isinstance(extend_kwargs, dict):
                 if isinstance(i_expression, (unicode, str)):
                     i_expression = i_expression.format(**extend_kwargs)
@@ -928,6 +1037,33 @@ class NGObjOpt(object):
             # turn on the expression-flag
             self.set_expression_enable(i_value_key, True)
             self.set_expression(i_value_key, i_expression)
+
+    def set_port_hints_by_data(self, data, extend_kwargs=None):
+        for i_port_path, i_value in data.items():
+            #
+            i_port_path = i_port_path.replace('/', '.')
+            i_p = self.ktn_obj.getParameter(i_port_path)
+            if i_p is None:
+                bsc_core.LogMtd.trace_warning(
+                    'port="{}" is non-exists'.format(i_port_path)
+                )
+                continue
+            i_hint_string = i_p.getHintString()
+            if i_hint_string:
+                i_hint_dict = eval(i_hint_string)
+            else:
+                i_hint_dict = {}
+            #
+            if isinstance(i_value, six.string_types):
+                i_hint_dict_ = eval(i_value)
+            elif isinstance(i_value, dict):
+                i_hint_dict_ = i_value
+            else:
+                raise RuntimeError()
+            #
+            i_hint_dict.update(i_hint_dict_)
+            #
+            self.get_port(i_port_path).setHintString(str(i_hint_dict))
 
     def set_shader_hints_by_data(self, data, extend_kwargs=None):
         for i_port_path, i_value in data.items():
@@ -976,11 +1112,20 @@ class NGObjOpt(object):
     def get_input_port(self, port_path):
         return self._ktn_obj.getInputPort(port_path)
 
+    def get_input_ports(self):
+        return self._ktn_obj.getInputPorts()
+
+    def get_input_port_names(self):
+        return [i.getName() for i in self.get_input_ports()]
+
     def get_output_port(self, port_path):
         return self._ktn_obj.getOutputPort(port_path)
 
     def get_output_ports(self):
         return self._ktn_obj.getOutputPorts()
+
+    def get_output_port_names(self):
+        return [i.getName() for i in self.get_output_ports()]
 
     def get_return_ports(self):
         return [self._ktn_obj.getReturnPort(i.getName()) for i in self._ktn_obj.getOutputPorts()]
@@ -1190,6 +1335,7 @@ class NGObjOpt(object):
             if isinstance(value, (bool,)):
                 ktn_port = group_ktn_obj.createChildNumber(name, value)
                 ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
+            #
             elif isinstance(value, six.string_types):
                 ktn_port = group_ktn_obj.createChildString(name, value)
                 if expression:
@@ -1214,6 +1360,16 @@ class NGObjOpt(object):
                     ktn_port.setHintString(
                         str({'widget': 'scriptButton', 'buttonText': label, 'scriptText': value})
                     )
+                elif widget in ['node']:
+                    ktn_port.setHintString(
+                        str({'widget': 'nodeDropProxy', 'buttonText': label, 'scriptText': value})
+                    )
+                    if value:
+                        ktn_port.setExpression(
+                            'getNode(\'{}\').getNodeName()'.format(
+                                value
+                            )
+                        )
             elif isinstance(value, (int, float)):
                 ktn_port = group_ktn_obj.createChildNumber(name, value)
                 if widget in ['boolean']:
@@ -1250,6 +1406,41 @@ class NGObjOpt(object):
                     for i in range(c):
                         i_ktn_port = ktn_port.getChildByIndex(i)
                         i_ktn_port.setValue(value[i], 0)
+                elif widget in ['capsule_list']:
+                    sep = ', '
+                    v = sep.join(value)
+                    ktn_port = group_ktn_obj.createChildString(name, v)
+                    ktn_port.setHintString(
+                        str(
+                            dict(
+                                widget='capsule',
+                                options=list(value),
+                                displayText=map(lambda x: str(x).capitalize(), list(value)),
+                                exclusive=False,
+                                colors=[bsc_core.RawTextOpt(i).to_rgb_(s_p=25, v_p=100) for i in list(value)],
+                                equalPartitionWidths=True,
+                                delimiter=sep
+                            )
+                        )
+                    )
+                    # if default is not None:
+                    #     ktn_port.setValue(default, 0)
+                elif widget in ['capsule_string']:
+                    ktn_port = group_ktn_obj.createChildString(name, value[0])
+                    ktn_port.setHintString(
+                        str(
+                            dict(
+                                widget='capsule',
+                                options=list(value),
+                                displayText=map(lambda x: str(x).capitalize(), list(value)),
+                                exclusive=True,
+                                colors=[bsc_core.RawTextOpt(i).to_rgb_(s_p=25, v_p=100) for i in list(value)],
+                                equalPartitionWidths=True,
+                            )
+                        )
+                    )
+                    if default is not None:
+                        ktn_port.setValue(default, 0)
                 else:
                     c = len(value)
                     if isinstance(value[0], six.string_types):
@@ -1476,7 +1667,7 @@ class NGPortOpt(object):
         return self._ktn_port.isExpression()
 
     def get_children(self):
-        return [self._ktn_port.getChildren()]
+        return self._ktn_port.getChildren()
 
     def clear_children(self):
         [self._ktn_port.deleteChild(i) for i in self.get_children()]

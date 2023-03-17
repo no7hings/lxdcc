@@ -164,7 +164,7 @@ class StgVersionOpt(AbsStgObjOpt):
         windows_task_directory = utl_core.Path.set_map_to_windows(directory_path)
         linux_task_directory = utl_core.Path.set_map_to_linux(directory_path)
         stg_folder = {
-            'name': directory_path,
+            'name': bsc_core.StgFileOpt(directory_path).name,
             'local_path': directory_path,
             'local_path_windows': windows_task_directory,
             'local_path_linux': linux_task_directory
@@ -225,6 +225,15 @@ class StgVersionOpt(AbsStgObjOpt):
     def set_movie_upload(self, file_path):
         if os.path.isfile(file_path):
             self._stg_obj_query.set_upload('sg_uploaded_movie', file_path)
+            # todo: use environ map
+            self._stg_obj_query.set(
+                'sg_path_to_movie',
+                file_path.replace(
+                    '/l/prod', '${RV_PATHSWAP_ROOT}'
+                ).replace(
+                    'l:/prod', '${RV_PATHSWAP_ROOT}'
+                )
+            )
             utl_core.Log.set_module_result_trace(
                 'stg-version set',
                 u'file="{}"'.format(file_path)

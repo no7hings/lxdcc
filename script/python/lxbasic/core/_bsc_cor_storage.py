@@ -943,7 +943,7 @@ class StgFileSearchOpt(object):
         self._set_key_sort_()
 
     def _set_key_sort_(self):
-        self._search_dict = _bsc_cor_dict.DictMtd.set_string_key_sort_to(self._search_dict)
+        self._search_dict = _bsc_cor_dict.DictMtd.sort_string_key_to(self._search_dict)
 
     def get_result(self, file_path_src):
         name_src = os.path.basename(file_path_src)

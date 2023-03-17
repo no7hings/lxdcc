@@ -511,10 +511,10 @@ class Om2MeshOpt(object):
         face_vertex_counts = []
         face_vertex_indices = []
         om2_obj = self._om2_obj_fnc
-        for face_index in xrange(om2_obj.numPolygons):
-            count = om2_obj.polygonVertexCount(face_index)
-            face_vertex_counts.append(count)
-            om2_indices = om2_obj.getPolygonVertices(face_index)
+        for i_face_index in xrange(om2_obj.numPolygons):
+            i_count = om2_obj.polygonVertexCount(i_face_index)
+            face_vertex_counts.append(i_count)
+            om2_indices = om2_obj.getPolygonVertices(i_face_index)
             indices = list(om2_indices)
             face_vertex_indices.extend(indices)
         return face_vertex_counts, face_vertex_indices
@@ -705,9 +705,9 @@ class Om2MeshOpt(object):
         face_indices = []
         for i_face_index in xrange(self._om2_obj_fnc.numPolygons):
             face_indices.append(i_face_index)
-            count = self._om2_obj_fnc.polygonVertexCount(i_face_index)
+            i_count = self._om2_obj_fnc.polygonVertexCount(i_face_index)
             j_om2_color = om2.MColor()
-            for j in range(count):
+            for j in range(i_count):
                 j_om2_color = om2.MColor()
                 j_r, j_g, j_b = rgbs[idx], rgbs[idx+1], rgbs[idx+2]
                 j_om2_color.r, j_om2_color.g, j_om2_color.b, j_om2_color.a = (j_r, j_g, j_b, alpha)

@@ -416,10 +416,18 @@ class VariablesSetting(object):
 
     def set(self, key, value):
         port_path = 'variables.{}.options'.format(key)
-        ktn_port = self._ktn_obj.getParameter(port_path)
-        if ktn_port is None:
+        p = self._ktn_obj.getParameter(port_path)
+        if p is None:
             pass
-        _ktn_cor_node.NGPortOpt(ktn_port).set(value)
+        _ktn_cor_node.NGPortOpt(p).set(value)
+
+    def get(self, key):
+        pass
+
+    def get_branches(self, key):
+        return _ktn_cor_node.NGPortOpt(
+            self._ktn_obj.getParameter('variables.{}.options'.format(key))
+        ).get()
 
     def set_register(self, key, values):
         ktn_port = self._ktn_obj.getParameter('variables')

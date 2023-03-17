@@ -23,31 +23,38 @@ class RsvStgProjectOpt(object):
         self._stg_connector = stg_objects.StgConnector()
 
     def get_default_light_rig_rsv_asset(self):
+        properties = self._rsv_project.properties
+        project = properties.get('project')
+        role = properties.get('roles.light_rig')
         _ = self._stg_connector.get_stg_entity_queries(
-            project=self._rsv_project.name,
-            role='lig',
+            project=project,
+            role=role,
             tags=['DefaultRig']
         )
         if _:
             return self._rsv_project.get_rsv_resource(
-                role='lig',
+                role=role,
                 asset=_[0].get('code')
             )
 
     def get_standard_light_rig_rsv_assets(self):
+        properties = self._rsv_project.properties
+        project = properties.get('project')
+        role = properties.get('roles.light_rig')
         _ = self._stg_connector.get_stg_entity_queries(
-            project=self._rsv_project.name,
-            role='lig',
+            project=project,
+            role=role,
             tags=['StandardRig']
         )
         if _:
             rsv_assets = [
                 self._rsv_project.get_rsv_resource(
-                    role='lig',
+                    role=role,
                     asset=i.get('code')
                 )
                 for i in _
             ]
+            rsv_assets = [i for i in rsv_assets if i is not None]
             default_rsv_asset = self.get_default_light_rig_rsv_asset()
             if default_rsv_asset in rsv_assets:
                 rsv_assets.remove(default_rsv_asset)
@@ -55,6 +62,22 @@ class RsvStgProjectOpt(object):
             rsv_assets.insert(0, default_rsv_asset)
             return rsv_assets
         return []
+
+    def get_light_args(self):
+        properties = self._rsv_project.properties
+        project = properties.get('project')
+        role = properties.get('roles.light_rig')
+        _0 = self._stg_connector.get_stg_entity_queries(
+            project=project,
+            role=role,
+            tags=['DefaultRig']
+        )
+        _1 = self._stg_connector.get_stg_entity_queries(
+            project=project,
+            role=role,
+            tags=['StandardRig']
+        )
+        return [i.get('code') for i in _0], [i.get('code') for i in _1]
 
 
 class RsvStgTaskOpt(object):

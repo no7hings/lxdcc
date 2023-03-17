@@ -3,45 +3,70 @@ option:
     category: 'workspace'
     type: 'variant_register'
     type_abr: 'vrn_rgt'
+    create_type: 'VariantRegister_Wsp'
     description:
         |-
-        register variant here
+        for variant register
     variant_key: ''
     #
+    auto_color: False
+    #
     color:
-        r: 0
-        g: 0
+        r: .5
+        g: .25
         b: 0
 #
 main:
-    type: 'VariableSwitch'
+    type: VariableSwitch
     path: '<option.root>/<option.type>'
     output: '<.path>.out'
     #
-    clear_start: 'extra'
+    clear_start: 'user'
     #
     attributes:
-        ns_offsetX: 800
-        ns_offsetY: 120
-        #
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
     #
     input_ports: []
     #
     output_ports: []
     #
     ports:
-        extra/variant_key:
-            widget: enumerate
-            value: ['resource', 'camera', 'look', 'light', 'layer', 'quality']
+        # basic
+        user/type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # option
+        user/option/auto_register_enable:
+            widget: boolean
+            value: True
             tool_tip: '...'
 
-        extra/register_variable:
+        user/option/auto_register_scheme:
+            widget: enumerate
+            value: ['append', 'prepend', 'override']
+            default: 'append'
+            tool_tip: '...'
+        # variant
+        user/variant/key:
+            widget: enumerate
+            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            default: 'geometry'
+            tool_tip: '...'
+
+        user/variant/register:
             widget: button
             value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspVariantRegister(node).register_variable()'
             tool_tip: '...'
     #
+    port_hints:
+        variableName: {label: 'key', readOnly: True}
+        patterns: {label: 'branches'}
+    #
     expressions:
-        variableName: 'extra.variant_key'
+        variableName: 'user.variant.key'

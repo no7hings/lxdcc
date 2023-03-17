@@ -3,16 +3,23 @@ option:
     category: 'workspace'
     type: 'material_area'
     type_abr: 'mtl_ara'
+    create_type: 'MaterialArea_Wsp'
     description:
         |-
         Material Area
-        - create new "material" in "material_area__customize#"
+        - create new in "<node.user__material_group.name>#"
     variant_key: 'look'
     #
+    auto_color: False
+    #
     color:
-        r: 0
-        g: 0
-        b: 0
+        r: .125
+        g: .375
+        b: .25
+    #
+    size:
+        w: 1280
+        h: 480
 #
 main:
     type: 'Group'
@@ -21,8 +28,8 @@ main:
     #
     attributes:
         ns_pin: 1.0
-        ns_offsetX: 720
-        ns_offsetY: 120
+        ns_offsetX: =<option.size.w>/2+320
+        ns_offsetY: =<option.size.h>/2+72
         #
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
@@ -38,9 +45,16 @@ main:
         - output
     #
     ports:
-        reset_node:
-            widget: button
-            value: ''
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        #
+        option/root:
+            widget: path
+            value: '/root/materials'
             tool_tip: '...'
         # workspace
         workspace/declare_enable:
@@ -58,22 +72,22 @@ main:
             widget: path
             value: '/root/materials'
             tool_tip: '...'
-        #
-        workspace/register/material_extra:
-            widget: string
-            value: ''
-            tool_tip: '...'
-            lock: True
-        # info
-        info/category:
-            widget: string
-            value: '<option.category>'
+        # record
+        record/variant_data_opt:
+            widget: node
+            value: '<node.variant_data_opt.name>'
             tool_tip: '...'
             lock: True
 
-        info/type:
-            widget: string
-            value: '<option.type>'
+        record/automate_group:
+            widget: node
+            value: '<node.automate__material_group.name>'
+            tool_tip: '...'
+            lock: True
+
+        record/user_group:
+            widget: node
+            value: '<node.user__material_group.name>'
             tool_tip: '...'
             lock: True
 #
@@ -81,93 +95,106 @@ node:
     # backdrop
     backdrop:
         type: Backdrop
-        path: '<main.path>/<option.type>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
         attributes:
-            x: 0
-            y: 380
             ns_text: '<option.description>'
             ns_fontScale: 1.5
-            ns_sizeX: 960
-            ns_sizeY: 480
-            ns_colorr: <main.attributes.ns_colorr>
-            ns_colorg: <main.attributes.ns_colorg>
-            ns_colorb: <main.attributes.ns_colorb>
+            x: 0
+            y: =<option.size.h>/2+120
+            ns_sizeX: =<option.size.w>
+            ns_sizeY: =<option.size.h>
+            ns_colorr: <option.color.r>
+            ns_colorg: <option.color.g>
+            ns_colorb: <option.color.b>
             ns_stickyLock: 1
-    # customize
-    customize:
-        type: 'GroupMerge'
-        path: '<main.path>/<option.type>__<..key>'
+    # utility_materials
+    utility_materials:
+        type: UtilityMaterials_Wsp
+        name: '<option.type_abr>__<..key>'
+        path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.out'
-        #
-        child:
-            type: 'NetworkMaterialCreate'
-            #
-            path_pattern: '{parent}/<option.type>_{key}'
-            #
-            nodes: {}
-    # merge
-    merge:
-        type: Merge
-        path: '<main.path>/<option.type>__<..key>'
-        output: '<.path>.out'
-        #
-        input_ports:
-            - default
-        #
-        connections:
-            #
-            - '<..customize.output>'
-            - '<.path>.default'
-    # register
-    data_register:
-        type: 'OpScript'
-        path: '<main.path>/<option.type>__<..key>'
-        input: '<.path>.i0'
+    # automate material group
+    automate__material_group:
+        tag: 'MTL_GRP'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: MaterialGroup_Wsp
+        name: '<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
         output: '<.path>.out'
         #
         ports:
-            user/data_1:
-                widget: string2
-                value: ['look.declare', '']
+            extra/texture_directory:
+                widget: file
+                value: '/texture_directory'
                 tool_tip: '...'
-                lock: True
-            user/data_2:
-                widget: string2
-                value: ['look.material_area_declare', '']
-                tool_tip: '...'
-                lock: True
-            user/data_3:
-                widget: string2
-                value: ['look.material_extra', '']
-                tool_tip: '...'
-                lock: True
-            user/data_4:
-                widget: string2
-                value: ['look.root', '']
-                tool_tip: '...'
-                lock: True
+        #
+        attributes:
+            ns_colorr: .5
+            ns_colorg: .5
+            ns_colorb: .5
+    # user material group
+    user__material_group:
+        tag: 'MTL_GRP'
+        variant:
+            |-
+            <..key % str(x).split('__')[0]>
+        type: UserMaterialGroup_Wsp
+        name: '<.variant>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        attributes:
+            ns_colorr: .125
+            ns_colorg: .5
+            ns_colorb: .25
+    # merge
+    merge:
+        tag: 'MRG'
+        type: Merge
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - utility_materials
+            - automate
+            - user
+        #
+        connections:
+            # utility materials
+            - '<..utility_materials.output>'
+            - '<.path>.utility_materials'
+            # automate material group
+            - '<..automate__material_group.output>'
+            - '<.path>.automate'
+            # user materials
+            - '<..user__material_group.output>'
+            - '<.path>.user'
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
         #
         parameters:
-            CEL: '/root'
-            script/lua:
-                |-
-                local m = require('wsp_op_script')
-
-                local location = Interface.GetInputLocationPath()
-                local user_attribute = Interface.GetOpArg('user')
-                
-                function main()
-                    m.register_by_data(m.get_data_for_register(location, user_attribute))
-                end
-                
-                main()
+            user/data_1/i0: 'look.current'
+            user/data_2/i0: 'look.material.root'
+            user/data_3/i0: 'look.material.area'
+            user/data_4/i0: 'look.material.automate_group'
+            user/data_5/i0: 'look.material.user_group'
         #
         expressions:
             user/data_1/i1: 'getParent().getNodeName()'
-            user/data_2/i1: 'getParent().getNodeName()'
-            user/data_3/i1: 'getParent().workspace.register.material_extra'
-            user/data_4/i1: 'getParent().workspace.register.material_root'
+            user/data_2/i1: 'getParent().option.root'
+            user/data_3/i1: 'getParent().getNodeName()'
+            user/data_4/i1: 'getParent().record.automate_group'
+            user/data_5/i1: 'getParent().record.user_group'
         #
         connections:
             - '<..merge.output>'

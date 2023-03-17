@@ -1,0 +1,100 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'variant_set'
+    type_abr: 'vrn_set'
+    create_type: 'VariantSet_Wsp'
+    description:
+        |-
+        for variant set
+    variant_key: ''
+    #
+    auto_color: False
+    #
+    color:
+        r: 0
+        g: 0
+        b: 0
+#
+main:
+    type: Group
+    path: '<option.root>/<option.type>'
+    input: '<.path>.input'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'input'
+    #
+    output_ports:
+        - 'output'
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        # variant
+        variant/key:
+            widget: enumerate
+            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            default: 'geometry'
+            tool_tip: '...'
+
+        variant/value:
+            widget: enumerate
+            value: ['None']
+            default: 'None'
+            tool_tip: '...'
+
+        variant/refresh_value:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspVariantSet(node).refresh_value()'
+            tool_tip: '...'
+#
+node:
+    variable_set:
+        type: VariableSet
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.in'
+        output: '<.path>.out'
+        #
+        expressions:
+            variableName: 'getParent().variant.key'
+            variableValue: 'getParent().variant.value'
+        #
+        connections:
+            # input
+            - '<main.input>'
+            - '<.input>'
+
+    #
+    # variant data opt
+    variant_data_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        expressions:
+            user/data_1/i0:
+                |-
+                '{}.branch'.format(getParent().variant.key)
+            user/data_1/i1: 'getParent().variant.value'
+        #
+        connections:
+            - '<..variable_set.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'

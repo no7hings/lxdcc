@@ -49,5 +49,5 @@ if __name__ == '__main__':
         if _:
 
             p = i_rsv_unit.get_properties_by_result(_[0])
-            print p.get('user_extra')
+            print p.get('artist')
 

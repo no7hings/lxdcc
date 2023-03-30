@@ -64,6 +64,16 @@ class DictMtd(object):
             dict_1[i_key] = dict_[i_key]
         return dict_1
     @classmethod
+    def sort_key_by_value_to(cls, dict_):
+        value_to_key_dict = {v: k for k, v in dict_.items()}
+        dict_1 = collections.OrderedDict()
+        values = dict_.values()
+        values.sort()
+        for i_value in values:
+            i_key = value_to_key_dict[i_value]
+            dict_1[i_key] = i_value
+        return dict_1
+    @classmethod
     def deduplication_value_to(cls, dict_):
         dict_1 = {}
         for k, v_0 in dict_.items():

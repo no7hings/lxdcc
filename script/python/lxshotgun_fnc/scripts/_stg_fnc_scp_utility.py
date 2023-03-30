@@ -395,7 +395,7 @@ def set_asset_render_info_update(rsv_task_properties):
     #
     stg_connector = stg_objects.StgConnector()
     #
-    stg_asset_query = stg_connector.get_stg_entity_query(
+    stg_asset_query = stg_connector.get_stg_resource_query(
         **rsv_task_properties.value
     )
     #
@@ -532,11 +532,11 @@ def set_asset_shotgun_task_create(rsv_version):
         **kwargs
     )
     if stg_project is not None:
-        stg_entity = stg_connector.get_stg_entity(
+        stg_entity = stg_connector.get_stg_resource(
             **kwargs
         )
         if stg_entity is None:
-            stg_connector.set_stg_entity_create(**kwargs)
+            stg_connector.create_stg_resource(**kwargs)
         #
         stg_step = stg_connector.get_stg_step(
             **kwargs

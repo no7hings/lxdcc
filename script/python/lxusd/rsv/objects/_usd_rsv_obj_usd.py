@@ -256,6 +256,37 @@ class RsvUsdAssetSetCreator(object):
             )
         return usd_file_path
     @classmethod
+    def _get_asset_usd_latest_file_path_(cls, rsv_asset, rsv_scene_properties):
+        if rsv_scene_properties:
+            resolver = rsv_commands.get_resolver()
+            workspace = rsv_scene_properties.get('workspace')
+            version = rsv_scene_properties.get('version')
+            rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
+            if workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
+                usd_file_rsv_unit = rsv_task.get_rsv_unit(
+                    keyword='asset-source-asset-set-usd-file'
+                )
+                #
+                usd_file_path = usd_file_rsv_unit.get_result(version='latest')
+            elif workspace in [rsv_scene_properties.get('workspaces.release')]:
+                usd_file_rsv_unit = rsv_task.get_rsv_unit(
+                    keyword='asset-asset-set-usd-file'
+                )
+                usd_file_path = usd_file_rsv_unit.get_result(version=version)
+            elif workspace in [rsv_scene_properties.get('workspaces.temporary')]:
+                usd_file_rsv_unit = rsv_task.get_rsv_unit(
+                    keyword='asset-temporary-asset-set-usd-file'
+                )
+                usd_file_path = usd_file_rsv_unit.get_result(version=version)
+            else:
+                raise RuntimeError()
+        else:
+            usd_file_path = '{}{}.usda'.format(
+                bsc_core.StgUserMtd.get_user_temporary_directory(),
+                rsv_asset.path
+            )
+        return usd_file_path
+    @classmethod
     def _get_asset_shot_usd_file_path_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         usd_file_path = None
         if rsv_scene_properties:
@@ -598,6 +629,108 @@ class RsvUsdAssetSetCreator(object):
 
     def set_run(self):
         pass
+
+
+class RsvUsdAssetSetVariant(object):
+    @classmethod
+    def get_variant_dict(cls, asset_usd_file_path, mode='main'):
+        resolver = rsv_commands.get_resolver()
+        rsv_project = resolver.get_rsv_project_by_any_file_path(asset_usd_file_path)
+        if rsv_project is None:
+            return {}
+        #
+        properties = None
+        keywords = [
+            'asset-source-asset-set-usd-file',
+            'asset-asset-set-usd-file',
+            'asset-temporary-asset-set-usd-file',
+        ]
+        for i_keyword in keywords:
+            i_rsv_unit = rsv_project.get_rsv_unit(keyword=i_keyword)
+            i_properties = i_rsv_unit.get_properties_by_result(asset_usd_file_path)
+            if i_properties:
+                properties = i_properties
+                break
+
+        from lxusd import usd_core
+
+        workspace_mapper = {v: k for k, v in properties.get('workspaces').items()}
+        asset_step_mapper = {v: k for k, v in properties.get('asset_steps').items()}
+        asset_task_query = properties.get('asset_tasks')
+        asset_task_mapper = {v: k for k, v in asset_task_query.items()}
+
+        cur_workspace = properties.get('workspace')
+        cur_workspace_key = workspace_mapper[cur_workspace]
+        cur_step = properties.get('step')
+        cur_step_key = asset_step_mapper[cur_step]
+        usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
+        usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
+        usd_variant_dict = usd_prim_opt.get_variant_dict()
+        if not usd_variant_dict:
+            return {}
+
+        c = bsc_objects.Content(value=collections.OrderedDict())
+
+        asset_step_keys = [
+            'model',
+            'groom',
+            'rig',
+            'effect',
+            'surface',
+            'light'
+        ]
+        for i_asset_step_key in asset_step_keys:
+            i_main = usd_variant_dict.get('{}_main'.format(i_asset_step_key))
+            if i_main is not None:
+                i_default_main, i_values_main = i_main
+                c.set(
+                    'asset_version_main.{}.default'.format(i_asset_step_key), i_default_main
+                )
+                c.set(
+                    'asset_version_main.{}.values'.format(i_asset_step_key), i_values_main
+                )
+                i_asset_task = asset_task_query.get(i_asset_step_key)
+                if i_asset_task is not None:
+                    if i_asset_task in usd_variant_dict:
+                        # main default use "None" when step-key is current step-key and workspace-key is "source"
+                        if (
+                            cur_step_key == i_asset_step_key
+                            and cur_workspace_key in {
+                                resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                            }
+                            and mode == 'override'
+                        ):
+                            i_default_main = 'None'
+                        # main default use register
+                        else:
+                            i_default_main = usd_variant_dict[i_asset_task][0]
+                            print i_default_main, i_asset_task
+                        #
+                        c.set(
+                            'asset_version_main.{}.default'.format(i_asset_step_key), i_default_main
+                        )
+            #
+            i_override = usd_variant_dict.get('{}_override'.format(i_asset_step_key))
+            if i_override:
+                i_default_override, i_values_override = i_override
+                c.set(
+                    'asset_version_override.{}.default'.format(i_asset_step_key), i_default_override
+                )
+                c.set(
+                    'asset_version_override.{}.values'.format(i_asset_step_key), i_values_override
+                )
+                if (
+                    cur_step_key == i_asset_step_key
+                    and cur_workspace_key in {
+                        resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                    }
+                    and mode == 'override'
+                ):
+                    i_default_override = i_values_override[-1]
+                    c.set(
+                        'asset_version_override.{}.default'.format(i_asset_step_key), i_default_override
+                    )
+        return c.get_value()
 
 
 class RsvUsdShotSetCreator(object):

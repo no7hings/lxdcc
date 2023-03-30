@@ -22,7 +22,8 @@ option:
 #
 main:
     type: GroupStack
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.input'
     output: '<.path>.output'
     #
@@ -33,6 +34,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -44,7 +48,7 @@ main:
     #
     ports:
         # basic
-        type:
+        user/type:
             widget: string
             value: '<option.create_type>'
             tool_tip: '...'

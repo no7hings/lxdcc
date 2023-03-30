@@ -401,13 +401,25 @@ class CallbackMtd(object):
                 except Exception:
                     print ktn_obj_opt.name
     @classmethod
-    def set_callbacks_add(cls):
+    def add_arnold_callbacks(cls):
         ss = [
             (cls.set_scene_load, Callbacks.Type.onSceneLoad),
         ]
         for function, callback_type in ss:
             callback_opt = CallbackOpt(function=function, callback_type=callback_type)
             callback_opt.set_add()
+    @classmethod
+    def add_callbacks(cls, data):
+        for function, callback_type in data:
+            pass
+    @classmethod
+    def add_as_scene_open(cls, fnc):
+        callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneLoad)
+        callback_opt.set_add()
+    @classmethod
+    def add_as_scene_save(cls, fnc):
+        callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneSave)
+        callback_opt.set_add()
 
 
 class VariablesSetting(object):
@@ -425,9 +437,10 @@ class VariablesSetting(object):
         pass
 
     def get_branches(self, key):
-        return _ktn_cor_node.NGPortOpt(
-            self._ktn_obj.getParameter('variables.{}.options'.format(key))
-        ).get()
+        p = self._ktn_obj.getParameter('variables.{}.options'.format(key))
+        if p:
+            return _ktn_cor_node.NGPortOpt(p).get()
+        return []
 
     def set_register(self, key, values):
         ktn_port = self._ktn_obj.getParameter('variables')
@@ -466,3 +479,39 @@ class VariablesSetting(object):
             ).get()
             dic[i_key] = i_values
         return dic
+
+
+class WorkspaceSetting(object):
+    def __init__(self):
+        self._cfg = bsc_objects.Configure(
+            value=bsc_core.CfgFileMtd.get_yaml(
+                'katana/script/scene'
+            )
+        )
+        self._cfg.set_flatten()
+        self._obj_opt = _ktn_cor_node.NGObjOpt(NodegraphAPI.GetNode('rootNode'))
+
+    def setup(self):
+        # self._obj_opt.clear_ports(self._cfg.get('main.clear_start'))
+        self._obj_opt.create_ports_by_data(
+            self._cfg.get('main.ports')
+        )
+
+    def build_environment_ports(self):
+        root = self._cfg.get('main.environment.root')
+        self._obj_opt.clear_ports(root)
+        self._obj_opt.create_ports_by_data(
+            self._cfg.get('main.environment.ports')
+        )
+
+    def register_environment(self, index, key, value):
+        root = self._cfg.get('main.environment.root')
+        self._obj_opt.set(
+            '{}.data_{}.i0'.format(root, index), key
+        )
+        self._obj_opt.set(
+            '{}.data_{}.i1'.format(root, index), value
+        )
+
+    def add_environs(self):
+        pass

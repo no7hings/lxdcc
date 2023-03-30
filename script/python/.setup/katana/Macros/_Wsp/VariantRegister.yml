@@ -12,13 +12,14 @@ option:
     auto_color: False
     #
     color:
-        r: .5
-        g: .25
+        r: .75
+        g: .5
         b: 0
 #
 main:
     type: VariableSwitch
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     output: '<.path>.out'
     #
     clear_start: 'user'
@@ -27,6 +28,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -55,7 +59,7 @@ main:
         # variant
         user/variant/key:
             widget: enumerate
-            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            value: ['geometry', 'look', 'camera', 'light', 'quality', 'layer']
             default: 'geometry'
             tool_tip: '...'
 

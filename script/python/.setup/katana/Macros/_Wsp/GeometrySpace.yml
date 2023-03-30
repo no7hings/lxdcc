@@ -20,12 +20,13 @@ option:
         b: 0
     #
     size:
-        w: 1280
+        w: 1200
         h: 480
 #
 main:
     type: Space_Wsp
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.join_upstream'
     output: '<.path>.output'
     #
@@ -41,24 +42,28 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
+    capsules:
+        extra/default_name: ['asset', 'shot']
+    #
     port_hints:
         variant/key: {readOnly: True}
-        extra/default_name: {options: ['asset', 'shot']}
     #
     parameters:
         type: '<option.create_type>'
         option/color: [<option.color.r>, <option.color.g>, <option.color.b>]
         variant/key: <option.variant_key>
-        extra/default_name: 'asset'
 #
 record_update:
     backdrop:
         attributes:
             ns_text: '<option.description>'
-            ns_fontScale: 1.5
+            ns_fontScale: 3
             x: 0
             y: =<option.size.h>/2+120
             ns_sizeX: =<option.size.w>

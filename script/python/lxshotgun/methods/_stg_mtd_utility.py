@@ -34,7 +34,7 @@ class StgTaskMtd(object):
                     i_entity_kwargs['sequence'] = entity[:3]
                     i_entity_kwargs['shot'] = entity
                 #
-                stg_connector.set_stg_entity_create(
+                stg_connector.create_stg_resource(
                     **i_entity_kwargs
                 )
                 #
@@ -74,7 +74,7 @@ class StgTaskMtd(object):
         )
         stg_connector = stg_objects.StgConnector()
         #
-        stg_connector.set_stg_entity_create(
+        stg_connector.create_stg_resource(
             **entity_kwargs
         )
         #
@@ -117,7 +117,7 @@ class StgTaskMtd(object):
         rsv_project = r.get_rsv_project(**kwargs)
         project_directory_path = rsv_project.get_directory_path()
         stg_connector = stg_objects.StgConnector()
-        stg_entity = stg_connector.get_stg_entity(**kwargs)
+        stg_entity = stg_connector.get_stg_resource(**kwargs)
         s = stg_api.Sgtk(project_directory_path)
         #
         s.create_filesystem_structure(

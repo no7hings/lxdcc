@@ -19,7 +19,8 @@ option:
 main:
     #
     type: Group
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.join_upstream'
     output: '<.path>.output'
     #
@@ -30,6 +31,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -47,11 +51,102 @@ main:
             value: '<option.create_type>'
             tool_tip: '...'
             lock: True
-        # option
-        option/scheme:
-            widget: enumerate
+        #
+        parameters/scheme:
+            widget: capsule_string
             value: ['master', 'renderable', 'shape', 'all']
             default: 'master'
+            tool_tip: '...'
+        # setting
+        #   renderable
+        parameters/setting/renderable_all:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/model:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/groom:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/character_effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/rig:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/surface:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/light:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/renderable/extend:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        #   shape
+        parameters/setting/shape_all:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/model:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/groom:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/character_effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/effect:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/rig:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/surface:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/light:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/shape/extend:
+            widget: boolean
+            value: True
             tool_tip: '...'
         #  root
         option/root:
@@ -148,103 +243,16 @@ main:
             widget: path
             value: '/root/world/geo/master/shape/etd_shapegrp'
             tool_tip: '...'
-        # setting
-        #   renderable
-        setting/renderable_all:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/model:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/groom:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/character_effect:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/effect:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/rig:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/surface:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/light:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/renderable/extend:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-        #   shape
-        setting/shape_all:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/model:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/groom:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/character_effect:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/effect:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/rig:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/surface:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/light:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/shape/extend:
-            widget: boolean
-            value: True
-            tool_tip: '...'
         # record
-        record/variant_data_opt:
+        record/variant_properties_opt:
             widget: node
-            value: '<node.variant_data_opt.name>'
+            value: '<node.variant_properties_opt.name>'
             tool_tip: '...'
             lock: True#
+    #
+    expand_groups:
+        - 'parameters'
+        - 'parameters/setting'
 #
 node:
     # dot
@@ -297,7 +305,7 @@ node:
         #
         e_0:
             |-
-            ' - (( {{}}))'.format(getParent().option.renderable.{k}) if (getParent().setting.renderable_all and getParent().setting.renderable.{k}) else ''
+            ' - (( {{}}))'.format(getParent().option.renderable.{k}) if (getParent().paramters.setting.renderable_all and getParent().paramters.setting.renderable.{k}) else ''
         #
         expressions:
             cel:
@@ -352,7 +360,7 @@ node:
         #
         e_0:
             |-
-            ' - (( {{}}))'.format(getParent().option.shape.{k}) if (getParent().setting.shape_all and getParent().setting.shape.{k}) else ''
+            ' - (( {{}}))'.format(getParent().option.shape.{k}) if (getParent().paramters.setting.shape_all and getParent().paramters.setting.shape.{k}) else ''
         #
         expressions:
             cel:
@@ -410,11 +418,11 @@ node:
         expressions:
             in:
                 |-
-                <..input_ports % str(x)>.index(getParent().option.scheme)
+                <..input_ports % str(x)>.index(getParent().parameters.scheme)
         #
         connections:
             # master
-            - '<..upstream_merge.output>'
+            - '<..renderable_prune.output>'
             - '<.path>.master'
             # renderable
             - '<..renderable_prune.output>'
@@ -425,8 +433,8 @@ node:
             # all
             - '<..all_merge.output>'
             - '<.path>.all'
-    # variant data opt
-    variant_data_opt:
+    # variant properties opt
+    variant_properties_opt:
         tag: 'VPO'
         type: VariantPropertiesOpt_Wsp
         name: '<option.type_abr>__<.tag>'
@@ -436,11 +444,10 @@ node:
         #
         parameters:
             user/data_1/i0: '<option.variant_key>.current'
-            user/data_2/i0: '<option.variant_key>.scheme'
         #
         expressions:
             user/data_1/i1: 'getParent().getNodeName()'
-            user/data_2/i1: 'getParent().option.scheme'
+            user/data_2/i1: 'getParent().parameters.scheme'
         #
         connections:
             - '<..scheme_switch.output>'

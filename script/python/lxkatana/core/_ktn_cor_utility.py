@@ -7,7 +7,7 @@ import threading
 #
 import time
 # noinspection PyUnresolvedReferences
-from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, UserNodes
+from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, UserNodes, CacheManager
 # noinspection PyUnresolvedReferences
 from UI4 import App
 

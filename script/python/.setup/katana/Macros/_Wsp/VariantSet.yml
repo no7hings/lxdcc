@@ -18,7 +18,8 @@ option:
 #
 main:
     type: Group
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.input'
     output: '<.path>.output'
     #
@@ -26,6 +27,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -43,22 +47,30 @@ main:
             tool_tip: '...'
             lock: True
         # variant
-        variant/key:
-            widget: enumerate
-            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
-            default: 'geometry'
-            tool_tip: '...'
-
-        variant/value:
-            widget: enumerate
+        parameters/key:
+            widget: capsule_string
             value: ['None']
             default: 'None'
             tool_tip: '...'
 
-        variant/refresh_value:
+        parameters/load_keys:
             widget: button
-            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspVariantSet(node).refresh_value()'
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspVariantSet(node).load_variant_keys()'
             tool_tip: '...'
+
+        parameters/value:
+            widget: capsule_string
+            value: ['None']
+            default: 'None'
+            tool_tip: '...'
+
+        parameters/load_values:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspVariantSet(node).load_variant_values()'
+            tool_tip: '...'
+    #
+    expand_groups:
+        - 'parameters'
 #
 node:
     variable_set:
@@ -75,10 +87,8 @@ node:
             # input
             - '<main.input>'
             - '<.input>'
-
-    #
-    # variant data opt
-    variant_data_opt:
+    # variant properties opt
+    variant_properties_opt:
         tag: 'VPO'
         type: VariantPropertiesOpt_Wsp
         name: '<option.type_abr>__<.tag>'

@@ -18,7 +18,8 @@ option:
 #
 main:
     type: OpScript
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.i0'
     output: '<.path>.out'
     #
@@ -28,6 +29,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -45,60 +49,70 @@ main:
         #
         user/data_1:
             widget: string2
+            label: ' '
             value: [ '', '' ]
             tool_tip: '...'
             lock: True
         #
         user/data_2:
             widget: string2
+            label: ' '
             value: [ '', '' ]
             tool_tip: '...'
             lock: True
         #
         user/data_3:
             widget: string2
+            label: ' '
             value: [ '', '' ]
             tool_tip: '...'
             lock: True
         #
         user/data_4:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True
         #
         user/data_5:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True
         #
         user/data_6:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True
         #
         user/data_7:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True
         #
         user/data_8:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True
         #
         user/data_9:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True
         #
         user/data_10:
             widget: string2
+            label: ' '
             value: ['', '']
             tool_tip: '...'
             lock: True

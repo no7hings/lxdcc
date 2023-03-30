@@ -17,8 +17,9 @@ option:
         b: 0
 #
 main:
-    type: 'Group'
-    path: '<option.root>/<option.type>'
+    type: Group
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.join_upstream'
     output: '<.path>.output'
     #
@@ -29,6 +30,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -56,317 +60,35 @@ main:
             widget: button
             value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspCamera(node).load_preset()'
             tool_tip: '...'
-        # option
-        option/passthrough:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        option/scheme:
-            widget: enumerate
+        #
+        parameters/branch:
+            widget: capsule_string
             value: ['asset', 'shot']
-            tool_tip: '...'
-        #
-        option/location:
-            widget: path
-            value: '/root/world/cam'
-            tool_tip: '...'
-            lock: True
-
-        option/root:
-            widget: path
-            value: '/root/world/cam/renderCamera'
-            tool_tip: '...'
-            lock: True
-
-        option/default:
-            widget: path
-            value: '/root/world/cam/renderCamera/defaultCamera/defaultCameraLeft/defaultCameraLeftShape'
-            tool_tip: '...'
-            lock: True
-        # cache
-        #   asset abc
-        cache/asset_abc/enable:
-            widget: boolean
-            value: False
+            default: 'asset'
             tool_tip: '...'
 
-        cache/asset_abc/file:
-            widget: file
-            value: ''
-            tool_tip: '...'
-
-        cache/asset_abc/element:
-            widget: enumerate
-            value: ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up']
-            default: 'full_body'
-            tool_tip: '...'
-
-        cache/asset_abc/camera_shape_from:
-            widget: path
-            value: ''
-            expression:
-                |-
-                {
-                    'full_body': str(option.location)+'/cam_closeUp/cam_closeUpShape',
-                    'upper_body': str(option.location)+'/cam_upperbody/cam_upperbodyShape',
-                    'upper_body_35': str(option.location)+'/cam_upperbody35/cam_upperbody35Shape',
-                    'upper_body_50': str(option.location)+'/cam_upperbody50/cam_upperbody50Shape',
-                    'close_up': str(option.location)+'/cam_closeUp/cam_closeUpShape',
-                }[str(cache.asset_abc.element)]
-            tool_tip: '...'
-            lock: True
-
-        cache/asset_abc/frame_from:
-            widget: integer
-            value: 4
-            tool_tip: '...'
-        #   usd create
-        cache/load_abc:
-            widget: button
-            value: ''
-            tool_tip: '...'
-        # setting
-        setting/add_to_camera_list:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        setting/fov:
-            widget: float
-            value: 35
-            tool_tip: '...'
-        #   clip plane
-        setting/clip_plane/near:
-            widget: float
-            value: .1
-
-        setting/clip_plane/far:
-            widget: float
-            value: 100000
-
-        setting/screen/mode:
-            widget: enumerate
-            value: ['horizontal', 'vertical', 'fill']
-            tool_tip: '...'
-        #   render
-        setting/render/resolution:
-            widget: resolution
-            value: '2048x2048'
-            tool_tip: '...'
-
-        setting/render/adjust_screen_window:
-            widget: enumerate
-            value: ['No adjustment', 'Adjust width to match resolution', 'Adjust height to match resolution']
-            default: 'Adjust height to match resolution'
-            tool_tip: '...'
-        # extra
-        #   turntable
-        extra/turntable/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        extra/turntable/scheme:
-            widget: enumerate
-            value: ['camera', 'geometry']
-            default: 'camera'
-            tool_tip: '...'
-
-        extra/turntable/geometry_root:
-            widget: path
-            value: '/root/world/geo/master'
-            tool_tip: '...'
-            lock: True
-
-        extra/turntable/direction:
-            widget: enumerate
-            value: ['clockwise', 'anticlockwise']
-            tool_tip: '...'
-
-        extra/turntable/start_frame:
-            widget: integer
-            value: 1
-            tool_tip: '...'
-
-        extra/turntable/end_frame:
-            widget: integer
-            value: 60
-            tool_tip: '...'
-
-        extra/turntable/frame_offset:
-            widget: integer
-            value: 0
-            tool_tip: '...'
-
-        extra/turntable/pivot_locator:
-            widget: path
-            value: '/root/world/loc/turntable/pivot_locator_for_camera'
-            tool_tip: '...'
-            lock: True
-
-        extra/turntable/axis:
-            widget: enumerate
-            value: ['X', 'Y', 'Z']
-            default: 'Y'
-            tool_tip: '...'
-        #   color checker
-        extra/color_checker/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        extra/color_checker/visible/main:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        extra/color_checker/visible/color_chart:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        extra/color_checker/visible/color_chart_flat:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        extra/color_checker/fit/scale_percent:
-            widget: float
-            value: .125
-            tool_tip: '...'
-        #
-        extra/color_checker/fit/margin_percent:
-            widget: float
-            value: .0125
-            tool_tip: '...'
-        # workspace
-        workspace/declare_enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-        #   register
-        workspace/register/variant_key:
+        parameters/asset:
+            widget: proxy
+            expand: True
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../branch', conditionalVisValue: 'asset'
+            }
+        # option
+        option/variant_key:
             widget: string
             value: '<option.variant_key>'
             tool_tip: '...'
             lock: True
         # record
-        record/variant_data_opt:
+        record/variant_properties_opt:
             widget: node
-            value: '<node.variant_data_opt.name>'
+            value: '<node.variant_properties_opt.name>'
             tool_tip: '...'
             lock: True
 #
 node:
-    # camera
-    placeholder:
-        type: 'CameraCreate'
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            transform/translate: [0, 10.477797173, 47.1840229369]
-        #
-        expressions:
-            name: 'getParent().option.default'
-            fov: 'getParent().setting.fov'
-    #   abc
-    asset_abc:
-        type: 'Alembic_In'
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            timing/mode: 'Hold Frame'
-            timing/holdTime: 4
-        #
-        expressions:
-            abcAsset: 'getParent().cache.asset_abc.file'
-            name: 'getParent().option.location'
-            #
-            timing/holdTime: 'getParent().cache.asset_abc.frame_from'
-    #
-    asset_abc_transform_copy:
-        type: HierarchyCopy
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        expressions:
-            copies/copy1/sourceLocation:
-                |-
-                '/'.join(str(getParent().cache.asset_abc.camera_shape_from).split('/')[:-1])
-            copies/copy1/destinationLocations/i0:
-                |-
-                '/'.join(str(getParent().option.default).split('/')[:-1])
-        #
-        connections:
-            - '<..asset_abc.output>'
-            - '<.path>.in'
-    #
-    asset_abc_transform_repair:
-        type: AttributeSet
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            attributeName: 'xform.scale1'
-            numberValue: { size: 3, tuple_size: 1, value: [ 1.0, 1.0, 1.0 ] }
-        #
-        expressions:
-            paths/i0:
-                |-
-                '/'.join(str(getParent().option.default).split('/')[:-1])
-        #
-        connections:
-            - '<..asset_abc_transform_copy.output>'
-            - '<.path>.A'
-    #
-    asset_abc_rename_shape:
-        type: Rename
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            locationTypes: 'camera'
-        #
-        expressions:
-            rootLocation:
-                |-
-                '/'.join(str(getParent().option.default).split('/')[:-1])
-            pattern:
-                |-
-                str(getParent().cache.asset_abc.camera_shape_from).split('/')[-1]
-            replace:
-                |-
-                str(getParent().option.default).split('/')[-1]
-
-        #
-        connections:
-            - '<..asset_abc_transform_repair.output>'
-            - '<.path>.in'
-    #   abc enable
-    asset_abc_enable:
-        type: Switch
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.output'
-        #
-        input_ports:
-            - 'off'
-            - 'on'
-        #
-        expressions:
-            in: '1 if getParent().cache.asset_abc.enable else 0'
-        #
-        connections:
-            # off
-            - '<..placeholder.output>'
-            - '<.path>.off'
-            # on
-            - '<..asset_abc_rename_shape.output>'
-            - '<.path>.on'
     # join geometry dot
-    join_geometry_dot:
+    join_upstream_dot:
         type: Dot
         path: '<main.path>/<option.type_abr>__<..key>'
         input: '<.path>.input'
@@ -387,6 +109,35 @@ node:
             # input
             - '<main.path>.join_other'
             - '<.input>'
+    # abc
+    asset:
+        tag: 'ACR'
+        type: AssetCamera_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.output'
+        #
+        proxy_ports:
+            parameters: ['<main.name>', 'parameters/asset']
+    #
+    branch_switch:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'asset'
+            - 'shot'
+        #
+        expressions:
+            in:
+                |-
+                ['asset', 'shot'].index(getParent().parameters.branch)
+        #
+        connections:
+            # off
+            - '<..asset.output>'
+            - '<.path>.asset'
     # upstream_merge
     upstream_merge:
         tag: 'UMG'
@@ -396,158 +147,22 @@ node:
         output: '<.path>.out'
         #
         input_ports:
-            - join_upstream
-            - camera
-            - join_other
+            - 'join_upstream'
+            - 'join_current'
+            - 'join_other'
         #
         connections:
             # join upstream
-            - '<..join_geometry_dot.output>'
+            - '<..join_upstream_dot.output>'
             - '<.path>.join_upstream'
-            # camera
-            - '<..asset_abc_enable.output>'
-            - '<.path>.camera'
+            # join current
+            - '<..branch_switch.output>'
+            - '<.path>.join_current'
             # join other
             - '<..join_other_dot.output>'
             - '<.path>.join_other'
-    #
-    passthrough_enable:
-        type: Switch
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.output'
-        #
-        input_ports:
-            - 'off'
-            - 'on'
-        #
-        expressions:
-            in: '1 if getParent().option.passthrough else 0'
-        #
-        connections:
-            # off
-            - '<..upstream_merge.output>'
-            - '<.path>.off'
-            # on
-            - '<..join_geometry_dot.output>'
-            - '<.path>.on'
-    # setting
-    #   camera list
-    camera_list_opt:
-        type: CameraListOpt_Wsp
-        path: '<main.path>/<option.type_abr>__<..key>'
-        input: '<.path>.i0'
-        output: '<.path>.out'
-        #
-        expressions:
-            user/enable: 'getParent().setting.add_to_camera_list'
-            user/camera_shape: 'getParent().option.default'
-        #
-        connections:
-            #
-            - '<..passthrough_enable.output>'
-            - '<.input>'
-    #   camera data
-    camera_properties_opt:
-        tag: 'CPO'
-        type: CameraPropertiesOpt_Wsp
-        name: '<option.type_abr>__<.tag>'
-        path: '<main.path>/<.name>'
-        input: '<.path>.i0'
-        output: '<.path>.out'
-        #
-        parameters:
-            user/enable: True
-        #
-        expressions:
-            CEL: 'getParent().option.default'
-            user/clip_plane/near: 'getParent().setting.clip_plane.near'
-            user/clip_plane/far: 'getParent().setting.clip_plane.far'
-            user/screen/mode: 'getParent().setting.screen.mode'
-            user/render/resolution: 'getParent().setting.render.resolution'
-        #
-        connections:
-            #
-            - '<..camera_list_opt.output>'
-            - '<.input>'
-    #   render properties
-    render_properties_opt:
-        tag: 'RPO'
-        type: RenderPropertiesOpt_Wsp
-        name: '<option.type_abr>__<.tag>'
-        path: '<main.path>/<.name>'
-        input: '<.path>.i0'
-        output: '<.path>.out'
-        #
-        parameters:
-            CEL: '/root'
-            user/option/builtin/enable: True
-        #
-        expressions:
-            user/option/builtin/camera: 'getParent().option.default'
-            user/option/builtin/resolution: 'getParent().setting.render.resolution'
-            user/option/builtin/adjust_screen_window: 'getParent().setting.render.adjust_screen_window'
-        #
-        connections:
-            #
-            - '<..camera_properties_opt.output>'
-            - '<.input>'
-    # extra
-    #   turntable
-    turntable:
-        tag: 'TTB'
-        type: Turntable_Wsp
-        name: '<option.type_abr>__<.tag>'
-        path: '<main.path>/<.name>'
-        input: '<.path>.join_upstream'
-        output: '<.path>.output'
-        #
-        expressions:
-            option/enable: 'getParent().extra.turntable.enable'
-            option/target:
-                |-
-                getParent().option.root if getParent().extra.turntable.scheme == 'camera' else getParent().extra.turntable.geometry_root
-            option/direction: 'getParent().extra.turntable.direction'
-            option/start_frame: 'getParent().extra.turntable.start_frame'
-            option/end_frame: 'getParent().extra.turntable.end_frame'
-            option/frame_offset: 'getParent().extra.turntable.frame_offset'
-            option/pivot_locator: 'getParent().extra.turntable.pivot_locator'
-            option/axis: 'getParent().extra.turntable.axis'
-        #
-        connections:
-            #
-            - '<..render_properties_opt.output>'
-            - '<.input>'
-    #   color check
-    color_checker:
-        tag: 'CCK'
-        type: ColorChecker_Wsp
-        name: '<option.type_abr>__<.tag>'
-        path: '<main.path>/<.name>'
-        input: '<.path>.join_camera'
-        output: '<.path>.output'
-        #
-        expressions:
-            option/enable: 'getParent().extra.color_checker.enable'
-            #
-            option/visible/main: 'getParent().extra.color_checker.visible.main'
-            option/visible/color_chart: 'getParent().extra.color_checker.visible.color_chart'
-            option/visible/color_chart_flat: 'getParent().extra.color_checker.visible.color_chart_flat'
-            #
-            extra/camera_attach/enable: 'getParent().extra.color_checker.enable'
-            #
-            extra/camera_fit/enable: 'getParent().extra.color_checker.enable'
-            extra/camera_fit/scale_percent: 'getParent().extra.color_checker.fit.scale_percent'
-            extra/camera_fit/margin_percent: 'getParent().extra.color_checker.fit.margin_percent'
-            extra/camera_fit/camera_fov: 'getParent().setting.fov'
-            extra/camera_fit/camera_screen_mode: 'getParent().setting.screen.mode'
-            extra/camera_fit/render_resolution: 'getParent().setting.render.resolution'
-        #
-        connections:
-            #
-            - '<..turntable.output>'
-            - '<.input>'
-    # variant data opt
-    variant_data_opt:
+    # variant properties opt
+    variant_properties_opt:
         tag: 'VPO'
         type: VariantPropertiesOpt_Wsp
         name: '<option.type_abr>__<.tag>'
@@ -557,18 +172,12 @@ node:
         #
         parameters:
             user/data_1/i0: '<option.variant_key>.current'
-            user/data_2/i0: '<option.variant_key>.scheme'
-            user/data_3/i0: '<option.variant_key>.root'
-            user/data_4/i0: '<option.variant_key>.default'
         #
         expressions:
             user/data_1/i1: 'getParent().getNodeName()'
-            user/data_2/i1: 'getParent().option.scheme'
-            user/data_3/i1: 'getParent().option.root'
-            user/data_4/i1: 'getParent().option.default'
         #
         connections:
-            - '<..color_checker.output>'
+            - '<..upstream_merge.output>'
             - '<.input>'
             # output
             - '<.output>'

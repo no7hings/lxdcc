@@ -372,7 +372,7 @@ class AbsScpLibShotgunDef(object):
             )
             i_move_file_path = i_rsv_task_unit_tgt.get_result()
             if i_move_file_path:
-                i_stg_asset_query_tgt = stg_connector.get_stg_entity_query(
+                i_stg_asset_query_tgt = stg_connector.get_stg_resource_query(
                     project=project, asset=asset
                 )
                 i_thumbnail_file_path = bsc_core.VdoFileOpt(i_move_file_path).get_thumbnail(block=True)

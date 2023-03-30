@@ -18,7 +18,8 @@ option:
 #
 main:
     type: 'Group'
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.join_upstream'
     output: '<.path>.output'
     #
@@ -29,6 +30,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -57,194 +61,198 @@ main:
             widget: button
             value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).load_preset()'
             tool_tip: '...'
+        # workspace
+        workspace:
+            widget: group
+            expand: True
 
-        option/project:
+        workspace/time_tag:
             widget: string
             value: ''
             tool_tip: '...'
+            lock: True
 
-        option/resource:
-            widget: string
-            value: ''
-            tool_tip: '...'
-
-        option/guess_option:
-            widget: button
-            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).guess_option()'
-            tool_tip: '...'
-
-        variant/keys:
+        workspace/keys:
             widget: capsule_list
-            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            value: ['geometry', 'look', 'camera', 'light', 'quality', 'layer']
+            default: ['geometry', 'look', 'camera', 'light']
             tool_tip: '...'
 
-        variant/register:
-            widget: button
-            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).register_variable()'
-            tool_tip: '...'
-        # build
-        build/time_tag:
-            widget: string
-            value: ''
-            tool_tip: '...'
-            lock: True
-
-        build/geometry/enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        build/geometry/scheme:
+        workspace/spaces/geometry:
             widget: capsule_string
             value: ['default', 'utility', 'user']
             default: 'user'
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1]>',
+            }
 
-        build/geometry/load:
-            widget: button
-            value: ''
+        workspace/spaces/geometry__tools:
+            widget: buttons
+            value:
+                - {
+                      name: 'load or update geometry',
+                      script: ''
+                }
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1].split("__")[0]>',
+            }
 
-        build/camera/enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        build/camera/scheme:
+        workspace/spaces/look:
             widget: capsule_string
             value: ['default', 'utility', 'user']
             default: 'user'
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1]>',
+            }
 
-        build/camera/load:
-            widget: button
-            value: ''
+        workspace/spaces/look__tools:
+            widget: buttons
+            value:
+                - {
+                      name: 'load or update look',
+                      script: ''
+                }
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1].split("__")[0]>',
+            }
 
-        build/look/enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        build/look/scheme:
+        workspace/spaces/camera:
             widget: capsule_string
             value: ['default', 'utility', 'user']
             default: 'user'
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1]>',
+            }
 
-        build/look/load:
-            widget: button
-            value: ''
+        workspace/spaces/camera__tools:
+            widget: buttons
+            value:
+                - {
+                      name: 'load or update camera',
+                      script: ''
+                }
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1].split("__")[0]>',
+            }
 
-        build/light/enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        build/light/scheme:
+        workspace/spaces/light:
             widget: capsule_string
             value: ['default', 'utility', 'user']
             default: 'user'
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1]>',
+            }
 
-        build/light/load:
-            widget: button
-            value: ''
+        workspace/spaces/light__tools:
+            widget: buttons
+            value:
+                - {
+                      name: 'load or update light',
+                      script: ''
+                }
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1].split("__")[0]>',
+            }
 
-        build/quality/enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        build/quality/scheme:
+        workspace/spaces/quality:
             widget: capsule_string
             value: ['default', 'utility', 'user']
             default: 'user'
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1]>',
+            }
 
-        build/quality/load:
-            widget: button
-            value: ''
+        workspace/spaces/quality__tools:
+            widget: buttons
+            value:
+                - {
+                      name: 'load or update quality',
+                      script: ''
+                }
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1].split("__")[0]>',
+            }
 
-        build/layer/enable:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        build/layer/scheme:
+        workspace/spaces/layer:
             widget: capsule_string
             value: ['default', 'utility', 'user']
             default: 'user'
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1]>',
+            }
 
-        build/layer/load:
-            widget: button
-            value: ''
+        workspace/spaces/layer__tools:
+            widget: buttons
+            value:
+                - {
+                      name: 'load or update layer',
+                      script: ''
+                }
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'contains',
+                conditionalVisPath: '../../keys',
+                conditionalVisValue: '<...key % x.split("/")[-1].split("__")[0]>',
+            }
 
-        build/execute:
-            widget: button
-            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).build()'
+        workspace/tools:
+            widget: buttons
+            value:
+                - {
+                    name: 'build all spaces',
+                    script: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).build()'
+                }
+                - {
+                    name: 'register all variants',
+                    script: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspWorkspace(node).register_all_variable()'
+                }
             tool_tip: '...'
-        #   render override
-        setting/render_override/properties/builtin_enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        setting/render_override/properties/builtin:
-            widget: script
-            value: ''
-            tool_tip: '...'
-
-        setting/render_override/properties/arnold_enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        setting/render_override/properties/arnold:
-            widget: script
-            value: ''
-            tool_tip: '...'
-
-        record/geometry:
-            widget: node
-            value: ''
-            tool_tip: '...'
-            lock: True
-
-        record/camera:
-            widget: node
-            value: ''
-            tool_tip: '...'
-            lock: True
-
-        record/look:
-            widget: node
-            value: ''
-            tool_tip: '...'
-            lock: True
-
-        record/light:
-            widget: node
-            value: ''
-            tool_tip: '...'
-            lock: True
-
-        record/quality:
-            widget: node
-            value: ''
-            tool_tip: '...'
-            lock: True
-
-        record/layer:
-            widget: node
-            value: ''
-            tool_tip: '...'
-            lock: True
+        #
+        aovs/builtin:
+            widget: proxy
+        #
+        aovs/custom:
+            widget: proxy
+        #
+        render/properties:
+            widget: proxy
+    #
+    expand_groups:
+        - 'workspace'
+        - 'workspace/spaces'
 #
 node:
     # dot
@@ -288,26 +296,65 @@ node:
             # join other
             - '<..join_other_dot.output>'
             - '<.path>.join_other'
-    # user render properties
-    override__render_properties_opt:
+    # aovs
+    aovs:
+        tag: 'AOVs'
+        type: Aovs_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.join_upstream'
+        output: '<.path>.output'
+        #
+        proxy_ports:
+            builtin: ['<main.name>', 'aovs/builtin']
+            custom: ['<main.name>', 'aovs/custom']
+        #
+        connections:
+            - '<..upstream_merge.path>.out'
+            - '<.input>'
+    # render properties
+    render_properties_opt:
         tag: 'RPO'
-        variant:
-            |-
-            <..key % str(x).split('__')[0]>
         type: RenderPropertiesOpt_Wsp
-        name: '<option.type_abr>__<.variant>__<.tag>'
+        name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
         output: '<.path>.out'
         #
-        expressions:
-            user/properties/builtin_enable: 'getParent().setting.render_override.properties.builtin_enable'
-            user/properties/builtin: 'getParent().setting.render_override.properties.builtin'
-            user/properties/arnold_enable: 'getParent().setting.render_override.properties.arnold_enable'
-            user/properties/arnold: 'getParent().setting.render_override.properties.arnold'
+        proxy_ports:
+            user/properties: ['<main.name>', 'render/properties']
+        #
+        parameters:
+            CEL: '/root'
+            user/properties/builtin:
+                |-
+                interactiveOutputs=
+            user/properties/arnold:
+                |-
+                enable_adaptive_sampling=0
+                enable_progressive_render=1
+                AA_progressive_samples_min=-1
+                sss_use_autobump=1
+                abort_on_error=0
+                bucket_size=32
+                texture_max_memory_MB=20480
+                
+                AA_samples=8
+
+                GI_diffuse_samples=2
+                GI_specular_samples=3
+                GI_transmission_samples=2
+                GI_volume_samples=0
+                GI_sss_samples=4
+                
+                GI_total_depth=14
+                GI_diffuse_depth=2
+                GI_specular_depth=3
+                GI_transmission_depth=8
+                GI_volume_depth=0
         #
         connections:
-            - '<..upstream_merge.output>'
+            - '<..aovs.output>'
             - '<.input>'
             # output
             - '<.output>'

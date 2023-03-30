@@ -26,7 +26,7 @@ class RsvStgProjectOpt(object):
         properties = self._rsv_project.properties
         project = properties.get('project')
         role = properties.get('roles.light_rig')
-        _ = self._stg_connector.get_stg_entity_queries(
+        _ = self._stg_connector.get_stg_resource_queries(
             project=project,
             role=role,
             tags=['DefaultRig']
@@ -41,7 +41,7 @@ class RsvStgProjectOpt(object):
         properties = self._rsv_project.properties
         project = properties.get('project')
         role = properties.get('roles.light_rig')
-        _ = self._stg_connector.get_stg_entity_queries(
+        _ = self._stg_connector.get_stg_resource_queries(
             project=project,
             role=role,
             tags=['StandardRig']
@@ -67,12 +67,12 @@ class RsvStgProjectOpt(object):
         properties = self._rsv_project.properties
         project = properties.get('project')
         role = properties.get('roles.light_rig')
-        _0 = self._stg_connector.get_stg_entity_queries(
+        _0 = self._stg_connector.get_stg_resource_queries(
             project=project,
             role=role,
             tags=['DefaultRig']
         )
-        _1 = self._stg_connector.get_stg_entity_queries(
+        _1 = self._stg_connector.get_stg_resource_queries(
             project=project,
             role=role,
             tags=['StandardRig']
@@ -94,11 +94,11 @@ class RsvStgTaskOpt(object):
             **kwargs
         )
         if stg_project is not None:
-            stg_entity = self._stg_connector.get_stg_entity(
+            stg_entity = self._stg_connector.get_stg_resource(
                 **kwargs
             )
             if stg_entity is None:
-                self._stg_connector.set_stg_entity_create(**kwargs)
+                self._stg_connector.create_stg_resource(**kwargs)
             #
             stg_step = self._stg_connector.get_stg_step(
                 **kwargs

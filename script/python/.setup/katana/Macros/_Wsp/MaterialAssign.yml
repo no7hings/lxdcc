@@ -18,10 +18,11 @@ option:
 #
 main:
     type: MaterialAssign
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     output: '<.path>.out'
     #
-    clear_start: 'option'
+    clear_start: 'user'
     #
     clear_ports: False
     clear_children: False
@@ -30,6 +31,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #

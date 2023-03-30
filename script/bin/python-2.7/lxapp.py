@@ -8,19 +8,32 @@ import os
 import getopt
 
 
+TOOL_MAPPER = dict(
+    mayapy=dict(
+        application='maya',
+        args_execute=['-- mayapy']
+    ),
+    hython=dict(
+        application='houdini',
+        args_execute=['-- hython']
+    ),
+)
+
+
 def main(argv):
     try:
         sys.stdout.write('execute lxapp from: "{}"\n'.format(__file__))
-        args_opt, args_execute = __get_opt_args(argv[1:])
-        opt_kwargs, opt_args = getopt.getopt(
-            args_opt,
+        opt_kwargs_0, opt_args_0 = getopt.getopt(
+            argv[1:],
             'ha:o:',
             ['help', 'app=', 'option=']
         )
-        packages_extend = None
         option = None
-        if opt_kwargs:
-            for i_key, i_value in opt_kwargs:
+        args_execute = None
+        args_extend = None
+        environs_extend = None
+        if opt_kwargs_0:
+            for i_key, i_value in opt_kwargs_0:
                 if i_key in ('-h', '--help'):
                     __print_help()
                     #
@@ -36,28 +49,15 @@ def main(argv):
                     option = 'project={}&application={}'.format(i_project, i_application)
                 elif i_key in ('-o', '--option'):
                     option = i_value
-            #
-            if opt_args:
-                packages_extend = opt_args
-                args_execute = args_execute
+        # etc. nsa_dev.maya
         else:
-            if opt_args:
-                launcher = opt_args[0]
-                if '.' not in launcher:
-                    raise SyntaxError()
-                _ = launcher.split('.')
-                if len(_) != 2:
-                    raise SyntaxError()
-                #
-                project, application = _
-                #
-                packages_extend = opt_args[1:]
-                #
-                option = 'project={}&application={}'.format(project, application)
-                args_execute = ['-- {}'.format(application)]
+            if opt_args_0:
+                option, args_execute, args_extend, environs_extend = __get_app_args(
+                    opt_args_0
+                )
         #
         if option is not None:
-            __execute_with_option(option, args_execute, packages_extend)
+            __execute_with_option(option, args_execute, args_extend, environs_extend)
     #
     except getopt.GetoptError:
         # import traceback
@@ -65,20 +65,44 @@ def main(argv):
         sys.stderr.write('argv error\n')
 
 
-def __get_opt_args(args):
-    if '-c' in args:
-        idx = args.index('-c')
-        args_opt = args[:idx]
-        args_e = args[idx+1:]
-        args_execute = '-c "{}"'.format(' '.join(map(lambda x: x.replace('"', '\\\"'), args_e)))
-        return args_opt, [args_execute]
-    elif '--' in args:
-        idx = args.index('--')
-        args_opt = args[:idx]
-        args_e = args[idx+1:]
-        args_execute = '-- {}'.format(' '.join(args_e))
-        return args_opt, [args_execute]
-    return args, None
+def __get_app_args(args):
+    # etc. nsa_dev.maya
+    launcher_arg = args[0]
+    if '.' not in launcher_arg:
+        raise SyntaxError(
+            sys.stderr.write('argv error\n')
+        )
+    #
+    _ = launcher_arg.split('.')
+    if len(_) != 2:
+        raise SyntaxError(
+            sys.stderr.write('argv error\n')
+        )
+    #
+    project, app_arg = _
+    #
+    if app_arg in TOOL_MAPPER:
+        cfg = TOOL_MAPPER[app_arg]
+        application = cfg['application']
+        args_execute = cfg['args_execute']
+    else:
+        application = app_arg
+        args_execute = ['-- {}'.format(application)]
+    #
+    args_extend = args[1:]
+    args_task = None
+    if len(args) == 2:
+        task_arg = args[1]
+        if '.' in task_arg:
+            _ = task_arg.split('.')
+            if len(_) == 2:
+                resource, task = _
+                if os.path.exists(task_arg) is False:
+                    args_task = [project, resource, task]
+                    args_extend = []
+    #
+    option = 'project={}&application={}'.format(project, application)
+    return option, args_execute, args_extend, args_task
 
 
 def __print_help():
@@ -95,7 +119,7 @@ def __print_help():
     )
 
 
-def __execute_with_option(option, args_execute, package_extend):
+def __execute_with_option(option, args_execute=None, args_extend=None, args_task=None):
     from lxbasic import bsc_core
     #
     import lxbasic.extra.methods as bsc_etr_methods
@@ -126,27 +150,44 @@ def __execute_with_option(option, args_execute, package_extend):
         opt_packages_extend.extend(framework_packages_extend)
     #
     rsv_app = rsv_project.get_rsv_app(application=application)
-    sys.stdout.write(
-        (
-            '\033[34m'
-            'resolved command:\n'
-            '\033[32m'
-            '{}'
-            '\033[0m\n'
-        ).format(
-            rsv_app.get_command(
-                args_execute=args_execute,
-                packages_extend=opt_packages_extend
-            )
-        )
+    command = rsv_app.get_command(
+        args_execute=args_execute,
+        args_extend=args_extend,
+        packages_extend=opt_packages_extend
     )
+    if command:
+        sys.stdout.write(
+            (
+                '\033[34m'
+                'resolved full command:\n'
+                '\033[32m'
+                '{}'
+                '\033[0m\n'
+            ).format(command)
+        )
+    #
+    if args_task is not None:
+        environs_extend = m.EtrBase.get_task_environs_extend(*args_task)
+    else:
+        environs_extend = m.EtrBase.get_project_environs_extend(project)
+    #
+    if environs_extend:
+        sys.stdout.write(
+            (
+                '\033[34m'
+                'resolved environments:\n'
+                '\033[32m'
+                '{}'
+                '\033[0m\n'
+            ).format('\n'.join(['{}={}'.format(k, v) for k, v in environs_extend.items()]))
+        )
     if args_execute:
-        framework_environs_extend = m.EtrBase.get_project_environs_extend(project)
         rsv_app.execute_command(
             args_execute=args_execute,
+            args_extend=args_extend,
             packages_extend=opt_packages_extend,
             #
-            environs_extend=framework_environs_extend
+            environs_extend=environs_extend
         )
 
 

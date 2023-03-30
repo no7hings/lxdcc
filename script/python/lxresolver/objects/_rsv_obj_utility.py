@@ -95,7 +95,7 @@ class RsvProject(rsv_abstracts.AbsRsvProject):
     RSV_OBJ_STACK_CLASS = _rsv_obj_stack.EntityStack
     #
     RSV_TAG_CLASS = RsvTag
-    RSV_ENTITY_CLASS = RsvResource
+    RSV_RESOURCE_CLASS = RsvResource
     RSV_STEP_CLASS = RsvStep
     RSV_TASK_CLASS = RsvTask
     RSV_TASK_VERSION_CLASS = RsvTaskVersion

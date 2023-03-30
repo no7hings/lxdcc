@@ -190,7 +190,7 @@ class AbsContent(object):
         self._value = value
     #
     def get_copy_value(self):
-        return copy.copy(self._value)
+        return copy.deepcopy(self._value)
     copy_value = property(get_copy_value)
     #
     @classmethod
@@ -321,7 +321,7 @@ class AbsContent(object):
         #
         es.append(value)
 
-    def _set_quote_unfold_(self, key, keys_all):
+    def _unfold_quote_(self, key, keys_all):
         value = self.get(key)
         if isinstance(value, six.string_types):
             if fnmatch.filter([value], '$*'):
@@ -341,8 +341,10 @@ class AbsContent(object):
                     raise KeyError('key="{}" is non-exists'.format(k_2))
                 # need use copy
                 self.set(key, copy.deepcopy(self.get(k_2)))
+            elif fnmatch.filter([value], '\\$*'):
+                self.set(key, value.replace('\\$', '$'))
 
-    def _set_inherit_and_override_unfold_(self, key, keys_all):
+    def _unfold_inherit_and_override_(self, key, keys_all):
         if fnmatch.filter([key], '*$'):
             value = self.get(key)
             if fnmatch.filter([value], '.*'):
@@ -399,15 +401,16 @@ class AbsContent(object):
 
     def set_flatten(self):
         keys_all = self.get_keys()
-        for i_key in keys_all:
-            i_value = self.get(i_key)
-            if isinstance(i_value, dict) is False:
-                self._set_quote_unfold_(i_key, keys_all)
         #
         for i_key in keys_all:
             i_value = self.get(i_key)
             if isinstance(i_value, dict) is False:
-                self._set_inherit_and_override_unfold_(i_key, keys_all)
+                self._unfold_inherit_and_override_(i_key, keys_all)
+        #
+        for i_key in keys_all:
+            i_value = self.get(i_key)
+            if isinstance(i_value, dict) is False:
+                self._unfold_quote_(i_key, keys_all)
         #
         keys_all = self.get_keys()
         for i_key in keys_all:

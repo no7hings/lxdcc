@@ -844,7 +844,7 @@ class AbsRsvObj(
         kwargs = copy.copy(self.properties.value)
         kwargs['workspace'] = self.rsv_project.get_workspace_user()
         kwargs['workspace_key'] = self.WorkspaceKeys.User
-        kwargs['user_extra'] = bsc_core.SystemMtd.get_user_name()
+        kwargs['artist'] = bsc_core.SystemMtd.get_user_name()
         p = self._get_valid_rsv_pattern_(**kwargs)
         return MtdBasic._set_pattern_update_(p, **kwargs)
 
@@ -1324,6 +1324,7 @@ class AbsRsvTask(
                             j_rsv_scene_properties.set('scene_type', scene_type)
                             #
                             j_rsv_scene_properties.set('branch', branch)
+                            j_rsv_scene_properties.set('resource', j_rsv_scene_properties.get(branch))
                             j_rsv_scene_properties.set('application', i_application)
                             #
                             j_rsv_scene_properties.set('extra.file', file_path)
@@ -1786,7 +1787,7 @@ class AbsRsvProject(
     RSV_OBJ_STACK_CLASS = None
     #
     RSV_TAG_CLASS = None
-    RSV_ENTITY_CLASS = None
+    RSV_RESOURCE_CLASS = None
     RSV_STEP_CLASS = None
     RSV_TASK_CLASS = None
     RSV_TASK_VERSION_CLASS = None
@@ -2212,8 +2213,8 @@ class AbsRsvProject(
             kwargs
         )
         matches = rsv_matcher.get_matches()
-        for i_match in matches:
-            _, i_variants = i_match
+        for i_m in matches:
+            _, i_variants = i_m
             i_kwargs = copy.copy(kwargs)
             i_kwargs.update(i_variants)
             i_rsv_tag = self.get_rsv_tag(**i_kwargs)
@@ -2316,8 +2317,8 @@ class AbsRsvProject(
             kwargs_over
         )
         matches = rsv_matcher.get_matches()
-        for i_match in matches:
-            _, i_variants = i_match
+        for i_m in matches:
+            _, i_variants = i_m
             i_kwargs_over = copy.copy(kwargs_over)
             i_kwargs_over.update(i_variants)
             i_rsv_resource = self._tag__get_rev_resource_(**i_kwargs_over)
@@ -2349,7 +2350,7 @@ class AbsRsvProject(
         # branch
         kwargs_over['branch'] = branch
         # asset/shot
-        kwargs_over[rsv_type] = name
+        kwargs_over[branch] = name
         #
         obj_path = self._get_main_rsv_path_(self.VariantCategories.Resource, kwargs_over)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
@@ -2369,7 +2370,7 @@ class AbsRsvProject(
         if matches:
             result, variants = matches[-1]
             self._completion_rsv_obj_create_kwargs_(kwargs, result, variants)
-            rsv_obj = self.RSV_ENTITY_CLASS(self, **kwargs)
+            rsv_obj = self.RSV_RESOURCE_CLASS(self, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
     #
@@ -2708,8 +2709,8 @@ class AbsRsvProject(
             kwargs
         )
         matches = rsv_matcher.get_matches()
-        for i_match in matches:
-            _, i_variants = i_match
+        for i_m in matches:
+            _, i_variants = i_m
             i_kwargs = copy.copy(kwargs)
             i_kwargs.update(i_variants)
             #
@@ -3341,25 +3342,26 @@ class AbsRsvRoot(
     #
     def _resolver__get_rsv_project_use_default_(self, file_path):
         rsv_project = self.get_rsv_project(project='default')
-        for i_platform in self.Platforms.All:
-            i_root = rsv_project.get_pattern('project-root-{}-dir'.format(i_platform))
-            i_glob_pattern = '{}/*'.format(i_root)
-            i_results = fnmatch.filter([file_path.lower()], i_glob_pattern)
-            if i_results:
-                i_variants = {'root': i_root}
-                i_pattern = rsv_project.get_pattern('project-dir')
-                i_pattern_ = '{}/{{extra}}'.format(i_pattern)
-                i_rsv_matcher = rsv_project._create_rsv_matcher_(
-                    i_pattern_, i_variants
-                )
-                i_project_properties = i_rsv_matcher._get_project_properties_by_default_(file_path)
-                i_project = i_project_properties.get('project')
-                if rsv_core.TRACE_RESULT_ENABLE is True:
-                    bsc_core.LogMtd.trace_method_result(
-                        'resolver project create',
-                        'project-name="{}", create use "default"'.format(i_project)
+        if rsv_project is not None:
+            for i_platform in self.Platforms.All:
+                i_root = rsv_project.get_pattern('project-root-{}-dir'.format(i_platform))
+                i_glob_pattern = '{}/*'.format(i_root)
+                i_results = fnmatch.filter([file_path.lower()], i_glob_pattern)
+                if i_results:
+                    i_variants = {'root': i_root}
+                    i_pattern = rsv_project.get_pattern('project-dir')
+                    i_pattern_ = '{}/{{extra}}'.format(i_pattern)
+                    i_rsv_matcher = rsv_project._create_rsv_matcher_(
+                        i_pattern_, i_variants
                     )
-                return self.get_rsv_project(project=i_project)
+                    i_project_properties = i_rsv_matcher._get_project_properties_by_default_(file_path)
+                    i_project = i_project_properties.get('project')
+                    if rsv_core.TRACE_RESULT_ENABLE is True:
+                        bsc_core.LogMtd.trace_method_result(
+                            'resolver project create',
+                            'project-name="{}", create use "default"'.format(i_project)
+                        )
+                    return self.get_rsv_project(project=i_project)
 
     def get_task_properties_by_work_scene_src_file_path(self, file_path):
         _ = self._get_rsv_task_properties_by_work_scene_src_file_path_(file_path)

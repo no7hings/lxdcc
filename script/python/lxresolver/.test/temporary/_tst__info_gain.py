@@ -17,6 +17,6 @@ sc = app.get_stg_connector()
 si = sc.shotgun
 
 print sc.get_stg_project(**rsp.value)
-print sc.get_stg_entity(**rsp.value)
+print sc.get_stg_resource(**rsp.value)
 print sc.get_stg_step(**rsp.value)
 print sc.get_stg_task(**rsp.value)

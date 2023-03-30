@@ -32,5 +32,6 @@ if __name__ == '__main__':
     # print RscFileMtd.get(
     #     'lua-scripts'
     # )
-    print CameraMtd.get_project_pos(25, 1, 'horizontal', (1024, 512))
+    print 1.0/2.0/math.tan(math.radians(70.0/2.0))
+    print 1.0/.646
 

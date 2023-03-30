@@ -1,4 +1,6 @@
 # coding:utf-8
+import collections
+
 import six
 
 from lxbasic import bsc_core
@@ -31,7 +33,7 @@ class ScpMacro(object):
         color_use_variant = self._cfg.get('option.color_use_variant', False)
         if color_use_variant is True:
             variant_key = self._cfg.get('option.variant_key')
-            r, g, b = bsc_core.RawTextOpt(variant_key).to_rgb_(maximum=1.0, s_p=12.5, v_p=25)
+            r, g, b = bsc_core.RawTextOpt(variant_key).to_rgb_(maximum=1.0, s_p=25, v_p=25)
             self._cfg.set(
                 'option.color.r', r
             )
@@ -81,6 +83,9 @@ class ScpMacro(object):
             self._obj_opt.create_ports_by_data(
                 data.get('ports') or {}
             )
+            self._obj_opt.set_parameters_by_data(
+                data.get('parameters') or {}
+            )
         #
         if data.get('type') in ['Group']:
             clear_children = data.get('clear_children', default_value=True)
@@ -113,7 +118,7 @@ class ScpMacro(object):
         ktn_obj, is_create = ktn_core.NGObjOpt._get_create_args_(path, type_name)
         obj_opt = ktn_core.NGObjOpt(ktn_obj)
         if is_create is True or force_update is True:
-            if not type_name.endswith('_Wsp'):
+            if (not type_name.endswith('_Wsp')) and (not type_name.endswith('_Wsp_Usr')):
                 obj_opt.set_color(bsc_core.RawTextOpt(type_name).to_rgb_(maximum=1.0, s_p=25, v_p=25))
             #
             obj_opt.create_input_ports_by_data(
@@ -132,9 +137,17 @@ class ScpMacro(object):
                 data.get('port_hints') or {},
                 extend_kwargs=extend_kwargs
             )
+            obj_opt.set_capsules_by_data(
+                data.get('capsules') or {},
+                extend_kwargs=extend_kwargs
+            )
             #
             obj_opt.set_parameters_by_data(
                 data.get('parameters') or {}
+            )
+            #
+            obj_opt.set_proxy_parameters_by_data(
+                data.get('proxy_parameters') or {}
             )
             #
             if type_name in ['LiveGroup']:
@@ -149,6 +162,16 @@ class ScpMacro(object):
                 extend_kwargs=extend_kwargs
             )
             #
+            obj_opt.create_proxy_ports_by_data(
+                data.get('proxy_ports') or {},
+                extend_kwargs=extend_kwargs
+            )
+            #
+            obj_opt.set_expand_groups_by_data(
+                data.get('expand_groups') or [],
+                extend_kwargs=extend_kwargs
+            )
+            #
             ktn_core.NGObjOpt._create_connections_by_data_(
                 data.get('connections') or [],
                 extend_kwargs=extend_kwargs
@@ -160,18 +183,18 @@ class ScpMacro(object):
             )
             base_type_name = data.get('base_type', None)
             #
-            if type_name in ['GroupStack', 'GroupMerge'] or base_type_name in ['GroupStack', 'GroupMerge']:
+            if type_name in {'GroupStack', 'GroupMerge'} or base_type_name in {'GroupStack', 'GroupMerge'}:
                 child_type_name = data.get('child.type')
                 if child_type_name is None:
                     raise RuntimeError()
                 ktn_obj.setChildNodeType(child_type_name)
-                child_nodes = data.get('child.nodes') or {}
-                if child_nodes:
+                child_data = data.get('child.nodes') or {}
+                if child_data:
                     child_path_pattern = data.get('child.path_pattern')
                     if child_path_pattern is None:
                         raise RuntimeError()
                     #
-                    for i_key, i_data in child_nodes.items():
+                    for i_key, i_data in child_data.items():
                         i_var = dict(
                             parent=path,
                             key=i_key
@@ -179,6 +202,16 @@ class ScpMacro(object):
                         i_data['type'] = child_type_name
                         i_data['path'] = child_path_pattern.format(**i_var)
                         cls._build_node_child_(i_data)
+
+            if type_name in {'NetworkMaterialCreate'} or base_type_name in {'NetworkMaterialCreate'}:
+                node_graph_data = data.get('node_graph') or {}
+                if node_graph_data:
+                    for i_key, i_data in node_graph_data.items():
+                        i_var = dict(
+                            parent=path,
+                            key=i_key
+                        )
+                        cls._build_node_node_graph_(i_data, i_var)
         #
         obj_opt.set_attributes(
             data.get('attributes') or {}
@@ -188,7 +221,7 @@ class ScpMacro(object):
     def _build_node_child_(cls, data, extend_kwargs=None):
         type_name = data['type']
         path = data['path']
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_group_stack_child_create_args_(path, type_name)
+        ktn_obj, is_create = ktn_core.NGObjOpt._get_group_child_create_args_(path, type_name)
         if is_create is True:
             obj_opt = ktn_core.NGObjOpt(ktn_obj)
             #
@@ -207,6 +240,38 @@ class ScpMacro(object):
             #
             obj_opt.set_expressions_by_data(
                 data.get('expressions') or {},
+                extend_kwargs=extend_kwargs
+            )
+            obj_opt.create_proxy_ports_by_data(
+                data.get('proxy_ports') or {},
+                extend_kwargs=extend_kwargs
+            )
+    @classmethod
+    def _build_node_node_graph_(cls, data, extend_kwargs=None):
+        type_name = data['type']
+        shader_type_name = data.get('shader_type')
+        path = data['path']
+        ktn_obj, is_create = ktn_core.NGObjOpt._get_material_node_graph_create_args_(path, type_name, shader_type_name)
+        if is_create is True:
+            obj_opt = ktn_core.NGObjOpt(ktn_obj)
+            #
+            obj_opt.set_attributes(
+                data.get('attributes') or {}
+            )
+            #
+            obj_opt.set_parameters_by_data(
+                data.get('parameters') or {},
+            )
+            obj_opt.set_arnold_geometry_properties_by_data(
+                data.get('arnold_geometry_properties') or {}
+            )
+            #
+            obj_opt.set_expressions_by_data(
+                data.get('expressions') or {},
+                extend_kwargs=extend_kwargs
+            )
+            ktn_core.NGObjOpt._create_connections_by_data_(
+                data.get('connections') or [],
                 extend_kwargs=extend_kwargs
             )
 
@@ -267,12 +332,56 @@ class ScpMacro(object):
         if layout_gui is True:
             self._obj_opt.gui_layout_node_graph(size=(240, 40))
 
+    def get_is_changed(self):
+        yaml_file_opt = bsc_core.StgFileOpt(self._file_path)
+        yaml_timestamp = yaml_file_opt.get_modify_timestamp()
+        macro_file_path = '{}.macro'.format(yaml_file_opt.path_base)
+        macro_file_opt = bsc_core.StgFileOpt(macro_file_path)
+        macro_timestamp = macro_file_opt.get_modify_timestamp()
+        return int(yaml_timestamp) != int(macro_timestamp)
+
     def save(self):
-        file_opt = bsc_core.StgFileOpt(self._file_path)
-        macro_file_path = '{}.macro'.format(file_opt.path_base)
+        import os
+        yaml_file_opt = bsc_core.StgFileOpt(self._file_path)
+        macro_file_path = '{}.macro'.format(yaml_file_opt.path_base)
+        macro_file_opt = bsc_core.StgFileOpt(macro_file_path)
+        if macro_file_opt.get_is_exists() is True:
+            var_dict = dict(
+                directory=macro_file_opt.get_directory_path(),
+                name=macro_file_opt.get_name_base(),
+                ext=macro_file_opt.get_ext(),
+                time_tag=bsc_core.TimestampOpt(macro_file_opt.get_modify_timestamp()).get_as_tag()
+            )
+            bck_file_path = '{directory}/.bck/{name}{ext}/{name}.{time_tag}{ext}'.format(
+                **var_dict
+            )
+            macro_file_opt.set_copy_to_file(bck_file_path)
         self._obj_opt.save_as_macro(
             macro_file_path
         )
+        os.utime(macro_file_path, (yaml_file_opt.get_modify_timestamp(), yaml_file_opt.get_modify_timestamp()))
+    @classmethod
+    def set_warning_show(cls, label, contents):
+        from lxutil import utl_core
+        #
+        from lxkatana import ktn_core
+        #
+        if contents:
+            if ktn_core.get_is_ui_mode():
+                utl_core.DialogWindow.set_create(
+                    label,
+                    content=u'\n'.join(contents),
+                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    #
+                    yes_label='Close',
+                    #
+                    no_visible=False, cancel_visible=False
+                )
+            else:
+                for i in contents:
+                    utl_core.Log.set_module_warning_trace(
+                        label, i
+                    )
 
 
 class AbsWsp(object):
@@ -285,17 +394,61 @@ class AbsWsp(object):
         else:
             self._ktn_obj = ktn_obj
         self._obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+    @classmethod
+    def get_rsv_project(cls):
+        pass
+    @classmethod
+    def get_rsv_asset(cls):
+        import lxresolver.commands as rsv_commands
+        #
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        f = ktn_dcc_objects.Scene.get_current_file_path()
+        #
+        if f:
+            resolver = rsv_commands.get_resolver()
+            rsv_task = resolver.get_rsv_task_by_any_file_path(f)
+            if rsv_task is not None:
+                rsv_asset = rsv_task.get_rsv_resource()
+                return rsv_asset
+    @classmethod
+    def _get_rsv_resource_(cls, branch, rsv_asset_path):
+        import lxresolver.commands as rsv_commands
+        #
+        _ = rsv_asset_path.split('/')
+        project, _, resource = _[1:]
+        resolver = rsv_commands.get_resolver()
+        kwargs = {
+            'project': project,
+            branch: resource
+        }
+        return resolver.get_rsv_resource(**kwargs)
 
     def get_rsv_task(self):
         pass
 
     def load_preset(self):
-        name = self._obj_opt.get('preset.name')
-        if name in self.PRESET_DICT:
-            for k, v in self.PRESET_DICT[name].items():
-                self._obj_opt.set(
-                    k.replace('/', '.'), v
-                )
+        key = self._obj_opt.get('preset.name')
+        c = bsc_objects.Content(value=self.PRESET_DICT)
+        self._obj_opt.set_parameters_by_data(
+            c.get('{}.parameters'.format(key)) or {}
+        )
+        self._obj_opt.set_proxy_parameters_by_data(
+            c.get('{}.proxy_parameters'.format(key)) or {}
+        )
+
+    def get_record(self, key):
+        s = ktn_core.KtnSGStageOpt(
+            self._ktn_obj
+        )
+        r = s.get_obj_opt('/root')
+        return r.get('lynxi.variants.{}'.format(key))
+
+    def get(self, key):
+        return self._obj_opt.get(key)
+
+    def set(self, key, value):
+        self._obj_opt.set(key, value)
 
 
 class ScpWspVariantRegister(AbsWsp):
@@ -304,20 +457,23 @@ class ScpWspVariantRegister(AbsWsp):
 
     def _get_key_(self):
         return self._obj_opt.get('variableName')
-
-    def _get_values_(self):
+    @classmethod
+    def _get_variant_values_(cls, obj_opt):
         list_ = []
-        ktn_port = self._obj_opt.get_port('patterns')
+        ktn_port = obj_opt.get_port('patterns')
         for i in ktn_core.NGPortOpt(ktn_port).get_children():
-            i_key = ktn_core.NGPortOpt(i).get_name()
+            i_variant_key = ktn_core.NGPortOpt(i).get_name()
             i_value = ktn_core.NGPortOpt(i).get()
-            if self._obj_opt.get_input_port(i_key).getConnectedPorts():
+            if obj_opt.get_input_port(i_variant_key).getConnectedPorts():
                 list_.append(i_value)
         return list_
 
+    def get_variant_values(self):
+        return self._get_variant_values_(self._obj_opt)
+
     def register_variable(self):
         key = self._get_key_()
-        values = self._get_values_()
+        values = self.get_variant_values()
         if values:
             ktn_core.VariablesSetting().set_register(
                 key, values
@@ -329,15 +485,160 @@ class ScpWspVariantSet(AbsWsp):
         super(ScpWspVariantSet, self).__init__(*args, **kwargs)
 
     def _get_key_(self):
-        return self._obj_opt.get('variant.key')
+        return self._obj_opt.get('parameters.key')
 
-    def refresh_value(self):
-        key = self._get_key_()
-        branches = ktn_core.VariablesSetting().get_branches(key)
-        if branches:
-            self._obj_opt.set_enumerate_strings(
-                'option.branch', branches
+    def _get_value_(self):
+        return self._obj_opt.get('parameters.value')
+
+    def clear_variant_keys(self):
+        p = 'parameters.key'
+        key_pre = self._obj_opt.get(
+            p
+        )
+        self._obj_opt.set_capsule_strings(
+            p, ['None']
+        )
+        return key_pre
+    @ktn_core.Modifier.undo_run
+    def load_variant_keys(self):
+        self._obj_opt.set_capsule_strings(
+            'parameters.key', ['None']
+        )
+        node_names = self._obj_opt.get_all_source_objs_(
+            inner=True, include_type_names=['VariableSwitch'],
+            skip_base_type_names=['SuperTool']
+        )
+        list_ = []
+        for i_node_name in node_names:
+            i_obj_opt = ktn_core.NGObjOpt(i_node_name)
+            list_.append(i_obj_opt.get('variableName'))
+        #
+        list__ = list(set(list_))
+        list__.sort(key=list_.index)
+        if list__:
+            self._obj_opt.set_capsule_strings(
+                'parameters.key', list__
             )
+    @ktn_core.Modifier.undo_run
+    def load_variant_values(self):
+        key = self._get_key_()
+        self._obj_opt.set_capsule_strings(
+            'parameters.value', ['None']
+        )
+        if key != 'None':
+            node_names = self._obj_opt.get_all_source_objs_(
+                inner=True, include_type_names=['VariableSwitch'],
+                skip_base_type_names=['SuperTool']
+            )
+            #
+            list_ = []
+            for i_node_name in node_names:
+                i_obj_opt = ktn_core.NGObjOpt(i_node_name)
+                if i_obj_opt.get('variableName') == key:
+                    i_values = ScpWspVariantRegister._get_variant_values_(i_obj_opt)
+                    list_.extend(i_values)
+            #
+            list__ = list(set(list_))
+            list__.sort(key=list_.index)
+            if list__:
+                self._obj_opt.set_capsule_strings(
+                    'parameters.value', list__
+                )
+
+
+class ScpWspVariantResolve(AbsWsp):
+    def __init__(self, *args, **kwargs):
+        super(ScpWspVariantResolve, self).__init__(*args, **kwargs)
+
+    def clear_all_variants(self):
+        variant_dict_pre = {}
+        c = 10
+        keys_p = 'parameters.keys'
+        self._obj_opt.set_capsule_strings(
+            keys_p, ['None']
+        )
+        self._obj_opt.set(
+            keys_p, 'None'
+        )
+        for i_index in range(c):
+            i_variant_key_p = 'parameters.variant.key_{}'.format(i_index)
+            i_variant_value_p = 'parameters.variant.value_{}'.format(i_index)
+            i_variant_key = self._obj_opt.get(i_variant_key_p)
+            if i_variant_key:
+                i_variant_value_pre = self._obj_opt.get(i_variant_value_p)
+                variant_dict_pre[i_variant_key] = i_variant_value_pre
+            self._obj_opt.set(
+                i_variant_key_p, ''
+            )
+            self._obj_opt.set_capsule_strings(
+                i_variant_value_p, ['None']
+            )
+            self._obj_opt.set(
+                i_variant_value_p, 'None'
+            )
+        return variant_dict_pre
+    @ktn_core.Modifier.undo_run
+    def resolve_all_variants(self):
+        variant_dict_pre = self.clear_all_variants()
+        node_names = self._obj_opt.get_all_source_objs_(
+            inner=True, include_type_names=['VariableSwitch'],
+            skip_base_type_names=['SuperTool']
+        )
+        if node_names:
+            condition_keys = []
+            condition_capsule_data = []
+            for i_index, i_node_name in enumerate(node_names):
+                i_variant_key_p = 'parameters.variant.key_{}'.format(i_index)
+                i_variant_value_p = 'parameters.variant.value_{}'.format(i_index)
+                #
+                i_obj_opt = ktn_core.NGObjOpt(i_node_name)
+                i_variant_key = i_obj_opt.get('variableName')
+                i_variant_value_pre = None
+                if i_variant_key in variant_dict_pre:
+                    i_variant_value_pre = variant_dict_pre[i_variant_key]
+                i_condition_key = 'variant_{}'.format(i_index)
+                condition_capsule_data.append(
+                    (i_condition_key, bsc_core.RawStringUnderlineOpt(i_variant_key).to_prettify())
+                )
+                condition_keys.append(i_condition_key)
+                self._obj_opt.set(
+                    i_variant_key_p, i_variant_key
+                )
+                i_variant_values = ScpWspVariantRegister._get_variant_values_(i_obj_opt)
+                self._obj_opt.set_capsule_strings(
+                    i_variant_value_p, i_variant_values
+                )
+                if i_variant_value_pre is not None:
+                    self._obj_opt.set(
+                        i_variant_value_p, i_variant_value_pre
+                    )
+                else:
+                    self._obj_opt.set(
+                        i_variant_value_p, i_variant_values[0]
+                    )
+
+            self._obj_opt.set_capsule_data(
+                'parameters.keys', condition_capsule_data
+            )
+            self._obj_opt.set(
+                'parameters.keys', ', '.join(condition_keys)
+            )
+
+    def get_variants(self):
+        dict_ = collections.OrderedDict()
+        node_names = self._obj_opt.get_all_source_objs_(
+            inner=True, include_type_names=['VariableSwitch'],
+            skip_base_type_names=['SuperTool']
+        )
+        if node_names:
+            for i_index, i_node_name in enumerate(node_names):
+                i_obj_opt = ktn_core.NGObjOpt(i_node_name)
+                i_variant_key = i_obj_opt.get('variableName')
+                i_variant_values = ScpWspVariantRegister._get_variant_values_(i_obj_opt)
+                dict_[i_variant_key] = i_variant_values
+
+    def set_variants(self, variant_dict):
+        pass
 
 
 class ScpWspShaderChecker(AbsWsp):
@@ -375,53 +676,281 @@ class ScpWspShaderChecker(AbsWsp):
         )
 
 
+# geometry
+class ScpWspAssetGeometry(AbsWsp):
+    def __init__(self, *args, **kwargs):
+        super(ScpWspAssetGeometry, self).__init__(*args, **kwargs)
+    @ktn_core.Modifier.undo_run
+    def load_latest_usd(self):
+        from lxutil import utl_core
+
+        from lxkatana import ktn_core
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        import lxusd.rsv.objects as usd_rsv_objects
+
+        import lxresolver.commands as rsv_commands
+
+        contents = []
+
+        f = ktn_dcc_objects.Scene.get_current_file_path()
+
+        self._obj_opt.set('parameters.usd.enable', 0)
+
+        resolver = rsv_commands.get_resolver()
+        rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(f)
+        if rsv_scene_properties:
+            rsv_project = resolver.get_rsv_project(
+                project=rsv_scene_properties.get('project')
+            )
+            rsv_asset = rsv_project.get_rsv_resource(
+                asset=rsv_scene_properties.get('asset')
+            )
+            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._get_asset_usd_latest_file_path_(
+                rsv_asset,
+                rsv_scene_properties
+            )
+            if asset_set_usd_file_path:
+                self._obj_opt.set(
+                    'parameters.usd.file', asset_set_usd_file_path
+                )
+                #
+                self._obj_opt.set('parameters.usd.enable', 1)
+                #
+                utl_core.Log.set_module_result_trace(
+                    'set usd create for asset',
+                    'file="{}"'.format(asset_set_usd_file_path)
+                )
+                #
+                ktn_core.CacheManager.flush()
+        else:
+            contents.append(
+                u'file={} is not not available'.format(f)
+            )
+        ScpMacro.set_warning_show(
+            'camera load', contents
+        )
+    @ktn_core.Modifier.undo_run
+    def create_new_usd(self):
+        from lxutil import utl_core
+
+        from lxkatana import ktn_core
+
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        import lxusd.rsv.objects as usd_rsv_objects
+
+        import lxresolver.commands as rsv_commands
+
+        contents = []
+
+        f = ktn_dcc_objects.Scene.get_current_file_path()
+
+        self._obj_opt.set('parameters.usd.enable', 0)
+
+        resolver = rsv_commands.get_resolver()
+        rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(f)
+        if rsv_scene_properties:
+            rsv_project = resolver.get_rsv_project(
+                project=rsv_scene_properties.get('project')
+            )
+            rsv_asset = rsv_project.get_rsv_resource(
+                asset=rsv_scene_properties.get('asset')
+            )
+            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._set_asset_usd_file_create_(
+                rsv_asset,
+                rsv_scene_properties
+            )
+            if asset_set_usd_file_path:
+                self._obj_opt.set(
+                    'parameters.usd.file', asset_set_usd_file_path
+                )
+                #
+                self._obj_opt.set('parameters.usd.enable', 1)
+                #
+                utl_core.Log.set_module_result_trace(
+                    'set usd create for asset',
+                    'file="{}"'.format(asset_set_usd_file_path)
+                )
+                #
+                ktn_core.CacheManager.flush()
+        else:
+            contents.append(
+                u'file={} is not not available'.format(f)
+            )
+        ScpMacro.set_warning_show(
+            'camera load', contents
+        )
+
+    def _load_usd_variant_fnc_(self, file_key, variant_group_key, mode='main'):
+        import lxusd.rsv.objects as usd_rsv_objects
+
+        contents = []
+
+        f = self._obj_opt.get(file_key)
+
+        if f:
+            usd_variant_dict = usd_rsv_objects.RsvUsdAssetSetVariant.get_variant_dict(
+                f, mode=mode
+            )
+            if usd_variant_dict:
+                if mode == 'main':
+                    self._obj_opt.set(
+                        '{}.asset_version_main.enable'.format(variant_group_key), 1
+                    )
+                    self._obj_opt.set(
+                        '{}.asset_version_override.enable'.format(variant_group_key), 0
+                    )
+                elif mode == 'override':
+                    self._obj_opt.set(
+                        '{}.asset_version_main.enable'.format(variant_group_key), 1
+                    )
+                    self._obj_opt.set(
+                        '{}.asset_version_override.enable'.format(variant_group_key), 1
+                    )
+
+                for i_k, i_v in usd_variant_dict.iteritems():
+                    for j_k, j_v in i_v.items():
+                        i_p = '{}.{}.{}'.format(variant_group_key, i_k, j_k)
+                        j_default = j_v['default']
+                        j_values = j_v['values']
+                        self._obj_opt.set_enumerate_strings(i_p, j_values)
+                        self._obj_opt.set(i_p, j_default)
+            else:
+                contents.append(
+                    u'file={} is not not available'.format(f)
+                )
+        else:
+            contents.append(
+                u'file={} is not not available'.format(f)
+            )
+        ScpMacro.set_warning_show(
+            'camera load', contents
+        )
+    @ktn_core.Modifier.undo_run
+    def load_usd_variant(self):
+        mode = self._obj_opt.get('parameters.usd_variant.mode')
+        self._load_usd_variant_fnc_(
+            'parameters.usd.file', 'parameters.usd_variant', mode=mode
+        )
+
+    def reset_usd_variant(self):
+        pass
+
+    def translate_to_center(self, above_axis_y=False):
+        from lxusd import usd_core
+        #
+        file_path = self._obj_opt.get('usd.file')
+        if file_path:
+            root = '/master'
+            sub_locations = [
+                '/master/hi',
+                '/master/shape',
+            ]
+            s_opt = usd_core.UsdStageOpt(
+                file_path
+            )
+            [s_opt.set_active_at(i, True) for i in sub_locations]
+            g = s_opt.get_geometry_args(root)
+            (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
+            if above_axis_y is True:
+                self._obj_opt.set(
+                    'parameters.extra.translate.offset', [-c_x, -y, -c_z]
+                )
+            else:
+                self._obj_opt.set(
+                    'parameters.extra.translate.offset', [-c_x, -c_y, -c_z]
+                )
+
+
 class ScpWspGeometry(AbsWsp):
-    # todo: use preset module
-    PRESET_DICT = {
-        'test_0': {
-            'cache/asset_usd/enable': True,
-            'cache/asset_usd/file': '/l/prod/cgm/work/assets/chr/nn_4y/srf/surfacing/set/scene/v037/nn_4y.usda'
-        }
-    }
-    # todo: configure to resolver
-    DEFAULT_VALUE_MAPPER = dict(
-        modeling='model',
-        groom='groom',
-        rig='rig',
-        effect='effect',
-        surfacing='surface',
-        animation='animation'
+    CFG_YAML = bsc_core.CfgFileMtd.get_yaml(
+        'katana/script/macro/geometry'
     )
     def __init__(self, *args, **kwargs):
         super(ScpWspGeometry, self).__init__(*args, **kwargs)
+        self._cfg = bsc_objects.Configure(value=self.CFG_YAML)
+        self.PRESET_DICT = self._cfg.get('preset')
 
-    def update_usd_variant(self):
-        from lxusd import usd_core
 
-        asset_usd_file_path = self._obj_opt.get('cache.asset_usd.file')
+# camera
+class ScpWspAssetCamera(AbsWsp):
+    def __init__(self, *args, **kwargs):
+        super(ScpWspAssetCamera, self).__init__(*args, **kwargs)
 
-        usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
-        # todo: root use configure
-        usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
-        usd_variant_dict = usd_prim_opt.get_variant_dict()
+    def load_latest_abc(self):
+        self.load_all_abc()
 
-        for k, v in usd_variant_dict.iteritems():
-            if bsc_core.RawTextOpt(k).get_is_matched('*_main'):
-                i_p = 'usd_variant.asset_version_main.{}'.format(k[:-len('_main')])
-                i_default, i_values = v
-                self._obj_opt.set_enumerate_strings(i_p, i_values)
-                self._obj_opt.set(i_p, i_default)
-            elif bsc_core.RawTextOpt(k).get_is_matched('*_override'):
-                i_p = 'usd_variant.asset_version_override.{}'.format(k[:-len('_override')])
-                i_default, i_values = v
-                self._obj_opt.set_enumerate_strings(i_p, i_values)
-                self._obj_opt.set(i_p, i_default)
+    def load_all_abc(self):
+        import lxresolver.commands as rsv_commands
         #
-        for k, v in usd_variant_dict.iteritems():
-            if k in self.DEFAULT_VALUE_MAPPER:
-                i_default, i_values = v
-                i_p = 'usd_variant.asset_version_main.{}'.format(self.DEFAULT_VALUE_MAPPER[k])
-                self._obj_opt.set(i_p, i_default)
+        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        #
+        self._obj_opt.set(
+            'parameters.abc.enable',
+            0
+        )
+        #
+        contents = []
+        #
+        f = ktn_dcc_objects.Scene.get_current_file_path()
+        if f:
+            resolver = rsv_commands.get_resolver()
+            rsv_task = resolver.get_rsv_task_by_any_file_path(f)
+            if rsv_task is not None:
+                rsv_entity = rsv_task.get_rsv_resource()
+                rsv_camera_task = rsv_entity.get_rsv_task(
+                    step='cam',
+                    task='camera'
+                )
+                if rsv_camera_task is not None:
+                    rsv_unit = rsv_camera_task.get_rsv_unit(
+                        keyword='asset-camera-main-abc-file'
+                    )
+                    file_paths = rsv_unit.get_result(version='all')
+                    if file_paths:
+                        self._obj_opt.set(
+                            'parameters.abc.enable',
+                            1
+                        )
+                        #
+                        self._obj_opt.set_enumerate_strings(
+                            'parameters.abc.file',
+                            file_paths
+                        )
+                        self._obj_opt.set(
+                            'parameters.abc.file',
+                            file_paths[-1]
+                        )
+                else:
+                    contents.append(
+                        u'asset="{}" camera task is non-exists'.format(rsv_entity.path)
+                    )
+            else:
+                contents.append(
+                    u'file={} is not not available'.format(f)
+                )
+        else:
+            contents.append(
+                u'file={} is not not available'.format(f)
+            )
+
+        ScpMacro.set_warning_show(
+            'camera load', contents
+        )
+
+
+class ScpWspCamera(AbsWsp):
+    PRESET_DICT = {
+        'test_0': {
+            'cache/asset_abc/enable': True,
+            'cache/asset_abc/file': '/l/prod/cgm/publish/assets/chr/nn_4y/cam/camera/nn_4y.cam.camera.v001/camera/abc/main.abc',
+            'cache/asset_abc/copy_from': '/root/world/cam/cam_fullbody/cam_fullbodyShape'
+        }
+    }
+    def __init__(self, *args, **kwargs):
+        super(ScpWspCamera, self).__init__(*args, **kwargs)
 
 
 class ScpWspSpace(AbsWsp):
@@ -447,7 +976,12 @@ class ScpWspSpace(AbsWsp):
         ScpWspVariantRegister(obj_name).register_variable()
         ktn_core.NGObjOpt(obj_name).set_port_execute('variant.register')
 
+    def get_variant_values(self):
+        n = self._obj_opt.get('record.variant_register')
+        return ScpWspVariantRegister(n).get_variant_values()
 
+
+# geometry
 class ScpWspGeometrySpace(AbsWsp):
     class Records(object):
         variant_register = 'record.variant_register'
@@ -475,18 +1009,6 @@ class ScpWspGeometrySpace(AbsWsp):
             self.Records.variant_register
         )
         ScpWspVariantRegister(node_name).register_variable()
-
-
-class ScpWspCamera(AbsWsp):
-    PRESET_DICT = {
-        'test_0': {
-            'cache/asset_abc/enable': True,
-            'cache/asset_abc/file': '/l/prod/cgm/publish/assets/chr/nn_4y/cam/camera/nn_4y.cam.camera.v001/camera/abc/main.abc',
-            'cache/asset_abc/camera_shape_from': '/root/world/cam/cam_fullbody/cam_fullbodyShape'
-        }
-    }
-    def __init__(self, *args, **kwargs):
-        super(ScpWspCamera, self).__init__(*args, **kwargs)
 
 
 class ScpWspCameraSpace(AbsWsp):
@@ -545,20 +1067,21 @@ class ScpWspLookSpace(AbsWsp):
         ScpWspVariantRegister(node_name).register_variable()
 
 
-class ScpWspLightRig(AbsWsp):
+class ScpWspAssetLightRig(AbsWsp):
     def __init__(self, *args, **kwargs):
-        super(ScpWspLightRig, self).__init__(*args, **kwargs)
-
-    def _get_light_args_(self):
+        super(ScpWspAssetLightRig, self).__init__(*args, **kwargs)
+    @classmethod
+    def _get_light_args_(cls, project):
         import lxbasic.extra.methods as bsc_etr_methods
 
         import lxresolver.commands as rsv_commands
 
         import lxshotgun.rsv.objects as stg_rsv_objects
 
-        project = self._obj_opt.get('option.project')
         if project == 'current':
             project = bsc_etr_methods.EtrBase.get_project()
+        elif project == 'default':
+            project = 'cgm'
         #
         resolver = rsv_commands.get_resolver()
         #
@@ -569,19 +1092,22 @@ class ScpWspLightRig(AbsWsp):
         defaults, currents = stg_rsv_objects.RsvStgProjectOpt(
             rsv_project
         ).get_light_args()
-        return defaults, currents
+        return ['/{}/{}'.format(project, i) for i in defaults], ['/{}/{}'.format(project, i) for i in currents]
 
     def guess_option(self):
-        args = self._get_light_args_()
+        pass
+
+    def load_resource(self, project='default'):
+        args = self._get_light_args_(project)
         if args:
             defaults, currents = args
             #
-            key_1 = 'option.resource'
-            current_pre = self._obj_opt.get(key_1)
+            key_1 = 'parameters.resource.name'
+            name_pre = self._obj_opt.get(key_1)
             if currents:
                 self._obj_opt.set_enumerate_strings(key_1, currents)
-                if current_pre != 'None':
-                    self._obj_opt.set(key_1, current_pre)
+                if name_pre != 'None':
+                    self._obj_opt.set(key_1, name_pre)
                 else:
                     if defaults:
                         self._obj_opt.set(key_1, defaults[0])
@@ -591,22 +1117,18 @@ class ScpWspLightRig(AbsWsp):
                 )
 
     def _get_live_group_results_(self):
-        import lxbasic.extra.methods as bsc_etr_methods
-
         import lxresolver.commands as rsv_commands
 
-        project = self._obj_opt.get('option.project')
-        if project == 'current':
-            project = bsc_etr_methods.EtrBase.get_project()
+        name = self._obj_opt.get('parameters.resource.name')
+        if name == 'None':
+            return
+        #
+        project, asset = name.split('/')[1:]
         #
         resolver = rsv_commands.get_resolver()
         #
         rsv_project = resolver.get_rsv_project(project=project)
         if rsv_project is None:
-            return
-
-        asset = self._obj_opt.get('option.resource')
-        if asset == 'None':
             return
         #
         properties = rsv_project.properties
@@ -629,67 +1151,41 @@ class ScpWspLightRig(AbsWsp):
             version='all'
         )
 
-    def load_light_rig(self):
+    def load_latest_light_rig(self):
+        self.load_all_light_rig()
+
+    def load_all_light_rig(self):
         results = self._get_live_group_results_()
         if results:
-            key = 'option.live_group.current'
-            current = results[-1]
+            key = 'parameters.live_group.file'
+            file_path = results[-1]
             self._obj_opt.set_enumerate_strings(
                 key, results
             )
             self._obj_opt.set(
-                key, current
+                key, file_path
             )
-            self.refresh_live_group()
+            self.reload_live_group()
 
-    def refresh_live_group(self, ):
-        current = self._obj_opt.get('option.live_group.current')
+    def reload_live_group(self, ):
+        file_path = self._obj_opt.get('parameters.live_group.file')
         name = self._obj_opt.get('record.live_group')
         obj_opt = ktn_core.NGObjOpt(
             name
         )
-
         obj_opt.set(
-            'source', current
+            'source', file_path
         )
         obj_opt.get_ktn_obj().reloadFromSource()
 
 
-class ScpWspLight(AbsWsp):
-    def __init__(self, *args, **kwargs):
-        super(ScpWspLight, self).__init__(*args, **kwargs)
-
-    def guess_light_rig_option(self):
-        name = self._obj_opt.get('record.light_rig')
-        args = ScpWspLightRig(name)._get_light_args_()
-        if args:
-            defaults, currents = args
-            key_1 = 'cache.light_rig.resource'
-            current_pre = self._obj_opt.get(key_1)
-            if currents:
-                self._obj_opt.set_enumerate_strings(key_1, currents)
-                if current_pre != 'None':
-                    self._obj_opt.set(key_1, current_pre)
-                else:
-                    if defaults:
-                        self._obj_opt.set(key_1, defaults[0])
-            else:
-                self._obj_opt.set_enumerate_strings(
-                    key_1, ['None']
-                )
-
-    def load_light_rig(self):
-        name = self._obj_opt.get('record.light_rig')
-        ScpWspLightRig(name).load_light_rig()
-
-
 class ScpWspWorkspace(AbsWsp):
-    CFG = bsc_core.CfgFileMtd.get_yaml(
+    CFG_YAML = bsc_core.CfgFileMtd.get_yaml(
         'katana/script/macro/workspace'
     )
     def __init__(self, *args, **kwargs):
         super(ScpWspWorkspace, self).__init__(*args, **kwargs)
-        self._cfg = bsc_objects.Configure(value=self.CFG)
+        self._cfg = bsc_objects.Configure(value=self.CFG_YAML)
 
         self._cfg.set(
             'option.path', self._obj_opt.get_path(),
@@ -697,10 +1193,10 @@ class ScpWspWorkspace(AbsWsp):
         self._cfg.set(
             'option.root', self._obj_opt.get_parent_opt().get_path(),
         )
-        exists_time_tag = self._obj_opt.get('build.time_tag')
+        exists_time_tag = self._obj_opt.get('workspace.time_tag')
         if not exists_time_tag:
             exists_time_tag = bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100)
-            self._obj_opt.set('build.time_tag', exists_time_tag)
+            self._obj_opt.set('workspace.time_tag', exists_time_tag)
         #
         self._cfg.set(
             'option.time_tag', exists_time_tag
@@ -719,70 +1215,124 @@ class ScpWspWorkspace(AbsWsp):
     def guess_option(self):
         pass
 
-    def register_variable(self):
-        record_p = self._obj_opt.get_port('record')
-        if record_p is not None:
-            for i in ktn_core.NGObjOpt(record_p).get_children():
-                i_p_opt = ktn_core.NGPortOpt(i)
-                i_obj_name = i_p_opt.get()
-                if i_obj_name:
-                    ktn_core.NGObjOpt(i_obj_name).set_port_execute('variant.register')
-
+    def register_all_variable(self):
+        keys = self._obj_opt.get('workspace.keys')
+        valid_keys = keys.split(', ')
+        for i_key in valid_keys:
+            i_record = self.get_record(
+                '{}.space'.format(i_key)
+            )
+            if i_record is not None:
+                ktn_core.NGObjOpt(i_record).set_port_execute('variant.register')
+    @ktn_core.Modifier.undo_run
     def build(self):
-        keys = self._cfg.get('option.keys')
-        for i_key in keys:
-            i_enable = self._obj_opt.get('build.{}.enable'.format(i_key))
-            i_scheme = self._obj_opt.get('build.{}.scheme'.format(i_key))
-            if i_enable:
-                i_cfg_key = 'build.{}.{}'.format(i_key, i_scheme)
-                if self._cfg.get_key_is_exists(i_cfg_key):
-                    i_data = self._cfg.get_content(i_cfg_key)
-                    i_record = self._obj_opt.get('record.{}'.format(i_key))
-                    if not i_record:
-                        i_main_data = i_data.get_content('main')
-                        self._build_element_(i_key, i_main_data)
-        #
+        keys = self._obj_opt.get('workspace.keys')
+        valid_keys = keys.split(', ')
+        c = len(valid_keys)
+        x, y = self._obj_opt.get_position()
+        w_s, h_s = self._cfg.get('option.size.w_s'), self._cfg.get('option.size.h_s')
         self._record_dict = dict(
             workspace=self._obj_opt.get_name()
         )
+        if valid_keys:
+            for i_index, i_key in enumerate(valid_keys):
+                i_scheme = self._obj_opt.get('workspace.spaces.{}'.format(i_key))
+                i_cfg_key = 'build.{}.{}'.format(i_key, i_scheme)
+                if self._cfg.get_key_is_exists(i_cfg_key):
+                    i_data = self._cfg.get_content(i_cfg_key)
+                    i_record = self.get_record('{}.space'.format(i_key))
+                    if not i_record:
+                        i_main_data = i_data.get_content('main')
+                        i_obj_opt = self._build_main_(i_key, i_main_data)
+                        i_node_data = i_data.get('node') or {}
+                        self._build_nodes_(i_node_data)
+                    else:
+                        i_obj_opt = ktn_core.NGObjOpt(i_record)
+                    #
+                    self._record_dict[i_key] = i_obj_opt.get_name()
+                    #
+                    i_index_y = c-i_index
+
+                    i_attributes = dict(
+                        y=y+h_s*i_index_y
+                    )
+                    i_obj_opt.set_attributes(
+                        i_attributes
+                    )
         #
-        exists_keys = []
         connections = []
-        record_p = self._obj_opt.get_port('record')
-        if record_p is not None:
-            for i in ktn_core.NGObjOpt(record_p).get_children():
-                i_p_opt = ktn_core.NGPortOpt(i)
-                i_key = i_p_opt.get_name()
-                i_obj_name = i_p_opt.get()
-                if i_obj_name:
-                    exists_keys.append(i_key)
-                    self._record_dict[i_key] = i_obj_name
-        c = len(exists_keys)
-        for i_index, i_key_src in enumerate(exists_keys):
+        for i_index, i_key_src in enumerate(valid_keys):
             i_obj_name_src = self._record_dict[i_key_src]
             i_obj_opt_src = ktn_core.NGObjOpt(i_obj_name_src)
             i_src = '{}.{}'.format(i_obj_name_src, i_obj_opt_src.get_output_port_names()[0])
             if i_index == c-1:
                 i_obj_key_tgt = 'workspace'
             else:
-                i_obj_key_tgt = exists_keys[i_index+1]
+                i_obj_key_tgt = valid_keys[i_index+1]
             i_obj_name_tgt = self._record_dict[i_obj_key_tgt]
             i_obj_opt_tgt = ktn_core.NGObjOpt(i_obj_name_tgt)
-            i_tgt = '{}.{}'.format(i_obj_name_tgt, i_obj_opt_tgt.get_input_port_names()[0])
+            i_output_names = i_obj_opt_tgt.get_input_port_names()
+            if 'join_upstream' in i_output_names:
+                i_output_name = 'join_upstream'
+            else:
+                i_output_name = i_output_names[0]
+            i_tgt = '{}.{}'.format(i_obj_name_tgt, i_output_name)
             connections.extend(
                 [i_src, i_tgt]
             )
 
-        ktn_core.NGObjOpt._create_connections_by_data_(connections)
+        for i_index, i_key in enumerate(valid_keys):
+            i_scheme = self._obj_opt.get('workspace.spaces.{}'.format(i_key))
+            i_cfg_key = 'build.{}.{}'.format(i_key, i_scheme)
+            i_data = self._cfg.get_content(i_cfg_key)
+            main_post_connections = i_data.get('main.post_connections')
+            if main_post_connections:
+                connections.extend(main_post_connections)
 
-    def _build_element_(self, key, data):
+        ktn_core.NGObjOpt._create_connections_by_data_(connections, extend_kwargs=self._record_dict)
+
+        # self._create_nodes_()
+
+    def _build_main_(self, key, data):
         ktn_obj, is_create = ScpMacro._build_node_(data)
-
+        obj_opt = ktn_core.NGObjOpt(ktn_obj)
         if is_create is True:
-            obj_opt = ktn_core.NGObjOpt(ktn_obj)
+
             self._obj_opt.set_expression(
                 'record.{}'.format(key),
                 'getNode(\'{}\').getNodeName()'.format(
                     obj_opt.get_name()
                 )
             )
+        return obj_opt
+
+    def _build_nodes_(self, data):
+        for k, v in data.items():
+            print k, v
+            ktn_obj, is_create = ScpMacro._build_node_(v)
+
+    def _create_nodes_(self, key, data):
+        pass
+
+
+class ScpWspRenderLayer(AbsWsp):
+    def __init__(self, *args, **kwargs):
+        super(ScpWspRenderLayer, self).__init__(*args, **kwargs)
+
+    def load_all_variant_value(self):
+        keys = self._obj_opt.get('variant.keys')
+        valid_keys = keys.split(', ')
+        for i_key in valid_keys:
+            i_record = self.get_record(
+                '{}.space'.format(i_key)
+            )
+            if i_record is not None:
+                i_port_path = 'variant.{}'.format(i_key)
+                i_values = ScpWspSpace(i_record).get_variant_values()
+                i_value = self._obj_opt.get(i_port_path)
+                self._obj_opt.set_capsule_strings(
+                    i_port_path, i_values
+                )
+                if i_value in i_values:
+                    self._obj_opt.set(i_port_path, i_value)
+

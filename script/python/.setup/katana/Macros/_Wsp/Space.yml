@@ -26,12 +26,13 @@ option:
         w_s: 320
         h_s: 80
         #
-        w: 1280
+        w: 1200
         h: 480
 #
 main:
     type: Group
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.join_upstream'
     output: '<.path>.output'
     #
@@ -43,15 +44,18 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
     input_ports:
-        - join_upstream
-        - join_other
+        - 'join_upstream'
+        - 'join_other'
     #
     output_ports:
-        - output
+        - 'output'
     #
     ports:
         # basic
@@ -73,7 +77,7 @@ main:
         # variant
         variant/key:
             widget: enumerate
-            value: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+            value: ['geometry', 'look', 'camera', 'light', 'quality', 'layer']
             tool_tip: '...'
 
         variant/register:
@@ -82,9 +86,9 @@ main:
             tool_tip: '...'
         # extra
         extra/default_name:
-            widget: enumerate
+            widget: capsule_list
             value: ['None']
-            default: 'None'
+            default: []
             tool_tip: '...'
 
         extra/add_default:
@@ -119,6 +123,12 @@ main:
             value: '<node.variant_register.name>'
             tool_tip: '...'
             lock: True
+
+        record/variant_properties_opt:
+            widget: node
+            value: '<node.variant_properties_opt.name>'
+            tool_tip: '...'
+            lock: True
 #
 node:
     # join upstream dot
@@ -144,7 +154,7 @@ node:
         output: '<.path>.output'
         #
         attributes:
-            x: =<option.size.w_s>
+            x: =0
             y: =<option.size.h>+<option.size.h_s>
         #
         connections:
@@ -158,6 +168,10 @@ node:
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
         #
         attributes:
             x: 0
@@ -180,14 +194,19 @@ node:
         #
         attributes:
             ns_text: '<option.description>'
-            ns_fontScale: 1.5
+            ns_fontScale: 3
             x: 0
             y: =<option.size.h>/2+120
             ns_sizeX: =<option.size.w>
             ns_sizeY: =<option.size.h>
+            #
             ns_colorr: <option.color.r>
             ns_colorg: <option.color.g>
             ns_colorb: <option.color.b>
+            ns_linkColorR: <option.color.r>
+            ns_linkColorG: <option.color.g>
+            ns_linkColorB: <option.color.b>
+            #
             ns_stickyLock: 1
     # variant register
     variant_register:
@@ -199,8 +218,25 @@ node:
         #
         expressions:
             user/variant/key: 'getParent().variant.key'
+    # variant properties opt
+    variant_properties_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        parameters:
+        #
+        expressions:
+            user/data_1/i0:
+                |-
+                '{}.space'.format(getParent().variant.key)
+            user/data_1/i1: 'getParent().getNodeName()'
         #
         connections:
+            - '<..variant_register.output>'
+            - '<.input>'
             # output
             - '<.output>'
             - '<main.output>'

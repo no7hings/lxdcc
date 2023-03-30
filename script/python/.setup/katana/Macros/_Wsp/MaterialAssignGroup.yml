@@ -23,7 +23,8 @@ option:
 #
 main:
     type: GroupStack
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.input'
     output: '<.path>.output'
     #
@@ -33,6 +34,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -48,11 +52,15 @@ main:
             tool_tip: '...'
             lock: True
         #
+        user/option/geometry_root:
+            widget: path
+            value: '/root/world/geo/master'
+            tool_tip: '...'
+        #
         user/option/material_root:
             widget: path
             value: '/root/materials'
             tool_tip: '...'
-            lock: True
         #
         user/build/ass_file:
             widget: file

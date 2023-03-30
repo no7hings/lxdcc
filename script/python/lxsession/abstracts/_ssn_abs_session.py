@@ -321,7 +321,7 @@ class AbsSsnRsvUnitDef(object):
             self._rsv_unit = rsv_obj.get_rsv_unit(
                 keyword=self._rsv_keyword
             )
-            self._rsv_unit_extend_variants['user_extra'] = bsc_core.SystemMtd.get_user_name()
+            self._rsv_unit_extend_variants['artist'] = bsc_core.SystemMtd.get_user_name()
     @property
     def rsv_task(self):
         return self._rsv_unit.get_rsv_task()

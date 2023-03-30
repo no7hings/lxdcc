@@ -1,0 +1,376 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'render_layer'
+    type_abr: 'rdr_lyr'
+    create_type: 'RenderLayer_Wsp'
+    description:
+        |-
+        for render
+    variant_key: 'render'
+    #
+    auto_color: False
+    #
+    color:
+        r: .375
+        g: .125
+        b: .375
+#
+main:
+    type: 'Group'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
+    input: '<.path>.join_upstream'
+    output: '<.path>.output'
+    #
+    attributes:
+        ns_offsetX: 480
+        ns_offsetY: 120
+        #
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports:
+        - 'join_upstream'
+        - 'join_other'
+    #
+    output_ports:
+        - output
+    #
+    ports:
+        # basic
+        type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+        #
+        parameters/variant_resolve:
+            widget: proxy
+            expand: True
+        #
+        parameters/customize/tag_0:
+            label: ' '
+            widget: strings
+            value: ['customize', 'main']
+            tool_tip: '...'
+        #
+        parameters/customize/tag_1:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+        #
+        parameters/customize/tag_2:
+            $: '..parameters/customize/tag_1'
+        #
+        parameters/customize/tag_3:
+            $: '..parameters/customize/tag_1'
+        #
+        parameters/customize/tag_4:
+            $: '..parameters/customize/tag_1'
+        #
+        parameters/environment/tag_0:
+            label: ' '
+            widget: strings
+            value: ['root', '$PG_ROOT']
+            tool_tip: '...'
+
+        parameters/environment/tag_1:
+            label: ' '
+            widget: strings
+            value: ['project', '$PG_PROJECT']
+            tool_tip: '...'
+
+        parameters/environment/tag_2:
+            label: ' '
+            widget: strings
+            value: ['role', '$PG_ROLE']
+            tool_tip: '...'
+
+        parameters/environment/tag_3:
+            label: ' '
+            widget: strings
+            value: ['asset', '$PG_ASSET']
+            tool_tip: '...'
+
+        parameters/environment/tag_4:
+            label: ' '
+            widget: strings
+            value: ['step', '$PG_STEP']
+            tool_tip: '...'
+
+        parameters/environment/tag_5:
+            label: ' '
+            widget: strings
+            value: ['task', '$PG_TASK']
+            tool_tip: '...'
+
+        parameters/environment/tag_6:
+            label: ' '
+            widget: strings
+            value: ['version', '$PG_VERSION']
+            tool_tip: '...'
+
+        parameters/environment/tag_7:
+            label: ' '
+            widget: strings
+            value: ['artist', '$PG_ARTIST']
+            tool_tip: '...'
+
+        parameters/environment/tag_8:
+            label: ' '
+            widget: strings
+            value: ['task_extra', '$PG_TASK_EXTRA']
+            tool_tip: '...'
+
+        parameters/environment/tag_9:
+            label: ' '
+            widget: strings
+            value: ['version_extra', '$PG_VERSION_EXTRA']
+            tool_tip: '...'
+
+        parameters/environment/tag_10:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+
+        parameters/environment/tag_11:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+
+        parameters/environment/tag_12:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+
+        parameters/environment/tag_13:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+
+        parameters/environment/tag_14:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+        #
+        parameters/render/output_directory:
+            widget: file
+            value: '{root}/{project}/assets/{role}/{asset}/user/work.{artist}/katana/render/{task_extra}/{asset}.{step}.{task}.{version}'
+            tool_tip: '...'
+        #
+        parameters/render/output/builtin/image_enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        #
+        parameters/render/output/builtin/image_pattern:
+            widget: string
+            value: '.{camera}.{look}.{light}/{aov}.####.exr'
+            tool_tip: '...'
+
+        parameters/render/output/arnold/stats_file_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        parameters/render/output/arnold/stats_file_pattern:
+            widget: file
+            value: '.{camera}.{look}.{light}/stats.####.json'
+            tool_tip: '...'
+
+        parameters/render/output/arnold/profile_file_enable:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        parameters/render/output/arnold/profile_file_pattern:
+            widget: file
+            value: '{cst_0}/{camera}.{look}.{light}/profile.####.json'
+            tool_tip: '...'
+        #
+        render/outputs:
+            widget: proxy
+    #
+    expand_groups:
+        - 'parameters'
+        - 'parameters/variant_resolve'
+        - 'parameters/render'
+        - 'parameters/render/output'
+#
+node:
+    # dot
+    join_upstream_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.input>'
+            - '<.input>'
+    #
+    join_other_dot:
+        type: Dot
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        connections:
+            # input
+            - '<main.path>.join_other'
+            - '<.input>'
+    # upstream merge
+    upstream_merge:
+        tag: 'UMG'
+        type: UpstreamMerge_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        output: '<.path>.out'
+        #
+        input_ports:
+            - 'join_upstream'
+            - 'join_other'
+        #
+        connections:
+            # join upstream
+            - '<..join_upstream_dot.output>'
+            - '<.path>.join_upstream'
+            # join other
+            - '<..join_other_dot.output>'
+            - '<.path>.join_other'
+    #
+    variant_resolve:
+        tag: 'VRR'
+        type: VariantResolve_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.input'
+        output: '<.path>.output'
+        #
+        proxy_ports:
+            parameters: ['<main.name>', 'parameters/variant_resolve']
+        #
+        connections:
+            - '<..upstream_merge.output>'
+            - '<.input>'
+    # render properties
+    render_properties:
+        tag: 'RPO'
+        type: RenderPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/output/builtin/image_enable: True
+        #
+        expressions:
+            user/output/variants:
+                |-
+                '\n'.join(
+                    [   i
+                        for i in [
+                            '\n'.join(
+                                [
+                                    "{}={}".format(
+                                        str(getParam("<...variant_resolve.name>.parameters.variant.key_{}".format(i.split("_")[-1] if i != "None" else 0))),
+                                        str(getParam("<...variant_resolve.name>.parameters.variant.value_{}".format(i.split("_")[-1] if i != "None" else 0)))
+                                    )
+                                    for i in str(getNode("<...variant_resolve.name>").parameters.keys).split(", ") 
+                                    if i != "None"
+                                ]
+                            ),
+                            '\n'.join(
+                                [
+                                    '{}={}'.format(
+                                        self.getNode().getParent().getParameter('parameters.customize.{}.i0'.format(i)).getValue(0),
+                                        self.getNode().getParent().getParameter('parameters.customize.{}.i1'.format(i)).getValue(0), 
+                                    )
+                                    for i in ["tag_{}".format(j) for j in range(5)] 
+                                    if self.getNode().getParent().getParameter('parameters.customize.{}.i0'.format(i)).getValue(0)
+                                ]
+                            ),
+                            '\n'.join(
+                                [
+                                    '{}={}'.format(
+                                        self.getNode().getParent().getParameter('parameters.environment.{}.i0'.format(i)).getValue(0),
+                                        self.getNode().getParent().getParameter('parameters.environment.{}.i1'.format(i)).getValue(0), 
+                                    )
+                                    for i in ["tag_{}".format(j) for j in range(15)] 
+                                    if self.getNode().getParent().getParameter('parameters.environment.{}.i0'.format(i)).getValue(0)
+                                ]
+                            )
+                        ] if i
+                    ]
+                )
+            #
+            user/output/builtin/image_enable: 'getParent().parameters.render.output.builtin.image_enable'
+            user/output/builtin/image_pattern:
+                |-
+                '{}{}'.format(
+                    str(getParent().parameters.render.output_directory), str(getParent().parameters.render.output.builtin.image_pattern)
+                )
+            #
+            user/output/arnold/stats_file_enable: 'getParent().parameters.render.output.arnold.stats_file_enable'
+            user/output/arnold/stats_file_pattern:
+                |-
+                '{}{}'.format(
+                    str(getParent().parameters.render.output_directory), str(getParent().parameters.render.output.arnold.stats_file_pattern)
+                )
+            user/output/arnold/profile_file_enable: 'getParent().parameters.render.output.arnold.profile_file_enable'
+            user/output/arnold/profile_file_pattern:
+                |-
+                '{}{}'.format(
+                    str(getParent().parameters.render.output_directory), str(getParent().parameters.render.output.arnold.profile_file_pattern)
+                )
+        #
+        connections:
+            - '<..variant_resolve.output>'
+            - '<.input>'
+            # output
+            - '<.output>'
+            - '<main.output>'
+    #
+    output:
+        tag: 'RDR'
+        type: Render
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.input'
+        output: '<.path>.out'
+        #
+        parameters: {}
+        #
+        proxy_ports:
+            outputs: ['<main.name>', 'render/outputs']
+        #
+        expressions:
+            passName:
+                |-
+                '{}__<..tag>'.format(
+                    '__'.join(
+                        [
+                            str(getParam("<...variant_resolve.name>.parameters.variant.value_{}".format(i.split("_")[-1] if i != "None" else 0)))
+                            for i in str(getNode("<...variant_resolve.name>").parameters.keys).split(", ")
+                        ]
+                    )
+                )
+        #
+        connections:
+            - '<..render_properties.output>'
+            - '<.input>'

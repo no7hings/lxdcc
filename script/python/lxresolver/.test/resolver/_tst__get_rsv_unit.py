@@ -25,6 +25,6 @@ if __name__ == '__main__':
         print i_rsv_unit.properties
 
         print i_rsv_unit.get_result(
-            extend_variants=dict(user_extra='dongchangbao')
+            extend_variants=dict(artist='dongchangbao')
         )
 

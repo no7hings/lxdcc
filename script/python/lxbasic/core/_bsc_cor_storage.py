@@ -879,6 +879,9 @@ class StgPathOpt(object):
     def get_modify_timestamp(self):
         return os.stat(self._path).st_mtime
 
+    def get_modify_time_tag(self):
+        return TimeMtd
+
     def get_user(self):
         return StorageMtd.get_user(self.get_path())
 
@@ -1080,9 +1083,10 @@ class StgFileOpt(StgPathOpt):
     def get_name(self):
         return os.path.basename(self.path)
     name = property(get_name)
-    @property
-    def name_base(self):
+
+    def get_name_base(self):
         return os.path.splitext(os.path.basename(self.path))[0]
+    name_base = property(get_name_base)
 
     def get_ext(self):
         if self._file_type is not None:

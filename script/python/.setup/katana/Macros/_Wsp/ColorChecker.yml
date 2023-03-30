@@ -6,7 +6,7 @@ option:
     create_type: 'ColorChecker_Wsp'
     description:
         |-
-        color checker
+        for camera attach a color-checker and fit to bottom left
     variant_key: ''
     #
     auto_color: False
@@ -18,8 +18,9 @@ option:
 #
 main:
     type: 'Group'
-    path: '<option.root>/<option.type>'
-    input: '<.path>.join_camera'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
+    input: '<.path>.input'
     output: '<.path>.output'
     #
     attributes:
@@ -29,9 +30,14 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
+        #
+        comment: '<option.description>'
     #
     input_ports:
-        - 'join_camera'
+        - 'input'
     #
     output_ports:
         - 'output'
@@ -43,12 +49,31 @@ main:
             value: '<option.create_type>'
             tool_tip: '...'
             lock: True
-        # option
-        option/enable:
+        parameters/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+        #   visible
+        parameters/visible/main:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/visible/color_chart:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/visible/color_chart_flat:
             widget: boolean
             value: False
             tool_tip: '...'
-
+        #
+        parameters/attach_fit:
+            widget: proxy
+            value: ''
+            tool_tip: '...'
+        # option
         option/location:
             widget: path
             value: '/root/world/etr'
@@ -63,24 +88,9 @@ main:
 
         option/default:
             widget: path
-            value: '/root/world/etr/color_checker/attach_group/ass'
+            value: '/root/world/etr/color_checker/ass'
             tool_tip: '...'
             lock: True
-        #   visible
-        option/visible/main:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        option/visible/color_chart:
-            widget: boolean
-            value: True
-            tool_tip: '...'
-
-        option/visible/color_chart_flat:
-            widget: boolean
-            value: False
-            tool_tip: '...'
         #   ass
         option/ass/main_file:
             widget: file
@@ -96,56 +106,14 @@ main:
             widget: file
             value: '/l/resource/td/asset/ass/color-checker-color-chart-flat.ass'
             tool_tip: '...'
-        # extra
-        #   camera attach
-        extra/camera_attach/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        extra/camera_attach/group:
-            widget: path
-            value: '/root/world/etr/color_checker/attach_group'
-            tool_tip: '...'
-            lock: True
-
-        extra/camera_attach/camera_shape:
-            widget: path
-            value: '/root/world/cam/renderCamera/defaultCamera/defaultCameraLeft/defaultCameraLeftShape'
-            tool_tip: '...'
-        #   camera fit
-        extra/camera_fit/enable:
-            widget: boolean
-            value: False
-            tool_tip: '...'
-
-        extra/camera_fit/scale_percent:
-            widget: float
-            value: .125
-            tool_tip: '...'
-
-        extra/camera_fit/margin_percent:
-            widget: float
-            value: .0125
-            tool_tip: '...'
-
-        extra/camera_fit/camera_fov:
-            widget: float
-            value: 70
-            tool_tip: '...'
-
-        extra/camera_fit/camera_screen_mode:
-            widget: enumerate
-            value: ['horizontal', 'vertical', 'fill']
-            tool_tip: '...'
-
-        extra/camera_fit/render_resolution:
-            widget: resolution
-            value: '2048x2048'
-            tool_tip: '...'
+    #
+    expand_groups:
+        - 'parameters'
+        - 'parameters/visible'
+        - 'parameters/attach_fit'
 #
 node:
-    join_camera_dot:
+    input_dot:
         type: Dot
         path: '<main.path>/<option.type_abr>__<..key>'
         input: '<.path>.input'
@@ -178,7 +146,7 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().option.visible.main else 0'
+            in: '1 if getParent().parameters.visible.main else 0'
         #
         connections:
             # on
@@ -207,7 +175,7 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().option.visible.color_chart else 0'
+            in: '1 if getParent().parameters.visible.color_chart else 0'
         #
         connections:
             # on
@@ -236,7 +204,7 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().option.visible.color_chart_flat else 0'
+            in: '1 if getParent().parameters.visible.color_chart_flat else 0'
         #
         connections:
             # on
@@ -272,122 +240,36 @@ node:
         output: '<.path>.out'
         #
         input_ports:
-            - 'join_camera'
-            - 'ass'
+            - 'join_upstream'
+            - 'join_current'
         #
         connections:
-            # join camera
-            - '<main.path>.join_camera'
-            - '<.path>.join_camera'
-            # ass
+            # join upstream
+            - '<main.input>'
+            - '<.path>.join_upstream'
+            # join current
             - '<..ass_merge.output>'
-            - '<.path>.ass'
-    #
-    camera_attach_from_xform:
-        type: TransformEdit
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        expressions:
-            path: 'getParent().extra.camera_attach.camera_shape'
-        #
-        connections:
-            - '<..upstream_merge.output>'
-            - '<.path>.in'
-    #   ass translate
-    camera_attach_to_xform:
-        type: TransformEdit
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        expressions:
-            path: 'getParent().option.default'
-        #
-        connections:
-            - '<..camera_attach_from_xform.output>'
-            - '<.path>.in'
-    #   extra
-    #   camera attach
-    camera_attach:
-        type: AttributeCopy
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            fromAttr: 'xform.interactive'
-            toAttr: 'xform.interactive'
-        #
-        expressions:
-            fromRoot: 'getParent().extra.camera_attach.camera_shape'
-            toRoot: 'getParent().extra.camera_attach.group'
-            toCEL: 'getParent().extra.camera_attach.group'
-        #
-        connections:
-            #
-            - '<..camera_attach_to_xform.output>'
-            - '<.path>.input'
-            #
-            - '<..camera_attach_to_xform.output>'
-            - '<.path>.copyFrom'
-
-    camera_attach_enable:
-        type: Switch
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.output'
-        #
-        input_ports:
-            - 'off'
-            - 'on'
-        #
-        expressions:
-            in: '1 if getParent().extra.camera_attach.enable else 0'
-        #
-        connections:
-            # off
-            - '<..upstream_merge.output>'
-            - '<.path>.off'
-            # on
-            - '<..camera_attach.output>'
-            - '<.path>.on'
+            - '<.path>.join_current'
+    #   setting
     #   camera fit
-    camera_fit_opt:
-        type: ColorCheckerCameraFitOpt_Wsp
-        path: '<main.path>/<option.type_abr>__<..key>'
+    attach_fit_opt:
+        tag: 'CFO'
+        type: ColorCheckerAttachFitOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
         input: '<.path>.i0'
         output: '<.path>.out'
         #
+        proxy_ports:
+            user/option: ['<main.name>', 'parameters/attach_fit']
+        #
         expressions:
-            user/enable: 'getParent().extra.camera_fit.enable'
-            user/scale_percent: 'getParent().extra.camera_fit.scale_percent'
-            user/margin_percent: 'getParent().extra.camera_fit.margin_percent'
-            user/camera/fov: 'getParent().extra.camera_fit.camera_fov'
-            user/camera/screen_mode: 'getParent().extra.camera_fit.camera_screen_mode'
-            user/render/resolution: 'getParent().extra.camera_fit.render_resolution'
+            CEL: 'getParent().option.default'
         #
         connections:
             #
-            - '<..camera_attach_enable.output>'
+            - '<..upstream_merge.output>'
             - '<.input>'
-
-    camera_fit_enable:
-        type: Switch
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.output'
-        #
-        input_ports:
-            - 'off'
-            - 'on'
-        #
-        expressions:
-            in: '1 if getParent().extra.camera_fit.enable else 0'
-        #
-        connections:
-            # off
-            - '<..camera_attach_enable.output>'
-            - '<.path>.off'
-            # on
-            - '<..camera_fit_opt.output>'
-            - '<.path>.on'
     # enable
     enable:
         type: Switch
@@ -399,14 +281,14 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().option.enable else 0'
+            in: '1 if getParent().parameters.enable else 0'
         #
         connections:
             # off
-            - '<..join_camera_dot.output>'
+            - '<..input_dot.output>'
             - '<.path>.off'
             # on
-            - '<..camera_fit_enable.output>'
+            - '<..attach_fit_opt.output>'
             - '<.path>.on'
             # output
             - '<.output>'

@@ -22,7 +22,8 @@ option:
 #
 main:
     type: Group
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.join_upstream'
     output: '<.path>.output'
     #
@@ -33,6 +34,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -205,8 +209,8 @@ node:
         output: '<.path>.out'
         #
         input_ports:
-            - join_upstream
-            - join_other
+            - 'join_upstream'
+            - 'join_other'
         #
         connections:
             # join geometry

@@ -44,10 +44,29 @@ class KatanaEventSetup(object):
         ktn_core.EventMtd.set_events_register()
 
 
+class KatanaWorkspaceSetup(object):
+    def __init__(self):
+        pass
+    @classmethod
+    def set_setup(cls):
+        from lxkatana import ktn_core
+
+        import lxkatana.scripts as ktn_scripts
+        #
+        ktn_core.CallbackMtd.add_arnold_callbacks()
+        ktn_core.CallbackMtd.add_as_scene_open(
+            ktn_scripts.ScpCbkEnvironment().execute
+        )
+        ktn_core.CallbackMtd.add_as_scene_save(
+            ktn_scripts.ScpCbkEnvironment().execute
+        )
+
+
 class KatanaCallbackSetup(object):
     def __init__(self):
         pass
     @classmethod
     def set_run(cls):
         from lxkatana import ktn_core
-        ktn_core.CallbackMtd.set_callbacks_add()
+        #
+        ktn_core.CallbackMtd.add_arnold_callbacks()

@@ -30,7 +30,7 @@ customize-name: '{customize}'
 any-key: '{any}'
 #
 user-name: '{user}'
-user_extra-name: '{user_extra}'
+artist-name: '{artist}'
 #
 time-tag: '{time}'
 # extend
@@ -58,7 +58,7 @@ variant-fnmatch-patterns:
     role: '[a-z][a-z][a-z]'
     sequence: '[a-z][0-9][0-9]'
 #    step: '[a-z][a-z][a-z]'
-    version: '[a-z][0-9][0-9][0-9]'
+    version: '[a-z][0-9][0-9][0-9]*'
     version_extra: '[0-9][0-9][0-9]'
     look_pass: '[A-Za-z]*'
     shot: '[a-z][0-9][0-9][0-9][0-9][0-9]'

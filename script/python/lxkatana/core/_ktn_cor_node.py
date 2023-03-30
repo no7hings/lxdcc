@@ -28,6 +28,22 @@ class KtnSGObjOpt(object):
     def get(self, key, use_global=False):
         return self.get_port_raw(key, use_global)
 
+    def get_properties(self, key):
+        def rcs_fnc_(k_):
+            _p = attrs.getChildByName(key)
+            if hasattr(_p, 'getNumberOfChildren'):
+                _c = _p.getNumberOfChildren()
+                for _i in range(_c):
+                    _i_p = _p.getChildByIndex(_i)
+                    print _i_p
+                    print dir(_i_p)
+
+        ps = bsc_objects.Properties(self)
+        tvl = self._traversal
+        if tvl.valid():
+            attrs = tvl.getLocationData().getAttrs()
+            rcs_fnc_(key)
+
 
 class KtnSGStageOpt(object):
     OBJ_PATHSEP = '/'
@@ -496,7 +512,7 @@ class NGObjOpt(object):
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj, False
     @classmethod
-    def _get_group_stack_child_create_args_(cls, path, type_name):
+    def _get_group_child_create_args_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
         name = path_opt.name
         parent_opt = path_opt.get_parent()
@@ -506,27 +522,53 @@ class NGObjOpt(object):
             parent = cls(parent_name)
             parent_ktn_obj = parent.ktn_obj
             if parent_ktn_obj is not None:
-                ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
-                if ktn_obj is None:
-                    raise RuntimeError('type="{}" is unknown'.format(type_name))
-                #
-                name_ktn_port = ktn_obj.getParameter('name')
-                if name_ktn_port is not None:
-                    name_ktn_port.setValue(str(name), 0)
-                #
-                input_port = ktn_obj.getInputPorts()[0]
-                output_port = ktn_obj.getOutputPorts()[0]
-                #
-                parent_return_port = NGObjOpt(parent_ktn_obj).get_return_ports()[0]
-                cur_output_port = parent_return_port.getConnectedPorts()[0]
-                cur_output_port.connect(input_port)
-                #
-                output_port.connect(parent_return_port)
-                #
-                ktn_obj.setName(name)
-                return ktn_obj, True
+                if parent_ktn_obj.getType() in ['GroupStack']:
+                    ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
+                    if ktn_obj is None:
+                        raise RuntimeError('type="{}" is unknown'.format(type_name))
+                    #
+                    parent_ktn_obj.buildChildNode(ktn_obj)
+                    #
+                    name_ktn_port = ktn_obj.getParameter('name')
+                    if name_ktn_port is not None:
+                        name_ktn_port.setValue(str(name), 0)
+                    ktn_obj.setName(name)
+                    return ktn_obj, True
+                elif parent_ktn_obj.getType() in ['GroupMerge']:
+                    ktn_obj = NodegraphAPI.CreateNode(type_name, parent_ktn_obj)
+                    if ktn_obj is None:
+                        raise RuntimeError('type="{}" is unknown'.format(type_name))
+                    #
+                    parent_ktn_obj.buildChildNode(ktn_obj)
+                    #
+                    name_ktn_port = ktn_obj.getParameter('name')
+                    if name_ktn_port is not None:
+                        name_ktn_port.setValue(str(name), 0)
+                    ktn_obj.setName(name)
+                    return ktn_obj, True
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
+        return ktn_obj, False
+    @classmethod
+    def _get_material_node_graph_create_args_(cls, path, type_name, shader_type_name=None):
+        path_opt = bsc_core.DccPathDagOpt(path)
+        name = path_opt.name
+        parent_opt = path_opt.get_parent()
+        parent_name = parent_opt.get_name()
+        ktn_obj = NodegraphAPI.GetNode(name)
+        if ktn_obj is None:
+            parent = cls(parent_name)
+            if type_name in {'NetworkMaterial'}:
+                exists_materials = parent.get_children(include_type_names=['NetworkMaterial'])
+                if len(exists_materials) == 1:
+                    default_material = exists_materials[0]
+                    if fnmatch.filter([default_material.getName()], 'NetworkMaterial*'):
+                        cls(default_material).set_rename(name)
+                        return default_material, True
+                return cls._get_create_args_(path, type_name)
+            elif type_name in {'ArnoldShadingNode'}:
+                return cls._get_shader_create_args_(path, type_name, shader_type_name)
+            return ktn_obj, True
         return ktn_obj, False
     @classmethod
     def _get_shader_create_args_(cls, path, type_name, shader_type_name):
@@ -759,8 +801,73 @@ class NGObjOpt(object):
         rcs_fnc_(list_, self._ktn_obj)
         return list_
 
+    def get_all_source_objs_(self, **kwargs):
+        def rcs_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
+            if skip_base_type_names:
+                base_type_name = ktn_obj_.getBaseType()
+                if base_type_name in skip_base_type_names:
+                    return
+            #
+            if hasattr(ktn_obj_, 'getChildren'):
+                outer_fnc_(ktn_obj_, root_name_, root_index_, branch_index_)
+                # inner
+                if inner is True:
+                    # reset start to 0
+                    _root_name = ktn_obj_.getName()
+                    if _root_name not in exclude_names:
+                        inner_fnc_(ktn_obj_, _root_name, root_index_, branch_index_)
+            else:
+                outer_fnc_(ktn_obj_, root_name_, root_index_, branch_index_)
+        #
+        def outer_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
+            _source_ktn_objs = self.__class__(ktn_obj_).get_source_objs()
+            #
+            if _source_ktn_objs:
+                branch_index_ += 1
+                add_fnc_(_source_ktn_objs, root_name_, root_index_, branch_index_)
+        #
+        def inner_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
+            root_index_ += 1
+            #
+            _source_ktn_objs = self._get_source_objs_inner_(ktn_obj_)
+            if _source_ktn_objs:
+                branch_index_ += 1
+                add_fnc_(_source_ktn_objs, root_name_, root_index_, branch_index_)
+        #
+        def add_fnc_(ktn_objs_, root_name_, root_index_, branch_index_):
+            for _i_sub_index, _i_ktn_obj in enumerate(ktn_objs_):
+                _i_leaf_name = _i_ktn_obj.getName()
+                if _i_leaf_name not in index_dict_:
+                    index_dict_[_i_leaf_name] = (root_index_, branch_index_, _i_sub_index, len(index_dict_))
+                    rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
+        #
+        name = self._ktn_obj.getName()
+        exclude_names = [
+            name,
+        ]
+        if self._ktn_obj.getParent():
+            exclude_names.append(self._ktn_obj.getParent().getName())
+        #
+        index_dict_ = {
+            name: (0, 0, 0, 0)
+        }
+        inner = kwargs.get('inner', False)
+        skip_base_type_names = kwargs.get('skip_base_type_names', [])
+        include_type_names = kwargs.get('include_type_names', [])
+        rcs_fnc_(self._ktn_obj, name, 0, 0)
+        list_ = bsc_core.DictMtd.sort_key_by_value_to(index_dict_).keys()
+        list_.reverse()
+        if include_type_names:
+            _ = [i for i in list_ if NodegraphAPI.GetNode(i).getType() in include_type_names]
+            return _
+        return list_
+
     def get_gui_layout_data(self, **kwargs):
         def rcs_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
+            if skip_base_type_names:
+                base_type_name = ktn_obj_.getBaseType()
+                if base_type_name in skip_base_type_names:
+                    return
             if hasattr(ktn_obj_, 'getChildren'):
                 _branch_name = ktn_obj_.getName()
                 outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
@@ -853,6 +960,7 @@ class NGObjOpt(object):
                     rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
         #
         inner = kwargs.get('inner', False)
+        skip_base_type_names = kwargs.get('skip_base_type_names', [])
         w, h = kwargs.get('size', [320, 40])
         #
         leaf_branch_name_dict = {
@@ -898,7 +1006,11 @@ class NGObjOpt(object):
         ).run()
     @Modifier.undo_debug_run
     def gui_layout_node_graph(self, scheme=(NGLayoutOpt.Orientation.Vertical, NGLayoutOpt.Direction.LeftToRight, NGLayoutOpt.Direction.BottomToTop), size=(320, 40)):
-        graph_dara = self.get_gui_layout_data(inner=True, size=size)
+        graph_dara = self.get_gui_layout_data(
+            inner=True,
+            size=size,
+            skip_base_type_names=['SuperTool']
+        )
         NGLayoutOpt(
             graph_dara,
             scheme=scheme,
@@ -916,6 +1028,7 @@ class NGObjOpt(object):
             NGPortOpt(port).set(raw)
 
     def set(self, key, value):
+        key = key.replace('/', '.')
         self.set_port_raw(key, value)
 
     def get(self, key):
@@ -928,10 +1041,11 @@ class NGObjOpt(object):
             #
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
-                bsc_core.LogMtd.trace_warning(
-                    'port="{}" is non-exists'.format(i_port_path)
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path)
+                    )
                 )
-                continue
             #
             i_value = i_args
             if isinstance(i_args, dict):
@@ -956,6 +1070,30 @@ class NGObjOpt(object):
                 self.set_expression_enable(i_port_path, False)
             #
             self.set(i_port_path, i_value)
+
+    def set_proxy_parameters_by_data(self, data, extend_kwargs=None):
+        for i_port_path, i_data in data.items():
+            #
+            i_port_path = i_port_path.replace('/', '.')
+            #
+            i_p = self.ktn_obj.getParameter(i_port_path)
+            if i_p is None:
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path)
+                    )
+                )
+            self.set_for_proxy(i_port_path, i_data, extend_kwargs)
+
+    def set_for_proxy(self, key, data, extend_kwargs):
+        port = self.ktn_obj.getParameter(key)
+        if port:
+            _ = NGPortOpt(port).get()
+            if _:
+                name = _.split('.')[0]
+                NGObjOpt(name).set_parameters_by_data(
+                    data, extend_kwargs
+                )
 
     def set_shader_parameters_by_data(self, data, extend_kwargs=None):
         """
@@ -1010,10 +1148,11 @@ class NGObjOpt(object):
             #
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
-                bsc_core.LogMtd.trace_warning(
-                    'port="{}" is non-exists'.format(i_port_path)
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path)
+                    )
                 )
-                continue
             #
             if isinstance(extend_kwargs, dict):
                 if isinstance(i_expression, (unicode, str)):
@@ -1021,6 +1160,58 @@ class NGObjOpt(object):
             #
             self.set_expression_enable(i_port_path, True)
             self.set_expression(i_port_path, i_expression)
+
+    def create_proxy_ports_by_data(self, data, extend_kwargs=None):
+        for i_port_path_src, i_arg_tgt in data.items():
+            i_port_path_src = i_port_path_src.replace('/', '.')
+            i_obj_path_tgt, i_port_path_tgt = i_arg_tgt
+            #
+            self.set_port_hint(
+                i_port_path_src, dict(
+                    text=bsc_core.RawStringUnderlineOpt(
+                        bsc_core.DccPortPathMtd.get_dag_name(i_port_path_src)
+                    ).to_prettify(capitalize=False)
+                )
+            )
+            #
+            i_obj_opt_tgt = NGObjOpt(i_obj_path_tgt)
+            i_port_path_tgt = i_port_path_tgt.replace('/', '.')
+            i_p_tgt = i_obj_opt_tgt.get_port(i_port_path_tgt)
+            if i_p_tgt is None:
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path_tgt)
+                    )
+                )
+            #
+            i_obj_opt_tgt.set_expression(
+                i_port_path_tgt, 'getParam(\'{}.{}\').param.getFullName()'.format(
+                    self.get_name(), i_port_path_src
+                )
+            )
+
+    def set_expand_groups_by_data(self, data, extend_kwargs=None):
+        for i_port_path in data:
+            #
+            i_port_path = i_port_path.replace('/', '.')
+            #
+            i_p = self.ktn_obj.getParameter(i_port_path)
+            if i_p is None:
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path)
+                    )
+                )
+            #
+            i_hint_string = i_p.getHintString()
+            if i_hint_string:
+                i_hint_dict = eval(i_hint_string)
+            else:
+                i_hint_dict = {}
+            #
+            i_hint_dict['open'] = True
+
+            self.get_port(i_port_path).setHintString(str(i_hint_dict))
 
     def set_shader_expressions_by_data(self, data, extend_kwargs=None):
         for i_port_path, i_expression in data.items():
@@ -1044,10 +1235,11 @@ class NGObjOpt(object):
             i_port_path = i_port_path.replace('/', '.')
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
-                bsc_core.LogMtd.trace_warning(
-                    'port="{}" is non-exists'.format(i_port_path)
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path)
+                    )
                 )
-                continue
             i_hint_string = i_p.getHintString()
             if i_hint_string:
                 i_hint_dict = eval(i_hint_string)
@@ -1063,7 +1255,37 @@ class NGObjOpt(object):
             #
             i_hint_dict.update(i_hint_dict_)
             #
-            self.get_port(i_port_path).setHintString(str(i_hint_dict))
+            i_p.setHintString(str(i_hint_dict))
+
+    def set_port_hint(self, port_path, hint_dict):
+        p = self.ktn_obj.getParameter(port_path)
+        if p is None:
+            raise RuntimeError(
+                bsc_core.LogMtd.trace_warning(
+                    'port="{}" is non-exists'.format(port_path)
+                )
+            )
+        hint_string = p.getHintString()
+        if hint_string:
+            hint_dict_ = eval(hint_string)
+        else:
+            hint_dict_ = {}
+
+        hint_dict_.update(hint_dict)
+        p.setHintString(str(hint_dict))
+
+    def set_capsules_by_data(self, data, extend_kwargs=None):
+        for i_port_path, i_value in data.items():
+            #
+            i_port_path = i_port_path.replace('/', '.')
+            i_p = self.ktn_obj.getParameter(i_port_path)
+            if i_p is None:
+                raise RuntimeError(
+                    bsc_core.LogMtd.trace_warning(
+                        'port="{}" is non-exists'.format(i_port_path)
+                    )
+                )
+            self.set_capsule_strings(i_port_path, i_value)
 
     def set_shader_hints_by_data(self, data, extend_kwargs=None):
         for i_port_path, i_value in data.items():
@@ -1105,6 +1327,16 @@ class NGObjOpt(object):
 
     def set_as_enumerate(self, key, value):
         self.set_enumerate_strings(key, value)
+
+    def set_capsule_strings(self, key, data):
+        port = self.ktn_obj.getParameter(key)
+        if port:
+            NGPortOpt(port).set_capsule_strings(data)
+
+    def set_capsule_data(self, key, data):
+        port = self.ktn_obj.getParameter(key)
+        if port:
+            NGPortOpt(port).set_capsule_data(data)
 
     def get_port(self, port_path):
         return self.ktn_obj.getParameter(port_path)
@@ -1200,6 +1432,7 @@ class NGObjOpt(object):
             for i in ktn_root_port.getChildren():
                 ktn_root_port.deleteChild(i)
         else:
+            port_path = port_path.replace('/', '.')
             ktn_root_port = self._ktn_obj.getParameter(port_path)
         #
         if ktn_root_port is not None:
@@ -1210,7 +1443,7 @@ class NGObjOpt(object):
         _ = self._ktn_obj.getChildren()
         if include_type_names is not None:
             if isinstance(include_type_names, (tuple, list)):
-                return [i for i in _ if self.__class__(i).get_type() in include_type_names]
+                return [i for i in _ if i.getType() in include_type_names]
         return _
 
     def clear_children(self, include_type_names=None):
@@ -1297,164 +1530,231 @@ class NGObjOpt(object):
             i_ktn_group_port = current_group_port.getChild(i_group_name)
             if i_ktn_group_port is None:
                 i_ktn_group_port = current_group_port.createChildGroup(i_group_name)
-            #
-            i_group_label = bsc_core.RawStringUnderlineOpt(i_group_name).to_prettify(capitalize=False)
-            i_ktn_group_port.setHintString(
-                str(
-                    str({'label': i_group_label})
+                #
+                i_group_label = bsc_core.RawStringUnderlineOpt(i_group_name).to_prettify(capitalize=False)
+                i_ktn_group_port.setHintString(
+                    str(
+                        dict(
+                            label=i_group_label,
+                            help='...'
+                        )
+                    )
                 )
-            )
             current_group_port = i_ktn_group_port
         #
         group_ktn_obj = current_group_port
         #
-        self._create_port_by_data(
-            group_ktn_obj,
-            dict(
-                widget=data.get('widget'),
-                name=port_name,
-                value=data.get('value'),
-                default=data.get('default'),
-                expression=data.get('expression'),
-                tool_tip=data.get('tool_tip'),
-                lock=data.get('lock')
+        widget = data.get('widget')
+        if widget in ['group']:
+            ktn_group = group_ktn_obj.createChildGroup(port_name)
+            label = data.get('label', None)
+            if label is None:
+                label = bsc_core.RawStringUnderlineOpt(port_name).to_prettify(capitalize=False)
+            #
+            hint_dict = {'label': label}
+            lock = data.get('lock')
+            if lock is True:
+                hint_dict['readOnly'] = True
+            tool_tip = data.get('tool_tip')
+            if tool_tip:
+                hint_dict['help'] = tool_tip
+            else:
+                hint_dict['help'] = '...'
+            #
+            expand = data.get('expand')
+            if expand:
+                hint_dict['open'] = True
+            #
+            visible_condition_hint = data.get('visible_condition_hint')
+            if visible_condition_hint:
+                hint_dict['conditionalVisOps'] = dict(visible_condition_hint)
+            ktn_group.setHintString(
+                str(hint_dict)
             )
-        )
+        else:
+            self._create_port_by_data(
+                group_ktn_obj,
+                dict(
+                    widget=data.get('widget'),
+                    name=port_name,
+                    label=data.get('label', None),
+                    value=data.get('value'),
+                    default=data.get('default'),
+                    expression=data.get('expression'),
+                    tool_tip=data.get('tool_tip'),
+                    lock=data.get('lock'),
+                    visible_condition_hint=data.get('visible_condition_hint'),
+                    expand=data.get('expand')
+                )
+            )
     @classmethod
     def _create_port_by_data(cls, group_ktn_obj, data):
         name = data['name']
+        label = data['label']
         widget = data['widget']
         value = data['value']
         default = data['default']
         expression = data['expression']
         tool_tip = data['tool_tip']
         lock = data['lock']
-        label = bsc_core.RawStringUnderlineOpt(name).to_prettify(capitalize=False)
+        if label != ' ':
+            label = bsc_core.RawStringUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = group_ktn_obj.getChild(name)
         if ktn_port is None:
-            if isinstance(value, (bool,)):
-                ktn_port = group_ktn_obj.createChildNumber(name, value)
-                ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
-            #
-            elif isinstance(value, six.string_types):
-                ktn_port = group_ktn_obj.createChildString(name, value)
-                if expression:
-                    ktn_port.setExpression(expression)
-                if widget in ['path']:
-                    ktn_port.setHintString(
-                        str({'widget': 'scenegraphLocation'})
-                    )
-                elif widget in ['file']:
-                    ktn_port.setHintString(
-                        str({'widget': 'fileInput'})
-                    )
-                elif widget in ['script']:
-                    ktn_port.setHintString(
-                        str({'widget': 'scriptEditor'})
-                    )
-                elif widget in ['resolution']:
-                    ktn_port.setHintString(
-                        str({'widget': 'resolution'})
-                    )
-                elif widget in ['button']:
-                    ktn_port.setHintString(
-                        str({'widget': 'scriptButton', 'buttonText': label, 'scriptText': value})
-                    )
-                elif widget in ['node']:
-                    ktn_port.setHintString(
-                        str({'widget': 'nodeDropProxy', 'buttonText': label, 'scriptText': value})
-                    )
-                    if value:
-                        ktn_port.setExpression(
-                            'getNode(\'{}\').getNodeName()'.format(
-                                value
-                            )
-                        )
-            elif isinstance(value, (int, float)):
-                ktn_port = group_ktn_obj.createChildNumber(name, value)
-                if widget in ['boolean']:
-                    ktn_port.setHintString(
-                        str({'widget': 'boolean'})
-                    )
-            elif isinstance(value, (list,)):
-                if widget in ['enumerate']:
-                    ktn_port = group_ktn_obj.createChildString(name, value[0])
-                    ktn_port.setHintString(
-                        str(dict(widget='popup', options=list(value)))
-                    )
-                    if default is not None:
-                        ktn_port.setValue(default, 0)
-                elif widget in ['color3']:
-                    c = 3
-                    ktn_port = group_ktn_obj.createChildNumberArray(name, c)
-                    for i in range(c):
-                        i_ktn_port = ktn_port.getChildByIndex(i)
-                        i_ktn_port.setValue(value[i], 0)
-                    #
-                    ktn_port.setHintString(
-                        str(dict(widget='color'))
-                    )
-                elif widget in ['float3']:
-                    c = 3
-                    ktn_port = group_ktn_obj.createChildNumberArray(name, c)
-                    for i in range(c):
-                        i_ktn_port = ktn_port.getChildByIndex(i)
-                        i_ktn_port.setValue(value[i], 0)
-                elif widget in ['string2']:
-                    c = 2
-                    ktn_port = group_ktn_obj.createChildStringArray(name, c)
-                    for i in range(c):
-                        i_ktn_port = ktn_port.getChildByIndex(i)
-                        i_ktn_port.setValue(value[i], 0)
-                elif widget in ['capsule_list']:
-                    sep = ', '
-                    v = sep.join(value)
-                    ktn_port = group_ktn_obj.createChildString(name, v)
-                    ktn_port.setHintString(
-                        str(
-                            dict(
-                                widget='capsule',
-                                options=list(value),
-                                displayText=map(lambda x: str(x).capitalize(), list(value)),
-                                exclusive=False,
-                                colors=[bsc_core.RawTextOpt(i).to_rgb_(s_p=25, v_p=100) for i in list(value)],
-                                equalPartitionWidths=True,
-                                delimiter=sep
-                            )
-                        )
-                    )
-                    # if default is not None:
-                    #     ktn_port.setValue(default, 0)
-                elif widget in ['capsule_string']:
-                    ktn_port = group_ktn_obj.createChildString(name, value[0])
-                    ktn_port.setHintString(
-                        str(
-                            dict(
-                                widget='capsule',
-                                options=list(value),
-                                displayText=map(lambda x: str(x).capitalize(), list(value)),
-                                exclusive=True,
-                                colors=[bsc_core.RawTextOpt(i).to_rgb_(s_p=25, v_p=100) for i in list(value)],
-                                equalPartitionWidths=True,
-                            )
-                        )
-                    )
-                    if default is not None:
-                        ktn_port.setValue(default, 0)
-                else:
-                    c = len(value)
-                    if isinstance(value[0], six.string_types):
-                        ktn_port = group_ktn_obj.createChildStringArray(name, c)
-                    elif isinstance(value[0], (int, float)):
-                        ktn_port = group_ktn_obj.createChildNumberArray(name, c)
-                    else:
-                        raise TypeError()
-                    #
-                    for i in range(c):
-                        i_ktn_port = ktn_port.getChildByIndex(i)
-                        i_ktn_port.setValue(value[i], 0)
+            if widget in {'proxy'}:
+                ktn_port = group_ktn_obj.createChildString(name, '')
+                ktn_port.setHintString(
+                    str({'widget': 'teleparam'})
+                )
             else:
-                raise TypeError()
+                if isinstance(value, (bool,)):
+                    ktn_port = group_ktn_obj.createChildNumber(name, value)
+                    ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
+                #
+                elif isinstance(value, six.string_types):
+                    ktn_port = group_ktn_obj.createChildString(name, value)
+                    if expression:
+                        ktn_port.setExpression(expression)
+                    if widget in {'path'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'scenegraphLocation'})
+                        )
+                    elif widget in {'CEL'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'cel'})
+                        )
+                    elif widget in {'file'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'fileInput'})
+                        )
+                    elif widget in {'script'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'scriptEditor'})
+                        )
+                    elif widget in {'resolution'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'resolution'})
+                        )
+                    elif widget in {'button'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'scriptButton', 'buttonText': label, 'scriptText': value})
+                        )
+                    elif widget in {'node'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'nodeDropProxy'})
+                        )
+                        if value:
+                            ktn_port.setExpression(
+                                'getNode(\'{}\').getNodeName()'.format(
+                                    value
+                                )
+                            )
+                elif isinstance(value, (int, float)):
+                    ktn_port = group_ktn_obj.createChildNumber(name, value)
+                    if widget in {'boolean'}:
+                        ktn_port.setHintString(
+                            str({'widget': 'boolean'})
+                        )
+                elif isinstance(value, (list,)):
+                    if widget in {'enumerate'}:
+                        ktn_port = group_ktn_obj.createChildString(name, value[0])
+                        ktn_port.setHintString(
+                            str(
+                                dict(
+                                    widget='popup',
+                                    options=list(value)
+                                )
+                            )
+                        )
+                        if default is not None:
+                            ktn_port.setValue(default, 0)
+                    elif widget in {'color3'}:
+                        c = 3
+                        ktn_port = group_ktn_obj.createChildNumberArray(name, c)
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(value[i], 0)
+                        #
+                        ktn_port.setHintString(
+                            str(dict(widget='color'))
+                        )
+                    elif widget in {'float3'}:
+                        c = 3
+                        ktn_port = group_ktn_obj.createChildNumberArray(name, c)
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(value[i], 0)
+                    elif widget in {'string2'}:
+                        c = 2
+                        ktn_port = group_ktn_obj.createChildStringArray(name, c)
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(value[i], 0)
+                    elif widget in {'capsule_string'}:
+                        if value:
+                            v = value[0]
+                        else:
+                            v = ''
+                        ktn_port = group_ktn_obj.createChildString(name, v)
+                        ktn_port.setHintString(
+                            str(
+                                dict(
+                                    widget='capsule',
+                                    options=list(value),
+                                    displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(value)),
+                                    exclusive=True,
+                                    colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=25, v_p=100) for i in list(value)],
+                                    equalPartitionWidths=True,
+                                )
+                            )
+                        )
+                        if default is not None:
+                            ktn_port.setValue(default, 0)
+                    elif widget in {'capsule_list'}:
+                        sep = ', '
+                        v = sep.join(value)
+                        ktn_port = group_ktn_obj.createChildString(name, v)
+                        ktn_port.setHintString(
+                            str(
+                                dict(
+                                    widget='capsule',
+                                    options=list(value),
+                                    displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(value)),
+                                    exclusive=False,
+                                    colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=25, v_p=100) for i in list(value)],
+                                    equalPartitionWidths=True,
+                                    delimiter=sep
+                                )
+                            )
+                        )
+                        if default is not None:
+                            default_v = sep.join(default)
+                            ktn_port.setValue(default_v, 0)
+                    elif widget in {'buttons'}:
+                        ktn_port = group_ktn_obj.createChildString(name, '')
+                        hint_dict = dict(
+                            widget='scriptToolbar',
+                            buttonData=[dict(text=i.get('name', ''), scriptText=i.get('script', ''), flat=0) for i in value]
+                        )
+                        ktn_port.setHintString(
+                            str(
+                                hint_dict
+                            )
+                        )
+                    else:
+                        c = len(value)
+                        if isinstance(value[0], six.string_types):
+                            ktn_port = group_ktn_obj.createChildStringArray(name, c)
+                        elif isinstance(value[0], (int, float)):
+                            ktn_port = group_ktn_obj.createChildNumberArray(name, c)
+                        else:
+                            raise TypeError()
+                        #
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(value[i], 0)
+                else:
+                    raise TypeError()
             #
             hint_string = ktn_port.getHintString()
             if hint_string:
@@ -1464,8 +1764,20 @@ class NGObjOpt(object):
             #
             if tool_tip is not None:
                 hint_dict['help'] = tool_tip
+            else:
+                hint_dict['help'] = '...'
+            #
             if lock is True:
                 hint_dict['readOnly'] = True
+            #
+            visible_condition_hint = data.get('visible_condition_hint')
+            if visible_condition_hint:
+                hint_dict['conditionalVisOps'] = dict(visible_condition_hint)
+            #
+            expand = data.get('expand')
+            if expand:
+                hint_dict['open'] = True
+            #
             hint_dict['label'] = label
             ktn_port.setHintString(
                 str(hint_dict)
@@ -1475,6 +1787,9 @@ class NGObjOpt(object):
         UserNodes.PublishNode(
             self._ktn_obj, file_path
         )
+
+    def get_variable_data(self):
+        pass
 
 
 class NGObjsOpt(object):
@@ -1646,6 +1961,56 @@ class NGPortOpt(object):
             hint_dict = eval(hint_string)
             return map(str, hint_dict.get('options', []))
         return []
+
+    def set_capsule_strings(self, strings):
+        hint_string = self.ktn_port.getHintString()
+        if hint_string:
+            hint_dict = eval(hint_string)
+        else:
+            hint_dict = {}
+        #
+        hint_dict.update(
+            dict(
+                options=list(strings),
+                displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(strings)),
+                colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=25, v_p=100) for i in list(strings)],
+            )
+        )
+        #
+        self.ktn_port.setHintString(
+            str(hint_dict)
+        )
+        self.ktn_port.setValue(
+            str(strings[0]), 0
+        )
+
+    def set_capsule_data(self, data):
+        hint_string = self.ktn_port.getHintString()
+        if hint_string:
+            hint_dict = eval(hint_string)
+        else:
+            hint_dict = {}
+        #
+        options = []
+        display_texts = []
+        colors = []
+        for i in data:
+            i_0, i_1 = i
+            options.append(i_0)
+            display_texts.append(i_1)
+            colors.append(bsc_core.RawTextOpt(i_1).to_rgb__(s_p=25, v_p=100))
+        #
+        hint_dict.update(
+            dict(
+                options=options,
+                displayText=display_texts,
+                colors=colors,
+            )
+        )
+        #
+        self.ktn_port.setHintString(
+            str(hint_dict)
+        )
 
     def set_connect_to(self, input_port):
         self._ktn_port.connect(

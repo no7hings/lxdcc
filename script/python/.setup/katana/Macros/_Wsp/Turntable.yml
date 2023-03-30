@@ -18,11 +18,10 @@ option:
 #
 main:
     type: 'Group'
-    path: '<option.root>/<option.type>'
-    input: '<.path>.join_upstream'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
+    input: '<.path>.input'
     output: '<.path>.output'
-    #
-    clear_start: 'extra'
     #
     attributes:
         ns_offsetX: 480
@@ -31,11 +30,14 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
     input_ports:
-        - 'join_upstream'
+        - 'input'
     #
     output_ports:
         - 'output'
@@ -47,59 +49,49 @@ main:
             value: '<option.create_type>'
             tool_tip: '...'
             lock: True
-        # option
-        option/enable:
-            widget: boolean
-            value: False
+
+        parameters/mode:
+            widget: capsule_string
+            value: ['geometry', 'camera', 'light']
+            default: 'geometry'
             tool_tip: '...'
 
-        option/target:
-            widget: path
-            value: '/root/world/geo/master'
+        parameters/target:
+            widget: CEL
+            value: ''
             tool_tip: '...'
-
-        option/direction:
-            widget: enumerate
-            value: ['clockwise', 'anticlockwise']
-            tool_tip: '...'
-
-        option/start_frame:
-            widget: integer
-            value: 1
-            tool_tip: '...'
-
-        option/end_frame:
-            widget: integer
-            value: 60
-            tool_tip: '...'
-
-        option/frame_offset:
-            widget: integer
-            value: 0
-            tool_tip: '...'
+        #
+        parameters/rotate:
+            widget: proxy
 
         option/pivot_locator:
             widget: path
             value: '/root/world/loc/turntable/pivot_locator'
             tool_tip: '...'
-
-        option/axis:
-            widget: enumerate
-            value: ['X', 'Y', 'Z']
-            default: 'Y'
+        # record
+        record/variant_properties_opt:
+            widget: node
+            value: '<node.variant_properties_opt.name>'
             tool_tip: '...'
+            lock: True
+    #
+    expressions:
+        parameters/target:
+            |-
+            {
+                'geometry': '/root/world/geo/master',
+                'camera': '/root/world/cam/renderCamera',
+                'light': '/root/world/lgt/gaffer',
+            }[str(parameters.mode)]
+        option/pivot_locator:
+            |-
+            '/root/world/loc/turntable/pivot_locator_for_{}'.format(parameters.mode)
+    #
+    expand_groups:
+        - 'parameters'
+        - 'parameters/rotate'
 #
 node:
-    join_upstream_dot:
-        type: Dot
-        path: '<main.path>/<option.type_abr>__<..key>'
-        input: '<.path>.input'
-        output: '<.path>.output'
-        #
-        connections:
-            # input
-            - '<main.input>'
-            - '<.input>'
     # locator
     locator:
         type: 'PrimitiveCreate'
@@ -121,173 +113,75 @@ node:
         output: '<.path>.out'
         #
         input_ports:
-            - 'input'
-            - 'locator'
+            - 'join_upstream'
+            - 'join_current'
         #
         connections:
-            # input
+            # join upstream
             - '<main.input>'
-            - '<.path>.input'
-            # locator
+            - '<.path>.join_upstream'
+            # join current
             - '<..locator.output>'
-            - '<.path>.locator'
-    #   transformation
-    #       translate pivot
-    translate_pivot:
-        type: AttributeSet
-        path: '<main.path>/<option.type_abr>__<..key>'
+            - '<.path>.join_current'
+    #
+    rotate_opt:
+        tag: 'TTR'
+        type: TurntableRotateOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
         output: '<.path>.out'
         #
-        parameters:
-            attributeName: 'xform.translate_pivot.translate_pivot'
-            numberValue: {size: 1, tuple_size: 3, value: [0, 0, 0]}
+        proxy_ports:
+            user/parameters: ['<main.name>', 'parameters/rotate']
         #
         expressions:
-            paths/i0: 'self.getParent().option.target'
-            #
-            numberValue/i0:
-                |-
-                getParam('<node.locator.name>.transform.translate.x')
-            numberValue/i1:
-                |-
-                getParam('<node.locator.name>.transform.translate.y')
-            numberValue/i2:
-                |-
-                getParam('<node.locator.name>.transform.translate.z')
+            CEL: 'getParent().parameters.target'
+            user/parameters/pivot_locator: 'getParent().option.pivot_locator'
         #
         connections:
             - '<..upstream_merge.output>'
-            - '<.path>.A'
-    #       rotate
-    rotate_x:
-        type: AttributeSet
-        path: '<main.path>/<option.type_abr>__<..key>'
+            - '<.input>'
+
+    # variant properties opt
+    variant_properties_opt:
+        tag: 'VPO'
+        type: VariantPropertiesOpt_Wsp
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
         output: '<.path>.out'
         #
-        parameters:
-            attributeName: 'xform.group.rotateX'
-            numberValue: {size: 1, tuple_size: 4, value: [1, 1, 0, 0]}
-        #
         expressions:
-            paths/i0: 'self.getParent().option.target'
+            user/data_1/i0:
+                |-
+                '{}.tuntable.current'.format(getParent().option.variant_key)
+            user/data_1/i1: 'getParent().getNodeName()'
             #
-            numberValue/i0:
+            user/data_2/i0:
                 |-
-                360/(
-                    getParent().option.end_frame-getParent().option.start_frame+1
-                )*(
-                    (frame+getParent().option.frame_offset)-getParent().option.start_frame
-                )*(
-                    1 if getParent().option.direction == 'anticlockwise' else -1
-                ) if getParent().option.start_frame <= (
-                    frame+getParent().option.frame_offset
-                ) <= getParent().option.end_frame and getParent().option.axis == 'X' else 0
-        #
-        connections:
-            - '<..translate_pivot.output>'
-            - '<.path>.A'
-    #
-    rotate_y:
-        type: AttributeSet
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            attributeName: 'xform.group.rotateY'
-            numberValue: {size: 1, tuple_size: 4, value: [0, 0, 1, 0]}
-        #
-        expressions:
-            paths/i0: 'self.getParent().option.target'
+                '{}.tuntable.traget'.format(getParent().option.variant_key)
+            user/data_2/i1: 'getParent().option.target'
             #
-            numberValue/i0:
+            user/data_3/i0:
                 |-
-                360/(
-                    getParent().option.end_frame-getParent().option.start_frame+1
-                )*(
-                    (frame+getParent().option.frame_offset)-getParent().option.start_frame
-                )*(
-                    1 if getParent().option.direction == 'anticlockwise' else -1
-                ) if getParent().option.start_frame <= (
-                    frame+getParent().option.frame_offset
-                ) <= getParent().option.end_frame and getParent().option.axis == 'Y' else 0
-        #
-        connections:
-            - '<..rotate_x.output>'
-            - '<.path>.A'
-    #
-    rotate_z:
-        type: AttributeSet
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            attributeName: 'xform.group.rotateZ'
-            numberValue: {size: 1, tuple_size: 4, value: [0, 0, 0, 1]}
-        #
-        expressions:
-            paths/i0: 'self.getParent().option.target'
+                '{}.tuntable.start_frame'.format(getParent().option.variant_key)
+            user/data_3/i1: 'getParent().option.start_frame'
             #
-            numberValue/i0:
+            user/data_4/i0:
                 |-
-                360/(
-                    getParent().option.end_frame-getParent().option.start_frame+1
-                )*(
-                    (frame+getParent().option.frame_offset)-getParent().option.start_frame
-                )*(
-                    1 if getParent().option.direction == 'anticlockwise' else -1
-                ) if getParent().option.start_frame <= (
-                    frame+getParent().option.frame_offset
-                ) <= getParent().option.end_frame and getParent().option.axis == 'Z' else 0
-        #
-        connections:
-            - '<..rotate_y.output>'
-            - '<.path>.A'
-    #       translate pivot inverse
-    translate_pivot_inverse:
-        type: AttributeSet
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.out'
-        #
-        parameters:
-            attributeName: 'xform.translate_pivotInverse.translate_pivotInverse'
-            numberValue: {size: 1, tuple_size: 3, value: [0, 0, 0]}
-        #
-        expressions:
-            paths/i0: 'self.getParent().option.target'
+                '{}.tuntable.end_frame'.format(getParent().option.variant_key)
+            user/data_4/i1: 'getParent().option.end_frame'
             #
-            numberValue/i0:
+            user/data_5/i0:
                 |-
-                -getParam('<node.locator.name>.transform.translate.x')
-            numberValue/i1:
-                |-
-                -getParam('<node.locator.name>.transform.translate.y')
-            numberValue/i2:
-                |-
-                -getParam('<node.locator.name>.transform.translate.z')
+                '{}.tuntable.frame_offset'.format(getParent().option.variant_key)
+            user/data_5/i1: 'getParent().option.frame_offset'
         #
         connections:
-            - '<..rotate_z.output>'
-            - '<.path>.A'
-    #   enable
-    enable:
-        type: Switch
-        path: '<main.path>/<option.type_abr>__<..key>'
-        output: '<.path>.output'
-        #
-        input_ports:
-            - 'off'
-            - 'on'
-        #
-        expressions:
-            in: '1 if getParent().option.enable else 0'
-        #
-        connections:
-            # off
-            - '<..join_upstream_dot.output>'
-            - '<.path>.off'
-            # on
-            - '<..translate_pivot_inverse.output>'
-            - '<.path>.on'
+            - '<..rotate_opt.output>'
+            - '<.input>'
             # output
             - '<.output>'
             - '<main.output>'
+

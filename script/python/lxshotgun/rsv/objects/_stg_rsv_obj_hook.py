@@ -225,7 +225,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxshotgun.objects as stg_objects
         #
         stg_connector = stg_objects.StgConnector()
-        print stg_connector.get_stg_entity()
+        print stg_connector.get_stg_resource()
 
     def set_review_mov_export(self):
         rsv_scene_properties = self._rsv_scene_properties

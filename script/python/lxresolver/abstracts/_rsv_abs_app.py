@@ -153,11 +153,15 @@ class AbsRsvAppDef(object):
     def get_packages(self):
         pass
 
-    def get_command(self, args_execute=None, packages_extend=None):
+    def get_command(self, args_execute=None, args_extend=None, packages_extend=None):
         raise NotImplementedError()
 
-    def execute_command(self, args_execute=None, packages_extend=None, **sub_progress_kwargs):
-        cmd = self.get_command(args_execute, packages_extend)
+    def execute_command(self, args_execute=None, args_extend=None, packages_extend=None, **sub_progress_kwargs):
+        cmd = self.get_command(
+            args_execute=args_execute,
+            args_extend=args_extend,
+            packages_extend=packages_extend
+        )
         if cmd:
             bsc_core.LogMtd.trace_method_result(
                 'execute app command',
@@ -226,11 +230,13 @@ class AbsRsvAppDefault(AbsRsvAppDef):
             return _
         return []
 
-    def get_command(self, args_execute=None, packages_extend=None):
+    def get_command(self, args_execute=None, args_extend=None, packages_extend=None):
         args = self.get_args(packages_extend)
         if args:
             if isinstance(args_execute, (set, tuple, list)):
                 args.extend(args_execute)
+            if isinstance(args_extend, (set, tuple, list)):
+                args.extend(args_extend)
             return ' '.join([self.BIN] + list(args))
 
     def _test_(self):
@@ -274,7 +280,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
             return _
         return []
 
-    def get_command(self, args_execute=None, packages_extend=None):
+    def get_command(self, args_execute=None, args_extend=None, packages_extend=None):
         if isinstance(args_execute, (set, tuple, list)):
             args_execute = [
                 '--join-cmd' if x_seq == 0 and y_seq == 0 and y in ['--', '-c'] else y
@@ -286,6 +292,8 @@ class AbsRsvAppNew(AbsRsvAppDef):
         if args:
             if isinstance(args_execute, (set, tuple, list)):
                 args.extend(args_execute)
+            if isinstance(args_extend, (set, tuple, list)):
+                args.extend(args_extend)
             return ' '.join([self.BIN] + list(args))
 
     def _test_(self):

@@ -18,7 +18,8 @@ option:
 #
 main:
     type: OpScript
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.i0'
     output: '<.path>.out'
     #
@@ -28,6 +29,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -93,10 +97,11 @@ main:
             widget: script
             value:
                 |-
+                geometry=asset
                 camera=asset_free
                 look=default
                 light=asset_standard
-                quality=low
+                quality=custom
                 layer=master
             tool_tip: '...'
 
@@ -107,7 +112,7 @@ main:
 
         user/output/builtin/image_pattern:
             widget: file
-            value: '/temp/\<camera\>.\<look\>.\<light\>.\<quality\>.\<layer\>/\<aov\>.####.exr'
+            value: '/temp/{geometry}.{camera}.{look}.{light}.{quality}.{layer}/{aov}.####.exr'
             tool_tip: '...'
 
         user/output/arnold/stats_file_enable:
@@ -117,7 +122,7 @@ main:
 
         user/output/arnold/stats_file_pattern:
             widget: file
-            value: '/temp/\<camera\>.\<look\>.\<light\>.\<quality\>.\<layer\>/stats.####.json'
+            value: '/temp/{geometry}.{camera}.{look}.{light}.{quality}.{layer}/stats.####.json'
             tool_tip: '...'
 
         user/output/arnold/profile_file_enable:
@@ -127,7 +132,7 @@ main:
 
         user/output/arnold/profile_file_pattern:
             widget: file
-            value: '/temp/\<camera\>.\<look\>.\<light\>.\<quality\>.\<layer\>/profile.####.json'
+            value: '/temp/{geometry}.{camera}.{look}.{light}.{quality}.{layer}/profile.####.json'
             tool_tip: '...'
     #
     parameters:
@@ -145,9 +150,13 @@ main:
                     for i, i_s in ipairs(raw_) do
                         if (i_s ~= '') then
                             local i_s_ = pystring.split(i_s, '=')
-                            local i_name = pystring.rstrip(pystring.lstrip(i_s_[1]))
+                            local i_key = pystring.rstrip(pystring.lstrip(i_s_[1]))
                             local i_value = pystring.rstrip(pystring.lstrip(i_s_[2]))
-                            mapper[i_name] = i_value
+                            local i_env_key = string.match(i_value, '$(%w+.*)')
+                            if (i_env_key ~= nil) then
+                                i_value = os.getenv(i_env_key)
+                            end
+                            mapper[i_key] = i_value
                         end
                     end
                 end
@@ -155,7 +164,7 @@ main:
             end
             
             function pattern_format_fnc(string, new_variant_mapper)
-                string = string.gsub(string, '\<(%w+.%w+)\>', function (s) return new_variant_mapper[s] end)
+                string = string.gsub(string, '{(%w+.%w+)}', function (s) return new_variant_mapper[s] end)
                 string = string.gsub(string, '####', function (s) return new_variant_mapper[s] end)
                 return string
             end

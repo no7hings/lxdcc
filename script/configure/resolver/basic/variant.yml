@@ -116,6 +116,9 @@ shot_steps_extra:
 asset_tasks:
     model: modeling
     groom: groom
+    effect: effect
+    rig: rigging
+    character_effect: cfx
     surface: surfacing
     light: lighting
     light_rig: lighting
@@ -124,3 +127,10 @@ sequence_tasks: {}
 #   shot
 shot_tasks:
     animation: animation
+#
+asset_usd_variant_indices:
+    model: modeling
+    groom: groom
+    effect: effect
+    rig: rigging
+    surface: surfacing

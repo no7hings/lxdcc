@@ -11,9 +11,10 @@ option:
         w_s: 240
         h_s: 320
     #
-    keys: ['geometry', 'camera', 'look', 'light', 'quality', 'layer']
+    keys: ['geometry', 'look', 'camera', 'light', 'quality', 'layer']
 #
 build:
+    # geometry
     geometry:
         default:
             main:
@@ -34,7 +35,33 @@ build:
         user:
             main:
                 $: '...default.main'
-                type: UserGeometrySpace_Wsp
+                type: GeometrySpace_Wsp_Usr
+    # look
+    look:
+        default:
+            main:
+                index_x: 1
+                index_y: 4
+                tag: 'look_space'
+                type: LookSpace_Wsp
+                name: '<.tag>__<option.time_tag>'
+                path: '<option.root>/<.name>'
+                input: '<.path>.join_upstream'
+                output: '<.path>.output'
+                #
+                attributes:
+                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
+                    ns_bubbleZoom: 1.0
+                #
+                post_connections:
+                    - '{geometry}.output'
+                    - '{look}.original'
+        #
+        user:
+            main:
+                $: '...default.main'
+                type: LookSpace_Wsp_Usr
     #
     camera:
         default:
@@ -56,29 +83,7 @@ build:
         user:
             main:
                 $: '...default.main'
-                type: UserCameraSpace_Wsp
-    #
-    look:
-        default:
-            main:
-                index_x: 1
-                index_y: 3
-                tag: 'look_space'
-                type: LookSpace_Wsp
-                name: '<.tag>__<option.time_tag>'
-                path: '<option.root>/<.name>'
-                input: '<.path>.join_upstream'
-                output: '<.path>.output'
-                #
-                attributes:
-                    x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
-                    y: =<option.position.y>+<option.size.h_s>*<..index_y>
-                    ns_bubbleZoom: 1.0
-        #
-        user:
-            main:
-                $: '...default.main'
-                type: UserLookSpace_Wsp
+                type: CameraSpace_Wsp_Usr
     #
     light:
         default:
@@ -100,7 +105,7 @@ build:
         user:
             main:
                 $: '...default.main'
-                type: UserLightSpace_Wsp
+                type: LightSpace_Wsp_Usr
     #
     quality:
         default:
@@ -117,12 +122,11 @@ build:
                 attributes:
                     x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
                     y: =<option.position.y>+<option.size.h_s>*<..index_y>
-                    ns_bubbleZoom: 1.0
         #
         user:
             main:
                 $: '...default.main'
-                type: UserQualitySpace_Wsp
+                type: QualitySpace_Wsp_Usr
     #
     layer:
         default:
@@ -139,34 +143,54 @@ build:
                 attributes:
                     x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
                     y: =<option.position.y>+<option.size.h_s>*<..index_y>
-                    ns_bubbleZoom: 1.0
         #
         user:
             main:
                 $: '...default.main'
-                type: UserLayerSpace_Wsp
+                type: LayerSpace_Wsp_Usr
+#
+node:
+    render_layer:
+        index_x: -1
+        index_y: 1
+        tag: 'render_layer'
+        type: RenderLayer_Wsp
+        name: '<.tag>__<option.time_tag>'
+        path: '<option.root>/<.name>'
+        input: '<.path>.join_upstream'
+        output: '<.path>.output'
+        #
+        attributes:
+            x: =<option.position.x>+<option.size.w_s>/2*<..index_x>
+            y: =<option.position.y>+<option.size.h_s>*<..index_y>
 #
 preset:
     default:
-        build/geometry/scheme: 'default'
-        build/camera/scheme: 'default'
-        build/look/scheme: 'default'
-        build/light/scheme: 'default'
-        build/quality/scheme: 'default'
-        build/layer/scheme: 'default'
+        parameters:
+            workspace/keys: 'geometry, look, camera, light, quality, layer'
+            workspace/spaces/geometry: 'default'
+            workspace/spaces/camera: 'default'
+            workspace/spaces/look: 'default'
+            workspace/spaces/light: 'default'
+            workspace/spaces/quality: 'default'
+            workspace/spaces/layer: 'default'
     #
     utility:
-        build/geometry/scheme: 'utility'
-        build/camera/scheme: 'utility'
-        build/look/scheme: 'utility'
-        build/light/scheme: 'utility'
-        build/quality/scheme: 'utility'
-        build/layer/scheme: 'utility'
+        parameters:
+            workspace/keys: 'geometry, look, camera, light, quality, layer'
+            workspace/spaces/geometry: 'utility'
+            workspace/spaces/camera: 'utility'
+            workspace/spaces/look: 'utility'
+            workspace/spaces/light: 'utility'
+            workspace/spaces/quality: 'utility'
+            workspace/spaces/layer: 'utility'
     #
     user:
-        build/geometry/scheme: 'user'
-        build/camera/scheme: 'user'
-        build/look/scheme: 'user'
-        build/light/scheme: 'user'
-        build/quality/scheme: 'user'
-        build/layer/scheme: 'user'
+        parameters:
+            workspace/keys: 'geometry, look, camera, light'
+            workspace/spaces/geometry: 'user'
+            workspace/spaces/camera: 'user'
+            workspace/spaces/look: 'user'
+            workspace/spaces/light: 'user'
+            workspace/spaces/quality: 'user'
+            workspace/spaces/layer: 'user'

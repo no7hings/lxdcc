@@ -9,6 +9,8 @@ from lxutil import utl_core
 
 from lxshotgun import stg_configure, stg_core
 
+import lxbasic.extra.methods as bsc_etr_methods
+
 import lxbasic.objects as bsc_objects
 
 
@@ -209,7 +211,7 @@ class StgConnector(object):
             list_.append(i)
         return list_
     # entity
-    def get_stg_entity(self, **kwargs):
+    def get_stg_resource(self, **kwargs):
         """
         :param kwargs:
             project=<project-name>
@@ -233,16 +235,16 @@ class StgConnector(object):
             ]
         )
 
-    def get_stg_entity_query(self, **kwargs):
+    def get_stg_resource_query(self, **kwargs):
         """
-        :param kwargs: =StgConnector.get_stg_entity
+        :param kwargs: =StgConnector.get_stg_resource
         :return:
         """
-        stg_obj = self.get_stg_entity(**kwargs)
+        stg_obj = self.get_stg_resource(**kwargs)
         if stg_obj:
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
 
-    def set_stg_entity_create(self, **kwargs):
+    def create_stg_resource(self, **kwargs):
         if 'asset' in kwargs:
             branch = 'asset'
         elif 'shot' in kwargs:
@@ -250,7 +252,7 @@ class StgConnector(object):
         else:
             raise TypeError()
         #
-        exists_stg_entity = self.get_stg_entity(**kwargs)
+        exists_stg_entity = self.get_stg_resource(**kwargs)
         if exists_stg_entity:
             return exists_stg_entity
         #
@@ -272,7 +274,7 @@ class StgConnector(object):
         )
         return _
 
-    def get_stg_entities(self, **kwargs):
+    def get_stg_resources(self, **kwargs):
         """
         :param kwargs:
             project=<project-name>
@@ -310,7 +312,7 @@ class StgConnector(object):
                 filters=filters
             )
 
-    def get_stg_entity_queries(self, **kwargs):
+    def get_stg_resource_queries(self, **kwargs):
         """
         :param kwargs:
             project=<project-name>
@@ -320,7 +322,7 @@ class StgConnector(object):
         """
         return [
             self.STG_OBJ_QUERY_CLS(self, i)
-            for i in self.get_stg_entities(**kwargs)
+            for i in self.get_stg_resources(**kwargs)
         ]
     # step
     def get_stg_steps(self, **kwargs):
@@ -352,6 +354,7 @@ class StgConnector(object):
         :return:
         """
         step = kwargs['step']
+        step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         return self._shotgun.find_one(
             entity_type='Step',
             filters=[
@@ -381,7 +384,7 @@ class StgConnector(object):
         return self._shotgun.find(
             entity_type='Task',
             filters=[
-                ['entity', 'is', self.get_stg_entity(**kwargs)],
+                ['entity', 'is', self.get_stg_resource(**kwargs)],
                 ['step', 'is', self.get_stg_step(**kwargs)],
             ]
         )
@@ -402,7 +405,7 @@ class StgConnector(object):
         return self._shotgun.find_one(
             entity_type='Task',
             filters=[
-                ['entity', 'is', self.get_stg_entity(**kwargs)],
+                ['entity', 'is', self.get_stg_resource(**kwargs)],
                 ['step', 'is', self.get_stg_step(**kwargs)],
                 ['content', 'is', task],
             ]
@@ -432,7 +435,7 @@ class StgConnector(object):
             'Task',
             dict(
                 project=self.get_stg_project(**kwargs),
-                entity=self.get_stg_entity(**kwargs),
+                entity=self.get_stg_resource(**kwargs),
                 step=self.get_stg_step(**kwargs),
                 content=task
             )
@@ -516,7 +519,9 @@ class StgConnector(object):
             branch = 'shot'
         else:
             raise TypeError()
+        #
         step = kwargs['step']
+        step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         task = kwargs['task']
         version = kwargs['version']
         #
@@ -559,6 +564,7 @@ class StgConnector(object):
             raise TypeError()
         #
         step = kwargs['step']
+        step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         task = kwargs['task']
         version = kwargs['version']
         #
@@ -568,7 +574,7 @@ class StgConnector(object):
             'Version',
             dict(
                 project=self.get_stg_project(**kwargs),
-                entity=self.get_stg_entity(**kwargs),
+                entity=self.get_stg_resource(**kwargs),
                 sg_task=self.get_stg_task(**kwargs),
                 #
                 code=name,
@@ -595,7 +601,7 @@ class StgConnector(object):
 
     def set_stg_published_file_create(self, **kwargs):
         stg_project = self.get_stg_project(**kwargs)
-        stg_entity = self.get_stg_entity(**kwargs)
+        stg_entity = self.get_stg_resource(**kwargs)
         stg_task = self.get_stg_task(**kwargs)
         stg_version = self.get_stg_version(**kwargs)
         #
@@ -744,7 +750,7 @@ class StgConnector(object):
 
     def set_stg_look_pass_create(self, **kwargs):
         stg_project = self.get_stg_project(**kwargs)
-        stg_entity = self.get_stg_entity(**kwargs)
+        stg_entity = self.get_stg_resource(**kwargs)
         if stg_project and stg_entity:
             look_pass_code = kwargs['look_pass_code']
             _ = [
@@ -786,6 +792,7 @@ class StgConnector(object):
             dmt='DMT',
         )
         step = kwargs['step']
+        step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         if step in mapper:
             stg_entity = self._shotgun.find_one(
                 entity_type='CustomNonProjectEntity01',
@@ -811,6 +818,22 @@ class StgConnector(object):
         )
         if c is not None:
             return c.get('sg_status_list.properties.valid_values.value')
+
+    def find_task_id(self, project, resource, task):
+        for i_branch in ['asset', 'shot']:
+            i_kwargs = {'project': project, i_branch: resource}
+            i_stg_resource = self.get_stg_resource(
+                **i_kwargs
+            )
+            i_task = self._shotgun.find_one(
+                entity_type='Task',
+                filters=[
+                    ['entity', 'is', i_stg_resource],
+                    ['content', 'is', task],
+                ]
+            )
+            if i_task is not None:
+                return i_task['id']
 
 
 if __name__ == '__main__':

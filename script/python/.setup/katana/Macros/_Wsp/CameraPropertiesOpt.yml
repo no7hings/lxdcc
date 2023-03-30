@@ -18,7 +18,8 @@ option:
 #
 main:
     type: OpScript
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.i0'
     output: '<.path>.out'
     #
@@ -28,6 +29,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -77,6 +81,7 @@ main:
             local location = Interface.GetInputLocationPath()
 
             function set_camera_screen(location, w, h, screen_mode)
+                Interface.SetAttr('geometry.screen_mode', StringAttribute(screen_mode))
                 local film_fit_value = Interface.GetAttr('geometry.arbitrary.lx_film_fit.value')
                 if (film_fit_value ~= nil) then
                     if (film_fit_value:getValue() == 0) then
@@ -115,8 +120,10 @@ main:
                     local render_resolution = Interface.GetOpArg('user.render.resolution')
                     local r = ResolutionTable.GetResolution(render_resolution:getValue())
                     local w, h = r:getXRes(), r:getYRes()
+                    
                     local screen_mode = Interface.GetOpArg('user.screen.mode'):getValue()
                     set_camera_screen(location, w, h, screen_mode)
+                    
                     local clip_plane_near = Interface.GetOpArg('user.clip_plane.near'):getValue()
                     Interface.SetAttr('geometry.near', DoubleAttribute(clip_plane_near))
                     local clip_plane_far = Interface.GetOpArg('user.clip_plane.far'):getValue()

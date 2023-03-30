@@ -117,7 +117,7 @@ class StgProjectOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('sg_colorspace') or 'Linear'
 
     def set_stg_asset_create(self, **kwargs):
-        self.shotgun.set_stg_entity_create(**kwargs)
+        self.shotgun.create_stg_resource(**kwargs)
 
 
 class StgTaskOpt(AbsStgObjOpt):

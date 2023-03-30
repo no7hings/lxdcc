@@ -681,8 +681,8 @@ class RawStringUnderlineOpt(object):
 
     def to_prettify(self, capitalize=True):
         if capitalize is True:
-            return ' '.join([i.capitalize() for i in self._string.split('_')])
-        return ' '.join([i.lower() for i in self._string.split('_')])
+            return ' '.join([i if i.isupper() else i.capitalize() for i in self._string.split('_')])
+        return ' '.join([i if i.isupper() else i.lower() for i in self._string.split('_')])
 
     def to_camelcase(self):
         return re.sub(r'_(\w)', lambda x: x.group(1).upper(), self._string)

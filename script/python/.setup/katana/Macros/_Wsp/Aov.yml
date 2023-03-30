@@ -23,7 +23,8 @@ option:
 main:
     # create from self
     type: Aov_Wsp
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     input: '<.path>.input'
     output: '<.path>.output'
     #
@@ -34,6 +35,9 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
     #
@@ -60,7 +64,7 @@ main:
         #
         option/type:
             widget: enumerate
-            value: ['BYTE', 'INT', 'UINT', 'BOOL', 'FLOAT', 'RGB', 'RGBA', 'VECTOR', 'VECTOR2', 'STRING']
+            value: ['BYTE', 'INT', 'UINT', 'BOOL', 'FLOAT', 'RGB', 'RGBA', 'VECTOR', 'VECTOR2', 'STRING', 'POINTER', 'NODE', 'ARRAY', 'MATRIX']
             default: 'RGBA'
             tool_tip: '...'
         #
@@ -68,6 +72,12 @@ main:
             widget: string
             value: 'primary'
             tool_tip: '...'
+        #
+        option/channel:
+            widget: string
+            value: 'primary'
+            tool_tip: '...'
+            lock: True
         #
         option/output_type:
             widget: enumerate
@@ -78,6 +88,9 @@ main:
             widget: file
             value: '/temp'
             tool_tip: '...'
+    #
+    expressions:
+        option/channel: 'option.name'
 #
 node:
     channel_define:

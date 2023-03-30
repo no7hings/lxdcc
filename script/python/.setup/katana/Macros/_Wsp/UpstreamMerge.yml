@@ -18,7 +18,8 @@ option:
 #
 main:
     type: Merge
-    path: '<option.root>/<option.type>'
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
     output: '<.path>.out'
     #
     clear_start: 'option'
@@ -30,12 +31,11 @@ main:
         ns_colorr: <option.color.r>
         ns_colorg: <option.color.g>
         ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
         #
         comment: '<option.description>'
-    #
-    input_ports:
-        - 'join_upstream'
-        - 'join_other'
     #
     output_ports: []
     #

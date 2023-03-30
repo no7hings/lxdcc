@@ -21,11 +21,16 @@ class Setup(object):
             )
         )
     @classmethod
+    def build_workspace(cls):
+        from lxkatana import ktn_setup
+        ktn_setup.KatanaWorkspaceSetup().set_setup()
+    @classmethod
     def set_run(cls, *args, **kwargs):
         print '*'*40
         print 'lx-katana-setup: start'
         cls.build_menu()
         cls.build_lua()
+        cls.build_workspace()
         print 'lx-katana-setup: complete'
         print '*' * 40
 

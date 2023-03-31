@@ -108,7 +108,9 @@ shot_steps_extra: []
 asset_tasks:
     model: modeling
     groom: groom
-    surface: surfacing
+    rig: rigging
+    effect: effect
+    surface: surface
     light: lighting
     light_rig: light_rig
 #   sequence

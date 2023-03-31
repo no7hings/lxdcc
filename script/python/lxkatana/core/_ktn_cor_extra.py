@@ -497,21 +497,47 @@ class WorkspaceSetting(object):
             self._cfg.get('main.ports')
         )
 
-    def build_environment_ports(self):
+    def build_env_ports(self):
         root = self._cfg.get('main.environment.root')
         self._obj_opt.clear_ports(root)
         self._obj_opt.create_ports_by_data(
             self._cfg.get('main.environment.ports')
         )
 
-    def register_environment(self, index, key, value):
+    def save_env(self, index, key, env_key, env_value):
         root = self._cfg.get('main.environment.root')
         self._obj_opt.set(
             '{}.data_{}.i0'.format(root, index), key
         )
         self._obj_opt.set(
-            '{}.data_{}.i1'.format(root, index), value
+            '{}.data_{}.i1'.format(root, index), env_key
+        )
+        self._obj_opt.set(
+            '{}.data_{}.i2'.format(root, index), env_value
         )
 
-    def add_environs(self):
-        pass
+    def get_env_data(self):
+        data = []
+        root = self._cfg.get('main.environment.root')
+        for i_index in range(20):
+            i_key = self._obj_opt.get(
+                '{}.data_{}.i0'.format(root, i_index)
+            )
+            i_env_key = self._obj_opt.get(
+                '{}.data_{}.i1'.format(root, i_index)
+            )
+            i_env_value = self._obj_opt.get(
+                '{}.data_{}.i2'.format(root, i_index)
+            )
+            if i_key and i_env_key and i_env_value:
+                data.append(
+                    (i_key, i_env_key, i_env_value)
+                )
+        return data
+
+    def get_task_kwargs(self):
+        dict_ = {}
+        data = self.get_env_data()
+        for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
+            dict_[i_key] = i_env_value
+        return dict_

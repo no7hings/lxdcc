@@ -47,4 +47,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             file_path
         )
         bsc_core.SubProcessMtd.set_run(cmd)
+    @classmethod
+    def get_app_execute_mapper(cls, *args, **kwargs):
+        return {}
 

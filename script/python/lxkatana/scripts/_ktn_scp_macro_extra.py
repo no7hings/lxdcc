@@ -1,4 +1,6 @@
 # coding:utf-8
+import re
+
 import collections
 
 import six
@@ -33,6 +35,20 @@ class ScpMacro(object):
         color_use_variant = self._cfg.get('option.color_use_variant', False)
         if color_use_variant is True:
             variant_key = self._cfg.get('option.variant_key')
+            r, g, b = bsc_core.RawTextOpt(variant_key).to_rgb_(maximum=1.0, s_p=25, v_p=25)
+            self._cfg.set(
+                'option.color.r', r
+            )
+            self._cfg.set(
+                'option.color.g', g
+            )
+            self._cfg.set(
+                'option.color.b', b
+            )
+        #
+        color_use_type = self._cfg.get('option.color_use_type', False)
+        if color_use_type is True:
+            variant_key = self._cfg.get('option.type')
             r, g, b = bsc_core.RawTextOpt(variant_key).to_rgb_(maximum=1.0, s_p=25, v_p=25)
             self._cfg.set(
                 'option.color.r', r
@@ -791,7 +807,7 @@ class ScpWspAssetGeometry(AbsWsp):
         f = self._obj_opt.get(file_key)
 
         if f:
-            usd_variant_dict = usd_rsv_objects.RsvUsdAssetSetVariant.get_variant_dict(
+            usd_variant_dict = usd_rsv_objects.RsvUsdAssetSet.get_variant_dict(
                 f, mode=mode
             )
             if usd_variant_dict:
@@ -1335,4 +1351,21 @@ class ScpWspRenderLayer(AbsWsp):
                 )
                 if i_value in i_values:
                     self._obj_opt.set(i_port_path, i_value)
+
+    def get_variants(self):
+        dict_ = {}
+        name = self._obj_opt.get(
+            'record.render_properties'
+        )
+        if ktn_core.NGObjOpt._get_is_exists_(name) is True:
+            obj_opt = ktn_core.NGObjOpt(name)
+            v = obj_opt.get('user.output.variants')
+            if v:
+                for i in v.split('\n'):
+                    i_k, i_v = i.split('=')[:2]
+                    i_r = re.findall(re.compile(r'\$(.*)', re.S), i_v)
+                    if i_r:
+                        i_v = bsc_core.EnvironMtd.get(i_r[0])
+                    dict_[i_k] = i_v
+        return dict_
 

@@ -2,6 +2,10 @@
 package-data:
     scheme: new
     #
+    configure-files:
+        windows: 'x:/CFG/SHOW-CFG/NSA_DEV/presets/global.applications.json'
+        linux: '/job/CFG/SHOW-CFG/NSA_DEV/presets/global.applications.json'
+    #
     package-root-patterns:
         windows: [ '{home}/packages', 'x:/PLE/bundle/internal', 'x:/PLE/bundle/thirdparty' ]
         linux: [ '{home}/packages', '/job/PLE/bundle/internal', '/job/PLE/bundle/thirdparty' ]

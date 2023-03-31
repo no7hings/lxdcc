@@ -7,9 +7,12 @@ option:
     description:
         |-
         for render
-    variant_key: 'render'
+    #
+    variant_key: 'render_layer'
     #
     auto_color: False
+    #
+    color_use_variant: True
     #
     color:
         r: .375
@@ -54,27 +57,6 @@ main:
         parameters/variant_resolve:
             widget: proxy
             expand: True
-        #
-        parameters/customize/tag_0:
-            label: ' '
-            widget: strings
-            value: ['customize', 'main']
-            tool_tip: '...'
-        #
-        parameters/customize/tag_1:
-            label: ' '
-            widget: strings
-            value: ['', '']
-            tool_tip: '...'
-        #
-        parameters/customize/tag_2:
-            $: '..parameters/customize/tag_1'
-        #
-        parameters/customize/tag_3:
-            $: '..parameters/customize/tag_1'
-        #
-        parameters/customize/tag_4:
-            $: '..parameters/customize/tag_1'
         #
         parameters/environment/tag_0:
             label: ' '
@@ -166,9 +148,50 @@ main:
             value: ['', '']
             tool_tip: '...'
         #
+        parameters/customize/tag_0:
+            label: ' '
+            widget: strings
+            value: ['customize', 'main']
+            tool_tip: '...'
+
+        parameters/customize/tag_1:
+            label: ' '
+            widget: strings
+            value: ['', '']
+            tool_tip: '...'
+
+        parameters/customize/tag_2:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_3:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_4:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_5:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_6:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_7:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_8:
+            $: '..parameters/customize/tag_1'
+
+        parameters/customize/tag_9:
+            $: '..parameters/customize/tag_1'
+        #
+        parameters/render/version:
+            widget: string
+            value: 'new'
+            tool_tip: '...'
+        #
         parameters/render/output_directory:
             widget: file
-            value: '{root}/{project}/assets/{role}/{asset}/user/work.{artist}/katana/render/{task_extra}/{asset}.{step}.{task}.{version}'
+            value: '{root}/{project}/assets/{role}/{asset}/user/work.{artist}/katana/render/{task_extra}/{asset}.{step}.{task}.{render_version}.{camera}.{look}.{light}'
             tool_tip: '...'
         #
         parameters/render/output/builtin/image_enable:
@@ -178,7 +201,7 @@ main:
         #
         parameters/render/output/builtin/image_pattern:
             widget: string
-            value: '.{camera}.{look}.{light}/{aov}.####.exr'
+            value: '/{aov}.####.exr'
             tool_tip: '...'
 
         parameters/render/output/arnold/stats_file_enable:
@@ -188,7 +211,7 @@ main:
 
         parameters/render/output/arnold/stats_file_pattern:
             widget: file
-            value: '.{camera}.{look}.{light}/stats.####.json'
+            value: '/stats.####.json'
             tool_tip: '...'
 
         parameters/render/output/arnold/profile_file_enable:
@@ -198,11 +221,17 @@ main:
 
         parameters/render/output/arnold/profile_file_pattern:
             widget: file
-            value: '{cst_0}/{camera}.{look}.{light}/profile.####.json'
+            value: '/profile.####.json'
             tool_tip: '...'
         #
         render/outputs:
             widget: proxy
+        # record
+        record/render_properties:
+            widget: node
+            value: '<node.render_properties.name>'
+            tool_tip: '...'
+            lock: True
     #
     expand_groups:
         - 'parameters'
@@ -283,7 +312,8 @@ node:
             user/output/variants:
                 |-
                 '\n'.join(
-                    [   i
+                    [   
+                        i
                         for i in [
                             '\n'.join(
                                 [
@@ -298,22 +328,25 @@ node:
                             '\n'.join(
                                 [
                                     '{}={}'.format(
-                                        self.getNode().getParent().getParameter('parameters.customize.{}.i0'.format(i)).getValue(0),
-                                        self.getNode().getParent().getParameter('parameters.customize.{}.i1'.format(i)).getValue(0), 
-                                    )
-                                    for i in ["tag_{}".format(j) for j in range(5)] 
-                                    if self.getNode().getParent().getParameter('parameters.customize.{}.i0'.format(i)).getValue(0)
-                                ]
-                            ),
-                            '\n'.join(
-                                [
-                                    '{}={}'.format(
                                         self.getNode().getParent().getParameter('parameters.environment.{}.i0'.format(i)).getValue(0),
                                         self.getNode().getParent().getParameter('parameters.environment.{}.i1'.format(i)).getValue(0), 
                                     )
                                     for i in ["tag_{}".format(j) for j in range(15)] 
                                     if self.getNode().getParent().getParameter('parameters.environment.{}.i0'.format(i)).getValue(0)
                                 ]
+                            ),
+                            '\n'.join(
+                                [
+                                    '{}={}'.format(
+                                        self.getNode().getParent().getParameter('parameters.customize.{}.i0'.format(i)).getValue(0),
+                                        self.getNode().getParent().getParameter('parameters.customize.{}.i1'.format(i)).getValue(0), 
+                                    )
+                                    for i in ["tag_{}".format(j) for j in range(10)] 
+                                    if self.getNode().getParent().getParameter('parameters.customize.{}.i0'.format(i)).getValue(0)
+                                ]
+                            ),
+                            '\n'.join(
+                                ['render_version={}'.format(str(getParent().parameters.render.version))]
                             )
                         ] if i
                     ]

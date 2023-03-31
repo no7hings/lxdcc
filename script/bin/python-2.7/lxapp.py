@@ -8,25 +8,13 @@ import os
 import getopt
 
 
-TOOL_MAPPER = dict(
-    mayapy=dict(
-        application='maya',
-        args_execute=['-- mayapy']
-    ),
-    hython=dict(
-        application='houdini',
-        args_execute=['-- hython']
-    ),
-)
-
-
 def main(argv):
     try:
         sys.stdout.write('execute lxapp from: "{}"\n'.format(__file__))
         opt_kwargs_0, opt_args_0 = getopt.getopt(
             argv[1:],
-            'ha:o:',
-            ['help', 'app=', 'option=']
+            'h',
+            ['help']
         )
         option = None
         args_execute = None
@@ -38,23 +26,14 @@ def main(argv):
                     __print_help()
                     #
                     sys.exit()
-                elif i_key in ('-a', '--app'):
-                    launcher = i_value
-                    if '.' not in launcher:
-                        raise SyntaxError()
-                    _ = launcher.split('.')
-                    if len(_) != 2:
-                        raise SyntaxError()
-                    i_project, i_application = _
-                    option = 'project={}&application={}'.format(i_project, i_application)
-                elif i_key in ('-o', '--option'):
-                    option = i_value
         # etc. nsa_dev.maya
         else:
             if opt_args_0:
-                option, args_execute, args_extend, environs_extend = __get_app_args(
+                _ = __get_app_args(
                     opt_args_0
                 )
+                if _ is not None:
+                    option, args_execute, args_extend, environs_extend = _
         #
         if option is not None:
             __execute_with_option(option, args_execute, args_extend, environs_extend)
@@ -74,15 +53,30 @@ def __get_app_args(args):
         )
     #
     _ = launcher_arg.split('.')
-    if len(_) != 2:
+    if len(_) < 2:
         raise SyntaxError(
             sys.stderr.write('argv error\n')
         )
     #
-    project, app_arg = _
+    project = _[0]
+    app_arg = '.'.join(_[1:])
     #
-    if app_arg in TOOL_MAPPER:
-        cfg = TOOL_MAPPER[app_arg]
+    import lxbasic.extra.methods as bsc_etr_methods
+    #
+    import lxresolver.commands as rsv_commands
+    # find resolver project
+    resolver = rsv_commands.get_resolver()
+    rsv_project = resolver.get_rsv_project(project=project)
+    if not rsv_project:
+        return
+
+    framework_scheme = rsv_project.get_framework_scheme()
+    m = bsc_etr_methods.get_module(framework_scheme)
+    #
+    app_execute_mapper = m.EtrBase.get_app_execute_mapper(rsv_project)
+    #
+    if app_arg in app_execute_mapper:
+        cfg = app_execute_mapper[app_arg]
         application = cfg['application']
         args_execute = cfg['args_execute']
     else:
@@ -150,6 +144,7 @@ def __execute_with_option(option, args_execute=None, args_extend=None, args_task
         opt_packages_extend.extend(framework_packages_extend)
     #
     rsv_app = rsv_project.get_rsv_app(application=application)
+    #
     command = rsv_app.get_command(
         args_execute=args_execute,
         args_extend=args_extend,
@@ -179,7 +174,7 @@ def __execute_with_option(option, args_execute=None, args_extend=None, args_task
                 '\033[32m'
                 '{}'
                 '\033[0m\n'
-            ).format('\n'.join(['{}={}'.format(k, v) for k, v in environs_extend.items()]))
+            ).format('\n'.join(['{}={}'.format(k.rjust(20), v) for k, v in environs_extend.items()]))
         )
     if args_execute:
         rsv_app.execute_command(

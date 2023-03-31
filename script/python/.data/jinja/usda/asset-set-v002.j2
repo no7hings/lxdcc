@@ -22,6 +22,8 @@ def Xform "{{ asset.root_name }}" (
         string effect_override = "None"
         string surface_main = "None"
         string surface_override = "None"
+        string light_main = "None"
+        string light_override = "None"
     }
     prepend variantSets = [
         "surface_override",
@@ -34,6 +36,8 @@ def Xform "{{ asset.root_name }}" (
         "groom_main",
         "model_override",
         "model_main",
+        "light_override",
+        "light_main",
     ]
 )
 {
@@ -167,6 +171,32 @@ def Xform "{{ asset.root_name }}" (
             string userProperties:usd:variants:asset:step:override = "surface"
             string userProperties:usd:variants:asset:surface:override:version = "{{ i_variant_key }}"
             string userProperties:usd:variants:asset:surface:override:file = "{{ i_variant_file }}"
+        }
+        {%- endfor %}
+    }
+    variantSet "light_main" = {
+        "None" {
+        }
+        {% for i_variant_key, i_variant_file in asset.version_main.light.iteritems() -%}
+        "{{ i_variant_key }}" (
+            prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
+        ) {
+            string userProperties:usd:variants:asset:step = "light"
+            string userProperties:usd:variants:asset:light:version = "{{ i_variant_key }}"
+            string userProperties:usd:variants:asset:light:file = "{{ i_variant_file }}"
+        }
+        {%- endfor %}
+    }
+    variantSet "light_override" = {
+        "None" {
+        }
+        {% for i_variant_key, i_variant_file in asset.version_override.light.iteritems() -%}
+        "{{ i_variant_key }}" (
+            prepend references = {{ '@%s@</master>' | format(i_variant_file) }}
+        ) {
+            string userProperties:usd:variants:asset:step:override = "light"
+            string userProperties:usd:variants:asset:light:override:version = "{{ i_variant_key }}"
+            string userProperties:usd:variants:asset:light:override:file = "{{ i_variant_file }}"
         }
         {%- endfor %}
     }

@@ -7,9 +7,10 @@ option:
     description:
         |-
         for variant resolve
-    variant_key: ''
     #
     auto_color: False
+    #
+    color_use_type: True
     #
     color:
         r: 0

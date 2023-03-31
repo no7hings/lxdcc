@@ -73,4 +73,5 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
 class EtrUsd(bsc_etr_abstracts.AbsEtrUsd):
     @classmethod
     def registry_set(cls, file_path):
-        pass
+        # noinspection PyUnresolvedReferences
+        import prod_tools.set_dressing.record_set_registry as record_set_registry; record_set_registry.run(file_path)

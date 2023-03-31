@@ -11,8 +11,6 @@ import lxkatana.scripts as ktn_scripts
 for i in [
     '_Wsp/VariantPropertiesOpt',
     '_Wsp/VariantRegister',
-    '_Wsp/VariantSet',
-    '_Wsp/VariantSetGroup',
     #
     '_Wsp/UpstreamMerge',
     '_Wsp/TurntableRotateOpt',
@@ -29,15 +27,15 @@ for i in [
     '_Wsp/AovGroup',
     '_Wsp/ColorCheckerAttachFitOpt',
     '_Wsp/ColorChecker',
-
+    #
     '_Wsp/Material',
     '_Wsp/MaterialGroup',
     '_Wsp/MaterialAssign',
     '_Wsp/MaterialAssignGroup',
     '_Wsp/GeometryPropertiesAssign',
     '_Wsp/GeometryPropertiesAssignGroup',
+    #
     '_Wsp/UtilityLookProperties',
-    '_Wsp/Aovs',
     '_Wsp/UtilityMaterials',
     #
     '_Wsp/AssetGeometry',
@@ -59,6 +57,7 @@ for i in [
     '_Wsp/LightSpace',
     '_Wsp/QualitySpace',
     '_Wsp/LayerSpace',
+    '_Wsp/ExtendSpace',
     #
     '_Wsp/Workspace',
     '_Wsp/RenderLayer',

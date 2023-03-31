@@ -1032,6 +1032,7 @@ class NGObjOpt(object):
         self.set_port_raw(key, value)
 
     def get(self, key):
+        key = key.replace('/', '.')
         return self.get_port_raw(key)
 
     def set_parameters_by_data(self, data, extend_kwargs=None):
@@ -1690,6 +1691,12 @@ class NGObjOpt(object):
                         for i in range(c):
                             i_ktn_port = ktn_port.getChildByIndex(i)
                             i_ktn_port.setValue(value[i], 0)
+                    elif widget in {'string3'}:
+                        c = 3
+                        ktn_port = group_ktn_obj.createChildStringArray(name, c)
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(value[i], 0)
                     elif widget in {'capsule_string'}:
                         if value:
                             v = value[0]
@@ -1808,6 +1815,38 @@ class NGObjsOpt(object):
                 obj_names, pattern
             )
         return obj_names
+
+
+class NGObjsMtd(object):
+    class MatchMode(object):
+        One = 0
+        All = 1
+
+    @classmethod
+    def find_nodes_by_port_filters(cls, type_name, filters, match_mode=MatchMode.All):
+        list_ = []
+        for i in NodegraphAPI.GetAllNodesByType(type_name) or []:
+            if filters:
+                if match_mode == cls.MatchMode.One:
+                    for j_p_p, j_v in filters:
+                        j_p = i.getParameter(j_p_p)
+                        if j_p is None:
+                            continue
+                        if j_p.getValue(0) == j_v:
+                            list_.append(i)
+                            break
+                elif match_mode == cls.MatchMode.All:
+                    i_c = len(filters)
+                    i_results = []
+                    for j_p_p, j_v in filters:
+                        j_p = i.getParameter(j_p_p)
+                        if j_p is None:
+                            continue
+                        if j_p.getValue(0) == j_v:
+                            i_results.append(1)
+                    if sum(i_results) == i_c:
+                        list_.append(i)
+        return list_
 
 
 class NGGroupStackOpt(NGObjOpt):

@@ -82,6 +82,8 @@ class VariantTypes(object):
     Workspace = 'workspace'
     WorkspaceKey = 'workspace_key'
     #
+    Branch = 'branch'
+    #
     Role = 'role'
     Asset = 'asset'
     #
@@ -95,6 +97,13 @@ class VariantTypes(object):
     TaskExtra = 'task_extra'
     VersionExtra = 'version_extra'
     #
+    User = 'user'
+    Artist = 'artist'
+    #
+    Inners = [
+        Branch
+    ]
+    #
     Trunks = [
         Project,
         Role, Sequence,
@@ -103,23 +112,29 @@ class VariantTypes(object):
     #
     Branches = [
         Step, Task,
-        Version
+        Version,
     ]
     #
     Mains = Trunks + Branches
     #
+    VariableTypes = [
+        Workspace,
+        WorkspaceKey
+    ]
+    #
+    Extends = [
+        User, Artist,
+    ]
+    #
     All = [
-        Root, Project, Workspace,
+        Root, Project, Workspace, WorkspaceKey,
+        Branch,
         Role, Sequence,
         Asset, Shot,
         Step, Task,
         Version,
         TaskExtra, VersionExtra,
-    ]
-    #
-    VariableTypes = [
-        Workspace,
-        WorkspaceKey
+        User, Artist,
     ]
 
 

@@ -26,6 +26,9 @@ class AbsEtrBase(object):
     @classmethod
     def open_ide(cls, file_path):
         raise NotImplementedError()
+    @classmethod
+    def get_app_execute_mapper(cls, *args, **kwargs):
+        raise NotImplementedError()
 
 
 class AbsEtrIde(object):

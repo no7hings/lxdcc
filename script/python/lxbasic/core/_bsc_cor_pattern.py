@@ -1,6 +1,8 @@
 # coding:utf-8
 from ._bsc_cor_utility import *
 
+from lxbasic.core import _bsc_cor_raw
+
 
 class PtnMultiplyFileMtd(object):
     RE_UDIM_KEYS = [
@@ -91,6 +93,52 @@ class PtnMultiplyFileMtd(object):
             if results:
                 return True
         return False
+
+
+class PtnVersion(object):
+    VERSION_ZFILL_COUNT = 3
+    PATTERN = 'v{}'.format('[0-9]'*VERSION_ZFILL_COUNT)
+    def __init__(self, text):
+        self._validation_(text)
+        #
+        self._text = text
+        self._number = int(text[-self.VERSION_ZFILL_COUNT:])
+    @classmethod
+    def _validation_(cls, text):
+        if not fnmatch.filter([text], cls.PATTERN):
+            raise TypeError(
+                'version: "{}" is Non-match "{}"'.format(text, cls.PATTERN)
+            )
+    @classmethod
+    def get_is_valid(cls, text):
+        return not not fnmatch.filter([text], cls.PATTERN)
+
+    def get_number(self):
+        return self._number
+    number = property(get_number)
+    @classmethod
+    def get_default(cls):
+        return 'v{}'.format(str(1).zfill(cls.VERSION_ZFILL_COUNT))
+
+    def __str__(self):
+        return self._text
+
+    def __iadd__(self, other):
+        if not isinstance(other, (int, float)):
+            raise TypeError()
+        self._number += int(other)
+        self._text = 'v{}'.format(str(self._number).zfill(self.VERSION_ZFILL_COUNT))
+        return self
+
+    def __isub__(self, other):
+        if not isinstance(other, (int, float)):
+            raise TypeError()
+        if self._number >= other:
+            self._number -= int(other)
+        else:
+            self._number = 0
+        self._text = 'v{}'.format(str(self._number).zfill(self.VERSION_ZFILL_COUNT))
+        return self
 
 
 class PtnParseMtd(object):
@@ -189,13 +237,15 @@ class PtnParseOpt(object):
             )
         )
 
-    def get_matches(self):
+    def get_matches(self, sort=False):
         list_ = []
         paths = glob.glob(
             PtnParseMtd.get_as_fnmatch(
                 self._pattern, self._key_format
             )
         ) or []
+        if sort is True:
+            paths = _bsc_cor_raw.RawTextsOpt(paths).set_sort_to()
         for i_path in paths:
             i_p = parse.parse(
                 self._pattern, i_path
@@ -232,6 +282,23 @@ class PtnParseOpt(object):
 
     def set_key_format(self, key, value):
         self._key_format[key] = value
+
+    def get_latest_version(self, version_key):
+        ms = self.get_matches(sort=True)
+        if ms:
+            l_m = ms[-1]
+            return l_m[version_key]
+        return PtnVersion.get_default()
+
+    def get_new_version(self, version_key):
+        ms = self.get_matches(sort=True)
+        if ms:
+            l_m = ms[-1]
+            l_v = l_m[version_key]
+            l_v_p = PtnVersion(l_v)
+            l_v_p += 1
+            return str(l_v_p)
+        return PtnVersion.get_default()
 
     def __str__(self):
         return self._pattern

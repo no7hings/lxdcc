@@ -136,10 +136,11 @@ class StgConnector(object):
     def shotgun(self):
         return self._shotgun
     @classmethod
-    def _get_stg_entity_type_(cls, branch):
+    def _get_stg_resource_tag_(cls, branch):
         return {
             'asset': 'Asset',
-            'shot': 'Shot'
+            'shot': 'Shot',
+            'sequence': 'Sequence',
         }[branch]
 
     def _set_stg_filters_completion_by_tags_(self, filters, **kwargs):
@@ -222,13 +223,15 @@ class StgConnector(object):
             branch = 'asset'
         elif 'shot' in kwargs:
             branch = 'shot'
+        elif 'sequence' in kwargs:
+            branch = 'sequence'
         else:
             raise TypeError()
         #
         entity_name = kwargs[branch]
         #
         return self._shotgun.find_one(
-            entity_type=self._get_stg_entity_type_(branch),
+            entity_type=self._get_stg_resource_tag_(branch),
             filters=[
                 ['project', 'is', self.get_stg_project(**kwargs)],
                 ['code', 'is', entity_name]
@@ -249,6 +252,8 @@ class StgConnector(object):
             branch = 'asset'
         elif 'shot' in kwargs:
             branch = 'shot'
+        elif 'sequence' in kwargs:
+            branch = 'sequence'
         else:
             raise TypeError()
         #
@@ -260,7 +265,7 @@ class StgConnector(object):
         role = kwargs['role']
         #
         _ = self._shotgun.create(
-            self._get_stg_entity_type_(branch),
+            self._get_stg_resource_tag_(branch),
             dict(
                 project=self.get_stg_project(**kwargs),
                 code=entity_name,
@@ -308,7 +313,7 @@ class StgConnector(object):
         #
         for i_branch in branches:
             return self._shotgun.find(
-                entity_type=self._get_stg_entity_type_(i_branch),
+                entity_type=self._get_stg_resource_tag_(i_branch),
                 filters=filters
             )
 
@@ -335,7 +340,7 @@ class StgConnector(object):
         return self._shotgun.find(
             entity_type='Step',
             filters=[
-                ['entity_type', 'is', self._get_stg_entity_type_(branch)]
+                ['entity_type', 'is', self._get_stg_resource_tag_(branch)]
             ]
         ) or []
 
@@ -820,11 +825,14 @@ class StgConnector(object):
             return c.get('sg_status_list.properties.valid_values.value')
 
     def find_task_id(self, project, resource, task):
-        for i_branch in ['asset', 'shot']:
+        for i_branch in ['asset', 'sequence', 'shot']:
             i_kwargs = {'project': project, i_branch: resource}
             i_stg_resource = self.get_stg_resource(
                 **i_kwargs
             )
+            if i_stg_resource is None:
+                continue
+            #
             i_task = self._shotgun.find_one(
                 entity_type='Task',
                 filters=[
@@ -832,8 +840,9 @@ class StgConnector(object):
                     ['content', 'is', task],
                 ]
             )
-            if i_task is not None:
-                return i_task['id']
+            if i_task is None:
+                continue
+            return i_task['id']
 
 
 if __name__ == '__main__':

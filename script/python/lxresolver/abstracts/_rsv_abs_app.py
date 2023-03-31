@@ -266,13 +266,17 @@ class AbsRsvAppNew(AbsRsvAppDef):
                     **dict(project=self._project, application=self._application)
                 )
             )
-            configure = bsc_objects.Configure(value=configure_file_path)
-            s = configure.get('{}.pipeline'.format(self._application))
-            p_c = bsc_objects.PackageContextNew(
-                s
-            )
-            args = p_c.get_args(packages_extend)
-            list_.extend(args)
+            data = bsc_core.StgFileOpt(configure_file_path).set_read()
+            key = self._application
+            if data:
+                if key in data:
+                    app_data = data[key]
+                    p_args = app_data['pipeline']
+                    p_c = bsc_objects.PackageContextNew(
+                        p_args
+                    )
+                    args = p_c.get_args(packages_extend)
+                    list_.extend(args)
         if list_:
             self.__class__.CACHE[key] = list_
             #

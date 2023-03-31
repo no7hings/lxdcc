@@ -29,9 +29,9 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         #
         c = stg_objects.StgConnector()
         task_id = c.find_task_id(
-            project='nsa_dev',
-            resource='td_test',
-            task='surface'
+            project=project,
+            resource=resource,
+            task=task
         )
         if task_id is not None:
             return dict(
@@ -66,3 +66,27 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             file_path
         )
         bsc_core.SubProcessMtd.set_run(cmd)
+    @classmethod
+    def get_app_execute_mapper(cls, rsv_project):
+        dict_ = {}
+        platform = bsc_core.SystemMtd.get_platform()
+        package_data = rsv_project.get_package_data()
+        cfg_file_path = package_data['configure-files'][platform]
+        data = bsc_core.StgFileOpt(cfg_file_path).set_read()
+        if data:
+            for i_app, i_data in data.items():
+                i_e_main = i_data.get('cmd')
+                if i_e_main is not None:
+                    dict_[i_app] = dict(
+                        application=i_app,
+                        args_execute=['-- {}'.format(i_e_main)]
+                    )
+                #
+                i_executes_extend = i_data.get('executes')
+                if i_executes_extend:
+                    for j_e_k_extend, j_e_s_extend in i_executes_extend.items():
+                        dict_[j_e_k_extend] = dict(
+                            application=i_app,
+                            args_execute=['-- {}'.format(j_e_s_extend)]
+                        )
+        return dict_

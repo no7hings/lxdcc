@@ -2,6 +2,10 @@
 package-data:
     scheme: default
     #
+    configure-files:
+        windows: ''
+        linux: ''
+    #
     package-root-patterns:
         windows: [ '{home}/packages', 'l:/packages/pg/prod' ]
         linux: [ '{home}/packages', '/l/packages/pg/prod' ]

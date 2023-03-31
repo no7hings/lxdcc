@@ -448,21 +448,34 @@ class RsvUsdAssetSetCreator(object):
                 )
         return c.value
     @classmethod
-    def _set_asset_all_comp_registry_update_(cls, configure, rsv_asset, rsv_scene_properties):
-        for i_step, i_task, i_key in cls.ASSET_OVERRIDE_VARIANTS:
-            i_cur_rsv_task = rsv_asset.get_rsv_task(
+    def _update_asset_all_registry_comps_(cls, configure, rsv_asset, rsv_scene_properties):
+        asset_step_query = rsv_scene_properties.get('asset_steps')
+        asset_task_query = rsv_scene_properties.get('asset_tasks')
+        keys = [
+            'model',
+            'groom',
+            'rig',
+            'effect',
+            'surface',
+            'light',
+        ]
+        for i_key in keys:
+            i_step = asset_step_query.get(i_key)
+            i_task = asset_task_query.get(i_key)
+            #
+            i_rsv_task = rsv_asset.get_rsv_task(
                 step=i_step, task=i_task
             )
-            if i_cur_rsv_task is not None:
+            if i_rsv_task is not None:
                 i_version_main_dict = cls._get_asset_version_main_dict_(
-                    i_cur_rsv_task
+                    i_rsv_task
                 )
                 configure.set(
                     'asset.version_main.{}'.format(i_key), i_version_main_dict
                 )
                 i_version_override_dict = cls._get_asset_version_override_dict_(
                     rsv_scene_properties,
-                    i_cur_rsv_task
+                    i_rsv_task
                 )
                 configure.set(
                     'asset.version_override.{}'.format(i_key), i_version_override_dict
@@ -553,7 +566,7 @@ class RsvUsdAssetSetCreator(object):
         #
         c.set('asset.set_file', asset_set_dress_usd_file_path)
 
-        cls._set_asset_all_comp_registry_update_(
+        cls._update_asset_all_registry_comps_(
             c, rsv_asset, rsv_scene_properties
         )
 
@@ -606,7 +619,7 @@ class RsvUsdAssetSetCreator(object):
             c.set('shot.shot_asset_main', shot_asset_main_dict)
             c.set('shot.shot_asset_override', shot_asset_override_dict)
 
-            cls._set_asset_all_comp_registry_update_(
+            cls._update_asset_all_registry_comps_(
                 c, rsv_asset, rsv_scene_properties
             )
 
@@ -631,7 +644,7 @@ class RsvUsdAssetSetCreator(object):
         pass
 
 
-class RsvUsdAssetSetVariant(object):
+class RsvUsdAssetSet(object):
     @classmethod
     def get_variant_dict(cls, asset_usd_file_path, mode='main'):
         resolver = rsv_commands.get_resolver()
@@ -671,7 +684,7 @@ class RsvUsdAssetSetVariant(object):
 
         c = bsc_objects.Content(value=collections.OrderedDict())
 
-        asset_step_keys = [
+        keys = [
             'model',
             'groom',
             'rig',
@@ -679,48 +692,57 @@ class RsvUsdAssetSetVariant(object):
             'surface',
             'light'
         ]
-        for i_asset_step_key in asset_step_keys:
-            i_main = usd_variant_dict.get('{}_main'.format(i_asset_step_key))
-            if i_main is not None:
-                i_default_main, i_values_main = i_main
+        for i_key in keys:
+            i_args_main = usd_variant_dict.get('{}_main'.format(i_key))
+            if i_args_main is not None:
+                i_default_main, i_values_main = i_args_main
                 c.set(
-                    'asset_version_main.{}.default'.format(i_asset_step_key), i_default_main
+                    'asset_version_main.{}.default'.format(i_key), i_default_main
                 )
                 c.set(
-                    'asset_version_main.{}.values'.format(i_asset_step_key), i_values_main
+                    'asset_version_main.{}.values'.format(i_key), i_values_main
                 )
-                i_asset_task = asset_task_query.get(i_asset_step_key)
-                if i_asset_task is not None:
-                    if i_asset_task in usd_variant_dict:
-                        # main default use "None" when step-key is current step-key and workspace-key is "source"
-                        if (
-                            cur_step_key == i_asset_step_key
-                            and cur_workspace_key in {
-                                resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
-                            }
-                            and mode == 'override'
-                        ):
-                            i_default_main = 'None'
-                        # main default use register
-                        else:
-                            i_default_main = usd_variant_dict[i_asset_task][0]
-                            print i_default_main, i_asset_task
-                        #
-                        c.set(
-                            'asset_version_main.{}.default'.format(i_asset_step_key), i_default_main
-                        )
+                #
+                i_asset_task = asset_task_query.get(i_key)
+                i_args_release = usd_variant_dict.get(i_asset_task)
+                # from set dressing
+                if i_asset_task in usd_variant_dict:
+                    i_default_release, i_values_release = i_args_release
+                    # main default use "None" when step-key is current step-key and workspace-key is "source"
+                    if (
+                        cur_step_key == i_key
+                        and cur_workspace_key in {
+                            resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                        }
+                        and mode == 'override'
+                    ):
+                        i_default_main = 'None'
+                    # main default use register
+                    else:
+                        i_default_main = '{}-default'.format(i_default_release)
+                        if i_default_release in i_values_main:
+                            i_values_main[i_values_main.index(i_default_release)] = i_default_main
+                    #
+                    for i_value in i_values_release:
+                        if i_value in i_values_main:
+                            if i_value != 'None':
+                                i_values_main[i_values_main.index(i_value)] = '{}-release'.format(i_value)
+                    #
+                    c.set(
+                        'asset_version_main.{}.default'.format(i_key), i_default_main
+                    )
             #
-            i_override = usd_variant_dict.get('{}_override'.format(i_asset_step_key))
-            if i_override:
-                i_default_override, i_values_override = i_override
+            i_override_args = usd_variant_dict.get('{}_override'.format(i_key))
+            if i_override_args:
+                i_default_override, i_values_override = i_override_args
                 c.set(
-                    'asset_version_override.{}.default'.format(i_asset_step_key), i_default_override
+                    'asset_version_override.{}.default'.format(i_key), i_default_override
                 )
                 c.set(
-                    'asset_version_override.{}.values'.format(i_asset_step_key), i_values_override
+                    'asset_version_override.{}.values'.format(i_key), i_values_override
                 )
                 if (
-                    cur_step_key == i_asset_step_key
+                    cur_step_key == i_key
                     and cur_workspace_key in {
                         resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
                     }
@@ -728,9 +750,12 @@ class RsvUsdAssetSetVariant(object):
                 ):
                     i_default_override = i_values_override[-1]
                     c.set(
-                        'asset_version_override.{}.default'.format(i_asset_step_key), i_default_override
+                        'asset_version_override.{}.default'.format(i_key), i_default_override
                     )
         return c.get_value()
+    @classmethod
+    def reduce_variant_dict(cls):
+        pass
 
 
 class RsvUsdShotSetCreator(object):
@@ -1106,9 +1131,10 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
             #
             if workspace in [rsv_scene_properties.get('workspaces.release')]:
+                bsc_core.LogMtd.trace_method_result(
+                    'register usd',
+                    'framework scheme use "{}"'.format(framework_scheme)
+                )
                 m = utl_etr_methods.get_module(framework_scheme)
                 register_file_path = '{}/registry.usda'.format(component_usd_directory_path)
-                if framework_scheme == 'default':
-                    m.EtrUsd.registry_set(
-                        register_file_path
-                    )
+                m.EtrUsd.registry_set(register_file_path)

@@ -2,7 +2,7 @@
 import lxusd.rsv.objects as rsv_objects
 
 
-d = rsv_objects.RsvUsdAssetSetVariant.get_variant_dict(
+d = rsv_objects.RsvUsdAssetSet.get_variant_dict(
     '/l/prod/cgm/work/assets/chr/nn_14y/srf/surfacing/set/scene/v034/nn_14y.usda', 'main'
 )
 

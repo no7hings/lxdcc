@@ -7,7 +7,8 @@ option:
     description:
         |-
         for asset geometry load
-    variant_key: 'geometry'
+    #
+    variant_key: 'render'
     #
     auto_color: False
     #
@@ -381,8 +382,9 @@ node:
                 rig: '$.modeling'
                 effect: '$.modeling'
                 surfacing: '$.modeling'
+                lighting: '$.modeling'
                 animation: '$.modeling'
-
+    #
     asset_version_main:
         type: GroupStack
         path: '<main.path>/<option.type_abr>__<..key>'
@@ -407,13 +409,15 @@ node:
                     #
                     expressions:
                         location: 'getParent().getParent().option.root'
-                        args/variantSelection/value: 'getParent().getParent().parameters.usd_variant.asset_version_main.<...key>'
+                        args/variantSelection/value:
+                            |-
+                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
                 groom: '$.model'
                 rig: '$.model'
                 effect: '$.model'
                 surface: '$.model'
                 light: '$.model'
-
+    #
     asset_version_main_enable:
         type: Switch
         path: '<main.path>/<option.type_abr>__<..key>'
@@ -458,7 +462,9 @@ node:
                     #
                     expressions:
                         location: 'getParent().getParent().option.root'
-                        args/variantSelection/value: 'getParent().getParent().parameters.usd_variant.asset_version_override.<...key>'
+                        args/variantSelection/value:
+                            |-
+                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
                 groom: '$.model'
                 rig: '$.model'
                 effect: '$.model'
@@ -509,7 +515,9 @@ node:
                     #
                     expressions:
                         location: 'getParent().getParent().option.root'
-                        args/variantSelection/value: 'getParent().getParent().parameters.usd_variant.shot_version_main.<...key>'
+                        args/variantSelection/value:
+                            |-
+                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
                 character_effect: '$.animation'
                 effect: '$.animation'
                 light: '$.animation'
@@ -558,7 +566,9 @@ node:
                     #
                     expressions:
                         location: 'getParent().getParent().option.root'
-                        args/variantSelection/value: 'getParent().getParent().parameters.usd_variant.shot_version_override.<...key>'
+                        args/variantSelection/value:
+                            |-
+                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
                 character_effect: '$.animation'
                 effect: '$.animation'
                 light: '$.animation'
@@ -582,7 +592,7 @@ node:
             # on
             - '<..shot_version_override.output>'
             - '<.path>.on'
-
+    #
     usd_enable:
         type: Switch
         path: '<main.path>/<option.type_abr>__<..key>'

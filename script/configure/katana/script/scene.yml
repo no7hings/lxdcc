@@ -1,34 +1,14 @@
-option:
-    rsv_scene_properties_mapper:
-        root: 'PG_ROOT'
-        project: 'PG_PROJECT'
-        workspace: 'PG_WORKSPACE'
-        branch: 'PG_BRANCH'
-        role: 'PG_ROLE'
-        sequence: 'PG_SEQUENCE'
-        asset: 'PG_ASSET'
-        shot: 'PG_SHOT'
-        resource: 'PG_RESOURCE'
-        #
-        step: 'PG_STEP'
-        #
-        task: 'PG_TASK'
-        task_extra: 'PG_TASK_EXTRA'
-        #
-        version: 'PG_VERSION'
-        version_extra: 'PG_VERSION_EXTRA'
-        #
-        artist: 'PG_ARTIST'
+option: {}
 
 main:
     environment:
-        root: 'user/workspace/environment'
+        root: 'user.workspace.environment'
         #
         ports:
             user/workspace/environment/data_0:
-                widget: string2
+                widget: string3
                 label: ' '
-                value: ['', '']
+                value: ['', '', '']
                 tool_tip: '...'
                 lock: True
 

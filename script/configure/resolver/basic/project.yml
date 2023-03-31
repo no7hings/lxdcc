@@ -169,6 +169,9 @@ asset-source-katana-scene-tmp-file: <asset-source-katana-tmp-dir>/<asset-version
 asset-user-katana-dir: <asset-user-task-dir>/katana
 asset-user-katana-scene-src-dir: <asset-user-katana-dir>
 asset-user-katana-scene-src-file: <asset-user-katana-dir>/<asset-version-name>.katana
+
+asset-user-katana-render-dir: <asset-user-katana-dir>/render
+asset-user-katana-render-layer-dir: <asset-user-katana-render-dir>/<asset-version-name>
     # clarisse
         # source
 asset-source-clarisse-dir: <asset-source-base_area-dir>/clarisse

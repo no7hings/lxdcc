@@ -420,6 +420,10 @@ class CallbackMtd(object):
     def add_as_scene_save(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneSave)
         callback_opt.set_add()
+    @classmethod
+    def add_as_render_setup(cls, fnc):
+        callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onRenderSetup)
+        callback_opt.set_add()
 
 
 class VariablesSetting(object):

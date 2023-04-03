@@ -41,7 +41,11 @@ class ScpCbkEnvironment(object):
         import lxresolver.commands as rsv_commands
         #
         data = []
-        f = kwargs['filename']
+        if 'filename' in kwargs:
+            f = kwargs['filename']
+        else:
+            f = ktn_core.NodegraphAPI.GetProjectFile()
+        #
         if f:
             resolver = rsv_commands.get_resolver()
             rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(f)
@@ -76,7 +80,7 @@ class ScpCbkEnvironment(object):
             )
             return True, data
         return False, None
-
+    @ktn_core.Modifier.undo_run
     def execute(self, *args, **kwargs):
         if ktn_core.get_is_ui_mode():
             fncs = [
@@ -107,15 +111,6 @@ class ScpCbkRender(object):
     def __init__(self):
         pass
 
-    def get_kwargs_from_scene(self):
-        p = bsc_objects.Content()
-        workspace_setting = ktn_core.WorkspaceSetting()
-        data = workspace_setting.get_env_data()
-        for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
-            print i_key, i_env_key, i_env_value
-            p.set(i_key, i_env_value)
-        return p
-
     def refresh_all_render_Layers_version(self):
         from lxkatana.scripts import _ktn_scp_macro_extra
 
@@ -130,23 +125,59 @@ class ScpCbkRender(object):
             i_kwargs = i_scp.get_variants()
             i_directory_p = i_obj_opt.get('parameters.render.output_directory')
             i_directory_p_opt = bsc_core.PtnParseOpt(i_directory_p)
-            i_version_string = i_kwargs.pop(version_key)
-            if bsc_core.PtnVersion.get_is_valid(i_version_string):
-                continue
             #
-            i_directory_p_opt.set_update(**i_kwargs)
-            #
-            i_version_kwargs = {}
-            if i_version_string == 'new':
-                i_version = i_directory_p_opt.get_new_version(version_key='render_version')
-            elif i_version_string == 'latest':
-                i_version = i_directory_p_opt.get_latest_version(version_key='render_version')
-            else:
-                raise RuntimeError()
-            #
-            i_version_kwargs[version_key] = i_version
-            i_obj_opt.set('parameters.render.version', i_version)
+            if i_directory_p_opt.get_keys():
+                i_version_string = i_kwargs.pop(version_key)
+                if bsc_core.PtnVersion.get_is_valid(i_version_string):
+                    continue
+                #
+                i_directory_p_opt.set_update(**i_kwargs)
+                #
+                i_version_kwargs = {}
+                if i_version_string == 'new':
+                    i_version = i_directory_p_opt.get_new_version(version_key='render_version')
+                elif i_version_string == 'latest':
+                    i_version = i_directory_p_opt.get_latest_version(version_key='render_version')
+                else:
+                    raise RuntimeError()
+                #
+                i_version_kwargs[version_key] = i_version
+                i_directory_p_opt.set_update(**i_version_kwargs)
+                #
+                i_result = i_directory_p_opt.get_value()
+                #
+                i_obj_opt.set('parameters.render.output_directory', i_result)
+                bsc_core.LogMtd.trace_method_result(
+                    'render process',
+                    'node: "{}"'.format(
+                        i_obj_opt.get_path()
+                    )
+                )
+                bsc_core.LogMtd.trace_method_result(
+                    'render process',
+                    'convert render output: "{}" >> "{}"'.format(
+                        i_directory_p, i_result
+                    )
+                )
 
+    def save_changed(self):
+        f = ktn_core.NodegraphAPI.GetProjectFile()
+        ktn_core.KatanaFile.Save(f)
+        bsc_core.LogMtd.trace_method_result(
+            'render process',
+            'save changed: "{}"'.format(
+                f
+            )
+        )
+    @ktn_core.Modifier.undo_run
     def execute(self, *args, **kwargs):
-        if ktn_core.get_is_ui_mode():
-            self.refresh_all_render_Layers_version()
+        bsc_core.LogMtd.trace_method_result(
+            'render process',
+            'is started'
+        )
+        self.refresh_all_render_Layers_version()
+        self.save_changed()
+        bsc_core.LogMtd.trace_method_result(
+            'render process',
+            'is completed'
+        )

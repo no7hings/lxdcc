@@ -6,10 +6,12 @@ from Katana import Callbacks
 class Setup(object):
     @classmethod
     def build_menu(cls):
-        print 'lx-katana-menu-setup: start'
-        from lxkatana import ktn_setup
-        ktn_setup.KatanaMenuSetup().set_setup()
-        print 'lx-katana-menu-setup: complete'
+        from lxkatana import ktn_core
+        if ktn_core.get_is_ui_mode():
+            print 'lx-katana-menu-setup: start'
+            from lxkatana import ktn_setup
+            ktn_setup.KatanaMenuSetup().set_setup()
+            print 'lx-katana-menu-setup: complete'
     @classmethod
     def build_lua(cls):
         from lxbasic import bsc_core

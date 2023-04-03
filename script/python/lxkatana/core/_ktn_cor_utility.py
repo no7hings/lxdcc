@@ -7,9 +7,7 @@ import threading
 #
 import time
 # noinspection PyUnresolvedReferences
-from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, UserNodes, CacheManager
-# noinspection PyUnresolvedReferences
-from UI4 import App
+from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, CacheManager, KatanaFile
 
 from lxbasic import bsc_core
 
@@ -24,6 +22,13 @@ import sys
 
 def get_is_ui_mode():
     return Configuration.get('KATANA_UI_MODE') == '1'
+
+
+if get_is_ui_mode():
+    # noinspection PyUnresolvedReferences
+    from UI4 import App
+    # noinspection PyUnresolvedReferences
+    from Katana import UserNodes
 
 
 class ResolutionOpt(object):

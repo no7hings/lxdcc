@@ -7,16 +7,21 @@ import lxbasic.extra.abstracts as bsc_etr_abstracts
 class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_base_packages_extend(cls):
-        return ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        return ['lxdcc']
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
         import lxbasic.objects as bsc_objects
-        #
-        return bsc_objects.PackageContextNew(
-            None
-        ).get_command(
-            args_execute=args_execute, packages_extend=packages_extend
+
+        args_execute = bsc_objects.PackageContextNew.convert_args_execute(
+            args_execute
         )
+
+        args = [
+            '/job/PLE/support/wrappers/paper-bin',
+            ' '.join(packages_extend or []),
+            ' '.join(args_execute or [])
+        ]
+        return ' '.join(args)
     @classmethod
     def get_project_environs_extend(cls, project):
         return dict(
@@ -90,3 +95,19 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                             args_execute=['-- {}'.format(j_e_s_extend)]
                         )
         return dict_
+
+
+class EtrStorage(bsc_etr_abstracts.AbsEtrStorage):
+    @classmethod
+    def create_directory(cls, directory_path):
+        bsc_core.StgRpcMtd.create_directory(directory_path)
+    @classmethod
+    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
+        bsc_core.StgRpcMtd.copy_to_file(
+            file_path_src, file_path_tgt, replace=replace
+        )
+    @classmethod
+    def change_owner(cls, path, user='artist', group='artists'):
+        bsc_core.StgRpcMtd.change_owner(
+            path, user, group
+        )

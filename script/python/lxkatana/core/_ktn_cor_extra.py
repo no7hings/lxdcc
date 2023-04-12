@@ -7,6 +7,7 @@ from lxkatana.core import _ktn_cor_node
 class EventOpt(object):
     class EventType(object):
         NodeCreate = 'node_create'
+
     #
     def __init__(self, handler, event_type):
         self._handler = handler
@@ -22,7 +23,7 @@ class EventOpt(object):
         )
         #
         utl_core.Log.set_module_result_trace(
-            'register-event',
+            'event register',
             'event-type="{}"'.format(self._event_type)
         )
 
@@ -33,7 +34,7 @@ class EventOpt(object):
                 eventType=self._event_type
             )
             utl_core.Log.set_module_result_trace(
-                'unregister-event',
+                'event deregister',
                 'event-type="{}"'.format(self._event_type)
             )
 
@@ -56,7 +57,7 @@ class CallbackOpt(object):
         )
         #
         utl_core.Log.set_module_result_trace(
-            'add-callback',
+            'callback register',
             'callback-type="{}"'.format(self._callback_type)
         )
 
@@ -66,7 +67,7 @@ class CallbackOpt(object):
             callbackFcn=self._function
         )
         utl_core.Log.set_module_result_trace(
-            'delete-callback',
+            'callback deregister',
             'callback-type="{}"'.format(self._callback_type)
         )
 
@@ -75,6 +76,7 @@ class EventMtd(object):
     @classmethod
     def get_all_event_types(cls):
         pass
+
     @classmethod
     def set_port_value(cls, *args, **kwargs):
         event_type, event_id = args
@@ -91,6 +93,7 @@ class EventMtd(object):
                     cls.set_arnold_ramp_write(ktn_obj_opt)
                 elif fnmatch.filter([ktn_port_opt.path], '*.parameters.ramp_Colors.value.*'):
                     cls.set_arnold_ramp_write(ktn_obj_opt)
+
     @classmethod
     def set_port_connect(cls, *args, **kwargs):
         event_type, event_id = args
@@ -103,6 +106,7 @@ class EventMtd(object):
                 shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
                 if shader_type_name in ['ramp_rgb', 'ramp_float']:
                     cls.set_arnold_ramp_read(ktn_obj_opt)
+
     @classmethod
     def set_port_disconnect(cls, *args, **kwargs):
         event_type, event_id = args
@@ -115,6 +119,7 @@ class EventMtd(object):
                 shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
                 if shader_type_name in ['ramp_rgb', 'ramp_float']:
                     cls.set_arnold_ramp_read(ktn_obj_opt)
+
     @classmethod
     def set_node_create(cls, *args, **kwargs):
         event_type, event_id = args
@@ -126,6 +131,7 @@ class EventMtd(object):
                 cls.set_arnold_ramp_read(ktn_obj_opt)
             #
             cls._set_arnold_obj_name_update_(ktn_obj_opt)
+
     @classmethod
     def set_node_edit(cls, *args, **kwargs):
         event_type, event_id = args
@@ -135,6 +141,7 @@ class EventMtd(object):
             shader_type_name = ktn_obj_opt.get_port_raw('nodeType')
             if shader_type_name in ['ramp_rgb', 'ramp_float']:
                 cls.set_arnold_ramp_read(ktn_obj_opt)
+
     @classmethod
     def set_arnold_ramp_write(cls, ktn_obj_opt):
         cls._set_arnold_ramp_write_(ktn_obj_opt)
@@ -142,6 +149,7 @@ class EventMtd(object):
         #     'ramp-write',
         #     'obj-name="{}"'.format(ktn_obj_opt.name)
         # )
+
     @classmethod
     def _set_arnold_ramp_write_(cls, ktn_obj_opt):
         # noinspection PyUnresolvedReferences
@@ -170,6 +178,7 @@ class EventMtd(object):
                 i_ktn_port_opt.set(str(ramp_value_dict))
         #
         # Utils.UndoStack.CloseGroup()
+
     @classmethod
     def set_arnold_ramp_read(cls, ktn_obj_opt):
         def fnc_():
@@ -178,10 +187,13 @@ class EventMtd(object):
             #     'ramp-read',
             #     'obj-name="{}"'.format(ktn_obj_opt.name)
             # )
+
         #
         import threading
+
         timer = threading.Timer(1, fnc_)
         timer.start()
+
     @classmethod
     def _set_arnold_ramp_read_(cls, ktn_obj_opt):
         # noinspection PyUnresolvedReferences
@@ -199,6 +211,7 @@ class EventMtd(object):
                 ktn_obj_opt.set_port_raw(value_port_path, value)
         #
         # Utils.UndoStack.CloseGroup()
+
     @classmethod
     def _set_arnold_obj_name_update_(cls, ktn_obj_opt):
         # noinspection PyUnresolvedReferences
@@ -214,6 +227,7 @@ class EventMtd(object):
                 ktn_obj.setAutoRenameAllowed(True)
         #
         # Utils.UndoStack.CloseGroup()
+
     @classmethod
     def set_events_register(cls):
         ss = [
@@ -231,15 +245,17 @@ class EventMtd(object):
 
 class ArnoldEventMtd(object):
     N = 'texture_directory'
-    DIRECTORY_KEY = 'extra.texture_directory'
+    DIRECTORY_KEY = 'user.extra.texture_directory'
     DIRECTORY_VALUE = '/texture_directory'
+
     @classmethod
-    def set_material_create(cls, *args, **kwargs):
+    def create_material_fnc(cls, *args, **kwargs):
         if kwargs['nodeType'] == 'NetworkMaterialCreate':
             node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
-            cls._set_material_create_(node_opt)
+            cls._create_material_(node_opt)
+
     @classmethod
-    def _set_material_create_(cls, node_opt):
+    def _create_material_(cls, node_opt):
         """
         # coding:utf-8
         import lxkatana
@@ -248,7 +264,7 @@ class ArnoldEventMtd(object):
 
         from lxkatana import ktn_core
 
-        ktn_core.ArnoldEventMtd._set_material_create_(
+        ktn_core.ArnoldEventMtd._create_material_(
             ktn_core.NGObjOpt(
                 NodegraphAPI.GetNode('NetworkMaterialCreate')
             )
@@ -256,6 +272,7 @@ class ArnoldEventMtd(object):
         :param node_opt:
         :return:
         """
+
         def connect_fnc_():
             _key = cls.DIRECTORY_KEY
             # ignore when expression is enable
@@ -269,12 +286,13 @@ class ArnoldEventMtd(object):
             if not _parent_opt:
                 return False
             # ignore parent has not directory
-            if not _parent_opt.get_port('user.Texture_Folder'):
+            if not _parent_opt.get_port(_key):
                 return False
             #
-            node_opt.set_expression(_key, 'getParent().user.Texture_Folder')
+            node_opt.set_expression(_key, 'getParent().{}'.format(_key))
             return True
 
+        #
         p_ns = [
             (cls.DIRECTORY_KEY, dict(widget='file', value=cls.DIRECTORY_VALUE)),
         ]
@@ -285,18 +303,16 @@ class ArnoldEventMtd(object):
                 )
 
         connect_fnc_()
+
     @classmethod
-    def _get_material_show_node_(cls, node_opt):
-        return [i for i in node_opt.get_children(['Merge'])][0]
-    #
-    @classmethod
-    def set_image_create(cls, *args, **kwargs):
+    def create_image_fnc(cls, *args, **kwargs):
         if kwargs['nodeType'] == 'ArnoldShadingNode':
             node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
             if node_opt.get('nodeType') in ['image']:
-                cls._set_image_create_(node_opt)
+                cls._create_image_(node_opt)
+
     @classmethod
-    def _set_image_create_(cls, node_opt):
+    def _create_image_(cls, node_opt):
         """
         # coding:utf-8
         import lxkatana
@@ -305,7 +321,7 @@ class ArnoldEventMtd(object):
 
         from lxkatana import ktn_core
 
-        ktn_core.ArnoldEventMtd._set_image_create_(
+        ktn_core.ArnoldEventMtd._create_image_(
             ktn_core.NGObjOpt(
                 NodegraphAPI.GetNode('image')
             )
@@ -313,6 +329,7 @@ class ArnoldEventMtd(object):
         :param node_opt:
         :return:
         """
+
         def connect_fnc_():
             _key = cls.DIRECTORY_KEY
             _parent_opt = node_opt.get_parent_opt()
@@ -328,7 +345,7 @@ class ArnoldEventMtd(object):
                     if not _parent_opt.get(_key):
                         return False
                     node_opt.set_expression(
-                        _key, 'getParent().extra.texture_directory'
+                        _key, 'getParent().{}'.format(_key)
                     )
                     return True
                 elif _parent_type == 'ShadingGroup':
@@ -338,11 +355,13 @@ class ArnoldEventMtd(object):
                             return False
                         #
                         node_opt.set_expression(
-                            _key, 'getParent().getParent().extra.texture_directory'
+                            _key, 'getParent().getParent().{}'.format(_key)
                         )
                         return True
 
         def post_connect_fnc_():
+            _key = cls.DIRECTORY_KEY
+            #
             if not node_opt.get(cls.DIRECTORY_KEY):
                 return False
             #
@@ -351,7 +370,7 @@ class ArnoldEventMtd(object):
                     'parameters.filename.enable', 1
                 )
                 node_opt.set_expression(
-                    'parameters.filename.value', 'extra.texture_directory+\'/tx\'+\'/texture_name.<udim>.tx\''
+                    'parameters.filename.value', '{}+\'/tx\'+\'/texture_name.<udim>.tx\''.format(_key)
                 )
                 #
                 node_opt.set(
@@ -368,6 +387,7 @@ class ArnoldEventMtd(object):
                     ns_colorb=0.3199999928474426
                 )
             )
+
         #
         p_ns = [
             (cls.DIRECTORY_KEY, dict(widget='file', value=cls.DIRECTORY_VALUE)),
@@ -400,6 +420,7 @@ class CallbackMtd(object):
                     EventMtd.set_arnold_ramp_write(ktn_obj_opt)
                 except Exception:
                     print ktn_obj_opt.name
+
     @classmethod
     def add_arnold_callbacks(cls):
         ss = [
@@ -408,18 +429,27 @@ class CallbackMtd(object):
         for function, callback_type in ss:
             callback_opt = CallbackOpt(function=function, callback_type=callback_type)
             callback_opt.set_add()
+
     @classmethod
     def add_callbacks(cls, data):
         for function, callback_type in data:
             pass
+
+    @classmethod
+    def add_as_scene_new(cls, fnc):
+        callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onNewScene)
+        callback_opt.set_add()
+
     @classmethod
     def add_as_scene_open(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneLoad)
         callback_opt.set_add()
+
     @classmethod
     def add_as_scene_save(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneSave)
         callback_opt.set_add()
+
     @classmethod
     def add_as_render_setup(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onRenderSetup)
@@ -503,21 +533,22 @@ class WorkspaceSetting(object):
 
     def build_env_ports(self):
         root = self._cfg.get('main.environment.root')
-        self._obj_opt.clear_ports(root)
-        self._obj_opt.create_ports_by_data(
-            self._cfg.get('main.environment.ports')
-        )
+        if self._obj_opt.get_port_is_exists(root) is False:
+            # self._obj_opt.clear_ports(root)
+            self._obj_opt.create_ports_by_data(
+                self._cfg.get('main.environment.ports')
+            )
 
     def save_env(self, index, key, env_key, env_value):
         root = self._cfg.get('main.environment.root')
         self._obj_opt.set(
-            '{}.data_{}.i0'.format(root, index), key
+            '{}.data_{}.i0'.format(root, index), key, ignore_changed=True
         )
         self._obj_opt.set(
-            '{}.data_{}.i1'.format(root, index), env_key
+            '{}.data_{}.i1'.format(root, index), env_key, ignore_changed=True
         )
         self._obj_opt.set(
-            '{}.data_{}.i2'.format(root, index), env_value
+            '{}.data_{}.i2'.format(root, index), env_value, ignore_changed=True
         )
 
     def get_env_data(self):
@@ -545,3 +576,167 @@ class WorkspaceSetting(object):
         for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
             dict_[i_key] = i_env_value
         return dict_
+
+    def build_look_ports(self):
+        root = self._cfg.get('main.look.root')
+        if self._obj_opt.get_port_is_exists(root) is False:
+            # self._obj_opt.clear_ports(root)
+            self._obj_opt.create_ports_by_data(
+                self._cfg.get('main.look.ports')
+            )
+    @classmethod
+    def get_look_output_nodes(cls):
+        return _ktn_cor_node.NGObjsMtd.find_nodes(
+            type_name='LookFileBake', ignore_bypassed=True
+        )
+    @classmethod
+    def get_look_output_node_opts(cls):
+        return [
+            _ktn_cor_node.NGObjOpt(i) for i in cls.get_look_output_nodes()
+        ]
+
+    def set_current_look_output(self, node_name):
+        root = self._cfg.get('main.look.root')
+        self._obj_opt.set(
+            '{}.output'.format(root), node_name
+        )
+
+    def get_current_look_output(self):
+        root = self._cfg.get('main.look.root')
+        return self._obj_opt.get(
+            '{}.output'.format(root)
+        )
+
+    def get_current_look_output_opt(self):
+        _ = self.get_current_look_output()
+        if _:
+            if _ktn_cor_node.NGObjOpt._get_is_exists_(_):
+                return _ktn_cor_node.NGObjOpt(_)
+
+    def update_current_look_output_with_dialog(self):
+        if get_is_ui_mode():
+            opts = self.get_look_output_node_opts()
+            if opts:
+                if len(opts) > 1:
+                    def yes_fnc_():
+                        _n = o.get('dcc.node')
+                        self.set_current_look_output(_n)
+                    #
+                    w = utl_core.DialogWindow.set_create(
+                        'Workspace Setting',
+                        content=(
+                            'More then one "LookFileBake" in scene:\n'
+                            '   1, choose one use as current\n'
+                            '   2, press "Confirm" to continue'
+                        ),
+                        status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                        options_configure=self._cfg.get('main.look.dialog_options'),
+                        #
+                        yes_method=yes_fnc_,
+                        #
+                        yes_label='Confirm',
+                        #
+                        no_visible=False, cancel_visible=False,
+                        show=False,
+                        window_size=(480, 240)
+                    )
+
+                    o = w.get_options_node()
+
+                    o.set('dcc.node', [i.get_name() for i in opts])
+
+                    w.set_window_show()
+
+                    if w.get_result() is True:
+                        return self.get_current_look_output()
+                else:
+                    name = opts[0].get_name()
+                    self.set_current_look_output(name)
+                    return name
+
+    def get_current_look_output_opt_force(self):
+        opt = self.get_current_look_output_opt()
+        if opt is not None:
+            return opt
+        else:
+            opts = self.get_look_output_node_opts()
+            if opts:
+                if len(opts) > 1:
+                    if get_is_ui_mode():
+                        def yes_fnc_():
+                            _n = o.get('dcc.node')
+                            self.set_current_look_output(_n)
+                        #
+                        w = utl_core.DialogWindow.set_create(
+                            'Workspace Setting',
+                            content=(
+                                'More then one "LookFileBake" in scene:\n'
+                                '   1, choose one use as current\n'
+                                '   2, press "Confirm" to continue'
+                            ),
+                            status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                            options_configure=self._cfg.get('main.look.dialog_options'),
+                            #
+                            yes_method=yes_fnc_,
+                            #
+                            yes_label='Confirm',
+                            #
+                            no_visible=False, cancel_visible=False,
+                            show=False,
+                            window_size=(480, 240)
+                        )
+
+                        o = w.get_options_node()
+
+                        o.set('dcc.node', [i.get_name() for i in opts])
+
+                        w.set_window_show()
+
+                        if w.get_result() is True:
+                            return self.get_current_look_output_opt()
+                    else:
+                        return opts[0]
+                else:
+                    return opts[0]
+
+
+class LayoutNodeHotKey(object):
+    """
+# coding:utf-8
+import lxkatana
+lxkatana.set_reload()
+
+from lxkatana import ktn_core
+
+ktn_core.LayoutNodeHotKey().register()
+    """
+    NAME = 'Layout Node'
+    ID = 'F4331532-D52B-11ED-8C7C-2CFDA1C062BB'
+    HOT_KEY = 'Alt+L'
+
+    def __init__(self):
+        self._ktn_gui = App.Tabs.FindTopTab('Node Graph')
+
+    def press_fnc(self, *args, **kwargs):
+        pass
+    @classmethod
+    def _release_fnc_(cls, ktn_gui):
+        ss = NodegraphAPI.GetAllSelectedNodes()
+        if ss:
+            group = ktn_gui.getEnteredGroupNode()
+            if group.getType() in {'NetworkMaterialCreate', 'ShadingGroup'}:
+                ss_ = [i_s for i_s in ss if i_s.getParent() == group]
+                _ktn_cor_node.NGGuiLayout(
+                    ss_
+                ).layout_shader_graph(
+                    size=(320, 320)
+                )
+
+    def release_fnc(self, *args, **kwargs):
+        ktn_gui = args[0]
+        self._release_fnc_(ktn_gui)
+
+    def register(self):
+        self._ktn_gui.registerKeyboardShortcut(
+            self.ID, self.NAME, self.HOT_KEY, self.press_fnc, self.release_fnc
+        )

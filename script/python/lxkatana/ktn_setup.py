@@ -48,19 +48,39 @@ class KatanaWorkspaceSetup(object):
     def __init__(self):
         pass
     @classmethod
-    def set_setup(cls):
+    def add_environment_callback(cls):
         from lxkatana import ktn_core
-
+        #
         import lxkatana.scripts as ktn_scripts
         #
         ktn_core.CallbackMtd.add_arnold_callbacks()
-        #
+        ktn_core.CallbackMtd.add_as_scene_new(
+            ktn_scripts.ScpCbkEnvironment().execute
+        )
         ktn_core.CallbackMtd.add_as_scene_open(
             ktn_scripts.ScpCbkEnvironment().execute
         )
         ktn_core.CallbackMtd.add_as_scene_save(
             ktn_scripts.ScpCbkEnvironment().execute
         )
+    @classmethod
+    def add_gui_callback(cls):
+        from lxkatana import ktn_core
+        if ktn_core.get_is_ui_mode():
+            import lxkatana.scripts as ktn_scripts
+            ktn_core.CallbackMtd.add_as_scene_new(
+                ktn_scripts.ScpCbkGui().execute
+            )
+            ktn_core.CallbackMtd.add_as_scene_open(
+                ktn_scripts.ScpCbkGui().execute
+            )
+            ktn_core.CallbackMtd.add_as_scene_save(
+                ktn_scripts.ScpCbkGui().execute
+            )
+    @classmethod
+    def set_setup(cls):
+        cls.add_environment_callback()
+        cls.add_gui_callback()
 
 
 class KatanaCallbackSetup(object):

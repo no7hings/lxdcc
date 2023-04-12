@@ -183,15 +183,49 @@ main:
 
         parameters/customize/tag_9:
             $: '..parameters/customize/tag_1'
-        #
-        parameters/render/version:
-            widget: string
-            value: 'new'
+        # render
+        #   layer
+        parameters/render/layer/mode:
+            widget: capsule_string
+            value: ['default', 'customize']
             tool_tip: '...'
-        #
-        parameters/render/output_directory:
+
+        parameters/render/layer/customize:
+            widget: string
+            value: '{camera}__{look}__{light}'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../mode', conditionalVisValue: 'customize'
+            }
+        #   version
+        parameters/render/version/mode:
+            widget: capsule_string
+            value: ['default', 'new', 'latest', 'customize']
+            tool_tip: '...'
+
+        parameters/render/version/customize:
+            widget: string
+            value: 'v001'
+            tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../mode', conditionalVisValue: 'customize'
+            }
+        #   frames
+        parameters/render/frames/mode:
+            widget: capsule_string
+            value: ['default', 'customize']
+            tool_tip: '...'
+
+        parameters/render/frames/customize:
+            widget: string
+            value: '1001-1120'
+            tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../mode', conditionalVisValue: 'customize'
+            }
+        #   output
+        parameters/render/output/directory:
             widget: file
-            value: '{root}/{project}/assets/{role}/{asset}/user/work.{artist}/katana/render/{task_extra}/{asset}.{step}.{task}.{render_version}.{camera}.{look}.{light}'
+            value: '{root}/{project}/assets/{role}/{asset}/user/work.{artist}/katana/render/{task_extra}/{asset}.{step}.{task}.{render_version}.{render_layer}'
             tool_tip: '...'
         #
         parameters/render/output/builtin/image_enable:
@@ -237,6 +271,9 @@ main:
         - 'parameters'
         - 'parameters/variant_resolve'
         - 'parameters/render'
+        - 'parameters/render/layer'
+        - 'parameters/render/version'
+        - 'parameters/render/frames'
         - 'parameters/render/output'
 #
 node:
@@ -346,7 +383,16 @@ node:
                                 ]
                             ),
                             '\n'.join(
-                                ['render_version={}'.format(str(getParent().parameters.render.version))]
+                                [
+                                    'render_version={}'.format(
+                                        str(getParent().parameters.render.version.customize) if getParent().parameters.render.version.mode == 'customize' else 'v000'
+                                    )
+                                ]
+                            ),
+                            '\n'.join(
+                                [
+                                    'render_layer={}'.format(getNode("<...output.name>").getNodeName())
+                                ]
                             )
                         ] if i
                     ]
@@ -356,20 +402,20 @@ node:
             user/output/builtin/image_pattern:
                 |-
                 '{}{}'.format(
-                    str(getParent().parameters.render.output_directory), str(getParent().parameters.render.output.builtin.image_pattern)
+                    str(getParent().parameters.render.output.directory), str(getParent().parameters.render.output.builtin.image_pattern)
                 )
             #
             user/output/arnold/stats_file_enable: 'getParent().parameters.render.output.arnold.stats_file_enable'
             user/output/arnold/stats_file_pattern:
                 |-
                 '{}{}'.format(
-                    str(getParent().parameters.render.output_directory), str(getParent().parameters.render.output.arnold.stats_file_pattern)
+                    str(getParent().parameters.render.output.directory), str(getParent().parameters.render.output.arnold.stats_file_pattern)
                 )
             user/output/arnold/profile_file_enable: 'getParent().parameters.render.output.arnold.profile_file_enable'
             user/output/arnold/profile_file_pattern:
                 |-
                 '{}{}'.format(
-                    str(getParent().parameters.render.output_directory), str(getParent().parameters.render.output.arnold.profile_file_pattern)
+                    str(getParent().parameters.render.output.directory), str(getParent().parameters.render.output.arnold.profile_file_pattern)
                 )
         #
         connections:
@@ -395,13 +441,19 @@ node:
         expressions:
             passName:
                 |-
-                '{}__<..tag>'.format(
+                str(
                     '__'.join(
                         [
                             str(getParam("<...variant_resolve.name>.parameters.variant.value_{}".format(i.split("_")[-1] if i != "None" else 0)))
                             for i in str(getNode("<...variant_resolve.name>").parameters.keys).split(", ")
                         ]
                     )
+                ) if getParent().parameters.render.layer.mode == "default" else str(getParent().parameters.render.layer.customize).format(
+                    **{
+                        str(getParam("<...variant_resolve.name>.parameters.variant.key_{}".format(i.split("_")[-1] if i != "None" else 0))): str(getParam("<...variant_resolve.name>.parameters.variant.value_{}".format(i.split("_")[-1] if i != "None" else 0)))
+                        for i in str(getNode("<...variant_resolve.name>").parameters.keys).split(", ") 
+                        if i != "None"
+                    }
                 )
         #
         connections:

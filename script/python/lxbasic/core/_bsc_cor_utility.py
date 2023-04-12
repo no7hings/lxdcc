@@ -383,7 +383,16 @@ class StorageMtd(object):
     @classmethod
     def get_permission(cls, path):
         def get_str_fnc_(st_mode_):
-            _mode_list = ['d', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x']
+            _mode_list = [
+                #
+                'd',
+                # self
+                'r', 'w', 'x',
+                # group
+                'r', 'w', 'x',
+                # other
+                'r', 'w', 'x'
+            ]
             _mode_str = bin(st_mode_)[-10:]
             _result = ''
             for _idx, _flg in enumerate(_mode_str):
@@ -771,3 +780,7 @@ class SPathMtd(object):
                 append('%')
                 append(item)
         return ''.join(res)
+
+
+if __name__ == '__main__':
+    print UuidMtd.get_new()

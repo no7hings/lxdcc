@@ -177,7 +177,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             self._file_path,
             root_lstrip='/root/world/geo'
         )
-        self._and_obj_universe = obj_scene.universe
+        self._and_universe = obj_scene.universe
 
     def __set_look_create_(self, pass_name):
         self._workspace.get_look_pass_index(pass_name)
@@ -187,16 +187,16 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._configure = self._workspace.set_configure_create(pass_name=pass_name)
         self._configure.set_flatten()
         # geometry
-        mesh_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
+        mesh_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
         mesh_and_objs = mesh_and_type.get_objs() if mesh_and_type is not None else []
-        curve_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
+        curve_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
         curve_and_objs = curve_and_type.get_objs() if curve_and_type is not None else []
-        xgen_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
+        xgen_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
         and_geometries = mesh_and_objs + curve_and_objs + xgen_and_objs
         # material
-        # material_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
+        # material_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
         # and_materials = material_and_type.get_objs()
         #
         method_args = [
@@ -247,7 +247,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         and_material_paths = and_geometry.get_input_port('material').get()
         if and_material_paths:
-            and_material = self._and_obj_universe.get_obj(and_material_paths[0])
+            and_material = self._and_universe.get_obj(and_material_paths[0])
             material_group_dcc_path = self._workspace.get_ng_material_group_path_use_hash(and_geometry_opt, pass_name)
             is_material_group_create, dcc_material_group = self._workspace.get_ng_material_group_force(material_group_dcc_path, pass_name)
             if is_material_group_create is True:
@@ -274,7 +274,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             #
             i_raw = and_material.get_input_port(i_and_bind_name).get()
             if i_raw is not None:
-                i_and_shader = self._and_obj_universe.get_obj(i_raw)
+                i_and_shader = self._and_universe.get_obj(i_raw)
                 if i_and_shader is not None:
                     i_ktn_shader_type_name = i_and_shader.type.name
                     i_shader_dcc_path = '{}/{}'.format(

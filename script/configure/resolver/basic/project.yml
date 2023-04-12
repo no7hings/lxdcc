@@ -59,7 +59,7 @@ variant-fnmatch-patterns:
     sequence: '[a-z][0-9][0-9]'
 #    step: '[a-z][a-z][a-z]'
     version: '[a-z][0-9][0-9][0-9]*'
-    version_extra: '[0-9][0-9][0-9]'
+    version_extra: '[0-9][0-9][0-9]*'
     look_pass: '[A-Za-z]*'
     shot: '[a-z][0-9][0-9][0-9][0-9][0-9]'
 #
@@ -196,18 +196,18 @@ asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<asset-version-name>.nk
 #
 asset-user-app-render-image-dir: <asset-user-task-dir>/render/<app-name>/<asset-version-name>
-# shared area
-asset-source-shared_area-dir: <asset-source-task-dir>
+# extend area
+asset-source-extend-dir: <asset-source-task-dir>
     # zbrush
-asset-source-zbrush-dir: <asset-source-shared_area-dir>/zb
+asset-source-zbrush-dir: <asset-source-extend-dir>/zb
 asset-source-zbrush-scene-src-dir: <asset-source-zbrush-dir>/<variant>/<version-name>
 asset-source-zbrush-scene-src-file: <asset-source-zbrush-scene-src-dir>/<asset-version-name>.spp
     # substance painter
-asset-source-sp-dir: <asset-source-shared_area-dir>/sp
+asset-source-sp-dir: <asset-source-extend-dir>/sp
 asset-source-sp-scene-src-dir: <asset-source-sp-dir>/<variant>/<version-name>
 asset-source-sp-scene-src-file: <asset-source-sp-scene-src-dir>/<asset-version-name>.spp
     # geometry
-asset-source-geometry-dir: <asset-source-shared_area-dir>/geometry/scene/<version-name>
+asset-source-geometry-dir: <asset-source-extend-dir>/geometry/scene/<version-name>
 asset-source-geometry-abc-var-file: <asset-source-geometry-dir>/<var-name>.abc
 # todo: remove keyword: hi, lo, shape, temp?
 asset-source-geometry-abc-hi-file: <asset-source-geometry-dir>/hi.abc
@@ -229,28 +229,38 @@ asset-source-geometry-info-xml-file: <asset-source-geometry-dir>/<var-name>.info
 asset-source-geometry-info-xml-hi-file: <asset-source-geometry-dir>/hi.info.xml
 
 asset-source-geometry-ovrride-usd-file: <asset-source-geometry-dir>/override.usda
-#   look
-asset-source-look-dir: <asset-source-shared_area-dir>/look/scene/<version-name>
-asset-source-look-assign-yml-file: <asset-source-look-dir>/all.assign.yml
-asset-source-look-ass-file: <asset-source-look-dir>/all.ass
-asset-source-look-mtlx-file: <asset-source-look-dir>/all.mtlx
+# look
+asset-source-look-dir: <asset-source-extend-dir>/look
+#   arnold ass
+asset-source-look-ass-dir: <asset-source-look-dir>/ass/<version-name>
+asset-source-look-ass-file: <asset-source-look-ass-dir>/default.ass
+asset-source-look-ass-sub-file: <asset-source-look-ass-dir>/<look-pass>.ass
+#   materialx
+asset-source-look-mtx-dir: <asset-source-look-dir>/mtx/<version-name>
+asset-source-look-mtx-file: <asset-source-look-dir>/default.mtlx
+#   look file
+asset-source-look-klf-dir: <asset-source-look-dir>/klf/<version-name>
 asset-source-look-klf-file: <asset-source-look-dir>/all.klf
-asset-source-look-yml-file: <asset-source-look-dir>/all.yml
+asset-source-look-klf-extra-file: <asset-source-look-dir>/all.json
+#   yaml
+asset-source-look-yml-dir: <asset-source-look-dir>/yml/<version-name>
+asset-source-look-yml-file: <asset-source-look-dir>/default.yml
+# texture
+asset-source-texture-dir: <asset-source-extend-dir>/texture/<variant>
 #
-asset-source-texture-base-dir: <asset-source-task-dir>/textue-base
-asset-source-texture-dir: <asset-source-task-dir>/texture/<variant>
-asset-source-texture-version-dir: <asset-source-task-dir>/texture/<variant>/<version-name>
+asset-source-texture-version-dir: <asset-source-extend-dir>/texture/<variant>/<version-name>
 asset-source-texture-src-dir: <asset-source-texture-version-dir>/src
 asset-source-texture-tx-dir: <asset-source-texture-version-dir>/tx
-#   set
-asset-source-set-dir: <asset-source-shared_area-dir>/set/scene/<version-name>
+# set
+asset-source-set-dir: <asset-source-extend-dir>/set/scene/<version-name>
 asset-source-asset-set-usd-file: <asset-source-set-dir>/<asset-name>.usda
 asset-source-shot-set-usd-file: <asset-source-set-dir>/<asset-shot-name>.usda
 # cache
-asset-source-cache-dir: <asset-source-shared_area-dir>/cache
-asset-source-usd-dir: <asset-source-shared_area-dir>/cache/usd/<version-name>
+asset-source-cache-dir: <asset-source-extend-dir>/cache
+asset-source-usd-dir: <asset-source-extend-dir>/cache/usd/<version-name>
 asset-source-component-usd-dir: <asset-source-usd-dir>
-asset-source-render-dir: <asset-source-shared_area-dir>/render/<user-name>
+asset-source-render-dir: <asset-source-extend-dir>/render/<user-name>
+# release **************************************************************************************************************
 # <asset-preview>
 asset-preview-dir: <asset-release-version-dir>/preview
 asset-preview-file: <asset-preview-dir>/<asset-version-name>.mov
@@ -427,7 +437,7 @@ asset-look-klf-dir: <asset-look-dir>/klf
 asset-look-klf-file: <asset-look-klf-dir>/<asset-name>.klf
 # <asset-look-json>
 asset-look-json-dir: <asset-look-dir>/json
-asset-look-json-file: <asset-look-klf-dir>/<asset-name>.json
+asset-look-klf-extra-file: <asset-look-klf-dir>/<asset-name>.json
 # <asset-look-yml>
 asset-look-yml-dir: <asset-look-dir>/yml
 asset-look-yml-file: <asset-look-yml-dir>/<asset-name>.yml
@@ -533,10 +543,15 @@ asset-temporary-katana-render-video-png-file: <asset-temporary-katana-render-out
 asset-temporary-katana-render-video-all-mov-file: <asset-temporary-katana-render-output-dir>/main/all.mov
 #
 asset-temporary-nuke-scene-src-dir: <asset-temporary-version-dir>/scene
-asset-temporary-nuke-scene-src-file: <asset-temporary-maya-scene-src-dir>/<asset-name>.nk
+asset-temporary-nuke-scene-src-file: <asset-temporary-nuke-scene-src-dir>/<asset-name>.nk
 asset-temporary-nuke-scene-dir: <asset-temporary-version-dir>/nuke
-asset-temporary-nuke-scene-file: <asset-temporary-maya-scene-dir>/<asset-name>.nk
+asset-temporary-nuke-scene-file: <asset-temporary-nuke-scene-dir>/<asset-name>.nk
 asset-temporary-nuke-render-output-dir: <asset-temporary-render-dir>/nuke-images
+#
+asset-temporary-clarisse-scene-src-dir: <asset-temporary-version-dir>/scene
+asset-temporary-clarisse-scene-src-file: <asset-temporary-clarisse-scene-src-dir>/<asset-name>.project
+asset-temporary-clarisse-scene-dir: <asset-temporary-version-dir>/clarisse
+asset-temporary-clarisse-scene-file: <asset-temporary-clarisse-scene-dir>/<asset-name>.project
 #
 asset-temporary-asset-set-usd-file: <asset-temporary-set-dir>/usd/<asset-name>.usda
 asset-temporary-shot-set-usd-file: <asset-temporary-set-dir>/usd/<asset-shot-name>.usda
@@ -573,7 +588,7 @@ asset-temporary-texture-tgt-dir: <asset-temporary-version-dir>/texture
 #
 asset-temporary-look-dir: <asset-temporary-version-dir>/look
 asset-temporary-look-klf-file: <asset-temporary-look-dir>/klf/<asset-name>.klf
-asset-temporary-look-json-file: <asset-temporary-look-dir>/klf/<asset-name>.json
+asset-temporary-look-klf-extra-file: <asset-temporary-look-dir>/klf/<asset-name>.json
 #
 asset-temporary-look-yml-dir: <asset-temporary-look-dir>/yml
 asset-temporary-look-yml-file: <asset-temporary-look-yml-dir>/<asset-name>.yml

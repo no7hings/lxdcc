@@ -20,10 +20,6 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 from lxutil_gui.qt import utl_gui_qt_core
 
 
-def get_is_ui_mode():
-    return Configuration.get('KATANA_UI_MODE') == '1'
-
-
 class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def get_current_file_path(cls):
@@ -137,7 +133,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         super(Scene, self).__init__(*args, **kwargs)
 
     def _set_load_by_root_(self, ktn_obj, root, include_obj_type=None):
-        self._scene_graph_opt = ktn_core.KtnSGStageOpt(ktn_obj)
+        self._scene_graph_opt = ktn_core.SGStageOpt(ktn_obj)
         tvl = self._scene_graph_opt._get_traversal_(root)
         while tvl.valid():
             i_obj_path = tvl.getLocationPath()
@@ -154,7 +150,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         obj_type = obj_category.set_type_create(obj_type_name)
         _obj = obj_type.set_obj_create(obj_path)
         #
-        if get_is_ui_mode() is True:
+        if ktn_core.get_is_ui_mode() is True:
             _obj.set_gui_attribute(
                 'icon', utl_gui_qt_core.QtKatanaMtd.get_qt_icon(obj_type_name)
             )
@@ -170,7 +166,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         w = utl_core.DialogWindow.set_create(
             label='Save',
-            content=u'Scene has been modified, Do you want to save change to "{}"'.format(
+            content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                 cls.get_current_file_path()
             ),
             window_size=(480, 160),
@@ -216,7 +212,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         if cls.get_scene_is_dirty() is True:
             w = utl_core.DialogWindow.set_create(
                 label='New',
-                content=u'Scene has been modified, Do you want to save change to "{}"'.format(
+                content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     cls.get_current_file_path()
                 ),
                 window_size=(480, 160),
@@ -229,6 +225,35 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             )
         else:
             no_fnc_()
+    @classmethod
+    def save_file_with_dialog(cls):
+        def yes_fnc_():
+            cls.set_file_save()
+        #
+        def no_fnc_():
+            pass
+        #
+        if cls.get_scene_is_dirty():
+            w = utl_core.DialogWindow.set_create(
+                label='Save Changed',
+                content=(
+                    u'Scene has been modified, Do you want to save changed to "{}"'
+                ).format(
+                    cls.get_current_file_path()
+                ),
+                status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                window_size=(480, 160),
+                #
+                yes_method=yes_fnc_,
+                no_method=no_fnc_,
+                #
+                yes_label='Save',
+                no_label='Don\'t save'
+            )
+
+            result = w.get_result()
+            if result is True:
+                pass
     @classmethod
     def set_file_import(cls, file_path):
         KatanaFile.Import(file_path)

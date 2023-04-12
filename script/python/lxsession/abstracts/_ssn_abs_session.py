@@ -275,6 +275,35 @@ class AbsSsnObj(
             'hook_option.rez.extend_packages'
         ) or []
 
+    def get_is_match_condition(self, match_dict):
+        condition_string = self._configure.get(
+            'rsv-match-condition'
+        )
+        if condition_string:
+            return self._match_fnc_(condition_string, match_dict)
+        return True
+    @classmethod
+    def _match_fnc_(cls, condition_string, match_dict):
+        if condition_string:
+            for i in condition_string.split('&'):
+                i_key, i_condition = i.split('=')
+                if i_key not in match_dict:
+                    continue
+                #
+                i_input = match_dict[i_key]
+                #
+                if not i_input:
+                    return False
+                #
+                if '+' in i_condition:
+                    i_values = i_condition.split('+')
+                    if i_input not in i_values:
+                        return False
+                else:
+                    if i_condition != i_input:
+                        return False
+        return True
+
     def __str__(self):
         return self._configure.get_str_as_yaml_style()
 
@@ -562,7 +591,7 @@ class AbsSsnOptionObj(AbsSsnObj):
     def __str__(self):
         return '{}(type="{}", hook={}, option="{}")'.format(
             self.__class__.__name__,
-            self.type,
+            self._type,
             self.hook,
             self.option
         )
@@ -775,6 +804,9 @@ class AbsSsnOptionMethod(
             f
         )
 
+    def get_batch_name(self):
+        return
+
 
 class AbsSsnRsvDef(object):
     def _set_rsv_def_init_(self):
@@ -799,7 +831,7 @@ class ValidationChecker(object):
     def set_options(self, options):
         self._check_options = options
 
-    def set_node_result_register(self, obj_path, description, check_group, check_status='error'):
+    def register_node_result(self, obj_path, description, check_group, check_status='error'):
         self._check_results.append(
             dict(
                 type='node',
@@ -811,7 +843,7 @@ class ValidationChecker(object):
             )
         )
 
-    def set_node_components_result_register(self, obj_path, elements, description, check_group, check_status='error'):
+    def register_node_components_result(self, obj_path, elements, description, check_group, check_status='error'):
         self._check_results.append(
             dict(
                 type='component',
@@ -823,7 +855,7 @@ class ValidationChecker(object):
             )
         )
 
-    def set_node_files_result_register(self, obj_path, elements, description, check_group, check_status='error'):
+    def register_node_files_result(self, obj_path, elements, description, check_group, check_status='error'):
         self._check_results.append(
             dict(
                 type='file',
@@ -835,7 +867,7 @@ class ValidationChecker(object):
             )
         )
 
-    def set_node_directories_result_register(self, obj_path, elements, description, check_group, check_status='error'):
+    def register_node_directories_result(self, obj_path, elements, description, check_group, check_status='error'):
         self._check_results.append(
             dict(
                 type='directory',
@@ -951,6 +983,62 @@ class ValidationChecker(object):
         return ''.join(list_)
 
 
+class AbsSsnRsvProjectOptionMethod(
+    AbsSsnOptionMethod,
+    AbsSsnRsvDef
+):
+    def __init__(self, *args, **kwargs):
+        super(AbsSsnRsvProjectOptionMethod, self).__init__(*args, **kwargs)
+        self._set_rsv_def_init_()
+
+        self._rsv_project = None
+        self._rsv_properties = None
+
+        option_opt = self.get_option_opt()
+
+        self._batch_name = option_opt.get('batch_name')
+        self._batch_file_path = option_opt.pop('batch_file')
+        self._file_path = option_opt.get('file')
+
+        if self._batch_file_path:
+            self._rsv_project = self._resolver.get_rsv_project_by_any_file_path(self._batch_file_path)
+        else:
+            if self._file_path:
+                self._rsv_project = self._resolver.get_rsv_project_by_any_file_path(self._file_path)
+        #
+        self._rsv_properties = self._rsv_project.properties
+
+        self.__completion_option_by_rsv_properties_()
+
+    def get_ddl_job_name(self):
+        return bsc_core.StgFileOpt(
+            self._file_path
+        ).get_name_base()
+
+    def get_group(self):
+        return self.get_ddl_job_name()
+
+    def get_rsv_project(self):
+        return self._rsv_project
+
+    def get_rsv_properties(self):
+        return self._rsv_properties
+
+    def __completion_option_by_rsv_properties_(self):
+        if self._rsv_properties is not None:
+            option_opt = self.get_option_opt()
+            for i_key in ['project']:
+                if self._rsv_properties.get_key_is_exists(i_key):
+                    option_opt.set(
+                        i_key, self._rsv_properties.get(i_key)
+                    )
+        else:
+            raise RuntimeError()
+
+    def get_batch_name(self):
+        return self._batch_name
+
+
 # session for rsv task deadline job
 class AbsSsnRsvTaskOptionMethod(
     AbsSsnOptionMethod,
@@ -983,7 +1071,7 @@ class AbsSsnRsvTaskOptionMethod(
                     self._file_path
                 )
         #
-        self.__set_option_completion_by_rsv_scene_properties_()
+        self.__completion_option_by_rsv_scene_properties_()
         #
         # print self.get_option_opt()
         # print self.get_option()
@@ -996,7 +1084,7 @@ class AbsSsnRsvTaskOptionMethod(
             if option_opt.get(i_key) is None:
                 option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
 
-    def __set_option_completion_by_rsv_scene_properties_(self):
+    def __completion_option_by_rsv_scene_properties_(self):
         if self._rsv_scene_properties is not None:
             option_opt = self.get_option_opt()
             for i_key in ['project', 'workspace', 'asset', 'shot', 'step', 'task', 'version', 'application']:
@@ -1141,6 +1229,9 @@ class AbsSsnRsvTaskOptionMethod(
     def get_validation_checker(self):
         return self._validation_checker
 
+    def get_batch_name(self):
+        return ''
+
 
 class AbsOptionRsvTaskBatcherSession(
     AbsSsnRsvTaskOptionMethod
@@ -1155,6 +1246,24 @@ class AbsApplicationSession(AbsSsnObj):
 
 
 if __name__ == '__main__':
-    print AbsSsnObj._get_choice_scheme_matched_(
-        'asset-model-maya', ['asset-*-katana']
+    print AbsSsnObj._match_fnc_(
+        'branch=asset&step=srf',
+        {
+            "root": "/production/shows",
+            "project": "nsa_dev",
+            "workspace": "work",
+            "workspace_key": "user",
+            "branch": "asset",
+            "role": "chr",
+            "sequence": "",
+            "asset": "td_test",
+            "shot": "",
+            "step": "srf",
+            "task": "surface",
+            "version": "v000_002",
+            "task_extra": "surface",
+            "version_extra": "",
+            "user": "",
+            "artist": "dongchangbao"
+        }
     )

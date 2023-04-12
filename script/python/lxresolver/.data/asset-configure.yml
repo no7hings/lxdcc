@@ -340,7 +340,7 @@ looks:
             version: latest
     json:
         file:
-            keyword: asset-look-json-file
+            keyword: asset-look-klf-extra-file
             workspace: publish
             version: latest
 #

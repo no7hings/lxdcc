@@ -80,6 +80,7 @@ class GuiNodeGraphOpt(GuiNodeGraphBase):
 
 
 class GuiNodeGraphTabOpt(GuiNodeGraphBase):
+    LAYOUT_NODE_KEY = 'F4331532-D52B-11ED-8C7C-2CFDA1C062BB'
     def __init__(self, ktn_gui=None):
         if ktn_gui is None:
             self._ktn_gui = App.Tabs.FindTopTab('Node Graph')
@@ -92,7 +93,7 @@ class GuiNodeGraphTabOpt(GuiNodeGraphBase):
         )
 
     def set_selection_view_fit(self):
-        self._ktn_gui.frameSelection()
+        self._ktn_gui.frameSelection(zoom=False)
 
     def get_current_group(self):
         return self._ktn_gui.getEnteredGroupNode()
@@ -102,6 +103,11 @@ class GuiNodeGraphTabOpt(GuiNodeGraphBase):
 
     def get_node_graph_opt(self):
         return GuiNodeGraphOpt(self.get_node_graph())
+
+    def add_hot_key(self, shortcut_id, name, shortcut, press_fnc, release_fnc):
+        self._ktn_gui.registerKeyboardShortcut(
+            shortcut_id, name, shortcut, press_fnc, release_fnc
+        )
 
 
 class Modifier(object):

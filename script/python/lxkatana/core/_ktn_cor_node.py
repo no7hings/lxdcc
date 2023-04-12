@@ -1,5 +1,8 @@
 # coding:utf-8
+import re
+
 import six
+
 from ._ktn_cor_utility import *
 
 
@@ -45,7 +48,7 @@ class KtnSGObjOpt(object):
             rcs_fnc_(key)
 
 
-class KtnSGStageOpt(object):
+class SGStageOpt(object):
     OBJ_PATHSEP = '/'
     PORT_PATHSEP = '.'
     #
@@ -380,6 +383,8 @@ class NGLayoutOpt(object):
         if not self._graph_dict:
             return
         #
+        use_one_by_one = self._option.get('use_one_by_one', False)
+        #
         w, h = self._size
         ort, drt_h, drt_v = self._scheme
         #
@@ -405,27 +410,28 @@ class NGLayoutOpt(object):
                     j_leaf_key = (i_root_index, j_leaf_name)
                     j_leaf_branch_names = self._leaf_branch_names_dict[j_leaf_key]
                     j_c = len(j_leaf_branch_names)
-                    if j_c == 1:
-                        j_leaf_branch_name = j_leaf_branch_names[0]
-                        j_leaf_branch_key = (i_root_index, j_leaf_branch_name)
-                        j_branch_leaf_names = self._branch_leaf_names_dict.get(j_leaf_branch_key, set())
-                        if len(j_branch_leaf_names) == 1:
-                            if j_leaf_branch_key in position_dict:
-                                j_x_, j_y_ = position_dict[j_leaf_branch_key]
-                                if ort == self.Orientation.Horizontal:
-                                    j_y = j_y_
-                                elif ort == self.Orientation.Vertical:
-                                    j_x = j_x_
-                    else:
-                        j_leaf_branch_name = self._get_leaf_branch_name_(i_root_index, j_leaf_branch_names)
-                        if j_leaf_branch_name is not None:
+                    if use_one_by_one is True:
+                        if j_c == 1:
+                            j_leaf_branch_name = j_leaf_branch_names[0]
                             j_leaf_branch_key = (i_root_index, j_leaf_branch_name)
-                            if j_leaf_branch_key in position_dict:
-                                j_x_, j_y_ = position_dict[j_leaf_branch_key]
-                                if ort == self.Orientation.Horizontal:
-                                    j_y = j_y_
-                                elif ort == self.Orientation.Vertical:
-                                    j_x = j_x_
+                            j_branch_leaf_names = self._branch_leaf_names_dict.get(j_leaf_branch_key, set())
+                            if len(j_branch_leaf_names) == 1:
+                                if j_leaf_branch_key in position_dict:
+                                    j_x_, j_y_ = position_dict[j_leaf_branch_key]
+                                    if ort == self.Orientation.Horizontal:
+                                        j_y = j_y_
+                                    elif ort == self.Orientation.Vertical:
+                                        j_x = j_x_
+                        else:
+                            j_leaf_branch_name = self._get_leaf_branch_name_(i_root_index, j_leaf_branch_names)
+                            if j_leaf_branch_name is not None:
+                                j_leaf_branch_key = (i_root_index, j_leaf_branch_name)
+                                if j_leaf_branch_key in position_dict:
+                                    j_x_, j_y_ = position_dict[j_leaf_branch_key]
+                                    if ort == self.Orientation.Horizontal:
+                                        j_y = j_y_
+                                    elif ort == self.Orientation.Vertical:
+                                        j_x = j_x_
                     #
                     position_dict[j_leaf_key] = (j_x, j_y)
         #
@@ -557,15 +563,24 @@ class NGObjOpt(object):
         parent_name = parent_opt.get_name()
         ktn_obj = NodegraphAPI.GetNode(name)
         if ktn_obj is None:
-            parent = cls(parent_name)
+            parent_opt = cls(parent_name)
             if type_name in {'NetworkMaterial'}:
-                exists_materials = parent.get_children(include_type_names=['NetworkMaterial'])
-                if len(exists_materials) == 1:
-                    default_material = exists_materials[0]
-                    if fnmatch.filter([default_material.getName()], 'NetworkMaterial*'):
-                        cls(default_material).set_rename(name)
-                        return default_material, True
-                return cls._get_create_args_(path, type_name)
+                # rename exists
+                materials_exists = parent_opt.get_children(include_type_names=['NetworkMaterial'])
+                if len(materials_exists) == 1:
+                    material_default = materials_exists[0]
+                    if fnmatch.filter([material_default.getName()], 'NetworkMaterial*'):
+                        cls(material_default).set_rename(name)
+                        return material_default, True
+                    else:
+                        parent_opt._ktn_obj.addNetworkMaterialNode()
+                else:
+                    parent_opt._ktn_obj.addNetworkMaterialNode()
+                #
+                materials_exists = parent_opt.get_children(include_type_names=['NetworkMaterial'])
+                material_add = materials_exists[-1]
+                cls(material_add).set_rename(name)
+                return material_add, True
             elif type_name in {'ArnoldShadingNode'}:
                 return cls._get_shader_create_args_(path, type_name, shader_type_name)
             return ktn_obj, True
@@ -706,7 +721,7 @@ class NGObjOpt(object):
     path = property(get_path)
 
     def get_name(self):
-        return self.ktn_obj.getName()
+        return self._ktn_obj.getName()
     name = property(get_name)
 
     def set_rename(self, new_name):
@@ -719,7 +734,7 @@ class NGObjOpt(object):
         self._ktn_obj.setName(new_name)
 
     def get_stage_opt(self):
-        return KtnSGStageOpt(
+        return SGStageOpt(
             self._ktn_obj
         )
 
@@ -990,7 +1005,7 @@ class NGObjOpt(object):
         #
         rcs_fnc_(self._ktn_obj, name, start_depth, start_index)
         return branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
-
+    @Modifier.undo_run
     def gui_layout_shader_graph(self, scheme=(NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
         graph_dara = self.get_gui_layout_data(inner=True, size=size)
         #
@@ -1001,10 +1016,10 @@ class NGObjOpt(object):
             option=dict(
                 expanded=expanded,
                 collapsed=collapsed,
-                shader_view_state=shader_view_state
+                shader_view_state=shader_view_state,
             )
         ).run()
-    @Modifier.undo_debug_run
+    @Modifier.undo_run
     def gui_layout_node_graph(self, scheme=(NGLayoutOpt.Orientation.Vertical, NGLayoutOpt.Direction.LeftToRight, NGLayoutOpt.Direction.BottomToTop), size=(320, 40)):
         graph_dara = self.get_gui_layout_data(
             inner=True,
@@ -1015,21 +1030,27 @@ class NGObjOpt(object):
             graph_dara,
             scheme=scheme,
             size=size,
+            option=dict(
+                use_one_by_one=True
+            )
         ).run()
+
+    def get_port_is_exists(self, port_path):
+        return self.ktn_obj.getParameter(port_path) is not None
 
     def get_port_raw(self, port_path):
         port = self.ktn_obj.getParameter(port_path)
         if port:
             return NGPortOpt(port).get()
 
-    def set_port_raw(self, port_path, raw):
+    def set_port_raw(self, port_path, raw, ignore_changed=False):
         port = self.ktn_obj.getParameter(port_path)
         if port:
             NGPortOpt(port).set(raw)
 
-    def set(self, key, value):
+    def set(self, key, value, ignore_changed=False):
         key = key.replace('/', '.')
-        self.set_port_raw(key, value)
+        self.set_port_raw(key, value, ignore_changed)
 
     def get(self, key):
         key = key.replace('/', '.')
@@ -1501,6 +1522,17 @@ class NGObjOpt(object):
         if parent:
             return self.__class__(parent)
 
+    def get_ancestors(self):
+        def rcs_fnc_(n_):
+            _p = n_.getParent()
+            if _p is not None:
+                list_.append(_p)
+                rcs_fnc_(_p)
+
+        list_ = []
+        rcs_fnc_(self._ktn_obj)
+        return list_
+
     def get_attributes(self):
         return self._ktn_obj.getAttributes()
 
@@ -1798,6 +1830,189 @@ class NGObjOpt(object):
     def get_variable_data(self):
         pass
 
+    def get_is_bypassed(self, ancestors=False):
+        if self._ktn_obj.isBypassed() is True:
+            return True
+        #
+        if ancestors is False:
+            return False
+        #
+        _ = self.get_ancestors()
+        if _:
+            for i in _:
+                if i.isBypassed():
+                    return True
+        return False
+
+    def update_cell(self, key, value):
+        p = '[(](.*?)[)]'
+        value_pre = self.get(key)
+        if value_pre:
+            _ = re.findall(p, value_pre)
+            if _:
+                value_cur = '({} {})'.format(_[0], value)
+            else:
+                value_cur = '({} {})'.format(value_pre, value)
+        else:
+            value_cur = value
+        #
+        self.set(key, value_cur)
+
+    def __str__(self):
+        return '{}(path="{}")'.format(
+            self.get_type_name(), self.get_path()
+        )
+
+
+class NGGuiLayout(object):
+    def __init__(self, ktn_objs):
+        self._ktn_objs = ktn_objs
+
+    def layout_shader_graph(self, scheme=(NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
+        graph_dara = self.get_gui_layout_data(inner=False, size=size)
+        #
+        NGLayoutOpt(
+            graph_dara,
+            scheme=scheme,
+            size=size,
+            option=dict(
+                expanded=expanded,
+                collapsed=collapsed,
+                shader_view_state=shader_view_state,
+            )
+        ).run()
+
+    def get_gui_layout_data(self, **kwargs):
+        def rcs_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
+            if skip_base_type_names:
+                base_type_name = ktn_obj_.getBaseType()
+                if base_type_name in skip_base_type_names:
+                    return
+            if hasattr(ktn_obj_, 'getChildren'):
+                _branch_name = ktn_obj_.getName()
+                outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
+                # inner
+                if inner is True:
+                    # reset start to 0
+                    _root_name = ktn_obj_.getName()
+                    _start_index = 0
+                    inner_fnc_(ktn_obj_, _root_name, _branch_name, root_index_, _start_index)
+            else:
+                _branch_name = ktn_obj_.getName()
+                outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
+        #
+        def outer_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
+            _source_ktn_objs = NGObjOpt(ktn_obj_).get_source_objs()
+            #
+            if _source_ktn_objs:
+                branch_index_ += 1
+                add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
+        #
+        def inner_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
+            root_index_ += 1
+            #
+            _source_ktn_objs = NGObjOpt._get_source_objs_inner_(ktn_obj_)
+            if _source_ktn_objs:
+                branch_index_ += 1
+                add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
+        #
+        def add_fnc_(ktn_objs_, root_name_, branch_name_, root_index_, branch_index_):
+            _graph_key_cur = (root_index_, branch_index_, root_name_)
+            _size_key_cur = (root_index_, root_name_)
+            #
+            if _size_key_cur not in size_dict:
+                _h_in_cur = {}
+                size_dict[_size_key_cur] = _h_in_cur
+            else:
+                _h_in_cur = size_dict[_size_key_cur]
+            #
+            if _graph_key_cur not in graph_dict:
+                _graph_data_in_cur = []
+                graph_dict[_graph_key_cur] = _graph_data_in_cur
+            else:
+                _graph_data_in_cur = graph_dict[_graph_key_cur]
+            #
+            _branch_key = (root_index_, branch_name_)
+            for _i_sub_index, _i_ktn_obj in enumerate(ktn_objs_):
+                _i_ktn_obj_opt = NGObjOpt(_i_ktn_obj)
+                _i_type_name = _i_ktn_obj.getType()
+                _i_leaf_name = _i_ktn_obj.getName()
+                _i_w = _i_ktn_obj_opt.get('gui_layout.size.w') or w
+                _i_h = _i_ktn_obj_opt.get('gui_layout.size.h') or h
+                #
+                if branch_index_ in _h_in_cur:
+                    _i_h_pre = _h_in_cur[branch_index_]
+                    if _i_h > _i_h_pre:
+                        _h_in_cur[branch_index_] = _i_h
+                else:
+                    _h_in_cur[branch_index_] = _i_h
+                #
+                _i_branch_index_key_cur = (root_index_, _i_leaf_name)
+                if _i_branch_index_key_cur not in leaf_branch_name_dict:
+                    leaf_branch_name_dict[_i_branch_index_key_cur] = branch_name_
+                #
+                _i_graph_key_cur = _graph_key_cur
+                # break the self-cycle
+                if _i_leaf_name != root_name_:
+                    # try move to end
+                    _i_leaf_key = (root_index_, _i_leaf_name)
+                    leaf_branch_names_dict.setdefault(
+                        _i_leaf_key, []
+                    ).append(branch_name_)
+                    branch_leaf_names_dict.setdefault(
+                        _branch_key, []
+                    ).append(_i_leaf_name)
+                    if _i_leaf_key in leaf_branch_index_dict:
+                        _i_branch_index_cur = branch_index_
+                        _i_index_pre = leaf_branch_index_dict[_i_leaf_key]
+                        if _i_index_pre < _i_branch_index_cur:
+                            _i_graph_key_pre = (root_index_, _i_index_pre, root_name_)
+                            if _i_graph_key_pre in graph_dict:
+                                _graph_data_in_index_pre = graph_dict[_i_graph_key_pre]
+                                if _i_leaf_name in _graph_data_in_index_pre:
+                                    _graph_data_in_index_pre.remove(_i_leaf_name)
+                                    _graph_data_in_cur.append(_i_leaf_name)
+                                    leaf_branch_index_dict[_i_leaf_key] = _i_branch_index_cur
+                    else:
+                        leaf_branch_index_dict[_i_leaf_key] = branch_index_
+                        #
+                        _graph_data_in_cur.append(_i_leaf_name)
+                    #
+                    rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
+        #
+        inner = kwargs.get('inner', False)
+        skip_base_type_names = kwargs.get('skip_base_type_names', [])
+        w, h = kwargs.get('size', [320, 40])
+        #
+        leaf_branch_name_dict = {
+            # (root_index, leaf_name): branch_name
+        }
+        #
+        branch_leaf_names_dict = {
+            # (root_index, branch_name): [leaf_name, ...]
+        }
+        leaf_branch_names_dict = {
+            # (root_index, leaf_name): [branch_name, ...]
+        }
+        #
+        leaf_branch_index_dict = {
+            # (root_index, leaf_name): branch_index
+        }
+        size_dict = {
+
+        }
+        graph_dict = {
+            # (root_index, branch_index, root_name): [name, ...]
+        }
+        #
+        for i_ktn_obj in self._ktn_objs:
+            i_name = i_ktn_obj.getName()
+            i_start_depth = 0
+            i_start_index = 0
+            #
+            rcs_fnc_(i_ktn_obj, i_name, i_start_depth, i_start_index)
+        return branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
+
 
 class NGObjsOpt(object):
     def __init__(self, type_name=None):
@@ -1821,11 +2036,16 @@ class NGObjsMtd(object):
     class MatchMode(object):
         One = 0
         All = 1
-
     @classmethod
-    def find_nodes_by_port_filters(cls, type_name, filters, match_mode=MatchMode.All):
+    def find_nodes(cls, type_name, ignore_bypassed=False):
+        _ = NodegraphAPI.GetAllNodesByType(type_name) or []
+        if ignore_bypassed is False:
+            return _
+        return [i for i in _ if NGObjOpt(i).get_is_bypassed(ancestors=True) is False]
+    @classmethod
+    def find_nodes_by_port_filters(cls, type_name, filters, match_mode=MatchMode.All, ignore_bypassed=False):
         list_ = []
-        for i in NodegraphAPI.GetAllNodesByType(type_name) or []:
+        for i in cls.find_nodes(type_name, ignore_bypassed=ignore_bypassed):
             if filters:
                 if match_mode == cls.MatchMode.One:
                     for j_p_p, j_v in filters:

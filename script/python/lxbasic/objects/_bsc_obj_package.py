@@ -216,6 +216,16 @@ class PackageContextNew(object):
 
     def get_args(self, packages_extend=None, beta_enable=False):
         return self._get_packages(packages_extend, beta_enable)
+    @classmethod
+    def convert_args_execute(cls, args_execute=None):
+        if isinstance(args_execute, (set, tuple, list)):
+            # replace first argument to "--join-cmd", etc. "-- maya", "-c maya" to "--join-cmd maya"
+            args_execute = [
+                '--join-cmd' if x_seq == 0 and y_seq == 0 and y in ['--', '-c'] else y
+                for x_seq, x in enumerate(args_execute)
+                for y_seq, y in enumerate(x.split(' '))
+            ]
+        return args_execute
 
     def get_command(self, args_execute=None, packages_extend=None, beta_enable=False):
         if isinstance(args_execute, (set, tuple, list)):

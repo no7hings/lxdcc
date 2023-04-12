@@ -10,6 +10,12 @@ class HookExecutor(ssn_abstracts.AbsHookExecutor):
         super(HookExecutor, self).__init__(*args, **kwargs)
 
 
+class RsvProjectHookExecutor(ssn_abstracts.AbsRsvProjectMethodHookExecutor):
+    SUBMITTER_CLASS = ddl_objects.DdlRsvProjectSubmiter
+    def __init__(self, *args, **kwargs):
+        super(RsvProjectHookExecutor, self).__init__(*args, **kwargs)
+
+
 class RsvTaskHookExecutor(ssn_abstracts.AbsRsvTaskMethodHookExecutor):
     SUBMITTER_CLASS = ddl_objects.DdlRsvTaskSubmiter
     def __init__(self, *args, **kwargs):

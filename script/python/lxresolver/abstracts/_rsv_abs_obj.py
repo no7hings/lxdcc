@@ -1385,7 +1385,7 @@ class AbsRsvTask(
         if storage_scheme == 'default':
             bsc_core.StgExtraMtd.create_directory(directory_path)
         elif storage_scheme == 'rpc':
-            bsc_core.StgExtraMtd.create_directory_use_rpc(directory_path)
+            bsc_core.StgRpcMtd.create_directory(directory_path)
 
 
 # <rsv-step>

@@ -30,44 +30,26 @@ def get_hook_args(key):
                     hook=key,
                     configure=configure
                 )
-            elif type_name == 'tool-panel':
-                session = ssn_objects.GuiSession(
-                    type=type_name,
-                    hook=key,
-                    configure=configure
-                )
             elif type_name == 'kit-panel':
-                session = ssn_objects.OptionGuiSession(
-                    type=type_name,
-                    hook=key,
-                    configure=configure
-                )
-            elif type_name == 'rsv-loader':
                 session = ssn_objects.GuiSession(
                     type=type_name,
                     hook=key,
                     configure=configure
                 )
-            elif type_name == 'rsv-publisher':
-                session = ssn_objects.GuiSession(
+            elif type_name in {
+                'tool',
+                'dcc-tool',
+            }:
+                session = ssn_objects.ToolSession(
                     type=type_name,
                     hook=key,
                     configure=configure
                 )
-            elif type_name == 'rsv-loader-test':
-                session = ssn_objects.GuiSession(
-                    type=type_name,
-                    hook=key,
-                    configure=configure
-                )
-            #
-            elif type_name == 'dcc-menu':
-                session = ssn_objects.GuiSession(
-                    type=type_name,
-                    hook=key,
-                    configure=configure
-                )
-            elif type_name == 'dcc-tool-panel':
+            elif type_name in {
+                'tool-panel', 'kit-panel',
+                'dcc-tool-panel', 'dcc-menu',
+                'rsv-tool-panel', 'rsv-loader', 'rsv-publisher'
+            }:
                 session = ssn_objects.GuiSession(
                     type=type_name,
                     hook=key,
@@ -167,14 +149,14 @@ def get_option_hook_args(option):
                     configure=configure,
                     option=option_opt.to_string()
                 )
-            elif type_name == 'rsv-task-method':
-                session = ssn_objects.RsvTaskMethodSession(
+            elif type_name in {'rsv-project-batcher', 'rsv-project-method'}:
+                session = ssn_objects.RsvProjectMethodSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,
                     option=option_opt.to_string()
                 )
-            elif type_name == 'rsv-task-batcher':
+            elif type_name in {'rsv-task-batcher', 'rsv-task-method'}:
                 session = ssn_objects.RsvTaskMethodSession(
                     type=type_name,
                     hook=option_hook_key,

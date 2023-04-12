@@ -360,12 +360,19 @@ class StgConnector(object):
         """
         step = kwargs['step']
         step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
-        return self._shotgun.find_one(
+        kwargs['step'] = step
+        #
+        results = self._shotgun.find(
             entity_type='Step',
             filters=[
                 ['short_name', 'is', step],
-            ]
+            ],
+            fields=['short_name']
         )
+        if results:
+            results = [i for i in results if i['short_name'] == step]
+            if results:
+                return results[0]
 
     def get_stg_step_query(self, **kwargs):
         """
@@ -811,18 +818,18 @@ class StgConnector(object):
                 return stg_entity_query
 
     def get_stg_all_version_types(self):
-        c = self.get_stg_entity_scheme(
+        _ = self.get_stg_entity_scheme(
             'Version', 'sg_version_type'
         )
-        if c is not None:
-            return c.get('sg_version_type.properties.valid_values.value')
+        if _ is not None:
+            return _.get('sg_version_type.properties.valid_values.value')
 
     def get_stg_all_version_status(self):
-        c = self.get_stg_entity_scheme(
+        _ = self.get_stg_entity_scheme(
             'Version', 'sg_status_list'
         )
-        if c is not None:
-            return c.get('sg_status_list.properties.valid_values.value')
+        if _ is not None:
+            return _.get('sg_status_list.properties.valid_values.value')
 
     def find_task_id(self, project, resource, task):
         for i_branch in ['asset', 'sequence', 'shot']:
@@ -843,6 +850,25 @@ class StgConnector(object):
             if i_task is None:
                 continue
             return i_task['id']
+
+    def find_task(self, project, resource, task):
+        for i_branch in ['asset', 'sequence', 'shot']:
+            i_kwargs = {'project': project, i_branch: resource}
+            i_stg_resource = self.get_stg_resource(
+                **i_kwargs
+            )
+            if i_stg_resource is None:
+                continue
+            #
+            i_task = self._shotgun.find_one(
+                entity_type='Task',
+                filters=[
+                    ['entity', 'is', i_stg_resource],
+                    ['content', 'is', task],
+                ]
+            )
+            if i_task is not None:
+                return i_task
 
 
 if __name__ == '__main__':

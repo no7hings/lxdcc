@@ -9,6 +9,13 @@ class DdlSubmiter(ddl_obj_abs.AbsDdlSubmiter):
         super(DdlSubmiter, self).__init__(*args, **kwargs)
 
 
+class DdlRsvProjectSubmiter(ddl_obj_abs.AbsDdlSubmiter):
+    CON = CON
+    CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('session/deadline/rsv-project-submiter')
+    def __init__(self, *args, **kwargs):
+        super(DdlRsvProjectSubmiter, self).__init__(*args, **kwargs)
+
+
 class DdlRsvTaskSubmiter(ddl_obj_abs.AbsDdlSubmiter):
     CON = CON
     CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('session/deadline/rsv-task-submiter')

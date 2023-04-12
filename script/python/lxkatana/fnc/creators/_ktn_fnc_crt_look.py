@@ -14,7 +14,6 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
     def __init__(self, option=None):
         super(LookWorkspaceCreator, self).__init__(option)
         #
-        print self.get('location')
         self._ktn_workspace = ktn_dcc_objects.AssetWorkspace(
             self.get('location')
         )

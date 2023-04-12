@@ -55,7 +55,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     def _get_katana_is_ui_mode_(cls):
         return Configuration.get('KATANA_UI_MODE')
 
-    def __set_file_export_(self, source_port, file_path, frame, camera_location):
+    def __set_file_export_(self, group_path, source_port, file_path, frame, camera_location):
         file_obj = utl_dcc_objects.OsFile(file_path)
         #
         file_obj.create_directory()
@@ -63,10 +63,10 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         path_base = file_obj.path_base
         ext = file_obj.ext
         #
-        merge_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__merge')
-        camera_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__camera')
-        render_settings_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__render_settings')
-        arnold_render_settings_node = ktn_dcc_objects.Node('/rootNode/look_ass_export__arnold_render_settings')
+        merge_node = ktn_dcc_objects.Node('{}/look_ass_export__merge'.format(group_path))
+        camera_node = ktn_dcc_objects.Node('{}/look_ass_export__camera'.format(group_path))
+        render_settings_node = ktn_dcc_objects.Node('{}/look_ass_export__render_settings'.format(group_path))
+        arnold_render_settings_node = ktn_dcc_objects.Node('{}/look_ass_export__arnold_render_settings'.format(group_path))
         #
         merge_node.get_dcc_instance('Merge')
         camera_node.get_dcc_instance('CameraCreate')
@@ -162,10 +162,10 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         u'file="{}"'.format(file_path)
                     )
         #
-        # merge_node.set_delete()
-        # camera_node.set_delete()
-        # render_settings_node.set_delete()
-        # arnold_render_settings_node.set_delete()
+        merge_node.set_delete()
+        camera_node.set_delete()
+        render_settings_node.set_delete()
+        arnold_render_settings_node.set_delete()
 
     def __set_export_(self, file_path, frame, location):
         usd_file_path = self.get('usd_file')
@@ -183,12 +183,13 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             look_pass_node = ktn_dcc_objects.Node(look_pass_node)
         #
         if look_pass_node.get_is_exists() is True:
+            group_path = look_pass_node.get_parent_path()
             input_port = look_pass_node.get_input_port(look_pass_name)
             if input_port:
                 source_port = input_port.get_source()
                 if source_port is not None:
                     self.__set_file_export_(
-                        source_port, file_path, frame, camera_location
+                        group_path, source_port, file_path, frame, camera_location
                     )
 
 

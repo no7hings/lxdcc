@@ -24,11 +24,11 @@ class AbsHookExecutor(object):
         session = self.get_session()
 
         name = session.get_type()
-        return self._set_deadline_submit_(
+        return self._submit_deadline_job_(
             session, name, dict(platform=bsc_core.SystemMtd.get_platform())
         )
 
-    def _set_deadline_submit_(self, session, name, option_extra_dict):
+    def _submit_deadline_job_(self, session, name, option_extra_dict):
         hook_option_opt = session.get_option_opt()
         hook_option = session.get_option()
         option_hook_key = hook_option_opt.get('option_hook_key')
@@ -37,6 +37,7 @@ class AbsHookExecutor(object):
         #
         self._ddl_submiter = self.SUBMITTER_CLASS()
         self._ddl_submiter.set_option(
+            batch_name=session.get_batch_name(),
             type=session.get_type(),
             name=name,
             group=session.get_group(),
@@ -66,12 +67,13 @@ class AbsHookExecutor(object):
             self._ddl_submiter.job_info.set(
                 'Frames', ','.join(map(str, range(len(batch_list))))
             )
-        #
+        # check is render mode
         renderer = hook_option_opt.get('renderer')
-        if renderer:
+        render_node = hook_option_opt.get('render_node')
+        if renderer or render_node:
             render_output_directory_path = hook_option_opt.get('render_output_directory')
             if render_output_directory_path:
-                self._ddl_submiter.option.set('deadline.output_file', render_output_directory_path)
+                self._ddl_submiter.option.set('deadline.output_directory', render_output_directory_path)
             #
             render_frames = hook_option_opt.get('render_frames', as_array=True)
             if render_frames:
@@ -82,7 +84,7 @@ class AbsHookExecutor(object):
             file_path = hook_option_opt.get('file')
             if file_path:
                 self._ddl_submiter.option.set('deadline.output_file', file_path)
-        # Priority
+        # priority
         deadline_priority = hook_option_opt.get('deadline_priority')
         if deadline_priority is not None:
             self._ddl_submiter.job_info.set('Priority', int(deadline_priority))
@@ -231,25 +233,42 @@ class AbsHookExecutor(object):
         return command
 
 
+class AbsRsvProjectMethodHookExecutor(AbsHookExecutor):
+    def __init__(self, *args, **kwargs):
+        super(AbsRsvProjectMethodHookExecutor, self).__init__(*args, **kwargs)
+
+    def execute_with_deadline(self):
+        session = self.get_session()
+        rsv_properties = session.get_rsv_properties()
+        if rsv_properties:
+            job_name = session.get_ddl_job_name()
+            return self._submit_deadline_job_(
+                session, job_name, rsv_properties.value
+            )
+
+    def set_run(self):
+        return self.execute_with_deadline()
+
+
 class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
     def __init__(self, *args, **kwargs):
         super(AbsRsvTaskMethodHookExecutor, self).__init__(*args, **kwargs)
 
     def execute_with_deadline(self):
         session = self.get_session()
+        resolver = rsv_commands.get_resolver()
         #
         hook_option_opt = session.get_option_opt()
         #
         scene_file_path = hook_option_opt.get('file')
-        resolver = rsv_commands.get_resolver()
         #
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
             file_path=scene_file_path
         )
         if rsv_scene_properties:
-            name = session._get_rsv_task_version_(rsv_scene_properties)
-            return self._set_deadline_submit_(
-                session, name, rsv_scene_properties.value
+            job_name = session._get_rsv_task_version_(rsv_scene_properties)
+            return self._submit_deadline_job_(
+                session, job_name, rsv_scene_properties.value
             )
 
     def set_run(self):

@@ -86,23 +86,23 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         else:
             raise RuntimeError()
         #
-        self._and_obj_universe = obj_scene.universe
+        self._and_universe = obj_scene.universe
     @mya_modifiers.set_undo_mark_mdf
     def set_run(self):
         self.__set_look_create_()
 
     def __set_look_create_(self):
         # geometry
-        mesh_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
+        mesh_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
         mesh_and_objs = mesh_and_type.get_objs() if mesh_and_type is not None else []
-        curve_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
+        curve_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
         curve_and_objs = curve_and_type.get_objs() if curve_and_type is not None else []
-        xgen_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
+        xgen_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
         geometry_and_objs = mesh_and_objs + curve_and_objs + xgen_and_objs
         # material
-        material_and_type = self._and_obj_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
+        material_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
         if material_and_type is not None:
             material_and_objs = material_and_type.get_objs()
             #
@@ -175,7 +175,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         for i_shader_and_bind_port_name in convert_dict.keys():
             raw = material_and_obj.get_input_port(i_shader_and_bind_port_name).get()
             if raw is not None:
-                shader_and_obj = self._and_obj_universe.get_obj(raw)
+                shader_and_obj = self._and_universe.get_obj(raw)
                 shader_dcc_obj, is_create = self.__set_material_shader_create_(shader_and_obj)
                 if shader_dcc_obj is not None:
                     # debug
@@ -447,7 +447,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         material_assigns = geometry_and_obj_opt.get_material_assigns()
         for k, v in material_assigns.items():
             for i in v:
-                i_and_material = self._and_obj_universe.get_obj(i)
+                i_and_material = self._and_universe.get_obj(i)
                 i_and_material_name = i_and_material.name
                 i_dcc_material = i_and_material_name
                 geometry_dcc_obj_opt.set_material(i_dcc_material)

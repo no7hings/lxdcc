@@ -10,8 +10,17 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         from lxutil import utl_core
 
         import lxutil.dcc.dcc_objects as utl_dcc_objects
+
+        from lxkatana import ktn_core
+
+        import lxkatana.scripts as ktn_scripts
         #
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        w_s = ktn_core.WorkspaceSetting()
+        opt = w_s.get_current_look_output_opt_force()
+        if opt is None:
+            return
+        #
+        s = ktn_scripts.ScpLookOutput(opt)
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -34,7 +43,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version, extend_variants=dict(var='hi')
         )
         #
-        geometry_uv_map_usd_source_file_path = ktn_dcc_objects.AssetWorkspace().get_geometry_uv_map_usd_source_file()
+        geometry_uv_map_usd_source_file_path = s.get_geometry_uv_map_usd_source_file()
         if geometry_uv_map_usd_source_file_path:
             utl_dcc_objects.OsFile(geometry_uv_map_usd_source_file_path).set_copy_to_file(
                 geometry_usd_var_file_path

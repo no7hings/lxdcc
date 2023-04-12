@@ -247,7 +247,7 @@ if __name__ == '__main__':
     c = get_menu_content_by_hook_options_(
         [
             {
-                'option_hook_key=dtb-panels/asset-look-library&category=texture': {'gui_parent': '/Asset', 'gui_icon_name': 'window/loader'}
+                'option_hook_key=dtb-panels/resource-library&category=texture': {'gui_parent': '/Asset', 'gui_icon_name': 'window/loader'}
             }
         ]
     )

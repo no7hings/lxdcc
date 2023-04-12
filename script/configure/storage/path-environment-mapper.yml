@@ -1,0 +1,13 @@
+windows:
+    PG_PROJ_ROOT:
+        - 'l:/prod'
+        - 'L:/prod'
+    PAPER_PRODUCTION:
+        - 'x:/shows'
+        - 'X:/shows'
+
+linux:
+    PG_PROJ_ROOT:
+        - '/l/prod'
+    PAPER_PRODUCTION:
+        - '/production/shows'

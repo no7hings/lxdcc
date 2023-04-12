@@ -1,5 +1,8 @@
 option:
+    batch_name: ''
+    #
     type: ''
+    # use version name
     name: ''
     # use version name
     group: ''

@@ -210,6 +210,7 @@ class AbsRsvObjHookOpt(object):
 
     def get_asset_model_act_frame_range(self):
         import lxutil.scripts as utl_scripts
+        #
         rsv_asset = self._rsv_task.get_rsv_resource()
         model_act_rsv_task = rsv_asset.get_rsv_task(
             step='mod',

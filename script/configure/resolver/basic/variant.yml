@@ -96,7 +96,7 @@ shot_steps:
     light_rig: lgtrig
     #
     digital_matte_paint: dmp
-    compostion: cmp
+    composition: cmp
     #
     set_dressing: set
 # step extra

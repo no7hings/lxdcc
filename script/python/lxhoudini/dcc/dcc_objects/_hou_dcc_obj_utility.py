@@ -114,7 +114,7 @@ class Scene(utl_abstract.AbsDccScene):
         if cls.get_scene_is_dirty() is True:
             w = utl_core.DialogWindow.set_create(
                 label='New',
-                content=u'Scene has been modified, Do you want to save change to "{}"'.format(
+                content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     cls.get_current_file_path()
                 ),
                 window_size=(480, 160),

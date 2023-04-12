@@ -1,7 +1,9 @@
 # coding:utf-8
+import os.path
+
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_log, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
+from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_time, _bsc_cor_log, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
 
 
 class StgRpcMtd(object):
@@ -14,7 +16,7 @@ class StgRpcMtd(object):
             'http://{0}:{1}'.format(cls.RPC_SERVER, cls.RPC_PORT+port_addition)
         )
     @classmethod
-    def create_directories(cls, directory_path, mode='1777'):
+    def create_directory(cls, directory_path, mode='775'):
         units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(directory_path)
         units.reverse()
         list_ = []
@@ -24,39 +26,148 @@ class StgRpcMtd(object):
                     list_.append(i_path)
         #
         for i in list_:
-            cls.create_directory(i, mode)
+            cls._create_directory_fnc_(i, mode)
     @classmethod
-    def create_directory(cls, directory_path, mode='1777'):
-        # noinspection PyUnresolvedReferences
-        from cosmos.rpc import client
-        clt = client.generate_client()
-        timeout = 25
-        start_time = time.time()
-        if os.path.isdir(directory_path) is False:
-            clt.makedirs(directory_path, mode)
+    def _create_directory_fnc_(cls, directory_path, mode='775'):
+        key = 'rpc create directory'
+        if os.path.exists(directory_path) is False:
+            timeout = 25
             cost_time = 0
-            parent_path = StgPathMtd.get_parent(directory_path)
-            while os.path.isdir(directory_path) is False:
+            start_time = time.time()
+            # noinspection PyUnresolvedReferences
+            from cosmos.rpc import client
+            clt = client.generate_client()
+            clt.makedir(directory_path, mode)
+            p = os.path.dirname(directory_path)
+            while os.path.exists(directory_path) is False:
                 cost_time = int(time.time() - start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
                         _bsc_cor_log.LogMtd.trace_method_error(
-                            'create-directory by rpc',
-                            'directory="{}" is timeout, cost time {}s'.format(directory_path, cost_time)
+                            key,
+                            'path="{}" is timeout, cost time {}s'.format(directory_path, cost_time)
+                        )
+                    )
+                #
+                if SystemMtd.get_is_linux():
+                    os.system('ls {}'.format(p))
+                #
+                time.sleep(1)
+            #
+            _bsc_cor_log.LogMtd.trace_method_result(
+                key,
+                'path="{}" is cost time {}s'.format(directory_path, cost_time)
+            )
+            # noinspection PyArgumentEqualDefault
+            cls.change_owner(
+                directory_path,
+                user='artist', group='artists'
+            )
+        return True
+    @classmethod
+    def remove_file(cls, file_path):
+        if os.path.exists(file_path) is True:
+            timeout = 25
+            cost_time = 0
+            start_time = time.time()
+            # noinspection PyUnresolvedReferences
+            from cosmos.rpc import client
+            clt = client.generate_client()
+            clt.rm_file(file_path)
+            while os.path.exists(file_path) is False:
+                cost_time = int(time.time()-start_time)
+                if cost_time > timeout:
+                    raise RuntimeError(
+                        _bsc_cor_log.LogMtd.trace_method_error(
+                            'rpc remove file',
+                            'file="{}" is timeout, cost time {}s'.format(file_path, cost_time)
                         )
                     )
                 #
                 time.sleep(1)
-                #
-                # subprocess.Popen(
-                #     'ls {}'.format(parent_path), shell=True
-                # )
             #
             _bsc_cor_log.LogMtd.trace_method_result(
-                'rpc create-directory',
-                'directory="{}" is cost time {}s'.format(directory_path, cost_time)
+                'rpc remove file',
+                'file="{}" is completed, cost time {}s'.format(file_path, cost_time)
             )
-        return True
+    @classmethod
+    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
+        key = 'rpc copy to file'
+        if replace is True:
+            if os.path.exists(file_path_tgt):
+                pass
+        #
+        if os.path.exists(file_path_tgt) is False:
+            directory_path_tgt = os.path.dirname(file_path_tgt)
+            if os.path.exists(directory_path_tgt) is False:
+                cls.create_directory(directory_path_tgt)
+            #
+            timeout = 25
+            cost_time = 0
+            start_time = time.time()
+            # noinspection PyUnresolvedReferences
+            from cosmos.rpc import client
+            clt = client.generate_client()
+            clt.copyfile(file_path_src, file_path_tgt)
+            p = os.path.dirname(file_path_tgt)
+            while os.path.exists(file_path_tgt) is False:
+                cost_time = int(time.time()-start_time)
+                if cost_time > timeout:
+                    raise RuntimeError(
+                        _bsc_cor_log.LogMtd.trace_method_error(
+                            key,
+                            'path="{}" is timeout, cost time {}s'.format(file_path_tgt, cost_time)
+                        )
+                    )
+                if SystemMtd.get_is_linux():
+                    os.system('ls {}'.format(p))
+                #
+                time.sleep(1)
+            # noinspection PyArgumentEqualDefault
+            cls.change_owner(
+                file_path_tgt,
+                user='artist', group='artists'
+            )
+            # noinspection PyArgumentEqualDefault
+            cls.change_mode(
+                file_path_tgt,
+                mode='775'
+            )
+            #
+            _bsc_cor_log.LogMtd.trace_method_result(
+                key,
+                'path="{} >> {}"'.format(file_path_src, file_path_tgt)
+            )
+    @classmethod
+    def change_mode(cls, path, mode='775'):
+        key = 'rpc change mode'
+        if os.path.exists(path) is True:
+            # noinspection PyUnresolvedReferences
+            from cosmos.rpc import client
+            clt = client.generate_client()
+            clt.chmod(path, mode)
+            p = os.path.dirname(path)
+            if SystemMtd.get_is_linux():
+                os.system('ls {}'.format(p))
+            _bsc_cor_log.LogMtd.trace_method_result(
+                key,
+                'path="{}", mode="{}"'.format(path, mode)
+            )
+    @classmethod
+    def change_owner(cls, path, user, group='artists'):
+        key = 'rpc change owner'
+        if os.path.exists(path) is True:
+            # noinspection PyUnresolvedReferences
+            from cosmos.rpc import client
+            clt = client.generate_client()
+            clt.chown(path, user, group)
+            p = os.path.dirname(path)
+            if SystemMtd.get_is_linux():
+                os.system('ls {}'.format(p))
+            _bsc_cor_log.LogMtd.trace_method_result(
+                key,
+                'path="{}", user="{}", group="{}"'.format(path, user, group)
+            )
 
 
 class StgSshMtd(object):
@@ -407,6 +518,12 @@ class StgExtraMtd(object):
         t_0.start()
         # t_0.join()
     @classmethod
+    def get_exists_component(cls, path):
+        units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(path)
+        for i in units:
+            if os.path.exists(i):
+                return i
+    @classmethod
     def set_file_open(cls, path):
         if SystemMtd.get_is_windows():
             cmd = u'explorer /select,"{}"'.format(path.replace('/', '\\'))
@@ -445,9 +562,6 @@ class StgExtraMtd(object):
                 'create-directory',
                 'directory="{}"'.format(directory_path)
             )
-    @classmethod
-    def create_directory_use_rpc(cls, directory_path, mode='1777'):
-        StgRpcMtd.create_directories(directory_path, mode)
 
 
 class StgPathLinkMtd(object):
@@ -880,7 +994,9 @@ class StgPathOpt(object):
         return os.stat(self._path).st_mtime
 
     def get_modify_time_tag(self):
-        return TimeMtd
+        return _bsc_cor_time.TimestampOpt(
+            self.get_modify_timestamp()
+        ).get_as_tag()
 
     def get_user(self):
         return StorageMtd.get_user(self.get_path())
@@ -1200,6 +1316,16 @@ class StgFileOpt(StgPathOpt):
         )
         self.set_copy_to_file(
             file_path_tgt, replace=replace
+        )
+
+    def get_render_file_path(self):
+        return '{directory}/.temporary/render/{time_tag}.{name_base}{ext}'.format(
+            **dict(
+                directory=self.get_directory_path(),
+                name_base=self.get_name_base(),
+                time_tag=self.get_modify_time_tag(),
+                ext=self.get_ext()
+            )
         )
 
 

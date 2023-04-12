@@ -11,6 +11,7 @@ Module containing the base class for NetworkMaterialCreate and
 NetworkMaterialEdit nodes.
 """
 from __future__ import absolute_import
+import six
 import logging, re, Utils
 from Katana import NodegraphAPI, Nodes3DAPI, RenderingAPI
 from PackageSuperToolAPI import NodeUtils

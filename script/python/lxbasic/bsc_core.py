@@ -32,6 +32,10 @@ if __name__ == '__main__':
     # print RscFileMtd.get(
     #     'lua-scripts'
     # )
-    print 1.0/2.0/math.tan(math.radians(70.0/2.0))
-    print 1.0/.646
+    # print RawTextOpt(
+    #     '1001-1120:5'
+    # ).to_frames()
+    print StgExtraMtd.get_exists_component(
+        '/production/shows/nsa_dev/assets/chr/td_test/user/work.dongchangbao/katana/render/surface/td_test.srf.surface.v007.shot_free__default__asset_standard'
+    )
 

@@ -9,8 +9,8 @@ variant-fnmatch-patterns:
     role: '[a-z][a-z][a-z]'
     sequence: '[a-z]*'
     step: '[a-z]*'
-    version: '[a-z][0-9][0-9][0-9]'
-    version_extra: '[0-9][0-9][0-9]'
+    version: '[a-z][0-9][0-9][0-9]*'
+    version_extra: '[0-9][0-9][0-9]*'
     look_pass: '[A-Za-z]*'
     shot: '{sequence}*'
 #
@@ -95,7 +95,7 @@ asset-user-nuke-dir: <asset-user-task-dir>/nuke
 asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>/scenes
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<task_extra-name>/<asset-version-name>.nk
 # extra area
-asset-source-shared_area-dir: <asset-source-task-dir>/shared_area/<task-name>
+asset-source-extend-dir: <asset-source-task-dir>/extend
 # shot =============================================================================================================== #
 shot-branch-dir: <project-dir>/sequences
 #

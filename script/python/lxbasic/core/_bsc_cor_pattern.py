@@ -280,6 +280,16 @@ class PtnParseOpt(object):
             p._fnmatch_pattern
         ) or []
 
+    def get_match_results(self, sort=False):
+        paths = glob.glob(
+            PtnParseMtd.get_as_fnmatch(
+                self._pattern, self._key_format
+            )
+        ) or []
+        if sort is True:
+            paths = _bsc_cor_raw.RawTextsOpt(paths).set_sort_to()
+        return paths
+
     def set_key_format(self, key, value):
         self._key_format[key] = value
 

@@ -634,7 +634,15 @@ class RawTextOpt(object):
         for i in texts:
             if '-' in i:
                 i_start_frame, i_end_frame = [j.strip() for j in i.split('-')][:2]
-                lis.extend(list(range(int(i_start_frame), int(i_end_frame)+1)))
+                if ':' in i:
+                    i_end_frame, i_frame_step = i_end_frame.split(':')
+                else:
+                    i_frame_step = 1
+                lis.extend(
+                    RawFrameRangeMtd.get(
+                        (i_start_frame, i_end_frame), i_frame_step
+                    )
+                )
             else:
                 lis.append(int(i))
         if lis:

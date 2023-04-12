@@ -817,12 +817,42 @@ class PathMapper(object):
         return dic
 
 
+class PathEnvMapper(object):
+    def __init__(self, file_path):
+        self._raw = bsc_core.StgFileOpt(file_path).set_read()
+        if bsc_core.SystemMtd.get_is_windows() is True:
+            p = 'windows'
+        elif bsc_core.SystemMtd.get_is_linux() is True:
+            p = 'linux'
+        else:
+            raise TypeError()
+        #
+        self._path_dict = self._get_path_dict_(p)
+        self._env_dict = self._get_env_dict_(p)
+
+    def _get_path_dict_(self, platform_):
+        dic = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            for i in v:
+                dic[i] = k
+        return dic
+
+    def _get_env_dict_(self, platform_):
+        dic = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            dic[k] = v[0]
+        return dic
+
+
 class Path(object):
     PATHSEP = '/'
     #
-    PATH_MAPPER = PathMapper(
+    MAPPER = PathMapper(
         file_path=bsc_core.CfgFileMtd.get_yaml('storage/path-mapper')
     )
+
     @classmethod
     def set_map_to_platform(cls, path):
         if path is not None:
@@ -836,7 +866,7 @@ class Path(object):
     def set_map_to_windows(cls, path):
         path = bsc_core.StgPathOpt(path).__str__()
         if bsc_core.StorageMtd.get_path_is_linux(path):
-            mapper_dict = cls.PATH_MAPPER._windows_dict
+            mapper_dict = cls.MAPPER._windows_dict
             for i_root_src, i_root_tgt in mapper_dict.items():
                 if path.startswith(i_root_src):
                     return i_root_tgt + path[len(i_root_src):]
@@ -846,11 +876,67 @@ class Path(object):
     def set_map_to_linux(cls, path):
         path = bsc_core.StgPathOpt(path).__str__()
         if bsc_core.StorageMtd.get_path_is_windows(path):
-            mapper_dict = cls.PATH_MAPPER._linux_dict
+            mapper_dict = cls.MAPPER._linux_dict
             for i_root_src, i_root_tgt in mapper_dict.items():
                 if path.startswith(i_root_src):
                     return i_root_tgt + path[len(i_root_src):]
             return path
+        return path
+
+
+class PathEnv(object):
+    MAPPER = PathEnvMapper(
+        file_path=bsc_core.CfgFileMtd.get_yaml('storage/path-environment-mapper')
+    )
+    @classmethod
+    def map_to_path(cls, path, pattern='[KEY]'):
+        """
+        print(
+            PathEnv.map_to_path(
+                '[PAPER_PRODUCTION]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+                pattern='[KEY]'
+            )
+        )
+        print(
+            PathEnv.map_to_path(
+                '${PAPER_PRODUCTION}/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+                pattern='${KEY}'
+            )
+        )
+        :param path:
+        :param pattern:
+        :return:
+        """
+        mapper_dict = cls.MAPPER._env_dict
+        for i_env_key, i_root in mapper_dict.items():
+            i_string = pattern.replace('KEY', i_env_key)
+            if path.startswith(i_string):
+                return i_root + path[len(i_string):]
+        return path
+    @classmethod
+    def map_to_env(cls, path, pattern='[KEY]'):
+        """
+        print(
+            PathEnv.map_to_env(
+                '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+                pattern='[KEY]'
+            ),
+        )
+        print(
+            PathEnv.map_to_env(
+                '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+                pattern='${KEY}'
+            )
+        )
+        :param path:
+        :param pattern:
+        :return:
+        """
+        mapper_dict = cls.MAPPER._path_dict
+        for i_root, i_env_key in mapper_dict.items():
+            if path.startswith(i_root):
+                i_string = pattern.replace('KEY', i_env_key)
+                return i_string + path[len(i_root):]
         return path
 
 
@@ -1764,4 +1850,27 @@ if __name__ == '__main__':
     #         '/l/temp/td/dongchangbao/plug/maya/lynxinode/plug-ins/lxConvertNode.py'
     #     )
     # print(a)
-    print(Path.set_map_to_windows('/production'))
+    print(
+        PathEnv.map_to_env(
+            '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+            pattern='[KEY]'
+        ),
+    )
+    print(
+        PathEnv.map_to_env(
+            '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+            pattern='${KEY}'
+        )
+    )
+    print(
+        PathEnv.map_to_path(
+            '[PAPER_PRODUCTION]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+            pattern='[KEY]'
+        )
+    )
+    print(
+        PathEnv.map_to_path(
+            '${PAPER_PRODUCTION}/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+            pattern='${KEY}'
+        )
+    )

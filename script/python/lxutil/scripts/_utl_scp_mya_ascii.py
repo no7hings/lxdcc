@@ -646,10 +646,6 @@ class DotMaFileReader(AbsFileReader):
 
 class DotAssFileReader(AbsFileReader):
     LINE_MATCHER_CLS = LineMatcher
-    MAPPER_DICT = {
-        '/l/prod': '[PG_PROJ_ROOT]',
-        'l:/prod': '[PG_PROJ_ROOT]',
-    }
     def __init__(self, file_path):
         super(DotAssFileReader, self).__init__(file_path)
 
@@ -671,11 +667,10 @@ class DotAssFileReader(AbsFileReader):
                     if i_p:
                         i_variants = i_p.named
                         i_file_path = i_variants['file_path']
-                        #
-                        i_new_file_path = None
-                        for k, v in self.MAPPER_DICT.items():
-                            if i_file_path.lower().startswith(k.lower()):
-                                i_new_file_path = v+i_file_path[len(k):]
+                        # noinspection PyArgumentEqualDefault
+                        i_new_file_path = utl_core.PathEnv.map_to_env(
+                            i_file_path, pattern='[KEY]'
+                        )
                         #
                         if i_new_file_path is not None:
                             i_new_line = i_line.replace(i_file_path, i_new_file_path)

@@ -17,25 +17,17 @@ class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         gpu_files=[],
         ass_files=[]
     )
-    MAPPER_DICT = {
-        '/l/prod': '${PG_PROJ_ROOT}',
-        'l:/prod': '${PG_PROJ_ROOT}',
-    }
     def __init__(self, option=None):
         super(DotXarcExporter, self).__init__(option)
     @classmethod
-    def _set_j2_option_update_(cls, option, keys):
-        def convert_fnc_(p_):
-            for _k, _v in cls.MAPPER_DICT.items():
-                if p_.lower().startswith(_k.lower()):
-                    return _v + p_[len(_k):]
-            return p_
-
-        file_path = option.get('file')
-        directory_path = os.path.dirname(file_path)
+    def _set_j2_option_update_(cls, option, include_keys):
+        def convert_fnc_(path_):
+            return utl_core.PathEnv.map_to_env(
+                path_, pattern='${KEY}'
+            )
         #
         for i_k, i_v in option.items():
-            if i_k in keys:
+            if i_k in include_keys:
                 if isinstance(i_v, (tuple, list)):
                     for j_seq, j in enumerate(i_v):
                         i_v[j_seq] = convert_fnc_(j)

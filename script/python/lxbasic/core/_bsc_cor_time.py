@@ -146,5 +146,13 @@ class TimestampOpt(object):
             int(self._timestamp)
         ).set_encode_to_36()
 
+    def get_as_tag_36_(self, multiply=1):
+        s = self._timestamp
+        y = time.localtime().tm_year
+        m = time.localtime().tm_mon
+        d = time.localtime().tm_mday
+        c_s = time.mktime(time.strptime('{}-{}-{}'.format(y, m, d), '%Y-%m-%d'))
+        return _bsc_cor_raw.RawIntegerOpt(int((s-c_s)*multiply)).set_encode_to_36()
+
     def to_prettify(self, language):
         return TimePrettifyMtd.to_prettify_by_timestamp(self._timestamp, language)

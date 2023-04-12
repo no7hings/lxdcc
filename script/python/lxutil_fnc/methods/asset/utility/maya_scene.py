@@ -20,7 +20,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         if maya_dcc_objects.Scene.get_scene_is_dirty():
             w = utl_core.DialogWindow.set_create(
                 label='Save',
-                content=u'Scene has been modified, Do you want to save change to "{}"'.format(
+                content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     maya_dcc_objects.Scene.get_current_file_path()
                 ),
                 window_size=(480, 160),

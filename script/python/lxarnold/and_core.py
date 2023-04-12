@@ -337,11 +337,12 @@ class AndObjMtd(object):
             ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', name
         )
 
-    def set_name_prettify(self, index, look_pass_name, time_tag=None):
-        and_type_name = self.type_name
-        if time_tag is not None:
-            return '{}__{}__{}__{}'.format(look_pass_name, and_type_name, index, time_tag)
-        return '{}__{}__{}'.format(look_pass_name, and_type_name, index)
+    def set_name_prettify(self, index, look_pass_name=None, time_tag=None):
+        type_name = self.type_name
+        tags = [
+            type_name, index, look_pass_name, time_tag
+        ]
+        return '_'.join([str(i) for i in tags if i is not None])
 
     def get_parent(self):
         return ai.AiNodeGetParent(self.and_instance)

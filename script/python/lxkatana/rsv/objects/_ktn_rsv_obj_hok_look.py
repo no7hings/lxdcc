@@ -10,12 +10,19 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         from lxutil import utl_core
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
-        #
-        from lxusd import usd_core
+
+        from lxkatana import ktn_core
         #
         import lxkatana.fnc.exporters as ktn_fnc_exporters
+
+        import lxkatana.scripts as ktn_scripts
         #
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        w_s = ktn_core.WorkspaceSetting()
+        opt = w_s.get_current_look_output_opt_force()
+        if opt is None:
+            return
+        #
+        s = ktn_scripts.ScpLookOutput(opt)
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -31,8 +38,8 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             keyword_1 = 'asset-temporary-look-ass-sub-file'
         else:
             raise TypeError()
-        ktn_workspace = ktn_dcc_objects.AssetWorkspace()
-        look_pass_names = ktn_workspace.get_look_pass_names()
+        #
+        look_pass_names = s.get_all_look_pass_names()
         #
         for i_look_pass_name in look_pass_names:
             if i_look_pass_name == 'default':
@@ -46,14 +53,14 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             i_look_ass_file = utl_dcc_objects.OsFile(i_look_ass_file_path)
             if i_look_ass_file.get_is_exists() is False or force is True:
-                i_look_pass_source_obj = ktn_workspace.get_pass_source_obj(i_look_pass_name)
-                if i_look_pass_source_obj is not None:
+                i_look_pass_source_node = s.get_look_pass_source_node(i_look_pass_name)
+                if i_look_pass_source_node is not None:
                     ktn_fnc_exporters.LookAssExporter(
                         option=dict(
                             file=i_look_ass_file_path,
                             location=root,
                             #
-                            look_pass_node=ktn_workspace.get_main_node('look_outputs'),
+                            look_pass_node=opt.get_path(),
                             look_pass=i_look_pass_name,
                             #
                             texture_use_environ_map=texture_use_environ_map
@@ -68,12 +75,23 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         model_act_cmp_usd_file_path = self.get_asset_model_act_cmp_usd_file()
         if model_act_cmp_usd_file_path is not None:
             dynamic_override_uv_maps = self._hook_option_opt.get_as_boolean('with_look_ass_dynamic_override_uv_maps')
-            ktn_workspace.set_dynamic_ass_export(
+            s.export_ass_auto(
                 dynamic_override_uv_maps=dynamic_override_uv_maps
             )
 
     def set_asset_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+        from lxkatana import ktn_core
+
+        import lxkatana.scripts as ktn_scripts
+        #
+        w_s = ktn_core.WorkspaceSetting()
+        opt = w_s.get_current_look_output_opt_force()
+        if opt is None:
+            return
+        #
+        s = ktn_scripts.ScpLookOutput(opt)
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -82,10 +100,10 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-look-klf-file'
-            keyword_1 = 'asset-look-json-file'
+            keyword_1 = 'asset-look-klf-extra-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-look-klf-file'
-            keyword_1 = 'asset-temporary-look-json-file'
+            keyword_1 = 'asset-temporary-look-klf-extra-file'
         else:
             raise TypeError()
         #
@@ -95,15 +113,12 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         look_klf_file_path = look_klf_file_rsv_unit.get_result(
             version=version
         )
-        asset_workspace = ktn_dcc_objects.AssetWorkspace()
-        #
-        ktn_dcc_objects.Node('rootNode').get_port('variables.camera').set('asset_free')
         #
         asset_geometries = ktn_dcc_objects.Node('asset__geometries')
         if asset_geometries.get_is_exists() is True:
             asset_geometries.get_port('lynxi_variants.look').set('asset-work')
         #
-        asset_workspace.set_look_klf_file_export(look_klf_file_path)
+        s.export_klf(look_klf_file_path)
         # extra
         look_json_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_1
@@ -111,6 +126,6 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         look_json_file_path = look_json_file_rsv_unit.get_result(
             version=version
         )
-        asset_workspace.set_look_klf_extra_export(
+        s.export_klf_extra(
             look_json_file_path
         )

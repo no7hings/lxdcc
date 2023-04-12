@@ -51,3 +51,16 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     def get_app_execute_mapper(cls, *args, **kwargs):
         return {}
 
+
+class EtrStorage(bsc_etr_abstracts.AbsEtrStorage):
+    @classmethod
+    def create_directory(cls, directory_path):
+        bsc_core.StgExtraMtd.create_directory(directory_path)
+    @classmethod
+    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
+        bsc_core.StgFileOpt(file_path_src).set_copy_to_file(
+            file_path_tgt, replace=replace
+        )
+    @classmethod
+    def change_owner(cls, path, user='artist', group='artists'):
+        pass

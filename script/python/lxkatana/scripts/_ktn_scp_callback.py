@@ -7,7 +7,7 @@ from lxkatana import ktn_core
 
 
 class ScpCbkEnvironment(object):
-    KEY = 'workspace environment'
+    KEY = 'workspace environment build'
     def __init__(self):
         self._cfg = bsc_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml(
@@ -19,6 +19,7 @@ class ScpCbkEnvironment(object):
     def save(cls, data):
         workspace_setting = ktn_core.WorkspaceSetting()
         workspace_setting.build_env_ports()
+        workspace_setting.build_look_ports()
         for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
             workspace_setting.save_env(
                 i_index, i_key, i_env_key, i_env_value
@@ -107,77 +108,18 @@ class ScpCbkEnvironment(object):
         )
 
 
-class ScpCbkRender(object):
+class ScpCbkGui(object):
     def __init__(self):
         pass
+    @classmethod
+    def refresh_tool_kit(cls):
+        from lxutil_gui.qt import utl_gui_qt_core
+        w = utl_gui_qt_core.get_session_window_by_name('dcc-tool-panels/gen-tool-kit')
+        if w is not None:
+            w.refresh_all()
+    @classmethod
+    def refresh_all(cls):
+        cls.refresh_tool_kit()
 
-    def refresh_all_render_Layers_version(self):
-        from lxkatana.scripts import _ktn_scp_macro_extra
-
-        version_key = 'render_version'
-
-        nodes = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='Group', filters=[('type', 'RenderLayer_Wsp')]
-        )
-        for i_node in nodes:
-            i_obj_opt = ktn_core.NGObjOpt(i_node)
-            i_scp = _ktn_scp_macro_extra.ScpWspRenderLayer(i_node)
-            i_kwargs = i_scp.get_variants()
-            i_directory_p = i_obj_opt.get('parameters.render.output_directory')
-            i_directory_p_opt = bsc_core.PtnParseOpt(i_directory_p)
-            #
-            if i_directory_p_opt.get_keys():
-                i_version_string = i_kwargs.pop(version_key)
-                if bsc_core.PtnVersion.get_is_valid(i_version_string):
-                    continue
-                #
-                i_directory_p_opt.set_update(**i_kwargs)
-                #
-                i_version_kwargs = {}
-                if i_version_string == 'new':
-                    i_version = i_directory_p_opt.get_new_version(version_key='render_version')
-                elif i_version_string == 'latest':
-                    i_version = i_directory_p_opt.get_latest_version(version_key='render_version')
-                else:
-                    raise RuntimeError()
-                #
-                i_version_kwargs[version_key] = i_version
-                i_directory_p_opt.set_update(**i_version_kwargs)
-                #
-                i_result = i_directory_p_opt.get_value()
-                #
-                i_obj_opt.set('parameters.render.output_directory', i_result)
-                bsc_core.LogMtd.trace_method_result(
-                    'render process',
-                    'node: "{}"'.format(
-                        i_obj_opt.get_path()
-                    )
-                )
-                bsc_core.LogMtd.trace_method_result(
-                    'render process',
-                    'convert render output: "{}" >> "{}"'.format(
-                        i_directory_p, i_result
-                    )
-                )
-
-    def save_changed(self):
-        f = ktn_core.NodegraphAPI.GetProjectFile()
-        ktn_core.KatanaFile.Save(f)
-        bsc_core.LogMtd.trace_method_result(
-            'render process',
-            'save changed: "{}"'.format(
-                f
-            )
-        )
-    @ktn_core.Modifier.undo_run
     def execute(self, *args, **kwargs):
-        bsc_core.LogMtd.trace_method_result(
-            'render process',
-            'is started'
-        )
-        self.refresh_all_render_Layers_version()
-        self.save_changed()
-        bsc_core.LogMtd.trace_method_result(
-            'render process',
-            'is completed'
-        )
+        self.refresh_all()

@@ -129,7 +129,7 @@ class EnvExtraMtd(EnvironMtd):
     @classmethod
     def get_beta_enable(cls):
         _ = cls.get(cls.BETA_ENABLE_KEY)
-        if _ == cls.TRUE:
+        if str(_).lower() == cls.TRUE:
             return True
         return False
     @classmethod

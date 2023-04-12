@@ -32,7 +32,7 @@ tools:
         type: item
         name: Asset-comparer
         icon: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.AssetComparerPanel().set_window_show()
+        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.PnlAssetGeometryComparer().set_window_show()
     #
     scene_packager:
         type: item

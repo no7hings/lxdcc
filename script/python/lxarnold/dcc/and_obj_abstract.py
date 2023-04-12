@@ -79,12 +79,6 @@ class AbsObjScene(
         #
         look_pass='default',
     )
-    MAPPER_DICT = {
-        '[PG_PROJ_ROOT]': {
-            'linux': '/l/prod',
-            'windows': 'l:/prod'
-        }
-    }
     def __init__(self, option=None):
         super(AbsObjScene, self).__init__()
         #
@@ -222,10 +216,7 @@ class AbsObjScene(
         #
         if and_port_name == 'filename':
             if and_exact_type == ai.AI_TYPE_STRING:
-                for k, v in self.MAPPER_DICT.items():
-                    if dcc_port_raw.lower().startswith(k.lower()):
-                        r = v[self._platform]
-                        dcc_port_raw = r + dcc_port_raw[len(k):]
+                dcc_port_raw = utl_core.PathEnv.map_to_path(dcc_port_raw)
         #
         dcc_input_port = dcc_obj.set_port_create(dcc_type, and_port_name, unr_configure.PortAssign.INPUTS)
         dcc_input_port.set_custom(is_custom)

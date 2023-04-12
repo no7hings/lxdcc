@@ -16,6 +16,12 @@ class GuiSession(ssn_abstracts.AbsSsnGui):
         super(GuiSession, self).__init__(*args, **kwargs)
 
 
+class ToolSession(ssn_abstracts.AbsSsnObj):
+    def __init__(self, *args, **kwargs):
+        super(ToolSession, self).__init__(*args, **kwargs)
+
+
+
 class OptionActionSession(ssn_abstracts.AbsSsnOptionAction):
     def __init__(self, *args, **kwargs):
         super(OptionActionSession, self).__init__(*args, **kwargs)
@@ -48,6 +54,12 @@ class SsnOptionMethod(ssn_abstracts.AbsSsnOptionMethod):
     EXECUTOR = _ssn_obj_executor.HookExecutor
     def __init__(self, *args, **kwargs):
         super(SsnOptionMethod, self).__init__(*args, **kwargs)
+
+
+class RsvProjectMethodSession(ssn_abstracts.AbsSsnRsvProjectOptionMethod):
+    EXECUTOR = _ssn_obj_executor.RsvProjectHookExecutor
+    def __init__(self, *args, **kwargs):
+        super(RsvProjectMethodSession, self).__init__(*args, **kwargs)
 
 
 class RsvTaskMethodSession(ssn_abstracts.AbsSsnRsvTaskOptionMethod):

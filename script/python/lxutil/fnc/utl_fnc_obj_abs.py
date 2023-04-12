@@ -386,6 +386,8 @@ class AbsFncDccGeometryComparer(object):
     #
     FNC_DCC_MESH_MATCHER_CLASS = None
     FNC_USD_MESH_REPAIRER_CLASS = None
+    #
+    CACHE = {}
     def __init__(self, file_path, root=None, option=None):
         self._scene_file_path = file_path
         self._root = root
@@ -399,19 +401,26 @@ class AbsFncDccGeometryComparer(object):
                 if k in self.OPTION:
                     self._option[k] = v
         #
-        self._task_properties = self._resolver.get_task_properties_by_any_scene_file_path(
+        self._rsv_scene_properties = self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
             file_path=file_path
         )
-        if self._task_properties is not None:
-            step = self._task_properties.get('step')
+        if self._rsv_scene_properties is not None:
+            step = self._rsv_scene_properties.get('step')
             if step in ['mod', 'srf', 'rig', 'grm']:
-                self._set_model_geometry_usd_hi_file_path_(
-                    rsv_operators.RsvAssetGeometryQuery(
-                        self._task_properties
-                    ).get_usd_hi_file(
-                        step='mod', task='modeling', version='latest'
-                    )
+                keyword = 'asset-geometry-usd-hi-file'
+                rsv_resource = self._resolver.get_rsv_resource(
+                    **self._rsv_scene_properties.get_value()
                 )
+                rsv_model_task = rsv_resource.get_rsv_task(
+                    step='mod', task='modeling'
+                )
+                if rsv_model_task is not None:
+                    rsv_unit = rsv_model_task.get_rsv_unit(
+                        keyword=keyword
+                    )
+                    result = rsv_unit.get_result()
+                    if result:
+                        self._set_model_geometry_usd_hi_file_path_(result)
             else:
                 raise TypeError()
         else:
@@ -440,12 +449,22 @@ class AbsFncDccGeometryComparer(object):
         self._model_dcc_geometries = []
 
     def _set_model_dcc_objs_update_(self):
+        import lxusd.dcc.dcc_objects as usd_dcc_objects
+        #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
+        #
         usd_file_path = self._model_geometry_usd_hi_file_path
         root = self._root
         if usd_file_path is not None:
-            self._model_dcc_obj_scene.set_load_from_dot_usd(usd_file_path, root)
-            self._model_dcc_obj_universe = self._model_dcc_obj_scene.universe
+            time_tag = bsc_core.StgFileOpt(usd_file_path).get_modify_time_tag()
+            if time_tag in AbsFncDccGeometryComparer.CACHE:
+                self._model_dcc_obj_universe = AbsFncDccGeometryComparer.CACHE[time_tag]
+            else:
+                self._model_dcc_obj_scene = usd_dcc_objects.Scene()
+                self._model_dcc_obj_scene.set_load_from_dot_usd(usd_file_path, root)
+                self._model_dcc_obj_universe = self._model_dcc_obj_scene.universe
+                AbsFncDccGeometryComparer.CACHE[time_tag] = self._model_dcc_obj_universe
+            #
             self._model_usd_scene_opt = usd_dcc_operators.SceneOpt(self._model_dcc_obj_scene.usd_stage)
             self._model_dcc_mesh_comparer_data = self._model_usd_scene_opt.get_mesh_comparer_data(
                 usd_file_path
@@ -684,16 +703,6 @@ class AbsDotXgenDef(object):
 
 
 class AbsDccTextureExport(object):
-    MAPPER_DICT = {
-        '/l/prod': '[PG_PROJ_ROOT]',
-        'l:/prod': '[PG_PROJ_ROOT]',
-    }
-    @classmethod
-    def _set_texture_environ_map_(cls, file_path):
-        for k, v in cls.MAPPER_DICT.items():
-            if file_path.lower().startswith(k.lower()):
-                return v + file_path[len(k):]
-        return file_path
     @classmethod
     def _set_copy_as_src_(
         cls,
@@ -781,8 +790,9 @@ class AbsDccTextureExport(object):
                             if j_texture_dst.get_exists_files_():
                                 # environ map
                                 if use_environ_map is True:
-                                    j_texture_path_dst_new = cls._set_texture_environ_map_(
-                                        j_texture_path_dst
+                                    # noinspection PyArgumentEqualDefault
+                                    j_texture_path_dst_new = utl_core.PathEnv.map_to_env(
+                                        j_texture_path_dst, pattern='[KEY]'
                                     )
                                     if j_texture_path_dst_new != j_texture_path_dst:
                                         j_texture_path_dst = j_texture_path_dst_new

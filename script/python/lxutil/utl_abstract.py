@@ -140,9 +140,11 @@ class AbsDccPort(AbsDccObjDef):
     @property
     def port_name(self):
         return self._port_path.split(self.PATHSEP)[-1]
-    @property
-    def name(self):
+
+    def get_name(self):
         return self._port_path
+    name = property(get_name)
+
     @property
     def icon(self):
         return utl_core.Icon.get_port()
@@ -468,9 +470,10 @@ class AbsDccObj(
     @property
     def type_name(self):
         return self.type
-    @property
-    def name(self):
+
+    def get_name(self):
         return self._name
+    name = property(get_name)
     # gui property *************************************************************************************************** #
     @property
     def icon(self):

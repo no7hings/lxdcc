@@ -8,7 +8,7 @@ option:
         |-
         for asset geometry load
     #
-    variant_key: 'render'
+    variant_key: 'geometry'
     #
     auto_color: False
     #
@@ -464,7 +464,7 @@ node:
                         location: 'getParent().getParent().option.root'
                         args/variantSelection/value:
                             |-
-                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
+                            str(getParent().getParent().parameters.usd_variant.asset_version_override.<...key>).split("-")[0]
                 groom: '$.model'
                 rig: '$.model'
                 effect: '$.model'
@@ -517,7 +517,7 @@ node:
                         location: 'getParent().getParent().option.root'
                         args/variantSelection/value:
                             |-
-                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
+                            str(getParent().getParent().parameters.usd_variant.shot_version_main.<...key>).split("-")[0]
                 character_effect: '$.animation'
                 effect: '$.animation'
                 light: '$.animation'
@@ -568,7 +568,7 @@ node:
                         location: 'getParent().getParent().option.root'
                         args/variantSelection/value:
                             |-
-                            str(getParent().getParent().parameters.usd_variant.asset_version_main.<...key>).split("-")[0]
+                            str(getParent().getParent().parameters.usd_variant.shot_version_override.<...key>).split("-")[0]
                 character_effect: '$.animation'
                 effect: '$.animation'
                 light: '$.animation'

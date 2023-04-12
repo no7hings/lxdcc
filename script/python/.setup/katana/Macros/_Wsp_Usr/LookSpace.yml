@@ -110,8 +110,9 @@ node_add:
         force_connections:
             - '<..default__geometry_properties_assign_group.output>'
             - '<.input>'
-            - '<..default__geometry_properties_assign_group.output>'
-            - '{upstream_merge}.out'
             #
             - '<.output>'
             - '{variant_register}.<.variant>'
+            #
+            - '<.output>'
+            - '{output}.<.variant>'

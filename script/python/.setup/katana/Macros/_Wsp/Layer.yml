@@ -241,7 +241,7 @@ main:
 
         option/shape/extend:
             widget: path
-            value: '/root/world/geo/master/shape/etd_shapegrp'
+            value: '/root/world/geo/master/shape/misc'
             tool_tip: '...'
         # record
         record/variant_properties_opt:

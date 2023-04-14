@@ -1,9 +1,9 @@
 # coding:utf-8
-from lxutil import utl_configure
+from lxutil import utl_core
 
 key = 'usda/set/asset-shot'
 
-c = utl_configure.Jinja.get_configure(
+c = utl_core.Jinja.get_configure(
     key
 )
 
@@ -37,8 +37,8 @@ c.set_flatten()
 usda_dict = c.get('usdas')
 #
 for k, v in usda_dict.items():
-    t = utl_configure.Jinja.get_template(
-        u'{}/{}'.format(key, k)
+    t = utl_core.Jinja.get_template(
+        '{}/{}'.format(key, k)
     )
     i_raw = t.render(
         **c.value

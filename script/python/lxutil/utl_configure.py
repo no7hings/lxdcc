@@ -112,32 +112,5 @@ class DccMeshCheckStatus(object):
     ]
 
 
-class Jinja(object):
-    ROOT = MainData.get_directory('jinja')
-    #
-    MAIN = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(ROOT)
-    )
-    USDA = jinja2.Environment(
-        loader=jinja2.FileSystemLoader('{}/usda'.format(ROOT))
-    )
-    XARC = jinja2.Environment(
-        loader=jinja2.FileSystemLoader('{}/xarc'.format(ROOT))
-    )
-    ARNOLD = jinja2.Environment(
-        loader=jinja2.FileSystemLoader('{}/arnold'.format(ROOT))
-    )
-    @classmethod
-    def get_template(cls, key):
-        return cls.MAIN.get_template(
-            '{}.j2'.format(key)
-        )
-    @classmethod
-    def get_configure(cls, key):
-        return bsc_objects.Configure(
-            value='{}/{}.yml'.format(cls.ROOT, key)
-        )
-
-
 if __name__ == '__main__':
     pass

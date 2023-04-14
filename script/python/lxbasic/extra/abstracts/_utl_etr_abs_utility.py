@@ -37,18 +37,6 @@ class AbsEtrIde(object):
         raise NotImplementedError()
 
 
-class AbsEtrStorage(object):
-    @classmethod
-    def create_directory(cls, *args, **kwargs):
-        raise NotImplementedError()
-    @classmethod
-    def copy_to_file(cls, *args, **kwargs):
-        raise NotImplementedError()
-    @classmethod
-    def change_owner(cls, *args, **kwargs):
-        raise NotImplementedError()
-
-
 class AbsEtrRv(object):
     @classmethod
     def open_file(cls, file_path):

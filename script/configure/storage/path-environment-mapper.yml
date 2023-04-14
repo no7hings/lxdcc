@@ -2,12 +2,12 @@ windows:
     PG_PROJ_ROOT:
         - 'l:/prod'
         - 'L:/prod'
-    PAPER_PRODUCTION:
+    PAPER_PRODUCTION_ROOT:
         - 'x:/shows'
         - 'X:/shows'
 
 linux:
     PG_PROJ_ROOT:
         - '/l/prod'
-    PAPER_PRODUCTION:
+    PAPER_PRODUCTION_ROOT:
         - '/production/shows'

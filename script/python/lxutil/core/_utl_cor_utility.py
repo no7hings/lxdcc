@@ -893,13 +893,13 @@ class PathEnv(object):
         """
         print(
             PathEnv.map_to_path(
-                '[PAPER_PRODUCTION]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+                '[PAPER_PRODUCTION_ROOT]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
                 pattern='[KEY]'
             )
         )
         print(
             PathEnv.map_to_path(
-                '${PAPER_PRODUCTION}/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
+                '${PAPER_PRODUCTION_ROOT}/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
                 pattern='${KEY}'
             )
         )
@@ -910,7 +910,7 @@ class PathEnv(object):
         mapper_dict = cls.MAPPER._env_dict
         for i_env_key, i_root in mapper_dict.items():
             i_string = pattern.replace('KEY', i_env_key)
-            if path.startswith(i_string):
+            if path.startswith(i_string+'/'):
                 return i_root + path[len(i_string):]
         return path
     @classmethod
@@ -934,7 +934,7 @@ class PathEnv(object):
         """
         mapper_dict = cls.MAPPER._path_dict
         for i_root, i_env_key in mapper_dict.items():
-            if path.startswith(i_root):
+            if path.startswith(i_root+'/'):
                 i_string = pattern.replace('KEY', i_env_key)
                 return i_string + path[len(i_root):]
         return path
@@ -1845,32 +1845,62 @@ class Modifier(object):
         return fnc_
 
 
+class Jinja(object):
+    """
+c = Jinja.get_configure_yaml(
+    'test/test'
+)
+t = Jinja.get_template(
+    'test/test'
+)
+print(
+    t.render(
+        name='World'
+    )
+)
+    """
+    @classmethod
+    def get_configure(cls, key):
+        f = bsc_core.CfgFileMtd.get_yaml(
+            'jinja/{}'.format(key)
+        )
+        if f:
+            return bsc_objects.Configure(
+                value=f
+            )
+    @classmethod
+    def get_template(cls, key):
+        import jinja2
+
+        f = bsc_core.CfgFileMtd.get_jinja(
+            'jinja/{}'.format(key)
+        )
+        if f:
+            return jinja2.Template(
+                bsc_core.StgFileOpt(f).set_read()
+            )
+
+
 if __name__ == '__main__':
+    pass
     # a = File.set_read(
     #         '/l/temp/td/dongchangbao/plug/maya/lynxinode/plug-ins/lxConvertNode.py'
     #     )
     # print(a)
-    print(
-        PathEnv.map_to_env(
-            '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-            pattern='[KEY]'
-        ),
+    c = Jinja.get_configure(
+        'test/test'
+    )
+    t = Jinja.get_template(
+        'test/test'
     )
     print(
-        PathEnv.map_to_env(
-            '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-            pattern='${KEY}'
+        c
+    )
+    print(
+        t.render(
+            **c.get_value()
         )
     )
     print(
-        PathEnv.map_to_path(
-            '[PAPER_PRODUCTION]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-            pattern='[KEY]'
-        )
-    )
-    print(
-        PathEnv.map_to_path(
-            '${PAPER_PRODUCTION}/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-            pattern='${KEY}'
-        )
+        Jinja.get_template('arnold/katana-ui-template-v002')
     )

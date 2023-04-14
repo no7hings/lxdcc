@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-from lxutil import utl_configure
+from lxutil import utl_core
 
 
 class ScpOslFile(object):
@@ -11,7 +11,7 @@ class ScpOslFile(object):
         output_file_opt.create_directory()
         info = bsc_core.OslFileMtd.get_info(file_path)
         if info:
-            j2_template = utl_configure.Jinja.ARNOLD.get_template('katana-ui-template-v002.j2')
+            j2_template = utl_core.Jinja.get_template('arnold/katana-ui-template-v002')
             raw = j2_template.render(
                 **info
             )
@@ -23,7 +23,7 @@ class ScpOslFile(object):
         output_file_opt.create_directory()
         info = bsc_core.OslFileMtd.get_info(file_path)
         if info:
-            j2_template = utl_configure.Jinja.ARNOLD.get_template('maya-ui-template-v002.j2')
+            j2_template = utl_core.Jinja.get_template('arnold/maya-ui-template-v002')
             raw = j2_template.render(
                 **info
             )

@@ -188,7 +188,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         check_status=validation_checker.CheckStatus.Warning
                     )
         #
-        directory_paths = utl_rsv_objects.RsvAssetWorkspaceTextureOpt(
+        directory_paths = utl_rsv_objects.RsvAssetTextureOpt(
             self._rsv_task
         ).get_all_directories(
             dcc_objs
@@ -211,9 +211,9 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         check_group = 'Shotgun Check'
         #
         root = self._rsv_scene_properties.get('dcc.root')
-        geometry_root_location = '/root/world/geo'
+        geometry_location = '/root/world/geo'
         #
-        location = '{}{}'.format(geometry_root_location, root)
+        location = '{}{}'.format(geometry_location, root)
         #
         stg_connector = stg_objects.StgConnector()
         sgt_task_query = stg_connector.get_stg_task_query(**self._rsv_scene_properties.value)
@@ -570,7 +570,6 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         check_group = 'Scene Check'
         w_s = ktn_core.WorkspaceSetting()
-        w_s.update_current_look_output_with_dialog()
         opt = w_s.get_current_look_output_opt_force()
         if opt is None:
             validation_checker.register_node_result(
@@ -581,14 +580,15 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return False
         s = ktn_scripts.ScpLookOutput(opt)
-        geometry_scheme = s.get_geometry_branch()
-        geometry_root_location = '/root/world/geo'
+        geometry_scheme = s.get_geometry_scheme()
+        geometry_root = s.get_geometry_root()
+        geometry_location = self._rsv_scene_properties.get('dcc.geometry_location')
         if geometry_scheme == 'asset':
             root = self._rsv_scene_properties.get('dcc.root')
-            location = '{}{}'.format(geometry_root_location, root)
+            location = '{}{}'.format(geometry_location, root)
         else:
             root = '/assets'
-            location = '{}{}'.format(geometry_root_location, root)
+            location = '{}{}'.format(geometry_location, root)
         #
         if ktn_core.get_is_ui_mode() is True:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
@@ -628,8 +628,6 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         check_group = 'Geometry Check'
         #
-        geometry_root_location = '/root/world/geo'
-        #
         w_s = ktn_core.WorkspaceSetting()
         opt = w_s.get_current_look_output_opt_force()
         if opt is None:
@@ -641,13 +639,15 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return False
         s = ktn_scripts.ScpLookOutput(opt)
-        geometry_scheme = s.get_geometry_branch()
+        geometry_scheme = s.get_geometry_scheme()
+        geometry_root = s.get_geometry_root()
+        geometry_location = self._rsv_scene_properties.get('dcc.geometry_location')
         if geometry_scheme == 'asset':
             root = self._rsv_scene_properties.get('dcc.root')
-            sub_root = '{}/hi'.format(root)
+            sub_root = '{}/hi'.format(geometry_root)
             #
-            location = '{}{}'.format(geometry_root_location, root)
-            sub_location = '{}{}'.format(geometry_root_location, sub_root)
+            location = '{}{}'.format(geometry_location, root)
+            sub_location = '{}{}'.format(geometry_location, sub_root)
             scene_usd_file_path = s.get_geometry_uv_map_usd_source_file()
             if scene_usd_file_path is None:
                 validation_checker.register_node_result(
@@ -664,7 +664,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
                     i_mesh_opt = usd_core.UsdGeometryMeshOpt(i_usd_prim)
                     i_uv_map_names = i_mesh_opt.get_uv_map_names()
-                    i_mesh_location = '{}/{}'.format(geometry_root_location, i_mesh_opt.get_path())
+                    i_mesh_location = '{}/{}'.format(geometry_location, i_mesh_opt.get_path())
                     if not 'st' in i_uv_map_names:
                         validation_checker.register_node_result(
                             i_mesh_location,
@@ -716,14 +716,15 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return False
         s = ktn_scripts.ScpLookOutput(opt)
-        geometry_scheme = s.get_geometry_branch()
-        geometry_root_location = '/root/world/geo'
+        geometry_scheme = s.get_geometry_scheme()
+        geometry_root = s.get_geometry_root()
+        geometry_location = self._rsv_scene_properties.get('dcc.geometry_location')
         if geometry_scheme == 'asset':
             root = self._rsv_scene_properties.get('dcc.root')
             sub_root = '{}/hi'.format(root)
             #
-            location = '{}{}'.format(geometry_root_location, root)
-            sub_location = '{}{}'.format(geometry_root_location, sub_root)
+            location = '{}{}'.format(geometry_location, root)
+            sub_location = '{}{}'.format(geometry_location, sub_root)
 
             stage_opt = ktn_core.SGStageOpt(opt.ktn_obj)
 
@@ -816,15 +817,11 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return False
         s = ktn_scripts.ScpLookOutput(opt)
-        geometry_scheme = s.get_geometry_branch()
-        geometry_root_location = '/root/world/geo'
-        if geometry_scheme == 'asset':
-            root = self._rsv_scene_properties.get('dcc.root')
-            location = '{}{}'.format(geometry_root_location, root)
-        else:
-            root = '/assets'
-            location = '{}{}'.format(geometry_root_location, root)
-        error_args = s.get_non_material_geometry_args(location)
+        geometry_scheme = s.get_geometry_scheme()
+        geometry_root = s.get_geometry_root()
+        geometry_location = self._rsv_scene_properties.get('dcc.geometry_location')
+        #
+        error_args = s.get_non_material_geometry_args(geometry_root)
         for i_pass_name, i_dcc_path in error_args:
             validation_checker.register_node_result(
                 i_dcc_path,
@@ -854,18 +851,13 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return False
         s = ktn_scripts.ScpLookOutput(opt)
-        geometry_scheme = s.get_geometry_branch()
-        geometry_root_location = '/root/world/geo'
-        if geometry_scheme == 'asset':
-            root = self._rsv_scene_properties.get('dcc.root')
-            location = '{}{}'.format(geometry_root_location, root)
-        else:
-            root = '/assets'
-            location = '{}{}'.format(geometry_root_location, root)
+        geometry_scheme = s.get_geometry_scheme()
+        geometry_root = s.get_geometry_root()
+        geometry_location = self._rsv_scene_properties.get('dcc.geometry_location')
         #
         dcc_texture_references = ktn_dcc_objects.TextureReferences()
 
-        dcc_shaders = s.get_all_dcc_geometry_shaders_by_location(location)
+        dcc_shaders = s.get_all_dcc_geometry_shaders_by_location(geometry_root)
         dcc_objs = dcc_texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )
@@ -891,25 +883,20 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 check_status=validation_checker.CheckStatus.Error,
             )
             return False
+        #
         s = ktn_scripts.ScpLookOutput(opt)
-        geometry_scheme = s.get_geometry_branch()
-        geometry_root_location = '/root/world/geo'
-        if geometry_scheme == 'asset':
-            root = self._rsv_scene_properties.get('dcc.root')
-            location = '{}{}'.format(geometry_root_location, root)
-        else:
-            root = '/assets'
-            location = '{}{}'.format(geometry_root_location, root)
+        geometry_scheme = s.get_geometry_scheme()
+        geometry_root = s.get_geometry_root()
+        geometry_location = self._rsv_scene_properties.get('dcc.geometry_location')
         #
         dcc_texture_references = ktn_dcc_objects.TextureReferences()
 
-        dcc_workspace = ktn_dcc_objects.AssetWorkspace()
-        dcc_shaders = dcc_workspace.get_all_dcc_geometry_shaders_by_location(location)
+        dcc_shaders = s.get_all_dcc_geometry_shaders_by_location(geometry_root)
         dcc_objs = dcc_texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )
         if dcc_objs:
             self._set_dcc_texture_workspace_check_(
                 validation_checker, check_group,
-                location, dcc_objs
+                geometry_root, dcc_objs
             )

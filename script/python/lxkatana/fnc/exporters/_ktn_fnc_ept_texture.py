@@ -1,10 +1,4 @@
 # coding:utf-8
-import copy
-
-from lxutil import utl_core
-
-import lxutil.dcc.dcc_objects as utl_dcc_objects
-
 from lxutil.fnc import utl_fnc_obj_abs
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -33,11 +27,21 @@ class TextureExporter(
         self._location = self.get('location')
 
     def set_run(self):
-        asset_workspace = ktn_dcc_objects.AssetWorkspace()
-        location = asset_workspace.get_geometry_location()
+        from lxkatana import ktn_core
+
+        import lxkatana.scripts as ktn_scripts
+        #
+        w_s = ktn_core.WorkspaceSetting()
+        opt = w_s.get_current_look_output_opt_force()
+        if opt is None:
+            return
+
+        s = ktn_scripts.ScpLookOutput(opt)
+
+        location = s.get_geometry_root()
         #
         texture_references = ktn_dcc_objects.TextureReferences()
-        dcc_shaders = asset_workspace.get_all_dcc_geometry_shaders_by_location(location)
+        dcc_shaders = s.get_all_dcc_geometry_shaders_by_location(location)
         dcc_objs = texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )

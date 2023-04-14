@@ -20,7 +20,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.DatabaseGeometryManagerPanel().set_window_show()'
+                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.PnlHashGeometry().set_window_show()'
         Texture(s):
             name: <..key>
             type: PrxExpandedGroup
@@ -56,6 +56,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: set_texture_color_spaces_switch
+
                 generate_texture_tiles_preview:
                     enable: True
                     name: Generate texture-tile(s) preview

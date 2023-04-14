@@ -27,9 +27,9 @@ class KatanaMenuSetup(utl_gui_qt_core.AsbQtMenuSetup):
             return qt_menu
 
     def set_setup(self):
-        self.set_menu_build_by_configure(
-            utl_configure.MainData.get_as_configure('katana/menu/main')
-        )
+        # self.set_menu_build_by_configure(
+        #     utl_configure.MainData.get_as_configure('katana/menu/main')
+        # )
         #
         import lxsession.commands as ssn_commands
         ssn_commands.set_hook_execute('dcc-menus/gen-menu')
@@ -53,7 +53,9 @@ class KatanaWorkspaceSetup(object):
         #
         import lxkatana.scripts as ktn_scripts
         #
-        ktn_core.CallbackMtd.add_arnold_callbacks()
+        ktn_core.CallbackMtd.add_as_startup_complete(
+            ktn_scripts.ScpCbkEnvironment().execute
+        )
         ktn_core.CallbackMtd.add_as_scene_new(
             ktn_scripts.ScpCbkEnvironment().execute
         )
@@ -67,16 +69,11 @@ class KatanaWorkspaceSetup(object):
     def add_gui_callback(cls):
         from lxkatana import ktn_core
         if ktn_core.get_is_ui_mode():
-            import lxkatana.scripts as ktn_scripts
-            ktn_core.CallbackMtd.add_as_scene_new(
-                ktn_scripts.ScpCbkGui().execute
-            )
-            ktn_core.CallbackMtd.add_as_scene_open(
-                ktn_scripts.ScpCbkGui().execute
-            )
-            ktn_core.CallbackMtd.add_as_scene_save(
-                ktn_scripts.ScpCbkGui().execute
-            )
+            import lxutil.scripts as utl_scripts
+            fnc = utl_scripts.ScpCbkGui().execute
+            ktn_core.CallbackMtd.add_as_scene_new(fnc)
+            ktn_core.CallbackMtd.add_as_scene_open(fnc)
+            ktn_core.CallbackMtd.add_as_scene_save(fnc)
     @classmethod
     def set_setup(cls):
         cls.add_environment_callback()

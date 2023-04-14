@@ -1,13 +1,13 @@
 # coding:utf-8
-from lxutil import utl_configure
+from lxutil import utl_core
 
 key = 'usda/shot-asset-set'
 
-t = utl_configure.Jinja.get_template(
+t = utl_core.Jinja.get_template(
     key
 )
 
-c = utl_configure.Jinja.get_configure(
+c = utl_core.Jinja.get_configure(
     key
 )
 

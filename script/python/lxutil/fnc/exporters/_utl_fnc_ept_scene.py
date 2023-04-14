@@ -117,11 +117,11 @@ class DotXgenUsdaExporter(
         if maya_scene_file_path:
             xgen_collection_file_paths = self._get_xgen_collection_file_paths_(maya_scene_file_path)
             key = 'usda/asset-xgen'
-            t = utl_configure.Jinja.get_template(
+            t = utl_core.Jinja.get_template(
                 key
             )
 
-            c = utl_configure.Jinja.get_configure(
+            c = utl_core.Jinja.get_configure(
                 key
             )
             for i_xgen_collection_file_path in xgen_collection_file_paths:

@@ -19,16 +19,6 @@ from lxutil.rsv import utl_rsv_obj_abstract
 
 
 class RsvUsdAssetSetCreator(object):
-    ASSET_OVERRIDE_VARIANTS = {
-        ('mod', 'modeling', 'model'),
-        ('grm', 'groom', 'groom'),
-        ('efx', 'effects', 'effect'),
-        ('rig', 'rigging', 'rig'),
-        ('srf', 'surfacing', 'surface'),
-    }
-    SHOT_ASSET_OVERRIDE_VARIANTS = {
-        ('rig', 'rigging', 'animation'),
-    }
     STEP_MAPPER = {
         'mod': 'model',
         'grm': 'groom',
@@ -551,11 +541,11 @@ class RsvUsdAssetSetCreator(object):
         )
         key = 'usda/asset-set-v002'
 
-        t = utl_configure.Jinja.get_template(
+        t = utl_core.Jinja.get_template(
             key
         )
 
-        c = utl_configure.Jinja.get_configure(
+        c = utl_core.Jinja.get_configure(
             key
         )
 
@@ -598,11 +588,11 @@ class RsvUsdAssetSetCreator(object):
 
             key = 'usda/shot-asset-set-v002'
 
-            t = utl_configure.Jinja.get_template(
+            t = utl_core.Jinja.get_template(
                 key
             )
 
-            c = utl_configure.Jinja.get_configure(
+            c = utl_core.Jinja.get_configure(
                 key
             )
             c.set('file', asset_shot_set_usd_file_path)
@@ -866,7 +856,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         )
         key = 'usda/set/shot-asset'
-        c = utl_configure.Jinja.get_configure(key)
+        c = utl_core.Jinja.get_configure(key)
         c.set_update(
             self._rsv_scene_properties.value
         )
@@ -881,8 +871,8 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         usda_dict = c.get('usdas')
         #
         for k, v in usda_dict.items():
-            t = utl_configure.Jinja.get_template(
-                u'{}/{}'.format(key, k)
+            t = utl_core.Jinja.get_template(
+                '{}/{}'.format(key, k)
             )
             i_raw = t.render(
                 **c.value
@@ -1080,7 +1070,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if step in step_mapper:
             key = step_mapper[step]
             #
-            c = utl_configure.Jinja.get_configure(key)
+            c = utl_core.Jinja.get_configure(key)
             #
             c.set_update(
                 self._rsv_scene_properties.value
@@ -1104,7 +1094,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     i_replace = v['replace']
                 else:
                     raise RuntimeError()
-                t = utl_configure.Jinja.get_template('{}/{}'.format(key, k))
+                t = utl_core.Jinja.get_template('{}/{}'.format(key, k))
                 i_raw = t.render(
                     **c.value
                 )

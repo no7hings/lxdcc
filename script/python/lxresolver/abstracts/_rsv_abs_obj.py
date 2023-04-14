@@ -1381,11 +1381,10 @@ class AbsRsvTask(
         )
         rsv_unit = self.get_rsv_unit(keyword=keyword)
         directory_path = rsv_unit.get_result()
-        storage_scheme = self.get_rsv_project().get_storage_scheme()
-        if storage_scheme == 'default':
-            bsc_core.StgExtraMtd.create_directory(directory_path)
-        elif storage_scheme == 'rpc':
-            bsc_core.StgRpcMtd.create_directory(directory_path)
+
+        bsc_core.StgPathPermissionMtd.create_directory(
+            directory_path
+        )
 
 
 # <rsv-step>
@@ -2890,9 +2889,20 @@ class AbsRsvProject(
         return self._raw_opt.get('schemes.storage')
 
     def get_dcc_data(self, application):
-        return self._raw_opt.get_content_as_unfold(
+        app_data = self._raw_opt.get_content_as_unfold(
             'dcc-data.{}'.format(application)
-        ).get_value()
+        )
+        extend_data = self._raw_opt.get('dcc-data.extend') or {}
+        for k, v in extend_data.items():
+            app_data.set(
+                k, v.format(**app_data.value)
+            )
+        app_extend_data = self._raw_opt.get('dcc-data.{}-extend'.format(application)) or {}
+        for k, v in app_extend_data.items():
+            app_data.set(
+                k, v.format(**app_data.value)
+            )
+        return app_data.get_value()
 
     def _get_rsv_obj_exists_(self, rsv_obj_path):
         return self._rsv_obj_stack.get_object_exists(rsv_obj_path)

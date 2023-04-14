@@ -95,19 +95,3 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                             args_execute=['-- {}'.format(j_e_s_extend)]
                         )
         return dict_
-
-
-class EtrStorage(bsc_etr_abstracts.AbsEtrStorage):
-    @classmethod
-    def create_directory(cls, directory_path):
-        bsc_core.StgRpcMtd.create_directory(directory_path)
-    @classmethod
-    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
-        bsc_core.StgRpcMtd.copy_to_file(
-            file_path_src, file_path_tgt, replace=replace
-        )
-    @classmethod
-    def change_owner(cls, path, user='artist', group='artists'):
-        bsc_core.StgRpcMtd.change_owner(
-            path, user, group
-        )

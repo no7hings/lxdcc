@@ -105,6 +105,7 @@ class GeometryAlembicBlender(object):
 
 
 class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
+    KEY = 'asset build'
     VAR_NAMES = ['hi', 'shape']
     #
     OPTION = dict(
@@ -125,10 +126,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         with_groom_grow_geometry=False,
         #
         with_surface_geometry_uv_map=False,
-        with_work_surface_geometry_uv_map=False,
+        with_surface_work_geometry_uv_map=False,
         uv_map_face_vertices_contrast=False,
         #
         with_surface_look=False,
+        with_surface_work_look=False,
         with_surface_cfx_look=False,
         #
         with_surface_look_preview=False,
@@ -255,10 +257,10 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 #
                 g_p.set_stop()
     @classmethod
-    def _set_work_geometry_uv_map_build_by_usd_(cls, rsv_task, with_work_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast):
+    def _set_work_geometry_uv_map_build_by_usd_(cls, rsv_task, with_surface_work_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast):
         import lxmaya.fnc.importers as mya_fnc_importers
         #
-        if with_work_surface_geometry_uv_map is True:
+        if with_surface_work_geometry_uv_map is True:
             root = None
             if rsv_task:
                 g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
@@ -333,6 +335,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                             name_join_time_tag=True,
                         )
                     ).set_run()
+                else:
+                    bsc_core.LogMtd.trace_method_warning(
+                        cls.KEY,
+                        'rsv-unit={} is non-exists'.format(look_ass_file)
+                    )
     @classmethod
     def _set_look_preview_build_by_yml_(cls, rsv_task, with_surface_look_preview):
         import lxmaya.fnc.importers as mya_fnc_importers
@@ -431,10 +438,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         with_groom_grow_geometry = self.get('with_groom_grow_geometry')
         #
         with_surface_geometry_uv_map = self.get('with_surface_geometry_uv_map')
-        with_work_surface_geometry_uv_map = self.get('with_work_surface_geometry_uv_map')
+        with_surface_work_geometry_uv_map = self.get('with_surface_work_geometry_uv_map')
         uv_map_face_vertices_contrast = self.get('uv_map_face_vertices_contrast')
         #
         with_surface_look = self.get('with_surface_look')
+        with_surface_work_look = self.get('with_surface_work_look')
         with_surface_cfx_look = self.get('with_surface_cfx_look')
         #
         with_surface_look_preview = self.get('with_surface_look_preview')
@@ -457,15 +465,47 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         rsv_asset = rsv_project.get_rsv_resource(asset=asset)
         #
-        model_rsv_task = rsv_project.get_rsv_task(asset=asset, step='mod', task='modeling')
-        model_act_rsv_task = rsv_project.get_rsv_task(asset=asset, step='mod', task='mod_dynamic')
-        groom_rsv_task = rsv_project.get_rsv_task(asset=asset, step='grm', task='groom')
-        surface_rsv_task = rsv_project.get_rsv_task(asset=asset, step='srf', task='surfacing')
-        surface_occ_rsv_task = rsv_project.get_rsv_task(asset=asset, step='srf', task='srf_anishading')
-        surface_cfx_rsv_task = rsv_project.get_rsv_task(asset=asset, step='srf', task='srf_cfxshading')
+        model_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.model'),
+            task=rsv_project.properties.get('asset_tasks.model')
+        )
+        model_act_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.model'),
+            task=rsv_project.properties.get('asset_tasks.model_act'),
+        )
+        groom_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.groom'),
+            task=rsv_project.properties.get('asset_tasks.groom')
+        )
+        surface_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.surface'),
+            task=rsv_project.properties.get('asset_tasks.surface')
+        )
+        surface_occ_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.surface'),
+            task=rsv_project.properties.get('asset_tasks.surface_ani')
+        )
+        surface_cfx_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.surface'),
+            task=rsv_project.properties.get('asset_tasks.surface_cfx')
+        )
         #
-        camera_rsv_task = rsv_project.get_rsv_task(asset=asset, step='cam', task='camera')
-        light_rsv_task = rsv_project.get_rsv_task(asset='lightrig', step='lgt', task='lighting')
+        camera_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.camera'),
+            task=rsv_project.properties.get('asset_tasks.camera')
+        )
+        light_rsv_task = rsv_project.get_rsv_task(
+            asset='lightrig',
+            step=rsv_project.properties.get('asset_steps.light_rig'),
+            task=rsv_project.properties.get('asset_tasks.light_rig')
+        )
         #
         method_args = [
             (self._set_geometry_build_by_usd_, (model_rsv_task, with_model_geometry, geometry_var_names)),
@@ -476,7 +516,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             (self._set_groom_geometry_build_, (groom_rsv_task, with_groom_geometry, with_groom_grow_geometry)),
             #
             (self._set_geometry_uv_map_build_by_usd_, (surface_rsv_task, with_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
-            (self._set_work_geometry_uv_map_build_by_usd_, (surface_rsv_task, with_work_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
+            (self._set_work_geometry_uv_map_build_by_usd_, (surface_rsv_task, with_surface_work_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
             #
             (self._set_look_build_by_ass_, (surface_rsv_task, with_surface_look)),
             (self._set_look_build_by_ass_, (surface_cfx_rsv_task, with_surface_cfx_look)),

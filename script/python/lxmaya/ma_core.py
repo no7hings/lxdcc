@@ -17,6 +17,8 @@ from . import ma_configure
 
 from PySide2 import QtWidgets
 
+from lxmaya.core import *
+
 
 def _ma__get_group_paths_():
     return [

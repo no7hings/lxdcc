@@ -635,19 +635,15 @@ class DccTexturesOpt(object):
     def set_color_space_auto_switch(self):
         dcc_nodes = self._texture_references.get_objs()
         if dcc_nodes:
-            g_p = utl_core.GuiProgressesRunner(
-                maximum=len(dcc_nodes)
-            )
-            for dcc_node in dcc_nodes:
-                g_p.set_update()
-                stg_files = dcc_node.get_file_objs()
-                if stg_files:
-                    for stg_file in stg_files:
-                        if stg_file.get_is_exists() is True:
-                            color_space = stg_file.get_tx_color_space()
-                            dcc_node.set_color_space(color_space)
-            #
-            g_p.set_stop()
+            with utl_core.GuiProgressesRunner.create(maximum=len(dcc_nodes), label='switch color-space auto') as g_p:
+                for i_dcc_node in dcc_nodes:
+                    g_p.set_update()
+                    stg_files = i_dcc_node.get_file_objs()
+                    if stg_files:
+                        for stg_file in stg_files:
+                            if stg_file.get_is_exists() is True:
+                                color_space = stg_file.get_tx_color_space()
+                                i_dcc_node.set_color_space(color_space)
 
     def set_tx_repath_to_orig(self):
         objs = self._objs

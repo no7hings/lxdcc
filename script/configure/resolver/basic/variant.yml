@@ -93,7 +93,8 @@ shot_steps:
     effect: efx
     character_effext: cfx
     light: lgt
-    light_rig: lgtrig
+    # use light
+    light_rig: lgt
     #
     digital_matte_paint: dmp
     composition: cmp
@@ -115,13 +116,17 @@ shot_steps_extra:
 #   asset
 asset_tasks:
     model: modeling
+    model_act: mod_dynamic
     groom: groom
     effect: effect
     rig: rigging
     character_effect: cfx
     surface: surfacing
+    surface_ani: srf_anishading
+    surface_cfx: srf_cfxshading
     light: lighting
     light_rig: lighting
+    canera: camera
 #   sequence
 sequence_tasks: {}
 #   shot

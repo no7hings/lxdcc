@@ -107,12 +107,16 @@ shot_steps_extra: []
 #   asset
 asset_tasks:
     model: modeling
+    model_act: mod_dynamic
     groom: groom
     rig: rigging
     effect: effect
     surface: surface
+    surface_ani: srf_anishading
+    surface_cfx: srf_cfxshading
     light: lighting
     light_rig: light_rig
+    canera: camera
 #   sequence
 sequence_tasks: {}
 #   shot

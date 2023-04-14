@@ -150,8 +150,8 @@ ktn_scripts.ScpLookOutput(
 
     def get_geometry_uv_map_usd_source_file(self):
         s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
-        root_location = s.get_obj_opt('/root').get('lynxi.variants.geometry.root')
-        _ = s.get_obj_opt(root_location).get('userProperties.usd.variants.asset.surface.override.file')
+        geometry_root_location = s.get_obj_opt('/root').get('lynxi.variants.geometry.root')
+        _ = s.get_obj_opt(geometry_root_location).get('userProperties.usd.variants.asset.surface.override.file')
         if _:
             f_opt = bsc_core.StgFileOpt(_)
             # TODO fix this bug
@@ -161,13 +161,21 @@ ktn_scripts.ScpLookOutput(
                 )
             return _
 
-    def get_geometry_branch(self):
+    def get_geometry_scheme(self):
         s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
-        return s.get_obj_opt('/root').get('lynxi.variants.geometry.branch')
+        if s.get_obj_exists('/root/world/geo/master') is True:
+            return 'asset'
+        elif s.get_obj_exists('/root/world/geo/assets') is True:
+            return 'shot'
+        return 'asset'
 
-    def get_geometry_root_location(self):
+    def get_geometry_root(self):
         s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
-        return s.get_obj_opt('/root').get('lynxi.variants.geometry.root')
+        if s.get_obj_exists('/root/world/geo/master') is True:
+            return '/root/world/geo/master'
+        elif s.get_obj_exists('/root/world/geo/assets') is True:
+            return '/root/world/geo/assets'
+        return '/root/world/geo/master'
 
     def export_ass_auto(self, dynamic_override_uv_maps=False):
         node = ktn_dcc_objects.Node(
@@ -176,7 +184,8 @@ ktn_scripts.ScpLookOutput(
         if node.get_is_exists() is True:
             parent_path = node.get_parent_path()
             look_pass_names = self.get_all_look_pass_names()
-            geometry_scheme = self.get_geometry_branch()
+            geometry_scheme = self.get_geometry_scheme()
+            geometry_root = self.get_geometry_root()
             if geometry_scheme == 'asset':
                 nodes = []
                 for i_look_pass_name in look_pass_names:
@@ -216,13 +225,10 @@ ktn_scripts.ScpLookOutput(
             self._obj_opt.get_path()
         )
         if node.get_is_exists() is True:
-            geometry_scheme = self.get_geometry_branch()
-            if geometry_scheme == 'asset':
-                location = self.get_geometry_root_location()
-            else:
-                location = '/root/world/geo/assets'
+            geometry_scheme = self.get_geometry_scheme()
+            geometry_root = self.get_geometry_root()
             #
-            node.set('rootLocations', [location])
+            node.set('rootLocations', [geometry_root])
             #
             node.get_port('saveTo').set(file_path)
             #
@@ -241,13 +247,10 @@ ktn_scripts.ScpLookOutput(
             self._obj_opt.get_path()
         )
         if node.get_is_exists() is True:
-            geometry_scheme = self.get_geometry_branch()
-            if geometry_scheme == 'asset':
-                location = self.get_geometry_root_location()
-            else:
-                location = '/root/world/geo/assets'
+            geometry_scheme = self.get_geometry_scheme()
+            geometry_root = self.get_geometry_root()
             #
-            dcc_shaders = self.get_all_dcc_geometry_shaders_by_location(location)
+            dcc_shaders = self.get_all_dcc_geometry_shaders_by_location(geometry_root)
             #
             patterns = [
                 # etc. '/tmp/file.%04d.ext'%frame
@@ -256,7 +259,7 @@ ktn_scripts.ScpLookOutput(
                 '*frame*'
             ]
             dict_ = {}
-
+            #
             if dcc_shaders:
                 for i_dcc_shader in dcc_shaders:
                     i_p = i_dcc_shader.get_port('parameters')
@@ -296,8 +299,8 @@ ktn_scripts.ScpLookOutput(
 class ScpLookAssImport(object):
     OPTION = dict(
         root='/master',
-        geometry_root='/root/world/geo',
-        material_root='/root/materials',
+        geometry_location='/root/world/geo',
+        material_location='/root/materials',
         look_pass='default',
     )
     CACHE = {}
@@ -310,8 +313,8 @@ class ScpLookAssImport(object):
 
         self._look_pass_name = self._option.get('look_pass')
         self._root_location = self._option.get('root')
-        self._geometry_root_location = self._option.get('geometry_root')
-        self._material_root_location = self._option.get('material_root')
+        self._geometry_root_location = self._option.get('geometry_location')
+        self._material_root_location = self._option.get('material_location')
 
         self._time_tag = bsc_core.TimestampOpt(bsc_core.StgFileOpt(self._file_path).get_modify_timestamp()).get_as_tag_36()
 

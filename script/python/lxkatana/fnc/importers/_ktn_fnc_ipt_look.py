@@ -466,9 +466,6 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         pass_name = self._pass_name
         asset_root = self._configure.get('option.asset_root')
         #
-        geometry_root = self._configure.get('option.geometry_root')
-        material_root = self._configure.get('option.material_root')
-        #
         and_geometry_opt = and_dcc_operators.ShapeLookOpt(and_geometry)
         #
         and_material_paths = and_geometry.get_input_port('material').get()

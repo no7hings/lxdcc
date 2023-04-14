@@ -436,6 +436,11 @@ class CallbackMtd(object):
             pass
 
     @classmethod
+    def add_as_startup_complete(cls, fnc):
+        callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onStartupComplete)
+        callback_opt.set_add()
+
+    @classmethod
     def add_as_scene_new(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onNewScene)
         callback_opt.set_add()

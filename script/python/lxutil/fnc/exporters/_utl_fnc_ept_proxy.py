@@ -41,7 +41,7 @@ class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         file_path = option.get('file')
         #
-        j2_template = utl_configure.Jinja.XARC.get_template('proxy.j2')
+        j2_template = utl_core.Jinja.get_template('xarc/proxy')
         raw = j2_template.render(
             **self._option
         )

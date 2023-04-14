@@ -27,7 +27,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         #
         frame=None,
         #
-        geometry_root='/root/world/geo',
+        geometry_location='/root/world/geo',
         output_obj=None,
         #
         camera_location='/root/world/cam/camera',

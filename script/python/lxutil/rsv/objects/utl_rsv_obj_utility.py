@@ -10,7 +10,7 @@ import lxresolver.commands as rsv_commands
 import lxresolver.methods as rsv_methods
 
 
-class RsvAssetWorkspaceTextureOpt(object):
+class RsvAssetTextureOpt(object):
     def __init__(self, rsv_task):
         self._resolver = rsv_commands.get_resolver()
 
@@ -54,14 +54,16 @@ class RsvAssetWorkspaceTextureOpt(object):
     def set_version_create_at(self, variant, version):
         if version == 'new':
             version = self.get_new_version_at(variant)
-        #
-        bsc_core.StorageMtd.create_directory(
+        # base
+        bsc_core.StgPathPermissionMtd.create_directory(
             self.get_directory_path_at(variant, version)
         )
-        bsc_core.StorageMtd.create_directory(
+        # src
+        bsc_core.StgPathPermissionMtd.create_directory(
             self.get_src_directory_path_at(variant, version)
         )
-        bsc_core.StorageMtd.create_directory(
+        # tx
+        bsc_core.StgPathPermissionMtd.create_directory(
             self.get_tx_directory_path_at(variant, version)
         )
         #
@@ -75,7 +77,7 @@ class RsvAssetWorkspaceTextureOpt(object):
     def set_version_lock_at(self, variant, version):
         directory_path = self.get_directory_path_at(variant, version)
         #
-        self.set_directory_locked(directory_path)
+        bsc_core.StgPathPermissionMtd.lock(directory_path)
         #
         utl_core.Log.set_module_result_trace(
             'version lock',
@@ -84,8 +86,8 @@ class RsvAssetWorkspaceTextureOpt(object):
             )
         )
     @classmethod
-    def set_directory_locked(cls, directory_path):
-        bsc_core.StgPathSshOpt(
+    def lock_directory(cls, directory_path):
+        bsc_core.StgSshOpt(
             directory_path
         ).set_just_read_only_for(
             ['cg_group', 'coop_grp']
@@ -187,7 +189,7 @@ class RsvAssetWorkspaceTextureOpt(object):
         if unlocked_directory_paths:
             with utl_core.LogProgressRunner.create_as_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
                 for _i in unlocked_directory_paths:
-                    self.set_directory_locked(_i)
+                    self.lock_directory(_i)
                     g_p.set_update()
 
     def set_all_directories_locked_with_dialog(self, dcc_objs):
@@ -208,3 +210,31 @@ class RsvAssetWorkspaceTextureOpt(object):
             kwargs_0, kwargs_1 = copy.copy(kwargs), copy.copy(kwargs)
             kwargs_0['keyword'], kwargs_1['keyword'] = 'asset-source-texture-src-dir', 'asset-source-texture-tx-dir'
             return self._resolver.get_result(**kwargs_0), self._resolver.get_result(**kwargs_1)
+
+
+class RsvAssetBuildOpt(object):
+    def __init__(self, rsv_resource):
+        self._resolver = rsv_commands.get_resolver()
+
+        self._rsv_resource = rsv_resource
+        self._rsv_project = self._rsv_resource.get_rsv_project()
+        # model
+        self._model_rsv_task = rsv_resource.get_rsv_task(
+            step=self._rsv_project.properties.get('asset_steps.model'),
+            task=self._rsv_project.properties.get('asset_tasks.model')
+        )
+
+        self._model_act_rsv_task = rsv_resource.get_rsv_task(
+            step=self._rsv_project.properties.get('asset_steps.model'),
+            task=self._rsv_project.properties.get('asset_tasks.model_act'),
+        )
+        # groom
+        self._groom_rsv_task = rsv_resource.get_rsv_task(
+            step=self._rsv_project.properties.get('asset_steps.groom'),
+            task=self._rsv_project.properties.get('asset_tasks.groom')
+        )
+        # surface
+        self._surface_rsv_task = rsv_resource.get_rsv_task(
+            step=self._rsv_project.properties.get('asset_steps.surface'),
+            task=self._rsv_project.properties.get('asset_tasks.surface')
+        )

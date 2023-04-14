@@ -1,41 +1,65 @@
 # ******************************************************************************************************************** #
 dcc-data:
+    extend:
+        # renderable
+        renderable_root: '{root}/hi'
+        # shape
+        shape_root: '{root}/shape'
+        #
+        model_shape_location: '{root}/shape/mod_shapegrp'
+        groom_shape_location: '{root}/shape/grm_shapegrp'
+        chracter_effect_shape_location: '{root}/shape/cfx_shapegrp'
+        effect_shape_location: '{root}/shape/efx_shapegrp'
+        rig_shape_location: '{root}/shape/rig_shapegrp'
+        surface_shape_location: '{root}/shape/srf_shapegrp'
+        light_shape_location: '{root}/shape/lgt_shapegrp'
+        extend_shape_location: '{root}/shape/misc'
+    #
+    maya-extend:
+        renderable_root: '{root}/mod/hi'
+        #
+        shape_root: ''
+        #
+        model_shape_location: '{root}/mod/misc'
+        groom_shape_location: '{root}/grm'
+        chracter_effect_shape_location: '{root}/cfx'
+        effect_shape_location: '{root}/efx'
+        rig_shape_location: '{root}/rig'
+        surface_shape_location: '{root}/srf'
+        light_shape_location: '{root}/lgt'
+        extend_shape_location: '{root}/misc/etd_shapegrp'
+    #
     maya:
         pathsep: '|'
+        geometry_location: '/'
+        #
         root_name: 'master'
         root: '/master'
-        location: '/'
-        #
-        high_location: '<.root>/mod/hi'
     #
     houdini:
         pathsep: '/'
+        geometry_location: '/'
+        #
         root_name: 'master'
         root: '/master'
-        location: '/'
-        #
-        high_location: '<.root>/hi'
     #
     katana:
         pathsep: '/'
+        geometry_location: '/root/world/geo'
+        #
         root_name: 'master'
         root: '/master'
-        location: '/root/world/geo'
-        #
-        high_location: '<.root>/hi'
     #
     clarisse:
         pathsep: '/'
+        geometry_location: '/'
+        #
         root_name: 'master'
         root: '/master'
-        location: '/'
-        #
-        high_location: '<.root>/hi'
     #
     nuke:
         pathsep: '/'
+        geometry_location: '/'
+        #
         root_name: 'master'
         root: '/master'
-        location: '/'
-        #
-        high_location: '<.root>/hi'

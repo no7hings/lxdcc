@@ -1072,7 +1072,7 @@ class AbsSpcWspLookGroup(AbsWsp):
 
         import lxresolver.scripts as rsv_scripts
 
-        env_data = rsv_scripts.ScpEnvironmentOpt.get_as_dict()
+        env_data = rsv_scripts.ScpEnvironment.get_as_dict()
 
         resolver = rsv_commands.get_resolver()
 

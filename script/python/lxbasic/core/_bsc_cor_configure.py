@@ -34,8 +34,24 @@ class CfgFileMtd(object):
                         cls.CACHE[key] = value
                         return value
     @classmethod
+    def get_directories(cls, key):
+        list_ = []
+        for i_path in cls.get_search_directories():
+            i_path_opt = _bsc_cor_storage.StgPathOpt(i_path)
+            if i_path_opt.get_is_exists() is True:
+                i_glob_pattern = '{}/{}'.format(i_path_opt.path, key)
+                i_results = _bsc_cor_storage.StgExtraMtd.get_paths_by_fnmatch_pattern(
+                    i_glob_pattern
+                )
+                if i_results:
+                    list_.extend(i_results)
+        return list_
+    @classmethod
     def get_yaml(cls, key):
         return cls.get('{}.yml'.format(key))
+    @classmethod
+    def get_jinja(cls, key):
+        return cls.get('{}.j2'.format(key))
     @classmethod
     def get_all(cls, key):
         for i_path in cls.get_search_directories():

@@ -7,7 +7,7 @@ from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor
 
 
 class StgRpcMtd(object):
-    RPC_SERVER = '10.10.152.74'
+    RPC_SERVER = '10.10.206.117'
     RPC_PORT = 58888
     PATHSEP = '/'
     @classmethod
@@ -34,10 +34,8 @@ class StgRpcMtd(object):
             timeout = 25
             cost_time = 0
             start_time = time.time()
-            # noinspection PyUnresolvedReferences
-            from cosmos.rpc import client
-            clt = client.generate_client()
-            clt.makedir(directory_path, mode)
+            clt = cls.get_client()
+            clt.mkdir(directory_path, mode)
             p = os.path.dirname(directory_path)
             while os.path.exists(directory_path) is False:
                 cost_time = int(time.time() - start_time)
@@ -70,9 +68,7 @@ class StgRpcMtd(object):
             timeout = 25
             cost_time = 0
             start_time = time.time()
-            # noinspection PyUnresolvedReferences
-            from cosmos.rpc import client
-            clt = client.generate_client()
+            clt = cls.get_client()
             clt.rm_file(file_path)
             while os.path.exists(file_path) is False:
                 cost_time = int(time.time()-start_time)
@@ -105,9 +101,7 @@ class StgRpcMtd(object):
             timeout = 25
             cost_time = 0
             start_time = time.time()
-            # noinspection PyUnresolvedReferences
-            from cosmos.rpc import client
-            clt = client.generate_client()
+            clt = cls.get_client()
             clt.copyfile(file_path_src, file_path_tgt)
             p = os.path.dirname(file_path_tgt)
             while os.path.exists(file_path_tgt) is False:
@@ -142,9 +136,7 @@ class StgRpcMtd(object):
     def change_mode(cls, path, mode='775'):
         key = 'rpc change mode'
         if os.path.exists(path) is True:
-            # noinspection PyUnresolvedReferences
-            from cosmos.rpc import client
-            clt = client.generate_client()
+            clt = cls.get_client()
             clt.chmod(path, mode)
             p = os.path.dirname(path)
             if SystemMtd.get_is_linux():
@@ -154,12 +146,10 @@ class StgRpcMtd(object):
                 'path="{}", mode="{}"'.format(path, mode)
             )
     @classmethod
-    def change_owner(cls, path, user, group='artists'):
+    def change_owner(cls, path, user='artist', group='artists'):
         key = 'rpc change owner'
         if os.path.exists(path) is True:
-            # noinspection PyUnresolvedReferences
-            from cosmos.rpc import client
-            clt = client.generate_client()
+            clt = cls.get_client()
             clt.chown(path, user, group)
             p = os.path.dirname(path)
             if SystemMtd.get_is_linux():
@@ -369,7 +359,7 @@ class StgSshMtd(object):
         return list_
 
 
-class StgPathSshOpt(StgSshMtd):
+class StgSshOpt(StgSshMtd):
     def __init__(self, path):
         self._path = path
         self._nas_path = StorageMtd.set_map_to_nas(path)
@@ -432,10 +422,29 @@ class StgPathSshOpt(StgSshMtd):
 
 class StgUserMtd(object):
     @classmethod
+    def get_windows_home(cls):
+        return '{}/{}'.format(
+            os.environ.get('HOMEDRIVE', 'c:'),
+            os.environ.get('HOMEPATH', 'c:/temp')
+        ).replace('\\', '/')
+    @classmethod
+    def get_linux_home(cls):
+        return '{}'.format(
+            os.environ.get('HOME', '/temp')
+        )
+    @classmethod
+    def get_home(cls):
+        if SystemMtd.get_is_windows():
+            return cls.get_windows_home()
+        elif SystemMtd.get_is_linux():
+            return cls.get_linux_home()
+        else:
+            raise SystemError()
+    @classmethod
     def get_windows_user_directory(cls):
         return '{}/{}/.lynxi'.format(
             os.environ.get('HOMEDRIVE', 'c:'),
-            os.environ.get('HOMEPATH', '/temp')
+            os.environ.get('HOMEPATH', 'c:/temp')
         ).replace('\\', '/')
     @classmethod
     def get_linux_user_directory(cls):
@@ -1470,3 +1479,164 @@ class StgTmpTextMtd(object):
         return '{}/.txt/{}/{}/{}{}'.format(
             directory_path, tag, region, key, '.txt'
         )
+
+
+class StgPathPermissionDefaultMtd(object):
+    @classmethod
+    def create_directory(cls, path, mode):
+        StgPathMtd.create_directory(path, mode)
+    @classmethod
+    def change_mode(cls, path, mode):
+        pass
+    @classmethod
+    def change_owner(cls, path, user='artist', group='artists'):
+        pass
+    @classmethod
+    def lock(cls, path):
+        StgSshOpt(
+            path
+        ).set_just_read_only_for(
+            ['cg_group', 'coop_grp']
+        )
+    @classmethod
+    def lock_all_below(cls, path):
+        StgSshOpt(
+            path
+        ).set_just_read_only_for(
+            ['cg_group', 'coop_grp']
+        )
+    @classmethod
+    def unlock(cls, path):
+        pass
+    @classmethod
+    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
+        StgFileOpt(file_path_src).set_copy_to_file(
+            file_path_tgt, replace=replace
+        )
+
+
+class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
+    @classmethod
+    def create_directory(cls, path, mode):
+        StgRpcMtd.create_directory(path)
+    @classmethod
+    def change_mode(cls, path, mode):
+        StgRpcMtd.change_mode(path, mode)
+    @classmethod
+    def change_owner(cls, path, user='artist', group='artists'):
+        StgRpcMtd.change_owner(path, user, group)
+    @classmethod
+    def lock(cls, path):
+        StgRpcMtd.change_mode(
+            path, '555'
+        )
+    @classmethod
+    def lock_all_below(cls, path):
+        StgRpcMtd.change_mode(
+            path, '555'
+        )
+        ds = StgDirectoryMtd.get_all_directory_paths__(
+            path
+        )
+        for i in ds:
+            StgRpcMtd.change_mode(
+                i, '555'
+            )
+    @classmethod
+    def unlock(cls, path):
+        pass
+    @classmethod
+    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
+        StgRpcMtd.copy_to_file(
+            file_path_src, file_path_tgt, replace=replace
+        )
+
+
+class StgPathPermissionBaseMtd(object):
+    SCHEME_MAPPER = dict(
+        windows={
+            'default': ['l:', 'L:'],
+            'new': ['x:', 'X:']
+        },
+        linux={
+            'default': ['/l'],
+            'new': ['/production']
+        }
+    )
+    MAP_DICT = {
+        i: k for k, v in SCHEME_MAPPER[SystemMtd.get_platform()].items() for i in v
+    }
+    METHOD_DICT = dict(
+        default=StgPathPermissionDefaultMtd,
+        new=StgPathPermissionNewMtd
+    )
+    @classmethod
+    def get_mode(cls, user, group, other):
+        query = [
+            '---',  # 0
+            '--x',  # 1
+            '-w-',  # 2
+            '-wx',  # 3
+            'r--',  # 4
+            'r-x',  # 5
+            'rw-',  # 6
+            'rwx',  # 7
+        ]
+        return str(query.index(user))+str(query.index(group))+str(query.index(other))
+    @classmethod
+    def get_scheme(cls, path):
+        for k, v in cls.MAP_DICT.items():
+            if path.startswith(k+'/'):
+                return v
+        return 'default'
+    @classmethod
+    def get_method(cls, path):
+        """
+print StgPathPermissionBaseMtd.get_method(
+    '/l/prod'
+)
+print StgPathPermissionBaseMtd.get_method(
+    '/production/shows'
+)
+        :param path:
+        :return:
+        """
+        return cls.METHOD_DICT[cls.get_scheme(path)]
+
+
+class StgPathPermissionMtd(object):
+    def __init__(self, path):
+        self._path = path
+        self._method = StgPathPermissionBaseMtd.get_method(
+            path
+        )
+    @classmethod
+    def create_directory(cls, path, mode='775'):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).create_directory(path, mode)
+    @classmethod
+    def change_owner(cls, path, user='artist', group='artists'):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).change_owner(path, user, group)
+    @classmethod
+    def change_mode(cls, path, mode):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).change_mode(path, mode)
+    @classmethod
+    def lock(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).lock(path)
+    @classmethod
+    def lock_all_below(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).lock_all_below(path)
+    @classmethod
+    def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
+        StgPathPermissionBaseMtd.get_method(
+            file_path_tgt
+        ).copy_to_file(file_path_src, file_path_tgt, replace)

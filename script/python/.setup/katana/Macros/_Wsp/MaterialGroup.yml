@@ -71,7 +71,7 @@ main:
         #
         user/option/geometry_root:
             widget: path
-            value: '/root/world/geo'
+            value: '/root/world/geo/master'
             tool_tip: '...'
             lock: True
         #

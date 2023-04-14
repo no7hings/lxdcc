@@ -34,42 +34,22 @@ class ScpCbkEnvironment(object):
                 cls.KEY,
                 'register: key="{}", value="{}"'.format(i_env_key, i_env_value)
             )
-    @classmethod
-    def add_for_render(cls):
-        pass
 
     def add_from_resolver(self, *args, **kwargs):
-        import lxresolver.commands as rsv_commands
-        #
-        data = []
         if 'filename' in kwargs:
             f = kwargs['filename']
         else:
             f = ktn_core.NodegraphAPI.GetProjectFile()
         #
-        if f:
-            resolver = rsv_commands.get_resolver()
-            rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(f)
-            if rsv_scene_properties:
-                dict_ = rsv_scene_properties.get_value()
-                keys = resolver.VariantTypes.All
-                for i_key in keys:
-                    if i_key in dict_:
-                        i_env_key = 'PG_{}'.format(i_key.upper())
-                        i_env_value = dict_[i_key]
-                        data.append(
-                            (i_key, i_env_key, i_env_value)
-                        )
-                #
-                bsc_core.LogMtd.trace_method_result(
-                    self.KEY,
-                    'load from resolver'
-                )
-                return True, data
-        return False, None
+        import lxresolver.scripts as rsv_scripts
+        return rsv_scripts.ScpEnvironment.get_data(f)
 
     def add_from_work_environment(self, *args, **kwargs):
-        return False, None
+        import lxshotgun.scripts as stg_objects
+        task_id = bsc_core.EnvironMtd.get(
+            'PAPER_TASK_ID'
+        )
+        return stg_objects.ScpEnvironment.get_data(task_id)
 
     def add_from_scene(self, *args, **kwargs):
         workspace_setting = ktn_core.WorkspaceSetting()
@@ -85,14 +65,14 @@ class ScpCbkEnvironment(object):
     def execute(self, *args, **kwargs):
         if ktn_core.get_is_ui_mode():
             fncs = [
-                self.add_from_work_environment,
-                #
                 self.add_from_resolver,
+                self.add_from_work_environment,
                 self.add_from_scene,
             ]
         else:
             fncs = [
                 self.add_from_resolver,
+                self.add_from_work_environment,
                 self.add_from_scene,
             ]
 

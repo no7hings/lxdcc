@@ -386,16 +386,18 @@ class StorageMtd(object):
             _mode_list = [
                 #
                 'd',
-                # self
+                # user
+                # read, write, execute
                 'r', 'w', 'x',
                 # group
                 'r', 'w', 'x',
                 # other
                 'r', 'w', 'x'
             ]
-            _mode_str = bin(st_mode_)[-10:]
+            print st_mode_
+            _mode_b = bin(st_mode_)[-10:]
             _result = ''
-            for _idx, _flg in enumerate(_mode_str):
+            for _idx, _flg in enumerate(_mode_b):
                 if _flg == '1':
                     _result += _mode_list[_idx]
                 else:

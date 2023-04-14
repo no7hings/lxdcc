@@ -165,7 +165,7 @@ class ScpRenderBuild(object):
                         )
                     )
                     # create directory
-                    bsc_etr_methods.EtrStorage.create_directory(
+                    bsc_core.StgPathPermissionMtd.create_directory(
                         i_result
                     )
                 else:
@@ -199,7 +199,7 @@ class ScpRenderBuild(object):
             file_path
         ).get_render_file_path()
         #
-        bsc_etr_methods.EtrStorage.copy_to_file(
+        bsc_core.StgPathPermissionMtd.copy_to_file(
             file_path,
             render_file_path
         )

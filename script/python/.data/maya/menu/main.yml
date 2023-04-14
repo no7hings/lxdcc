@@ -66,7 +66,7 @@ tools:
         type: item
         name: Database Geometry Manager
         icon: None
-        command: import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.DatabaseGeometryManagerPanel().set_window_show()
+        command: import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.PnlHashGeometry().set_window_show()
     #
     asset_builder:
         type: item

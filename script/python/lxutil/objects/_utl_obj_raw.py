@@ -683,7 +683,7 @@ class DotUsdaFile(object):
     def _set_write_(cls, key, file_path, option):
         directory_path = os.path.dirname(file_path)
         #
-        j2_template = utl_configure.Jinja.USDA.get_template(key)
+        j2_template = utl_core.Jinja.get_template('usda/{}'.format(key))
         kwargs = copy.copy(cls.OPTION)
         #
         cls._set_option_update_(option, directory_path)
@@ -700,7 +700,7 @@ class DotUsdaFile(object):
 
     def set_surface_look_write(self, look_root_name, look_pass_name, look_pass_names, look_file_path, look_properties_file_dict):
         self._set_write_(
-            key='surface-look.j2',
+            key='surface-look',
             file_path=self._file_path,
             option=dict(
                 look_root=look_root_name,
@@ -713,7 +713,7 @@ class DotUsdaFile(object):
 
     def set_surface_registry_write(self, look_file_path, uv_map_file_path):
         self._set_write_(
-            key='surface-registry.j2',
+            key='surface-registry',
             file_path=self._file_path,
             option=dict(
                 look_file=look_file_path,

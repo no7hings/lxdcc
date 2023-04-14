@@ -6,7 +6,7 @@ f = _utl_obj_raw.DotUsdaFile
 f_p = '/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v012/cache/usd/shading_test.usda'
 
 f._set_write_(
-    key='default.j2',
+    key='default',
     file_path='/l/prod/cjd/publish/assets/chr/td_test/srf/surfacing/td_test.srf.surfacing.v012/cache/usd/shading_test.usda',
     option=dict(
         children=dict(

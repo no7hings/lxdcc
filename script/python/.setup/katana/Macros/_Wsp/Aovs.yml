@@ -133,13 +133,13 @@ main:
             tool_tip: '...'
 
         builtin/lpe/primary:
-            widget: capsule_list
+            widget: capsule_strings
             value: ['primary', 'beauty', 'rgba']
             default: ['primary']
             tool_tip: '...'
         #
         builtin/lpe/additive_set:
-            widget: capsule_list
+            widget: capsule_strings
             value: ['additive_set_1', 'additive_set_2', 'additive_set_3']
             default: ['additive_set_2']
             tool_tip:
@@ -160,13 +160,13 @@ main:
 
         builtin/lpe/additive_set_1/main:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['direct', 'indirect', 'albedo']
             tool_tip: '...'
 
         builtin/lpe/additive_set_1/extend:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['emission', 'background']
             tool_tip: '...'
         # set 2
@@ -182,13 +182,13 @@ main:
 
         builtin/lpe/additive_set_2/main:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['diffuse', 'specular', 'transmission', 'sss', 'coat', 'sheen', 'volume']
             tool_tip: '...'
 
         builtin/lpe/additive_set_2/extend:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['emission', 'background']
             tool_tip: '...'
         # set 3
@@ -204,83 +204,83 @@ main:
         #   diffuse
         builtin/lpe/additive_set_3/diffuse:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['diffuse_direct', 'diffuse_indirect', 'diffuse_albedo']
             tool_tip: '...'
         #   specular
         builtin/lpe/additive_set_3/specular:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['specular_direct', 'specular_indirect', 'specular_albedo']
             tool_tip: '...'
         #   transmission
         builtin/lpe/additive_set_3/transmission:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['transmission_direct', 'transmission_indirect', 'transmission_albedo']
             tool_tip: '...'
         #   sss
         builtin/lpe/additive_set_3/sss:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['sss_direct', 'sss_indirect', 'sss_albedo']
             tool_tip: '...'
         #   coat
         builtin/lpe/additive_set_3/coat:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['coat_direct', 'coat_indirect', 'coat_albedo']
             tool_tip: '...'
         #   sheen
         builtin/lpe/additive_set_3/sheen:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['sheen_direct', 'sheen_indirect', 'sheen_albedo']
             tool_tip: '...'
         #   volume
         builtin/lpe/additive_set_3/volume:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['volume_direct', 'volume_indirect', 'volume_albedo']
             tool_tip: '...'
         #
         builtin/lpe/additive_set_3/extend:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['emission', 'background']
             tool_tip: '...'
         #
         builtin/lpe/extend/set_1:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['A', 'Z', 'N', 'P', 'Pref']
             default: ['A', 'Z', 'N', 'P', 'Pref']
             tool_tip: '...'
 
         builtin/lpe/extend/set_2:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['opacity', 'volume_opacity', 'shadow_matte', 'motionvector']
             default: ['opacity', 'volume_opacity']
             tool_tip: '...'
 
         builtin/lpe/extend/set_3:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['cputime', 'raycount']
             default: ['cputime', 'raycount']
             tool_tip: '...'
 
         builtin/lpe/extend/set_4:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['shader', 'object']
             default: []
             tool_tip: '...'
         #
         custom/crypto/set_1:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['crypto_object', 'crypto_material', 'crypto_asset']
             tool_tip: '...'
 #

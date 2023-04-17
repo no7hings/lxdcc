@@ -1,10 +1,6 @@
 # coding:utf-8
 import os
 
-import enum
-
-import jinja2
-
 import lxbasic.objects as bsc_objects
 
 

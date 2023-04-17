@@ -95,7 +95,7 @@ main:
             tool_tip: '...'
 
         parameters/ass/includes:
-            widget: capsule_list
+            widget: capsule_strings
             value: ['geometry', 'look', 'camera', 'light']
             default: ['geometry', 'look']
             tool_tip: '...'

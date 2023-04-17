@@ -63,7 +63,7 @@ main:
 
         parameters/keys:
             label: ' '
-            widget: capsule_list
+            widget: capsule_strings
             value: ['None']
         # 0
         parameters/variant/key_0:

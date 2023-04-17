@@ -1749,7 +1749,7 @@ class NGObjOpt(object):
                         )
                         if default is not None:
                             ktn_port.setValue(default, 0)
-                    elif widget in {'capsule_list'}:
+                    elif widget in {'capsule_strings'}:
                         sep = ', '
                         v = sep.join(value)
                         ktn_port = group_ktn_obj.createChildString(name, v)

@@ -54,7 +54,7 @@ main:
         #
         parameters/scheme:
             widget: capsule_string
-            value: ['master', 'renderable', 'shape', 'all']
+            value: ['master', 'renderable', 'non_renderable', 'all']
             default: 'master'
             tool_tip: '...'
         # setting
@@ -103,48 +103,48 @@ main:
             widget: boolean
             value: True
             tool_tip: '...'
-        #   shape
-        parameters/setting/shape_all:
+        #   non_renderable
+        parameters/setting/non_renderable_all:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/model:
+        parameters/setting/non_renderable/model:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/groom:
+        parameters/setting/non_renderable/groom:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/character_effect:
+        parameters/setting/non_renderable/character_effect:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/effect:
+        parameters/setting/non_renderable/effect:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/rig:
+        parameters/setting/non_renderable/rig:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/surface:
+        parameters/setting/non_renderable/surface:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/light:
+        parameters/setting/non_renderable/light:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/shape/extend:
+        parameters/setting/non_renderable/extend:
             widget: boolean
             value: True
             tool_tip: '...'
@@ -154,7 +154,7 @@ main:
             value: '/root/world/geo/master'
             tool_tip: '...'
         # renderable
-        option/renderable_root:
+        option/renderable_location:
             widget: path
             value: '/root/world/geo/master'
             tool_tip: '...'
@@ -198,48 +198,48 @@ main:
             widget: path
             value: '/root/world/geo/master/etd'
             tool_tip: '...'
-        # shape
-        option/shape_root:
+        # non renderable
+        option/non_renderable_location:
             widget: path
             value: '/root/world/geo/master/shape'
             tool_tip: '...'
 
-        option/shape/model:
+        option/non_renderable/model:
             widget: path
             value: '/root/world/geo/master/shape/mod_shapegrp'
             tool_tip: '...'
 
-        option/shape/groom:
+        option/non_renderable/groom:
             widget: path
             value: '/root/world/geo/master/shape/grm_shapegrp'
             tool_tip: '...'
 
-        option/shape/character_effect:
+        option/non_renderable/character_effect:
             widget: path
             value: '/root/world/geo/master/shape/cfx_shapegrp'
             tool_tip: '...'
 
-        option/shape/effect:
+        option/non_renderable/effect:
             widget: path
             value: '/root/world/geo/master/shape/efx_shapegrp'
             tool_tip: '...'
 
-        option/shape/rig:
+        option/non_renderable/rig:
             widget: path
             value: '/root/world/geo/master/shape/rig_shapegrp'
             tool_tip: '...'
 
-        option/shape/surface:
+        option/non_renderable/surface:
             widget: path
             value: '/root/world/geo/master/shape/srf_shapegrp'
             tool_tip: '...'
 
-        option/shape/light:
+        option/non_renderable/light:
             widget: path
             value: '/root/world/geo/master/shape/rig_shapegrp'
             tool_tip: '...'
 
-        option/shape/extend:
+        option/non_renderable/extend:
             widget: path
             value: '/root/world/geo/master/shape/misc'
             tool_tip: '...'
@@ -311,9 +311,9 @@ node:
             cel:
                 |-
                 '(( {}/*))'.format(getParent().option.root) + (
-                    ' + (( {}/*))'.format(getParent().option.renderable_root)
+                    ' + (( {}/*))'.format(getParent().option.renderable_location)
                 ) + (
-                    ' - (( {}))'.format(getParent().option.renderable_root)
+                    ' - (( {}))'.format(getParent().option.renderable_location)
                 ) + (
                     <..e_0 % str(x).format(k='model')>
                 ) + (
@@ -335,8 +335,8 @@ node:
         connections:
             - '<..upstream_merge.output>'
             - '<.input>'
-    # shape
-    shape_usd_active:
+    # non_renderable
+    non_renderable_usd_active:
         type: UsdInActivationSet
         path: '<main.path>/<option.type_abr>__<..key>'
         input: '<.path>.in'
@@ -347,12 +347,12 @@ node:
             active: True
         #
         expressions:
-            locations/i0: 'getParent().option.shape_root'
+            locations/i0: 'getParent().option.non_renderable_location'
         connections:
             - '<..upstream_merge.output>'
             - '<.input>'
 
-    shape_prune:
+    non_renderable_prune:
         type: Prune
         path: '<main.path>/<option.type_abr>__<..key>'
         input: '<.path>.A'
@@ -360,15 +360,15 @@ node:
         #
         e_0:
             |-
-            ' - (( {{}}))'.format(getParent().option.shape.{k}) if (getParent().paramters.setting.shape_all and getParent().paramters.setting.shape.{k}) else ''
+            ' - (( {{}}))'.format(getParent().option.non_renderable.{k}) if (getParent().paramters.setting.non_renderable_all and getParent().paramters.setting.non_renderable.{k}) else ''
         #
         expressions:
             cel:
                 |-
                 '(( {}/*))'.format(getParent().option.root) + (
-                    ' + (( {}/*))'.format(getParent().option.shape_root)
+                    ' + (( {}/*))'.format(getParent().option.non_renderable_location)
                 ) + (
-                    ' - (( {}))'.format(getParent().option.shape_root)
+                    ' - (( {}))'.format(getParent().option.non_renderable_location)
                 ) + (
                     <..e_0 % str(x).format(k='model')>
                 ) + (
@@ -388,7 +388,7 @@ node:
                 )
         #
         connections:
-            - '<..shape_usd_active.output>'
+            - '<..non_renderable_usd_active.output>'
             - '<.input>'
     # all
     all_merge:
@@ -398,22 +398,22 @@ node:
         #
         input_ports:
             - 'renderable'
-            - 'shape'
+            - 'non_renderable'
         #
         connections:
             # renderable
             - '<..renderable_prune.output>'
             - '<.path>.renderable'
-            # shape
-            - '<..shape_prune.output>'
-            - '<.path>.shape'
+            # non_renderable
+            - '<..non_renderable_prune.output>'
+            - '<.path>.non_renderable'
     #
     scheme_switch:
         type: Switch
         path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
-        input_ports: ['master', 'renderable', 'shape', 'all']
+        input_ports: ['master', 'renderable', 'non_renderable', 'all']
         #
         expressions:
             in:
@@ -427,9 +427,9 @@ node:
             # renderable
             - '<..renderable_prune.output>'
             - '<.path>.renderable'
-            # shape
-            - '<..shape_prune.output>'
-            - '<.path>.shape'
+            # non_renderable
+            - '<..non_renderable_prune.output>'
+            - '<.path>.non_renderable'
             # all
             - '<..all_merge.output>'
             - '<.path>.all'

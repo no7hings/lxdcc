@@ -49,7 +49,7 @@ main:
         comment: '<option.description>'
     #
     capsules:
-        extra/default_name: ['master', 'renderable', 'shape', 'all']
+        extra/default_name: ['master', 'renderable', 'non_renderable', 'all']
     #
     port_hints:
         variant/key: {readOnly: True}

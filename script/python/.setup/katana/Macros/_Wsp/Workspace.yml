@@ -73,7 +73,7 @@ main:
             lock: True
 
         workspace/keys:
-            widget: capsule_list
+            widget: capsule_strings
             value: ['geometry', 'look', 'camera', 'light', 'quality', 'layer']
             default: ['geometry', 'look', 'camera', 'light']
             tool_tip: '...'

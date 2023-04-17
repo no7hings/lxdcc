@@ -88,7 +88,7 @@ main:
             tool_tip: '...'
         # extra
         extra/default_name:
-            widget: capsule_list
+            widget: capsule_strings
             value: ['default']
             default: ['default']
             tool_tip: '...'

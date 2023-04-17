@@ -134,7 +134,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         with_surface_cfx_look=False,
         #
         with_surface_look_preview=False,
-        with_work_surface_look_preview=False,
+        with_surface_work_look_preview=False,
         #
         save_scene=False,
         #
@@ -357,10 +357,10 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                         )
                     ).set_run()
     @classmethod
-    def _set_work_look_preview_build_by_yml_(cls, rsv_task, with_work_surface_look_preview):
+    def _set_work_look_preview_build_by_yml_(cls, rsv_task, with_surface_work_look_preview):
         import lxmaya.fnc.importers as mya_fnc_importers
         #
-        if with_work_surface_look_preview is True:
+        if with_surface_work_look_preview is True:
             if rsv_task:
                 look_yml_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-source-look-yml-file')
                 work_look_yml_file_path = look_yml_file_rsv_unit.get_result(version='latest')
@@ -446,7 +446,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         with_surface_cfx_look = self.get('with_surface_cfx_look')
         #
         with_surface_look_preview = self.get('with_surface_look_preview')
-        with_work_surface_look_preview = self.get('with_work_surface_look_preview')
+        with_surface_work_look_preview = self.get('with_surface_work_look_preview')
         #
         with_camera = self.get('with_camera')
         with_light = self.get('with_light')
@@ -522,7 +522,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             (self._set_look_build_by_ass_, (surface_cfx_rsv_task, with_surface_cfx_look)),
             #
             (self._set_look_preview_build_by_yml_, (surface_occ_rsv_task, with_surface_look_preview)),
-            (self._set_work_look_preview_build_by_yml_, (surface_occ_rsv_task, with_work_surface_look_preview)),
+            (self._set_work_look_preview_build_by_yml_, (surface_occ_rsv_task, with_surface_work_look_preview)),
             #
             (self._set_model_act_geometry_dyn_connect_, (with_model_act_geometry_dyn_connect, )),
             #

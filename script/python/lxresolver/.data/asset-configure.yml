@@ -314,7 +314,6 @@ looks:
             step: <option.steps.surface>
             task: <option.tasks.surface-anm>
             version: latest
-
         #
         work-file:
             keyword: asset-source-look-yml-file

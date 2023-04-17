@@ -69,7 +69,9 @@ print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/
         keys = resolver.VariantTypes.All
         for i_key in keys:
             i_env_key = 'PG_{}'.format(i_key.upper())
-            dict_[i_key] = bsc_core.EnvironMtd.get(i_env_key) or ''
+            i_env_value = bsc_core.EnvironMtd.get(i_env_key)
+            if i_env_value:
+                dict_[i_key] = i_env_value
         return dict_
 
 

@@ -2,31 +2,49 @@
 dcc-data:
     extend:
         # renderable
-        renderable_root: '{root}/hi'
-        # shape
-        shape_root: '{root}/shape'
+        renderable_location: '{root}/hi'
         #
-        model_shape_location: '{root}/shape/mod_shapegrp'
-        groom_shape_location: '{root}/shape/grm_shapegrp'
-        chracter_effect_shape_location: '{root}/shape/cfx_shapegrp'
-        effect_shape_location: '{root}/shape/efx_shapegrp'
-        rig_shape_location: '{root}/shape/rig_shapegrp'
-        surface_shape_location: '{root}/shape/srf_shapegrp'
-        light_shape_location: '{root}/shape/lgt_shapegrp'
+        rdr_model_location: '{root}/hi'
+        rdr_groom_location: '{root}/hair'
+        rdr_chracter_effect_location: ''
+        rdr_effect_location: ''
+        rdr_rig_location: ''
+        rdr_surface_location: ''
+        rdr_light_location: ''
+        rdr_shape_location: ''
+        # shape
+        non_renderable_location: '{root}/shape'
+        #
+        nrd_model_location: '{root}/shape/mod_shapegrp'
+        nrd_groom_location: '{root}/shape/grm_shapegrp'
+        nrd_chracter_effect_location: '{root}/shape/cfx_shapegrp'
+        nrd_effect_location: '{root}/shape/efx_shapegrp'
+        nrd_rig_location: '{root}/shape/rig_shapegrp'
+        nrd_surface_location: '{root}/shape/srf_shapegrp'
+        nrd_light_location: '{root}/shape/lgt_shapegrp'
         extend_shape_location: '{root}/shape/misc'
     #
     maya-extend:
-        renderable_root: '{root}/mod/hi'
+        renderable_location: '{root}/mod/hi'
         #
-        shape_root: ''
+        rdr_model_location: '{root}/mod/hi'
+        rdr_groom_location: '{root}/hair'
+        rdr_chracter_effect_location: ''
+        rdr_effect_location: ''
+        rdr_rig_location: ''
+        rdr_surface_location: ''
+        rdr_light_location: ''
+        rdr_shape_location: ''
         #
-        model_shape_location: '{root}/mod/misc'
-        groom_shape_location: '{root}/grm'
-        chracter_effect_shape_location: '{root}/cfx'
-        effect_shape_location: '{root}/efx'
-        rig_shape_location: '{root}/rig'
-        surface_shape_location: '{root}/srf'
-        light_shape_location: '{root}/lgt'
+        non_renderable_location: ''
+        #
+        nrd_model_location: '{root}/mod/misc'
+        nrd_groom_location: '{root}/grm'
+        nrd_chracter_effect_location: '{root}/cfx'
+        nrd_effect_location: '{root}/efx'
+        nrd_rig_location: '{root}/rig'
+        nrd_surface_location: '{root}/srf'
+        nrd_light_location: '{root}/lgt'
         extend_shape_location: '{root}/misc/etd_shapegrp'
     #
     maya:

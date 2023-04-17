@@ -177,6 +177,9 @@ class StgVersionOpt(AbsStgObjOpt):
     def get_stg_folder(self):
         return self._stg_obj_query.get('sg_version_folder')
 
+    def set_stg_version_number(self, number):
+        self._stg_obj_query.set_update('sg_version_number', str(number))
+
     def get_stg_type(self):
         return self._stg_obj_query.get('sg_version_type')
 

@@ -641,12 +641,14 @@ class ExceptionMtd(object):
         #
         exc_type, exc_value, exc_stack = sys.exc_info()
         exc_texts = []
-        # value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+        value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
         for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
             i_file_path, i_line, i_fnc, i_fnc_line = stk
             exc_texts.append(
                 u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
+            #
+            exc_texts.append(value)
         return '\n'.join(exc_texts)
     @classmethod
     def get_stack_(cls):

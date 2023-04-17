@@ -167,6 +167,10 @@ class RsvStgTaskOpt(object):
             version_directory_path
         )
         #
+        stg_version_opt.set_stg_version_number(
+            bsc_core.PtnVersion(version).get_number()
+        )
+        #
         if version_type:
             stg_version_opt.set_stg_type(version_type)
         #

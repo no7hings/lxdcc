@@ -196,69 +196,69 @@ asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<asset-version-name>.nk
 #
 asset-user-app-render-image-dir: <asset-user-task-dir>/render/<app-name>/<asset-version-name>
-# extend area
+# extend area ******************************************************************************************************** #
 asset-source-extend-dir: <asset-source-task-dir>
-    # zbrush
+#   zbrush
 asset-source-zbrush-dir: <asset-source-extend-dir>/zb
 asset-source-zbrush-scene-src-dir: <asset-source-zbrush-dir>/<variant>/<version-name>
 asset-source-zbrush-scene-src-file: <asset-source-zbrush-scene-src-dir>/<asset-version-name>.spp
-    # substance painter
+#   substance painter
 asset-source-sp-dir: <asset-source-extend-dir>/sp
 asset-source-sp-scene-src-dir: <asset-source-sp-dir>/<variant>/<version-name>
 asset-source-sp-scene-src-file: <asset-source-sp-scene-src-dir>/<asset-version-name>.spp
-    # geometry
-asset-source-geometry-dir: <asset-source-extend-dir>/geometry/scene/<version-name>
-asset-source-geometry-abc-var-file: <asset-source-geometry-dir>/<var-name>.abc
-# todo: remove keyword: hi, lo, shape, temp?
-asset-source-geometry-abc-hi-file: <asset-source-geometry-dir>/hi.abc
-asset-source-geometry-abc-lo-file: <asset-source-geometry-dir>/lo.abc
-asset-source-geometry-abc-shape-file: <asset-source-geometry-dir>/shape.abc
-asset-source-geometry-abc-temp-file: <asset-source-geometry-dir>/temp.usd
-#
-asset-source-geometry-usd-var-file: <asset-source-geometry-dir>/<var-name>.usd
-asset-source-geometry-usd-hi-file: <asset-source-geometry-dir>/hi.usd
-asset-source-geometry-usd-lo-file: <asset-source-geometry-dir>/lo.usd
-asset-source-geometry-usd-shape-file: <asset-source-geometry-dir>/shape.usd
-asset-source-geometry-usd-temp-file: <asset-source-geometry-dir>/temp.usd
-#
-asset-source-geometry-uv_map-usd-file: <asset-source-geometry-dir>/uv_map.usd
-asset-source-geometry-uv_map-usd-var-file: <asset-source-geometry-dir>/<var-name>.uv_map.usd
-asset-source-geometry-extra-usd-dir: <asset-source-geometry-dir>/geo_extra
+#   geometry
+asset-source-geometry-dir: <asset-source-extend-dir>/geometry
+#       abc
+asset-source-geometry-abc-dir: <asset-source-geometry-dir>/abc/<version-name>
+asset-source-geometry-abc-var-file: <asset-source-geometry-abc-dir>/<var-name>.abc
+#       usd
+asset-source-geometry-usd-dir: <asset-source-geometry-dir>/usd/<version-name>
+asset-source-geometry-usd-var-file: <asset-source-geometry-usd-dir>/<var-name>.usd
+# todo: remove hi, lo, shape, temp
+asset-source-geometry-usd-hi-file: <asset-source-geometry-usd-dir>/hi.usd
+asset-source-geometry-usd-lo-file: <asset-source-geometry-usd-dir>/lo.usd
+asset-source-geometry-usd-shape-file: <asset-source-geometry-usd-dir>/shape.usd
+asset-source-geometry-usd-temp-file: <asset-source-geometry-usd-dir>/temp.usd
+asset-source-geometry-uv_map-usd-file: <asset-source-geometry-usd-dir>/uv_map.usd
+asset-source-geometry-uv_map-usd-var-file: <asset-source-geometry-usd-dir>/<var-name>.uv_map.usd
+asset-source-geometry-extra-usd-dir: <asset-source-geometry-usd-dir>/geo_extra
 asset-source-geometry-user_property-usd-file: <asset-source-geometry-extra-usd-dir>/user_property.usd
-asset-source-geometry-info-xml-file: <asset-source-geometry-dir>/<var-name>.info.xml
-asset-source-geometry-info-xml-hi-file: <asset-source-geometry-dir>/hi.info.xml
-
-asset-source-geometry-ovrride-usd-file: <asset-source-geometry-dir>/override.usda
-# look
+#       xml
+asset-source-geometry-xml-dir: <asset-source-geometry-dir>/xml/<version-name>
+asset-source-geometry-info-xml-file: <asset-source-geometry-xml-dir>/<var-name>.info.xml
+#   look
 asset-source-look-dir: <asset-source-extend-dir>/look
-#   arnold ass
+#       arnold ass
 asset-source-look-ass-dir: <asset-source-look-dir>/ass/<version-name>
 asset-source-look-ass-file: <asset-source-look-ass-dir>/default.ass
 asset-source-look-ass-sub-file: <asset-source-look-ass-dir>/<look-pass>.ass
-#   materialx
+#       materialx
 asset-source-look-mtx-dir: <asset-source-look-dir>/mtx/<version-name>
-asset-source-look-mtx-file: <asset-source-look-dir>/default.mtlx
-#   look file
+asset-source-look-mtx-file: <asset-source-look-mtx-dir>/default.mtlx
+#       look file
 asset-source-look-klf-dir: <asset-source-look-dir>/klf/<version-name>
-asset-source-look-klf-file: <asset-source-look-dir>/all.klf
-asset-source-look-klf-extra-file: <asset-source-look-dir>/all.json
-#   yaml
+asset-source-look-klf-file: <asset-source-look-klf-dir>/all.klf
+asset-source-look-klf-extra-file: <asset-source-look-klf-dir>/all.json
+#       yaml
 asset-source-look-yml-dir: <asset-source-look-dir>/yml/<version-name>
-asset-source-look-yml-file: <asset-source-look-dir>/default.yml
-# texture
+asset-source-look-yml-file: <asset-source-look-yml-dir>/default.yml
+#   texture
 asset-source-texture-dir: <asset-source-extend-dir>/texture/<variant>
 #
 asset-source-texture-version-dir: <asset-source-extend-dir>/texture/<variant>/<version-name>
 asset-source-texture-src-dir: <asset-source-texture-version-dir>/src
 asset-source-texture-tx-dir: <asset-source-texture-version-dir>/tx
-# set
-asset-source-set-dir: <asset-source-extend-dir>/set/scene/<version-name>
-asset-source-asset-set-usd-file: <asset-source-set-dir>/<asset-name>.usda
-asset-source-shot-set-usd-file: <asset-source-set-dir>/<asset-shot-name>.usda
+#   set
+asset-source-set-dir: <asset-source-extend-dir>/set
+#       usd
+asset-source-set-usd-dir: <asset-source-set-dir>/usd/<version-name>
+asset-source-asset-set-usd-file: <asset-source-set-usd-dir>/<asset-name>.usda
+asset-source-shot-set-usd-file: <asset-source-set-usd-dir>/<asset-shot-name>.usda
+#
+asset-source-component-usd-dir: <asset-source-set-usd-dir>
 # cache
 asset-source-cache-dir: <asset-source-extend-dir>/cache
-asset-source-usd-dir: <asset-source-extend-dir>/cache/usd/<version-name>
-asset-source-component-usd-dir: <asset-source-usd-dir>
+#
 asset-source-render-dir: <asset-source-extend-dir>/render/<user-name>
 # release **************************************************************************************************************
 # <asset-preview>

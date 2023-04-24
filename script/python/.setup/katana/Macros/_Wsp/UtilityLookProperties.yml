@@ -231,7 +231,7 @@ node:
             - '<.input>'
         #
         child:
-            type: LookPropertiesOpt_Wsp
+            type: LookProperties_Opt
             #
             path_pattern: '{parent}/<option.type_abr>__<...key>__{key}'
             #
@@ -296,7 +296,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -330,7 +330,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -357,7 +357,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -401,7 +401,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -427,7 +427,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -454,7 +454,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -528,7 +528,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: LookPropertiesOpt_Wsp
+        type: LookProperties_Opt
         name: '<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -623,7 +623,7 @@ node:
             - '<main.output>'
         #
         child:
-            type: LookPropertiesOpt_Wsp
+            type: LookProperties_Opt
             #
             path_pattern: '{parent}/<option.type_abr>__<...key>__{key}'
             #

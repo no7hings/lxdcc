@@ -339,7 +339,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: RenderPropertiesOpt_Wsp
+        type: RenderProperties_Opt
         name: '<option.type_abr>__<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -371,7 +371,7 @@ node:
         variant:
             |-
             <..key % str(x).split('__')[0]>
-        type: RenderPropertiesOpt_Wsp
+        type: RenderProperties_Opt
         name: '<option.type_abr>__<.variant>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -390,7 +390,7 @@ node:
     # render resolution
     render_resolution_opt:
         tag: 'RRO'
-        type: RenderResolutionOpt_Wsp
+        type: RenderResolution_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -413,7 +413,7 @@ node:
     # variant properties opt
     variant_properties_opt:
         tag: 'VPO'
-        type: VariantPropertiesOpt_Wsp
+        type: VariantProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'

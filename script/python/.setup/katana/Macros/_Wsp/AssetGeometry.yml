@@ -393,7 +393,7 @@ node:
                 effect: '$.modeling'
                 surfacing: '$.modeling'
                 lighting: '$.modeling'
-                plant: '$.model'
+                plant: '$.modeling'
                 animation: '$.modeling'
     #
     asset_version_main:
@@ -681,7 +681,7 @@ node:
     #   user data
     user_data_opt:
         tag: UDO
-        type: UserDataOpt_Wsp
+        type: UserData_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -829,7 +829,7 @@ node:
     # variant properties opt
     variant_properties_opt:
         tag: 'VPO'
-        type: VariantPropertiesOpt_Wsp
+        type: VariantProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'

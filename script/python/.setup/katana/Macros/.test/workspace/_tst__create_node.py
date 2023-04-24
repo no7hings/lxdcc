@@ -9,23 +9,25 @@ import lxkatana.scripts as ktn_scripts
 
 
 for i in [
-    '_Wsp/VariantPropertiesOpt',
+    '_Opt/VariantProperties',
+    '_Opt/TurntableRotate',
+    '_Opt/CameraProperties',
+    '_Opt/CameraCopy',
+    '_Opt/CameraList',
+    '_Opt/RenderProperties',
+    '_Opt/RenderResolution',
+    '_Opt/UserData',
+    '_Opt/LookProperties',
+    '_Opt/ColorCheckerAttachFit',
+    #
     '_Wsp/VariantRegister',
     #
     '_Wsp/UpstreamMerge',
-    '_Wsp/TurntableRotateOpt',
     '_Wsp/Turntable',
-    '_Wsp/CameraPropertiesOpt',
-    '_Wsp/CameraCopyOpt',
-    '_Wsp/CameraListOpt',
-    '_Wsp/RenderPropertiesOpt',
-    '_Wsp/RenderResolutionOpt',
-    '_Wsp/UserDataOpt',
-    '_Wsp/LookPropertiesOpt',
+    #
     '_Wsp/Aov',
     '_Wsp/Aovs',
     '_Wsp/AovGroup',
-    '_Wsp/ColorCheckerAttachFitOpt',
     '_Wsp/ColorChecker',
     #
     '_Wsp/Material',

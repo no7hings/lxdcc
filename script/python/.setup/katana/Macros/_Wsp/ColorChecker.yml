@@ -254,7 +254,7 @@ node:
     #   camera fit
     attach_fit_opt:
         tag: 'CFO'
-        type: ColorCheckerAttachFitOpt_Wsp
+        type: ColorCheckerAttachFit_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'

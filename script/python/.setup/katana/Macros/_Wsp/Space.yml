@@ -221,7 +221,7 @@ node:
     # variant properties opt
     variant_properties_opt:
         tag: 'VPO'
-        type: VariantPropertiesOpt_Wsp
+        type: VariantProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'

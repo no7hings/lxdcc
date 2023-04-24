@@ -260,7 +260,7 @@ node:
     #
     copy_opt:
         tag: CCO
-        type: CameraCopyOpt_Wsp
+        type: CameraCopy_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -326,7 +326,7 @@ node:
     #   camera list
     camera_list_opt:
         tag: 'CLO'
-        type: CameraListOpt_Wsp
+        type: CameraList_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -343,7 +343,7 @@ node:
     #   camera data
     camera_properties_opt:
         tag: 'CPO'
-        type: CameraPropertiesOpt_Wsp
+        type: CameraProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -366,7 +366,7 @@ node:
     #   render properties
     render_properties_opt:
         tag: 'RPO'
-        type: RenderPropertiesOpt_Wsp
+        type: RenderProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'
@@ -388,7 +388,7 @@ node:
     # variant properties opt
     variant_properties_opt:
         tag: 'VPO'
-        type: VariantPropertiesOpt_Wsp
+        type: VariantProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'

@@ -359,7 +359,7 @@ node:
     # render properties
     render_properties:
         tag: 'RPO'
-        type: RenderPropertiesOpt_Wsp
+        type: RenderProperties_Opt
         name: '<option.type_abr>__<.tag>'
         path: '<main.path>/<.name>'
         input: '<.path>.i0'

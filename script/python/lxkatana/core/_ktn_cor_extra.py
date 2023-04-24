@@ -22,7 +22,7 @@ class EventOpt(object):
             enabled=True
         )
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'event register',
             'event-type="{}"'.format(self._event_type)
         )
@@ -33,7 +33,7 @@ class EventOpt(object):
                 handler=self._handler,
                 eventType=self._event_type
             )
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'event deregister',
                 'event-type="{}"'.format(self._event_type)
             )
@@ -56,7 +56,7 @@ class CallbackOpt(object):
             callbackFcn=self._function
         )
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'callback register',
             'callback-type="{}"'.format(self._callback_type)
         )
@@ -66,7 +66,7 @@ class CallbackOpt(object):
             callbackType=self._callback_type,
             callbackFcn=self._function
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'callback deregister',
             'callback-type="{}"'.format(self._callback_type)
         )
@@ -145,7 +145,7 @@ class EventMtd(object):
     @classmethod
     def set_arnold_ramp_write(cls, ktn_obj_opt):
         cls._set_arnold_ramp_write_(ktn_obj_opt)
-        # utl_core.Log.set_module_result_trace(
+        # bsc_core.LogMtd.trace_method_result(
         #     'ramp-write',
         #     'obj-name="{}"'.format(ktn_obj_opt.name)
         # )
@@ -183,7 +183,7 @@ class EventMtd(object):
     def set_arnold_ramp_read(cls, ktn_obj_opt):
         def fnc_():
             cls._set_arnold_ramp_read_(ktn_obj_opt)
-            # utl_core.Log.set_module_result_trace(
+            # bsc_core.LogMtd.trace_method_result(
             #     'ramp-read',
             #     'obj-name="{}"'.format(ktn_obj_opt.name)
             # )

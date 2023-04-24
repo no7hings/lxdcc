@@ -618,7 +618,7 @@ class AndTextureOpt(object):
             else:
                 raise TypeError()
         except:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.LogMtd.trace_method_warning(
                 'color-space-guess',
                 u'file-obj="{}" guess color-space error'.format(self._file_path)
             )

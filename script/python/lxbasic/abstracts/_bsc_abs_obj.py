@@ -211,7 +211,7 @@ class AbsContent(object):
         rcs_fnc_(self._key, self._value)
         return lis
 
-    def _get_last_keys_(self):
+    def _get_leaf_keys_(self):
         def rcs_fnc_(k_, v_):
             for _k, _v in v_.items():
                 if k_ is not None:
@@ -228,12 +228,32 @@ class AbsContent(object):
         rcs_fnc_(self._key, self._value)
         return lis
 
+    def _get_leaf_values_(self):
+        def rcs_fnc_(k_, v_):
+            for _k, _v in v_.items():
+                if k_ is not None:
+                    _key = '{}.{}'.format(k_, _k)
+                else:
+                    _key = _k
+                #
+                if isinstance(_v, dict):
+                    rcs_fnc_(_key, _v)
+                else:
+                    lis.append(_v)
+
+        lis = []
+        rcs_fnc_(self._key, self._value)
+        return lis
+
     def get_leaf_key_as_paths(self):
-        keys = self._get_last_keys_()
+        keys = self._get_leaf_keys_()
         return [self._to_key_path_(i) for i in keys]
 
     def get_leaf_keys(self):
-        return self._get_last_keys_()
+        return self._get_leaf_keys_()
+
+    def get_leaf_values(self):
+        return self._get_leaf_values_()
 
     def get_keys(self, regex=None):
         _ = self._get_all_keys_()
@@ -300,7 +320,7 @@ class AbsContent(object):
                 #
                 v = v[k]
 
-    def set_element_add(self, key, value):
+    def add_element(self, key, value):
         v = self.get(key)
         if isinstance(v, (tuple, list)):
             es = v
@@ -311,7 +331,7 @@ class AbsContent(object):
         if value not in es:
             es.append(value)
 
-    def set_element_append(self, key, value):
+    def append_element(self, key, value):
         v = self.get(key)
         if isinstance(v, (tuple, list)):
             es = v
@@ -603,7 +623,7 @@ class AbsProcess(object):
             else:
                 self.__set_running_(result)
 
-    def set_element_add(self, element):
+    def add_element(self, element):
         self._elements.append(element)
 
     def get_elements(self):

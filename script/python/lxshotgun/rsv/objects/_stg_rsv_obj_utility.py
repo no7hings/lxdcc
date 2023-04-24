@@ -196,7 +196,7 @@ class RsvStgTaskOpt(object):
                 f_opt = bsc_core.StgFileOpt(
                     f
                 )
-                f_opt.set_map_to_platform()
+                f_opt.map_to_current()
                 if f_opt.get_is_exists() is True:
                     stg_version_opt.set_movie_upload(f)
         #

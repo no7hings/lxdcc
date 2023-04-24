@@ -175,7 +175,7 @@ class Selection(object):
             if isinstance(i, hou.NetworkEditor):
                 return i
 
-    def set_all_select(self):
+    def select_all(self):
         [hou.node(i).setSelected(True) for i in self._paths]
         path = self._paths[-1]
         if hou.node(path) is not None:

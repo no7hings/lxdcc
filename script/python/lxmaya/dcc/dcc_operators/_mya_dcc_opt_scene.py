@@ -14,6 +14,11 @@ from lxmaya import ma_configure
 
 class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
     def __init__(self, *args, **kwargs):
+        """
+        stage is universe
+        :param args:
+        :param kwargs:
+        """
         self._stage = args[0]
     @property
     def stage(self):
@@ -45,7 +50,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                                 dcc_obj_name = dcc_obj.name
                                 #
                                 dcc_path_dag_opt = bsc_core.DccPathDagOpt(dcc_path)
-                                mya_path_dag_opt = dcc_path_dag_opt.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+                                mya_path_dag_opt = dcc_path_dag_opt.translate_to(ma_configure.Util.OBJ_PATHSEP)
                                 mya_obj_path = mya_path_dag_opt.path
                                 mya_mesh = _mya_dcc_obj_geometry.Mesh(mya_obj_path)
                                 mya_mesh_opt = _mya_dcc_opt_geometry.MeshOpt(mya_mesh)
@@ -94,7 +99,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                         dcc_path = dcc_obj.path
                         #
                         dcc_path_dag_opt = bsc_core.DccPathDagOpt(dcc_path)
-                        mya_path_dag_opt = dcc_path_dag_opt.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+                        mya_path_dag_opt = dcc_path_dag_opt.translate_to(ma_configure.Util.OBJ_PATHSEP)
                         mya_obj_path = mya_path_dag_opt.path
                         mya_mesh = _mya_dcc_obj_geometry.Mesh(mya_obj_path)
                         mya_mesh_opt = _mya_dcc_opt_geometry.MeshOpt(mya_mesh)

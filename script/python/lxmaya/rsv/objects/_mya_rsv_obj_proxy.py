@@ -21,7 +21,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         asset = self._rsv_scene_properties.get('asset')
         version = self._rsv_scene_properties.get('version')
         location = '{}/{}'.format(root, 'hi')
-        mya_location = bsc_core.DccPathDagOpt(location).set_translate_to('|').get_value()
+        mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').get_value()
         mya_group = mya_dcc_objects.Group(mya_location)
         if mya_group.get_is_exists() is True:
             act = 'static'

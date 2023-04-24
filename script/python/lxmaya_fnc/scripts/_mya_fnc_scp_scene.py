@@ -19,7 +19,7 @@ def set_scene_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)
@@ -45,7 +45,7 @@ def set_scene_export_by_any_scene_file(option):
             create_scene_src = option_opt.get('create_scene_src') or False
             if create_scene_src is True:
                 mya_dcc_objects.Scene.set_file_new()
-                set_asset_scene_src_create(rsv_task_properties)
+                execute_asset_scene_src_create(rsv_task_properties)
             #
             any_scene_file = utl_dcc_objects.OsFile(any_scene_file_path)
             if any_scene_file.get_is_exists() is True:
@@ -67,7 +67,7 @@ def set_scene_export_by_any_scene_file(option):
                 # scene
                 with_scene = option_opt.get('with_scene') or False
                 if with_scene is True:
-                    scene_file_path = set_asset_scene_export(rsv_task_properties)
+                    scene_file_path = execute_asset_scene_export(rsv_task_properties)
                     mya_dcc_objects.Scene.set_file_open(scene_file_path)
                 # snapshot-preview
                 with_snapshot_preview = option_opt.get('with_snapshot_preview') or False
@@ -97,7 +97,7 @@ def set_scene_export_by_any_scene_file(option):
 
 
 # create scene-src
-def set_asset_scene_src_create(rsv_task_properties):
+def execute_asset_scene_src_create(rsv_task_properties):
     import lxresolver.operators as rsv_operators
     #
     import lxmaya.dcc.dcc_objects as mya_dcc_objects
@@ -142,7 +142,7 @@ def set_asset_look_preview_scene_scr_create(rsv_task_properties):
     mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
 
 
-def set_asset_scene_export(rsv_task_properties):
+def execute_asset_scene_export(rsv_task_properties):
     import lxresolver.operators as rsv_operators
     #
     import lxmaya.fnc.exporters as mya_fnc_exporters
@@ -315,7 +315,7 @@ def set_scene_clear_by_any_scene_file(option):
     }
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)

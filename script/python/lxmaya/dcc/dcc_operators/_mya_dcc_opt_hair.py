@@ -44,14 +44,14 @@ class XgenDescriptionOpt(utl_dcc_opt_abs.AbsObjOpt):
         )
         points = []
         counts = []
-        widths = []
+        widths = [0.003]
         for i in guides:
             i_points = ma_core.CmdXgenSplineGuideOpt(
                 i
             ).get_control_points()
             points.extend(i_points)
             counts.append(len(i_points))
-            widths.append(0.003)
+            # widths.append(0.003)
         return counts, points, widths
 
 

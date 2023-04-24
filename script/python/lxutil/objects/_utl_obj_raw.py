@@ -348,7 +348,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
                 else:
                     pass
                     j_key = '{}.extra'.format(cur_description_name)
-                    d.set_element_add(j_key, i_obj_type)
+                    d.add_element(j_key, i_obj_type)
                     # print i_obj_type
         return d
 

@@ -28,9 +28,9 @@ class LookPropertiesUsdExporter(utl_fnc_obj_abs.AbsDccExporter):
         ignore_default = self._option['ignore_default']
         root = self._root
         scene = and_dcc_objects.Scene()
-        scene.set_load_from_dot_ass(
+        scene.load_from_dot_ass(
             ass_file_path,
-            root_lstrip='/root/world/geo'
+            path_lstrip='/root/world/geo'
         )
         universe = scene.universe
         #

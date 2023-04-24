@@ -7,6 +7,7 @@ from lxbasic.core import _bsc_cor_raw, _bsc_cor_pattern
 
 
 class LogMtd(object):
+    ENABLE = True
     TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
     @classmethod
     def get_time(cls):
@@ -35,29 +36,34 @@ class LogMtd(object):
     #
     @classmethod
     def result(cls, text):
-        sys.stdout.write(text+'\n')
+        if cls.ENABLE is True:
+            sys.stdout.write(text+'\n')
     @classmethod
     def error(cls, text):
-        sys.stderr.write(text+'\n')
+        if cls.ENABLE is True:
+            sys.stderr.write(text+'\n')
     #
     @classmethod
     def trace_result(cls, text):
-        sys.stdout.write(
-            cls.get_result(text+'\n')
-        )
-        return text
+        if cls.ENABLE is True:
+            sys.stdout.write(
+                cls.get_result(text+'\n')
+            )
+            return text
     @classmethod
     def trace_warning(cls, text):
-        sys.stdout.write(
-            cls.get_warning(text+'\n')
-        )
-        return text
+        if cls.ENABLE is True:
+            sys.stdout.write(
+                cls.get_warning(text+'\n')
+            )
+            return text
     @classmethod
     def trace_error(cls, text):
-        sys.stderr.write(
-            cls.get_error(text+'\n')
-        )
-        return text
+        if cls.ENABLE is True:
+            sys.stderr.write(
+                cls.get_error(text+'\n')
+            )
+            return text
     #
     @classmethod
     def get_method_result(cls, name, text):
@@ -185,8 +191,8 @@ class LogProgress(object):
             self._p = p
             if self._use_as_progress_bar is True:
                 LogMtd.trace_method_result(
-                    u'{}'.format(self._label),
-                    u'is running {} {}%, cost time {}'.format(
+                    '{}'.format(self._label),
+                    'is running {} {}%, cost time {}'.format(
                         self._get_progress_bar_string_(percent),
                         p,
                         _bsc_cor_raw.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
@@ -195,8 +201,8 @@ class LogProgress(object):
                 )
             else:
                 LogMtd.trace_method_result(
-                    u'{}'.format(self._label),
-                    u'is running {}%, cost time {}'.format(
+                    '{}'.format(self._label),
+                    'is running {}%, cost time {}'.format(
                         p,
                         _bsc_cor_raw.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
                     )
@@ -206,8 +212,8 @@ class LogProgress(object):
         c = 20
         p = int(percent*c)
         p = max(p, 1)
-        return u'{}{}'.format(
-            p*u'■', (c-p)*u'□'
+        return '{}{}'.format(
+            p*'■', (c-p)*'□'
         )
 
     def set_stop(self):

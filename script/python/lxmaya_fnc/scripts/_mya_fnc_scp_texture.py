@@ -25,7 +25,7 @@ def set_asset_texture_tx_export(task_properties, force=False):
         sub_root = '{}/hi'.format(root)
         #
         sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
-        sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
+        sub_root_mya_dag_path = sub_root_dag_path.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
         #
@@ -89,7 +89,7 @@ def set_asset_texture_export(task_properties, force=False):
         sub_root = '{}/hi'.format(root)
         #
         sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
-        sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
+        sub_root_mya_dag_path = sub_root_dag_path.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
         #

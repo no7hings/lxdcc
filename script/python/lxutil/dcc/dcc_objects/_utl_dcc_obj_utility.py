@@ -12,24 +12,38 @@ class Obj(
     unr_abstracts.AbsObjGuiDef
 ):
     PATHSEP = '/'
-    def __init__(self, path):
+    def __init__(self, path, **kwargs):
         self._set_obj_dag_def_init_(path)
         if self.path.startswith(self.PATHSEP):
             self._name = self.path.split(self.PATHSEP)[-1]
         else:
             self._name = self.path
 
+        if 'icon_name' in kwargs:
+            self._icon_file_path = utl_gui_core.RscIconFile.get(kwargs.get('icon_name'))
+        else:
+            self._icon_file_path = utl_gui_core.RscIconFile.get('obj/object')
+
+        if 'type_name' in kwargs:
+            self._type_name = kwargs.get('type_name')
+        else:
+            self._type_name = 'null'
+
         self._set_obj_gui_def_init_()
+    def get_type_name(self):
+        return self._type_name
+
     @property
     def type(self):
-        return 'tag'
+        return self._type_name
     @property
     def icon(self):
-        from lxutil_gui import utl_gui_core
-        return utl_gui_core.RscIconFile.get('object')
+        return self._icon_file_path
 
     def _set_dag_create_(self, path):
-        pass
+        _ = self.__class__(path)
+        _._icon_file_path = utl_gui_core.RscIconFile.get('obj/group')
+        return _
 
     def _get_child_paths_(self, path):
         pass

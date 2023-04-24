@@ -179,7 +179,7 @@ class DccPathDagOpt(object):
     def get_components(self):
         return [self.__class__(i) for i in self.get_component_paths()]
 
-    def set_translate_to(self, pathsep='/'):
+    def translate_to(self, pathsep='/'):
         return self.__class__(
             DccPathDagMtd.get_dag_pathsep_replace(
                 self.path,
@@ -188,7 +188,7 @@ class DccPathDagOpt(object):
             )
         )
 
-    def set_namespace_clear_to(self):
+    def clear_namespace_to(self):
         return self.__class__(
             DccPathDagMtd.get_dag_path_with_namespace_clear(
                 self.path,
@@ -229,6 +229,50 @@ class DccPathDagOpt(object):
 
     def to_string(self):
         return self._path
+
+
+class DccPathMapOpt(object):
+    """
+s = DccPathMapOpt(
+    {
+        '/master/mod/hi': '/master/hi',
+        '/master/cfx': '/master/aux/cfx',
+        '/master/grm': '/master/aux/grm',
+    }
+)
+
+for i in [
+    '/master/mod/hi',
+    '/master/mod/hi/a',
+    '/master/cfx',
+    '/master/grm'
+]:
+    print s.get(i)
+    """
+    def __init__(self, mapper, pathsep='/'):
+        self._mapper = mapper
+        self._mapper_reverse = {v: k for k, v in mapper.items()}
+        self._pathsep = pathsep
+
+    def get(self, path):
+        for k, v in self._mapper.items():
+            if path == k:
+                return v
+            elif path.startswith(
+                k+self._pathsep
+            ):
+                return v+path[len(k):]
+        return path
+
+    def get_as_reverse(self, path):
+        for k, v in self._mapper_reverse.items():
+            if path == k:
+                return v
+            elif path.startswith(
+                    k+self._pathsep
+            ):
+                return v+path[len(k):]
+        return path
 
 
 class DccPortPathMtd(object):

@@ -1,13 +1,11 @@
 # coding:utf-8
 import six
-
-import sys
 # noinspection PyUnresolvedReferences
 from Katana import Configuration, RenderManager, ScenegraphManager, KatanaFile, FarmAPI, CacheManager, Nodes3DAPI, NodegraphAPI
 # noinspection PyUnresolvedReferences
 from UI4 import Manifest
 
-from lxutil import utl_core
+from lxbasic import bsc_core
 
 import lxutil.scripts as utl_scripts
 
@@ -18,7 +16,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
-class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     RENDER_MODE = 'previewRender'
     #
     OPTION = dict(
@@ -40,7 +38,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         texture_use_environ_map=False,
     )
     def __init__(self, option=None):
-        super(LookAssExporter, self).__init__(option)
+        super(FncLookAssExporter, self).__init__(option)
         self._file_path = self.get('file')
         self._location = self.get('location')
 
@@ -124,7 +122,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 #
                 i_output_file = utl_dcc_objects.OsFile(i_output_file_path)
                 if i_output_file.get_is_exists() is True:
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'ass export',
                         'file="{}"'.format(i_output_file_path)
                     )
@@ -132,7 +130,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                         fr = utl_scripts.DotAssFileReader(i_output_file_path)
                         fr._set_file_paths_convert_()
                         #
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.LogMtd.trace_method_result(
                             'katana-ass-sequence-export',
                             u'file="{}"'.format(file_path)
                         )
@@ -149,7 +147,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             #
             output_file = utl_dcc_objects.OsFile(output_file_path)
             if output_file.get_is_exists() is True:
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'ass export',
                     'file="{}"'.format(output_file_path)
                 )
@@ -157,7 +155,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                     fr = utl_scripts.DotAssFileReader(output_file_path)
                     fr._set_file_paths_convert_()
                     #
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'katana-ass-export',
                         u'file="{}"'.format(file_path)
                     )
@@ -172,7 +170,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         camera_location = self.get('camera_location')
         look_pass_node = self.get('look_pass_node')
         look_pass_name = self.get('look_pass')
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'ass export',
             'obj="{}", look_pass="{}"'.format(
                 look_pass_node,

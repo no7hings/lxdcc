@@ -5,6 +5,7 @@ schemes:
     storage: default
 # workspaces
 workspaces:
+    work: work
     source: work
     user: user
     release: publish
@@ -116,13 +117,13 @@ shot_steps_extra:
 #   asset
 asset_tasks:
     model: modeling
-    model_act: mod_dynamic
+    model_dynamic: mod_dynamic
     groom: groom
     effect: effect
     rig: rigging
     character_effect: cfx
     surface: surfacing
-    surface_ani: srf_anishading
+    surface_prv: srf_anishading
     surface_cfx: srf_cfxshading
     light: lighting
     light_rig: lighting

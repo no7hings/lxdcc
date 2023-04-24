@@ -20,7 +20,7 @@ import lxmaya.dcc.dcc_xgn_operators as mya_dcc_xgn_operators
 from lxmaya.fnc.exporters import _mya_fnc_ept_geometry
 
 
-class XgenExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class XgenExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         xgen_project_directory='',
         xgen_collection_directory='',
@@ -36,7 +36,7 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         super(XgenExporter, self).__init__(option)
     @classmethod
     def _set_grow_mesh_abc_export_(cls, directory_path, location):
-        mya_location = bsc_core.DccPathDagOpt(location).set_translate_to('|').to_string()
+        mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').to_string()
         group = mya_dcc_objects.Group(mya_location)
         xgen_collection_obj_paths = group.get_all_shape_paths(include_obj_type=[ma_configure.Util.XGEN_PALETTE])
         for i_xgen_collection_obj_path in xgen_collection_obj_paths:
@@ -59,7 +59,7 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 ).set_run()
     @classmethod
     def _set_xgen_collection_export_(cls, xgen_project_directory_path, xgen_collection_directory_path, location):
-        mya_location = bsc_core.DccPathDagOpt(location).set_translate_to('|').to_string()
+        mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').to_string()
         group = mya_dcc_objects.Group(mya_location)
         xgen_collection_obj_paths = group.get_all_shape_paths(include_obj_type=[ma_configure.Util.XGEN_PALETTE])
         for i_xgen_collection_obj_path in xgen_collection_obj_paths:
@@ -106,7 +106,7 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             )
 
 
-class XgenUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class XgenUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -119,7 +119,7 @@ class XgenUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         option_opt = self.get_option()
         location = option_opt.get('location')
         location_dag_opt = bsc_core.DccPathDagOpt(location)
-        mya_location_obj_path = location_dag_opt.set_translate_to(
+        mya_location_obj_path = location_dag_opt.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
         mya_location = mya_location_obj_path.path

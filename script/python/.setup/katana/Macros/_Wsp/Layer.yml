@@ -54,7 +54,7 @@ main:
         #
         parameters/scheme:
             widget: capsule_string
-            value: ['master', 'renderable', 'non_renderable', 'all']
+            value: ['master', 'renderable', 'auxiliary', 'all']
             default: 'master'
             tool_tip: '...'
         # setting
@@ -103,48 +103,48 @@ main:
             widget: boolean
             value: True
             tool_tip: '...'
-        #   non_renderable
-        parameters/setting/non_renderable_all:
+        #   auxiliary
+        parameters/setting/auxiliary_all:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/model:
+        parameters/setting/auxiliary/model:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/groom:
+        parameters/setting/auxiliary/groom:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/character_effect:
+        parameters/setting/auxiliary/character_effect:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/effect:
+        parameters/setting/auxiliary/effect:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/rig:
+        parameters/setting/auxiliary/rig:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/surface:
+        parameters/setting/auxiliary/surface:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/light:
+        parameters/setting/auxiliary/light:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/non_renderable/extend:
+        parameters/setting/auxiliary/extend:
             widget: boolean
             value: True
             tool_tip: '...'
@@ -198,48 +198,48 @@ main:
             widget: path
             value: '/root/world/geo/master/etd'
             tool_tip: '...'
-        # non renderable
-        option/non_renderable_location:
+        # auxiliary
+        option/auxiliary_location:
             widget: path
             value: '/root/world/geo/master/shape'
             tool_tip: '...'
 
-        option/non_renderable/model:
+        option/auxiliary/model:
             widget: path
             value: '/root/world/geo/master/shape/mod_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/groom:
+        option/auxiliary/groom:
             widget: path
             value: '/root/world/geo/master/shape/grm_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/character_effect:
+        option/auxiliary/character_effect:
             widget: path
             value: '/root/world/geo/master/shape/cfx_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/effect:
+        option/auxiliary/effect:
             widget: path
             value: '/root/world/geo/master/shape/efx_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/rig:
+        option/auxiliary/rig:
             widget: path
             value: '/root/world/geo/master/shape/rig_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/surface:
+        option/auxiliary/surface:
             widget: path
             value: '/root/world/geo/master/shape/srf_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/light:
+        option/auxiliary/light:
             widget: path
             value: '/root/world/geo/master/shape/rig_shapegrp'
             tool_tip: '...'
 
-        option/non_renderable/extend:
+        option/auxiliary/extend:
             widget: path
             value: '/root/world/geo/master/shape/misc'
             tool_tip: '...'
@@ -335,8 +335,8 @@ node:
         connections:
             - '<..upstream_merge.output>'
             - '<.input>'
-    # non_renderable
-    non_renderable_usd_active:
+    # auxiliary
+    auxiliary_usd_active:
         type: UsdInActivationSet
         path: '<main.path>/<option.type_abr>__<..key>'
         input: '<.path>.in'
@@ -347,12 +347,12 @@ node:
             active: True
         #
         expressions:
-            locations/i0: 'getParent().option.non_renderable_location'
+            locations/i0: 'getParent().option.auxiliary_location'
         connections:
             - '<..upstream_merge.output>'
             - '<.input>'
 
-    non_renderable_prune:
+    auxiliary_prune:
         type: Prune
         path: '<main.path>/<option.type_abr>__<..key>'
         input: '<.path>.A'
@@ -360,15 +360,15 @@ node:
         #
         e_0:
             |-
-            ' - (( {{}}))'.format(getParent().option.non_renderable.{k}) if (getParent().paramters.setting.non_renderable_all and getParent().paramters.setting.non_renderable.{k}) else ''
+            ' - (( {{}}))'.format(getParent().option.auxiliary.{k}) if (getParent().paramters.setting.auxiliary_all and getParent().paramters.setting.auxiliary.{k}) else ''
         #
         expressions:
             cel:
                 |-
                 '(( {}/*))'.format(getParent().option.root) + (
-                    ' + (( {}/*))'.format(getParent().option.non_renderable_location)
+                    ' + (( {}/*))'.format(getParent().option.auxiliary_location)
                 ) + (
-                    ' - (( {}))'.format(getParent().option.non_renderable_location)
+                    ' - (( {}))'.format(getParent().option.auxiliary_location)
                 ) + (
                     <..e_0 % str(x).format(k='model')>
                 ) + (
@@ -388,7 +388,7 @@ node:
                 )
         #
         connections:
-            - '<..non_renderable_usd_active.output>'
+            - '<..auxiliary_usd_active.output>'
             - '<.input>'
     # all
     all_merge:
@@ -398,22 +398,22 @@ node:
         #
         input_ports:
             - 'renderable'
-            - 'non_renderable'
+            - 'auxiliary'
         #
         connections:
             # renderable
             - '<..renderable_prune.output>'
             - '<.path>.renderable'
-            # non_renderable
-            - '<..non_renderable_prune.output>'
-            - '<.path>.non_renderable'
+            # auxiliary
+            - '<..auxiliary_prune.output>'
+            - '<.path>.auxiliary'
     #
     scheme_switch:
         type: Switch
         path: '<main.path>/<option.type_abr>__<..key>'
         output: '<.path>.output'
         #
-        input_ports: ['master', 'renderable', 'non_renderable', 'all']
+        input_ports: ['master', 'renderable', 'auxiliary', 'all']
         #
         expressions:
             in:
@@ -427,9 +427,9 @@ node:
             # renderable
             - '<..renderable_prune.output>'
             - '<.path>.renderable'
-            # non_renderable
-            - '<..non_renderable_prune.output>'
-            - '<.path>.non_renderable'
+            # auxiliary
+            - '<..auxiliary_prune.output>'
+            - '<.path>.auxiliary'
             # all
             - '<..all_merge.output>'
             - '<.path>.all'

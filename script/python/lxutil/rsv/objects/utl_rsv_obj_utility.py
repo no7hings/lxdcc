@@ -226,7 +226,7 @@ class RsvAssetBuildOpt(object):
 
         self._model_act_rsv_task = rsv_resource.get_rsv_task(
             step=self._rsv_project.properties.get('asset_steps.model'),
-            task=self._rsv_project.properties.get('asset_tasks.model_act'),
+            task=self._rsv_project.properties.get('asset_tasks.model_dynamic'),
         )
         # groom
         self._groom_rsv_task = rsv_resource.get_rsv_task(

@@ -1332,7 +1332,10 @@ class AbsRsvTask(
                             j_rsv_scene_properties.set('extra.time_tag', bsc_core.TimeMtd.get_time_tag())
                             #
                             j_rsv_scene_properties.set(
-                                'dcc', self._rsv_project.get_dcc_data(i_application)
+                                'dcc', self._rsv_project.get_dcc_data(i_application).get_value()
+                            )
+                            j_rsv_scene_properties.set(
+                                'usd', self._rsv_project.get_dcc_data('usd').get_value()
                             )
                             return j_rsv_scene_properties
     # tag
@@ -2889,20 +2892,25 @@ class AbsRsvProject(
         return self._raw_opt.get('schemes.storage')
 
     def get_dcc_data(self, application):
-        app_data = self._raw_opt.get_content_as_unfold(
+        main_data = self._raw_opt.get_content_as_unfold(
             'dcc-data.{}'.format(application)
         )
-        extend_data = self._raw_opt.get('dcc-data.extend') or {}
-        for k, v in extend_data.items():
-            app_data.set(
-                k, v.format(**app_data.value)
+        extend_data = self._raw_opt.get('dcc-data.dcc-extend') or {}
+        extend_c = bsc_objects.Content(value=extend_data)
+        for i_k in extend_c.get_leaf_keys():
+            i_v = extend_c.get(i_k)
+            main_data.set(
+                i_k, i_v.format(**main_data.value)
             )
-        app_extend_data = self._raw_opt.get('dcc-data.{}-extend'.format(application)) or {}
-        for k, v in app_extend_data.items():
-            app_data.set(
-                k, v.format(**app_data.value)
-            )
-        return app_data.get_value()
+        extend_data_over = self._raw_opt.get('dcc-data.{}-extend'.format(application)) or {}
+        if extend_data_over:
+            extend_data_over_c = bsc_objects.Content(value=extend_data_over)
+            for i_k in extend_data_over_c.get_leaf_keys():
+                i_v = extend_data_over_c.get(i_k)
+                main_data.set(
+                    i_k, i_v.format(**main_data.value)
+                )
+        return main_data
 
     def _get_rsv_obj_exists_(self, rsv_obj_path):
         return self._rsv_obj_stack.get_object_exists(rsv_obj_path)

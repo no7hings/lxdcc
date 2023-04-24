@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
@@ -55,7 +57,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_look_ass_file.get_is_exists() is False or force is True:
                 i_look_pass_source_node = s.get_look_pass_source_node(i_look_pass_name)
                 if i_look_pass_source_node is not None:
-                    ktn_fnc_exporters.LookAssExporter(
+                    ktn_fnc_exporters.FncLookAssExporter(
                         option=dict(
                             file=i_look_ass_file_path,
                             location=root,
@@ -67,7 +69,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
                     ).set_run()
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.LogMtd.trace_method_warning(
                     'look-ass export',
                     u'file="{}" is exists'.format(i_look_ass_file_path)
                 )

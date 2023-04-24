@@ -20,7 +20,7 @@ def set_proxy_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option, default_option='with_look_ass=True')
     #
     scene_src_file_path = option_opt.get('file')
-    scene_src_file_path = utl_core.Path.set_map_to_platform(scene_src_file_path)
+    scene_src_file_path = utl_core.Path.map_to_current(scene_src_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=scene_src_file_path)
@@ -88,7 +88,7 @@ def set_asset_proxy_export(rsv_task_properties):
     asset = rsv_task.get('asset')
     version = rsv_task_properties.get('version')
     location = '{}/{}'.format(root, 'hi')
-    mya_location = bsc_core.DccPathDagOpt(location).set_translate_to('|').get_value()
+    mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').get_value()
     #
     act = 'static'
     for i_look_pass in ['default']:

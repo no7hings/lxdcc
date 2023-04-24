@@ -7,7 +7,7 @@ import lxbasic.extra.abstracts as bsc_etr_abstracts
 class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_base_packages_extend(cls):
-        return ['lxdcc', 'lxdcc_lib', 'lxdcc_gui', 'lxdcc_rsc']
+        return ['lxdcc']
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
         import lxbasic.objects as bsc_objects

@@ -17,7 +17,7 @@ def set_render_scene_create_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     scene_src_file_path = option_opt.get('file')
-    scene_src_file_path = utl_core.Path.set_map_to_platform(scene_src_file_path)
+    scene_src_file_path = utl_core.Path.map_to_current(scene_src_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=scene_src_file_path)

@@ -59,59 +59,44 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         elif version_scheme == 'new':
             version = version_scheme
         #
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep=pathsep
         )
         dcc_root = mya_dcc_objects.Group(
             mya_root_dag_opt.get_value()
         )
         if dcc_root.get_is_exists() is True:
-            if workspace == rsv_scene_properties.get('workspaces.source'):
-                keyword = 'asset-source-geometry-usd-var-file'
-            elif workspace == rsv_scene_properties.get('workspaces.release'):
-                keyword = 'asset-geometry-usd-var-file'
+            if workspace == rsv_scene_properties.get('workspaces.release'):
+                keyword = 'asset-geometry-usd-payload-file'
             elif workspace == rsv_scene_properties.get('workspaces.temporary'):
-                keyword = 'asset-temporary-geometry-usd-var-file'
+                keyword = 'asset-temporary-geometry-usd-payload-file'
             else:
                 raise TypeError()
-            # location_names = [i.name for i in dcc_root.get_children()]
-            # use white list
-            location_names = ['hi', 'shape', 'hair', 'aux']
-            with utl_core.GuiProgressesRunner.create(maximum=len(location_names), label='export geometry in location') as g_p:
-                for i_location_name in location_names:
-                    g_p.set_update()
-                    #
-                    i_geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
-                        keyword=keyword
-                    )
-                    i_geometry_usd_var_file_path = i_geometry_usd_var_file_rsv_unit.get_result(
-                        version=version, extend_variants=dict(var=i_location_name)
-                    )
-                    #
-                    i_location = '{}/{}'.format(root, i_location_name)
-                    i_sub_root_dag_path = bsc_core.DccPathDagOpt(i_location)
-                    i_mya_sub_root_dag_path = i_sub_root_dag_path.set_translate_to(
-                        pathsep=pathsep
-                    )
-                    #
-                    sub_root_mya_obj = mya_dcc_objects.Group(i_mya_sub_root_dag_path.path)
-                    if sub_root_mya_obj.get_is_exists() is True:
-                        mya_fnc_exporters.GeometryUsdExporter_(
-                            file_path=i_geometry_usd_var_file_path,
-                            root=i_location,
-                            option=dict(
-                                default_prim_path=root,
-                                with_uv=True,
-                                with_mesh=True,
-                                use_override=False,
-                                port_match_patterns=['pg_*']
-                            )
-                        ).set_run()
+
+            rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword)
+            file_path = rsv_unit.get_result(version=version)
+
+            mya_fnc_exporters.FncGeometryUsdExporterNew(
+                option=dict(
+                    file=file_path,
+                    renderable_locations=[
+                        '/master/mod/hi',
+                        '/master/mod/lo',
+                    ],
+                    auxiliary_locations=[
+                        '/master/grm',
+                        '/master/cfx',
+                        '/master/efx',
+                        '/master/misc'
+                    ],
+                )
+            ).execute()
         else:
             raise RuntimeError()
 
     def set_asset_geometry_uv_map_usd_export(self, version_scheme='match'):
         import lxusd.fnc.exporters as usd_fnc_exporters
+        import lxusd.rsv.objects as usd_rsv_objects
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -120,40 +105,21 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         #
-        if workspace == rsv_scene_properties.get('workspaces.source'):
-            keyword_0 = 'asset-source-geometry-usd-var-file'
-            keyword_1 = 'asset-source-geometry-uv_map-usd-file'
-        elif workspace == rsv_scene_properties.get('workspaces.release'):
-            keyword_0 = 'asset-geometry-usd-var-file'
-            keyword_1 = 'asset-geometry-uv_map-usd-file'
+        if workspace == rsv_scene_properties.get('workspaces.release'):
+            keyword = 'asset-geometry-usd-uv_map-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
-            keyword_0 = 'asset-temporary-geometry-usd-var-file'
-            keyword_1 = 'asset-temporary-geometry-uv_map-usd-file'
+            keyword = 'asset-temporary-geometry-usd-uv_map-file'
         else:
             raise TypeError()
         #
-        geometry_usd_hi_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword_0
+        file_rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword)
+        file_path = file_rsv_unit.get_result(version=version)
+
+        usd_rsv_objects.RsvTaskOverrideUsdCreator(
+            self._rsv_task
+        ).create_geometry_uv_map_at(
+            file_path
         )
-        geometry_usd_var_file_path = geometry_usd_hi_file_rsv_unit.get_exists_result(
-            version=version, extend_variants=dict(var='hi')
-        )
-        if geometry_usd_var_file_path:
-            geometry_uv_map_usd_file_rsv_unit = self._rsv_task.get_rsv_unit(
-                keyword=keyword_1
-            )
-            geometry_uv_map_usd_file_path = geometry_uv_map_usd_file_rsv_unit.get_result(
-                version=version
-            )
-            usd_fnc_exporters.GeometryUvMapExporter(
-                file_path=geometry_uv_map_usd_file_path,
-                root=root,
-                option=dict(
-                    file_0=geometry_usd_var_file_path,
-                    file_1=geometry_usd_var_file_path,
-                    display_color=bsc_core.RawTextOpt(step).to_rgb(maximum=1.0)
-                )
-            ).set_run()
 
     def set_asset_geometry_abc_export(self, version_scheme='match'):
         rsv_scene_properties = self._rsv_scene_properties
@@ -168,7 +134,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         elif version_scheme == 'new':
             version = version_scheme
         #
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep=pathsep
         )
         dcc_root = mya_dcc_objects.Group(
@@ -199,7 +165,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     i_location = '{}/{}'.format(root, i_location_name)
                     i_sub_root_dag_path = bsc_core.DccPathDagOpt(i_location)
-                    i_mya_sub_root_dag_path = i_sub_root_dag_path.set_translate_to(
+                    i_mya_sub_root_dag_path = i_sub_root_dag_path.translate_to(
                         pathsep=pathsep
                     )
                     #
@@ -240,7 +206,7 @@ class RsvDccGeometryExtraHookOpt(
         elif version_scheme == 'new':
             version = version_scheme
         #
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep=pathsep
         )
         dcc_root = mya_dcc_objects.Group(

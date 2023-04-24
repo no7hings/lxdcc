@@ -1,11 +1,11 @@
 # coding:utf-8
 import collections
-#
-import math
 # noinspection PyUnresolvedReferences
 from Katana import Utils, NodegraphAPI, CacheManager, RenderManager
 # noinspection PyUnresolvedReferences
 from UI4 import Manifest
+
+from lxbasic import bsc_core
 
 
 class _MacroMtd(object):
@@ -28,7 +28,7 @@ class _MacroMtd(object):
                 )
             else:
                 for i in contents:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.LogMtd.trace_method_warning(
                         label, i
                     )
 
@@ -392,7 +392,7 @@ class LxAsset(object):
                 )
                 self.__set_usd_variant_by_dict_(usd_variant_dict)
                 #
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
@@ -464,7 +464,7 @@ class LxAsset(object):
                     usd_variant_dict
                 )
                 #
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'set usd create for shot-asset',
                     'file="{}"'.format(asset_shot_set_usd_file_path)
                 )
@@ -795,7 +795,7 @@ class LxAssetAss(object):
                             settings=rss
                         )
                         l_p.set_update()
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.LogMtd.trace_method_result(
                             'ass sequence export',
                             'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
                         )

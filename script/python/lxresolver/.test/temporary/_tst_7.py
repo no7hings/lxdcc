@@ -17,7 +17,7 @@ for i in [
     'L:/prod/cjd/publish/assets/prp/changting_a/mod/mod_layout/changting_a.mod.mod_layout.v001/maya/changting_a.ma',
     # '/l/prod/cjd/publish/assets/prp/changting_a/mod/mod_layout/changting_a.mod.mod_layout.v001/maya/changting_a.ma',
 ]:
-    file_path = utl_core.Path.set_map_to_platform(i)
+    file_path = utl_core.Path.map_to_current(i)
     task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=file_path)
     print task_properties
 

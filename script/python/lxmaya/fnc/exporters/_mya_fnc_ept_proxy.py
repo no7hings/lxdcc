@@ -17,7 +17,7 @@ from lxutil.fnc import utl_fnc_obj_abs
 from lxmaya.fnc.exporters import _mya_fnc_ept_look
 
 
-class ProxyGpuExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class ProxyGpuExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     # cmds.gpuCache(
     #     nodepathString,
     #     startTime=startFrame, endTime=endFrame,
@@ -49,7 +49,7 @@ class ProxyGpuExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         file_path = option.get('file')
         location = option['location']
         location_dag_opt = bsc_core.DccPathDagOpt(location)
-        mya_location = location_dag_opt.set_translate_to('|').get_value()
+        mya_location = location_dag_opt.translate_to('|').get_value()
         frame = option.get('frame')
         start_frame, end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         o = ma_core.CmdMeshesOpt(mya_location)
@@ -79,7 +79,7 @@ class ProxyGpuExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             )
 
 
-class ProxyAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class ProxyAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -94,17 +94,17 @@ class ProxyAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         file_path = option.get('file')
         location = option['location']
         location_dag_opt = bsc_core.DccPathDagOpt(location)
-        mya_location = location_dag_opt.set_translate_to('|').get_value()
+        mya_location = location_dag_opt.translate_to('|').get_value()
         frame = option.get('frame')
         start_frame, end_frame = mya_dcc_objects.Scene.get_frame_range(frame)
         #
-        _mya_fnc_ept_look.LookAssExporter(
+        _mya_fnc_ept_look.FncLookAssExporter(
             option=dict(
                 file=file_path,
                 location=location,
                 texture_use_environ_map=True,
             ),
-        ).set_run()
+        ).execute()
     @classmethod
     def _set_color_correct_create_(cls):
         def set_user_data_rgb_over_create_fnc_(osl_color_correct_):

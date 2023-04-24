@@ -30,7 +30,7 @@ geometries:
     shape: 'geo/shape.usd'
     hair: 'geo/hair.usd'
     #
-    uv_map: 'uv_map.usd'
+    uv_map: 'uv_map.usda'
 #
 usdas:
     material: 'shading.usda'

@@ -13,7 +13,7 @@ def set_usd_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     scene_file_path = option_opt.get('file')
-    scene_file_path = utl_core.Path.set_map_to_platform(scene_file_path)
+    scene_file_path = utl_core.Path.map_to_current(scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=scene_file_path)
@@ -79,41 +79,9 @@ def set_asset_geometry_uv_map_usd_export(rsv_task_properties):
 
 
 def set_asset_work_geometry_uv_map_usd_export(rsv_task_properties):
-    import lxutil.dcc.dcc_objects as utl_dcc_objects
-    #
-    import lxresolver.commands as rsv_commands
-    #
-    import lxusd.fnc.exporters as usd_fnc_exporters
-    #
-    version = rsv_task_properties.get('version')
-    #
-    root = rsv_task_properties.get('dcc.root')
-    #
-    resolver = rsv_commands.get_resolver()
-    rsv_task = resolver.get_rsv_task(**rsv_task_properties.value)
-    #
-    var_names = ['hi']
-    #
-    for i_var_name in var_names:
-        i_geometry_usd_hi_file_unit = rsv_task.get_rsv_unit(keyword='asset-source-geometry-usd-var-file')
-        i_geometry_usd_hi_file_path = i_geometry_usd_hi_file_unit.get_result(
-            version=version, extend_variants=dict(var=i_var_name)
-        )
-        if i_geometry_usd_hi_file_path:
-            i_geometry_usd_hi_file = utl_dcc_objects.OsFile(i_geometry_usd_hi_file_path)
-            if i_geometry_usd_hi_file.get_is_exists() is True:
-                i_geometry_uv_map_usd_file_unit = rsv_task.get_rsv_unit(keyword='asset-source-geometry-uv_map-usd-var-file')
-                i_geometry_uv_map_usd_file_path = i_geometry_uv_map_usd_file_unit.get_result(
-                    version=version, extend_variants=dict(var=i_var_name)
-                )
-                usd_fnc_exporters.GeometryUvMapExporter(
-                    file_path=i_geometry_uv_map_usd_file_path,
-                    root=root,
-                    option=dict(
-                        file_0=i_geometry_usd_hi_file_path,
-                        file_1=i_geometry_usd_hi_file_path
-                    )
-                ).set_run()
+    raise RuntimeError(
+        'this method is removed'
+    )
 
 
 def set_asset_geometry_uv_map_usd_link_export(rsv_task_properties):
@@ -212,7 +180,7 @@ def set_usd_create_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     scene_file_path = option_opt.get('file')
-    scene_file_path = utl_core.Path.set_map_to_platform(scene_file_path)
+    scene_file_path = utl_core.Path.map_to_current(scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=scene_file_path)

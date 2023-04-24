@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
@@ -27,9 +29,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         #
-        if workspace == rsv_scene_properties.get('workspaces.source'):
-            keyword = 'asset-source-geometry-usd-var-file'
-        elif workspace == rsv_scene_properties.get('workspaces.release'):
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-geometry-usd-var-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword = 'asset-temporary-geometry-usd-var-file'
@@ -49,7 +49,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 geometry_usd_var_file_path
             )
         else:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.LogMtd.trace_method_error(
                 'usd export',
                 'file="{}" is non-exists'.format(geometry_uv_map_usd_source_file_path)
             )
@@ -68,10 +68,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         #
-        if workspace == rsv_scene_properties.get('workspaces.source'):
-            keyword_0 = 'asset-source-geometry-usd-var-file'
-            keyword_1 = 'asset-source-geometry-uv_map-usd-file'
-        elif workspace == rsv_scene_properties.get('workspaces.release'):
+        if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-geometry-usd-var-file'
             keyword_1 = 'asset-geometry-uv_map-usd-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
@@ -103,7 +100,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             ).set_run()
         else:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.LogMtd.trace_method_error(
                 'usd export',
                 'file="{}" is non-exists'.format(geometry_usd_var_file_path)
             )

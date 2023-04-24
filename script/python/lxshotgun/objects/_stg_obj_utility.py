@@ -544,12 +544,12 @@ class StgConnector(object):
         task = kwargs['task']
         version = kwargs['version']
         #
-        version_code = self.VERSION_NAME_PATTERN.format(
+        version_code = bsc_core.PtnParseOpt(self.VERSION_NAME_PATTERN).set_update_to(
             resource=kwargs[branch],
             step=step,
             task=task,
             version=version
-        )
+        ).get_value()
         #
         _ = self._shotgun.find_one(
             entity_type='Version',
@@ -592,12 +592,12 @@ class StgConnector(object):
         task = kwargs['task']
         version = kwargs['version']
         #
-        name = self.VERSION_NAME_PATTERN.format(
+        name = bsc_core.PtnParseOpt(self.VERSION_NAME_PATTERN).set_update_to(
             resource=kwargs[branch],
             step=step,
             task=task,
             version=version
-        )
+        ).get_value()
         #
         _ = self._shotgun.create(
             'Version',
@@ -672,7 +672,7 @@ class StgConnector(object):
                         "task": stg_task,
                         "project": stg_project,
                         "entity": stg_entity,
-                        "path_cache": bsc_core.StorageMtd.set_map_to_platform(file_path),
+                        "path_cache": bsc_core.StgPathMapMtd.map_to_current(file_path),
                         "version_number": version_number,
                      }
                 )

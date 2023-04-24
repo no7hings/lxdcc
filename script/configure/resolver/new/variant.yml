@@ -5,6 +5,7 @@ schemes:
     storage: rpc
 # workspaces
 workspaces:
+    work: team
     source: team
     user: work
     release: shared
@@ -40,7 +41,7 @@ asset_steps:
     model: mod
     groom: grm
     effect: efx
-    chracter_effect: cfx
+    character_effect: cfx
     rig: rig
     surface: srf
     #
@@ -107,12 +108,12 @@ shot_steps_extra: []
 #   asset
 asset_tasks:
     model: modeling
-    model_act: mod_dynamic
+    model_dynamic: mod_dynamic
     groom: groom
     rig: rigging
     effect: effect
     surface: surface
-    surface_ani: srf_anishading
+    surface_prv: srf_anishading
     surface_cfx: srf_cfxshading
     light: lighting
     light_rig: light_rig

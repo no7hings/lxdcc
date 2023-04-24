@@ -126,7 +126,7 @@ class ObjType(unr_abstracts.AbsObjType):
     # type/def
     PATHSEP = unr_configure.ObjType.PATHSEP
     # obj_type/def
-    DCC_OBJ_CLASS = Obj
+    DCC_NODE_CLASS = Obj
     # port_query/def
     PORT_QUERY_CLASS = PortQuery
     PORT_QUERY_STACK_CLASS = _unr_obj_stack.PortQueryStack

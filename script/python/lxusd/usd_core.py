@@ -36,13 +36,13 @@ class UsdStageOpt(UsdBasic):
             elif isinstance(args[0], six.string_types):
                 file_path = args[0]
                 if os.path.isfile(file_path) is True:
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'usd-file open is started', 'file="{}"'.format(
                             file_path
                         )
                     )
                     stage = self._set_file_open_(file_path)
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'usd-file open is completed', 'file="{}"'.format(
                             file_path
                         )
@@ -66,12 +66,12 @@ class UsdStageOpt(UsdBasic):
         root_layer = self._usd_stage.GetRootLayer()
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.append(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'usd-layer-append',
                 u'file="{}"'.format(file_path)
             )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.LogMtd.trace_method_warning(
                 'usd-layer-append',
                 u'file="{}" is non-exist'.format(file_path)
             )
@@ -83,12 +83,12 @@ class UsdStageOpt(UsdBasic):
         root_layer = self._usd_stage.GetRootLayer()
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.insert(0, file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'usd-layer prepend',
                 u'file="{}"'.format(file_path)
             )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.LogMtd.trace_method_warning(
                 'usd-layer prepend',
                 u'file="{}" is non-exist'.format(file_path)
             )
@@ -97,14 +97,14 @@ class UsdStageOpt(UsdBasic):
         prim = self._usd_stage.GetPrimAtPath(obj_path)
         self._usd_stage.SetDefaultPrim(prim)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'default-prim set',
             u'obj="{}"'.format(obj_path)
         )
 
     def set_export_to(self, file_path):
         self._usd_stage.Export(file_path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'usd-export',
             u'file="{}"'.format(file_path)
         )
@@ -113,13 +113,13 @@ class UsdStageOpt(UsdBasic):
         # base, ext = os.path.splitext(file_path)
         # self._usd_stage.Export(base + '.usda')
         # #
-        # utl_core.Log.set_module_result_trace(
+        # bsc_core.LogMtd.trace_method_result(
         #     'usd-geometry-export',
         #     'file-path: "{}"'.format(file_path)
         # )
 
     def set_obj_create_as_override(self, obj_path):
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'override-prim create',
             u'obj="{}"'.format(obj_path)
         )
@@ -349,6 +349,49 @@ class UsdStageOpt(UsdBasic):
                 UsdGeom.Mesh(usd_prim)
             ).get_radius(pivot)
 
+    def load_by_locations_fnc(self, file_path, locations, active_locations=None):
+        stage_tmp = Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
+        if isinstance(active_locations, (tuple, list)):
+            for i in active_locations:
+                i_p = stage_tmp.GetPrimAtPath(i)
+                if i_p.IsValid():
+                    i_p.SetActive(True)
+        #
+        for i_location_arg in locations:
+            if isinstance(i_location_arg, (tuple, list)):
+                i_location_source, i_location_target = i_location_arg
+            elif isinstance(i_location_arg, six.string_types):
+                i_location_source, i_location_target = i_location_arg, i_location_arg
+            else:
+                raise RuntimeError()
+            # when target is exists, use target
+            # etc. we have source location "/master/hi", need map to "/master/mod/hi", "/master/hi" is already exists, use "/master/hi"
+            i_p_tgt = stage_tmp.GetPrimAtPath(i_location_target)
+            if i_p_tgt.IsValid():
+                self.load_by_location_fnc(file_path, i_location_target, i_location_target)
+            # when target is non exists, use source and reference source to target
+            else:
+                i_p_src = stage_tmp.GetPrimAtPath(i_location_source)
+                if i_p_src.IsValid():
+                    self.load_by_location_fnc(file_path, i_location_source, i_location_target)
+        #
+        self._usd_stage.Flatten()
+
+    def load_by_location_fnc(self, file_path, location_source, location_target):
+        usd_location = self._usd_stage.GetPseudoRoot()
+        #
+        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
+            location_target, pathsep=usd_configure.Obj.PATHSEP
+        )
+        if dag_path_comps:
+            dag_path_comps.reverse()
+        #
+        for i in dag_path_comps:
+            if i != usd_configure.Obj.PATHSEP:
+                usd_location = self._usd_stage.DefinePrim(i, usd_configure.ObjType.Xform)
+        #
+        usd_location.GetReferences().AddReference(file_path, location_source)
+
 
 class UsdFileWriteOpt(object):
     def __init__(self, file_path):
@@ -376,7 +419,7 @@ class UsdFileWriteOpt(object):
         file_opt = bsc_core.StgFileOpt(self._file_path)
         file_opt.create_directory()
         self._usd_stage.Export(self._file_path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'usd-export',
             u'file="{}"'.format(self._file_path)
         )
@@ -483,7 +526,7 @@ class UsdPrimOpt(object):
             dic[i_variant_set_opt.get_name()] = i_variant_set_opt.get_current_variant_name(), i_variant_set_opt.get_variant_names()
         return dic
     @classmethod
-    def _set_customize_attribute_add_(cls, usd_obj, key, value):
+    def _add_customize_attribute_(cls, usd_obj, key, value):
         if isinstance(value, bool):
             dcc_type_name = unr_configure.Type.CONSTANT_BOOLEAN
         elif isinstance(value, int):
@@ -825,7 +868,7 @@ class UsdMeshOpt(object):
         if self._usd_mesh.HasPrimvar(uv_map_name) is True:
             return self._usd_mesh.GetPrimvar(uv_map_name)
         else:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'uv-map create',
                 u'uv-map-path="{}.{}"'.format(
                     self._obj_path, uv_map_name

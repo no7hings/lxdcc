@@ -182,7 +182,7 @@ class AbsHouObjs(utl_abstract.AbsDccObjs):
     def get_objs(cls, **kwargs):
         lis = []
         for obj_path in cls.get_paths():
-            obj = cls.DCC_OBJ_CLASS(obj_path)
+            obj = cls.DCC_NODE_CLASS(obj_path)
             obj_type = obj.type
             if obj_type in cls.FILE_REFERENCE_FILE_PORT_PATHS_DICT:
                 port_paths = cls.FILE_REFERENCE_FILE_PORT_PATHS_DICT[obj_type]

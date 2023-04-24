@@ -6,14 +6,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_scene_src_create(self):
-        from lxbasic import bsc_core
-
+    def execute_asset_scene_src_create(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-        import lxkatana.fnc.importers as ktn_fnc_importers
-
-        import lxkatana.fnc.creators as ktn_fnc_creators
+        import lxkatana.scripts as ktn_scripts
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -22,12 +18,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-katana-scene-src-file'
-            keyword_1 = 'asset-look-ass-file'
-            keyword_2 = 'asset-look-ass-sub-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-katana-scene-src-file'
-            keyword_1 = 'asset-temporary-look-ass-file'
-            keyword_2 = 'asset-temporary-look-ass-sub-file'
         else:
             raise TypeError()
 
@@ -37,56 +29,15 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         scene_src_file_path = scene_src_file_rsv_unit.get_result(
             version=version
         )
-        # save first
+        # save file first
         ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
 
-        ktn_fnc_creators.LookWorkspaceCreator().set_run()
-
-        look_ass_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword_1
-        )
-        look_ass_file_path = look_ass_file_rsv_unit.get_exists_result(
-            version=version
-        )
-        if look_ass_file_path:
-            ktn_fnc_importers.LookAssImporter(
-                option=dict(
-                    file=look_ass_file_path,
-                    location='/root/materials',
-                    look_pass='default'
-                )
-            ).set_run()
-
-            look_ass_sub_file_rsv_unit = self._rsv_task.get_rsv_unit(
-                keyword=keyword_2
-            )
-            look_ass_sub_file_paths = look_ass_sub_file_rsv_unit.get_results(
-                version=version
-            )
-            for i_file_path in look_ass_sub_file_paths:
-                i_properties = look_ass_sub_file_rsv_unit.get_properties_by_result(i_file_path)
-                i_look_pass_name = i_properties.get('look_pass')
-                ktn_fnc_importers.LookAssImporter(
-                    option=dict(
-                        file=i_file_path,
-                        location='/root/materials',
-                        look_pass=i_look_pass_name
-                    )
-                ).set_run()
-        else:
-            raise RuntimeError(
-                bsc_core.LogMtd.trace_method_error(
-                    'scene create',
-                    'file="{}" is non-exists'.format(look_ass_file_path)
-                )
-            )
-
-        # self.set_front_camera_for_assess()
+        ktn_scripts.ScpWorkspaceCreate.new()
 
         ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
         return scene_src_file_path
 
-    def set_asset_scene_export(self):
+    def execute_asset_scene_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
         rsv_scene_properties = self._rsv_scene_properties
@@ -182,7 +133,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             _ = fnmatch.filter(shot_paths, '*/{}'.format(shot_name))
             if _:
                 shot_geometries_node_opt.set('options.shot', _[0])
-            shot_geometries_node_opt.set_port_execute('usd.create')
+            shot_geometries_node_opt.execute_port('usd.create')
         # usd
         geometries = [ktn_dcc_objects.Node(i) for i in ['asset__geometries', 'shot__geometries']]
         usd_version_enable = self._hook_option_opt.get_as_boolean('usd_version_enable')
@@ -218,7 +169,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             light_pass_dcc_node = ktn_dcc_objects.Node('all__light')
             if light_pass_dcc_node.get_is_exists() is True:
                 light_pass_dcc_node.set('lights.light_rig.name', light_pass_all)
-                ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).set_port_execute(
+                ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).execute_port(
                     'lights.light_rig.load'
                 )
         #
@@ -227,7 +178,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             light_pass_dcc_node = ktn_dcc_objects.Node('light_rig_1__light')
             if light_pass_dcc_node.get_is_exists() is True:
                 light_pass_dcc_node.set('lights.light_rig.name', light_pass_add_1)
-                ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).set_port_execute(
+                ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).execute_port(
                     'lights.light_rig.load'
                 )
         #
@@ -236,7 +187,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             light_pass_dcc_node = ktn_dcc_objects.Node('light_rig_2__light')
             if light_pass_dcc_node.get_is_exists() is True:
                 light_pass_dcc_node.set('lights.light_rig.name', light_pass_add_2)
-                ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).set_port_execute(
+                ktn_core.NGObjOpt(light_pass_dcc_node.ktn_obj).execute_port(
                     'lights.light_rig.load'
                 )
         # light
@@ -304,7 +255,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 ', '.join(self._hook_option_opt.get(i_variable_key, as_array=True))
             )
 
-        renderer_node_opt.set_port_execute('create')
+        renderer_node_opt.execute_port('create')
         #
         ktn_dcc_objects.Scene.set_file_save()
 
@@ -428,7 +379,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if geometry_usd_var_file_path_shape:
                 s.set_sublayer_append(geometry_usd_var_file_path_shape)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.LogMtd.trace_method_warning(
                     u'front camera setup',
                     u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )
@@ -492,7 +443,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if geometry_usd_var_file_path_shape:
                 s.set_sublayer_append(geometry_usd_var_file_path_shape)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.LogMtd.trace_method_warning(
                     u'front camera setup',
                     u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )

@@ -119,12 +119,10 @@ class ScpRenderBuild(object):
 
         from lxkatana.scripts import _ktn_scp_macro_extra
 
-        import lxbasic.extra.methods as bsc_etr_methods
-
         version_key = 'render_version'
 
         render_layers = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='Group', filters=[('type', 'RenderLayer_Wsp')]
+            type_name='Group', filters=[('type', 'in', {'RenderLayer_Wsp', 'RenderLayer_Wsp_Usr'})]
         )
         for i_render_layer in render_layers:
             i_obj_opt = ktn_core.NGObjOpt(i_render_layer)

@@ -25,7 +25,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         sub_root = '{}/hi'.format(root)
         #
         sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
-        sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
+        sub_root_mya_dag_path = sub_root_dag_path.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
         #
@@ -150,7 +150,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         sub_root = '{}/hi'.format(root)
         #
         sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
-        sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(
+        sub_root_mya_dag_path = sub_root_dag_path.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
         #
@@ -607,7 +607,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                             script_option=i_maya_look_import_query.get_script_option(
                                 file=i_maya_scene_src_file_path,
                                 with_scene=True,
-                                with_look_preview=True,
+                                with_surface_preview=True,
                                 #
                                 user=user, time_tag=time_tag,
                                 #

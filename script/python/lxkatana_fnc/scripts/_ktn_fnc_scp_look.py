@@ -18,7 +18,7 @@ def set_look_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)
@@ -124,7 +124,7 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
     )
     default_look_ass_file = utl_dcc_objects.OsFile(default_look_ass_file_path)
     if default_look_ass_file.get_is_exists() is False or force is True:
-        ktn_fnc_exporters.LookAssExporter(
+        ktn_fnc_exporters.FncLookAssExporter(
             option=dict(
                 file=default_look_ass_file_path,
                 location='/master',
@@ -150,7 +150,7 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
             if i_look_ass_file.get_is_exists() is False or force is True:
                 i_look_pass_source_obj = ktn_workspace.get_pass_source_obj(i_look_pass_name)
                 if i_look_pass_source_obj is not None:
-                    ktn_fnc_exporters.LookAssExporter(
+                    ktn_fnc_exporters.FncLookAssExporter(
                         option=dict(
                             file=i_look_ass_file_path,
                             location='/master',
@@ -179,7 +179,7 @@ def set_asset_work_look_ass_export(rsv_task_properties, force=False):
     default_look_ass_file = utl_dcc_objects.OsFile(default_look_ass_file_path)
     ktn_workspace = ktn_dcc_objects.AssetWorkspace()
     if default_look_ass_file.get_is_exists() is False or force is True:
-        ktn_fnc_exporters.LookAssExporter(
+        ktn_fnc_exporters.FncLookAssExporter(
             option=dict(
                 file=default_look_ass_file_path,
                 location='/master',
@@ -265,7 +265,7 @@ def set_cfx_look_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     #

@@ -8,7 +8,7 @@ from lxutil import utl_configure, utl_core
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         name='',

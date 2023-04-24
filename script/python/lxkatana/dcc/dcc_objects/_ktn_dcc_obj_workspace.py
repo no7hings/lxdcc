@@ -218,7 +218,7 @@ class AssetWorkspace(object):
             i_obj_opt = ktn_core.NGObjOpt(i)
             i_key = i_obj_opt.get('lynxi_variants.key')
             if i_key in keys:
-                i_obj_opt.set_port_execute('lynxi_variants.register_variable')
+                i_obj_opt.execute_port('lynxi_variants.register_variable')
         #
         ktn_core.VariablesSetting().set_register_by_configure(
             {
@@ -253,12 +253,12 @@ class AssetWorkspace(object):
             configure.set('option.offset_x', offset_x)
             configure.set_flatten()
             self._set_workspace_create_by_configure_(configure)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'look-pass add',
                 'look-pass"{}"'.format(pass_name)
             )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.LogMtd.trace_method_warning(
                 'look pass add',
                 'look-pass="{}" is exists'.format(pass_name)
             )
@@ -449,7 +449,7 @@ class AssetWorkspace(object):
     @classmethod
     def _set_node_executes_(cls, ktn_obj, executes):
         for i_port_path in executes:
-            ktn_core.NGObjOpt(ktn_obj).set_port_execute(i_port_path)
+            ktn_core.NGObjOpt(ktn_obj).execute_port(i_port_path)
     @classmethod
     def _set_node_layout_by_backdrop_(cls, dcc_node, dcc_main_node, dcc_backdrop_node, d_size):
         if dcc_backdrop_node.get_is_exists() is True:
@@ -564,7 +564,7 @@ class AssetWorkspace(object):
         if enable_dcc_port.get_is_exists() is True:
             enable_dcc_port.set(True)
         else:
-            utl_core.Log.set_warning_trace(
+            bsc_core.LogMtd.trace_warning(
                 'port-name="{}" is unknown'.format(parameter_port_name)
             )
         #
@@ -635,7 +635,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -647,7 +647,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -664,7 +664,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -680,7 +680,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -692,7 +692,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'hair-usd-import',
                 u'file="{}"'.format(file_path)
             )
@@ -704,7 +704,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -716,7 +716,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -731,7 +731,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             dcc_node.get_port('camera.file').set(file_path)
             dcc_node.get_port('camera.path').set('{}{}'.format(camera_root, path))
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -830,10 +830,10 @@ class AssetWorkspace(object):
                     geometry_settings_ktn_obj = geometry_settings.ktn_obj
                     geometry_settings.set('usd.override_enable', False)
                     #
-                    ktn_core.NGObjOpt(geometry_settings_ktn_obj).set_port_execute('usd.guess')
+                    ktn_core.NGObjOpt(geometry_settings_ktn_obj).execute_port('usd.guess')
                     start_frame, end_frame = geometry_settings.get('usd.start_frame'), geometry_settings.get('usd.end_frame')
                     if start_frame != end_frame:
-                        ktn_core.NGObjOpt(geometry_settings_ktn_obj).set_port_execute('usd.shot_override.create')
+                        ktn_core.NGObjOpt(geometry_settings_ktn_obj).execute_port('usd.shot_override.create')
                         geometry_settings.set('usd.override_enable', True)
                     #
                     location = geometry_settings.get('usd.location')
@@ -851,13 +851,13 @@ class AssetWorkspace(object):
             if geometry_settings.get_is_exists() is True:
                 geometry_settings.set('usd.override_enable', False)
             #
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'look-klf export',
                 '"{}"'.format(file_path)
             )
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.LogMtd.trace_method_error(
                     'look-klf export',
                     'obj="{}" is non-exists'.format(dcc_obj.path)
                 )
@@ -938,10 +938,10 @@ class AssetWorkspace(object):
                                 i_input_port
                             )
                             #
-                            ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).set_port_execute(
+                            ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).execute_port(
                                 'export.guess'
                             )
-                            ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).set_port_execute(
+                            ktn_core.NGObjOpt(i_asset_ass_exporter.ktn_obj).execute_port(
                                 'export.execute'
                             )
 
@@ -1073,7 +1073,7 @@ class AssetWorkspace(object):
             return scene_graph_opt.get(atr_path)
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.LogMtd.trace_method_error(
                     'obj="{}" is non-exists'.format(dcc_obj.path)
                 )
             )
@@ -1085,7 +1085,7 @@ class AssetWorkspace(object):
         root = '{}/master'.format(geometry_location)
         #
         obj_scene = _ktn_dcc_obj_utility.Scene()
-        obj_scene.set_load_by_root(
+        obj_scene.load_from_location(
             ktn_obj='{}__material_assigns_merge'.format(pass_name),
             root=root,
         )
@@ -1439,7 +1439,7 @@ class AssetWorkspace(object):
         )
         ktn_core.NGObjOpt(
             node.ktn_obj
-        ).set_port_execute(
+        ).execute_port(
             'usd.create'
         )
 
@@ -1449,7 +1449,7 @@ class AssetWorkspace(object):
         )
         ktn_core.NGObjOpt(
             node.ktn_obj
-        ).set_port_execute(
+        ).execute_port(
             'extra.transformation.translate_to_origin'
         )
         #
@@ -1458,7 +1458,7 @@ class AssetWorkspace(object):
         )
         ktn_core.NGObjOpt(
             node.ktn_obj
-        ).set_port_execute(
+        ).execute_port(
             'cameras.front.fill_to_front'
         )
 
@@ -1468,7 +1468,7 @@ class AssetWorkspace(object):
         )
         ktn_core.NGObjOpt(
             node.ktn_obj
-        ).set_port_execute(
+        ).execute_port(
             'extra.transformation.translate_to_origin'
         )
         #
@@ -1477,6 +1477,6 @@ class AssetWorkspace(object):
         )
         ktn_core.NGObjOpt(
             node.ktn_obj
-        ).set_port_execute(
+        ).execute_port(
             'cameras.front.fill_to_rotation'
         )

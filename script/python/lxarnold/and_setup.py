@@ -66,7 +66,7 @@ class MayaSetup(object):
             ma_ae_setup.set_ae_procs_setup(
                 lis
             )
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'maya-ae setup',
                 'path="{}"'.format(', '.join(lis))
             )

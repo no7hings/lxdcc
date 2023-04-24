@@ -586,6 +586,18 @@ class Om2MeshOpt(object):
         return world_matrix
     @classmethod
     def set_create(cls, name, face_vertices, points, uv_map_coords=None, normal_maps=None, color_maps=None):
+        """
+        face_vertex_counts = [4]
+        face_vertex_indices = [0, 1, 2, 3]
+        points = [(0, 0, 0), (0, 1, 0), (0, 1, 1), (0, 0, 1)]
+        :param name:
+        :param face_vertices:
+        :param points:
+        :param uv_map_coords:
+        :param normal_maps:
+        :param color_maps:
+        :return:
+        """
         transform = cmds.createNode('transform', name=name)
         om2_obj = om2.MFnMesh()
         face_vertex_counts, face_vertex_indices = face_vertices
@@ -675,6 +687,7 @@ class Om2MeshOpt(object):
             points.append((x*scale, y, -z*scale))
         #
         name = '{}_morph_mesh_0'.format(self.name)
+        #
         self.set_create(
             name, face_vertices, points
         )

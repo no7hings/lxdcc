@@ -117,7 +117,7 @@ class AbsDdlSubmiter(object):
     def set_job_info_extra(self, raw):
         if isinstance(raw, dict):
             content = bsc_objects.Content(value=raw)
-            for seq, k in enumerate(content._get_last_keys_()):
+            for seq, k in enumerate(content._get_leaf_keys_()):
                 self.job_info.set(
                     'ExtraInfoKeyValue{}'.format(seq),
                     '{}={}'.format(k, content.get(k))

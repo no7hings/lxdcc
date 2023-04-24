@@ -193,7 +193,7 @@ class AndRamp(AndShader):
         self._ramp_dict = {}
 
     def _set_ramp_value_(self, key, value):
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'arnold-ramp-set',
             'attribute="{}"'.format(key)
         )
@@ -203,7 +203,7 @@ class AndRamp(AndShader):
         self.get_port('parameters.{}.enable'.format(key)).set(False)
         self.get_port('parameters.{}.value'.format(key)).set(value)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'arnold-ramp-set',
             'value="{}"'.format(self.get_port('parameters.{}.value'.format(key)).get())
         )

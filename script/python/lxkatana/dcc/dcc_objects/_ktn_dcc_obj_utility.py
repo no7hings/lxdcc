@@ -5,6 +5,8 @@ import types
 # noinspection PyUnresolvedReferences
 from Katana import Configuration, NodegraphAPI, KatanaFile
 
+from lxbasic import bsc_core
+
 from lxkatana import ktn_configure, ktn_core
 
 from lxutil import utl_core
@@ -32,25 +34,25 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def set_file_open(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'katana-file open',
             u'file="{}" is started'.format(file_path)
         )
         KatanaFile.Load(file_obj.path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'katana-file open',
             u'file="{}" is completed'.format(file_path)
         )
     @classmethod
     def set_file_save(cls):
         file_path = cls.get_current_file_path()
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'katana-file save',
             u'file="{}" is started'.format(file_path)
         )
         if file_path:
             KatanaFile.Save(file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'katana-file save',
                 u'file="{}" is completed'.format(file_path)
             )
@@ -60,12 +62,12 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def set_file_save_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         file_obj.create_directory()
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'katana-file save-to',
             u'file="{}" is started'.format(file_path)
         )
         KatanaFile.Save(file_obj.path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'katana-file save-to',
             u'file="{}" is completed'.format(file_path)
         )
@@ -132,7 +134,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def __init__(self, *args, **kwargs):
         super(Scene, self).__init__(*args, **kwargs)
 
-    def _set_load_by_root_(self, ktn_obj, root, include_obj_type=None):
+    def load_from_location_fnc(self, ktn_obj, root, include_obj_type=None):
         self._scene_graph_opt = ktn_core.SGStageOpt(ktn_obj)
         tvl = self._scene_graph_opt._get_traversal_(root)
         while tvl.valid():
@@ -146,8 +148,8 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def _set_obj_create_(self, obj_type_name, obj_path):
         obj_category_name = unr_configure.ObjCategory.LYNXI
         #
-        obj_category = self.universe.set_obj_category_create(obj_category_name)
-        obj_type = obj_category.set_type_create(obj_type_name)
+        obj_category = self.universe.generate_obj_category(obj_category_name)
+        obj_type = obj_category.generate_type(obj_type_name)
         _obj = obj_type.set_obj_create(obj_path)
         #
         if ktn_core.get_is_ui_mode() is True:
@@ -276,7 +278,7 @@ class Selection(object):
     def get_selected_paths(cls, include=None):
         return [i.getName() for i in NodegraphAPI.GetAllSelectedNodes() or []]
 
-    def set_all_select(self):
+    def select_all(self):
         if self._node_graph_ktn_objs:
             NodegraphAPI.SetAllSelectedNodes(
                 self._node_graph_ktn_objs
@@ -297,7 +299,7 @@ class Selection(object):
         if self._scene_graph_obj_paths:
             ktn_core.KtnSGSelectionOpt(
                 self._scene_graph_obj_paths
-            ).set_all_select()
+            ).select_all()
     @classmethod
     def set_clear(cls):
         NodegraphAPI.SetAllSelectedNodes([])

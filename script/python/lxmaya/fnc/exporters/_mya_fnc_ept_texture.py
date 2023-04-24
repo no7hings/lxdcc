@@ -12,7 +12,7 @@ from lxmaya import ma_configure
 
 class TextureExporter(
     utl_fnc_obj_abs.AbsDccTextureExport,
-    utl_fnc_obj_abs.AbsFncOptionMethod,
+    utl_fnc_obj_abs.AbsFncOptionBase,
 ):
     OPTION = dict(
         directory_base='',
@@ -32,7 +32,7 @@ class TextureExporter(
 
     def set_run(self):
         root_dag_path = bsc_core.DccPathDagOpt(self._location)
-        root_mya_dag_path = root_dag_path.set_translate_to(
+        root_mya_dag_path = root_dag_path.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
         #

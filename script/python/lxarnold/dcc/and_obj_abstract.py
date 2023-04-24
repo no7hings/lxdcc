@@ -37,15 +37,15 @@ class AbsDotMtlxDef(object):
     def _set_geometry_objs_build_(self, geometries_properties, root):
         and_obj_type = ai.AiNodeEntryLookUp(and_configure.ObjType.AND_MESH_NAME)
         for geometry_properties in geometries_properties:
-            obj_category = self.universe.set_obj_category_create(and_configure.ObjCategory.LYNXI)
+            obj_category = self.universe.generate_obj_category(and_configure.ObjCategory.LYNXI)
             obj_type_name = geometry_properties.get('type')
-            obj_type = obj_category.set_type_create(obj_type_name)
+            obj_type = obj_category.generate_type(obj_type_name)
             obj_path = geometry_properties.get('path')
             if root is not None:
                 obj_path = '{}{}'.format(root, obj_path)
             obj = obj_type.set_obj_create(obj_path)
 
-    def _set_load_by_dot_mtlx_(self, file_obj, root=None, root_lstrip=None):
+    def _set_load_by_dot_mtlx_(self, file_obj, root=None, path_lstrip=None):
         self.set_restore()
         file_path = file_obj.path
         universe_created = False
@@ -55,7 +55,7 @@ class AbsDotMtlxDef(object):
         #
         self._and_universe = ai.AiUniverse()
         self._root = root
-        self._path_lstrip = root_lstrip
+        self._path_lstrip = path_lstrip
         #
         dot_mtlx_file_reader = _utl_obj_raw.DotMtlxFileReader(file_path)
         geometries_properties = dot_mtlx_file_reader.get_geometries_properties()
@@ -75,7 +75,7 @@ class AbsObjScene(
     #
     OPTION = dict(
         shader_rename=False,
-        root_lstrip=None,
+        path_lstrip=None,
         #
         look_pass='default',
     )
@@ -105,20 +105,20 @@ class AbsObjScene(
     def ar_universe(self):
         return self._and_universe
 
-    def set_load_from_file(self, file_path, root_lstrip=None):
+    def set_load_from_file(self, file_path, path_lstrip=None, path_mapper=None):
         file_obj = self.FILE_CLASS(file_path)
         if file_obj.get_is_exists() is True:
             file_ext = file_obj.ext
             if file_ext in ['.ass']:
-                self._set_load_by_dot_ass_(file_obj, root_lstrip)
+                self.load_from_dot_ass_fnc(file_obj, path_lstrip)
 
-    def set_load_from_dot_ass(self, file_path, root=None, root_lstrip=None, time_tag=None):
+    def load_from_dot_ass(self, file_path, path_lstrip=None, path_mapper=None, time_tag=None):
         file_obj = self.FILE_CLASS(file_path)
-        self._set_load_by_dot_ass_(file_obj, root_lstrip=root_lstrip, time_tag=time_tag)
+        self.load_from_dot_ass_fnc(file_obj, path_lstrip=path_lstrip, path_mapper=path_mapper, time_tag=time_tag)
 
-    def set_load_from_dot_mtlx(self, file_path, root=None, root_lstrip=None):
+    def set_load_from_dot_mtlx(self, file_path, root=None, path_lstrip=None):
         file_obj = self.FILE_CLASS(file_path)
-        self._set_load_by_dot_mtlx_(file_obj, root=root, root_lstrip=root_lstrip)
+        self._set_load_by_dot_mtlx_(file_obj, root=root, path_lstrip=path_lstrip)
     # node
     def _set_dcc_obj_build_(self, and_obj_mtd):
         and_universe = and_obj_mtd.universe
@@ -126,19 +126,19 @@ class AbsObjScene(
         and_obj_type_name = and_obj_mtd.type_name
         and_obj_category_name = and_obj_mtd.category_name
         # shape
-        if and_obj_category_name in [and_configure.ObjCategory.AND_SHAPE_NAME]:
+        if and_obj_category_name in {and_configure.ObjCategory.AND_SHAPE_NAME}:
             shape_and_obj_mtd = and_core.AndShapeObjMtd(and_universe, and_obj)
             # mesh
-            if and_obj_type_name in [and_configure.ObjType.AND_MESH_NAME]:
+            if and_obj_type_name in {and_configure.ObjType.AND_MESH_NAME}:
                 self._set_dcc_mesh_objs_build_(shape_and_obj_mtd)
             # curve
-            elif and_obj_type_name in [and_configure.ObjType.AND_CURVE_NAME]:
+            elif and_obj_type_name in {and_configure.ObjType.AND_CURVE_NAME}:
                 self._set_dcc_curves_build_(shape_and_obj_mtd)
             # xgen
-            elif and_obj_type_name in [and_configure.ObjType.AND_XGEN_NAME]:
+            elif and_obj_type_name in {and_configure.ObjType.AND_XGEN_NAME}:
                 self._set_dcc_xgen_objs_build_(shape_and_obj_mtd)
         # shader
-        elif and_obj_category_name in [and_configure.ObjCategory.AND_SHADER_NAME]:
+        elif and_obj_category_name in {and_configure.ObjCategory.AND_SHADER_NAME}:
             shader_and_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_obj)
             self._set_dcc_shader_objs_build(shader_and_obj_mtd)
         # others
@@ -323,7 +323,7 @@ class AbsObjScene(
         #
         and_obj_type_name = shader_and_obj_mtd.type_name
         and_obj_category_name = shader_and_obj_mtd.category_name
-        dcc_obj_type = self.universe._get_obj_type_force_(and_obj_category_name, and_obj_type_name)
+        dcc_obj_type = self.universe.get_or_create_obj_type(and_obj_category_name, and_obj_type_name)
         dcc_obj_path_args = ('', and_prettify_obj_name)
         dcc_obj = dcc_obj_type.set_obj_create(dcc_obj_path_args)
         # port/input
@@ -335,41 +335,43 @@ class AbsObjScene(
         and_obj_name = shape_and_obj_mtd.name
         maya_obj_path = shape_and_obj_mtd.get_maya_path()
         if maya_obj_path is not None:
-            mesh_dcc_objs = self._set_mesh_objs_create_by_maya_obj_path_(maya_obj_path)
+            mesh_dcc_objs = self.create_mesh_for_maya_fnc(maya_obj_path)
         else:
-            mesh_dcc_objs = self._set_mesh_objs_create_(and_obj_name)
+            mesh_dcc_objs = self.create_mesh_fnc(and_obj_name)
         # material
         dcc_material_objs = self._set_dcc_materials_build_(shape_and_obj_mtd)
-        for mesh_dcc_obj in mesh_dcc_objs:
+        for i_dcc_mesh in mesh_dcc_objs:
             # material
-            self._set_dcc_obj_material_input_build_(mesh_dcc_obj, [i.path for i in dcc_material_objs], [])
+            self._set_dcc_obj_material_input_build_(i_dcc_mesh, [i.path for i in dcc_material_objs], [])
             # property
             self._set_dcc_geometry_obj_properties_build_(
-                shape_and_obj_mtd, mesh_dcc_obj,
+                shape_and_obj_mtd, i_dcc_mesh,
                 blacklist=and_configure.ObjProperty.AR_MESH_BLACKLIST
             )
-            # mesh_dcc_obj.set_gui_attribute('icon', utl_core.Icon.get('obj/mesh'))
+            # i_dcc_mesh.set_gui_attribute('icon', utl_core.Icon.get('obj/mesh'))
             # visibility
-            self._set_dcc_geometry_obj_visibilities_build_(shape_and_obj_mtd, mesh_dcc_obj)
+            self._set_dcc_geometry_obj_visibilities_build_(shape_and_obj_mtd, i_dcc_mesh)
 
     def _set_dcc_geometry_create_(self, obj_type_args, obj_path_args):
-        dcc_obj_type = self.universe._get_obj_type_force_(*obj_type_args)
-        # clear namespace
+        dcc_obj_type = self.universe.get_or_create_obj_type(*obj_type_args)
+        # clear namespace per component for path args
         obj_path_args = [bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(i) for i in obj_path_args]
         # path lstrip
         obj_path = bsc_core.DccPathDagMtd.get_dag_path(obj_path_args)
         obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, self._path_lstrip)
+        if self._path_mapper_opt is not None:
+            obj_path = self._path_mapper_opt.get(obj_path)
         dcc_obj = dcc_obj_type.set_obj_create(obj_path)
         return dcc_obj
 
-    def _set_mesh_objs_create_by_maya_obj_path_(self, maya_obj_path):
+    def create_mesh_for_maya_fnc(self, maya_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
             # trim <shape-name>
             and_configure.ObjType.LYNXI_MESH_ARGS, maya_obj_path.split(and_configure.Node.MAYA_PATHSEP)
         )
         return [dcc_obj]
 
-    def _set_mesh_objs_create_(self, shape_and_obj_path):
+    def create_mesh_fnc(self, shape_and_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
             and_configure.ObjType.LYNXI_MESH_ARGS, shape_and_obj_path.split(and_configure.Node.ARNOLD_PATHSEP)
         )
@@ -530,7 +532,7 @@ class AbsObjScene(
         return dcc_nodes
 
     def _set_dcc_material_build_(self, material_dcc_obj_name, shader_dcc_obj_names):
-        dcc_obj_type = self.universe._get_obj_type_force_(*and_configure.ObjType.LYNXI_MATERIAL_ARGS)
+        dcc_obj_type = self.universe.get_or_create_obj_type(*and_configure.ObjType.LYNXI_MATERIAL_ARGS)
         obj_path_args = ('', material_dcc_obj_name)
         dcc_obj = dcc_obj_type.set_obj_create(obj_path_args)
         # shader port
@@ -564,8 +566,11 @@ class AbsObjScene(
     def _set_ar_universe_load_(self):
         pass
     # main method
-    def _set_load_by_dot_ass_(self, file_obj, root_lstrip=None, time_tag=None):
+    def load_from_dot_ass_fnc(self, file_obj, path_lstrip=None, path_mapper=None, time_tag=None):
         self.set_restore()
+        #
+        if path_mapper is not None:
+            self._path_mapper_opt = bsc_core.DccPathMapOpt(path_mapper)
         #
         file_path = file_obj.path
 
@@ -575,17 +580,17 @@ class AbsObjScene(
             ai.AiBegin()
         #
         self._and_universe = ai.AiUniverse()
-        self._path_lstrip = root_lstrip
+        self._path_lstrip = path_lstrip
         self._time_tag = time_tag
         ai.AiASSLoad(self._and_universe, file_path, ai.AI_NODE_ALL)
         # node iterator start
         and_obj_iterator = ai.AiUniverseGetNodeIterator(self._and_universe, sum(self.AR_OBJ_CATEGORY_MASK))
         self.get_index_dict()
-        utl_core.Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'ass load',
             u'file="{}"'.format(file_path)
         )
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
+        with utl_core.GuiProgressesRunner.create(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
             while not ai.AiNodeIteratorFinished(and_obj_iterator):
                 l_p.set_update()
                 and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)
@@ -615,6 +620,7 @@ class AbsObjScene(
     def set_restore(self):
         self._universe = self.UNIVERSE_CLASS()
         self._path_lstrip = None
+        self._path_mapper_opt = None
         self._and_universe = None
         self._material_name_dict = {}
     #

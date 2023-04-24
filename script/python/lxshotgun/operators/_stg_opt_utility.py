@@ -48,7 +48,7 @@ class ImgFileOpt(object):
             if color_space in ['ACES CG']:
                 arguments += [
                     '-dlut "{}"'.format(
-                        utl_core.Path.set_map_to_platform(
+                        utl_core.Path.map_to_current(
                             self.COLOR_SPACE_OPTION['ACEScg_sRGB']
                         )
                     )
@@ -161,8 +161,8 @@ class StgVersionOpt(AbsStgObjOpt):
         self._stg_obj_query.set_update('description', description)
 
     def set_folder(self, directory_path):
-        windows_task_directory = utl_core.Path.set_map_to_windows(directory_path)
-        linux_task_directory = utl_core.Path.set_map_to_linux(directory_path)
+        windows_task_directory = utl_core.Path.map_to_windows(directory_path)
+        linux_task_directory = utl_core.Path.map_to_linux(directory_path)
         stg_folder = {
             'name': bsc_core.StgFileOpt(directory_path).name,
             'local_path': directory_path,

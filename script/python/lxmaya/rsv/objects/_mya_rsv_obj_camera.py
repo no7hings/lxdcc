@@ -26,7 +26,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         location = '/camera_grp'
         #
-        mya_location = bsc_core.DccPathDagOpt(location).set_translate_to(
+        mya_location = bsc_core.DccPathDagOpt(location).translate_to(
             pathsep=pathsep
         ).to_string()
         mya_group = mya_dcc_objects.Group(

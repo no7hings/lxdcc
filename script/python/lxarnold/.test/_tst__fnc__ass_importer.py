@@ -9,7 +9,7 @@ f = '/data/f/cjd__wuhu__debug/test_1.ass'
 
 s = dcc_objects.Scene()
 
-s.set_load_from_dot_ass(f)
+s.load_from_dot_ass(f)
 
 ms = s.universe.get_obj_type('mesh').get_objs()
 

@@ -7,7 +7,7 @@ import lxbasic.objects as bsc_objects
 from lxutil_gui import utl_gui_core
 
 
-class MenuBuilder(object):
+class MenuSetup(object):
     def __init__(self):
         pass
     @classmethod

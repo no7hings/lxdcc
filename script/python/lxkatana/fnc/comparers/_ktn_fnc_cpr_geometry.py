@@ -8,17 +8,19 @@ class FncDccMeshMatcher(utl_fnc_obj_abs.AbsFncDccMeshMatcher):
         super(FncDccMeshMatcher, self).__init__(*args, **kwargs)
 
 
-class GeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
+class FncGeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
     DCC_SCENE_CLASS = None
     DCC_SCENE_OPT_CLASS = None
     #
     FNC_DCC_MESH_MATCHER_CLASS = FncDccMeshMatcher
     FNC_USD_MESH_REPAIRER_CLASS = None
     #
+    RSV_KEYWORD = 'asset-geometry-usd-payload-file'
+    DCC_NAMESPACE = 'usd'
     def __init__(self, *args):
-        super(GeometryComparer, self).__init__(*args)
+        super(FncGeometryComparer, self).__init__(*args)
 
-    def _set_scene_dcc_objs_update_(self):
+    def update_target_fnc(self):
         from lxbasic import bsc_core
 
         from lxkatana import ktn_core
@@ -38,21 +40,21 @@ class GeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
         #
         usd_file_path = s.get_geometry_uv_map_usd_source_file()
         if usd_file_path is not None:
-            root = self._root
+            location = self._location
             #
             time_tag = bsc_core.StgFileOpt(usd_file_path).get_modify_time_tag()
             #
-            self._scene_dcc_obj_scene = usd_dcc_objects.Scene()
+            self._dcc_scene_tgt = usd_dcc_objects.Scene()
             if time_tag in utl_fnc_obj_abs.AbsFncDccGeometryComparer.CACHE:
-                self._scene_dcc_obj_universe = utl_fnc_obj_abs.AbsFncDccGeometryComparer.CACHE[time_tag]
+                self._dcc_universe_tgt = utl_fnc_obj_abs.AbsFncDccGeometryComparer.CACHE[time_tag]
             else:
-                self._scene_dcc_obj_scene.set_load_from_dot_usd(usd_file_path, root)
-                self._scene_dcc_obj_universe = self._scene_dcc_obj_scene.universe
-                utl_fnc_obj_abs.AbsFncDccGeometryComparer.CACHE[time_tag] = self._scene_dcc_obj_universe
+                self._dcc_scene_tgt.load_from_dot_usd(usd_file_path, location)
+                self._dcc_universe_tgt = self._dcc_scene_tgt.universe
+                utl_fnc_obj_abs.AbsFncDccGeometryComparer.CACHE[time_tag] = self._dcc_universe_tgt
             #
-            self._scene_usd_scene_opt = usd_dcc_operators.SceneOpt(self._scene_dcc_obj_scene.usd_stage)
-            self._scene_dcc_mesh_comparer_data = self._scene_usd_scene_opt.get_mesh_comparer_data(usd_file_path)
-            self._scene_dcc_geometries = []
-            mesh_type = self._scene_dcc_obj_universe.get_obj_type('Mesh')
+            self._scene_usd_scene_opt = usd_dcc_operators.SceneOpt(self._dcc_scene_tgt.usd_stage, self.DCC_NAMESPACE)
+            self._dcc_comparer_data_tgt = self._scene_usd_scene_opt.get_mesh_comparer_data(usd_file_path)
+            self._dcc_geometries_tgt = []
+            mesh_type = self._dcc_universe_tgt.get_obj_type('Mesh')
             if mesh_type is not None:
-                self._scene_dcc_geometries = mesh_type.get_objs()
+                self._dcc_geometries_tgt = mesh_type.get_objs()

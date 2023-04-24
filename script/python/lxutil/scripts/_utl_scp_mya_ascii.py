@@ -638,7 +638,7 @@ class DotMaFileReader(AbsFileReader):
                         variants = p.named
                         file_path = variants.get('file_path')
                         if auto_convert is True:
-                            file_path = utl_core.Path.set_map_to_platform(file_path)
+                            file_path = utl_core.Path.map_to_current(file_path)
                         lis.append(file_path)
                         break
         return lis

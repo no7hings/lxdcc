@@ -556,6 +556,14 @@ class RawTextMtd(object):
             for i in r:
                 lis.append(i.span())
         return lis
+    @classmethod
+    def to_prettify(cls, text, capitalize=True):
+        _ = re.sub(
+            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
+        )
+        if capitalize is True:
+            return ' '.join([i if i.isupper() else i.capitalize() for i in _.split('_')])
+        return ' '.join([i if i.isupper() else i.lower() for i in _.split('_')])
 
 
 class RawTextOpt(object):
@@ -604,13 +612,20 @@ class RawTextOpt(object):
         return 0, 0, 0
 
     def to_rgb__(self, maximum=255, seed=0, s_p=45, v_p=45):
+        """
+        :param maximum:
+        :param seed:
+        :param s_p: minimum s
+        :param v_p: minimum v
+        :return:
+        """
         string = self._raw
         if string:
             d = 1000.0
             a = RawTextMtd.to_integer(string)
             h = float(a % (360+seed)*d)/d
-            s = float(s_p+a % s_p)/100.0
-            v = float(v_p+a % v_p)/100.0
+            s = float((s_p/2)+a % (s_p/2))/100.0
+            v = float((v_p/2)+a % (v_p/2))/100.0
             # print h, s, v
             return RawColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0

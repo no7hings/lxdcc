@@ -9,7 +9,7 @@ from ...dcc.dcc_objects import _mya_dcc_obj_dag, _mya_dcc_obj_geometry
 
 
 class Groups(mya_dcc_obj_abs.AbsMyaObjs):
-    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Group
+    DCC_NODE_CLASS = _mya_dcc_obj_dag.Group
     def __init__(self, *args):
         super(Groups, self).__init__(*args)
     @classmethod
@@ -30,7 +30,7 @@ class Groups(mya_dcc_obj_abs.AbsMyaObjs):
 
 
 class Shapes(mya_dcc_obj_abs.AbsMyaObjs):
-    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Shape
+    DCC_NODE_CLASS = _mya_dcc_obj_dag.Shape
     def __init__(self, *args):
         super(Shapes, self).__init__(*args)
     @classmethod
@@ -57,7 +57,7 @@ class Geometries(mya_dcc_obj_abs.AbsMyaObjs):
         'nurbsSurface'
     ]
     #
-    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Shape
+    DCC_NODE_CLASS = _mya_dcc_obj_dag.Shape
     def __init__(self, *args):
         super(Geometries, self).__init__(*args)
 
@@ -67,6 +67,6 @@ class Meshes(mya_dcc_obj_abs.AbsMyaObjs):
         'mesh',
     ]
     #
-    DCC_OBJ_CLASS = _mya_dcc_obj_geometry.Mesh
+    DCC_NODE_CLASS = _mya_dcc_obj_geometry.Mesh
     def __init__(self, *args):
         super(Meshes, self).__init__(*args)

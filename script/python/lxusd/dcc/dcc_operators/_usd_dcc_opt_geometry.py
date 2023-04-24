@@ -82,7 +82,7 @@ class TransformOpt(AbsUsdOptDef):
         )
 
     def set_customize_attribute_add(self, key, value):
-        usd_core.UsdPrimOpt._set_customize_attribute_add_(
+        usd_core.UsdPrimOpt._add_customize_attribute_(
             self.xform, key, value
         )
 
@@ -293,7 +293,7 @@ class MeshOpt(
         )
 
     def set_customize_attribute_add(self, key, value):
-        usd_core.UsdPrimOpt._set_customize_attribute_add_(
+        usd_core.UsdPrimOpt._add_customize_attribute_(
             self.mesh, key, value
         )
 

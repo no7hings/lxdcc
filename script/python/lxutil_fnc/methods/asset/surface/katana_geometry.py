@@ -40,7 +40,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         obj = ktn_dcc_objects.Node('set_usd')
         #
         obj_scene = ktn_dcc_objects.Scene()
-        obj_scene.set_load_by_root(
+        obj_scene.load_from_location(
             ktn_obj='geometries_merge',
             root=sub_location,
         )
@@ -68,7 +68,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             #
             work_scene_src_file_path = ktn_dcc_objects.Scene.get_current_file_path()
             #
-            fnc_geometry_comparer = ktn_fnc_comparers.GeometryComparer(
+            fnc_geometry_comparer = ktn_fnc_comparers.FncGeometryComparer(
                 work_scene_src_file_path, sub_root
             )
             es = [
@@ -136,7 +136,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         sub_location = '{}{}'.format(geometry_location, sub_root)
         #
         obj_scene = ktn_dcc_objects.Scene()
-        obj_scene.set_load_by_root(
+        obj_scene.load_from_location(
             ktn_obj='asset_geometries_merge',
             root=sub_location,
         )
@@ -154,7 +154,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             else:
                 work_scene_src_file_path = ktn_dcc_objects.Scene.get_current_file_path()
                 #
-                fnc_geometry_comparer = ktn_fnc_comparers.GeometryComparer(
+                fnc_geometry_comparer = ktn_fnc_comparers.FncGeometryComparer(
                     work_scene_src_file_path, sub_root
                 )
                 es = [
@@ -187,7 +187,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
     def _set_new_repair_run_(self):
         from lxkatana import ktn_core
         if ktn_core.NGObjOpt._get_is_exists_('asset__geometries') is True:
-            ktn_core.NGObjOpt('asset__geometries').set_port_execute(
+            ktn_core.NGObjOpt('asset__geometries').execute_port(
                 'usd.create'
             )
 

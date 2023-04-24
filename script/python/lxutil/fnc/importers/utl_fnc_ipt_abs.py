@@ -6,7 +6,7 @@ from lxutil import utl_core
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         root='',

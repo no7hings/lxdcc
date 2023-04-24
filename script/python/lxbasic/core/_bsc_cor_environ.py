@@ -25,8 +25,8 @@ class EnvironMtd(object):
     def get_temporary_root(cls):
         _ = cls.get(cls.TEMPORARY_ROOT_KEY)
         if _ is not None:
-            return StorageMtd.set_map_to_platform(_)
-        return StorageMtd.set_map_to_platform(cls.TEMPORARY_ROOT_DEFAULT)
+            return StgPathMapMtd.map_to_current(_)
+        return StgPathMapMtd.map_to_current(cls.TEMPORARY_ROOT_DEFAULT)
     @classmethod
     def set_temporary_path(cls, path):
         cls.set(cls.TEMPORARY_ROOT_KEY, path)
@@ -34,14 +34,14 @@ class EnvironMtd(object):
     def get_session_root(cls):
         _ = cls.get(cls.SESSION_ROOT_KEY)
         if _ is not None:
-            return StorageMtd.set_map_to_platform(_)
-        return StorageMtd.set_map_to_platform(cls.SESSION_ROOT_DEFAULT)
+            return StgPathMapMtd.map_to_current(_)
+        return StgPathMapMtd.map_to_current(cls.SESSION_ROOT_DEFAULT)
     @classmethod
     def get_database_path(cls):
         _ = cls.get(cls.DATABASE_PATH_KEY)
         if _ is not None:
-            return StorageMtd.set_map_to_platform(_)
-        return StorageMtd.set_map_to_platform(cls.DATABASE_PATH_DEFAULT)
+            return StgPathMapMtd.map_to_current(_)
+        return StgPathMapMtd.map_to_current(cls.DATABASE_PATH_DEFAULT)
     @classmethod
     def get_data_paths(cls):
         pass

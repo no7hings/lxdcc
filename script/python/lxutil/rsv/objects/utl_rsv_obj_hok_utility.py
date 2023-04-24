@@ -33,7 +33,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             directory_path_src = directory_paths_src[0]
 
             directory_path_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
-            directory_path_opt_src.set_map_to_platform()
+            directory_path_opt_src.map_to_current()
             if directory_path_opt_src.get_is_exists() is True:
                 directory_path_opt_src.set_copy_to_directory(
                     directory_path_tgt
@@ -70,7 +70,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if file_paths_src:
             file_path_src = file_paths_src[0]
             file_path_opt_src = bsc_core.StgFileOpt(file_path_src)
-            file_path_opt_src.set_map_to_platform()
+            file_path_opt_src.map_to_current()
             if file_path_opt_src.get_is_exists() is True:
                 version = self._rsv_scene_properties.get('version')
 
@@ -141,7 +141,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             directory_path_src = directory_paths_src[0]
             directory_path_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
-            directory_path_opt_src.set_map_to_platform()
+            directory_path_opt_src.map_to_current()
             if directory_path_opt_src.get_is_exists() is True:
                 directory_path_opt_src.set_copy_to_directory(
                     directory_path_tgt
@@ -179,7 +179,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             for i_file_path_src in file_paths_src:
                 i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
-                i_file_path_opt_src.set_map_to_platform()
+                i_file_path_opt_src.map_to_current()
                 if i_file_path_opt_src.get_is_exists() is True:
                     i_file_path_opt_src.set_copy_to_directory(
                         directory_path_tgt
@@ -218,7 +218,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             for i_file_path_src in file_paths_src:
                 i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
                 # map path to current platform first
-                i_file_path_opt_src.set_map_to_platform()
+                i_file_path_opt_src.map_to_current()
                 if i_file_path_opt_src.get_is_exists() is True:
                     i_file_path_opt_src.set_copy_to_directory(
                         directory_path_tgt
@@ -378,13 +378,13 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version, extend_variants=dict(variant=variant)
         )
 
-        mya_fnc_exporters.LookAssExporter(
+        mya_fnc_exporters.FncLookAssExporter(
             option=dict(
                 file=ass_file_path,
                 location=root,
                 texture_use_environ_map=True,
             )
-        ).set_run()
+        ).execute()
     # katana
     def set_katana_create(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects

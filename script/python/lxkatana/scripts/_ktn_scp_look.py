@@ -1,4 +1,5 @@
 # coding:utf-8
+import collections
 import copy
 
 import fnmatch
@@ -150,16 +151,18 @@ ktn_scripts.ScpLookOutput(
 
     def get_geometry_uv_map_usd_source_file(self):
         s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
-        geometry_root_location = s.get_obj_opt('/root').get('lynxi.variants.geometry.root')
-        _ = s.get_obj_opt(geometry_root_location).get('userProperties.usd.variants.asset.surface.override.file')
-        if _:
-            f_opt = bsc_core.StgFileOpt(_)
-            # TODO fix this bug
-            if f_opt.get_name() == 'hi.uv_map.usd':
-                return '{}/hi.usd'.format(
-                    f_opt.get_directory_path()
-                )
-            return _
+        geometry_scheme = self.get_geometry_scheme()
+        if geometry_scheme == 'asset':
+            location = '/root/world/geo/master'
+            _ = s.get_obj_opt(location).get('userProperties.usd.variants.asset.surface.override.file')
+            if _:
+                f_opt = bsc_core.StgFileOpt(_)
+                # TODO fix this bug
+                if f_opt.get_name() == 'uv_map.usda':
+                    return '{}/payload.usda'.format(
+                        f_opt.get_directory_path()
+                    )
+                return _
 
     def get_geometry_scheme(self):
         s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
@@ -206,13 +209,13 @@ ktn_scripts.ScpLookOutput(
                                 i_node.get_input_port('input')
                             )
                             #
-                            ktn_core.NGObjOpt(i_node.ktn_obj).set_port_execute(
+                            ktn_core.NGObjOpt(i_node.ktn_obj).execute_port(
                                 'parameters.ass.guess'
                             )
                             nodes.append(i_node)
                 #
                 for i_node in nodes:
-                    ktn_core.NGObjOpt(i_node.ktn_obj).set_port_execute(
+                    ktn_core.NGObjOpt(i_node.ktn_obj).execute_port(
                         'parameters.execute'
                     )
                     i_node.set_delete()
@@ -237,7 +240,7 @@ ktn_scripts.ScpLookOutput(
             #
             node.ktn_obj.WriteToLookFile(None, file_path)
             #
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'look-klf export',
                 '"{}"'.format(file_path)
             )
@@ -302,6 +305,11 @@ class ScpLookAssImport(object):
         geometry_location='/root/world/geo',
         material_location='/root/materials',
         look_pass='default',
+        #
+        path_mapper=[
+            ('/master/mod/hi', '/master/hi'),
+            ('/master/mod/lo', '/master/lo'),
+        ]
     )
     CACHE = {}
     def __init__(self, file_path, option=None):
@@ -340,15 +348,17 @@ class ScpLookAssImport(object):
             obj_scene = and_dcc_objects.Scene(
                 option=dict(
                     shader_rename=True,
-                    root_lstrip=self._geometry_root_location,
+                    path_lstrip=self._geometry_root_location,
                     look_pass=None,
                     time_tag=None,
                 )
             )
             #
-            obj_scene.set_load_from_dot_ass(
+            obj_scene.load_from_dot_ass(
                 self._file_path,
-                root_lstrip=self._geometry_root_location
+                path_lstrip=self._geometry_root_location,
+                path_mapper=collections.OrderedDict(self._option.get('path_mapper')),
+                time_tag=self._time_tag
             )
             self._and_universe = obj_scene.universe
             ScpLookAssImport.CACHE[key] = self._and_universe
@@ -399,13 +409,12 @@ class ScpLookAssImport(object):
         self._geometry_properties_hash_cache[hash_key] = name
         return name
 
-    def _get_node_path_(self, group_path, name, look_pass_name, tag):
-        dcc_name_format = '{group}/{name}__{look_pass}__{time_tag}_{tag}'
+    def _get_node_path_(self, group_path, name, look_pass_name, tag, time_tag=None):
+        dcc_name_format = '{group}/{name}__{look_pass}_{tag}'
         dcc_name = dcc_name_format.format(
             group=group_path,
             look_pass=look_pass_name,
             name=name,
-            time_tag=self._time_tag,
             tag=tag
         )
         return dcc_name
@@ -485,7 +494,7 @@ class ScpLookAssImport(object):
                     #
                     self._create_material_shader_node_graph_(i_and_shader, network_material_path, look_pass_name)
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.LogMtd.trace_method_warning(
                         'shader create',
                         'obj="{}" is non-exists'.format(i_raw)
                     )
@@ -554,12 +563,12 @@ class ScpLookAssImport(object):
                 nod_target_ktn_obj.getInputPort(nod_target_ktn_port_path)
             )
             if nod_source_ktn_port is None:
-                utl_core.Log.set_error_trace(
+                bsc_core.LogMtd.trace_error(
                     'connection: "{}" >> "{}"'.format(i_and_source_port.path, i_and_target_port.path)
                 )
                 continue
             if nod_target_ktn_port is None:
-                utl_core.Log.set_error_trace(
+                bsc_core.LogMtd.trace_error(
                     'connection: "{}" >> "{}"'.format(i_and_source_port.path, i_and_target_port.path)
                 )
                 continue
@@ -611,7 +620,7 @@ class ScpLookAssImport(object):
                     if i_and_port_name == 'name':
                         dcc_obj.get_port('arnold_name').set_create('string', i_raw)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.LogMtd.trace_method_warning(
                             'shader-port set',
                             'attribute="{}" is non-exists'.format(i_value_dcc_port.path)
                         )
@@ -726,7 +735,7 @@ class ScpLookAssImport(object):
             if i_enable_dcc_port.get_is_exists() is True:
                 i_enable_dcc_port.set(True)
             else:
-                utl_core.Log.set_warning_trace(
+                bsc_core.LogMtd.trace_warning(
                     'port-name="{}" is unknown'.format(i_dcc_port_name)
                 )
             #
@@ -761,7 +770,7 @@ class ScpLookAssImport(object):
             if i_enable_dcc_port.get_is_exists() is True:
                 i_enable_dcc_port.set(True)
             else:
-                utl_core.Log.set_warning_trace(
+                bsc_core.LogMtd.trace_warning(
                     'port-name="{}" is unknown'.format(i_dcc_port_name)
                 )
             #

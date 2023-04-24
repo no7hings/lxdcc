@@ -225,9 +225,9 @@ class MeshLookOpt(AbsLookOpt):
                 port.set(visibilities[and_configure.Visibility.AUTOBUMP_VISIBILITY])
 
 
-class XgenDescriptionLookMtd(AbsLookOpt):
+class XgenDescriptionLookOpt(AbsLookOpt):
     def __init__(self, *args):
-        super(XgenDescriptionLookMtd, self).__init__(*args)
+        super(XgenDescriptionLookOpt, self).__init__(*args)
 
     def get_material_assigns(self):
         material_assigns = collections.OrderedDict()
@@ -295,21 +295,22 @@ class ObjsLookOpt(object):
     ]
     TEXTURE_REFERENCE_TYPE_NAMES = [
         'file',
-        'aiImage'
+        'aiImage',
+        'osl_window_box',
+        'osl_window_box_s'
     ]
     def __init__(self, objs):
         self._objs = objs
 
     def get_material_paths(self):
-        lis = []
-        for obj in self._objs:
-            if obj.type in self.SHAPE_TYPE_NAMES:
-                shape_look_opt = ShapeLookOpt(obj)
-                material_paths = shape_look_opt.get_material_paths()
-                for i in material_paths:
-                    if i not in lis:
-                        lis.append(i)
-        return lis
+        set_ = set([])
+        for i_obj in self._objs:
+            if i_obj.type in self.SHAPE_TYPE_NAMES:
+                i_shape_look_opt = ShapeLookOpt(i_obj)
+                i_material_paths = i_shape_look_opt.get_material_paths()
+                for j_path in i_material_paths:
+                    set_.add(j_path)
+        return list(set_)
 
     def get_texture_reference_paths(self):
         def rcs_fnc_(obj_path_):
@@ -321,13 +322,12 @@ class ObjsLookOpt(object):
                 if not _i in keys:
                     keys.append(_i)
                     rcs_fnc_(_i)
-
         #
         keys = []
         lis = []
         #
         material_paths = self.get_material_paths()
-        for material_path in material_paths:
-            rcs_fnc_(material_path)
+        for i_path in material_paths:
+            rcs_fnc_(i_path)
 
         return lis

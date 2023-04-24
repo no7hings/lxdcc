@@ -12,7 +12,7 @@ if __name__ == '__main__':
         # '/production/shows/nsa_dev/assets/chr/td_test/user/team.mod/maya/scenes/modeling/td_test.mod.modeling.modeling.v000_001.ma',
         # '/production/shows/nsa_dev/assets/chr/td_test/user/work.dongchangbao/maya/scenes/modeling/td_test.mod.modeling.modeling.v000_001.ma',
         # '/production/shows/nsa_dev/assets/chr/td_test/user/team.mod/katana/scenes/modeling/td_test.mod.modeling.modeling.v000_001.katana',
-        '/production/shows/nsa_dev/assets/chr/td_test/shared/mod/modeling/td_test.mod.modeling.v004/scene/td_test.ma',
+        # '/production/shows/nsa_dev/assets/chr/td_test/shared/mod/modeling/td_test.mod.modeling.v004/scene/td_test.ma',
         # '/production/shows/tnt/sequences/c10/c10010/user/work.fangxiaodong/katana/scenes/lighting/c10010.lgt.lighting.lighting.v000_001.katana'
     ]:
 

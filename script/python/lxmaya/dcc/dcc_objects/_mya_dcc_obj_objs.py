@@ -23,7 +23,7 @@ from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag, _mya_dcc_
 
 
 class Nodes(object):
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, type_names):
         self._type_names = type_names
 
@@ -31,13 +31,13 @@ class Nodes(object):
         return cmds.ls(type=self._type_names, long=1) or []
 
     def get_objs(self):
-        return [self.DCC_OBJ_CLASS(i) for i in self.get_obj_paths()]
+        return [self.DCC_NODE_CLASS(i) for i in self.get_obj_paths()]
 
 
 class Sets(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['objectSet']
     EXCLUDE_DCC_PATHS = ['defaultLightSet', 'defaultObjectSet']
-    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Shape
+    DCC_NODE_CLASS = _mya_dcc_obj_dag.Shape
     def __init__(self, *args):
         super(Sets, self).__init__(*args)
 
@@ -45,7 +45,7 @@ class Sets(mya_dcc_obj_abs.AbsMyaObjs):
 class Cameras(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['camera']
     EXCLUDE_DCC_PATHS = ['|persp|perspShape', '|top|topShape', '|front|frontShape', '|side|sideShape']
-    DCC_OBJ_CLASS = _mya_dcc_obj_dag.Shape
+    DCC_NODE_CLASS = _mya_dcc_obj_dag.Shape
     def __init__(self, *args):
         super(Cameras, self).__init__(*args)
 
@@ -53,7 +53,7 @@ class Cameras(mya_dcc_obj_abs.AbsMyaObjs):
 class AnimationLayers(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['animLayer']
     EXCLUDE_DCC_PATHS = ['BaseAnimation']
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(AnimationLayers, self).__init__(*args)
 
@@ -61,7 +61,7 @@ class AnimationLayers(mya_dcc_obj_abs.AbsMyaObjs):
 class DisplayLayers(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['displayLayer']
     EXCLUDE_DCC_PATHS = ['defaultLayer']
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.DisplayLayer
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.DisplayLayer
     def __init__(self, *args):
         super(DisplayLayers, self).__init__(*args)
 
@@ -74,7 +74,7 @@ class Constrains(mya_dcc_obj_abs.AbsMyaObjs):
         'scaleConstraint'
     ]
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(Constrains, self).__init__(*args)
 
@@ -82,7 +82,7 @@ class Constrains(mya_dcc_obj_abs.AbsMyaObjs):
 class UnknownNodes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['unknown']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(UnknownNodes, self).__init__(*args)
 
@@ -90,7 +90,7 @@ class UnknownNodes(mya_dcc_obj_abs.AbsMyaObjs):
 class References(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['reference']
     EXCLUDE_DCC_PATHS = ['_UNKNOWN_REF_NODE_', 'sharedReferenceNode']
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Reference
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Reference
     def __init__(self, *args):
         super(References, self).__init__(*args)
 
@@ -142,7 +142,7 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
         'defaultLightSet',
         'defaultObjectSet'
     ]
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Material
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Material
     def __init__(self, *args):
         super(Materials, self).__init__(*args)
 
@@ -158,7 +158,7 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
 class TemporaryNodes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['mesh', 'nurbsCurve', 'nurbsSurface', 'brush', 'nParticle']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _mya_dcc_obj_obj.Node
+    DCC_NODE_CLASS = _mya_dcc_obj_obj.Node
     def __init__(self, *args):
         super(TemporaryNodes, self).__init__(*args)
 
@@ -471,10 +471,10 @@ class TextureReferences(AbsFileReferences):
         for obj_path in obj_paths:
             i_obj_type_name = cmds.nodeType(obj_path)
             if i_obj_type_name in cls.PORT_QUERY_DICT:
-                obj_cls = cls._get_obj_cls_(i_obj_type_name)
-                obj = obj_cls(obj_path)
-                cls._set_obj_reference_update_(obj)
-                lis.append(obj)
+                i_obj_cls = cls._get_obj_cls_(i_obj_type_name)
+                i_obj = i_obj_cls(obj_path)
+                cls._set_obj_reference_update_(i_obj)
+                lis.append(i_obj)
         return lis
     @classmethod
     def _set_obj_reference_update_(cls, obj):
@@ -494,7 +494,7 @@ class TextureReferences(AbsFileReferences):
 class XgenPalettes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['xgmPalette']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _mya_dcc_obj_xgen.XgnPalette
+    DCC_NODE_CLASS = _mya_dcc_obj_xgen.XgnPalette
     def __init__(self):
         super(XgenPalettes, self).__init__(XgenPalettes)
 
@@ -502,6 +502,6 @@ class XgenPalettes(mya_dcc_obj_abs.AbsMyaObjs):
 class XgenDescriptions(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['xgmDescription']
     EXCLUDE_DCC_PATHS = []
-    DCC_OBJ_CLASS = _mya_dcc_obj_xgen.XgnDescription
+    DCC_NODE_CLASS = _mya_dcc_obj_xgen.XgnDescription
     def __init__(self):
         super(XgenDescriptions, self).__init__(XgenPalettes)

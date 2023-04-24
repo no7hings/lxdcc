@@ -17,8 +17,8 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 class GeometryAlembicBlender(object):
     def __init__(self, src_root, tgt_root):
-        self._src_root = bsc_core.DccPathDagOpt(src_root).set_translate_to('|').to_string()
-        self._tgt_root = bsc_core.DccPathDagOpt(tgt_root).set_translate_to('|').to_string()
+        self._src_root = bsc_core.DccPathDagOpt(src_root).translate_to('|').to_string()
+        self._tgt_root = bsc_core.DccPathDagOpt(tgt_root).translate_to('|').to_string()
 
     def __set_meshes_blend_(self):
         self._set_meshes_connect_(
@@ -104,7 +104,7 @@ class GeometryAlembicBlender(object):
         self.__set_meshes_blend_()
 
 
-class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
+class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
     KEY = 'asset build'
     VAR_NAMES = ['hi', 'shape']
     #
@@ -148,28 +148,28 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
     def __init__(self, option=None):
         super(AssetBuilder, self).__init__(option)
     @classmethod
-    def _set_geometry_build_by_usd_(cls, rsv_task, enable, geometry_var_names):
+    def _build_geometry_from_usd_(cls, rsv_task, enable, geometry_var_names):
         import lxmaya.fnc.importers as mya_fnc_importers
         #
         if enable is True:
             root = None
             if rsv_task:
                 g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
-                for var_name in geometry_var_names:
+                for i_var_name in geometry_var_names:
                     g_p.set_update()
                     #
-                    keyword = 'asset-geometry-usd-{}-file'.format(var_name)
+                    keyword = 'asset-geometry-usd-{}-file'.format(i_var_name)
                     model_geometry_usd_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
                     model_geometry_usd_hi_file_path = model_geometry_usd_hi_file.get_result(version='latest')
                     if model_geometry_usd_hi_file_path:
-                        ipt = mya_fnc_importers.GeometryUsdImporter_(
-                            file_path=model_geometry_usd_hi_file_path,
-                            root=root,
+                        ipt = mya_fnc_importers.FncGeometryUsdImporter(
                             option=dict(
+                                file=model_geometry_usd_hi_file_path,
+                                location=root,
                                 port_match_patterns=['pg_*']
                             )
                         )
-                        ipt.set_run()
+                        ipt.execute()
                     else:
                         utl_core.Log.set_module_warning_trace(
                             'asset-build',
@@ -190,13 +190,13 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 model__act_abc_dyn__file = rsv_task.get_rsv_unit(keyword=keyword)
                 model__act_abc_dyn__file_path = model__act_abc_dyn__file.get_result(version='latest')
                 if model__act_abc_dyn__file_path:
-                    mya_fnc_importers.GeometryAbcImporter(
-                        file_path=model__act_abc_dyn__file_path,
-                        root=dyn_sub_root,
+                    mya_fnc_importers.FncGeometryAbcImporter(
                         option=dict(
+                            file=model__act_abc_dyn__file_path,
+                            location=dyn_sub_root,
                             hidden=True
                         )
-                    ).set_run()
+                    ).execute()
                 #
                 root = '/master'
                 #
@@ -220,7 +220,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                             )
                     #
                     ma_core.CmdObjOpt(
-                        bsc_core.DccPathDagOpt(root).set_translate_to('|').to_string()
+                        bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
                     ).set_customize_attributes_create(customize_attributes)
     @classmethod
     def _set_model_act_geometry_dyn_connect_(cls, with_model_act_geometry_dyn_connect):
@@ -235,18 +235,20 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             root = None
             if rsv_task:
                 g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
-                for var_name in geometry_var_names[:1]:
+                for i_var_name in geometry_var_names[:1]:
                     g_p.set_update()
                     #
-                    keyword = 'asset-geometry-usd-{}-file'.format(var_name)
+                    keyword = 'asset-geometry-usd-{}-file'.format(i_var_name)
                     surface_geometry_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
                     surface_geometry_hi_file_path = surface_geometry_hi_file.get_result(version='latest')
                     if surface_geometry_hi_file_path:
-                        ipt = mya_fnc_importers.GeometryUsdImporter_(
-                            file_path=surface_geometry_hi_file_path,
-                            root=root,
+                        ipt = mya_fnc_importers.FncGeometryUsdImporter(
+                            option=dict(
+                                file=surface_geometry_hi_file_path,
+                                location=root,
+                            )
                         )
-                        ipt.set_meshes_uv_maps_import_run(
+                        ipt.import_uv_map(
                             uv_map_face_vertices_contrast
                         )
                     else:
@@ -264,18 +266,20 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
             root = None
             if rsv_task:
                 g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
-                for var_name in geometry_var_names[:1]:
+                for i_var_name in geometry_var_names[:1]:
                     g_p.set_update()
                     #
-                    keyword = 'asset-source-geometry-usd-{}-file'.format(var_name)
+                    keyword = 'asset-source-geometry-usd-{}-file'.format(i_var_name)
                     work_surface_geometry_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
                     work_surface_geometry_hi_file_path = work_surface_geometry_hi_file.get_result(version='latest')
                     if work_surface_geometry_hi_file_path:
-                        ipt = mya_fnc_importers.GeometryUsdImporter_(
-                            file_path=work_surface_geometry_hi_file_path,
-                            root=root,
+                        ipt = mya_fnc_importers.FncGeometryUsdImporter(
+                            option=dict(
+                                file=work_surface_geometry_hi_file_path,
+                                location=root,
+                            )
                         )
-                        ipt.set_meshes_uv_maps_import_run(uv_map_face_vertices_contrast)
+                        ipt.import_uv_map(uv_map_face_vertices_contrast)
                     else:
                         utl_core.Log.set_module_warning_trace(
                             'asset-build',
@@ -314,9 +318,9 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                             xgen_location='/master/hair',
                         )
                     #
-                    mya_fnc_importers.GeometryXgenImporter(
+                    mya_fnc_importers.FncGeometryXgenImporter(
                         option=option
-                    ).set_run()
+                    ).execute()
     @classmethod
     def _set_look_build_by_ass_(cls, rsv_task, enable):
         import lxmaya.fnc.importers as mya_fnc_importers
@@ -327,14 +331,14 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                 look_ass_file = rsv_task.get_rsv_unit(keyword='asset-look-ass-file')
                 look_ass_file_path = look_ass_file.get_result(version='latest')
                 if look_ass_file_path:
-                    mya_fnc_importers.LookAssImporter(
+                    mya_fnc_importers.FncLookAssImporterNew(
                         option=dict(
                             file=look_ass_file_path,
                             location='/master',
                             look_pass='default',
                             name_join_time_tag=True,
                         )
-                    ).set_run()
+                    ).execute()
                 else:
                     bsc_core.LogMtd.trace_method_warning(
                         cls.KEY,
@@ -473,7 +477,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         model_act_rsv_task = rsv_project.get_rsv_task(
             asset=asset,
             step=rsv_project.properties.get('asset_steps.model'),
-            task=rsv_project.properties.get('asset_tasks.model_act'),
+            task=rsv_project.properties.get('asset_tasks.model_dynamic'),
         )
         groom_rsv_task = rsv_project.get_rsv_task(
             asset=asset,
@@ -488,7 +492,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         surface_occ_rsv_task = rsv_project.get_rsv_task(
             asset=asset,
             step=rsv_project.properties.get('asset_steps.surface'),
-            task=rsv_project.properties.get('asset_tasks.surface_ani')
+            task=rsv_project.properties.get('asset_tasks.surface_prv')
         )
         surface_cfx_rsv_task = rsv_project.get_rsv_task(
             asset=asset,
@@ -508,10 +512,10 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
         )
         #
         method_args = [
-            (self._set_geometry_build_by_usd_, (model_rsv_task, with_model_geometry, geometry_var_names)),
+            (self._build_geometry_from_usd_, (model_rsv_task, with_model_geometry, geometry_var_names)),
             (self._set_model_act_geometry_dyn_build_, (model_act_rsv_task, with_model_act_geometry_dyn, model_act_properties, geometry_var_names)),
             #
-            (self._set_geometry_build_by_usd_, (surface_cfx_rsv_task, with_surface_cfx_geometry, geometry_var_names)),
+            (self._build_geometry_from_usd_, (surface_cfx_rsv_task, with_surface_cfx_geometry, geometry_var_names)),
             #
             (self._set_groom_geometry_build_, (groom_rsv_task, with_groom_geometry, with_groom_grow_geometry)),
             #
@@ -539,6 +543,328 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
                     g_p.set_update()
                     #
                     i_method(*i_args)
+
+
+class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
+    KEY = 'asset build'
+    OPTION = dict(
+        project='',
+        asset='',
+        #
+        root='/master',
+        # data
+        with_geometry=False,
+        with_geometry_uv_map=False,
+        with_look=False,
+        with_surface_preview=False,
+        # key
+        with_model=False,
+        with_model_dynamic=False,
+        model_act_properties=['pg_start_frame', 'pg_end_frame'],
+        # model
+        model_space='release',  # or 'work'
+        model_elements=[
+            'renderable',
+            'auxiliary'
+        ],
+        #
+        with_groom=False,
+        with_groom_grow=False,
+        # groom
+        groom_space='release',  # or 'work'
+        groom_elements=[
+            'renderable'
+        ],
+        #
+        with_surface=False,
+        # surface
+        surface_space='release',  # or 'work'
+        surface_elements=[
+            'renderable'
+        ]
+    )
+    def __init__(self, option=None):
+        super(FncAssetBuilderNew, self).__init__(option)
+        import lxresolver.commands as rsv_commands
+        #
+        project = self.get('project')
+        asset = self.get('asset')
+        #
+        resolver = rsv_commands.get_resolver()
+        rsv_project = resolver.get_rsv_project(project=project)
+        #
+        self._rsv_asset = rsv_project.get_rsv_resource(asset=asset)
+        #
+        self._model_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.model'),
+            task=rsv_project.properties.get('asset_tasks.model')
+        )
+        self._model_dynamic_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.model'),
+            task=rsv_project.properties.get('asset_tasks.model_dynamic')
+        )
+        self._groom_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.groom'),
+            task=rsv_project.properties.get('asset_tasks.groom')
+        )
+        self._surface_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.surface'),
+            task=rsv_project.properties.get('asset_tasks.surface')
+        )
+        self._surface_prv_rsv_task = rsv_project.get_rsv_task(
+            asset=asset,
+            step=rsv_project.properties.get('asset_steps.surface'),
+            task=rsv_project.properties.get('asset_tasks.surface_prv')
+        )
+    @classmethod
+    def build_model_geometry_fnc(cls, rsv_task, space):
+        if rsv_task is not None:
+            import lxmaya.fnc.importers as mya_fnc_importers
+            #
+            if space == 'work':
+                keyword = 'asset-source-geometry-usd-payload-file'
+            elif space == 'release':
+                keyword = 'asset-geometry-usd-payload-file'
+            else:
+                raise RuntimeError()
+            rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
+            file_path = rsv_unit.get_result(version='latest')
+            if file_path:
+                mya_fnc_importers.FncGeometryImporterNew(
+                    option=dict(
+                        file=file_path,
+                        root='/master',
+                        renderable_locations=[
+                            '/master/mod/hi',
+                            '/master/mod/lo',
+                        ],
+                        auxiliary_locations=[
+                            '/master/grm',
+                            '/master/cfx',
+                            '/master/efx',
+                            '/master/misc'
+                        ],
+                        port_match_patterns=['pg_*']
+                    )
+                ).execute()
+    @classmethod
+    def build_model_dynamic_geometry_fnc(cls, rsv_task, space, property_names):
+        if rsv_task:
+            dyn_sub_root = '/dyn/master/hi'
+            from lxusd import usd_core
+
+            import lxmaya.fnc.importers as mya_fnc_importers
+            #
+            keyword = 'asset-geometry-abc-hi-dyn-file'
+            model__act_abc_dyn__file = rsv_task.get_rsv_unit(keyword=keyword)
+            model__act_abc_dyn__file_path = model__act_abc_dyn__file.get_result(version='latest')
+            if model__act_abc_dyn__file_path:
+                mya_fnc_importers.FncGeometryAbcImporter(
+                    option=dict(
+                        file=model__act_abc_dyn__file_path,
+                        location=dyn_sub_root,
+                        hidden=True
+                    )
+                ).execute()
+                #
+                GeometryAlembicBlender(
+                    '/dyn/master/hi', '/master/hi'
+                ).set_run()
+            #
+            root = '/master'
+            #
+            keyword = 'asset-component-registry-usd-file'
+            usd_file_rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
+            usd_file_path = usd_file_rsv_unit.get_result(version='latest')
+            if usd_file_path:
+                usd_stage_opt = usd_core.UsdStageOpt(usd_file_path)
+                usd_prim = usd_stage_opt.get_obj(root)
+                usd_prim_opt = usd_core.UsdPrimOpt(usd_prim)
+                #
+                customize_attributes = usd_prim_opt.get_customize_attributes(
+                    includes=property_names
+                )
+                if not customize_attributes:
+                    start_frame, end_frame = usd_stage_opt.get_frame_range()
+                    if start_frame != end_frame:
+                        customize_attributes = dict(
+                            pg_start_frame=start_frame,
+                            pg_end_frame=end_frame
+                        )
+                #
+                ma_core.CmdObjOpt(
+                    bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
+                ).set_customize_attributes_create(customize_attributes)
+    @classmethod
+    def build_groom_geometry_fnc(cls, rsv_task, space, with_groom_grow):
+        import lxmaya.fnc.importers as mya_fnc_importers
+        if rsv_task:
+            xgen_collection_directory_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-xgen-collection-dir')
+            xgen_collection_directory_path = xgen_collection_directory_rsv_unit.get_exists_result()
+            xgen_collection_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-xgen-file')
+            xgen_collection_file_paths = xgen_collection_file_rsv_unit.get_latest_results()
+            xgen_grow_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-xgen-grow-mesh-file')
+            xgen_grow_file_paths = xgen_grow_file_rsv_unit.get_latest_results()
+            if xgen_collection_file_paths:
+                if with_groom_grow is True:
+                    option = dict(
+                        # xgen
+                        xgen_collection_file=xgen_collection_file_paths,
+                        xgen_collection_directory=xgen_collection_directory_path,
+                        xgen_location='/master/hair',
+                        # grow
+                        grow_file=xgen_grow_file_paths,
+                        grow_location='/master/hair/hair_shape/hair_growMesh',
+                    )
+                else:
+                    option = dict(
+                        # xgen
+                        xgen_collection_file=xgen_collection_file_paths,
+                        xgen_collection_directory=xgen_collection_directory_path,
+                        xgen_location='/master/hair',
+                    )
+                #
+                mya_fnc_importers.FncGeometryXgenImporter(
+                    option=option
+                ).execute()
+    @classmethod
+    def build_surface_geometry_uv_map_fnc(cls, rsv_task, space):
+        if rsv_task is not None:
+            import lxmaya.fnc.importers as mya_fnc_importers
+            #
+            if space == 'work':
+                keyword = 'asset-source-geometry-usd-payload-file'
+            elif space == 'release':
+                keyword = 'asset-geometry-usd-payload-file'
+            else:
+                raise RuntimeError()
+            rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
+            file_path = rsv_unit.get_result(version='latest')
+            if file_path:
+                mya_fnc_importers.FncGeometryImporterNew(
+                    option=dict(
+                        file=file_path,
+                        root='/master',
+                        renderable_locations=[
+                            '/master/mod/hi',
+                            '/master/mod/lo',
+                        ],
+                        auxiliary_locations=[
+                            '/master/grm',
+                            '/master/cfx',
+                            '/master/efx',
+                            '/master/misc'
+                        ],
+                        port_match_patterns=['pg_*'],
+                        #
+                        uv_map_only=True
+                    )
+                ).execute()
+    @classmethod
+    def build_surface_look_fnc(cls, rsv_task, space):
+        if rsv_task:
+            import lxmaya.fnc.importers as mya_fnc_importers
+            #
+            if space == 'work':
+                keyword = 'asset-source-look-ass-file'
+            elif space == 'release':
+                keyword = 'asset-look-ass-file'
+            else:
+                raise RuntimeError()
+            #
+            rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
+            file_path = rsv_unit.get_result(version='latest')
+            if file_path:
+                mya_fnc_importers.FncLookAssImporterNew(
+                    option=dict(
+                        file=file_path,
+                        location='/master',
+                        look_pass='default',
+                        name_join_time_tag=True,
+                    )
+                ).execute()
+            else:
+                bsc_core.LogMtd.trace_method_warning(
+                    cls.KEY,
+                    'rsv-unit={} is non-exists'.format(rsv_unit)
+                )
+    @classmethod
+    def build_surface_look_preview_fnc(cls, rsv_task, space):
+        if rsv_task:
+            import lxmaya.fnc.importers as mya_fnc_importers
+            #
+            if space == 'work':
+                keyword = 'asset-source-look-yml-file'
+            elif space == 'release':
+                keyword = 'asset-look-yml-file'
+            else:
+                raise RuntimeError()
+            #
+            rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
+            file_path = rsv_unit.get_result(version='latest')
+            if file_path:
+                mya_fnc_importers.LookYamlImporter(
+                    option=dict(
+                        file=file_path
+                    )
+                ).set_run()
+            else:
+                bsc_core.LogMtd.trace_method_warning(
+                    cls.KEY,
+                    'file is not found'
+                )
+
+        else:
+            bsc_core.LogMtd.trace_method_warning(
+                cls.KEY,
+                'task is not found'
+            )
+
+    def execute(self):
+        method_args = []
+        # geometry
+        if self.get('with_geometry') is True:
+            if self.get('with_model') is True:
+                method_args.append(
+                    (self.build_model_geometry_fnc, (self._model_rsv_task, self.get('model_space')))
+                )
+            if self.get('with_model_dynamic') is True:
+                method_args.append(
+                    (self.build_model_dynamic_geometry_fnc, (self._model_dynamic_rsv_task, self.get('model_space'), self.get('model_act_properties')))
+                )
+            if self.get('with_groom') is True:
+                method_args.append(
+                    (self.build_groom_geometry_fnc, (self._groom_rsv_task, self.get('groom_space'), self.get('with_groom_grow')))
+                )
+        # geometry uv map
+        if self.get('with_geometry_uv_map') is True:
+            if self.get('with_surface') is True:
+                method_args.append(
+                    (self.build_surface_geometry_uv_map_fnc, (self._surface_rsv_task, self.get('surface_space')))
+                )
+        #
+        if self.get('with_look') is True:
+            # either surface_preview or surface
+            # check surface preview first
+            if self.get('with_surface_preview') is True:
+                method_args.append(
+                    (self.build_surface_look_preview_fnc, (self._surface_prv_rsv_task, self.get('surface_space')))
+                )
+            elif self.get('with_surface') is True:
+                method_args.append(
+                    (self.build_surface_look_fnc, (self._surface_rsv_task, self.get('surface_space')))
+                )
+        #
+        if method_args:
+            with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute asset build method') as g_p:
+                for i_mtd, i_args in method_args:
+                    g_p.set_update()
+                    #
+                    i_mtd(*i_args)
 
 
 if __name__ == '__main__':

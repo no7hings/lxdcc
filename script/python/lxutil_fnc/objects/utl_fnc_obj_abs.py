@@ -154,7 +154,7 @@ class AbsMethodDef(object):
 class AbsMethodCheckDef(object):
     FNC_ISP_IGNORE_CLASS = None
     #
-    DCC_OBJ_CLASS = utl_dcc_objects.Obj
+    DCC_NODE_CLASS = utl_dcc_objects.Obj
     CONTENT_CLASS = bsc_objects.Content
     def _set_method_check_def_init_(self):
         self._error_obj_content = self.CONTENT_CLASS(

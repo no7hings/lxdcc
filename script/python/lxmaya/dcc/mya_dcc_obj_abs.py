@@ -452,6 +452,9 @@ class AbsMyaObj(
         if cmds.objExists(self.path) is True:
             return cmds.nodeType(self.path)
         return '*'
+
+    def get_api_type_name(self):
+        return cmds.nodeType(self.get_path(), apiType=1)
     @property
     def icon(self):
         return utl_gui_qt_core.QtMayaMtd.get_qt_icon(self.type)

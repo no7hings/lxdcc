@@ -41,18 +41,27 @@ class AbsDccObjDef(object):
     def __init__(self, path):
         self._path = path
         self._name = path.split(self.PATHSEP)[-1]
+
     @property
     def type(self):
         raise NotImplementedError()
+
+    def get_type_name(self):
+        return self.type
+    type_name = property(get_type_name)
+
     @property
     def data_type(self):
         return None
-    @property
-    def name(self):
+
+    def get_name(self):
         return self._name
-    @property
-    def path(self):
+    name = property(get_name)
+
+    def get_path(self):
         return self._path
+    path = property(get_path)
+
     @property
     def icon(self):
         raise NotImplementedError()
@@ -467,6 +476,9 @@ class AbsDccObj(
     @property
     def type(self):
         raise NotImplementedError()
+
+    def get_type_name(self):
+        return self.type
     @property
     def type_name(self):
         return self.type
@@ -687,12 +699,12 @@ class AbsDccObjs(object):
     INCLUDE_DCC_TYPES = []
     EXCLUDE_DCC_PATHS = []
     #
-    DCC_OBJ_CLASS = None
+    DCC_NODE_CLASS = None
     def __init__(self, *args):
         pass
     @classmethod
     def _set_obj_create_(cls, path_):
-        return cls.DCC_OBJ_CLASS(path_)
+        return cls.DCC_NODE_CLASS(path_)
     @classmethod
     def get_paths(cls, **kwargs):
         raise NotImplementedError()

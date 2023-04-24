@@ -9,7 +9,7 @@ from lxutil import utl_core
 def setup_fnc_():
     from lxutil import utl_setup
     utl_setup.OcioSetup(
-        bsc_core.StorageMtd.set_map_to_platform(
+        bsc_core.StgPathMapMtd.map_to_current(
             '/l/packages/pg/third_party/ocio/aces/1.2'
         )
     ).set_run()

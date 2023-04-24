@@ -130,7 +130,7 @@ class SGStageOpt(object):
         while True:
             if (int(time.time())-start_time) > timeout:
                 raise RuntimeError(
-                    utl_core.Log.set_module_error_trace(
+                    bsc_core.LogMtd.trace_method_error(
                         'location traversal is timeout'
                     )
                 )
@@ -168,7 +168,7 @@ class SGStageOpt(object):
         while True:
             if (int(time.time())-start_time) > timeout:
                 raise RuntimeError(
-                    utl_core.Log.set_module_error_trace(
+                    bsc_core.LogMtd.trace_method_error(
                         'location traversal is timeout'
                     )
                 )
@@ -237,7 +237,7 @@ class KtnSGSelectionOpt(object):
         self._paths = args[0]
         self._scene_graph = ScenegraphManager.getActiveScenegraph()
 
-    def set_all_select(self):
+    def select_all(self):
         paths = self._paths
         list_ = []
         for path in paths:
@@ -440,6 +440,48 @@ class NGLayoutOpt(object):
                 i_root_index, i_name = k
                 i_position = v
                 self._layout_fnc_(i_name, i_position)
+
+
+class NGObjsMtd(object):
+    class MatchMode(object):
+        One = 0
+        All = 1
+    @classmethod
+    def find_nodes(cls, type_name, ignore_bypassed=False):
+        _ = NodegraphAPI.GetAllNodesByType(type_name) or []
+        if ignore_bypassed is False:
+            return _
+        return [i for i in _ if NGObjOpt(i).get_is_bypassed(ancestors=True) is False]
+    @classmethod
+    def filter_fnc(cls, nodes, filters):
+        list_ = []
+        for i in nodes:
+            if filters:
+                i_c = len(filters)
+                i_results = []
+                for j_f_p, j_f_o, j_f_v in filters:
+                    j_p = i.getParameter(j_f_p)
+                    if j_p is None:
+                        continue
+                    j_v = j_p.getValue(0)
+                    if j_f_o == 'in':
+                        j_r = j_v in j_f_v
+                    elif j_f_o == 'is':
+                        j_r = j_v == j_f_v
+                    else:
+                        raise RuntimeError()
+                    #
+                    if j_r is True:
+                        i_results.append(1)
+                    else:
+                        break
+                #
+                if sum(i_results) == i_c:
+                    list_.append(i)
+        return list_
+    @classmethod
+    def find_nodes_by_port_filters(cls, type_name, filters, ignore_bypassed=False):
+        return cls.filter_fnc(cls.find_nodes(type_name, ignore_bypassed=ignore_bypassed), filters)
 
 
 class NGObjOpt(object):
@@ -1468,21 +1510,33 @@ class NGObjOpt(object):
                 return [i for i in _ if i.getType() in include_type_names]
         return _
 
+    def find_children(self, type_name, filters):
+        _ = self.get_children(include_type_names=[type_name])
+        return NGObjsMtd.filter_fnc(_, filters)
+
     def clear_children(self, include_type_names=None):
         for i in self.get_children(include_type_names):
             i.delete()
 
-    def set_port_execute(self, port_path):
+    def execute_port(self, port_path, index=None):
         ktn_port = self._ktn_obj.getParameter(port_path)
         if ktn_port:
             hint_string = ktn_port.getHintString()
             if hint_string:
                 hint_dict = eval(hint_string)
-                if hint_dict['widget'] in ['scriptButton']:
+                widget = hint_dict['widget']
+                if widget in {'scriptButton'}:
                     script = hint_dict['scriptText']
                     # noinspection PyUnusedLocal
                     node = self._ktn_obj
                     exec script
+                elif widget in {'scriptToolbar'}:
+                    tools = hint_dict['buttonData']
+                    if isinstance(index, int):
+                        script = tools[index]['scriptText']
+                        # noinspection PyUnusedLocal
+                        node = self._ktn_obj
+                        exec script
 
     def set_input_port_create(self, port_path, **create_kwargs):
         _ = self._ktn_obj.getInputPort(port_path)
@@ -1742,7 +1796,7 @@ class NGObjOpt(object):
                                     options=list(value),
                                     displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(value)),
                                     exclusive=True,
-                                    colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=25, v_p=100) for i in list(value)],
+                                    colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(value)],
                                     equalPartitionWidths=True,
                                 )
                             )
@@ -1760,7 +1814,7 @@ class NGObjOpt(object):
                                     options=list(value),
                                     displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(value)),
                                     exclusive=False,
-                                    colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=25, v_p=100) for i in list(value)],
+                                    colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(value)],
                                     equalPartitionWidths=True,
                                     delimiter=sep
                                 )
@@ -2032,43 +2086,6 @@ class NGObjsOpt(object):
         return obj_names
 
 
-class NGObjsMtd(object):
-    class MatchMode(object):
-        One = 0
-        All = 1
-    @classmethod
-    def find_nodes(cls, type_name, ignore_bypassed=False):
-        _ = NodegraphAPI.GetAllNodesByType(type_name) or []
-        if ignore_bypassed is False:
-            return _
-        return [i for i in _ if NGObjOpt(i).get_is_bypassed(ancestors=True) is False]
-    @classmethod
-    def find_nodes_by_port_filters(cls, type_name, filters, match_mode=MatchMode.All, ignore_bypassed=False):
-        list_ = []
-        for i in cls.find_nodes(type_name, ignore_bypassed=ignore_bypassed):
-            if filters:
-                if match_mode == cls.MatchMode.One:
-                    for j_p_p, j_v in filters:
-                        j_p = i.getParameter(j_p_p)
-                        if j_p is None:
-                            continue
-                        if j_p.getValue(0) == j_v:
-                            list_.append(i)
-                            break
-                elif match_mode == cls.MatchMode.All:
-                    i_c = len(filters)
-                    i_results = []
-                    for j_p_p, j_v in filters:
-                        j_p = i.getParameter(j_p_p)
-                        if j_p is None:
-                            continue
-                        if j_p.getValue(0) == j_v:
-                            i_results.append(1)
-                    if sum(i_results) == i_c:
-                        list_.append(i)
-        return list_
-
-
 class NGGroupStackOpt(NGObjOpt):
     def __init__(self, ktn_obj):
         super(NGGroupStackOpt, self).__init__(ktn_obj)
@@ -2232,7 +2249,7 @@ class NGPortOpt(object):
             dict(
                 options=list(strings),
                 displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(strings)),
-                colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=25, v_p=100) for i in list(strings)],
+                colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(strings)],
             )
         )
         #
@@ -2257,7 +2274,7 @@ class NGPortOpt(object):
             i_0, i_1 = i
             options.append(i_0)
             display_texts.append(i_1)
-            colors.append(bsc_core.RawTextOpt(i_1).to_rgb__(s_p=25, v_p=100))
+            colors.append(bsc_core.RawTextOpt(i_1).to_rgb__(s_p=50, v_p=50))
         #
         hint_dict.update(
             dict(

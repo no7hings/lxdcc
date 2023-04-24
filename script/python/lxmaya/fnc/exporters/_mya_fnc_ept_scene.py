@@ -29,7 +29,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 import lxutil.fnc.exporters as utl_fnc_exporters
 
 
-class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class SceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     WITH_XGEN = 'with_xgen_collection'
     OPTION = dict(
         file='',
@@ -62,7 +62,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         _selected_paths = []
         if location:
             root_dag_opt = bsc_core.DccPathDagOpt(location)
-            root_mya_dag_opt = root_dag_opt.set_translate_to(
+            root_mya_dag_opt = root_dag_opt.translate_to(
                 ma_configure.Util.OBJ_PATHSEP
             )
             _selected_paths = cmds.ls(selection=1, long=1) or []
@@ -251,7 +251,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             light = light.set_create('aiStandIn')
         #
         atr_raw = dict(
-            dso=utl_core.Path.set_map_to_platform(
+            dso=utl_core.Path.map_to_current(
                 '/l/resource/td/asset/ass/default-light.ass'
             )
         )
@@ -282,7 +282,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
 
     def set_run(self):
         use_render = self._option.get('use_render')
-        self._mya_root_dag_path = self._root_dat_opt.set_translate_to(
+        self._mya_root_dag_path = self._root_dat_opt.translate_to(
             ma_configure.Util.OBJ_PATHSEP
         )
         root_mya_obj = mya_dcc_objects.Group(self._mya_root_dag_path.path)
@@ -369,7 +369,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         self._results = [mov_file_path]
 
 
-class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         root=''
@@ -383,7 +383,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
     @classmethod
     def _set_camera_create_(cls, root, persp_view):
         dcc_root_dag_path = bsc_core.DccPathDagOpt(root)
-        mya_root_dag_path = dcc_root_dag_path.set_translate_to(
+        mya_root_dag_path = dcc_root_dag_path.translate_to(
             pathsep='|'
         )
         mya_camera = mya_dcc_objects.Shape('|persp_view')

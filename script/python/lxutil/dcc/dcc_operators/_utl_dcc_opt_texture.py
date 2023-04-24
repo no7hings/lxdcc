@@ -683,7 +683,7 @@ class DccTexturesOpt(object):
         #
         self._set_repath_queue_run_(repath_queue)
 
-    def set_map_to_platform(self, target_platform=None):
+    def map_to_current(self, target_platform=None):
         objs = self._objs
         #
         if objs:
@@ -691,11 +691,11 @@ class DccTexturesOpt(object):
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     stg_texture = utl_dcc_objects.OsTexture(j_file_path)
                     if target_platform is None:
-                        tgt_stg_texture_path = bsc_core.StorageMtd.set_map_to_platform(stg_texture.path)
+                        tgt_stg_texture_path = utl_core.Path.map_to_current(stg_texture.path)
                     elif target_platform == 'windows':
-                        tgt_stg_texture_path = bsc_core.StorageMtd.set_map_to_windows(stg_texture.path)
+                        tgt_stg_texture_path = utl_core.Path.map_to_windows(stg_texture.path)
                     elif target_platform == 'linux':
-                        tgt_stg_texture_path = bsc_core.StorageMtd.set_map_to_linux(stg_texture.path)
+                        tgt_stg_texture_path = utl_core.Path.map_to_linux(stg_texture.path)
                     else:
                         raise TypeError()
                     #
@@ -742,7 +742,7 @@ class TextureTxMainProcess(bsc_abstracts.AbsProcess):
         for i in self._file_paths:
             i_e = self.ELEMENT_PROCESS_CLS(i)
             i_e.set_name(i)
-            self.set_element_add(i_e)
+            self.add_element(i_e)
 
     def _set_sub_process_create_fnc_(self):
         return True
@@ -786,7 +786,7 @@ class TextureJpgMainProcess(bsc_abstracts.AbsProcess):
         for i in self._file_paths:
             i_e = self.ELEMENT_PROCESS_CLS(i)
             i_e.set_name(i)
-            self.set_element_add(i_e)
+            self.add_element(i_e)
 
     def _set_sub_process_create_fnc_(self):
         return True

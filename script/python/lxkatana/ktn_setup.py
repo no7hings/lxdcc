@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil import utl_configure, utl_core
 
 from lxutil_gui.qt import utl_gui_qt_core
@@ -20,17 +22,13 @@ class KatanaMenuSetup(utl_gui_qt_core.AsbQtMenuSetup):
             qt_menu_bar.addMenu(qt_menu)
             qt_menu.setObjectName(name)
             qt_menu.setTitle(name)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'menu-add',
                 u'menu="{}"'.format(name)
             )
             return qt_menu
 
     def set_setup(self):
-        # self.set_menu_build_by_configure(
-        #     utl_configure.MainData.get_as_configure('katana/menu/main')
-        # )
-        #
         import lxsession.commands as ssn_commands
         ssn_commands.set_hook_execute('dcc-menus/gen-menu')
 

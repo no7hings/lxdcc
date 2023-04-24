@@ -17,7 +17,7 @@ def set_xgen_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)

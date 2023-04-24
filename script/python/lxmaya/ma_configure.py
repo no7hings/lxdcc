@@ -1,4 +1,5 @@
 # coding:utf-8
+import enum
 
 
 class Util(object):
@@ -15,6 +16,28 @@ class Util(object):
     XGEN_PALETTE = 'xgmPalette'
     XGEN_DESCRIPTION = 'xgmDescription'
     XGEN_SPLINE_GUIDE = 'xgmSplineGuide'
+
+
+class Types(enum.EnumMeta):
+    Mesh = 'mesh'
+    Curve = 'nurbsCurve'
+    Transform = 'transform'
+    File = 'file'
+    Material = 'shadingEngine'
+    #
+    XgenPalette = 'xgmPalette'
+    XgenDescription = 'xgmDescription'
+    XgenSplineGuide = 'xgmSplineGuide'
+
+
+class ApiTypes(object):
+    Transform = 'kTransform'
+    TransformPlugin = 'kPluginTransformNode'
+    #
+    Transforms = {
+        Transform,
+        TransformPlugin
+    }
 
 
 class XGen(object):

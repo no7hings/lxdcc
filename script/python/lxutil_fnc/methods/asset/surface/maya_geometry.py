@@ -28,7 +28,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         sub_root = '{}/hi'.format(root)
         #
         sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
-        sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+        sub_root_mya_dag_path = sub_root_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
         #
         sub_root_mya_obj = mya_dcc_objects.Group(sub_root_mya_dag_path.path)
         if sub_root_mya_obj.get_is_exists() is False:
@@ -54,7 +54,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 )
             #
             work_scene_src_file_path = mya_dcc_objects.Scene.get_current_file_path()
-            fnc_geometry_comparer = mya_fnc_comparers.GeometryComparer(
+            fnc_geometry_comparer = mya_fnc_comparers.FncGeometryComparer(
                 work_scene_src_file_path, sub_root
             )
             es = [
@@ -67,7 +67,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             results = fnc_geometry_comparer.get_results()
             for i_src_gmt_path, i_tgt_gmt_path, i_description in results:
                 i_src_gmt_path_dag_opt = bsc_core.DccPathDagOpt(i_src_gmt_path)
-                i_mya_path_dag_opt = i_src_gmt_path_dag_opt.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+                i_mya_path_dag_opt = i_src_gmt_path_dag_opt.translate_to(ma_configure.Util.OBJ_PATHSEP)
                 for j_e in es:
                     if j_e in i_description:
                         self.set_obj_check_result_at(
@@ -129,7 +129,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         sub_root = '{}/hi'.format(root)
         #
         sub_root_dag_path = bsc_core.DccPathDagOpt(sub_root)
-        sub_root_mya_dag_path = sub_root_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+        sub_root_mya_dag_path = sub_root_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
         #
         sub_root_mya_obj = mya_dcc_objects.Group(sub_root_mya_dag_path.path)
         if sub_root_mya_obj.get_is_exists() is True:

@@ -99,7 +99,7 @@ class GeometryAbcExporter(object):
                 _ = list(raw)
             else:
                 raise TypeError()
-            return map(lambda x: bsc_core.DccPathDagOpt(x).set_translate_to('|').to_string(), _)
+            return map(lambda x: bsc_core.DccPathDagOpt(x).translate_to('|').to_string(), _)
         return []
     @classmethod
     def _get_file_(cls, file_path):
@@ -347,218 +347,6 @@ class GeometryUsdExporter1(object):
                 )
 
 
-class GeometryUsdExporter_(object):
-    OPTION = dict(
-        default_prim_path=None,
-        with_uv=True,
-        with_mesh=True,
-        with_curve=False,
-        root_lstrip=None,
-        use_override=False,
-        export_selected=False,
-        namespace_clear=True,
-        with_visible=True,
-        with_display_color=True,
-        #
-        port_match_patterns=[]
-    )
-    def __init__(self, file_path, root=None, option=None):
-        self._file_path = file_path
-        self._root = root
-
-        self._option = copy.copy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                self._option[k] = v
-
-        self._results = []
-
-    def set_run(self):
-        default_prim_path = self._option.get('default_prim_path')
-        use_override = self._option['use_override']
-        usd_root_lstrip = self._option['root_lstrip']
-        with_visible = self._option['with_visible']
-        with_display_color = self._option['with_display_color']
-        port_match_patterns = self._option['port_match_patterns']
-        #
-        if self._root.startswith('|'):
-            self._root = self._root.replace('|', '/')
-        root_dag_path = bsc_core.DccPathDagOpt(self._root)
-        root_mya_dag_path = root_dag_path.set_translate_to(
-            pathsep=ma_configure.Util.OBJ_PATHSEP
-        )
-        mya_root = root_mya_dag_path.path
-        #
-        root_mya_obj = mya_dcc_objects.Group(mya_root)
-        if root_mya_obj.get_is_exists() is True:
-            mya_objs = root_mya_obj.get_descendants()
-            if mya_objs:
-                usd_geometry_exporter = usd_fnc_exporters.GeometryExporter(
-                    option=dict(
-                        file=self._file_path,
-                        location=self._root,
-                        default_prim_path=default_prim_path
-                    )
-                )
-                c = len(mya_objs)
-                l_p = utl_core.LogProgressRunner.create_as_bar(maximum=c, label='geometry-usd export')
-                #
-                for i_mya_obj in mya_objs:
-                    l_p.set_update()
-                    #
-                    i_mya_obj_type = i_mya_obj.type
-                    i_mya_obj_path = i_mya_obj.path
-                    #
-                    i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
-                        i_mya_obj_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
-                    )
-                    i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
-                    # clean namespace
-                    if ':' in i_usd_obj_path:
-                        utl_core.Log.set_module_warning_trace(
-                            'usd-mesh export',
-                            'obj="{}" has namespace'.format(i_usd_obj_path)
-                        )
-                    #
-                    i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
-                        i_usd_obj_path
-                    )
-                    i_usd_obj_path = bsc_core.DccPathDagMtd.set_dag_path_cleanup(
-                        i_usd_obj_path
-                    )
-                    if i_mya_obj_type == ma_configure.Util.TRANSFORM_TYPE:
-                        transform_mya_obj = mya_dcc_objects.Transform(i_mya_obj_path)
-                        transform_mya_obj_opt = mya_dcc_operators.TransformOpt(transform_mya_obj)
-                        transform_usd_obj_opt = usd_geometry_exporter._set_transform_opt_create_(
-                            i_usd_obj_path, use_override=use_override
-                        )
-                        matrix = transform_mya_obj_opt.get_matrix()
-                        transform_usd_obj_opt.set_matrix(matrix)
-                        #
-                        if with_visible is True:
-                            transform_usd_obj_opt.set_visible(
-                                transform_mya_obj.get_visible()
-                            )
-                    #
-                    elif i_mya_obj_type == ma_configure.Util.MESH_TYPE:
-                        i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
-                        if i_mya_mesh.get_port('intermediateObject').get() is False:
-                            i_mya_mesh_opt = mya_dcc_operators.MeshOpt(i_mya_mesh)
-                            if i_mya_mesh_opt.get_is_invalid() is False:
-                                i_usd_mesh_opt = usd_geometry_exporter._set_mesh_opt_create_(
-                                    i_usd_obj_path, use_override=use_override
-                                )
-                                i_usd_mesh_opt.set_create(
-                                    face_vertices=i_mya_mesh_opt.get_face_vertices(),
-                                    points=i_mya_mesh_opt.get_points(),
-                                    uv_maps=i_mya_mesh_opt.get_uv_maps()
-                                )
-                                # export visibility
-                                if with_visible is True:
-                                    i_usd_mesh_opt.set_visible(
-                                        i_mya_mesh.get_visible()
-                                    )
-                                # export color use name
-                                if with_display_color is True:
-                                    color = bsc_core.RawTextOpt(i_mya_mesh.name).to_rgb_(
-                                        maximum=1
-                                    )
-                                    i_usd_mesh_opt.set_display_color_fill(
-                                        color
-                                    )
-                            else:
-                                utl_core.Log.set_module_error_trace(
-                                    'usd-mesh export',
-                                    'obj="{}" is invalid'.format(i_mya_obj.path)
-                                )
-                    # nurbs curve
-                    elif i_mya_obj_type == ma_configure.Util.CURVE_TYPE:
-                        i_mya_curve = mya_dcc_objects.Curve(i_mya_obj_path)
-                        if i_mya_curve.get_port('intermediateObject').get() is False:
-                            i_mya_curve_opt = mya_dcc_operators.NurbsCurveOpt(i_mya_curve)
-                            if i_mya_curve_opt.get_is_invalid() is False:
-                                i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
-                                    i_usd_obj_path, use_override=use_override
-                                )
-                                counts, points, widths = i_mya_curve_opt.get_usd_basis_curve_data()
-                                i_usd_curve_opt.set_create(
-                                    counts, points, widths
-                                )
-                                if with_display_color is True:
-                                    color = bsc_core.RawTextOpt(i_mya_curve.name).to_rgb_(
-                                        maximum=1
-                                    )
-                                    i_usd_curve_opt.set_display_color_fill(
-                                        color
-                                    )
-                    # xgen description
-                    elif i_mya_obj_type == ma_configure.Util.XGEN_DESCRIPTION:
-                        i_mya_xgen_description = mya_dcc_objects.Shape(i_mya_obj_path)
-                        i_mya_xgen_description_guide_opt = mya_dcc_operators.XgenDescriptionOpt(
-                            i_mya_xgen_description
-                        )
-                        if i_mya_xgen_description_guide_opt.get_is_exists() is True:
-                            i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
-                                i_usd_obj_path, use_override=use_override
-                            )
-                            counts, points, widths = i_mya_xgen_description_guide_opt.get_usd_basis_curve_data()
-                            i_usd_curve_opt.set_create(
-                                counts, points, widths
-                            )
-                            if with_display_color is True:
-                                color = bsc_core.RawTextOpt(i_mya_xgen_description.name).to_rgb_(
-                                    maximum=1
-                                )
-                                i_usd_curve_opt.set_display_color_fill(
-                                    color
-                                )
-
-                    # xgen guide
-                    # elif i_mya_obj_type == ma_configure.Util.XGEN_SPLINE_GUIDE:
-                    #     i_mya_xgen_spline_guide = mya_dcc_objects.Shape(i_mya_obj_path)
-                    #     i_mya_xgen_spline_guide_opt = mya_dcc_operators.XgenSplineGuideOpt(
-                    #         i_mya_xgen_spline_guide
-                    #     )
-                    #     if i_mya_xgen_spline_guide_opt.get_is_exists() is True:
-                    #         i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
-                    #             i_usd_obj_path, use_override=use_override
-                    #         )
-                    #         counts, points, widths = i_mya_xgen_spline_guide_opt.get_usd_basis_curve_data()
-                    #         i_usd_curve_opt.set_create(
-                    #             counts, points, widths
-                    #         )
-                    #         if with_display_color is True:
-                    #             color = bsc_core.RawTextOpt(i_mya_xgen_spline_guide.name).to_rgb_(
-                    #                 maximum=1
-                    #             )
-                    #             i_usd_curve_opt.set_display_color_fill(
-                    #                 color
-                    #             )
-
-                    if port_match_patterns:
-                        i_geometry_usd_fnc = usd_geometry_exporter._get_geometry_fnc_(i_usd_obj_path)
-                        if i_geometry_usd_fnc is not None:
-                            i_customize_ports = ma_core.CmdObjOpt(i_mya_obj_path).get_customize_ports()
-                            for j_port in i_customize_ports:
-                                if j_port.get_is_naming_matches(port_match_patterns) is True:
-                                    j_key = j_port.port_path
-                                    j_value = j_port.get()
-                                    if j_value is None:
-                                        j_value = ''
-                                    usd_core.UsdPrimOpt._set_customize_attribute_add_(
-                                        i_geometry_usd_fnc, j_key, j_value
-                                    )
-                #
-                l_p.set_stop()
-                #
-                usd_geometry_exporter.set_run()
-        else:
-            utl_core.Log.set_module_warning_trace(
-                'maya-usd-export',
-                'obj="{}" is non-exists'.format(self._root)
-            )
-
-
 class DatabaseGeometryExport(object):
     OPTION = dict(
         force=False
@@ -605,7 +393,7 @@ class DatabaseGeometryExport(object):
         self._set_uv_map_export_run_()
 
 
-class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionMethod):
+class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -615,7 +403,7 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionMethod):
         super(CameraAbcExport, self).__init__(option)
         option = self.get_option()
         location = option.get('location')
-        g = mya_dcc_objects.Group(bsc_core.DccPathDagOpt(location).set_translate_to('|').to_string())
+        g = mya_dcc_objects.Group(bsc_core.DccPathDagOpt(location).translate_to('|').to_string())
         self._camera_shape_paths = g.get_all_shape_paths(include_obj_type='camera')
         self._camera_transform_paths = map(lambda x: mya_dcc_objects.Shape(x).transform.path, self._camera_shape_paths)
 
@@ -644,7 +432,200 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionMethod):
         ).set_run()
 
 
-class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+    OPTION = dict(
+        file='',
+        location='',
+        #
+        default_prim_path=None,
+        #
+        with_mesh=True,
+        with_mesh_uv=True,
+        with_curve=True,
+        #
+        path_lstrip=None,
+        use_override=False,
+        export_selected=False,
+        # auto clear namespace
+        namespace_clear=True,
+        #
+        with_visible=True,
+        with_display_color=True,
+        #
+        port_match_patterns=[]
+    )
+    def __init__(self, option=None):
+        super(FncGeometryUsdExporter, self).__init__(option)
+
+    def execute(self):
+        file_path = self.get('file')
+        location = self.get('location')
+        #
+        default_prim_path = self.get('default_prim_path')
+        use_override = self.get('use_override')
+        usd_root_lstrip = self.get('path_lstrip')
+        with_visible = self.get('with_visible')
+        with_display_color = self.get('with_display_color')
+        port_match_patterns = self.get('port_match_patterns')
+        #
+        if location.startswith('|'):
+            location = location.replace('|', '/')
+        #
+        root_dag_path = bsc_core.DccPathDagOpt(location)
+        root_mya_dag_path = root_dag_path.translate_to(
+            pathsep=ma_configure.Util.OBJ_PATHSEP
+        )
+        mya_root = root_mya_dag_path.path
+        #
+        root_mya_obj = mya_dcc_objects.Group(mya_root)
+        if root_mya_obj.get_is_exists() is True:
+            mya_objs = root_mya_obj.get_descendants()
+            if mya_objs:
+                usd_geometry_exporter = usd_fnc_exporters.GeometryExporter(
+                    option=dict(
+                        file=file_path,
+                        location=location,
+                        #
+                        default_prim_path=default_prim_path
+                    )
+                )
+                c = len(mya_objs)
+                with utl_core.GuiProgressesRunner.create(maximum=c, label='geometry-usd export') as g_p:
+                    for i_mya_obj in mya_objs:
+                        g_p.set_update()
+                        #
+                        i_mya_type_name = i_mya_obj.get_type_name()
+                        i_mya_api_type_name = i_mya_obj.get_api_type_name()
+                        i_mya_obj_path = i_mya_obj.get_path()
+                        #
+                        i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
+                            i_mya_obj_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
+                        )
+                        i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
+                        # clean namespace
+                        if ':' in i_usd_obj_path:
+                            utl_core.Log.set_module_warning_trace(
+                                'usd-mesh export',
+                                'obj="{}" has namespace'.format(i_usd_obj_path)
+                            )
+                        #
+                        i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
+                            i_usd_obj_path
+                        )
+                        i_usd_obj_path = bsc_core.DccPathDagMtd.set_dag_path_cleanup(
+                            i_usd_obj_path
+                        )
+                        if i_mya_api_type_name in ma_configure.ApiTypes.Transforms:
+                            transform_mya_obj = mya_dcc_objects.Transform(i_mya_obj_path)
+                            transform_mya_obj_opt = mya_dcc_operators.TransformOpt(transform_mya_obj)
+                            transform_usd_obj_opt = usd_geometry_exporter._set_transform_opt_create_(
+                                i_usd_obj_path, use_override=use_override
+                            )
+                            matrix = transform_mya_obj_opt.get_matrix()
+                            transform_usd_obj_opt.set_matrix(matrix)
+                            #
+                            if with_visible is True:
+                                transform_usd_obj_opt.set_visible(
+                                    transform_mya_obj.get_visible()
+                                )
+                        #
+                        elif i_mya_type_name == ma_configure.Util.MESH_TYPE:
+                            i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
+                            if i_mya_mesh.get_port('intermediateObject').get() is False:
+                                i_mya_mesh_opt = mya_dcc_operators.MeshOpt(i_mya_mesh)
+                                if i_mya_mesh_opt.get_is_invalid() is False:
+                                    i_usd_mesh_opt = usd_geometry_exporter._set_mesh_opt_create_(
+                                        i_usd_obj_path, use_override=use_override
+                                    )
+                                    i_usd_mesh_opt.set_create(
+                                        face_vertices=i_mya_mesh_opt.get_face_vertices(),
+                                        points=i_mya_mesh_opt.get_points(),
+                                        uv_maps=i_mya_mesh_opt.get_uv_maps()
+                                    )
+                                    # export visibility
+                                    if with_visible is True:
+                                        i_usd_mesh_opt.set_visible(
+                                            i_mya_mesh.get_visible()
+                                        )
+                                    # export color use name
+                                    if with_display_color is True:
+                                        color = bsc_core.RawTextOpt(i_mya_mesh.name).to_rgb__(
+                                            maximum=1, s_p=50, v_p=100
+                                        )
+                                        i_usd_mesh_opt.set_display_color_fill(
+                                            color
+                                        )
+                                else:
+                                    utl_core.Log.set_module_error_trace(
+                                        'usd-mesh export',
+                                        'obj="{}" is invalid'.format(i_mya_obj.path)
+                                    )
+                        # nurbs curve
+                        elif i_mya_type_name == ma_configure.Util.CURVE_TYPE:
+                            i_mya_curve = mya_dcc_objects.Curve(i_mya_obj_path)
+                            if i_mya_curve.get_port('intermediateObject').get() is False:
+                                i_mya_curve_opt = mya_dcc_operators.NurbsCurveOpt(i_mya_curve)
+                                if i_mya_curve_opt.get_is_invalid() is False:
+                                    i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
+                                        i_usd_obj_path, use_override=use_override
+                                    )
+                                    counts, points, widths = i_mya_curve_opt.get_usd_basis_curve_data()
+                                    i_usd_curve_opt.set_create(
+                                        counts, points, widths
+                                    )
+                                    if with_display_color is True:
+                                        color = bsc_core.RawTextOpt(i_mya_curve.name).to_rgb__(
+                                            maximum=1, s_p=50, v_p=100
+                                        )
+                                        i_usd_curve_opt.set_display_color_fill(
+                                            color
+                                        )
+                        # xgen description
+                        elif i_mya_type_name == ma_configure.Util.XGEN_DESCRIPTION:
+                            i_mya_xgen_description = mya_dcc_objects.Shape(i_mya_obj_path)
+                            i_mya_xgen_description_guide_opt = mya_dcc_operators.XgenDescriptionOpt(
+                                i_mya_xgen_description
+                            )
+                            if i_mya_xgen_description_guide_opt.get_is_exists() is True:
+                                i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
+                                    i_usd_obj_path, use_override=use_override
+                                )
+                                counts, points, widths = i_mya_xgen_description_guide_opt.get_usd_basis_curve_data()
+                                i_usd_curve_opt.set_create(
+                                    counts, points, widths
+                                )
+                                if with_display_color is True:
+                                    color = bsc_core.RawTextOpt(i_mya_xgen_description.name).to_rgb__(
+                                            maximum=1, s_p=50, v_p=100
+                                        )
+                                    i_usd_curve_opt.set_display_color_fill(
+                                        color
+                                    )
+
+                        if port_match_patterns:
+                            i_geometry_usd_fnc = usd_geometry_exporter._get_geometry_fnc_(i_usd_obj_path)
+                            if i_geometry_usd_fnc is not None:
+                                i_customize_ports = ma_core.CmdObjOpt(i_mya_obj_path).get_customize_ports()
+                                for j_port in i_customize_ports:
+                                    if j_port.get_is_naming_matches(port_match_patterns) is True:
+                                        j_key = j_port.port_path
+                                        j_value = j_port.get()
+                                        if j_value is None:
+                                            j_value = ''
+                                        #
+                                        usd_core.UsdPrimOpt._add_customize_attribute_(
+                                            i_geometry_usd_fnc, j_key, j_value
+                                        )
+                #
+                usd_geometry_exporter.set_run()
+        else:
+            utl_core.Log.set_module_warning_trace(
+                'maya-usd-export',
+                'obj="{}" is non-exists'.format(location)
+            )
+
+
+class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -698,16 +679,18 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         )
     @classmethod
     def _set_tmp_usd_export_(cls, file_path, location, root):
-        GeometryUsdExporter_(
-            file_path=file_path,
-            root=location,
+        FncGeometryUsdExporter(
             option=dict(
+                file=file_path,
+                location=location,
+                #
                 default_prim_path=root,
-                with_uv=True,
+                with_mesh_uv=True,
                 with_mesh=True,
+                #
                 use_override=False
             )
-        ).set_run()
+        ).execute()
 
     def set_run(self):
         subdiv_dict = self.get('subdiv_dict')
@@ -716,7 +699,7 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
             for k, v in subdiv_dict.items():
                 i_obj_path = bsc_core.DccPathDagOpt(
                     k
-                ).set_translate_to('|')
+                ).translate_to('|')
                 # i_results = self._set_subdiv_(
                 #     i_obj_path, v
                 # )
@@ -743,4 +726,129 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
                 display_color=self.get('display_color')
             )
         ).set_run()
+
+
+class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
+    KEY = 'geometry usd export'
+    OPTION = dict(
+        file='',
+        # locations
+        renderable_locations=[
+            # '/master/mod/hi',
+            # '/master/mod/lo',
+            # '/master/hair',
+            # '/master/plant',
+            # '/master/light'
+        ],
+        auxiliary_locations=[
+            # '/master/grm',
+            # '/master/cfx',
+            # '/master/efx',
+            # '/master/misc'
+        ],
+        #
+        root='/master',
+        #
+        pathsep='|',
+        #
+        port_match_patterns=[
+            # 'pg_*'
+        ]
+    )
+    def __init__(self, option):
+        super(FncGeometryUsdExporterNew, self).__init__(option)
+
+    def execute(self):
+        file_path = self.get('file')
+        if not file_path:
+            raise RuntimeError()
+
+        directory_path = bsc_core.StgFileOpt(file_path).get_directory_path()
+
+        root = self.get('root')
+        pathsep = self.get('pathsep')
+        #
+        export_args = []
+        for i_branch_key in ['renderable', 'auxiliary']:
+            i_branch_data = []
+            i_leaf_locations = self.get('{}_locations'.format(i_branch_key))
+            for j_leaf_location in i_leaf_locations:
+                j_leaf_location_opt_cur = bsc_core.DccPathDagOpt(j_leaf_location).translate_to(
+                    pathsep
+                )
+                j_leaf_location_cur = j_leaf_location_opt_cur.get_value()
+                if ma_core.CmdObjOpt._get_is_exists_(j_leaf_location_cur) is True:
+                    j_leaf_name = j_leaf_location_opt_cur.get_name()
+                    j_leaf_file_name = 'geo/{}.usd'.format(j_leaf_name)
+                    j_leaf_option = dict(
+                        name=j_leaf_name,
+                        location=j_leaf_location,
+                        file=j_leaf_file_name,
+                    )
+                    i_branch_data.append(j_leaf_option)
+            #
+            export_args.append((i_branch_key, i_branch_data))
+        #
+        if export_args:
+            payload_key = 'payload'
+            payload_cfg_key = 'usda/geometry/{}'.format(payload_key)
+            payload_c = utl_core.Jinja.get_configure(payload_cfg_key)
+            payload_t = utl_core.Jinja.get_template(payload_cfg_key)
+            with utl_core.GuiProgressesRunner(maximum=len(export_args)) as g_p:
+                for i_branch_key, i_branch_data in export_args:
+                    g_p.set_update()
+                    #
+                    if i_branch_data:
+                        i_branch_cfg_key = 'usda/geometry/all/{}'.format(i_branch_key)
+                        i_branch_c = utl_core.Jinja.get_configure(i_branch_cfg_key)
+                        i_branch_t = utl_core.Jinja.get_template(i_branch_cfg_key)
+                        for j_leaf_option in i_branch_data:
+                            i_branch_c.append_element('elements', j_leaf_option)
+                            #
+                            j_leaf_file_path = '{}/{}'.format(directory_path, j_leaf_option.get('file'))
+                            j_leaf_location = j_leaf_option.get('location')
+                            #
+                            FncGeometryUsdExporter(
+                                option=dict(
+                                    file=j_leaf_file_path,
+                                    location=j_leaf_location,
+                                    #
+                                    default_prim_path=root,
+                                    #
+                                    with_mesh_uv=True,
+                                    with_mesh=True,
+                                    with_curve=True,
+                                    #
+                                    port_match_patterns=self.get('port_match_patterns')
+                                )
+                            ).execute()
+                        #
+                        i_branch_raw = i_branch_t.render(
+                            **i_branch_c.get_value()
+                        )
+                        i_branch_file_name = '{}.usda'.format(i_branch_key)
+                        i_branch_file_path = '{}/{}'.format(directory_path, i_branch_file_name)
+                        #
+                        payload_c.append_element('elements', dict(file=i_branch_file_name))
+                        #
+                        bsc_core.StgFileOpt(
+                            i_branch_file_path
+                        ).set_write(
+                            i_branch_raw
+                        )
+            #
+            payload_raw = payload_t.render(
+                **payload_c.get_value()
+            )
+            bsc_core.StgFileOpt(
+                file_path
+            ).set_write(
+                payload_raw
+            )
+        else:
+            bsc_core.LogMtd.trace_method_warning(
+                self.KEY,
+                'nothing to export'
+            )
+
 

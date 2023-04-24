@@ -1,28 +1,39 @@
 # ******************************************************************************************************************** #
 dcc-data:
-    extend:
+    dcc-extend:
         # renderable
         renderable_location: '{root}'
+        renderable:
+            model:
+                high: '{root}/hi'
+                low: '{root}/lo'
+            groom: '{root}/hair'
+            character_effect: ''
+            effect: ''
+            rig: ''
+            surface: '{root}/look'
+            light: ''
+            plant: '{root}/plant'
+            misc: ''
+        # auxiliary
+        auxiliary_location: '{root}/shape'
+        auxiliary:
+            model: ''
+            groom: '{root}/shape/grm_shapegrp'
+            character_effect: '{root}/shape/cfx_shapegrp'
+            effect: '{root}/shape/efx_shapegrp'
+            rig: '{root}/shape/rig_shapegrp'
+            surface: '{root}/shape/srf_shapegrp'
+            light: '{root}/shape/lgt_shapegrp'
+            plant: ''
+            misc: '{root}/shape/misc'
+    #
+    usd:
+        pathsep: '/'
+        geometry_location: '/'
         #
-        rdr_model_location: '{root}/hi'
-        rdr_groom_location: '{root}/hair'
-        rdr_chracter_effect_location: ''
-        rdr_effect_location: ''
-        rdr_rig_location: ''
-        rdr_surface_location: ''
-        rdr_light_location: ''
-        rdr_shape_location: ''
-        # shape
-        non_renderable_location: '{root}/shape'
-        #
-        nrd_model_location: '{root}/shape/mod_shapegrp'
-        nrd_groom_location: '{root}/shape/grm_shapegrp'
-        nrd_chracter_effect_location: '{root}/shape/cfx_shapegrp'
-        nrd_effect_location: '{root}/shape/efx_shapegrp'
-        nrd_rig_location: '{root}/shape/rig_shapegrp'
-        nrd_surface_location: '{root}/shape/srf_shapegrp'
-        nrd_light_location: '{root}/shape/lgt_shapegrp'
-        extend_shape_location: '{root}/shape/misc'
+        root_name: 'master'
+        root: '/master'
     #
     maya:
         pathsep: '|'

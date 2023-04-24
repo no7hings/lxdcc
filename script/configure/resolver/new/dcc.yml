@@ -1,51 +1,66 @@
 # ******************************************************************************************************************** #
 dcc-data:
-    extend:
+    dcc-extend:
         # renderable
-        renderable_location: '{root}/hi'
-        #
-        rdr_model_location: '{root}/hi'
-        rdr_groom_location: '{root}/hair'
-        rdr_chracter_effect_location: ''
-        rdr_effect_location: ''
-        rdr_rig_location: ''
-        rdr_surface_location: ''
-        rdr_light_location: ''
-        rdr_shape_location: ''
-        # shape
-        non_renderable_location: '{root}/shape'
-        #
-        nrd_model_location: '{root}/shape/mod_shapegrp'
-        nrd_groom_location: '{root}/shape/grm_shapegrp'
-        nrd_chracter_effect_location: '{root}/shape/cfx_shapegrp'
-        nrd_effect_location: '{root}/shape/efx_shapegrp'
-        nrd_rig_location: '{root}/shape/rig_shapegrp'
-        nrd_surface_location: '{root}/shape/srf_shapegrp'
-        nrd_light_location: '{root}/shape/lgt_shapegrp'
-        extend_shape_location: '{root}/shape/misc'
+        renderable_location: '{root}'
+        renderable:
+            model:
+                high: '{root}/hi'
+                low: '{root}/lo'
+            groom: '{root}/hair'
+            character_effect: ''
+            effect: ''
+            rig: ''
+            surface: '{root}/look'
+            light: '{root}/light'
+            plant: '{root}/plant'
+            misc: '{root}/misc'
+        # auxiliary
+        auxiliary_location: '{root}/aux'
+        auxiliary:
+            model: ''
+            groom: '{root}/aux/grm'
+            character_effect: '{root}/aux/cfx'
+            effect: '{root}/aux/efx'
+            rig: '{root}/aux/rig'
+            surface: '{root}/aux/srf'
+            light: '{root}/aux/lgt'
+            plant: '{root}/aux/plt'
+            misc: '{root}/aux/misc'
     #
     maya-extend:
-        renderable_location: '{root}/mod/hi'
+        renderable_location: ''
+        renderable:
+            model:
+                high: '{root}/mod/hi'
+                low: '{root}/mod/lo'
+            groom: '{root}/hair'
+            character_effect: ''
+            effect: ''
+            rig: ''
+            surface: '{root}/look'
+            light: '{root}/light'
+            plant: '{root}/plant'
+            misc: ''
+        # auxiliary
+        auxiliary_location: ''
+        auxiliary:
+            model: '{root}/mod/misc'
+            groom: '{root}/grm'
+            character_effect: '{root}/cfx'
+            effect: '{root}/efx'
+            rig: '{root}/rig'
+            surface: '{root}/srf'
+            light: '{root}/lgt'
+            plant: '{root}/plt'
+            misc: '{root}/misc'
+    #
+    usd:
+        pathsep: '/'
+        geometry_location: '/'
         #
-        rdr_model_location: '{root}/mod/hi'
-        rdr_groom_location: '{root}/hair'
-        rdr_chracter_effect_location: ''
-        rdr_effect_location: ''
-        rdr_rig_location: ''
-        rdr_surface_location: ''
-        rdr_light_location: ''
-        rdr_shape_location: ''
-        #
-        non_renderable_location: ''
-        #
-        nrd_model_location: '{root}/mod/misc'
-        nrd_groom_location: '{root}/grm'
-        nrd_chracter_effect_location: '{root}/cfx'
-        nrd_effect_location: '{root}/efx'
-        nrd_rig_location: '{root}/rig'
-        nrd_surface_location: '{root}/srf'
-        nrd_light_location: '{root}/lgt'
-        extend_shape_location: '{root}/misc/etd_shapegrp'
+        root_name: 'master'
+        root: '/master'
     #
     maya:
         pathsep: '|'

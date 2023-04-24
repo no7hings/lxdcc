@@ -513,37 +513,55 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 cmds.setAttr('hardwareRenderingGlobals.multiSampleEnable', 1)
                 cmds.setAttr('hardwareRenderingGlobals.ssaoEnable', 1)
     #
-    def _set_load_by_root_(self, root, include_obj_type):
+    def load_from_location_fnc(self, root, include_obj_type):
         self.set_restore()
         #
         root_dag_path = bsc_core.DccPathDagOpt(root)
-        root_mya_dag_path = root_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+        root_mya_dag_path = root_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
         mya_root = _mya_dcc_obj_dag.Group(root_mya_dag_path.path)
         if mya_root.get_is_exists() is True:
-            mya_objs = mya_root.get_descendants()
-            for mya_obj in mya_objs:
-                if mya_obj.type in ['mesh']:
-                    if mya_obj.get_port('intermediateObject').get() is False:
-                        self._set_obj_create_(mya_obj)
-                elif mya_obj.type in ['transform']:
-                    self._set_obj_create_(mya_obj)
+            objs = mya_root.get_descendants()
+            for i_obj in objs:
+                if i_obj.type in {'mesh'}:
+                    if i_obj.get_port('intermediateObject').get() is False:
+                        self._set_obj_create_(i_obj)
+                elif i_obj.get_api_type_name() in ma_configure.ApiTypes.Transforms:
+                    self._set_obj_create_(i_obj)
 
     def _set_obj_create_(self, mya_obj):
         obj_category_name = unr_configure.ObjCategory.MAYA
         obj_type_name = mya_obj.type
         mya_obj_path = mya_obj.path
         mya_dag_path = bsc_core.DccPathDagOpt(mya_obj_path)
-        dcc_dag_path = mya_dag_path.set_translate_to('/')
+        dcc_dag_path = mya_dag_path.translate_to('/')
         dcc_obj_path = dcc_dag_path.path
         #
-        obj_category = self.universe.set_obj_category_create(obj_category_name)
-        obj_type = obj_category.set_type_create(obj_type_name)
+        obj_category = self.universe.generate_obj_category(obj_category_name)
+        obj_type = obj_category.generate_type(obj_type_name)
         obj = obj_type.set_obj_create(dcc_obj_path)
         obj.set_gui_attribute(
             'icon', utl_gui_qt_core.QtMayaMtd.get_qt_icon(obj_type_name)
         )
         return obj
     # clear
+    @classmethod
+    @utl_core.Modifier.ignore_run
+    def set_unused_scripts_clear(cls):
+        for i in cmds.scriptJob(listJobs=1):
+            for k in ['leukocyte.antivirus()']:
+                if k in i:
+                    utl_core.Log.set_result_trace(
+                        'unused-script-job-remove: "{}"'.format(k)
+                    )
+                    index = i.split(': ')[0]
+                    cmds.scriptJob(kill=int(index), force=1)
+        #
+        for i in cmds.ls(type='script'):
+            if i in ['breed_gene', 'vaccine_gene']:
+                utl_core.Log.set_result_trace(
+                    'unused-script-remove: "{}"'.format(i)
+                )
+                cmds.delete(i)
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unused_shaders_clear(cls):

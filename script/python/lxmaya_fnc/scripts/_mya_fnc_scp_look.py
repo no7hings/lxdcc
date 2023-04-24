@@ -25,7 +25,7 @@ def set_look_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option, default_option='with_look_ass=True')
     #
     scene_src_file_path = option_opt.get('file')
-    scene_src_file_path = utl_core.Path.set_map_to_platform(scene_src_file_path)
+    scene_src_file_path = utl_core.Path.map_to_current(scene_src_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=scene_src_file_path)
@@ -115,7 +115,7 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
     #
     root = rsv_task_properties.get('dcc.root')
     root_dcc_dag_path = bsc_core.DccPathDagOpt(root)
-    root_mya_dag_path = root_dcc_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+    root_mya_dag_path = root_dcc_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
     root_mya_obj = mya_dcc_objects.Group(root_mya_dag_path.value)
     if root_mya_obj.get_is_exists() is True:
         _look_pass_names = root_mya_obj.get_port('pg_lookpass').get_enumerate_strings() or None
@@ -154,25 +154,25 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
                 i_look_ass_file_path = '{}.{}{}'.format(i_path_base, i_look_pass_name, i_ext)
             # main-file(s)
             if i_look_ass_file.get_is_exists() is False or force is True:
-                mya_fnc_exporters.LookAssExporter(
+                mya_fnc_exporters.FncLookAssExporter(
                     option=dict(
                         file=i_look_ass_file_path,
                         location=root,
                         texture_use_environ_map=True,
                     )
-                ).set_run()
+                ).execute()
             #
             if start_frame is not None and end_frame is not None:
                 i_frame = start_frame, end_frame
                 #
-                mya_fnc_exporters.LookAssExporter(
+                mya_fnc_exporters.FncLookAssExporter(
                     option=dict(
                         file=i_look_ass_file_path,
                         location=root,
                         frame=i_frame,
                         texture_use_environ_map=True,
                     )
-                ).set_run()
+                ).execute()
     else:
         utl_core.Log.set_module_warning_trace(
             key,
@@ -201,7 +201,7 @@ def set_asset_look_preview_yml_export(rsv_task_properties):
     #
     root = rsv_task_properties.get('dcc.root')
     root_dcc_dag_path = bsc_core.DccPathDagOpt(root)
-    root_mya_dag_path = root_dcc_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+    root_mya_dag_path = root_dcc_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
     root_mya_obj = mya_dcc_objects.Group(root_mya_dag_path.path)
     if root_mya_obj.get_is_exists() is True:
         if workspace == 'work':
@@ -217,12 +217,12 @@ def set_asset_look_preview_yml_export(rsv_task_properties):
         else:
             raise TypeError()
         #
-        mya_fnc_exporters.LookYamlExporter(
+        mya_fnc_exporters.FncLookYamlExporter(
             option=dict(
                 file=look_yaml_file_path,
-                root=root
+                locations=[root]
             )
-        ).set_run()
+        ).execute()
     else:
         utl_core.Log.set_module_warning_trace(
             key,
@@ -257,7 +257,7 @@ def set_look_import_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option, default_option='with_look_ass=True')
     #
     scene_file_path = option_opt.get('file')
-    scene_file_path = utl_core.Path.set_map_to_platform(scene_file_path)
+    scene_file_path = utl_core.Path.map_to_current(scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=scene_file_path)
@@ -275,8 +275,8 @@ def set_look_import_by_any_scene_file(option):
                 if with_scene is True:
                     mya_dcc_objects.Scene.set_file_open(scene_file_path)
                 #
-                with_look_preview = option_opt.get('with_look_preview') or False
-                if with_look_preview is True:
+                with_surface_preview = option_opt.get('with_surface_preview') or False
+                if with_surface_preview is True:
                     set_asset_look_preview_import(rsv_task_properties)
                 #
                 if with_scene is True:
@@ -327,7 +327,7 @@ def set_cfx_look_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)
@@ -392,7 +392,7 @@ def set_look_preview_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option, default_option='with_look_ass=True')
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)
@@ -433,7 +433,7 @@ def set_look_preview_export_by_any_scene_file(option):
             #
             with_scene = option_opt.get('with_scene') or False
             if with_scene is True:
-                _mya_fnc_scp_scene.set_asset_scene_export(rsv_task_properties)
+                _mya_fnc_scp_scene.execute_asset_scene_export(rsv_task_properties)
             #
             with_work_scene_src = option_opt.get('with_work_scene_src') or False
             if with_work_scene_src is True:

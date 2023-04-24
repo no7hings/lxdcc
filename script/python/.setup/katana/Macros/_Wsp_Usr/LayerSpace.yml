@@ -74,7 +74,7 @@ node_add:
             - '{variant_register}.<.variant>'
     # renderable
     renderable__layer: '$ .master__layer'
-    # non renderable
-    non_renderable__layer: '$ .master__layer'
+    # auxiliary
+    auxiliary__layer: '$ .master__layer'
     # all
     all__layer: '$ .master__layer'

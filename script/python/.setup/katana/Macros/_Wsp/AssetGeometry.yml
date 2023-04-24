@@ -113,6 +113,11 @@ main:
             value: [ 'None' ]
             tool_tip: '...'
 
+        parameters/usd_variant/asset_version_main/plant:
+            widget: enumerate
+            value: ['None']
+            tool_tip: '...'
+
         parameters/usd_variant/asset_version_main/light:
             widget: enumerate
             value: [ 'None' ]
@@ -152,6 +157,11 @@ main:
         parameters/usd_variant/asset_version_override/surface:
             widget: enumerate
             value: [ 'None' ]
+            tool_tip: '...'
+
+        parameters/usd_variant/asset_version_override/plant:
+            widget: enumerate
+            value: ['None']
             tool_tip: '...'
 
         parameters/usd_variant/asset_version_override/light:
@@ -383,6 +393,7 @@ node:
                 effect: '$.modeling'
                 surfacing: '$.modeling'
                 lighting: '$.modeling'
+                plant: '$.model'
                 animation: '$.modeling'
     #
     asset_version_main:
@@ -416,6 +427,7 @@ node:
                 rig: '$.model'
                 effect: '$.model'
                 surface: '$.model'
+                plant: '$.model'
                 light: '$.model'
     #
     asset_version_main_enable:
@@ -469,6 +481,7 @@ node:
                 rig: '$.model'
                 effect: '$.model'
                 surface: '$.model'
+                plant: '$.model'
                 light: '$.model'
     #       asset version override enable
     asset_version_override_enable:

@@ -213,14 +213,22 @@ asset-source-geometry-abc-dir: <asset-source-geometry-dir>/abc/<version-name>
 asset-source-geometry-abc-var-file: <asset-source-geometry-abc-dir>/<var-name>.abc
 #       usd
 asset-source-geometry-usd-dir: <asset-source-geometry-dir>/usd/<version-name>
-asset-source-geometry-usd-var-file: <asset-source-geometry-usd-dir>/<var-name>.usd
+asset-source-geometry-usd-var-dir: <asset-source-geometry-usd-dir>/geo
+asset-source-geometry-usd-var-file: <asset-source-geometry-usd-var-dir>/<var-name>.usd
+#   geometry branch
+asset-source-geometry-usd-renderable-file: <asset-source-geometry-usd-dir>/renderable.usda
+asset-source-geometry-usd-auxiliary-file: <asset-source-geometry-usd-dir>/auxiliary.usda
+asset-source-geometry-usd-payload-file: <asset-source-geometry-usd-dir>/payload.usda
+asset-source-geometry-usd-uv_map-file: <asset-source-geometry-usd-dir>/uv_map.usda
+#
+asset-source-geometry-usd-main-file: <asset-source-geometry-usd-dir>/main.usda
 # todo: remove hi, lo, shape, temp
-asset-source-geometry-usd-hi-file: <asset-source-geometry-usd-dir>/hi.usd
-asset-source-geometry-usd-lo-file: <asset-source-geometry-usd-dir>/lo.usd
-asset-source-geometry-usd-shape-file: <asset-source-geometry-usd-dir>/shape.usd
-asset-source-geometry-usd-temp-file: <asset-source-geometry-usd-dir>/temp.usd
-asset-source-geometry-uv_map-usd-file: <asset-source-geometry-usd-dir>/uv_map.usd
-asset-source-geometry-uv_map-usd-var-file: <asset-source-geometry-usd-dir>/<var-name>.uv_map.usd
+asset-source-geometry-usd-hi-file: <asset-source-geometry-usd-var-dir>/hi.usd
+asset-source-geometry-usd-lo-file: <asset-source-geometry-usd-var-dir>/lo.usd
+asset-source-geometry-usd-shape-file: <asset-source-geometry-usd-var-dir>/shape.usd
+asset-source-geometry-usd-temp-file: <asset-source-geometry-usd-var-dir>/temp.usd
+asset-source-geometry-uv_map-usd-file: <asset-source-geometry-usd-var-dir>/uv_map.usd
+#
 asset-source-geometry-extra-usd-dir: <asset-source-geometry-usd-dir>/geo_extra
 asset-source-geometry-user_property-usd-file: <asset-source-geometry-extra-usd-dir>/user_property.usd
 #       xml
@@ -335,7 +343,7 @@ asset-cache-dir: <asset-release-version-dir>/cache
 # <asset-geometry>
 asset-geometry-dir: <asset-release-version-dir>/cache
 # <asset-geometry-abc>
-asset-geometry-abc-dir: <asset-geometry-dir>/abc
+asset-geometry-abc-dir: <asset-cache-dir>/abc
 asset-geometry-abc-var-dir: <asset-geometry-abc-dir>/geo
 asset-geometry-abc-var-file: <asset-geometry-abc-var-dir>/<var-name>.abc
 asset-geometry-abc-hi-file: <asset-geometry-abc-var-dir>/hi.abc
@@ -360,11 +368,17 @@ asset-proxy-xarc-dir: <asset-proxy-dir>/xarc
 asset-proxy-xarc-sub-act-file: <asset-proxy-xarc-dir>/<look-pass>/<act-name>.xarc
 #
 asset-geometry-abc-hi-dyn-file: <asset-geometry-abc-dir>/dynamic.abc
-# <asset-geometry-usd>
-asset-geometry-usd-dir: <asset-geometry-dir>/usd
-#
-asset-geometry-usd-var-dir: <asset-geometry-dir>/usd/geo
+# geometry
+asset-geometry-usd-dir: <asset-cache-dir>/usd
+#   var
+asset-geometry-usd-var-dir: <asset-cache-dir>/usd/geo
 asset-geometry-usd-var-file: <asset-geometry-usd-var-dir>/<var-name>.usd
+#   branch
+asset-geometry-usd-renderable-file: <asset-geometry-usd-dir>/renderable.usda
+asset-geometry-usd-auxiliary-file: <asset-geometry-usd-dir>/auxiliary.usda
+asset-geometry-usd-payload-file: <asset-geometry-usd-dir>/payload.usda
+asset-geometry-usd-uv_map-file: <asset-geometry-usd-dir>/uv_map.usda
+#
 asset-geometry-usd-hi-file: <asset-geometry-usd-var-dir>/hi.usd
 asset-geometry-usd-lo-file: <asset-geometry-usd-var-dir>/lo.usd
 asset-geometry-usd-shape-file: <asset-geometry-usd-var-dir>/shape.usd
@@ -378,7 +392,7 @@ asset-geometry-uv_map-usd-var-file: <asset-geometry-usd-dir>/uv_map.<var-name>.u
 asset-geometry-extra-usd-dir: <asset-geometry-usd-dir>/geo_extra
 asset-geometry-user_property-usd-file: <asset-geometry-extra-usd-dir>/user_property.usd
 # <asset-geometry-ass>
-asset-geometry-ass-dir: <asset-geometry-dir>/ass
+asset-geometry-ass-dir: <asset-cache-dir>/ass
 asset-geometry-ass-file: <asset-geometry-ass-dir>/<var-name>.ass
 #
 asset-geometry-xgen-dir: <asset-release-version-dir>/maya
@@ -448,7 +462,6 @@ asset-texture-tgt-dir: <asset-release-version-dir>/texture
 asset-usd-dir: <asset-release-version-dir>/cache/usd
 asset-component-usd-dir: <asset-usd-dir>
 #
-asset-usd-payload-file: <asset-component-usd-dir>/payload.usda
 asset-component-registry-usd-file: <asset-component-usd-dir>/registry.usda
 #
 asset-component-usd-file: <asset-component-usd-dir>/<asset-name>.usda
@@ -561,6 +574,11 @@ asset-temporary-geometry-dir: <asset-temporary-version-dir>/cache
 asset-temporary-geometry-usd-dir: <asset-temporary-geometry-dir>/usd
 asset-temporary-geometry-usd-var-dir: <asset-temporary-geometry-usd-dir>/geo
 asset-temporary-geometry-usd-var-file: <asset-temporary-geometry-usd-var-dir>/<var-name>.usd
+#   geometry branch
+asset-temporary-geometry-usd-renderable-file: <asset-temporary-geometry-usd-dir>/renderable.usda
+asset-temporary-geometry-usd-auxiliary-file: <asset-temporary-geometry-usd-dir>/auxiliary.usda
+asset-temporary-geometry-usd-payload-file: <asset-temporary-geometry-usd-dir>/payload.usda
+asset-temporary-geometry-usd-uv_map-file: <asset-temporary-geometry-usd-dir>/uv_map.usda
 #
 asset-temporary-geometry-proxy-usd-var-file: <asset-temporary-geometry-usd-var-dir>/proxy_<var-name>.usd
 # geometry abc

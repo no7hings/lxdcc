@@ -14,7 +14,7 @@ class Setup(object):
         def fnc_():
             print 'lx-dcc menu setup: is started'
             from lxmaya import ma_setup
-            ma_setup.MenuBuilder().set_setup()
+            ma_setup.MenuSetup().set_setup()
             print 'lx-dcc menu setup: is completed'
         from lxmaya import ma_core
         if ma_core.get_is_ui_mode():

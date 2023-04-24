@@ -98,7 +98,7 @@ class Selection(object):
     def __init__(self, *args):
         self._paths = args[0]
 
-    def set_all_select(self):
+    def select_all(self):
         exist_paths = [i for i in self._paths if cmds.objExists(i)]
         cmds.select(exist_paths)
     @classmethod

@@ -32,5 +32,5 @@ class AbsUsdScene(object):
             'usd-reference-add',
             u'file="{}"'.format(file_path)
         )
-        usd_root.GetReferences().AddReference('{}'.format(file_path), usd_root.GetPath())
+        usd_root.GetReferences().AddReference(file_path, usd_root.GetPath())
         stage.Flatten()

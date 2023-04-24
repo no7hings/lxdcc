@@ -11,7 +11,7 @@ def set_camera_create_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)
@@ -34,50 +34,9 @@ def set_camera_create_by_any_scene_file(option):
 
 
 def set_asset_camera_persp_abc_create(rsv_task_properties):
-    import lxresolver.operators as rsv_operators
-    #
-    import lxmaya.fnc.importers as mya_fnc_importers
-    #
-    import lxmaya.fnc.exporters as mya_fnc_exporters
-    #
-    import lxmaya.dcc.dcc_objects as mya_dcc_objects
-    #
-    import lxmaya.fnc.builders as mya_fnc_builders
-    #
-    root = rsv_task_properties.get('dcc.root')
-    project = rsv_task_properties.get('project')
-    asset = rsv_task_properties.get('asset')
-    version = rsv_task_properties.get('version')
-    mya_fnc_builders.AssetBuilder(
-        option=dict(
-            project=project,
-            asset=asset,
-            with_model_geometry=True,
-            geometry_var_names=['hi'],
-        )
-    ).set_run()
-    #
-    asset_scene_query = rsv_operators.RsvAssetSceneQuery(rsv_task_properties)
-    camera_abc_file_path = asset_scene_query.get_camera_presp_abc_file(
-        version=version
+    raise RuntimeError(
+        'this method is removed'
     )
-    camera_transform, camera_shape = mya_fnc_exporters.CameraYamlExporter._set_camera_create_(
-        root=root, persp_view=True
-    )
-    camera_locator_abc_file_path = '/l/resource/td/asset/abc/camera-locator.abc'
-    #
-    mya_fnc_importers.GeometryAbcImporter(
-        file_path=camera_locator_abc_file_path,
-        root='/cameras'
-    ).set_run()
-    mya_dcc_objects.Node(camera_transform).set_parent_path(
-        '|cameras|camera_locator'
-    )
-    mya_fnc_exporters.GeometryAbcExporter(
-        file_path=camera_abc_file_path,
-        root='/cameras',
-        frame=(1, 8)
-    ).set_run()
 
 
 def set_camera_export_by_any_scene_file(option):
@@ -94,7 +53,7 @@ def set_camera_export_by_any_scene_file(option):
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
     any_scene_file_path = option_opt.get('file')
-    any_scene_file_path = utl_core.Path.set_map_to_platform(any_scene_file_path)
+    any_scene_file_path = utl_core.Path.map_to_current(any_scene_file_path)
     #
     resolver = rsv_commands.get_resolver()
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)

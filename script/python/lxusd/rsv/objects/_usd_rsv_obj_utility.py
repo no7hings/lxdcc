@@ -116,7 +116,7 @@ class RsvUsdAssetSetCreator(object):
                 i_shot_asset = i_location.split('/')[-1]
                 dict_[i_shot_asset] = i_location
         except:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.LogMtd.trace_method_error(
                 'shot-asset resolver',
                 'file="{}" is error'.format(shot_set_dress_usd_file_path)
             )
@@ -494,18 +494,18 @@ class RsvUsdAssetSetCreator(object):
             if cur_step in ['srf']:
                 RsvTaskOverrideUsdCreator(
                     cur_rsv_task
-                )._set_geometry_uv_map_create_()
+                ).create_all_source_geometry_uv_map_over()
                 #
-                work_asset_geometry_uv_map_var_file_unit = cur_rsv_task.get_rsv_unit(
-                    keyword='asset-source-geometry-uv_map-usd-var-file'
+                rsv_unit_override = cur_rsv_task.get_rsv_unit(
+                    keyword='asset-source-geometry-usd-uv_map-file'
                 )
-                work_asset_geometry_uv_map_var_file_paths = work_asset_geometry_uv_map_var_file_unit.get_result(
-                    version='all', extend_variants=dict(var='hi')
+                file_paths_override = rsv_unit_override.get_result(
+                    version='all'
                 )
-                for i_file_path in work_asset_geometry_uv_map_var_file_paths:
-                    i_properties = work_asset_geometry_uv_map_var_file_unit.get_properties_by_result(i_file_path)
+                for i_file_path_override in file_paths_override:
+                    i_properties = rsv_unit_override.get_properties_by_result(i_file_path_override)
                     i_version = i_properties.get('version')
-                    dict_[i_version] = i_file_path
+                    dict_[i_version] = i_file_path_override
         elif cur_workspace == rsv_scene_properties.get('workspaces.release'):
             comp_register_usd_file_rsv_unit = cur_rsv_task.get_rsv_unit(
                 keyword='asset-component-registry-usd-file'
@@ -701,9 +701,9 @@ class RsvUsdAssetSet(object):
                     # main default use "None" when step-key is current step-key and workspace-key is "source"
                     if (
                         cur_step_key == i_key
-                        and cur_workspace_key in {
-                            resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
-                        }
+                        # and cur_workspace_key in {
+                        #     resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                        # }
                         and mode == 'override'
                     ):
                         i_default_main = 'None'
@@ -733,9 +733,9 @@ class RsvUsdAssetSet(object):
                 )
                 if (
                     cur_step_key == i_key
-                    and cur_workspace_key in {
-                        resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
-                    }
+                    # and cur_workspace_key in {
+                    #     resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                    # }
                     and mode == 'override'
                 ):
                     i_default_override = i_values_override[-1]
@@ -743,9 +743,6 @@ class RsvUsdAssetSet(object):
                         'asset_version_override.{}.default'.format(i_key), i_default_override
                     )
         return c.get_value()
-    @classmethod
-    def reduce_variant_dict(cls):
-        pass
 
 
 class RsvUsdShotSetCreator(object):
@@ -765,7 +762,7 @@ class RsvUsdShotSetCreator(object):
         return paths
 
 
-class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
+class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         var_names=['hi'],
         root='/master'
@@ -774,45 +771,75 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
     def __init__(self, rsv_task, option=None):
         super(RsvTaskOverrideUsdCreator, self).__init__(option)
         if rsv_task is None:
-            raise TypeError()
+            raise RuntimeError()
         #
         self._rsv_task = rsv_task
 
-    def _set_geometry_uv_map_create_at_(self, var_name):
+        self._rsv_project = rsv_task.get_rsv_project()
+
+        self._dcc_data = self._rsv_project.get_dcc_data(
+            application='maya'
+        )
+
+        self._renderable_c = self._dcc_data.get_content('renderable')
+
+        self._location_mapper = {
+            bsc_core.DccPathDagOpt(i).get_name(): i for i in self._renderable_c.get_leaf_values() if i
+        }
+
+    def create_element_geometry_uv_map_over_at(self, directory_path, var_name):
         import lxusd.fnc.exporters as usd_fnc_exporters
         #
         root = self.get('root')
-        work_asset_geometry_var_file_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-source-geometry-usd-var-file'
-        )
-        work_asset_geometry_uv_map_var_file_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-source-geometry-uv_map-usd-var-file'
-        )
-        work_asset_geometry_hi_file_paths = work_asset_geometry_var_file_unit.get_result(
-            version='all', extend_variants=dict(var=var_name)
-        )
-        for i_work_asset_geometry_var_file_path in work_asset_geometry_hi_file_paths:
-            i_properties = work_asset_geometry_var_file_unit.get_properties_by_result(i_work_asset_geometry_var_file_path)
-            i_version = i_properties.get('version')
-            i_work_asset_geometry_uv_map_var_file_path = work_asset_geometry_uv_map_var_file_unit.get_result(
-                version=i_version, extend_variants=dict(var=var_name)
-            )
-            if utl_dcc_objects.OsFile(i_work_asset_geometry_uv_map_var_file_path).get_is_exists() is False:
+        #
+        file_path = '{}/geo/{}.usd'.format(directory_path, var_name)
+        file_path_over = '{}/geo/{}.uv_map.usd'.format(directory_path, var_name)
+        if bsc_core.StgFileOpt(file_path).get_is_exists() is True:
+            if bsc_core.StgFileOpt(file_path_over).get_is_exists() is False:
                 usd_fnc_exporters.GeometryUvMapExporter(
-                    file_path=i_work_asset_geometry_uv_map_var_file_path,
+                    file_path=file_path_over,
                     root=root,
                     option=dict(
-                        file_0=i_work_asset_geometry_var_file_path,
-                        file_1=i_work_asset_geometry_var_file_path
+                        file_0=file_path,
+                        file_1=file_path
                     )
                 ).set_run()
+            return file_path_over
 
-    def _set_geometry_uv_map_create_(self):
-        for i_var_name in self.VAR_NAMES:
-            self._set_geometry_uv_map_create_at_(i_var_name)
+    def create_geometry_uv_map_at(self, file_path):
+        key = 'uv_map'
+        if bsc_core.StgFileOpt(file_path).get_is_exists() is False:
+            directory_path = bsc_core.StgFileOpt(file_path).get_directory_path()
+            elements = []
+            for i_var in self.VAR_NAMES:
+                i_location = self._location_mapper[i_var]
+                i_file_path_over = self.create_element_geometry_uv_map_over_at(directory_path, i_var)
+                if i_file_path_over:
+                    elements.append(
+                        dict(
+                            name=i_var,
+                            location=i_location,
+                            file=i_file_path_over[len(directory_path)+1:],
+                        )
+                    )
+            #
+            if elements:
+                i_c = utl_core.Jinja.get_configure('usda/geometry/all/{}'.format(key))
+                i_t = utl_core.Jinja.get_template('usda/geometry/all/{}'.format(key))
+                i_c.set('elements', elements)
+                i_raw = i_t.render(**i_c.get_value())
+                bsc_core.StgFileOpt(
+                    file_path
+                ).set_write(i_raw)
 
-    def _set_geometry_display_color_create_at_(self):
-        pass
+    def create_all_source_geometry_uv_map_over(self):
+        rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword='asset-source-geometry-usd-dir'
+        )
+        directory_paths = rsv_unit.get_result(version='all')
+        for i_directory_path in directory_paths:
+            file_path = '{}/uv_map.usda'.format(i_directory_path)
+            self.create_geometry_uv_map_at(file_path)
 
     def set_run(self):
         pass
@@ -928,7 +955,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_geometry_usd_var_file_path:
                 s.set_sublayer_append(i_geometry_usd_var_file_path)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.LogMtd.trace_method_warning(
                     'look property create',
                     'variant="{}" is not found'.format(i_var_name)
                 )
@@ -998,7 +1025,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_geometry_usd_var_file_path:
                 s.set_sublayer_append(i_geometry_usd_var_file_path)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.LogMtd.trace_method_warning(
                     'geometry display-color create',
                     'file="{}" is not found'.format(i_geometry_usd_var_file_path)
                 )

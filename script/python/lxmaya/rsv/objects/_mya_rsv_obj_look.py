@@ -36,7 +36,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         root_dag_opt = bsc_core.DccPathDagOpt(root)
-        mya_root_dag_opt = root_dag_opt.set_translate_to(pathsep)
+        mya_root_dag_opt = root_dag_opt.translate_to(pathsep)
         mya_root = mya_dcc_objects.Group(mya_root_dag_opt.value)
         if mya_root.get_is_exists() is True:
             look_pass_names = self.get_asset_exists_look_pass_names()
@@ -62,13 +62,13 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 # main-file(s)
                 i_look_ass_file = utl_dcc_objects.OsFile(i_look_ass_file_path)
                 if i_look_ass_file.get_is_exists() is False or force is True:
-                    mya_fnc_exporters.LookAssExporter(
+                    mya_fnc_exporters.FncLookAssExporter(
                         option=dict(
                             file=i_look_ass_file_path,
                             location=root,
                             texture_use_environ_map=texture_use_environ_map,
                         )
-                    ).set_run()
+                    ).execute()
                 else:
                     utl_core.Log.set_module_warning_trace(
                         'look-ass export',
@@ -78,14 +78,14 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 if start_frame is not None and end_frame is not None:
                     i_frame = start_frame, end_frame
                     #
-                    mya_fnc_exporters.LookAssExporter(
+                    mya_fnc_exporters.FncLookAssExporter(
                         option=dict(
                             file=i_look_ass_file_path,
                             location=root,
                             frame=i_frame,
                             texture_use_environ_map=texture_use_environ_map,
                         )
-                    ).set_run()
+                    ).execute()
         else:
             utl_core.Log.set_module_error_trace(
                 'ass export',
@@ -118,19 +118,19 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         look_yml_file_rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword)
 
         root_dcc_dag_path = bsc_core.DccPathDagOpt(root)
-        root_mya_dag_path = root_dcc_dag_path.set_translate_to(pathsep)
+        root_mya_dag_path = root_dcc_dag_path.translate_to(pathsep)
         root_mya_obj = mya_dcc_objects.Group(root_mya_dag_path.path)
         if root_mya_obj.get_is_exists() is True:
             look_yml_file_path = look_yml_file_rsv_unit.get_result(
                 version=version
             )
             #
-            mya_fnc_exporters.LookYamlExporter(
+            mya_fnc_exporters.FncLookYamlExporter(
                 option=dict(
                     file=look_yml_file_path,
-                    root=root
+                    locations=[root]
                 )
-            ).set_run()
+            ).execute()
         else:
             utl_core.Log.set_module_warning_trace(
                 'look-yml export',

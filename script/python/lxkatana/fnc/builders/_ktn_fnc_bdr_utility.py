@@ -12,7 +12,7 @@ import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionMethod):
+class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
     VAR_NAMES = ['hi', 'lo', 'shape']
     #
     OPTION = dict(

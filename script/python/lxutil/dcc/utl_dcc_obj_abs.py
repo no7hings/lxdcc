@@ -62,7 +62,7 @@ class AbsOsDirectory(
     def set_create(self):
         if self.get_is_exists() is False:
             bsc_core.StorageMtd.create_directory(self.path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'directory create',
                 u'directory-path="{}"'.format(self.path)
             )
@@ -71,7 +71,7 @@ class AbsOsDirectory(
         tgt_directory = self.__class__(tgt_directory_path)
         if tgt_directory.get_is_exists():
             if replace is False:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.LogMtd.trace_method_warning(
                     'link create',
                     u'path="{}" is exists'.format(tgt_directory.path)
                 )
@@ -79,7 +79,7 @@ class AbsOsDirectory(
             else:
                 if os.path.islink(tgt_directory.path) is True:
                     os.remove(tgt_directory.path)
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'path-link-remove',
                         u'path="{}"'.format(tgt_directory.path)
                     )
@@ -87,7 +87,7 @@ class AbsOsDirectory(
         if tgt_directory.get_is_exists() is False:
             self._set_symlink_create_(self.path, tgt_directory.path)
             #
-            utl_core.Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'link create',
                 u'connection="{}" >> "{}"'.format(self.path, tgt_directory.path)
             )
@@ -478,7 +478,7 @@ class AbsOsFile(
                         os.remove(file_tgt.path)
                         #
                         bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_tgt.path)
-                        link_log = utl_core.Log.set_module_result_trace(
+                        link_log = bsc_core.LogMtd.trace_method_result(
                             'link replace',
                             u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
                         )
@@ -487,7 +487,7 @@ class AbsOsFile(
                         )
                         return True, link_log
                 else:
-                    return False, utl_core.Log.set_module_warning_trace(
+                    return False, bsc_core.LogMtd.trace_method_warning(
                         'link create',
                         u'file="{}" is exists'.format(file_path_tgt)
                     )
@@ -496,7 +496,7 @@ class AbsOsFile(
                 file_tgt.create_directory()
                 # link src to target
                 bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_path_tgt)
-                link_log = utl_core.Log.set_module_result_trace(
+                link_log = bsc_core.LogMtd.trace_method_result(
                     'link create',
                     u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
                 )
@@ -590,7 +590,7 @@ class AbsOsFile(
                             if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                                 file_path_src, file_path_tgt,
                             ) is True:
-                                utl_core.Log.set_module_warning_trace(
+                                bsc_core.LogMtd.trace_method_warning(
                                     'file link replace',
                                     u'relation="{} >> {}" is non-changed'.format(file_path_src, file_path_tgt)
                                 )
@@ -598,7 +598,7 @@ class AbsOsFile(
                             #
                             os.remove(file_path_tgt)
                             bsc_core.StgPathLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
-                            utl_core.Log.set_module_result_trace(
+                            bsc_core.LogMtd.trace_method_result(
                                 'file link replace',
                                 u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
                             )
@@ -606,7 +606,7 @@ class AbsOsFile(
                         #
                         os.remove(file_path_tgt)
                         bsc_core.StgPathLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.LogMtd.trace_method_result(
                             'file link replace',
                             u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
                         )
@@ -618,7 +618,7 @@ class AbsOsFile(
                     return
 
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.LogMtd.trace_method_warning(
                         'file link',
                         u'file="{}" is exists'.format(file_path_tgt)
                     )
@@ -631,7 +631,7 @@ class AbsOsFile(
                     self.path, file_tgt.path
                 )
                 #
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'file link',
                     u'relation="{} >> {}"'.format(self.path, file_tgt.path)
                 )
@@ -1222,10 +1222,10 @@ class AbsObjScene(unr_abstracts.AbsObjScene):
     def __init__(self, *args, **kwargs):
         super(AbsObjScene, self).__init__(*args, **kwargs)
 
-    def set_load_by_root(self, *args, **kwargs):
-        self._set_load_by_root_(*args, **kwargs)
+    def load_from_location(self, *args, **kwargs):
+        self.load_from_location_fnc(*args, **kwargs)
 
-    def _set_load_by_root_(self, *args, **kwargs):
+    def load_from_location_fnc(self, *args, **kwargs):
         raise NotImplementedError()
 
 

@@ -1,13 +1,18 @@
 # coding:utf-8
 import lxusd.dcc.dcc_objects as usd_dcc_objects
 
-usd_file_path = '/l/prod/cgm/publish/assets/env/builds_ca/srf/surfacing/builds_ca.srf.surfacing.v010/cache/usd/geo/hi.usd'
-root = '/master'
+usd_file_path = '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/geometry/usd/v023/payload.usda'
+location = '/master/mod/hi'
+location_source = '/master/hi'
 
 s = usd_dcc_objects.Scene()
 
-s.set_load_from_dot_usd(usd_file_path, root)
+s.load_from_dot_usd(usd_file_path, location, location_source)
 
 u = s.universe
 
-print u.get_obj('/master/hi').get_children()
+print u.get_objs()
+
+print u.get_obj('/master/hi')
+
+# print u.get_obj('/master/hi').get_children()

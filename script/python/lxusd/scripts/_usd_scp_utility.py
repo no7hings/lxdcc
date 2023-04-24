@@ -200,10 +200,10 @@ class UsdMeshCompare(object):
         import lxusd.dcc.dcc_operators as usd_dcc_operators
 
         s_src = usd_dcc_objects.Scene()
-        s_src.set_load_from_dot_usd(self._file_path_src, root='/master')
+        s_src.load_from_dot_usd(self._file_path_src, '/master')
 
         s_tgt = usd_dcc_objects.Scene()
-        s_tgt.set_load_from_dot_usd(self._file_path_tgt, root='/master')
+        s_tgt.load_from_dot_usd(self._file_path_tgt, '/master')
 
         n = 'L_legorna_002_hiShape'
 

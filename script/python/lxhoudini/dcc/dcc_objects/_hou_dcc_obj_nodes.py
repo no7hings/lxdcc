@@ -189,7 +189,7 @@ class Alembics(hou_dcc_obj_abs.AbsHouObjs):
     INCLUDE_DCC_TYPES = [
         'Sop/alembic',
     ]
-    DCC_OBJ_CLASS = _hou_dcc_obj_node.Alembic
+    DCC_NODE_CLASS = _hou_dcc_obj_node.Alembic
     FILE_REFERENCE_FILE_PORT_PATHS_DICT = {
         'Sop/alembic': ['fileName']
     }
@@ -201,7 +201,7 @@ class Materialxs(hou_dcc_obj_abs.AbsHouObjs):
     INCLUDE_DCC_TYPES = [
         'arnold::Driver/materialx',
     ]
-    DCC_OBJ_CLASS = _hou_dcc_obj_node.AndMaterialx
+    DCC_NODE_CLASS = _hou_dcc_obj_node.AndMaterialx
     FILE_REFERENCE_FILE_PORT_PATHS_DICT = {
         'arnold::Driver/materialx': ['filename']
     }

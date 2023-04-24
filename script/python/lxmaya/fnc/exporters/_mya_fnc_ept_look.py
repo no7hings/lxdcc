@@ -37,7 +37,7 @@ from lxutil.fnc import utl_fnc_obj_abs
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 
-class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     PLUG_NAME = 'mtoa'
     OPTION = dict(
         file='',
@@ -48,7 +48,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         texture_use_environ_map=False,
     )
     def __init__(self, option=None):
-        super(LookAssExporter, self).__init__(option)
+        super(FncLookAssExporter, self).__init__(option)
         self._file_path = self.get('file')
         self._location = self.get('location')
         self._frame = self.get('frame')
@@ -111,7 +111,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         # noinspection PyArgumentList
         return cmds.arnoldExportAss(**kwargs)
     @_mya_mdf_utility.set_undo_mark_mdf
-    def set_run(self):
+    def execute(self):
         # noinspection PyUnresolvedReferences
         import arnold as ai
         #
@@ -161,7 +161,7 @@ class LookAssExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
 
 
 class LookMtlxExporter(object):
-    def __init__(self, file_path, root=None, look='default', ass_file_path=None, root_lstrip=None):
+    def __init__(self, file_path, root=None, look='default', ass_file_path=None, path_lstrip=None):
         self._file_path = file_path
         self._root = root
         self._look = look
@@ -174,7 +174,7 @@ class LookMtlxExporter(object):
             self._ass_file_path = '{}.ass'.format(base)
             self._use_exists_ass = False
         #
-        self._path_lstrip = root_lstrip
+        self._path_lstrip = path_lstrip
         #
         self._mesh_subdivision_dict = {}
         #
@@ -221,19 +221,19 @@ class LookMtlxExporter(object):
         self._get_meshes_subdivision_()
         #
         if self._use_exists_ass is False:
-            exporter = LookAssExporter(
+            exporter = FncLookAssExporter(
                 option=dict(
                     file=self._ass_file_path,
                     location=self._root,
                     texture_use_environ_map=True,
                 )
             )
-            exporter.set_run()
+            exporter.execute()
         #
         if os.path.isfile(self._ass_file_path) is True:
             self._scene = ar_commands.set_scene_load_from_dot_ass(
                 file_path=self._ass_file_path,
-                root_lstrip=self._path_lstrip
+                path_lstrip=self._path_lstrip
             )
             self._universe = self._scene.universe
             #
@@ -296,11 +296,11 @@ class LookAssignExporter(object):
         POINTS_KEY,
         FACE_VERTICES_KEY
     ]
-    def __init__(self, file_path, root=None, look='default', root_lstrip=None):
+    def __init__(self, file_path, root=None, look='default', path_lstrip=None):
         self._file_path = file_path
         self._root = root
         self._look = look
-        self._path_lstrip = root_lstrip
+        self._path_lstrip = path_lstrip
         #
         self._look_content = ma_fnc_core.LookContent(collections.OrderedDict())
         #
@@ -343,7 +343,7 @@ class LookAssignExporter(object):
             if obj_type == ma_configure.Util.XGEN_DESCRIPTION:
                 xgen_description = mya_dcc_objects.XgenDescription(hair_path)
                 xgen_description_opt = mya_dcc_operators.XgenDescriptionOpt(xgen_description)
-                look_opt = mya_dcc_operators.XgenDescriptionLookMtd(xgen_description)
+                look_opt = mya_dcc_operators.XgenDescriptionLookOpt(xgen_description)
                 path = xgen_description_opt.get_path(lstrip=self._path_lstrip)
                 name = xgen_description_opt.get_name()
                 material_assigns = look_opt.get_material_assigns()
@@ -357,7 +357,6 @@ class LookAssignExporter(object):
                 self._look_content.set_material_assigns_value(self._look, var, seq, material_assigns)
                 self._look_content.set_properties_value(self._look, var, seq, properties)
                 self._look_content.set_visibilities_value(self._look, var, seq, visibilities)
-
         #
         raw = self._look_content.get_raw()
         if raw:
@@ -375,167 +374,7 @@ class LookAssignExporter(object):
         return self._results
 
 
-class LookYamlExporter(object):
-    OPTION = dict(
-        file='',
-        root=''
-    )
-    def __init__(self, option):
-        self._option = copy.copy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                self._option[k] = v
-        #
-        self._raw = bsc_objects.Content(
-            value=collections.OrderedDict()
-        )
-    @mya_modifiers.set_undo_mark_mdf
-    def set_run(self):
-        file_path = self._option['file']
-        dcc_root = self._option['root']
-        dcc_root_dag_path = bsc_core.DccPathDagOpt(dcc_root)
-        mya_root_dag_path = dcc_root_dag_path.set_translate_to(
-            pathsep='|'
-        )
-        mya_root = mya_dcc_objects.Group(mya_root_dag_path.value)
-        self._set_obj_create_('root', mya_root.path)
-        self._set_obj_attributes_create_(
-            'root', mya_root.path,
-            customize=True, customize_includes=['pg_lookpass']
-        )
-        mya_objs = mya_root.get_descendants()
-        cmds.ls()
-        if mya_objs:
-            gp = utl_core.GuiProgressesRunner(maximum=len(mya_objs))
-            for i_mya_obj in mya_objs:
-                gp.set_update()
-                if i_mya_obj.type == 'mesh':
-                    i_mesh = mya_dcc_objects.Mesh(i_mya_obj.path)
-                    i_mesh_opt = mya_dcc_operators.MeshLookOpt(i_mesh)
-                    #
-                    self._set_obj_create_('geometry', i_mya_obj.path)
-                    self._set_obj_attributes_create_('geometry', i_mya_obj.path)
-                    self._set_geometry_attributes_create_(
-                        'geometry', i_mya_obj.path, i_mesh_opt.get_material_assigns()
-                    )
-                    #
-                    materials = i_mesh_opt.get_materials()
-                    for i_material in materials:
-                        i_material = mya_dcc_objects.Node(i_material.path)
-                        if self._set_obj_create_('material', i_material.path) is True:
-                            self._set_obj_attributes_create_(
-                                'material', i_material.path,
-                                definition=True, definition_includes=['surfaceShader', 'displacementShader', 'volumeShader']
-                            )
-                            #
-                            source_objs = i_material.get_all_source_objs()
-                            for i_source_node in source_objs:
-                                i_source_node_obj_type_name = i_source_node.type_name
-                                if i_source_node_obj_type_name not in [
-                                    'transform', 'mesh',
-                                    'shadingEngine',
-                                    'groupId',
-                                    'displayLayer',
-                                    'xgmSplineGuide', 'xgmSplineGuide', 'xgmGuideData', 'xgmMakeGuide', 'xgmSubdPatch'
-                                ]:
-                                    if self._set_obj_create_('node-graph', i_source_node.path) is True:
-                                        self._set_obj_attributes_create_(
-                                            'node-graph', i_source_node.path,
-                                            definition=True
-                                        )
-                elif i_mya_obj.type == 'transform':
-                    self._set_obj_create_('transform', i_mya_obj.path)
-                    self._set_obj_attributes_create_(
-                        'transform', i_mya_obj.path,
-                        definition=True, definition_includes=['visibility']
-                    )
-                    source_objs = i_mya_obj.get_all_source_objs()
-                    for i_source_node in source_objs:
-                        i_source_node_obj_type_name = i_source_node.type_name
-                        if i_source_node_obj_type_name not in ['transform', 'mesh', 'shadingEngine', 'groupId']:
-                            if self._set_obj_create_('node-graph', i_source_node.path) is True:
-                                self._set_obj_attributes_create_(
-                                    'node-graph', i_source_node.path,
-                                    definition=True
-                                )
-            gp.set_stop()
-        #
-        # self._raw.set_print_as_yaml_style()
-        self._raw.set_save_to(
-            file_path
-        )
-
-    def _set_obj_create_(self, scheme, obj_path):
-        key = '{}.{}'.format(scheme, obj_path)
-        if self._raw.get(key) is None:
-            self._raw.set(
-                '{}.{}.properties.type'.format(scheme, obj_path),
-                'maya/{}'.format(ma_core.CmdObjOpt(obj_path).get_type_name())
-            )
-            return True
-        return False
-
-    def _set_obj_attributes_create_(self, scheme, obj_path, definition=False, customize=False, definition_includes=None, customize_includes=None):
-        if definition is True:
-            self._raw.set(
-                '{}.{}.properties.definition-attributes'.format(scheme, obj_path),
-                self._get_obj_definition_attributes_(obj_path, definition_includes)
-            )
-        else:
-            self._raw.set(
-                '{}.{}.properties.definition-attributes'.format(scheme, obj_path),
-                collections.OrderedDict()
-            )
-        if customize is True:
-            self._raw.set(
-                '{}.{}.properties.customize-attributes'.format(scheme, obj_path),
-                self._get_obj_customize_attributes_(obj_path, customize_includes)
-            )
-        else:
-            self._raw.set(
-                '{}.{}.properties.customize-attributes'.format(scheme, obj_path),
-                collections.OrderedDict()
-            )
-
-    def _set_geometry_attributes_create_(self, scheme, obj_path, material_assigns):
-        self._raw.set(
-            '{}.{}.properties.material-assigns'.format(scheme, obj_path),
-            material_assigns
-        )
-
-    def _get_obj_definition_attributes_(self, obj_path, includes=None):
-        dic = collections.OrderedDict()
-        ports = ma_core.CmdObjOpt(obj_path).get_ports(includes)
-        for i_port in ports:
-            i_port_raw = collections.OrderedDict()
-            i_port_raw['type'] = 'maya/{}'.format(i_port.get_type_name())
-            if i_port.get_has_source_(exact=True):
-                i_port_raw['connection'] = i_port.get_source()
-                dic[i_port.get_port_path()] = i_port_raw
-            else:
-                if i_port.get_is_changed() is True:
-                    i_port_raw['value'] = i_port.get()
-                    dic[i_port.get_port_path()] = i_port_raw
-        return dic
-
-    def _get_obj_customize_attributes_(self, obj_path, includes=None):
-        dic = collections.OrderedDict()
-        ports = ma_core.CmdObjOpt(obj_path).get_customize_ports(includes)
-        for i_port in ports:
-            i_port_raw = collections.OrderedDict()
-            i_port_raw['type'] = 'maya/{}'.format(i_port.get_type_name())
-            if i_port.get_has_source_(exact=True):
-                i_port_raw['connection'] = i_port.get_source()
-            #
-            if i_port.get_is_enumerate():
-                i_port_raw['enumerate-strings'] = i_port.get_enumerate_strings()
-            #
-            i_port_raw['value'] = i_port.get()
-            dic[i_port.get_port_path()] = i_port_raw
-        return dic
-
-
-class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
+class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         directory='',
         location='',
@@ -568,7 +407,6 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
         # frame_step=frameStep,
         # frame_padding=framePadding
         #
-        print kwargs
         cmds.select(mya_mesh_path)
         cmds.arnoldRenderToTexture(
             **kwargs
@@ -769,14 +607,14 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
             # debug, render a black texture when "castsShadows" is "False"
             mya_show_set.get_port('castsShadows').set(True)
         #
-        mya_location_path = bsc_core.DccPathDagOpt(location_path).set_translate_to('|').get_value()
+        mya_location_path = bsc_core.DccPathDagOpt(location_path).translate_to('|').get_value()
         #
         mya_group = mya_dcc_objects.Group(mya_location_path)
         mya_mesh_paths = mya_group.get_all_shape_paths(
             include_obj_type=['mesh']
         )
         for i_mya_mesh_path in mya_mesh_paths:
-            mya_hide_set.set_element_add(i_mya_mesh_path)
+            mya_hide_set.add_element(i_mya_mesh_path)
         #
         self._set_arnold_options_create_()
         self._set_arnold_light_create_()
@@ -795,7 +633,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
                 l_p.set_update()
                 #
                 mya_hide_set.set_element_remove(i_mya_mesh_path)
-                mya_show_set.set_element_add(i_mya_mesh_path)
+                mya_show_set.add_element(i_mya_mesh_path)
                 #
                 self._set_cmd_run_(
                     i_mya_mesh_path,
@@ -810,7 +648,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
                     enable_aovs=True
                 )
                 #
-                mya_hide_set.set_element_add(i_mya_mesh_path)
+                mya_hide_set.add_element(i_mya_mesh_path)
                 mya_show_set.set_element_remove(i_mya_mesh_path)
                 #
                 i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
@@ -830,7 +668,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
         directory = utl_dcc_objects.OsDirectory_(directory_path)
 
         mya_group = mya_dcc_objects.Group(
-            bsc_core.DccPathDagOpt(location_path).set_translate_to('|').get_value()
+            bsc_core.DccPathDagOpt(location_path).translate_to('|').get_value()
         )
         mya_mesh_paths = mya_group.get_all_shape_paths(
             include_obj_type=['mesh']
@@ -842,3 +680,165 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionMethod):
                 i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
                 #
                 self._set_preview_shader_convert_(directory, i_mya_mesh)
+
+
+class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+    OPTION = dict(
+        file='',
+        locations=[],
+        pathsep='|'
+    )
+    def __init__(self, option=None):
+        super(FncLookYamlExporter, self).__init__(option)
+
+    def update_node_fnc(self, scheme, obj_path):
+        key = '{}.{}'.format(scheme, obj_path)
+        if self._raw.get(key) is None:
+            self._raw.set(
+                '{}.{}.properties.type'.format(scheme, obj_path),
+                'maya/{}'.format(ma_core.CmdObjOpt(obj_path).get_type_name())
+            )
+            return True
+        return False
+
+    def update_node_properties_fnc(self, scheme, obj_path, definition=False, customize=False, definition_includes=None, customize_includes=None):
+        if definition is True:
+            self._raw.set(
+                '{}.{}.properties.definition-attributes'.format(scheme, obj_path),
+                self.get_node_definition_properties_fnc(obj_path, definition_includes)
+            )
+        else:
+            self._raw.set(
+                '{}.{}.properties.definition-attributes'.format(scheme, obj_path),
+                collections.OrderedDict()
+            )
+        if customize is True:
+            self._raw.set(
+                '{}.{}.properties.customize-attributes'.format(scheme, obj_path),
+                self.get_node_customize_properties_fnc(obj_path, customize_includes)
+            )
+        else:
+            self._raw.set(
+                '{}.{}.properties.customize-attributes'.format(scheme, obj_path),
+                collections.OrderedDict()
+            )
+
+    def update_geometry_material_assign_fnc(self, scheme, obj_path, material_assigns):
+        self._raw.set(
+            '{}.{}.properties.material-assigns'.format(scheme, obj_path),
+            material_assigns
+        )
+    @classmethod
+    def get_node_definition_properties_fnc(cls, obj_path, includes=None):
+        dic = collections.OrderedDict()
+        ports = ma_core.CmdObjOpt(obj_path).get_ports(includes)
+        for i_port in ports:
+            i_port_raw = collections.OrderedDict()
+            i_port_raw['type'] = 'maya/{}'.format(i_port.get_type_name())
+            if i_port.get_has_source_(exact=True):
+                i_port_raw['connection'] = i_port.get_source()
+                dic[i_port.get_port_path()] = i_port_raw
+            else:
+                if i_port.get_is_changed() is True:
+                    i_port_raw['value'] = i_port.get()
+                    dic[i_port.get_port_path()] = i_port_raw
+        return dic
+    @classmethod
+    def get_node_customize_properties_fnc(cls, obj_path, includes=None):
+        dic = collections.OrderedDict()
+        ports = ma_core.CmdObjOpt(obj_path).get_customize_ports(includes)
+        for i_port in ports:
+            i_port_raw = collections.OrderedDict()
+            i_port_raw['type'] = 'maya/{}'.format(i_port.get_type_name())
+            if i_port.get_has_source_(exact=True):
+                i_port_raw['connection'] = i_port.get_source()
+            #
+            if i_port.get_is_enumerate():
+                i_port_raw['enumerate-strings'] = i_port.get_enumerate_strings()
+            #
+            i_port_raw['value'] = i_port.get()
+            dic[i_port.get_port_path()] = i_port_raw
+        return dic
+
+    def update_by_location_fnc(self, location, pathsep):
+        location_cur = bsc_core.DccPathDagOpt(location).translate_to(pathsep).get_value()
+        group = mya_dcc_objects.Group(location_cur)
+        nodes = group.get_descendants()
+        if nodes:
+            with utl_core.GuiProgressesRunner.create(
+                maximum=len(nodes), label='export look at "{}"'.format(location)
+            ) as g_p:
+                for i_node in nodes:
+                    g_p.set_update()
+                    if i_node.type == 'mesh':
+                        i_mesh = mya_dcc_objects.Mesh(i_node.path)
+                        i_mesh_opt = mya_dcc_operators.MeshLookOpt(i_mesh)
+                        #
+                        self.update_node_fnc('geometry', i_node.path)
+                        self.update_node_properties_fnc('geometry', i_node.path)
+                        self.update_geometry_material_assign_fnc(
+                            'geometry', i_node.path, i_mesh_opt.get_material_assigns()
+                        )
+                        #
+                        i_materials = i_mesh_opt.get_materials()
+                        for j_material in i_materials:
+                            j_material = mya_dcc_objects.Node(j_material.path)
+                            if self.update_node_fnc('material', j_material.path) is True:
+                                self.update_node_properties_fnc(
+                                    'material', j_material.path,
+                                    definition=True,
+                                    definition_includes=['surfaceShader', 'displacementShader', 'volumeShader']
+                                )
+                                #
+                                source_objs = j_material.get_all_source_objs()
+                                for i_source_node in source_objs:
+                                    i_source_node_obj_type_name = i_source_node.type_name
+                                    if i_source_node_obj_type_name not in [
+                                        'transform', 'mesh',
+                                        'shadingEngine',
+                                        'groupId',
+                                        'displayLayer',
+                                        'xgmSplineGuide', 'xgmSplineGuide', 'xgmGuideData', 'xgmMakeGuide',
+                                        'xgmSubdPatch'
+                                    ]:
+                                        if self.update_node_fnc('node-graph', i_source_node.path) is True:
+                                            self.update_node_properties_fnc(
+                                                'node-graph', i_source_node.path,
+                                                definition=True
+                                            )
+                    elif i_node.type == 'transform':
+                        self.update_node_fnc('transform', i_node.path)
+                        self.update_node_properties_fnc(
+                            'transform', i_node.path,
+                            definition=True, definition_includes=['visibility']
+                        )
+                        source_objs = i_node.get_all_source_objs()
+                        for i_source_node in source_objs:
+                            i_source_node_obj_type_name = i_source_node.type_name
+                            if i_source_node_obj_type_name not in ['transform', 'mesh', 'shadingEngine', 'groupId']:
+                                if self.update_node_fnc('node-graph', i_source_node.path) is True:
+                                    self.update_node_properties_fnc(
+                                        'node-graph', i_source_node.path,
+                                        definition=True
+                                    )
+
+    def execute(self):
+        file_path = self.get('file')
+
+        self._raw = bsc_objects.Content(
+            value=collections.OrderedDict()
+        )
+
+        locations = self.get('locations')
+        if locations:
+            pathsep = self.get('pathsep')
+            with utl_core.GuiProgressesRunner.create(
+                maximum=len(locations), label='export look preview'
+            ) as g_p:
+                for i_location in locations:
+                    g_p.set_update()
+                    self.update_by_location_fnc(i_location, pathsep)
+
+        bsc_core.StgFileOpt(file_path).set_write(
+            self._raw.get_value()
+        )

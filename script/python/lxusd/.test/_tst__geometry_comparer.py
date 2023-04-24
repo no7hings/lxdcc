@@ -3,7 +3,7 @@ from lxutil import utl_configure
 
 import lxusd.fnc.comparers as usd_fnc_comparers
 
-print usd_fnc_comparers.GeometryComparer(
+print usd_fnc_comparers.FncGeometryComparer(
     option=dict(
         file_src='/l/prod/cgm/publish/assets/flg/xiangzhang_tree_g/mod/modeling/xiangzhang_tree_g.mod.modeling.v003/cache/usd/geo/hi.usd',
         file_tgt='/l/prod/cgm/publish/assets/flg/xiangzhang_tree_g/mod/mod_dynamic/xiangzhang_tree_g.mod.mod_dynamic.v001/cache/usd/geo/hi.usd',

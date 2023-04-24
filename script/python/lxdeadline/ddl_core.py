@@ -220,13 +220,13 @@ class DdlCacheMtd(object):
     METHOD_PATH_PATTERN = '{type}.{name}.{engine}.{script}'
     @classmethod
     def set_ddl_job_id_add(cls, method_key, ddl_group_key, ddl_job_key, ddl_job_id):
-        cls.CONTENT.set_element_add(
+        cls.CONTENT.add_element(
             '{}.{}.{}.job-ids'.format(method_key, ddl_group_key, ddl_job_key),
             ddl_job_id
         )
     @classmethod
     def set_ddl_method_update(cls, ddl_method_path, ddl_method):
-        cls.CONTENT.set_element_add(
+        cls.CONTENT.add_element(
             '{}.job-ids'.format(ddl_method_path),
             ddl_method.get_ddl_job_id()
         )

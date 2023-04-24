@@ -45,12 +45,4 @@ if __name__ == '__main__':
     # )
     # print StgPathPermissionMtd.change_owner('/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002')
 
-    c = CfgJinjaMtd.get_configure_yaml(
-        'test/test'
-    )
-    t = CfgJinjaMtd.get_template(
-        'test/test'
-    )
-    print t.render(
-        name='World'
-    )
+    print RawTextMtd.to_integer('geometry')

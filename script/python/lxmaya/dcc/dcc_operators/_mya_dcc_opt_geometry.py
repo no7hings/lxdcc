@@ -251,7 +251,6 @@ class MeshOpt(
                 self.om2_obj.renameUVSet(uv_map_name_default, name_bck)
                 self.om2_obj.renameUVSet(name_0, uv_map_name_default)
                 self.om2_obj.deleteUVSet(name_bck)
-
     @mya_modifiers.set_undo_mark_mdf
     def _get_map_face_non_uv_comp_names_(self):
         path = self.obj.path
@@ -701,7 +700,7 @@ class NurbsCurveOpt(
     def get_usd_basis_curve_data(self):
         points = self.get_points()
         counts = [len(points)]
-        widths = [0.01]
+        widths = [0.003]
         return counts, points, widths
 
 

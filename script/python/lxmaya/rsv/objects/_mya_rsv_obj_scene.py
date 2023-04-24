@@ -20,7 +20,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_scene_export(self):
+    def execute_asset_scene_export(self):
         key = 'asset scene export'
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -35,7 +35,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             location = root
         #
-        mya_location = bsc_core.DccPathDagOpt(location).set_translate_to(
+        mya_location = bsc_core.DccPathDagOpt(location).translate_to(
             pathsep=pathsep
         ).to_string()
         mya_group = mya_dcc_objects.Group(
@@ -78,7 +78,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = self._rsv_scene_properties.get('version')
         root = self._rsv_scene_properties.get('dcc.root')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep='|'
         )
         mya_root = mya_dcc_objects.Group(
@@ -108,7 +108,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         orig_file_path = '/l/resource/td/asset/maya/asset-camera.ma'
-        orig_file_path = bsc_core.StorageMtd.set_map_to_platform(orig_file_path)
+        orig_file_path = bsc_core.StgPathMapMtd.map_to_current(orig_file_path)
 
         scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
@@ -122,7 +122,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if scene_src_file.get_is_exists() is True:
                 mya_dcc_objects.Scene.set_file_open(scene_src_file_path)
                 camera_location = '/camera_grp'
-                mya_camera_location = bsc_core.DccPathDagOpt(camera_location).set_translate_to(pathsep).to_string()
+                mya_camera_location = bsc_core.DccPathDagOpt(camera_location).translate_to(pathsep).to_string()
                 mya_camera_group = mya_dcc_objects.Group(mya_camera_location)
                 if mya_camera_group.get_is_exists() is True:
                     mya_fnc_builders.AssetBuilder(
@@ -134,7 +134,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             render_resolution=(2048, 2048),
                         )
                     ).set_run()
-                    mya_root = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
+                    mya_root = bsc_core.DccPathDagOpt(root).translate_to(pathsep).to_string()
                     mya_group = mya_dcc_objects.Group(mya_root)
                     if mya_group.get_is_exists() is True:
                         mya_dcc_objects.Scene.set_current_frame(4)
@@ -189,7 +189,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
-        mya_root = bsc_core.DccPathDagOpt(root).set_translate_to(pathsep).to_string()
+        mya_root = bsc_core.DccPathDagOpt(root).translate_to(pathsep).to_string()
 
         mya_fnc_exporters.PreviewExporter(
             file_path=preview_mov_file_path,
@@ -253,7 +253,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).set_run()
         mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
 
-    def set_asset_scene_src_create(self):
+    def execute_asset_scene_src_create(self):
         rsv_scene_properties = self._rsv_scene_properties
         #
         project = rsv_scene_properties.get('project')
@@ -275,22 +275,40 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         with_build = self._hook_option_opt.get_as_boolean('with_build')
         if with_build is True:
-            mya_fnc_builders.AssetBuilder(
+            mya_fnc_builders.FncAssetBuilderNew(
                 option=dict(
-                    project=project,
-                    asset=asset,
+                    # data
+                    with_geometry=True,
+                    with_geometry_uv_map=True,
+                    with_look=True,
+                    # key
+                    with_model=self._hook_option_opt.get_as_boolean('with_model_geometry'),
+                    with_model_dynamic=self._hook_option_opt.get_as_boolean('with_model_dynamic'),
+                    # model
+                    model_space='release',
+                    model_elements=[
+                        'renderable',
+                    ],
                     #
-                    with_model_geometry=self._hook_option_opt.get('with_model_geometry') or False,
-                    with_model_act_geometry_dyn=True,
-                    with_model_act_geometry_dyn_connect=True,
-                    model_act_properties=['pg_start_frame', 'pg_end_frame'],
+                    with_groom=self._hook_option_opt.get_as_boolean('with_groom_geometry'),
+                    with_groom_grow=True,
+                    # groom
+                    groom_space='release',
+                    groom_elements=[
+                        'renderable'
+                    ],
                     #
-                    with_surface_look=self._hook_option_opt.get('with_surface_look') or False,
-                    with_surface_geometry_uv_map=self._hook_option_opt.get('with_surface_geometry_uv_map') or False,
-                    #
-                    geometry_var_names=self._hook_option_opt.get('geometry_var_names', as_array=True) or [],
+                    with_surface=(
+                        self._hook_option_opt.get_as_boolean('with_surface_look')
+                        or self._hook_option_opt.get_as_boolean('with_surface_geometry_uv_map')
+                    ),
+                    # surface
+                    surface_space='release',
+                    surface_elements=[
+                        'renderable'
+                    ]
                 )
-            ).set_run()
+            ).execute()
         #
         mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
 
@@ -306,7 +324,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = self._rsv_scene_properties.get('dcc.root')
         pathsep = self._rsv_scene_properties.get('dcc.pathsep')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep=pathsep
         )
         mya_group = mya_dcc_objects.Group(
@@ -375,7 +393,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep=pathsep
         )
         mya_group = mya_dcc_objects.Group(
@@ -421,7 +439,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = self._rsv_scene_properties.get('dcc.root')
         pathsep = self._rsv_scene_properties.get('dcc.pathsep')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).set_translate_to(
+        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
             pathsep=pathsep
         )
         mya_group = mya_dcc_objects.Group(

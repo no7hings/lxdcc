@@ -21,7 +21,7 @@ g_f = usd_fnc_exporters.GeometryUvMapExporter(
     file_path=file_path,
     root='/master',
     option=dict(
-        root_lstrip=True,
+        path_lstrip=True,
         file_0=geometry_file_path,
         file_1=surface_geometry_file_path
     )

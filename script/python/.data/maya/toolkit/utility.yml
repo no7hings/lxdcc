@@ -78,4 +78,4 @@ central:
                     #
                     type: PrxPressItem
                     path: <...path>/<..key>
-                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; from lxutil import utl_core; mya_dcc_objects.Scene.set_file_reference(utl_core.Path.set_map_to_platform("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma"))'
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; from lxutil import utl_core; mya_dcc_objects.Scene.set_file_reference(utl_core.Path.map_to_current("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma"))'

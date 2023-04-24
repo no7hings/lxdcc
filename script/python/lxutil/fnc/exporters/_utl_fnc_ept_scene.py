@@ -64,7 +64,7 @@ class DotMaExporter(
 
 
 class DotXgenExporter(
-    utl_fnc_obj_abs.AbsFncOptionMethod,
+    utl_fnc_obj_abs.AbsFncOptionBase,
     utl_fnc_obj_abs.AbsDotXgenDef
 ):
     OPTION = dict(
@@ -97,7 +97,7 @@ class DotXgenExporter(
 
 
 class DotXgenUsdaExporter(
-    utl_fnc_obj_abs.AbsFncOptionMethod,
+    utl_fnc_obj_abs.AbsFncOptionBase,
     utl_fnc_obj_abs.AbsDotXgenDef
 ):
     OPTION = dict(

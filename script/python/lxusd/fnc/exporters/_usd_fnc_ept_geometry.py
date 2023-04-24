@@ -22,13 +22,14 @@ import lxusd.dcc.dcc_operators as usd_dcc_operators
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
-        root_lstrip=False,
         file_0=None,
         file_1=None,
         #
-        display_color=(0.25, 0.75, 0.5)
+        display_color=(0.25, 0.75, 0.5),
+        #
+        path_lstrip=None,
     )
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
@@ -107,7 +108,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self.set_uv_map_export()
 
 
-class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -225,7 +226,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._usd_stage_opt_tgt.set_export_to(self._file_path)
 
 
-class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -331,7 +332,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
         self._usd_stage_opt_tgt.set_export_to(self._file_path)
 
 
-class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         input_file='',
         output_file='',
@@ -363,10 +364,10 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionMethod):
 
 
 class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
-    ROOT_LSTRIP = 'root_lstrip'
+    ROOT_LSTRIP = 'path_lstrip'
     GEOMETRY_FILE = 'geometry_file'
     OPTION = dict(
-        root_lstrip=False,
+        path_lstrip=None,
         geometry_file=None,
     )
     def __init__(self, file_path, root=None, option=None):
@@ -426,7 +427,7 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
     def set_run(self):
         raw = self._get_info_raw(
             self._usd_stage,
-            root=self._root, lstrip=self._option.get('root_lstrip')
+            root=self._root, lstrip=self._option.get('path_lstrip')
         )
         #
         f = utl_dcc_objects.OsFile(self._file_path)
@@ -437,14 +438,15 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
         # self._usd_stage.Export(base + '.usda')
 
 
-class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
         #
         default_prim_path=None,
         with_usda=False,
-        root_lstrip=False,
+        #
+        path_lstrip=None,
     )
     def __init__(self, *args, **kwargs):
         super(GeometryExporter, self).__init__(*args, **kwargs)

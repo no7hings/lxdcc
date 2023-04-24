@@ -221,14 +221,25 @@ class GuiProgressesRunner(object):
             self._ps = QT_PROGRESS_CREATE_METHOD(maximum, label=label)
         else:
             self._ps = []
+        #
+        if not self._ps:
+            self._log_progress = bsc_core.LogProgress(
+                maximum, label or 'progress', use_as_progress_bar=True
+            )
 
     def set_update(self, sub_label=None):
         for p in self._ps:
             p.set_update()
+        #
+        if not self._ps:
+            self._log_progress.set_update(sub_label)
 
     def set_stop(self):
         for p in self._ps:
             p.set_stop()
+        #
+        if not self._ps:
+            self._log_progress.set_stop()
 
     def __enter__(self):
         return self
@@ -787,106 +798,63 @@ class File(object):
             ).set_read()
 
 
-class PathMapper(object):
-    def __init__(self, file_path):
-        self._raw = bsc_core.StgFileOpt(file_path).set_read()
-        if bsc_core.SystemMtd.get_is_windows() is True:
-            p = 'windows'
-        elif bsc_core.SystemMtd.get_is_linux() is True:
-            p = 'linux'
-        else:
-            raise TypeError()
-        #
-        self._windows_dict = self._get_mapper_dict_('windows')
-        self._linux_dict = self._get_mapper_dict_('linux')
-        #
-        self._current_dict = self._get_mapper_dict_(p)
-
-    def __contains__(self, item):
-        return item in self._current_dict
-
-    def __getitem__(self, item):
-        return self._current_dict[item]
-
-    def _get_mapper_dict_(self, platform_):
-        dic = collections.OrderedDict()
-        raw_platform = self._raw[platform_]
-        for k, v in raw_platform.items():
-            for i in v:
-                dic[i] = k
-        return dic
-
-
-class PathEnvMapper(object):
-    def __init__(self, file_path):
-        self._raw = bsc_core.StgFileOpt(file_path).set_read()
-        if bsc_core.SystemMtd.get_is_windows() is True:
-            p = 'windows'
-        elif bsc_core.SystemMtd.get_is_linux() is True:
-            p = 'linux'
-        else:
-            raise TypeError()
-        #
-        self._path_dict = self._get_path_dict_(p)
-        self._env_dict = self._get_env_dict_(p)
-
-    def _get_path_dict_(self, platform_):
-        dic = collections.OrderedDict()
-        raw_platform = self._raw[platform_]
-        for k, v in raw_platform.items():
-            for i in v:
-                dic[i] = k
-        return dic
-
-    def _get_env_dict_(self, platform_):
-        dic = collections.OrderedDict()
-        raw_platform = self._raw[platform_]
-        for k, v in raw_platform.items():
-            dic[k] = v[0]
-        return dic
-
-
 class Path(object):
     PATHSEP = '/'
     #
-    MAPPER = PathMapper(
-        file_path=bsc_core.CfgFileMtd.get_yaml('storage/path-mapper')
+    MAPPER = bsc_core.StgPathMapper(
+        bsc_core.StgFileOpt(
+            bsc_core.CfgFileMtd.get_yaml('storage/path-mapper')
+        ).set_read()
     )
-
     @classmethod
-    def set_map_to_platform(cls, path):
+    def map_to_current(cls, path):
         if path is not None:
             if bsc_core.SystemMtd.get_is_windows():
-                return cls.set_map_to_windows(path)
+                return cls.map_to_windows(path)
             elif bsc_core.SystemMtd.get_is_linux():
-                return cls.set_map_to_linux(path)
+                return cls.map_to_linux(path)
             return bsc_core.StgPathOpt(path).__str__()
         return path
     @classmethod
-    def set_map_to_windows(cls, path):
+    def map_to_windows(cls, path):
+        # clear first
         path = bsc_core.StgPathOpt(path).__str__()
         if bsc_core.StorageMtd.get_path_is_linux(path):
             mapper_dict = cls.MAPPER._windows_dict
             for i_root_src, i_root_tgt in mapper_dict.items():
-                if path.startswith(i_root_src):
+                if path == i_root_src:
+                    return i_root_tgt
+                elif path.startswith(i_root_src+cls.PATHSEP):
                     return i_root_tgt + path[len(i_root_src):]
             return path
         return path
     @classmethod
-    def set_map_to_linux(cls, path):
+    def map_to_linux(cls, path):
+        """
+print Path.map_to_linux(
+    'l:/a'
+)
+        :param path:
+        :return:
+        """
+        # clear first
         path = bsc_core.StgPathOpt(path).__str__()
         if bsc_core.StorageMtd.get_path_is_windows(path):
             mapper_dict = cls.MAPPER._linux_dict
             for i_root_src, i_root_tgt in mapper_dict.items():
-                if path.startswith(i_root_src):
+                if path == i_root_src:
+                    return i_root_tgt
+                elif path.startswith(i_root_src+cls.PATHSEP):
                     return i_root_tgt + path[len(i_root_src):]
             return path
         return path
 
 
 class PathEnv(object):
-    MAPPER = PathEnvMapper(
-        file_path=bsc_core.CfgFileMtd.get_yaml('storage/path-environment-mapper')
+    MAPPER = bsc_core.StgPathEnvMapper(
+        bsc_core.StgFileOpt(
+            bsc_core.CfgFileMtd.get_yaml('storage/path-environment-mapper')
+        ).set_read()
     )
     @classmethod
     def map_to_path(cls, path, pattern='[KEY]'):
@@ -907,10 +875,13 @@ class PathEnv(object):
         :param pattern:
         :return:
         """
+        path = bsc_core.StgPathOpt(path).__str__()
         mapper_dict = cls.MAPPER._env_dict
         for i_env_key, i_root in mapper_dict.items():
             i_string = pattern.replace('KEY', i_env_key)
-            if path.startswith(i_string+'/'):
+            if path == i_string:
+                return i_root
+            elif path.startswith(i_string+'/'):
                 return i_root + path[len(i_string):]
         return path
     @classmethod
@@ -932,10 +903,13 @@ class PathEnv(object):
         :param pattern:
         :return:
         """
+        path = bsc_core.StgPathOpt(path).__str__()
         mapper_dict = cls.MAPPER._path_dict
         for i_root, i_env_key in mapper_dict.items():
-            if path.startswith(i_root+'/'):
-                i_string = pattern.replace('KEY', i_env_key)
+            i_string = pattern.replace('KEY', i_env_key)
+            if path == i_root:
+                return i_string
+            elif path.startswith(i_root+'/'):
                 return i_string + path[len(i_root):]
         return path
 
@@ -962,9 +936,9 @@ class AppLauncher(object):
             application: <application-name>
         """
         if bsc_core.StgPathOpt(self.LOCAL_ROOT).get_is_exists():
-            self._root = Path.set_map_to_platform(self.LOCAL_ROOT)
+            self._root = Path.map_to_current(self.LOCAL_ROOT)
         else:
-            self._root = Path.set_map_to_platform(self.SERVER_ROOT)
+            self._root = Path.map_to_current(self.SERVER_ROOT)
         #
         self._kwargs = dict(
             root=self._root,

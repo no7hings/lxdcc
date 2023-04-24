@@ -14,9 +14,9 @@ class PtnMultiplyFileMtd(object):
         (r'#', r'{}', -1),
         # maya
         (r'<f>', r'{}', 4),
-        # katana, etc, "test.(0001-0600)%04d.exr"
+        # katana, etc. "test.(0001-0600)%04d.exr"
         (r'(\()[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9](\))(%04d)', r'{}', 4),
-        # houdini, etc, "test.$F.exr"
+        # houdini, etc. "test.$F.exr"
         (r'$F', r'\{}[^\d]', 4),
     ]
     # houdini

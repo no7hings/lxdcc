@@ -6,7 +6,7 @@ import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 class TextureExporter(
     utl_fnc_obj_abs.AbsDccTextureExport,
-    utl_fnc_obj_abs.AbsFncOptionMethod,
+    utl_fnc_obj_abs.AbsFncOptionBase,
 ):
     FIX_NAME_BLANK = 'fix_name_blank'
     USE_TX = 'use_tx'

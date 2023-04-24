@@ -62,14 +62,14 @@ class AbsMeshComparerDef(object):
     @classmethod
     def _set_mesh_comparer_data_build_(cls, content_0, dcc_obj_path, dcc_obj_name, face_vertices_uuid, points_uuid):
         #  name
-        content_0.set_element_append('property.name.{}'.format(dcc_obj_name), dcc_obj_path)
+        content_0.append_element('property.name.{}'.format(dcc_obj_name), dcc_obj_path)
         # path
         content_0.set('property.path.{}'.format(dcc_obj_path), dcc_obj_name)
         # face-vertices
-        content_0.set_element_append('face-vertices.uuid.{}'.format(face_vertices_uuid), dcc_obj_path)
+        content_0.append_element('face-vertices.uuid.{}'.format(face_vertices_uuid), dcc_obj_path)
         content_0.set('face-vertices.path.{}'.format(dcc_obj_path), face_vertices_uuid)
         # points
-        content_0.set_element_append('points.uuid.{}'.format(points_uuid), dcc_obj_path)
+        content_0.append_element('points.uuid.{}'.format(points_uuid), dcc_obj_path)
         content_0.set('points.path.{}'.format(dcc_obj_path), points_uuid)
 
 

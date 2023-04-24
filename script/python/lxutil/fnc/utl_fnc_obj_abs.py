@@ -388,18 +388,16 @@ class AbsFncDccGeometryComparer(object):
     FNC_USD_MESH_REPAIRER_CLASS = None
     #
     CACHE = {}
-    def __init__(self, file_path, root=None, option=None):
-        self._scene_file_path = file_path
-        self._root = root
+    #
+    RSV_KEYWORD = 'asset-geometry-usd-payload-file'
+    DCC_NAMESPACE = 'usd'
+    def __init__(self, file_path, location=None, location_source=None):
+        self._file_path = file_path
+        self._location = location
+        self._location_source = location_source
         #
         self._cache_directory = bsc_core.EnvironMtd.get_temporary_root()
         self._resolver = rsv_commands.get_resolver()
-        #
-        self._option = copy.deepcopy(self.OPTION)
-        if isinstance(option, dict):
-            for k, v in option.items():
-                if k in self.OPTION:
-                    self._option[k] = v
         #
         self._rsv_scene_properties = self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
             file_path=file_path
@@ -407,7 +405,7 @@ class AbsFncDccGeometryComparer(object):
         if self._rsv_scene_properties is not None:
             step = self._rsv_scene_properties.get('step')
             if step in ['mod', 'srf', 'rig', 'grm']:
-                keyword = 'asset-geometry-usd-hi-file'
+                keyword = self.RSV_KEYWORD
                 rsv_resource = self._resolver.get_rsv_resource(
                     **self._rsv_scene_properties.get_value()
                 )
@@ -420,105 +418,108 @@ class AbsFncDccGeometryComparer(object):
                     )
                     result = rsv_unit.get_result()
                     if result:
-                        self._set_model_geometry_usd_hi_file_path_(result)
+                        self.set_source_file(result)
             else:
                 raise TypeError()
         else:
             raise TypeError()
         #
-        self._set_model_dcc_objs_init_()
-        self._set_scene_dcc_obj_init_()
+        self.init_source_fnc()
+        self.init_target_fnc()
         #
         self._results = []
 
-    def _set_model_geometry_usd_hi_file_path_(self, file_path):
-        self._model_geometry_usd_hi_file_path = file_path
+    def set_source_file(self, file_path):
+        self._source_file_path = file_path
 
-    def _set_model_dcc_objs_init_(self):
+    def init_source_fnc(self):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
         #
-        self._model_dcc_obj_scene = usd_dcc_objects.Scene()
-        self._model_dcc_obj_universe = self._model_dcc_obj_scene.universe
-        self._model_usd_scene_opt = usd_dcc_operators.SceneOpt(self._model_dcc_obj_scene.usd_stage)
-        self._model_dcc_mesh_comparer_data = bsc_objects.Content(
+        self._dcc_scene_src = usd_dcc_objects.Scene()
+        self._dcc_universe_src = self._dcc_scene_src.universe
+        self._dcc_stage_opt_src = usd_dcc_operators.SceneOpt(self._dcc_scene_src.usd_stage, self.DCC_NAMESPACE)
+        self._dcc_comparer_data_src = bsc_objects.Content(
             value={}
         )
         #
-        self._model_dcc_geometries = []
+        self._dcc_geometries_src = []
 
-    def _set_model_dcc_objs_update_(self):
+    def init_target_fnc(self):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
         #
-        usd_file_path = self._model_geometry_usd_hi_file_path
-        root = self._root
+        self._dcc_scene_tgt = usd_dcc_objects.Scene()
+        self._dcc_universe_tgt = self._dcc_scene_tgt.universe
+        self._dcc_stage_opt_tgt = usd_dcc_operators.SceneOpt(self._dcc_scene_tgt.usd_stage, self.DCC_NAMESPACE)
+        self._dcc_comparer_data_tgt = bsc_objects.Content(
+            value={}
+        )
+        #
+        self._dcc_geometries_tgt = []
+    #
+    def update_source_fnc(self):
+        import lxusd.dcc.dcc_objects as usd_dcc_objects
+        #
+        import lxusd.dcc.dcc_operators as usd_dcc_operators
+        #
+        usd_file_path = self._source_file_path
         if usd_file_path is not None:
             time_tag = bsc_core.StgFileOpt(usd_file_path).get_modify_time_tag()
             if time_tag in AbsFncDccGeometryComparer.CACHE:
-                self._model_dcc_obj_universe = AbsFncDccGeometryComparer.CACHE[time_tag]
+                self._dcc_universe_src = AbsFncDccGeometryComparer.CACHE[time_tag]
             else:
-                self._model_dcc_obj_scene = usd_dcc_objects.Scene()
-                self._model_dcc_obj_scene.set_load_from_dot_usd(usd_file_path, root)
-                self._model_dcc_obj_universe = self._model_dcc_obj_scene.universe
-                AbsFncDccGeometryComparer.CACHE[time_tag] = self._model_dcc_obj_universe
+                self._dcc_scene_src = usd_dcc_objects.Scene()
+                self._dcc_scene_src.load_from_dot_usd(
+                    usd_file_path,
+                    self._location,
+                    self._location_source
+                )
+                self._dcc_universe_src = self._dcc_scene_src.universe
+                AbsFncDccGeometryComparer.CACHE[time_tag] = self._dcc_universe_src
             #
-            self._model_usd_scene_opt = usd_dcc_operators.SceneOpt(self._model_dcc_obj_scene.usd_stage)
-            self._model_dcc_mesh_comparer_data = self._model_usd_scene_opt.get_mesh_comparer_data(
+            self._dcc_stage_opt_src = usd_dcc_operators.SceneOpt(self._dcc_scene_src.usd_stage, self.DCC_NAMESPACE)
+            self._dcc_comparer_data_src = self._dcc_stage_opt_src.get_mesh_comparer_data(
                 usd_file_path
             )
             #
-            self._model_dcc_geometries = []
-            mesh_type = self._model_dcc_obj_universe.get_obj_type('Mesh')
+            self._dcc_geometries_src = []
+            mesh_type = self._dcc_universe_src.get_obj_type('Mesh')
             if mesh_type is not None:
-                self._model_dcc_geometries = mesh_type.get_objs()
+                self._dcc_geometries_src = mesh_type.get_objs()
 
-    def _set_scene_dcc_obj_init_(self):
-        import lxusd.dcc.dcc_objects as usd_dcc_objects
+    def update_target_fnc(self):
+        scene_file_path = self._file_path
+        location = self._location
         #
-        import lxusd.dcc.dcc_operators as usd_dcc_operators
+        self._dcc_scene_tgt = self.DCC_SCENE_CLASS()
+        self._dcc_scene_tgt.load_from_location(location, include_obj_type=['mesh'])
+        self._dcc_universe_tgt = self._dcc_scene_tgt.universe
+        self._dcc_stage_opt_tgt = self.DCC_SCENE_OPT_CLASS(self._dcc_universe_tgt)
+        self._dcc_comparer_data_tgt = self._dcc_stage_opt_tgt.get_mesh_comparer_data(scene_file_path)
         #
-        self._scene_dcc_obj_scene = usd_dcc_objects.Scene()
-        self._scene_dcc_obj_universe = self._scene_dcc_obj_scene.universe
-        self._scene_dcc_stage_opt = usd_dcc_operators.SceneOpt(self._scene_dcc_obj_scene.usd_stage)
-        self._scene_dcc_mesh_comparer_data = bsc_objects.Content(
-            value={}
-        )
-        #
-        self._scene_dcc_geometries = []
-
-    def _set_scene_dcc_objs_update_(self):
-        scene_file_path = self._scene_file_path
-        root = self._root
-        #
-        self._scene_dcc_obj_scene = self.DCC_SCENE_CLASS()
-        self._scene_dcc_obj_scene.set_load_by_root(root, include_obj_type=['mesh'])
-        self._scene_dcc_obj_universe = self._scene_dcc_obj_scene.universe
-        self._scene_dcc_stage_opt = self.DCC_SCENE_OPT_CLASS(self._scene_dcc_obj_universe)
-        self._scene_dcc_mesh_comparer_data = self._scene_dcc_stage_opt.get_mesh_comparer_data(scene_file_path)
-        #
-        self._scene_dcc_geometries = []
-        mesh_type = self._scene_dcc_obj_universe.get_obj_type('mesh')
+        self._dcc_geometries_tgt = []
+        mesh_type = self._dcc_universe_tgt.get_obj_type('mesh')
         if mesh_type is not None:
-            self._scene_dcc_geometries = mesh_type.get_objs()
-    # geometry in model
-    def get_model_dcc_geometry(self, dcc_geometry_path):
-        return self._model_dcc_obj_universe.get_obj(dcc_geometry_path)
-    # geometry in scene
-    def get_scene_dcc_geometry(self, dcc_geometry_path):
-        return self._scene_dcc_obj_universe.get_obj(dcc_geometry_path)
+            self._dcc_geometries_tgt = mesh_type.get_objs()
+    #
+    def get_geometry_src(self, dcc_geometry_path):
+        return self._dcc_universe_src.get_obj(dcc_geometry_path)
 
+    def get_geometry_tgt(self, dcc_geometry_path):
+        return self._dcc_universe_tgt.get_obj(dcc_geometry_path)
+    #
     def get_matched_mesh(self, src_path):
-        src_data = self._model_dcc_mesh_comparer_data
-        tgt_data = self._scene_dcc_mesh_comparer_data
+        src_data = self._dcc_comparer_data_src
+        tgt_data = self._dcc_comparer_data_tgt
         return self.FNC_DCC_MESH_MATCHER_CLASS(
             src_path, src_data, tgt_data
         ).get()
-
-    def set_mesh_repair(self, src_path, tgt_path, check_statuses):
-        src_usd_prim = self._model_dcc_obj_scene.usd_stage.GetPrimAtPath(src_path)
+    #
+    def repair_mesh(self, src_path, tgt_path, check_statuses):
+        src_usd_prim = self._dcc_scene_src.usd_stage.GetPrimAtPath(src_path)
         if src_usd_prim.IsValid() is True:
             self.FNC_USD_MESH_REPAIRER_CLASS(
                 src_usd_prim, tgt_path, check_statuses
@@ -535,8 +536,8 @@ class AbsFncDccGeometryComparer(object):
         self._results = []
         #
         methods = [
-            self._set_model_dcc_objs_update_,
-            self._set_scene_dcc_objs_update_
+            self.update_source_fnc,
+            self.update_target_fnc
         ]
         if methods:
             with utl_core.GuiProgressesRunner.create(maximum=len(methods), label='execute geometry-comparer method') as g_p:
@@ -544,8 +545,8 @@ class AbsFncDccGeometryComparer(object):
                     g_p.set_update()
                     method()
         #
-        src_dcc_geometries = self._model_dcc_geometries
-        tgt_dcc_geometries = self._scene_dcc_geometries
+        src_dcc_geometries = self._dcc_geometries_src
+        tgt_dcc_geometries = self._dcc_geometries_tgt
         #
         if src_dcc_geometries:
             with utl_core.GuiProgressesRunner.create(maximum=len(src_dcc_geometries), label='gain geometry-comparer result') as g_p:
@@ -572,8 +573,8 @@ class AbsFncDccGeometryComparer(object):
         lis = []
         #
         methods = [
-            self._set_model_dcc_objs_update_,
-            self._set_scene_dcc_objs_update_
+            self.update_source_fnc,
+            self.update_target_fnc
         ]
         if methods:
             with utl_core.GuiProgressesRunner.create(maximum=len(methods), label='execute geometry-comparer method') as g_p:
@@ -581,8 +582,8 @@ class AbsFncDccGeometryComparer(object):
                     g_p.set_update()
                     method()
         #
-        dcc_geometries_src = self._model_dcc_geometries
-        dcc_geometries_tgt = self._scene_dcc_geometries
+        dcc_geometries_src = self._dcc_geometries_src
+        dcc_geometries_tgt = self._dcc_geometries_tgt
         #
         dcc_geometry_paths = []
         if dcc_geometries_src:
@@ -608,7 +609,7 @@ class AbsFncDccGeometryComparer(object):
         return lis
 
 
-class AbsFncOptionMethod(object):
+class AbsFncOptionBase(object):
     OPTION = dict()
     def __init__(self, option=None):
         self._option = copy.copy(self.OPTION)
@@ -725,7 +726,7 @@ class AbsDccTextureExport(object):
                     l_p.set_update()
                     for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
                         # map path to current platform
-                        j_texture_path_dpt = utl_core.Path.set_map_to_platform(j_texture_path_dpt)
+                        j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
                         j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
                         # fix name overlay
                         if j_texture_path_dpt in index_query:
@@ -803,7 +804,7 @@ class AbsDccTextureExport(object):
                                     j_texture_path_dst,
                                     remove_expression,
                                 )
-                                utl_core.Log.set_module_result_trace(
+                                bsc_core.LogMtd.trace_method_result(
                                     'texture export',
                                     u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
                                 )
@@ -814,7 +815,7 @@ class AbsDccTextureExport(object):
                                 )
 
 
-class AbsUsdGeometryComparer(AbsFncOptionMethod):
+class AbsUsdGeometryComparer(AbsFncOptionBase):
     OPTION = dict(
         file_src='',
         file_tgt='',
@@ -831,9 +832,12 @@ class AbsUsdGeometryComparer(AbsFncOptionMethod):
 
         if file_path is not None:
             scene = usd_dcc_objects.Scene()
-            scene.set_load_from_dot_usd(file_path, location)
+            scene.load_from_dot_usd(
+                file_path,
+                location
+            )
             universe = scene.universe
-            stage_opt = usd_dcc_operators.SceneOpt(scene.usd_stage)
+            stage_opt = usd_dcc_operators.SceneOpt(scene.usd_stage, 'usd')
             comparer_data = stage_opt.get_mesh_comparer_data(
                 file_path
             )

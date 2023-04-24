@@ -121,7 +121,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unknown_nodes_clear()'
+                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_unknown_plug_ins_clear()'
         #
         Unload(s):
             name: <..key>

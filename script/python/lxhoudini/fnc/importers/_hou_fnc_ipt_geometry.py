@@ -2,7 +2,7 @@
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class GeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionMethod):
+class GeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         root='',

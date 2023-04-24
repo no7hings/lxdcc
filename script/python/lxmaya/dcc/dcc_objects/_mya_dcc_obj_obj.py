@@ -50,14 +50,14 @@ class Node(mya_dcc_obj_abs.AbsMyaObj):
 class DisplayLayer(mya_dcc_obj_abs.AbsMyaObj):
     PORT_CLASS = _mya_dcc_obj_utility.Port
     CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
-    DCC_OBJ_CLASS = Node
+    DCC_NODE_CLASS = Node
     def __init__(self, path):
         super(DisplayLayer, self).__init__(path)
 
     def get_objs(self):
         lis = []
         for path in self.get_node_paths():
-            lis.append(self.DCC_OBJ_CLASS(path))
+            lis.append(self.DCC_NODE_CLASS(path))
         return lis
 
     def get_node_paths(self):
@@ -303,7 +303,7 @@ class Set(mya_dcc_obj_abs.AbsMyaObj):
         if self.get_is_exists() is False:
             cmds.sets(name=self.path, empty=1)
 
-    def set_element_add(self, path):
+    def add_element(self, path):
         cmds.sets(path, addElement=self.path, edit=1)
         utl_core.Log.set_module_result_trace(
             'set-element-add',

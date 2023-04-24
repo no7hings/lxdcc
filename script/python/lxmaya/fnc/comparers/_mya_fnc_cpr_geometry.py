@@ -20,11 +20,14 @@ class FncUsdMeshRepairer(utl_fnc_obj_abs.AbsFncUsdMeshRepairer):
         super(FncUsdMeshRepairer, self).__init__(*args, **kwargs)
 
 
-class GeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
+class FncGeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
     DCC_SCENE_CLASS = mya_dcc_objects.Scene
     DCC_SCENE_OPT_CLASS = mya_dcc_operators.SceneOpt
     #
     FNC_DCC_MESH_MATCHER_CLASS = FncDccMeshMatcher
     FNC_USD_MESH_REPAIRER_CLASS = FncUsdMeshRepairer
-    def __init__(self, *args):
-        super(GeometryComparer, self).__init__(*args)
+    #
+    RSV_KEYWORD = 'asset-geometry-usd-payload-file'
+    DCC_NAMESPACE = 'maya'
+    def __init__(self, *args, **kwargs):
+        super(FncGeometryComparer, self).__init__(*args, **kwargs)

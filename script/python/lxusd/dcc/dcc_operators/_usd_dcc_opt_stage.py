@@ -16,15 +16,21 @@ from lxusd.dcc.dcc_operators import _usd_dcc_opt_geometry
 
 
 class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
-    def __init__(self, *args, **kwargs):
-        self._stage = args[0]
+    def __init__(self, stage, namespace=None):
+        self._stage = stage
+        if namespace is not None:
+            self._namespace = namespace
+        else:
+            self._namespace = 'usd'
     @property
     def stage(self):
         return self._stage
 
     def get_mesh_comparer_data(self, file_path):
         if file_path:
-            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'mesh-comparer')
+            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(
+                file_path, 'mesh-comparer-{}'.format(self._namespace)
+            )
             return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
         else:
             return bsc_objects.Content(value={})

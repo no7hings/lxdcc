@@ -17,7 +17,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         dcc_root = task_properties.get('dcc.root')
         #
         dcc_root_dag_path = bsc_core.DccPathDagOpt(dcc_root)
-        mya_root_dag_path = dcc_root_dag_path.set_translate_to(
+        mya_root_dag_path = dcc_root_dag_path.translate_to(
             pathsep=dcc_pathsep
         )
         #

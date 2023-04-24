@@ -87,7 +87,7 @@ def set_export_check_run(rsv_task_properties):
     dcc_root = rsv_task_properties.get('dcc.root')
     #
     dcc_root_dag_opt = bsc_core.DccPathDagOpt(dcc_root)
-    mya_root_dag_opt = dcc_root_dag_opt.set_translate_to(
+    mya_root_dag_opt = dcc_root_dag_opt.translate_to(
         pathsep=dcc_pathsep
     )
     #

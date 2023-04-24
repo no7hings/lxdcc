@@ -283,6 +283,154 @@ class SystemMtd(TimeMtd):
         return sys.stderr.write(text+'\n')
 
 
+class StgPathMapper(object):
+    def __init__(self, raw):
+        self._raw = raw
+        if SystemMtd.get_is_windows() is True:
+            p = 'windows'
+        elif SystemMtd.get_is_linux() is True:
+            p = 'linux'
+        else:
+            raise TypeError()
+        #
+        self._windows_dict = self._get_mapper_dict_('windows')
+        self._linux_dict = self._get_mapper_dict_('linux')
+        #
+        self._current_dict = self._get_mapper_dict_(p)
+
+    def __contains__(self, item):
+        return item in self._current_dict
+
+    def __getitem__(self, item):
+        return self._current_dict[item]
+
+    def _get_mapper_dict_(self, platform_):
+        dic = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            for i in v:
+                dic[i] = k
+        return dic
+
+
+class StgPathEnvMapper(object):
+    def __init__(self, raw):
+        self._raw = raw
+        if SystemMtd.get_is_windows() is True:
+            p = 'windows'
+        elif SystemMtd.get_is_linux() is True:
+            p = 'linux'
+        else:
+            raise TypeError()
+        #
+        self._path_dict = self._get_path_dict_(p)
+        self._env_dict = self._get_env_dict_(p)
+
+    def _get_path_dict_(self, platform_):
+        dic = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            for i in v:
+                dic[i] = k
+        return dic
+
+    def _get_env_dict_(self, platform_):
+        dic = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            dic[k] = v[0]
+        return dic
+
+
+class StgPathMapMtd(object):
+    PATHSEP = '/'
+    MAPPER = StgPathMapper(
+        {
+            "windows": {
+                "L:": [
+                    "/l"
+                ],
+                "O:": [
+                    "/o"
+                ],
+                "Q:": [
+                    "/depts"
+                ],
+                "Z:": [
+                    "/production"
+                ],
+                "X:": [
+                    "/job"
+                ]
+            },
+            "linux": {
+                "/l": [
+                    "L:",
+                    "l:"
+                ],
+                "/o": [
+                    "O:",
+                    "o:"
+                ],
+                "/depts": [
+                    "Q:",
+                    "q:"
+                ],
+                "/production": [
+                    "Z:",
+                    "z:"
+                ],
+                "/job": [
+                    "X:",
+                    "x:"
+                ]
+            }
+        }
+    )
+    @classmethod
+    def map_to_current(cls, path):
+        if path is not None:
+            if SystemMtd.get_is_windows():
+                return cls.map_to_windows(path)
+            elif SystemMtd.get_is_linux():
+                return cls.map_to_linux(path)
+            return StorageMtd.clear_pathsep_to(path)
+        return path
+    @classmethod
+    def map_to_windows(cls, path):
+        # clear first
+        path = StorageMtd.clear_pathsep_to(path)
+        if StorageMtd.get_path_is_linux(path):
+            mapper_dict = cls.MAPPER._windows_dict
+            for i_root_src, i_root_tgt in mapper_dict.items():
+                if path == i_root_src:
+                    return i_root_tgt
+                elif path.startswith(i_root_src+cls.PATHSEP):
+                    return i_root_tgt+path[len(i_root_src):]
+            return path
+        return path
+    @classmethod
+    def map_to_linux(cls, path):
+        """
+print Path.map_to_linux(
+    'l:/a'
+)
+        :param path:
+        :return:
+        """
+        # clear first
+        path = StorageMtd.clear_pathsep_to(path)
+        if StorageMtd.get_path_is_windows(path):
+            mapper_dict = cls.MAPPER._linux_dict
+            for i_root_src, i_root_tgt in mapper_dict.items():
+                if path == i_root_src:
+                    return i_root_tgt
+                elif path.startswith(i_root_src+cls.PATHSEP):
+                    return i_root_tgt+path[len(i_root_src):]
+            return path
+        return path
+
+
 class StorageMtd(object):
     PATHSEP = '/'
     @classmethod
@@ -298,17 +446,8 @@ class StorageMtd(object):
         elif cls.get_path_is_linux(path):
             return cls.PATHSEP
     @classmethod
-    def set_map_to_platform(cls, path):
-        if path is not None:
-            if SystemMtd.get_is_windows():
-                return cls.set_map_to_windows(path)
-            elif SystemMtd.get_is_linux():
-                return cls.set_map_to_linux(path)
-            return cls.set_pathsep_cleanup(path)
-        return path
-    @classmethod
     def set_map_to_nas(cls, path):
-        path = cls.set_pathsep_cleanup(path)
+        path = cls.clear_pathsep_to(path)
         if StorageMtd.get_path_is_linux(path):
             src_root = path[:2]
             if src_root == '/l':
@@ -320,27 +459,7 @@ class StorageMtd(object):
             else:
                 return path
     @classmethod
-    def set_map_to_windows(cls, path):
-        path = cls.set_pathsep_cleanup(path)
-        if StorageMtd.get_path_is_linux(path):
-            src_root = path[:2]
-            src_root_name = src_root[-1]
-            tgt_root = src_root_name + ':'
-            _ = tgt_root + path[len(src_root):]
-            return _
-        return path
-    @classmethod
-    def set_map_to_linux(cls, path):
-        path = cls.set_pathsep_cleanup(path)
-        if StorageMtd.get_path_is_windows(path):
-            src_root = path[:2]
-            src_root_name = src_root[0]
-            tgt_root = '/' + src_root_name.lower()
-            _ = tgt_root + path[len(src_root):]
-            return _
-        return path
-    @classmethod
-    def set_pathsep_convert(cls, path):
+    def convert_pathsep_to(cls, path):
         lis = []
         for i in path:
             i_r = repr(i)
@@ -369,8 +488,8 @@ class StorageMtd(object):
         #
         return ''.join(lis).decode('unicode_escape')
     @classmethod
-    def set_pathsep_cleanup(cls, path):
-        path_ = cls.set_pathsep_convert(path)
+    def clear_pathsep_to(cls, path):
+        path_ = cls.convert_pathsep_to(path)
         #
         _ = path_.split(cls.PATHSEP)
         new_path = cls.PATHSEP.join([i for i in _ if i])
@@ -566,7 +685,7 @@ class UuidMtd(object):
         return cls.get_by_string(hash_value)
     @classmethod
     def get_by_file(cls, file_path):
-        check_file_path = StorageMtd.set_map_to_linux(file_path)
+        check_file_path = StgPathMapMtd.map_to_linux(file_path)
         if os.path.isfile(file_path):
             timestamp = os.stat(file_path).st_mtime
             size = os.path.getsize(file_path)

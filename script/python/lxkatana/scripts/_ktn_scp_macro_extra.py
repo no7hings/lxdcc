@@ -17,7 +17,6 @@ import lxbasic.objects as bsc_objects
 from lxkatana import ktn_core
 
 
-
 class ScpMacro(object):
     def __init__(self, file_path):
         self._file_path = file_path
@@ -401,7 +400,7 @@ class ScpMacro(object):
                 )
             else:
                 for i in contents:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.LogMtd.trace_method_warning(
                         label, i
                     )
 
@@ -704,8 +703,6 @@ class ScpWspAssetGeometry(AbsWsp):
         super(ScpWspAssetGeometry, self).__init__(*args, **kwargs)
     @ktn_core.Modifier.undo_run
     def load_latest_usd(self):
-        from lxutil import utl_core
-
         from lxkatana import ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -740,10 +737,12 @@ class ScpWspAssetGeometry(AbsWsp):
                 #
                 self._obj_opt.set('parameters.usd.enable', 1)
                 #
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
+                #
+                self.load_usd_variant()
                 #
                 ktn_core.CacheManager.flush()
         else:
@@ -755,8 +754,6 @@ class ScpWspAssetGeometry(AbsWsp):
         )
     @ktn_core.Modifier.undo_run
     def create_new_usd(self):
-        from lxutil import utl_core
-
         from lxkatana import ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -791,16 +788,19 @@ class ScpWspAssetGeometry(AbsWsp):
                 #
                 self._obj_opt.set('parameters.usd.enable', 1)
                 #
-                utl_core.Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
+                #
+                self.load_usd_variant()
                 #
                 ktn_core.CacheManager.flush()
         else:
             contents.append(
                 u'file={} is not not available'.format(f)
             )
+        #
         ScpMacro.set_warning_show(
             'camera load', contents
         )
@@ -894,6 +894,35 @@ class ScpWspGeometry(AbsWsp):
         super(ScpWspGeometry, self).__init__(*args, **kwargs)
         self._cfg = bsc_objects.Configure(value=self.CFG_YAML)
         self.PRESET_DICT = self._cfg.get('preset')
+
+
+class ScpWspGeometrySpace(AbsWsp):
+    class Records(object):
+        variant_register = 'record.variant_register'
+    #
+    class Keys(object):
+        node_name = 'record.variant_register'
+        #
+        default_name = 'extra.default_name'
+        customize_name = 'extra.customize_name'
+    #
+    def __init__(self, *args, **kwargs):
+        super(ScpWspGeometrySpace, self).__init__(*args, **kwargs)
+
+    def add_default(self):
+        pass
+
+    def add_customize(self):
+        pass
+
+    def _add_(self, key):
+        pass
+
+    def register_variable(self):
+        node_name = self._obj_opt.get(
+            self.Records.variant_register
+        )
+        ScpWspVariantRegister(node_name).register_variable()
 
 
 # camera
@@ -996,41 +1025,11 @@ class ScpWspSpace(AbsWsp):
             self.Records.variant_register
         )
         ScpWspVariantRegister(obj_name).register_variable()
-        ktn_core.NGObjOpt(obj_name).set_port_execute('variant.register')
+        ktn_core.NGObjOpt(obj_name).execute_port('variant.register')
 
     def get_variant_values(self):
         n = self._obj_opt.get('record.variant_register')
         return ScpWspVariantRegister(n).get_variant_values()
-
-
-# geometry
-class ScpWspGeometrySpace(AbsWsp):
-    class Records(object):
-        variant_register = 'record.variant_register'
-    #
-    class Keys(object):
-        node_name = 'record.variant_register'
-        #
-        default_name = 'extra.default_name'
-        customize_name = 'extra.customize_name'
-    #
-    def __init__(self, *args, **kwargs):
-        super(ScpWspGeometrySpace, self).__init__(*args, **kwargs)
-
-    def add_default(self):
-        pass
-
-    def add_customize(self):
-        pass
-
-    def _add_(self, key):
-        pass
-
-    def register_variable(self):
-        node_name = self._obj_opt.get(
-            self.Records.variant_register
-        )
-        ScpWspVariantRegister(node_name).register_variable()
 
 
 class ScpWspCameraSpace(AbsWsp):
@@ -1080,11 +1079,24 @@ class AbsSpcWspLookGroup(AbsWsp):
             **env_data
         )
         if rsv_task is not None:
-            keyword = 'asset-source-look-ass-file'
+            version_cur = env_data.get('version') or None
+            workspace_key = env_data.get('workspace_key')
+            if workspace_key in {resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.User}:
+                keyword = 'asset-source-look-ass-file'
+                version = 'latest'
+            elif workspace_key in {resolver.WorkspaceKeys.Release}:
+                keyword = 'asset-look-ass-file'
+                version = version_cur
+            elif workspace_key in {resolver.WorkspaceKeys.Temporary}:
+                keyword = 'asset-temporary-look-ass-file'
+                version = version_cur
+            else:
+                raise RuntimeError()
+
             rsv_unit = rsv_task.get_rsv_unit(
                 keyword=keyword
             )
-            result = rsv_unit.get_result()
+            result = rsv_unit.get_result(version=version)
             if result:
                 self._obj_opt.set(
                     'user.parameters.ass.file', result
@@ -1136,7 +1148,6 @@ class SpcWspGeometryPropertiesAssignGroup(AbsSpcWspLookGroup):
             )
 
 
-# look
 class ScpWspLookSpace(AbsWsp):
     class Records(object):
         variant_register = 'record.variant_register'
@@ -1321,7 +1332,7 @@ class ScpWspWorkspace(AbsWsp):
                 '{}.space'.format(i_key)
             )
             if i_record is not None:
-                ktn_core.NGObjOpt(i_record).set_port_execute('variant.register')
+                ktn_core.NGObjOpt(i_record).execute_port('variant.register')
     @ktn_core.Modifier.undo_run
     def build(self):
         keys = self._obj_opt.get('workspace.keys')
@@ -1625,7 +1636,7 @@ class ScpAssetAssExport(AbsWsp):
                             settings=rss
                         )
                         l_p.set_update()
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.LogMtd.trace_method_result(
                             'ass sequence export',
                             'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
                         )

@@ -17,11 +17,11 @@ class FncUsdObj(object):
         self._dcc_path = usd_prim.GetPath().pathString
         self._usd_path = self._dcc_path
         self._usd_path_dag_opt = bsc_core.DccPathDagOpt(self._usd_path)
-        self._mya_path_dag_opt = self._usd_path_dag_opt.set_translate_to(self.OBJ_PATHSEP)
+        self._mya_path_dag_opt = self._usd_path_dag_opt.translate_to(self.OBJ_PATHSEP)
         #
         if location is not None:
             location_path_dag_opt = bsc_core.DccPathDagOpt(location)
-            mya_root = location_path_dag_opt.set_translate_to(self.OBJ_PATHSEP)
+            mya_root = location_path_dag_opt.translate_to(self.OBJ_PATHSEP)
             self._mya_path_dag_opt.set_parent_path(mya_root.path)
 
     def __str__(self):
@@ -63,7 +63,7 @@ class FncUsdMesh(FncUsdObj):
         self.set_group_create()
         #
         tgt_path_dag_opt = bsc_core.DccPathDagOpt(tgt_path)
-        tgt_mya_path_dag_opt = tgt_path_dag_opt.set_translate_to(self.OBJ_PATHSEP)
+        tgt_mya_path_dag_opt = tgt_path_dag_opt.translate_to(self.OBJ_PATHSEP)
         tgt_mya_mesh = mya_dcc_objects.Mesh(tgt_mya_path_dag_opt.get_value())
         #
         if tgt_mya_mesh.get_is_exists() is True:
@@ -227,13 +227,13 @@ class FncUsdMesh(FncUsdObj):
     def set_delete(cls, tgt_path):
         mesh_dcc_path_dag_opt = bsc_core.DccPathDagOpt(tgt_path)
         transform_dcc_path_dag_opt = mesh_dcc_path_dag_opt.get_parent()
-        transform_mya_path_dag_opt = transform_dcc_path_dag_opt.set_translate_to(cls.OBJ_PATHSEP)
+        transform_mya_path_dag_opt = transform_dcc_path_dag_opt.translate_to(cls.OBJ_PATHSEP)
         mya_dcc_objects.Node(transform_mya_path_dag_opt.get_value()).set_delete()
     @classmethod
     def set_remove(cls, tgt_path):
         mesh_dcc_path_dag_opt = bsc_core.DccPathDagOpt(tgt_path)
         transform_dcc_path_dag_opt = mesh_dcc_path_dag_opt.get_parent()
-        transform_mya_path_dag_opt = transform_dcc_path_dag_opt.set_translate_to(cls.OBJ_PATHSEP)
+        transform_mya_path_dag_opt = transform_dcc_path_dag_opt.translate_to(cls.OBJ_PATHSEP)
         mya_dcc_objects.Node(transform_mya_path_dag_opt.get_value()).set_to_world()
 
 
@@ -241,7 +241,7 @@ class FncDccMesh(object):
     OBJ_PATHSEP = '|'
     def __init__(self, dcc_path):
         self._dcc_path_dag_opt = bsc_core.DccPathDagOpt(dcc_path)
-        self._mya_path_dag_opt = self._dcc_path_dag_opt.set_translate_to(self.OBJ_PATHSEP)
+        self._mya_path_dag_opt = self._dcc_path_dag_opt.translate_to(self.OBJ_PATHSEP)
         self._maya_mesh = mya_dcc_objects.Mesh(self._mya_path_dag_opt.get_value())
         #
         self._mya_mesh_opt = mya_dcc_operators.MeshOpt(self._maya_mesh)

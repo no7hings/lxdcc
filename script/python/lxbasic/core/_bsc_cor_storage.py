@@ -952,7 +952,7 @@ class StgPathOpt(object):
     PATHSEP = '/'
     def __init__(self, path, cleanup=True):
         if cleanup is True:
-            self._path = StorageMtd.set_pathsep_cleanup(path)
+            self._path = StorageMtd.clear_pathsep_to(path)
         else:
             self._path = path
         #
@@ -1026,8 +1026,8 @@ class StgPathOpt(object):
     def get_is_writeable(self):
         return os.access(self._path, os.W_OK)
 
-    def set_map_to_platform(self):
-        self._path = StorageMtd.set_map_to_platform(self._path)
+    def map_to_current(self):
+        self._path = StgPathMapMtd.map_to_current(self._path)
 
     def __str__(self):
         return self._path
@@ -1415,7 +1415,7 @@ class StgTmpBaseMtd(object):
     ROOT = '/l/temp'
     @classmethod
     def get_user_directory(cls, tag):
-        return StorageMtd.set_map_to_platform(
+        return StgPathMapMtd.map_to_current(
             u'{root}/temporary/{tag}/{date_tag}-{user}'.format(
                 **dict(
                     root=cls.ROOT,

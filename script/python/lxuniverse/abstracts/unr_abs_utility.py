@@ -132,7 +132,7 @@ class AbsProperties(object):
         _rcs_fnc(None, self._value)
         return lis
 
-    def _get_last_keys_(self):
+    def _get_leaf_keys_(self):
         def _rcs_fnc(k_, v_):
             for _k, _v in v_.items():
                 if k_ is not None:
@@ -491,7 +491,7 @@ class AbsCategoryDef(object):
         """
         return self.TYPE_CLASS(self, type_name)
 
-    def set_type_create(self, type_name):
+    def generate_type(self, type_name):
         category = self
         category_name = self.name
         stack = self._type_stack
@@ -504,7 +504,7 @@ class AbsCategoryDef(object):
         return type_
 
     def _get_type_force_(self, type_name):
-        return self.set_type_create(type_name)
+        return self.generate_type(type_name)
 
     def get_type(self, type_name):
         """
@@ -1150,7 +1150,7 @@ class AbsObjDagPath(object):
     def get_components(self):
         return [self.__class__(i) for i in self.get_component_paths()]
 
-    def set_translate_to(self, pathsep):
+    def translate_to(self, pathsep):
         return self.__class__(
             bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
                 self.path,
@@ -1159,7 +1159,7 @@ class AbsObjDagPath(object):
             )
         )
 
-    def set_namespace_clear_to(self):
+    def clear_namespace_to(self):
         return self.__class__(
             bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
                 self.path,
@@ -1323,7 +1323,6 @@ class AbsObjGuiDef(object):
 
     def get_gui_extra_menu_raw(self):
         return self.get_gui_attribute('gui_extra_menu')
-
     #
     def set_gui_extend_menu_raw(self, raw):
         self.set_gui_attribute('gui_extend_menu', raw)
@@ -2163,7 +2162,7 @@ class AbsPort(
 # obj/type/def
 class AbsObjTypeObjDef(object):
     # class(<obj>)
-    DCC_OBJ_CLASS = None
+    DCC_NODE_CLASS = None
 
     def _set_obj_type_obj_def_init_(self):
         pass
@@ -2209,21 +2208,21 @@ class AbsObjTypeObjDef(object):
             self.universe._set_obj_add_(obj)
         return obj
 
-    def set_obj_register(self, obj_oath):
-        obj = self.DCC_OBJ_CLASS(self, obj_oath)
+    def generate_obj(self, obj_oath):
+        obj = self.DCC_NODE_CLASS(self, obj_oath)
         self.universe._set_obj_add_(obj)
         return obj
 
     @property
     def obj_pathsep(self):
-        return self.DCC_OBJ_CLASS.PATHSEP
+        return self.DCC_NODE_CLASS.PATHSEP
 
     @classmethod
     def _get_obj_path_(cls, obj_path_args):
-        return cls.DCC_OBJ_CLASS.PATHSEP.join(obj_path_args)
+        return cls.DCC_NODE_CLASS.PATHSEP.join(obj_path_args)
 
     def _set_obj_create_(self, obj_path, **kwargs):
-        new_obj = self.DCC_OBJ_CLASS(self, obj_path)
+        new_obj = self.DCC_NODE_CLASS(self, obj_path)
         new_obj.set_ancestors_create()
         return new_obj
 
@@ -2730,7 +2729,7 @@ class AbsObjType(
             obj_path = self._get_obj_path_(obj_path_args)
         else:
             raise TypeError()
-        new_obj = self.DCC_OBJ_CLASS(self, obj_path)
+        new_obj = self.DCC_NODE_CLASS(self, obj_path)
         for port_query in self.get_port_queries():
             type_path = port_query.type.path
             port_path = port_query.port_path
@@ -3191,7 +3190,7 @@ class AbsObjUniverseDef(object):
             obj_category._set_port_queries_build_(unr_configure.ObjCategory.PORT_QUERY_RAW)
         #
         for obj_category_name, obj_type_name in unr_configure.ObjType.ALL:
-            obj_type = self._get_obj_type_force_(obj_category_name, obj_type_name)
+            obj_type = self.get_or_create_obj_type(obj_category_name, obj_type_name)
             obj_type._set_port_queries_build_(unr_configure.ObjType.PORT_QUERY_RAW)
         #
         root_type = self.get_obj_type(unr_configure.ObjType.ROOT)
@@ -3260,7 +3259,7 @@ class AbsObjUniverseDef(object):
     def _set_obj_category_create_as_new_(self, obj_category_name):
         return self.OBJ_CATEGORY_CLASS(self, obj_category_name)
 
-    def set_obj_category_create(self, obj_category_name):
+    def generate_obj_category(self, obj_category_name):
         stack = self._obj_category_stack
         if stack.get_object_exists(obj_category_name) is True:
             return stack.get_object(obj_category_name)
@@ -3269,7 +3268,7 @@ class AbsObjUniverseDef(object):
         return obj_category
 
     def _get_obj_category_force_(self, obj_category_name):
-        return self.set_obj_category_create(obj_category_name)
+        return self.generate_obj_category(obj_category_name)
 
     def get_obj_categories(self):
         return self._obj_category_stack.get_objects()
@@ -3278,7 +3277,7 @@ class AbsObjUniverseDef(object):
         return self._obj_category_stack.get_object(obj_category_name)
 
     # <obj-type>
-    def _get_obj_type_force_(self, obj_category_name, obj_type_name):
+    def get_or_create_obj_type(self, obj_category_name, obj_type_name):
         category = self._get_obj_category_force_(obj_category_name)
         return category._get_type_force_(obj_type_name)
 
@@ -4045,7 +4044,7 @@ class AbsObjScene(object):
         return self._universe
 
     @property
-    def root_lstrip(self):
+    def path_lstrip(self):
         return self._path_lstrip
 
     def set_restore(self):

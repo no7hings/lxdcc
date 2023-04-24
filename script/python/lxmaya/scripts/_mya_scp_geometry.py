@@ -14,11 +14,11 @@ from lxutil import utl_core
 class AttributeTranslator(object):
     def __init__(self, root_src, root_tgt):
         root_src_dag_path = unr_objects.ObjDagPath(root_src)
-        self._mya_root_src_dag_path = root_src_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+        self._mya_root_src_dag_path = root_src_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
         self._mya_root_src_path = self._mya_root_src_dag_path.path
 
         root_tgt_dag_path = unr_objects.ObjDagPath(root_tgt)
-        self._mya_root_tgt_dag_path = root_tgt_dag_path.set_translate_to(ma_configure.Util.OBJ_PATHSEP)
+        self._mya_root_tgt_dag_path = root_tgt_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
         self._mya_root_tgt_path = self._mya_root_tgt_dag_path.path
 
     def set_uv_translate(self, clear_history=False):

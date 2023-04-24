@@ -6,7 +6,7 @@ import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 from lxutil.fnc import utl_fnc_obj_abs
 
 
-class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionMethod):
+class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         localtion='',
         look_path='default'

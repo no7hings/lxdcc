@@ -508,10 +508,10 @@ class DccTexturesOpt(object):
                         #
                         matches = [i for search_ext in search_ext_keys for i in ext_search_dict.get(search_ext, [])]
                         if matches:
-                            tgt_directory_path, tgt_name_base, ext_tgt = matches[0]
+                            directory_path_tgt, tgt_name_base, ext_tgt = matches[0]
                             #
                             tgt_name_base = i_name_base_src
-                            target_file_path = u'{}/{}{}'.format(tgt_directory_path, tgt_name_base, ext_tgt)
+                            target_file_path = u'{}/{}{}'.format(directory_path_tgt, tgt_name_base, ext_tgt)
                             j_port = i_obj.get_port(j_port_path)
                             tgt_texture_file_obj = utl_dcc_objects.OsTexture(target_file_path)
                             #
@@ -570,7 +570,7 @@ class DccTexturesOpt(object):
 
             self._set_repath_queue_run_(repath_queue)
 
-    def set_copy_and_repath_to(self, tgt_directory_path):
+    def set_copy_and_repath_to(self, directory_path_tgt):
         objs = self._objs
         #
         copy_queue = []
@@ -581,10 +581,10 @@ class DccTexturesOpt(object):
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     j_port = i_obj.get_port(j_port_path)
                     src_texture_file_obj = utl_dcc_objects.OsTexture(j_file_path)
-                    tgt_texture_file_obj = src_texture_file_obj.get_target_file(tgt_directory_path)
+                    tgt_texture_file_obj = src_texture_file_obj.get_target_file(directory_path_tgt)
                     for src_texture_file_tile_obj in src_texture_file_obj.get_exists_files_():
                         tgt_texture_file_tile_obj = src_texture_file_tile_obj.get_target_file(
-                            tgt_directory_path
+                            directory_path_tgt
                         )
                         copy_queue.append(
                             (src_texture_file_tile_obj, tgt_texture_file_tile_obj)

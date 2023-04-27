@@ -1339,43 +1339,29 @@ class AbsObjGuiDef(object):
 
 class AbsObjOsDef(object):
     PATHSEP = '/'
-
     @classmethod
-    def _set_symlink_create_(cls, src_path, tgt_path):
+    def create_symlink_fnc(cls, src_path, tgt_path):
         tgt_dir_path = os.path.dirname(tgt_path)
         src_rel_path = os.path.relpath(src_path, tgt_dir_path)
         if os.path.exists(tgt_path) is False:
             os.symlink(src_rel_path, tgt_path)
 
-    @classmethod
-    def _set_os_path_reduce_(cls, path):
-        path_ = path.replace('\\', cls.PATHSEP)
-        _ = path_.split(cls.PATHSEP)
-        new_path = cls.PATHSEP.join([i for i in _ if i])
-        if path_.startswith(cls.PATHSEP):
-            return cls.PATHSEP + new_path
-        return new_path
-
     def _set_obj_os_def_init_(self):
         self._root = bsc_core.StorageMtd.get_root(
             self.path
         )
-
     @property
     def root_name(self):
         return self._root
-
     @property
     def normcase_root_name(self):
         return os.path.normcase(self._root)
-
     @property
     def path(self):
         """
         :return: str(<plf-path>)
         """
         raise NotImplementedError()
-
     @property
     def normcase_path(self):
         """
@@ -1383,14 +1369,12 @@ class AbsObjOsDef(object):
         :return: str(path)
         """
         return os.path.normcase(self.path)
-
     @property
     def name(self):
         """
         :return: str(<plf-name>)
         """
         raise NotImplementedError()
-
     @property
     def normcase_name(self):
         return os.path.basename(self.name)
@@ -3562,10 +3546,10 @@ class AbsOsDirectory(
             self.path
         )
 
-    def set_copy_to(self, tgt_directory_path):
-        if os.path.exists(tgt_directory_path) is False:
+    def set_copy_to(self, directory_path_tgt):
+        if os.path.exists(directory_path_tgt) is False:
             shutil.copytree(
-                self.path, tgt_directory_path
+                self.path, directory_path_tgt
             )
 
     def get_file_paths(self, include_exts=None):
@@ -3581,7 +3565,7 @@ class AbsOsDirectory(
             self.path, include_exts
         )
 
-    def set_copy_to_directory(self, tgt_directory_path):
+    def set_copy_to_directory(self, directory_path_tgt):
         def copy_fnc_(src_file_path_, tgt_file_path_):
             shutil.copy2(src_file_path_, tgt_file_path_)
             self.LOG.set_module_result_trace(
@@ -3597,7 +3581,7 @@ class AbsOsDirectory(
         for i_src_file_path in file_paths:
             i_local_file_path = i_src_file_path[len(src_directory_path):]
             #
-            i_tgt_file_path = tgt_directory_path + i_local_file_path
+            i_tgt_file_path = directory_path_tgt + i_local_file_path
             if os.path.exists(i_tgt_file_path) is False:
                 i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
                 if os.path.exists(i_tgt_dir_path) is False:
@@ -3764,8 +3748,8 @@ class AbsOsFile(
         else:
             self.LOG.set_warning_trace('file copy: source "{}" is Non-exist.'.format(self.path))
 
-    def get_target_file_path(self, tgt_directory_path, fix_name_blank=False, ignore_structure=True, ext_override=None):
-        tgt_directory_path = bsc_core.StgPathOpt(tgt_directory_path).__str__()
+    def get_target_file_path(self, directory_path_tgt, fix_name_blank=False, ignore_structure=True, ext_override=None):
+        directory_path_tgt = bsc_core.StgPathOpt(directory_path_tgt).__str__()
         if ignore_structure is True:
             name = self.name
             if fix_name_blank is True:
@@ -3774,13 +3758,13 @@ class AbsOsFile(
             if ext_override is not None:
                 base, ext = os.path.splitext(name)
                 name = '{}{}'.format(base, ext_override)
-            return u'{}/{}'.format(tgt_directory_path, name)
+            return u'{}/{}'.format(directory_path_tgt, name)
         else:
-            return u'{}/{}'.format(tgt_directory_path, self.path)
+            return u'{}/{}'.format(directory_path_tgt, self.path)
 
-    def get_target_file(self, tgt_directory_path):
+    def get_target_file(self, directory_path_tgt):
         return self.__class__(
-            self.get_target_file_path(tgt_directory_path)
+            self.get_target_file_path(directory_path_tgt)
         )
 
     def create_directory(self):

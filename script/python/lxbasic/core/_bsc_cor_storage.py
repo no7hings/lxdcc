@@ -63,28 +63,28 @@ class StgRpcMtd(object):
             )
         return True
     @classmethod
-    def remove_file(cls, file_path):
-        if os.path.exists(file_path) is True:
+    def delete(cls, path):
+        if os.path.exists(path) is True:
             timeout = 25
             cost_time = 0
             start_time = time.time()
             clt = cls.get_client()
-            clt.rm_file(file_path)
-            while os.path.exists(file_path) is False:
+            clt.rm_file(path)
+            while os.path.exists(path) is False:
                 cost_time = int(time.time()-start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
                         _bsc_cor_log.LogMtd.trace_method_error(
-                            'rpc remove file',
-                            'file="{}" is timeout, cost time {}s'.format(file_path, cost_time)
+                            'rpc delete',
+                            'path="{}" is timeout, cost time {}s'.format(path, cost_time)
                         )
                     )
                 #
                 time.sleep(1)
             #
             _bsc_cor_log.LogMtd.trace_method_result(
-                'rpc remove file',
-                'file="{}" is completed, cost time {}s'.format(file_path, cost_time)
+                'rpc delete',
+                'path="{}" is completed, cost time {}s'.format(path, cost_time)
             )
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
@@ -775,7 +775,7 @@ class StgDirectoryMtd(object):
     def get_file_relative_path(cls, directory_path, file_path):
         return os.path.relpath(file_path, directory_path)
     @classmethod
-    def set_copy_to(cls, src_directory_path, tgt_directory_path, excludes=None):
+    def set_copy_to(cls, src_directory_path, directory_path_tgt, excludes=None):
         def copy_fnc_(src_file_path_, tgt_file_path_):
             shutil.copy2(src_file_path_, tgt_file_path_)
             _bsc_cor_log.LogMtd.trace_method_result(
@@ -800,7 +800,7 @@ class StgDirectoryMtd(object):
                 if is_match is True:
                     continue
             #
-            i_tgt_file_path = tgt_directory_path + i_local_file_path
+            i_tgt_file_path = directory_path_tgt + i_local_file_path
             if os.path.exists(i_tgt_file_path) is False:
                 i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
                 if os.path.exists(i_tgt_dir_path) is False:
@@ -1509,17 +1509,23 @@ class StgPathPermissionDefaultMtd(object):
             ['cg_group', 'coop_grp']
         )
     @classmethod
-    def lock_all_below(cls, path):
+    def unlock(cls, path):
+        pass
+    @classmethod
+    def delete(cls, path):
+        os.remove(path)
+    @classmethod
+    def lock_all_directories(cls, path):
         StgSshOpt(
             path
         ).set_just_read_only_for(
             ['cg_group', 'coop_grp']
         )
     @classmethod
-    def unlock_all_below(cls, path):
+    def unlock_all_directories(cls, path):
         pass
     @classmethod
-    def unlock(cls, path):
+    def unlock_all_files(cls, path):
         pass
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
@@ -1544,7 +1550,17 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
             path, '555'
         )
     @classmethod
-    def lock_all_below(cls, path):
+    def unlock(cls, path):
+        StgRpcMtd.change_mode(
+            path, '775'
+        )
+    @classmethod
+    def delete(cls, path):
+        StgRpcMtd.delete(
+            path
+        )
+    @classmethod
+    def lock_all_directories(cls, path):
         StgRpcMtd.change_mode(
             path, '555'
         )
@@ -1556,7 +1572,7 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
                 i, '555'
             )
     @classmethod
-    def unlock_all_below(cls, path):
+    def unlock_all_directories(cls, path):
         StgRpcMtd.change_mode(
             path, '775'
         )
@@ -1568,8 +1584,17 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
                 i, '775'
             )
     @classmethod
-    def unlock(cls, path):
-        pass
+    def unlock_all_files(cls, path):
+        StgRpcMtd.change_mode(
+            path, '775'
+        )
+        ds = StgDirectoryMtd.get_all_file_paths__(
+            path
+        )
+        for i in ds:
+            StgRpcMtd.change_mode(
+                i, '775'
+            )
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
         StgRpcMtd.copy_to_file(
@@ -1653,15 +1678,30 @@ class StgPathPermissionMtd(object):
             path
         ).lock(path)
     @classmethod
-    def lock_all_below(cls, path):
+    def unlock(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
-        ).lock_all_below(path)
+        ).unlock(path)
     @classmethod
-    def unlock_all_below(cls, path):
+    def delete(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
-        ).unlock_all_below(path)
+        ).delete(path)
+    @classmethod
+    def lock_all_directories(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).lock_all_directories(path)
+    @classmethod
+    def unlock_all_directories(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).unlock_all_directories(path)
+    @classmethod
+    def unlock_all_files(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).unlock_all_files(path)
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
         StgPathPermissionBaseMtd.get_method(

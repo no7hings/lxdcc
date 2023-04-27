@@ -40,19 +40,19 @@ if __name__ == '__main__':
     # print StgPathPermissionBaseMtd.get_mode(
     #     'r-x', 'r-x', 'r-x'
     # )
-    # StgPathPermissionMtd.lock_all_below(
+    # StgPathPermissionMtd.lock_all_directories(
     #     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002'
     # )
     # print StgPathPermissionMtd.change_owner('/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002')
 
-    # StgPathPermissionMtd.unlock_all_below(
-    #     '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/td_test.srf.surfacing.v004'
-    # )
+    StgPathPermissionMtd.unlock_all_files(
+        '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/texture'
+    )
     #
     # print RawTextMtd.to_integer('geometry')
-    print RawTextOpt(
-        'dreambae'
-    ).to_rgb_0()
-    print RawTextOpt(
-        'dreambae_nightare'
-    ).to_rgb_0()
+    # print RawTextOpt(
+    #     'dreambae'
+    # ).to_rgb_0()
+    # print RawTextOpt(
+    #     'dreambae_nightare'
+    # ).to_rgb_0()

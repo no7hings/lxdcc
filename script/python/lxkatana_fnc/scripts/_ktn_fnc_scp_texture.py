@@ -23,24 +23,24 @@ def set_asset_texture_tx_export(task_properties, force=False):
         #     )
         # ).set_tx_create_and_repath()
         # texture-src
-        texture_src_directory_path = rsv_operators.RsvAssetTextureQuery(task_properties).get_src_directory(
+        texture_directory_path_src = rsv_operators.RsvAssetTextureQuery(task_properties).get_src_directory(
             task=task,
             version=version
         )
         # TODO remove orig directory
         # texture-tgt
-        texture_tgt_directory_path = rsv_operators.RsvAssetTextureQuery(task_properties).get_tgt_directory(
+        texture_directory_path_tgt = rsv_operators.RsvAssetTextureQuery(task_properties).get_tgt_directory(
             task=task,
             version=version
         )
         #
         ktn_fnc_exporters.TextureExporter(
             option=dict(
-                directory_base=texture_src_directory_path,
-                directory=texture_tgt_directory_path,
+                directory_base=texture_directory_path_src,
+                directory=texture_directory_path_tgt,
                 #
                 fix_name_blank=True,
-                use_tx=True,
+                repath_to_tx_force=True,
                 with_reference=False,
                 use_environ_map=True,
                 #
@@ -70,24 +70,24 @@ def set_asset_texture_export(task_properties, force=False):
             )
         ).set_tx_repath_to_orig()
         # texture-src
-        texture_src_directory_path = rsv_operators.RsvAssetTextureQuery(task_properties).get_src_directory(
+        texture_directory_path_src = rsv_operators.RsvAssetTextureQuery(task_properties).get_src_directory(
             task=task,
             version=version
         )
         # TODO remove orig directory
         # texture-tgt
-        texture_tgt_directory_path = rsv_operators.RsvAssetTextureQuery(task_properties).get_tgt_directory(
+        texture_directory_path_tgt = rsv_operators.RsvAssetTextureQuery(task_properties).get_tgt_directory(
             task=task,
             version=version
         )
         #
         ktn_fnc_exporters.TextureExporter(
             option=dict(
-                directory_base=texture_src_directory_path,
-                directory=texture_tgt_directory_path,
+                directory_base=texture_directory_path_src,
+                directory=texture_directory_path_tgt,
                 #
                 fix_name_blank=True,
-                use_tx=False,
+                repath_to_tx_force=False,
                 with_reference=False,
                 use_environ_map=True,
             )

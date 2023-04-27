@@ -58,9 +58,9 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 #
 # utl_dcc_objects.OsTexture(
 #     '/l/temp/td/dongchangbao/texture_base_test/exr/jiguang_cloth_mask.<udim>.####.exr'
-# ).set_copy_as_src(
-#     directory_path_src='/l/temp/td/dongchangbao/texture_base_test/base',
-#     directory_path_tgt='/l/temp/td/dongchangbao/texture_base_test/tgt'
+# ).copy_as_base_link(
+#     directory_path_bsc='/l/temp/td/dongchangbao/texture_base_test/base',
+#     directory_path_dst='/l/temp/td/dongchangbao/texture_base_test/tgt'
 # )
 
 # utl_dcc_objects.OsTexture(

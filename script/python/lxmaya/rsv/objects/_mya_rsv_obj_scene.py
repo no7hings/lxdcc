@@ -428,7 +428,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             texture_tgt_directory_tgt_unit = self._rsv_task.get_rsv_unit(
                 keyword=keyword_0
             )
-            texture_tgt_directory_path = texture_tgt_directory_tgt_unit.get_result(
+            texture_directory_path_tgt = texture_tgt_directory_tgt_unit.get_result(
                 version=version
             )
             start_index, end_index = self._hook_option_opt.get('start_index'), self._hook_option_opt.get('end_index')
@@ -440,7 +440,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             mya_fnc_exporters.TextureBaker(
                 option=dict(
-                    directory=texture_tgt_directory_path,
+                    directory=texture_directory_path_tgt,
                     location=root,
                     include_indices=include_indices,
                     resolution=bake_resolution,
@@ -481,7 +481,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             texture_tgt_directory_tgt_unit = self._rsv_task.get_rsv_unit(
                 keyword=keyword_1
             )
-            texture_tgt_directory_path = texture_tgt_directory_tgt_unit.get_result(
+            texture_directory_path_tgt = texture_tgt_directory_tgt_unit.get_result(
                 version=version
             )
             #
@@ -489,7 +489,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             mya_fnc_exporters.TextureBaker(
                 option=dict(
-                    directory=texture_tgt_directory_path,
+                    directory=texture_directory_path_tgt,
                     location=root,
                     resolution=bake_resolution,
                 )

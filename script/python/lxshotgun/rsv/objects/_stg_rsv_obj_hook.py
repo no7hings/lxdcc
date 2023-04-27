@@ -174,7 +174,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         directory_path = directory_rsv_unit.get_result(
             version=version
         )
-        bsc_core.StgPathPermissionMtd.lock_all_below(
+        bsc_core.StgPathPermissionMtd.lock_all_directories(
             directory_path
         )
 

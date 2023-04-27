@@ -335,7 +335,7 @@ class AbsTextureReferences(object):
         self._set_customize_update_(exclude_paths=exclude_paths, include_paths=include_paths)
         return self._raw.values()
     @classmethod
-    def set_obj_repath_to(cls, obj, port_path, file_path_new, remove_expression=False):
+    def repath_fnc(cls, obj, port_path, file_path_new, remove_expression=False):
         cls._set_real_file_path_(
             obj.get_port(port_path), file_path_new, remove_expression
         )

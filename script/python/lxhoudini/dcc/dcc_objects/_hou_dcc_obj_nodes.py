@@ -49,7 +49,6 @@ class AbsFileReferences(object):
     def get_objs(self):
         lis = []
         PORT_PATHSEP = hou_configure.Util.PORT_PATHSEP
-        file_path_reduce_fnc = _hou_dcc_obj_os.OsFile._set_os_path_reduce_
         for hou_parm, hou_path in hou.fileReferences():
             if hou_parm is not None:
                 if hou_path.startswith('op:'):

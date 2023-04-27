@@ -518,7 +518,6 @@ class StorageMtd(object):
                 # other
                 'r', 'w', 'x'
             ]
-            print st_mode_
             _mode_b = bin(st_mode_)[-10:]
             _result = ''
             for _idx, _flg in enumerate(_mode_b):

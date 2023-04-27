@@ -53,7 +53,6 @@ class SignalInstance(object):
     def set_emit_send(self, *args, **kwargs):
         if self._methods:
             for i in self._methods:
-                print i
                 i(*args, **kwargs)
             # THREAD_MAXIMUM.acquire()
             # #
@@ -552,7 +551,6 @@ class UndoStack(object):
 
     def set_undo(self):
         if self._fncs and self._undo_index is not None:
-            print self._undo_index
             if self._undo_index > 0:
                 self._undo_index -= 1
                 key = self._keys[self._undo_index]

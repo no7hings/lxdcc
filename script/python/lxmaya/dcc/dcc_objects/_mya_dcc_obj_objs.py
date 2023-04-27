@@ -429,7 +429,7 @@ class AbsFileReferences(object):
                 lis.append(file_path)
         return lis
     @classmethod
-    def set_obj_repath_to(cls, obj, port_path, file_path_new, remove_expression=False):
+    def repath_fnc(cls, obj, port_path, file_path_new, remove_expression=False):
         port = obj.get_port(port_path)
         file_path = cls._get_real_file_path_(
             port

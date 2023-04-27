@@ -68,29 +68,30 @@ class AbsOsDirectory(
                 u'directory-path="{}"'.format(self.path)
             )
 
-    def link_to(self, tgt_directory_path, replace=False):
-        tgt_directory = self.__class__(tgt_directory_path)
-        if tgt_directory.get_is_exists():
+    def link_to(self, directory_path_tgt, replace=False):
+        directory_tgt = self.__class__(directory_path_tgt)
+        if directory_tgt.get_is_exists():
             if replace is False:
                 bsc_core.LogMtd.trace_method_warning(
                     'link create',
-                    u'path="{}" is exists'.format(tgt_directory.path)
+                    u'path="{}" is exists'.format(directory_tgt.path)
                 )
                 return
             else:
-                if os.path.islink(tgt_directory.path) is True:
-                    os.remove(tgt_directory.path)
+                if os.path.islink(directory_tgt.path) is True:
+                    bsc_core.StgPathPermissionMtd.unlock(directory_tgt.path)
+                    os.remove(directory_tgt.path)
                     bsc_core.LogMtd.trace_method_result(
                         'path-link-remove',
-                        u'path="{}"'.format(tgt_directory.path)
+                        u'path="{}"'.format(directory_tgt.path)
                     )
         #
-        if tgt_directory.get_is_exists() is False:
-            self._set_symlink_create_(self.path, tgt_directory.path)
+        if directory_tgt.get_is_exists() is False:
+            self.create_symlink_fnc(self.path, directory_tgt.path)
             #
             bsc_core.LogMtd.trace_method_result(
                 'link create',
-                u'connection="{}" >> "{}"'.format(self.path, tgt_directory.path)
+                u'connection="{}" >> "{}"'.format(self.path, directory_tgt.path)
             )
 
     def get_directory_paths(self):
@@ -223,7 +224,7 @@ class AbsOsFile(
         if list_:
             list_.sort()
         else:
-            utl_core.Log.set_warning_trace('file: "{}" is Non-exists.'.format(self.path))
+            bsc_core.LogMtd.trace_warning('file: "{}" is Non-exists.'.format(self.path))
         return list_
 
     def get_exists_sequence_files(self):
@@ -447,9 +448,7 @@ class AbsOsFile(
             pass
         return None
 
-    def set_unit_copy_as_src(self, directory_path_src, directory_path_tgt, fix_name_blank=False, replace=True):
-        import lxresolver.methods as rsv_methods
-
+    def copy_unit_as_base_link(self, directory_path_bsc, directory_path_dst, fix_name_blank=False, replace=True):
         if self.get_is_exists_file():
             timestamp = self.get_modify_timestamp()
             size = self.get_size()
@@ -460,8 +459,8 @@ class AbsOsFile(
             #
             time_tag = bsc_core.RawIntegerOpt(int(timestamp)).set_encode_to_36()
             size_tag = bsc_core.RawIntegerOpt(int(size)).set_encode_to_36()
-            file_path_tgt = u'{}/{}'.format(directory_path_tgt, name)
-            file_path_dir_src = u'{}/{}'.format(directory_path_src, name)
+            file_path_tgt = u'{}/{}'.format(directory_path_dst, name)
+            file_path_dir_src = u'{}/{}'.format(directory_path_bsc, name)
             file_path_name_src = u'V-{}-{}.{}'.format(time_tag, size_tag, name)
             file_path_src = u'{}/{}'.format(file_path_dir_src, file_path_name_src)
             file_path_copy_log_src = u'{}/.copy.log'.format(file_path_dir_src)
@@ -508,18 +507,18 @@ class AbsOsFile(
                 )
                 return True, link_log
         else:
-            utl_core.Log.set_warning_trace(
+            bsc_core.LogMtd.trace_warning(
                 'file-src-copy',
                 'file-path"{}" not available'.format(self.path)
             )
         return False, None
 
-    def set_copy_as_src(self, directory_path_src, directory_path_tgt, fix_name_blank=False, replace=True):
+    def copy_as_base_link(self, directory_path_bsc, directory_path_dst, fix_name_blank=False, replace=True):
         files = self.get_exists_files_()
         for i_file in files:
-            i_file.set_unit_copy_as_src(
-                directory_path_src=directory_path_src,
-                directory_path_tgt=directory_path_tgt,
+            i_file.copy_unit_as_base_link(
+                directory_path_bsc=directory_path_bsc,
+                directory_path_dst=directory_path_dst,
                 fix_name_blank=fix_name_blank,
                 replace=replace
             )
@@ -678,6 +677,82 @@ class AbsOsTexture(AbsOsFile):
     TX_EXT = '.tx'
     EXR_EXT = '.exr'
     JPG_EXT = '.jpg'
+    @classmethod
+    def get_directory_args_dpt_as_default_fnc(cls, texture_any, target_extension):
+        target_format = target_extension[1:]
+        # source
+        if texture_any.directory.get_path_is_matched('*/src') is True:
+            directory_path_src = texture_any.directory.path
+            directory_path_tgt = texture_any.directory.get_as_new_name(target_format).path
+            return directory_path_src, directory_path_tgt
+        # target
+        elif texture_any.directory.get_path_is_matched('*/{}'.format(target_format)) is True:
+            directory_path_src = (texture_any.directory.get_as_new_name('src')).path
+            directory_path_tgt = texture_any.directory.path
+            return directory_path_src, directory_path_tgt
+        #
+        directory_path_src = texture_any.directory.path
+        directory_path_tgt = texture_any.directory.path
+        return directory_path_src, directory_path_tgt
+    @classmethod
+    def get_directory_args_dst_as_default_fnc(cls, texture_any, target_extension, target_directory):
+        target_format = target_extension[1:]
+        # source
+        if texture_any.directory.get_path_is_matched('*/src') is True:
+            directory_path_src = '{}/src'.format(target_directory)
+            directory_path_tgt = '{}/{}'.format(target_directory, target_format)
+            return directory_path_src, directory_path_tgt
+        # target
+        elif texture_any.directory.get_path_is_matched('*/{}'.format(target_format)) is True:
+            directory_path_src = '{}/src'.format(target_directory)
+            directory_path_tgt = '{}/{}'.format(target_directory, target_format)
+            return directory_path_src, directory_path_tgt
+        #
+        directory_path_src = target_directory
+        directory_path_tgt = target_directory
+        return directory_path_src, directory_path_tgt
+    @classmethod
+    def get_directory_args_dpt_as_separate_fnc(cls, texture_any, target_extension):
+        target_format = target_extension[1:]
+        # source
+        if texture_any.directory.get_path_is_matched('*/src') is True:
+            directory_path_src = texture_any.directory.path
+            directory_path_tgt = texture_any.directory.get_as_new_name(target_format).path
+            return directory_path_src, directory_path_tgt
+        # target
+        elif texture_any.directory.get_path_is_matched('*/{}'.format(target_format)) is True:
+            directory_path_src = (texture_any.directory.get_as_new_name('src')).path
+            directory_path_tgt = texture_any.directory.path
+            return directory_path_src, directory_path_tgt
+        #
+        directory_path_src = '{}/src'.format(texture_any.directory.path)
+        directory_path_tgt = '{}/{}'.format(texture_any.directory.path, target_format)
+        return directory_path_src, directory_path_tgt
+    @classmethod
+    def get_directory_args_dst_as_separate_fnc(cls, texture_any, target_extension, target_directory):
+        target_format = target_extension[1:]
+        # source
+        if texture_any.directory.get_path_is_matched('*/src') is True:
+            directory_path_src = '{}/src'.format(target_directory)
+            directory_path_tgt = '{}/{}'.format(target_directory, target_format)
+            return directory_path_src, directory_path_tgt
+        # target
+        elif texture_any.directory.get_path_is_matched('*/{}'.format(target_format)) is True:
+            directory_path_src = '{}/src'.format(target_directory)
+            directory_path_tgt = '{}/{}'.format(target_directory, target_format)
+            return directory_path_src, directory_path_tgt
+        #
+        directory_path_src = '{}/src'.format(target_directory)
+        directory_path_tgt = '{}/{}'.format(target_directory, target_format)
+        return directory_path_src, directory_path_tgt
+
+    def copy_unit_tx_as_base_link_with_src(self, directory_path_bsc, directory_path_dst, fix_name_blank=False, replace=True):
+        if self.get_is_exists_file():
+            directory_args_dpt = self.get_directory_args_dpt_as_separate_fnc(
+                self, '.tx'
+            )
+            print directory_args_dpt
+    #
     @classmethod
     def _get_unit_is_exists_as_ext_tgt_(cls, file_path_any, ext_tgt):
         tgt_ext_orig_path = cls._get_unit_path_src_as_ext_tgt_(file_path_any, ext_tgt)
@@ -1014,14 +1089,14 @@ class AbsOsTexture(AbsOsFile):
                         if os.path.isfile(i_tx_file_path):
                             tx_list.append(i_tx_file_path)
                         else:
-                            utl_core.Log.set_warning_trace(
+                            bsc_core.LogMtd.trace_warning(
                                 u'texture-tx: "{}" is non-exists.'.format(i_tx_file_path)
                             )
                     #
                     if tx_list:
                         list_.extend(tx_list)
             else:
-                utl_core.Log.set_warning_trace(
+                bsc_core.LogMtd.trace_warning(
                     u'texture-udim: "{}" is non-exists.'.format(self.path)
                 )
         #

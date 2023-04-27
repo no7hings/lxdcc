@@ -161,15 +161,19 @@ class StgVersionOpt(AbsStgObjOpt):
         self._stg_obj_query.set_update('description', description)
 
     def set_folder(self, directory_path):
-        windows_task_directory = utl_core.Path.map_to_windows(directory_path)
-        linux_task_directory = utl_core.Path.map_to_linux(directory_path)
+        directory_path_windows = utl_core.Path.map_to_windows(directory_path)
+        directory_path_linux = utl_core.Path.map_to_linux(directory_path)
         stg_folder = {
             'name': bsc_core.StgFileOpt(directory_path).name,
             'local_path': directory_path,
-            'local_path_windows': windows_task_directory,
-            'local_path_linux': linux_task_directory
+            'local_path_windows': directory_path_windows,
+            'local_path_linux': directory_path_linux
         }
         self.set_stg_folder(stg_folder)
+
+    def set_publish_directory(self, directory_path):
+        directory_path_linux = utl_core.Path.map_to_linux(directory_path)
+        self._stg_obj_query.set_update('sg_published_path', directory_path_linux)
 
     def set_stg_folder(self, stg_folder):
         self._stg_obj_query.set_update('sg_version_folder', stg_folder)

@@ -6,7 +6,9 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_texture_export(self, use_tx=False):
+    def execute_render_texture_export(self):
+        from lxbasic import bsc_core
+        #
         import lxutil.dcc.dcc_operators as utl_dcc_operators
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -27,52 +29,36 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             raise TypeError()
         #
-        with_texture_tx = self._hook_option_opt.get('with_texture_tx') or False
-        #
-        if with_texture_tx is True:
-            pass
-            # utl_dcc_operators.DccTexturesOpt(
-            #     ktn_dcc_objects.TextureReferences(
-            #         option=dict(
-            #             with_reference=False
-            #         )
-            #     )
-            # ).set_tx_create_and_repath()
-        else:
-            utl_dcc_operators.DccTexturesOpt(
-                ktn_dcc_objects.TextureReferences(
-                    option=dict(
-                        with_reference=False
-                    )
-                )
-            ).set_tx_repath_to_orig()
-
         texture_src_directory_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )
-        texture_src_directory_path = texture_src_directory_rsv_unit.get_result(
+        texture_directory_path_src = texture_src_directory_rsv_unit.get_result(
             version=version
         )
+        bsc_core.StgPathPermissionMtd.create_directory(texture_directory_path_src)
+        #
         texture_tgt_directory_tgt_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_1
         )
-        texture_tgt_directory_path = texture_tgt_directory_tgt_unit.get_result(
+        texture_directory_path_tgt = texture_tgt_directory_tgt_unit.get_result(
             version=version
         )
+        bsc_core.StgPathPermissionMtd.create_directory(texture_directory_path_tgt)
+        #
         # TODO remove orig directory
         ktn_fnc_exporters.TextureExporter(
             option=dict(
-                directory_base=texture_src_directory_path,
-                directory=texture_tgt_directory_path,
+                directory_base=texture_directory_path_src,
+                directory=texture_directory_path_tgt,
                 #
                 fix_name_blank=True,
-                use_tx=False,
+                repath_to_tx_force=False,
                 with_reference=False,
                 use_environ_map=True,
             )
         ).set_run()
 
-    def set_workspace_texture_lock(self):
+    def execute_texture_workspace_lock(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxutil.rsv.objects as utl_rsv_objects

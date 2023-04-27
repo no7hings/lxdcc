@@ -163,7 +163,7 @@ class RsvStgTaskOpt(object):
         )
         version_directory_path = version_rsv_unit.get_result(version=version)
         #
-        stg_version_opt.set_folder(
+        stg_version_opt.set_publish_directory(
             version_directory_path
         )
         #

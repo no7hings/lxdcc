@@ -5,18 +5,18 @@ import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
 class TextureExporter(
-    utl_fnc_obj_abs.AbsDccTextureExport,
+    utl_fnc_obj_abs.AbsFncTextureExportDef,
     utl_fnc_obj_abs.AbsFncOptionBase,
 ):
     FIX_NAME_BLANK = 'fix_name_blank'
-    USE_TX = 'use_tx'
+    USE_TX = 'repath_to_tx_force'
     WITH_REFERENCE = 'width_reference'
     OPTION = dict(
         directory_base='',
         directory='',
         location='',
         fix_name_blank=False,
-        use_tx=False,
+        repath_to_tx_force=False,
         width_reference=False,
         use_environ_map=False,
     )
@@ -45,17 +45,16 @@ class TextureExporter(
         dcc_objs = texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )
-        self._set_copy_as_src_(
-            directory_path_dst=self._directory_path_dst, 
-            directory_path_base=self._directory_path_base,
+        self.copy_as_base_link_fnc(
+            directory_path_bsc=self._directory_path_base, directory_path_dst=self._directory_path_dst,
             dcc_objs=dcc_objs,
             fix_name_blank=self.get('fix_name_blank'),
-            use_tx=self.get('use_tx'),
+            repath_to_tx_force=self.get('repath_to_tx_force'),
             with_reference=self.get('width_reference'),
             #
             ignore_missing_texture=True,
             remove_expression=True,
             use_environ_map=self.get('use_environ_map'),
             #
-            repath_fnc=texture_references.set_obj_repath_to,
+            repath_fnc=texture_references.repath_fnc,
         )

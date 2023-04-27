@@ -45,4 +45,14 @@ if __name__ == '__main__':
     # )
     # print StgPathPermissionMtd.change_owner('/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002')
 
-    print RawTextMtd.to_integer('geometry')
+    # StgPathPermissionMtd.unlock_all_below(
+    #     '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/td_test.srf.surfacing.v004'
+    # )
+    #
+    # print RawTextMtd.to_integer('geometry')
+    print RawTextOpt(
+        'dreambae'
+    ).to_rgb_0()
+    print RawTextOpt(
+        'dreambae_nightare'
+    ).to_rgb_0()

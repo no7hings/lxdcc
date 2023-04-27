@@ -575,7 +575,7 @@ class StgExtraMtd(object):
 
 class StgPathLinkMtd(object):
     @classmethod
-    def set_link_to(cls, path_src, path_tgt):
+    def link_to(cls, path_src, path_tgt):
         if os.path.exists(path_tgt) is False:
             tgt_dir_path = os.path.dirname(path_tgt)
             src_rel_path = os.path.relpath(path_src, tgt_dir_path)
@@ -610,7 +610,7 @@ class StgPathLinkMtd(object):
                 break
         return cur_path
     @classmethod
-    def set_file_link_to(cls, path_src, path_tgt):
+    def link_file_to(cls, path_src, path_tgt):
         if os.path.isfile(path_src):
             if os.path.islink(path_src):
                 path_src = cls.get_link_source(path_src)
@@ -963,9 +963,19 @@ class StgPathOpt(object):
         else:
             self._root = '/'
 
+    def get_type_name(self):
+        if self.get_is_file():
+            return 'file'
+        return 'directory'
+    type_name = property(get_type_name)
+
     def get_path(self):
         return self._path
     path = property(get_path)
+
+    def get_name(self):
+        return os.path.basename(self.path)
+    name = property(get_name)
 
     def get_root(self):
         return self._root
@@ -1506,6 +1516,9 @@ class StgPathPermissionDefaultMtd(object):
             ['cg_group', 'coop_grp']
         )
     @classmethod
+    def unlock_all_below(cls, path):
+        pass
+    @classmethod
     def unlock(cls, path):
         pass
     @classmethod
@@ -1541,6 +1554,18 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
         for i in ds:
             StgRpcMtd.change_mode(
                 i, '555'
+            )
+    @classmethod
+    def unlock_all_below(cls, path):
+        StgRpcMtd.change_mode(
+            path, '775'
+        )
+        ds = StgDirectoryMtd.get_all_directory_paths__(
+            path
+        )
+        for i in ds:
+            StgRpcMtd.change_mode(
+                i, '775'
             )
     @classmethod
     def unlock(cls, path):
@@ -1607,9 +1632,6 @@ print StgPathPermissionBaseMtd.get_method(
 class StgPathPermissionMtd(object):
     def __init__(self, path):
         self._path = path
-        self._method = StgPathPermissionBaseMtd.get_method(
-            path
-        )
     @classmethod
     def create_directory(cls, path, mode='775'):
         StgPathPermissionBaseMtd.get_method(
@@ -1635,6 +1657,11 @@ class StgPathPermissionMtd(object):
         StgPathPermissionBaseMtd.get_method(
             path
         ).lock_all_below(path)
+    @classmethod
+    def unlock_all_below(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).unlock_all_below(path)
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
         StgPathPermissionBaseMtd.get_method(

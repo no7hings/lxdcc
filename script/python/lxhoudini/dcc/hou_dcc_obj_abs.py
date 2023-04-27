@@ -60,7 +60,7 @@ class AbsHouObj(utl_abstract.AbsDccObj):
     def hou_obj(self):
         return hou.node(self.path)
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         return self.__class__(path)
 
     def get_is_file_reference(self):

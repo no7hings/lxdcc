@@ -238,14 +238,14 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         render_option.set_image_size(image_width, image_height)
         render_option.set_output_file_path(output_file_path_base)
         #
-        light = cls._set_arnold_light_create_()
-        cls._set_arnold_options_create_()
+        light = cls.create_arnold_lights_fnc()
+        cls.create_arnold_options_fnc()
         cls._set_arnold_options_update_()
         cls._set_arnold_render_run_(camera, image_width, image_height)
         cmds.delete(light)
         cmds.delete(camera)
     @classmethod
-    def _set_arnold_light_create_(cls):
+    def create_arnold_lights_fnc(cls):
         light = mya_dcc_objects.Shape('light')
         if light.get_is_exists() is False:
             light = light.set_create('aiStandIn')
@@ -258,7 +258,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         [light.get_port(k).set(v) for k, v in atr_raw.items()]
         return light.transform.path
     @classmethod
-    def _set_arnold_options_create_(cls):
+    def create_arnold_options_fnc(cls):
         # noinspection PyBroadException
         try:
             # noinspection PyUnresolvedReferences
@@ -273,7 +273,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         arnold_render_option.set_aa_sample(6)
     @classmethod
     def _set_arnold_render_run_(cls, camera, image_width, image_height, frame=None):
-        cls._set_arnold_options_create_()
+        cls.create_arnold_options_fnc()
         #
         cmds.arnoldRender(
             seq='', cam=camera, w=image_width, h=image_height, srv=False

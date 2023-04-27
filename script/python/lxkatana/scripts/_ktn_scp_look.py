@@ -164,6 +164,14 @@ ktn_scripts.ScpLookOutput(
                     )
                 return _
 
+    def get_geometry_uv_map_usd_file(self):
+        s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
+        geometry_scheme = self.get_geometry_scheme()
+        if geometry_scheme == 'asset':
+            location = '/root/world/geo/master'
+            _ = s.get_obj_opt(location).get('userProperties.usd.variants.asset.surface.override.file')
+            return _
+
     def get_geometry_scheme(self):
         s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
         if s.get_obj_exists('/root/world/geo/master') is True:

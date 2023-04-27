@@ -24,6 +24,7 @@ from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
 from lxresolver import rsv_configure
 
 
+# todo: remove this method
 class AssetWorkspace(object):
     CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default-v1')
     GEOMETRY_TYPES = [

@@ -529,7 +529,7 @@ class AbsDccObj(
     def get_naming_overlapped_paths(self):
         pass
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         pass
 
     def _get_child_paths_(self, path):

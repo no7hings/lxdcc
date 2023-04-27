@@ -355,6 +355,9 @@ class AbsRsvVersionKey(object):
     @property
     def number(self):
         return self._number
+    @classmethod
+    def valid_fnc(cls, text):
+        return not not fnmatch.filter([text], cls.VERSION_FNMATCH_PATTERN)
 
     def __str__(self):
         return self._text
@@ -652,13 +655,16 @@ class AbsRsvMatcher(
             format_dict.update(parameters)
             if 'version' in format_dict:
                 version = format_dict['version']
-                rsv_version_key = self.RSV_VERSION_KEY_CLASS(version)
-                rsv_version_key += 1
-                format_dict['version'] = str(rsv_version_key)
+                if self.RSV_VERSION_KEY_CLASS.valid_fnc(version):
+                    rsv_version_key = self.RSV_VERSION_KEY_CLASS(version)
+                    rsv_version_key += 1
+                    format_dict['version'] = str(rsv_version_key)
                 return self.__get_path_by_local_variants_(format_dict)
-        else:
+            return result
+        #
+        if 'version' in format_dict:
             format_dict['version'] = 'v001'
-            return self.__get_path_by_local_variants_(format_dict)
+        return self.__get_path_by_local_variants_(format_dict)
 
     def get_current(self):
         format_dict = copy.copy(self._match_variants)
@@ -892,7 +898,7 @@ class AbsRsvObj(
     def icon(self):
         return bsc_core.RscIconFileMtd.get('file/folder')
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         return self.rsv_project._project__get_rsv_obj_(path)
 
     def _get_child_paths_(self, *args, **kwargs):
@@ -1388,6 +1394,9 @@ class AbsRsvTask(
         bsc_core.StgPathPermissionMtd.create_directory(
             directory_path
         )
+        # bsc_core.StgPathPermissionMtd.change_owner(
+        #
+        # )
 
 
 # <rsv-step>
@@ -2104,7 +2113,7 @@ class AbsRsvProject(
                     return root_choice
         return 'root_primary'
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         if path == self._rsv_path:
             return self
         return self._project__get_rsv_obj_(path)
@@ -3104,7 +3113,7 @@ class AbsRsvRoot(
     def icon(self):
         return bsc_core.RscIconFileMtd.get('resolver/root')
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         if path == self.path:
             return self
 

@@ -308,7 +308,7 @@ class AbsScpLibFileDef(object):
         file_path_src = rsv_unit_file_src.get_result(version='latest')
         file_path_tgt = rsv_unit_file_tgt.get_result(version='v001')
         if file_path_src:
-            utl_dcc_objects.OsFile(file_path_src).set_link_to(
+            utl_dcc_objects.OsFile(file_path_src).link_to(
                 file_path_tgt, replace=True
             )
 

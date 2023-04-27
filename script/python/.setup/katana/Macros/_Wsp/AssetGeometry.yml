@@ -388,13 +388,12 @@ node:
                     #
                     expressions:
                         location: 'getParent().getParent().option.root'
-                groom: '$.modeling'
-                rig: '$.modeling'
+                grooming: '$.modeling'
+                rigging: '$.modeling'
                 effect: '$.modeling'
                 surfacing: '$.modeling'
                 lighting: '$.modeling'
                 plant: '$.modeling'
-                animation: '$.modeling'
     #
     asset_version_main:
         type: GroupStack

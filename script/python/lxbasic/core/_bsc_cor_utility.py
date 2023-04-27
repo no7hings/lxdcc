@@ -169,12 +169,17 @@ class ApplicationMtd(object):
 
 class TimeMtd(object):
     TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+    TIME_FORMAT_EXACT = '%Y-%m-%d %H:%M:%S.%f'
     #
     TIME_TAG_FORMAT = '%Y_%m%d_%H%M_%S_%f'
     DATA_TAG_FORMAT = '%Y_%m%d'
     @classmethod
-    def get_time(cls):
+    def get_time(cls, exact=False):
         timestamp = time.time()
+        if exact is True:
+            return datetime.datetime.now().strftime(
+                cls.TIME_FORMAT_EXACT
+            )
         return time.strftime(
             cls.TIME_FORMAT,
             time.localtime(timestamp)

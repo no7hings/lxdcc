@@ -24,8 +24,8 @@ ktn_scripts.ScpWorkspaceCreate.new()
         self._obj_opt = obj_opt
     @classmethod
     def load_geometry_auto(cls):
-        g_ns = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='Group', filters=[('type', 'in', {'AssetGeometry_Wsp'})]
+        g_ns = ktn_core.NGObjsMtd.filter_nodes(
+            filters=[('node_type', 'is', 'Group'), ('type', 'in', {'AssetGeometry_Wsp'})]
         )
         if g_ns:
             g_n = g_ns[0]
@@ -38,27 +38,33 @@ ktn_scripts.ScpWorkspaceCreate.new()
             )
     @classmethod
     def load_look_auto(cls):
-        m_gs = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='GroupMerge',
-            filters=[('user.type', 'in', {'MaterialGroup_Wsp', 'MaterialGroup_Wsp_Usr'})]
+        m_gs = ktn_core.NGObjsMtd.filter_nodes(
+            filters=[
+                ('node_type', 'is', 'GroupMerge'),
+                ('user.type', 'in', {'MaterialGroup_Wsp', 'MaterialGroup_Wsp_Usr'})
+            ]
         )
         if m_gs:
             m_g = m_gs[0]
             ktn_core.NGObjOpt(m_g).execute_port('user.parameters.ass.tools', index=0)
             ktn_core.NGObjOpt(m_g).execute_port('user.parameters.ass.tools', index=1)
         #
-        ma_gs = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='GroupStack',
-            filters=[('user.type', 'in', {'MaterialAssignGroup_Wsp', 'MaterialAssignGroup_Wsp_Usr'})]
+        ma_gs = ktn_core.NGObjsMtd.filter_nodes(
+            filters=[
+                ('node_type', 'is', 'GroupStack'),
+                ('user.type', 'in', {'MaterialAssignGroup_Wsp', 'MaterialAssignGroup_Wsp_Usr'})
+            ]
         )
         if ma_gs:
             ms_g = ma_gs[0]
             ktn_core.NGObjOpt(ms_g).execute_port('user.parameters.ass.tools', index=0)
             ktn_core.NGObjOpt(ms_g).execute_port('user.parameters.ass.tools', index=1)
         #
-        gpa_gs = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='GroupStack',
-            filters=[('user.type', 'in', {'GeometryPropertiesAssignGroup_Wsp', 'GeometryPropertiesAssignGroup_Wsp_Usr'})]
+        gpa_gs = ktn_core.NGObjsMtd.filter_nodes(
+            filters=[
+                ('node_type', 'is', 'GroupStack'),
+                ('user.type', 'in', {'GeometryPropertiesAssignGroup_Wsp', 'GeometryPropertiesAssignGroup_Wsp_Usr'})
+            ]
         )
         if gpa_gs:
             gpa_g = gpa_gs[0]

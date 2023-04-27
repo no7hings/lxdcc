@@ -9,10 +9,6 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_geometry_usd_export(self):
-        from lxutil import utl_core
-
-        import lxutil.dcc.dcc_objects as utl_dcc_objects
-
         from lxkatana import ktn_core
 
         import lxkatana.scripts as ktn_scripts
@@ -30,36 +26,44 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
-            keyword = 'asset-geometry-usd-var-file'
+            keyword = 'asset-cache-usd-dir'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
-            keyword = 'asset-temporary-geometry-usd-var-file'
+            keyword = 'asset-temporary-cache-usd-dir'
         else:
             raise TypeError()
 
-        geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
+        directory_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword
         )
-        geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_result(
-            version=version, extend_variants=dict(var='hi')
+        directory_path = directory_rsv_unit.get_result(
+            version=version
         )
         #
-        geometry_uv_map_usd_source_file_path = s.get_geometry_uv_map_usd_source_file()
-        if geometry_uv_map_usd_source_file_path:
-            utl_dcc_objects.OsFile(geometry_uv_map_usd_source_file_path).set_copy_to_file(
-                geometry_usd_var_file_path
+        file_path = s.get_geometry_uv_map_usd_source_file()
+        if file_path:
+            from lxusd import usd_core
+            usd_core.UsdBasic.copy_with_references_fnc(
+                file_path,
+                directory_path,
+                replace=True
             )
         else:
             bsc_core.LogMtd.trace_method_error(
                 'usd export',
-                'file="{}" is non-exists'.format(geometry_uv_map_usd_source_file_path)
+                'file="{}" is non-exists'.format(file_path)
             )
 
     def set_asset_geometry_uv_map_usd_export(self):
-        from lxbasic import bsc_core
+        from lxkatana import ktn_core
+
+        import lxkatana.scripts as ktn_scripts
         #
-        from lxutil import utl_core
+        w_s = ktn_core.WorkspaceSetting()
+        opt = w_s.get_current_look_output_opt_force()
+        if opt is None:
+            return
         #
-        import lxusd.fnc.exporters as usd_fnc_exporters
+        s = ktn_scripts.ScpLookOutput(opt)
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -69,38 +73,28 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
-            keyword_0 = 'asset-geometry-usd-var-file'
-            keyword_1 = 'asset-geometry-uv_map-usd-file'
+            keyword = 'asset-cache-usd-dir'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
-            keyword_0 = 'asset-temporary-geometry-usd-var-file'
-            keyword_1 = 'asset-temporary-geometry-uv_map-usd-file'
+            keyword = 'asset-temporary-cache-usd-dir'
         else:
             raise TypeError()
-        #
-        geometry_usd_hi_file_rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword=keyword_0
+
+        directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword=keyword
         )
-        geometry_usd_var_file_path = geometry_usd_hi_file_rsv_unit.get_exists_result(
-            version=version, extend_variants=dict(var='hi')
+        directory_path = directory_rsv_unit.get_result(
+            version=version
         )
-        if geometry_usd_var_file_path:
-            geometry_uv_map_usd_file_rsv_unit = self._rsv_task.get_rsv_unit(
-                keyword=keyword_1
+        file_path = s.get_geometry_uv_map_usd_file()
+        if file_path:
+            from lxusd import usd_core
+            usd_core.UsdBasic.copy_with_references_fnc(
+                file_path,
+                directory_path,
+                replace=True
             )
-            geometry_uv_map_usd_file_path = geometry_uv_map_usd_file_rsv_unit.get_result(
-                version=version
-            )
-            usd_fnc_exporters.GeometryUvMapExporter(
-                file_path=geometry_uv_map_usd_file_path,
-                root=root,
-                option=dict(
-                    file_0=geometry_usd_var_file_path,
-                    file_1=geometry_usd_var_file_path,
-                    display_color=bsc_core.RawTextOpt(step).to_rgb(maximum=1.0)
-                )
-            ).set_run()
         else:
             bsc_core.LogMtd.trace_method_error(
                 'usd export',
-                'file="{}" is non-exists'.format(geometry_usd_var_file_path)
+                'file="{}" is non-exists'.format(file_path)
             )

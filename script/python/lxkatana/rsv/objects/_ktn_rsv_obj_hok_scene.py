@@ -7,6 +7,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def execute_asset_scene_src_create(self):
+        from lxbasic import bsc_core
+
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxkatana.scripts as ktn_scripts
@@ -18,8 +20,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-katana-scene-src-file'
+            keyword_1 = 'asset-katana-scene-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-katana-scene-src-file'
+            keyword_1 = 'asset-temporary-katana-scene-file'
         else:
             raise TypeError()
 
@@ -35,7 +39,16 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ktn_scripts.ScpWorkspaceCreate.new()
 
         ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
-        return scene_src_file_path
+        #
+        if self._hook_option_opt.get_as_boolean('with_scene_link') is True:
+            scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                keyword=keyword_1
+            )
+            scene_file_path = scene_file_rsv_unit.get_result(version=version)
+            bsc_core.StgFileOpt(scene_file_path).create_directory()
+            bsc_core.StgPathLinkMtd.link_file_to(
+                scene_src_file_path, scene_file_path
+            )
 
     def execute_asset_scene_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -291,7 +304,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if bsc_core.StorageMtd.get_is_exists(scene_src_file_path) is False:
             utl_dcc_objects.OsFile(
                 scene_file_path
-            ).set_link_to(
+            ).link_to(
                 scene_src_file_path
             )
 

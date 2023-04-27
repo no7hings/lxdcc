@@ -55,9 +55,10 @@ class AbsOsDirectory(
                 ('copy name', None, self.set_copy_name_to_clipboard),
             ]
         )
-    @property
-    def icon(self):
+
+    def get_icon(self):
         return utl_core.FileIcon.get_folder()
+    icon = property(get_icon)
 
     def set_create(self):
         if self.get_is_exists() is False:
@@ -67,7 +68,7 @@ class AbsOsDirectory(
                 u'directory-path="{}"'.format(self.path)
             )
 
-    def set_link_to(self, tgt_directory_path, replace=False):
+    def link_to(self, tgt_directory_path, replace=False):
         tgt_directory = self.__class__(tgt_directory_path)
         if tgt_directory.get_is_exists():
             if replace is False:
@@ -154,13 +155,15 @@ class AbsOsFile(
         # file reference node
         self._obj = None
         self._relevant_dcc_port_path = None
-    @property
-    def icon(self):
+
+    def get_icon(self):
         if self.ext:
             _ = utl_core.FileIcon.get_by_file_ext(self.ext)
             if _:
                 return _
         return utl_core.FileIcon.get_default()
+    icon = property(get_icon)
+
     @property
     def file_path(self):
         return self._path
@@ -477,7 +480,7 @@ class AbsOsFile(
                     ) is False:
                         os.remove(file_tgt.path)
                         #
-                        bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_tgt.path)
+                        bsc_core.StgPathLinkMtd.link_to(file_path_src, file_tgt.path)
                         link_log = bsc_core.LogMtd.trace_method_result(
                             'link replace',
                             u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -495,7 +498,7 @@ class AbsOsFile(
             if file_tgt.get_is_exists() is False:
                 file_tgt.create_directory()
                 # link src to target
-                bsc_core.StgPathLinkMtd.set_link_to(file_path_src, file_path_tgt)
+                bsc_core.StgPathLinkMtd.link_to(file_path_src, file_path_tgt)
                 link_log = bsc_core.LogMtd.trace_method_result(
                     'link create',
                     u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -578,7 +581,7 @@ class AbsOsFile(
             self.path, file_path_tgt,
         )
 
-    def set_link_to(self, tgt_file_path, replace=False):
+    def link_to(self, tgt_file_path, replace=False):
         file_tgt = self.__class__(tgt_file_path)
         file_path_src = self.path
         file_path_tgt = file_tgt.path
@@ -597,7 +600,7 @@ class AbsOsFile(
                                 return
                             #
                             os.remove(file_path_tgt)
-                            bsc_core.StgPathLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
+                            bsc_core.StgPathLinkMtd.link_file_to(file_path_src, file_path_tgt)
                             bsc_core.LogMtd.trace_method_result(
                                 'file link replace',
                                 u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -605,7 +608,7 @@ class AbsOsFile(
                             return
                         #
                         os.remove(file_path_tgt)
-                        bsc_core.StgPathLinkMtd.set_file_link_to(file_path_src, file_path_tgt)
+                        bsc_core.StgPathLinkMtd.link_file_to(file_path_src, file_path_tgt)
                         bsc_core.LogMtd.trace_method_result(
                             'file link replace',
                             u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
@@ -627,7 +630,7 @@ class AbsOsFile(
             if file_tgt.get_is_exists() is False:
                 file_tgt.create_directory()
                 #
-                bsc_core.StgPathLinkMtd.set_file_link_to(
+                bsc_core.StgPathLinkMtd.link_file_to(
                     self.path, file_tgt.path
                 )
                 #
@@ -637,7 +640,7 @@ class AbsOsFile(
                 )
 
     def set_link_to_file(self, file_path_tgt, replace=False):
-        self.set_link_to(
+        self.link_to(
             file_path_tgt, replace
         )
 
@@ -645,7 +648,7 @@ class AbsOsFile(
         file_path_tgt = u'{}/{}'.format(
             directory_path_tgt, self.name
         )
-        self.set_link_to(
+        self.link_to(
             file_path_tgt, replace
         )
 

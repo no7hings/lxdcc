@@ -96,7 +96,9 @@ class AbsSsnRsvApplication(object):
             if scene_src_file_opt_src.get_is_exists() is True:
                 scene_src_file_opt_tgt = bsc_core.StgFileOpt(scene_src_file_path_tgt)
                 if scene_src_file_opt_tgt.get_is_exists() is False:
-                    scene_src_file_opt_src.set_copy_to_file(scene_src_file_path_tgt)
+                    bsc_core.StgPathPermissionMtd.copy_to_file(
+                        scene_src_file_path_src, scene_src_file_path_tgt
+                    )
                     if application == 'maya':
                         utl_fnc_exporters.DotMaExporter(
                             option=dict(
@@ -109,7 +111,9 @@ class AbsSsnRsvApplication(object):
                         for i_ext in ext_extras:
                             i_src = '{}.{}'.format(scene_src_file_opt_src.path_base, i_ext)
                             i_tgt = '{}.{}'.format(scene_src_file_opt_tgt.path_base, i_ext)
-                            bsc_core.StgFileOpt(i_src).set_copy_to_file(i_tgt)
+                            bsc_core.StgPathPermissionMtd.copy_to_file(
+                                i_src, i_tgt
+                            )
                     return scene_src_file_path_tgt
                 else:
                     return scene_src_file_path_tgt

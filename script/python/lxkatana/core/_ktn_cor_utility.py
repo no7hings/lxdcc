@@ -77,6 +77,13 @@ class GuiNodeGraphOpt(GuiNodeGraphBase):
     def move_node_to_view_center(self, ktn_obj):
         x, y = self.get_track_position()
         self.set_node_position(ktn_obj, (x, y))
+    @classmethod
+    def import_nodes_from_file(cls, file_path):
+        nodes = KatanaFile.Import(file_path, True)
+        if nodes:
+            tab = App.Tabs.FindTopTab('Node Graph')
+            tab.prepareFloatingLayerWithPasteBounds(nodes)
+            tab.enableFloatingLayer()
 
 
 class GuiNodeGraphTabOpt(GuiNodeGraphBase):

@@ -204,15 +204,15 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 check_status=validation_checker.CheckStatus.Warning
             )
     @classmethod
-    def maya_check_location_fnc(cls, validation_checker, check_group, location, pathsep, ignore=False):
+    def maya_check_location_fnc(cls, validation_checker, check_group, location, pathsep, ignore_check=False):
         from lxbasic import bsc_core
 
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
         #
         dcc_location = bsc_core.DccPathDagOpt(location).translate_to(pathsep).to_string()
-        dcc_location_node = mya_dcc_objects.Node(dcc_location)
-        if dcc_location_node.get_is_exists() is False:
-            if ignore is False:
+        dcc_group = mya_dcc_objects.Node(dcc_location)
+        if dcc_group.get_is_exists() is False:
+            if ignore_check is False:
                 validation_checker.register_node_result(
                     dcc_location,
                     check_group=check_group,
@@ -324,12 +324,12 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if not dcc_root_location_cur:
             return False
         #
-        dcc_model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
-        dcc_model_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_model_location, pathsep)
-        if not dcc_model_location_cur:
+        model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
+        dcc_model_location = self.maya_check_location_fnc(validation_checker, check_group, model_location, pathsep)
+        if not dcc_model_location:
             return False
 
-        geometry_paths = mya_dcc_objects.Group(dcc_model_location_cur).get_all_shape_paths(include_obj_type=['mesh'])
+        geometry_paths = mya_dcc_objects.Group(dcc_model_location).get_all_shape_paths(include_obj_type=['mesh'])
         if geometry_paths:
             with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check geometry') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
@@ -395,9 +395,9 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if not dcc_root_location_cur:
             return False
         #
-        dcc_model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
-        dcc_model_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_model_location, pathsep)
-        if not dcc_model_location_cur:
+        model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
+        dcc_model_location = self.maya_check_location_fnc(validation_checker, check_group, model_location, pathsep)
+        if not dcc_model_location:
             return False
         #
         rsv_entity = self._rsv_task.get_rsv_resource()
@@ -422,7 +422,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         work_scene_src_file_path = mya_dcc_objects.Scene.get_current_file_path()
         dcc_model_location_src = self._rsv_scene_properties.get('usd.renderable.model.high')
         fnc_geometry_comparer = mya_fnc_comparers.FncGeometryComparer(
-            work_scene_src_file_path, dcc_model_location, dcc_model_location_src
+            work_scene_src_file_path, model_location, dcc_model_location_src
         )
         fnc_geometry_comparer.set_source_file(
             model_file_path
@@ -474,10 +474,10 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if not dcc_root_location_cur:
             return False
         #
-        dcc_model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
-        dcc_model_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_model_location, pathsep, ignore=True)
-        if dcc_model_location_cur:
-            geometry_paths = mya_dcc_objects.Group(dcc_model_location_cur).get_all_shape_paths(include_obj_type=['mesh'])
+        model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
+        dcc_model_location = self.maya_check_location_fnc(validation_checker, check_group, model_location, pathsep, ignore_check=True)
+        if dcc_model_location:
+            geometry_paths = mya_dcc_objects.Group(dcc_model_location).get_all_shape_paths(include_obj_type=['mesh'])
             if geometry_paths:
                 with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check look') as g_p:
                     for i_geometry_path in geometry_paths:
@@ -504,7 +504,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             )
         #
         dcc_groom_location = self._rsv_scene_properties.get('dcc.renderable.groom')
-        dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore=True)
+        dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore_check=True)
         if dcc_groom_location_cur:
             geometry_paths = mya_dcc_objects.Group(dcc_groom_location_cur).get_all_shape_paths(include_obj_type=[ma_configure.Types.XgenDescription])
             with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check look') as g_p:
@@ -536,10 +536,10 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if not dcc_root_location_cur:
             return False
 
-        dcc_model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
-        dcc_model_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_model_location, pathsep)
-        if dcc_model_location_cur:
-            objs = mya_dcc_objects.Group(dcc_model_location_cur).get_descendants()
+        model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
+        dcc_model_location = self.maya_check_location_fnc(validation_checker, check_group, model_location, pathsep)
+        if dcc_model_location:
+            objs = mya_dcc_objects.Group(dcc_model_location).get_descendants()
             objs_look_opt = mya_dcc_operators.ObjsLookOpt(objs)
             includes = objs_look_opt.get_texture_reference_paths()
             #
@@ -548,7 +548,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 self.dcc_texture_check_fnc(validation_checker, check_group, dcc_objs)
 
         dcc_groom_location = self._rsv_scene_properties.get('dcc.renderable.groom')
-        dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore=True)
+        dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore_check=True)
         if dcc_groom_location_cur:
             objs = mya_dcc_objects.Group(dcc_groom_location_cur).get_descendants()
             objs_look_opt = mya_dcc_operators.ObjsLookOpt(objs)
@@ -571,10 +571,10 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if not dcc_root_location_cur:
             return False
         # model
-        dcc_model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
-        dcc_model_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_model_location, pathsep)
-        if dcc_model_location_cur:
-            objs = mya_dcc_objects.Group(dcc_model_location_cur).get_descendants()
+        model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
+        dcc_model_location = self.maya_check_location_fnc(validation_checker, check_group, model_location, pathsep)
+        if dcc_model_location:
+            objs = mya_dcc_objects.Group(dcc_model_location).get_descendants()
             objs_look_opt = mya_dcc_operators.ObjsLookOpt(objs)
             includes = objs_look_opt.get_texture_reference_paths()
             #
@@ -586,7 +586,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
         # groom
         dcc_groom_location = self._rsv_scene_properties.get('dcc.renderable.groom')
-        dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore=True)
+        dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore_check=True)
         if dcc_groom_location_cur:
             objs = mya_dcc_objects.Group(dcc_groom_location_cur).get_descendants()
             objs_look_opt = mya_dcc_operators.ObjsLookOpt(objs)

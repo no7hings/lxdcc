@@ -261,7 +261,7 @@ def set_asset_review_link_create(rsv_version):
         )
         review_mov_file = utl_dcc_objects.OsFile(review_mov_file_path)
         if review_mov_file.get_is_exists() is False:
-            preview_mov_file.set_link_to(
+            preview_mov_file.link_to(
                 review_mov_file.path
             )
 

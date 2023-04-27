@@ -18,6 +18,8 @@ class StgObjQuery(object):
     def __init__(self, stg_connector, stg_obj):
         self._stg_connector = stg_connector
         self._stg_obj = stg_obj
+        self._type = self._stg_obj.get('type')
+        self._id = self._stg_obj.get('id')
     @property
     def stg_connector(self):
         return self._stg_connector
@@ -27,10 +29,10 @@ class StgObjQuery(object):
     #
     @property
     def type(self):
-        return self._stg_obj.get('type')
+        return self._type
     @property
     def id(self):
-        return self._stg_obj.get('id')
+        return self._id
     @property
     def stg_obj(self):
         return self._stg_obj

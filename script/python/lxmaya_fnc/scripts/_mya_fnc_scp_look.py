@@ -504,7 +504,7 @@ def set_asset_look_preview_work_scene_src_create(rsv_task_properties):
             #
             utl_dcc_objects.OsFile(
                 scene_file_path
-            ).set_link_to(work_scene_src_file_path)
+            ).link_to(work_scene_src_file_path)
         else:
             utl_core.Log.set_module_warning_trace(
                 'preview work-scene-src link create',

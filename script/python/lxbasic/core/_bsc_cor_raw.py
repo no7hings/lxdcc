@@ -1,4 +1,6 @@
 # coding:utf-8
+import hashlib
+
 from ._bsc_cor_utility import *
 
 
@@ -525,6 +527,8 @@ class RawTextMtd(object):
         )
     @classmethod
     def to_integer(cls, string):
+        if isinstance(string, six.text_type):
+            string = string.encode('utf-8')
         _ = re.sub(
             ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '0', string
         ).lower()
@@ -605,8 +609,8 @@ class RawTextOpt(object):
             d = 1000.0
             a = sum([ord(i)*(seq*10 if seq > 0 else 1) for seq, i in enumerate(string[::-1])])
             h = float(a % (360+seed)*d)/d
-            s = float(s_p+a % s_p)/100.0
-            v = float(v_p+a % v_p)/100.0
+            s = float((s_p/2)+a % (s_p/2))/100.0
+            v = float((v_p/2)+a % (v_p/2))/100.0
             # print h, s, v
             return RawColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
@@ -626,7 +630,20 @@ class RawTextOpt(object):
             h = float(a % (360+seed)*d)/d
             s = float((s_p/2)+a % (s_p/2))/100.0
             v = float((v_p/2)+a % (v_p/2))/100.0
-            # print h, s, v
+            return RawColorMtd.hsv2rgb(h, s, v, maximum)
+        return 0, 0, 0
+
+    def to_rgb_0(self, maximum=255, seed=0, s_p=45, v_p=45):
+        string = self._raw
+        if string:
+            d = 1000.0
+            hash_ = hashlib.md5(string.encode('utf-8')).hexdigest()
+            h_a = int(hash_[0:8], 16)
+            s_a = int(hash_[8:16], 16)
+            v_a = int(hash_[16:24], 16)
+            h = float(h_a % (360+seed)*d)/d
+            s = float((s_p/2)+s_a % (s_p/2))/100.0
+            v = float((v_p/2)+v_a % (v_p/2))/100.0
             return RawColorMtd.hsv2rgb(h, s, v, maximum)
         return 0, 0, 0
 

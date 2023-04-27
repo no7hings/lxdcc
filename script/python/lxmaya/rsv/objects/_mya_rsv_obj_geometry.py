@@ -95,7 +95,6 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise RuntimeError()
 
     def set_asset_geometry_uv_map_usd_export(self, version_scheme='match'):
-        import lxusd.fnc.exporters as usd_fnc_exporters
         import lxusd.rsv.objects as usd_rsv_objects
         #
         rsv_scene_properties = self._rsv_scene_properties

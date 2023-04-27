@@ -284,6 +284,9 @@ class StgVersionOpt(AbsStgObjOpt):
             {'sg_last_version': stg_version}
         )
 
+    def get_all_carbon_copy_user(self):
+        pass
+
 
 class StgLookPassOpt(AbsStgObjOpt):
     def __init__(self, stg_obj_query):

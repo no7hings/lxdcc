@@ -948,7 +948,7 @@ class AbsObjDagDef(object):
 
     #
     def get_root(self):
-        return self._set_dag_create_(self.PATHSEP)
+        return self.create_dag_fnc(self.PATHSEP)
 
     #
     def get_is_root(self):
@@ -972,25 +972,25 @@ class AbsObjDagDef(object):
         return lis
 
     def get_dag_components(self):
-        return [self._set_dag_create_(i) for i in self.get_dag_component_paths()]
+        return [self.create_dag_fnc(i) for i in self.get_dag_component_paths()]
 
     def get_dag_element_objs(self):
         """
         :return: list[instance(<obj>), ...]
         """
-        return [self._set_dag_create_(i) for i in self.get_dag_component_paths()]
+        return [self.create_dag_fnc(i) for i in self.get_dag_component_paths()]
 
     #
     def set_ancestors_create(self):
         """
         :return: None
         """
-        [self._set_dag_create_(i) for i in self.get_ancestor_paths()]
+        [self.create_dag_fnc(i) for i in self.get_ancestor_paths()]
 
     def set_dag_components_create(self):
         pass
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         raise NotImplementedError()
 
     def get_parent_path(self):
@@ -1011,7 +1011,7 @@ class AbsObjDagDef(object):
         """
         parent_path = self.get_parent_path()
         if parent_path is not None:
-            return self._set_dag_create_(self.get_parent_path())
+            return self.create_dag_fnc(self.get_parent_path())
 
     def get_ancestor_paths(self):
         """
@@ -1023,7 +1023,7 @@ class AbsObjDagDef(object):
         """
         :return: list[instance(<obj>), ...]
         """
-        return [self._set_dag_create_(i) for i in self.get_ancestor_paths()]
+        return [self.create_dag_fnc(i) for i in self.get_ancestor_paths()]
 
     # child
     def _get_child_paths_(self, *args, **kwargs):
@@ -1443,7 +1443,7 @@ class AbsObjOsDef(object):
     def get_is_readable(self):
         return bsc_core.StorageMtd.get_is_readable(self.path)
 
-    def set_link_to(self, *args, **kwargs):
+    def link_to(self, *args, **kwargs):
         pass
 
 
@@ -2981,7 +2981,7 @@ class AbsObj(
         self._set_obj_properties_def_init_()
         self._set_obj_attributes_def_init_()
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         """
         :param path: str(<obj-path>)
         :return:
@@ -3514,7 +3514,7 @@ class AbsOsDirectory(
         self._set_obj_os_def_init_()
 
     # dag
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         return self.__class__(path)
 
     def _get_child_paths_(self, path, includes=None):
@@ -3524,25 +3524,23 @@ class AbsOsDirectory(
 
     def _set_child_create_(self, path):
         return self.__class__(path)
-
     @property
     def type(self):
         return 'directory'
+
+    def get_type_name(self):
+        return 'directory'
+    type_name = property(get_type_name)
 
     @property
     def type_path(self):
         return 'storage/{}'.format(self.type_name)
 
-    @property
-    def type_name(self):
-        return 'directory'
-
     def get_is_root(self):
         return self._path == self._root
-
     #
     def get_root(self):
-        return self._set_dag_create_(self._root)
+        return self.create_dag_fnc(self._root)
 
     # os
     def get_is_directory(self):
@@ -3656,14 +3654,12 @@ class AbsOsFile(
 
     def get_ext_split(self):
         return self._get_ext_split_(self.path)
-
     # dag
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         return self.OS_DIRECTORY_CLASS(path)
 
     def _set_child_create_(self, path):
         raise TypeError()
-
     # child
     def _get_child_paths_(self, path):
         return []
@@ -3673,16 +3669,15 @@ class AbsOsFile(
         if self.ext:
             return self.ext[1:]
         return '*'
-
     @property
     def type_path(self):
         return 'storage/{}'.format(self.type_name)
 
-    @property
-    def type_name(self):
+    def get_type_name(self):
         if self.ext:
             return self.ext[1:]
         return '*'
+    type_name = property(get_type_name)
 
     def get_is_root(self):
         return self._path == self._root
@@ -3690,7 +3685,7 @@ class AbsOsFile(
     #
     def get_root(self):
         if self._root is not None:
-            return self._set_dag_create_(self._root)
+            return self.create_dag_fnc(self._root)
 
     # os
     def get_is_directory(self):

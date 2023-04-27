@@ -834,7 +834,7 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def create_all_source_geometry_uv_map_over(self):
         rsv_unit = self._rsv_task.get_rsv_unit(
-            keyword='asset-source-geometry-usd-dir'
+            keyword='asset-source-cache-usd-dir'
         )
         directory_paths = rsv_unit.get_result(version='all')
         for i_directory_path in directory_paths:

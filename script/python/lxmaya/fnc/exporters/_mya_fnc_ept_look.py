@@ -413,7 +413,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         )
         cmds.select(clear=1)
     @classmethod
-    def _set_arnold_visibilities_create_(cls, mya_set):
+    def convert_arnold_visibilities_fnc(cls, mya_set):
         from lxarnold import and_configure
         #
         c = and_configure.Visibility.MAYA_VISIBILITY_DICT
@@ -421,7 +421,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         for k, v in c.items():
             cmd_obj_opt.set_customize_attribute_create(v, False)
     @classmethod
-    def _set_preview_shader_convert_(cls, directory, mya_mesh):
+    def convert_preview_shaders_fnc(cls, directory, mya_mesh):
         beauty_texture_exr_path_pattern = '{}/*_{}_[0-9][0-9][0-9][0-9].exr'.format(
             directory.path, mya_mesh.name
         )
@@ -436,15 +436,15 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             ('transmission', transmission_texture_exr_path_pattern),
             ('opacity', opacity_texture_exr_path_pattern),
         ]
-        dic = cls._set_texture_jpg_convert_(texture_exr_path_patterns)
+        dic = cls.convert_preview_textures_fnc(texture_exr_path_patterns)
         beauty_texture_jpgs = dic.get('beauty') or []
         if beauty_texture_jpgs:
             beauty_texture_jpg = beauty_texture_jpgs[0]
-            cls._set_preview_shader_create_(
+            cls.create_preview_shaders_fnc(
                 mya_mesh, beauty_texture_jpg
             )
     @classmethod
-    def _set_texture_jpg_convert_(cls, patterns):
+    def convert_preview_textures_fnc(cls, patterns):
         dic = {}
         for i_key, i_pattern in patterns:
             i_texture_exr_paths = glob.glob(i_pattern) or []
@@ -463,7 +463,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                     )
         return dic
     @classmethod
-    def _set_preview_shader_create_(cls, mya_mesh, texture_jpg):
+    def create_preview_shaders_fnc(cls, mya_mesh, texture_jpg):
         material_name = '{}__material'.format(mya_mesh.name)
         material = mya_dcc_objects.Material(material_name)
         if material.get_is_exists() is False:
@@ -499,7 +499,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         if ma_core.get_is_ui_mode() is True:
             mel.eval('generateUvTilePreview {}'.format(image.path))
     @classmethod
-    def _set_arnold_options_create_(cls):
+    def create_arnold_options_fnc(cls):
         # noinspection PyUnresolvedReferences
         import mtoa.core as core
         core.createOptions()
@@ -510,7 +510,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             'ignoreDisplacement', True
         )
     @classmethod
-    def _set_arnold_light_create_(cls):
+    def create_arnold_lights_fnc(cls):
         light = mya_dcc_objects.Shape('light')
         if light.get_is_exists() is False:
             light = light.set_create('aiStandIn')
@@ -519,7 +519,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         [light.get_port(k).set(v) for k, v in atr_raw.items()]
         return light.transform.path
     @classmethod
-    def _set_arnold_aovs_create_(cls):
+    def create_arnold_aovs_fnc(cls):
         from lxarnold import and_configure
         #
         dic = {
@@ -592,7 +592,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             mya_hide_set.set_create(
                 'set'
             )
-            self._set_arnold_visibilities_create_(mya_hide_set)
+            self.convert_arnold_visibilities_fnc(mya_hide_set)
         #
         mya_hide_set.set_elements_clear()
         #
@@ -601,7 +601,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             mya_show_set.set_create(
                 'set'
             )
-            self._set_arnold_visibilities_create_(mya_show_set)
+            self.convert_arnold_visibilities_fnc(mya_show_set)
             #
             mya_show_set.get_port('primaryVisibility').set(True)
             # debug, render a black texture when "castsShadows" is "False"
@@ -616,9 +616,9 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         for i_mya_mesh_path in mya_mesh_paths:
             mya_hide_set.add_element(i_mya_mesh_path)
         #
-        self._set_arnold_options_create_()
-        self._set_arnold_light_create_()
-        self._set_arnold_aovs_create_()
+        self.create_arnold_options_fnc()
+        self.create_arnold_lights_fnc()
+        self.create_arnold_aovs_fnc()
         #
         if include_indices:
             mya_mesh_paths = [mya_mesh_paths[i] for i in include_indices]
@@ -653,7 +653,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
                 #
-                # self._set_preview_shader_convert_(directory, i_mya_mesh)
+                # self.convert_preview_shaders_fnc(directory, i_mya_mesh)
         #
         # file_path = mya_dcc_objects.Scene.get_current_file_path()
         # import os
@@ -679,7 +679,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
                 #
-                self._set_preview_shader_convert_(directory, i_mya_mesh)
+                self.convert_preview_shaders_fnc(directory, i_mya_mesh)
 
 
 class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):

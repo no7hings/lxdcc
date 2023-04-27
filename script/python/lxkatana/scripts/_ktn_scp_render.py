@@ -121,8 +121,11 @@ class ScpRenderBuild(object):
 
         version_key = 'render_version'
 
-        render_layers = ktn_core.NGObjsMtd.find_nodes_by_port_filters(
-            type_name='Group', filters=[('type', 'in', {'RenderLayer_Wsp', 'RenderLayer_Wsp_Usr'})]
+        render_layers = ktn_core.NGObjsMtd.filter_nodes(
+            filters=[
+                ('node_type', 'is', 'Group'),
+                ('type', 'in', {'RenderLayer_Wsp', 'RenderLayer_Wsp_Usr'})
+            ]
         )
         for i_render_layer in render_layers:
             i_obj_opt = ktn_core.NGObjOpt(i_render_layer)

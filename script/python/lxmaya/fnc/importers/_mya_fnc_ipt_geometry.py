@@ -461,7 +461,7 @@ mya_fnc_importers.FncGeometryImporterNew(
         file='',
         #
         root='/master',
-        root_type='magicAsset',
+        root_type='transform',
         #
         renderable_locations=[
             # '/master/mod/hi',
@@ -523,19 +523,19 @@ mya_fnc_importers.FncGeometryImporterNew(
         file_path = self.get('file')
         root_location = self.get('root')
         root_type_name = self.get('root_type')
-
+        #
         locations = self.get_locations_fnc(
             self.get('renderable_locations') + self.get('auxiliary_locations')
         )
-        s = usd_core.UsdStageOpt()
+        s_opt = usd_core.UsdStageOpt()
 
-        s.load_by_locations_fnc(
+        s_opt.load_by_locations_fnc(
             file_path,
             locations=locations,
             active_locations=self.get('active_locations')
         )
 
-        usd_stage = s.usd_instance
+        usd_stage = s_opt.usd_instance
         #
         if self.get('uv_map_only') is True:
             FncGeometryUsdImporter.import_uv_map_fnc(

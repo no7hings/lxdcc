@@ -24,6 +24,19 @@ class UsdBasic(object):
     @classmethod
     def _set_file_open_(cls, file_path):
         return Usd.Stage.Open(file_path, Usd.Stage.LoadAll)
+    @classmethod
+    def copy_with_references_fnc(cls, file_path_src, directory_tgt, replace=False):
+        s = Usd.Stage.Open(file_path_src, Usd.Stage.LoadAll)
+        layers = s.GetUsedLayers()
+        directory_src = bsc_core.StgFileOpt(file_path_src).get_directory_path()
+        for i in layers:
+            i_file_path_src = i.realPath
+            if i_file_path_src:
+                i_name = i_file_path_src[len(directory_src)+1:]
+                i_file_path_tgt = '{}/{}'.format(directory_tgt, i_name)
+                bsc_core.StgFileOpt(i_file_path_src).set_copy_to_file(
+                    i_file_path_tgt, replace=replace
+                )
 
 
 class UsdStageOpt(UsdBasic):

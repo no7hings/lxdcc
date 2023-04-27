@@ -17,13 +17,12 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxmaya.fnc.exporters as mya_fnc_exporters
         #
-        root = self._rsv_scene_properties.get('dcc.root')
         asset = self._rsv_scene_properties.get('asset')
         version = self._rsv_scene_properties.get('version')
-        location = '{}/{}'.format(root, 'hi')
-        mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').get_value()
-        mya_group = mya_dcc_objects.Group(mya_location)
-        if mya_group.get_is_exists() is True:
+        model_location = self._rsv_scene_properties.get('dcc.renderable.model.high')
+        dcc_model_location = bsc_core.DccPathDagOpt(model_location).translate_to('|').get_value()
+        dcc_model_group = mya_dcc_objects.Group(dcc_model_location)
+        if dcc_model_group.get_is_exists() is True:
             act = 'static'
             for i_look_pass in ['default']:
                 i_name = '{}.{}.{}'.format(asset, i_look_pass, act)
@@ -45,15 +44,6 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                 )
                 #
-                # mya_fnc_exporters.PreviewExporter(
-                #     file_path=i_proxy_jpg_sub_file_path,
-                #     root=location,
-                #     option=dict(
-                #         use_render=False,
-                #         convert_to_dot_mov=False,
-                #     )
-                # ).set_run()
-                #
                 i_xarc_option['jpg_file'] = i_proxy_jpg_sub_file_path
                 #
                 i_proxy_gpu_act_file = self._rsv_task.get_rsv_unit(
@@ -69,7 +59,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 mya_fnc_exporters.ProxyGpuExporter(
                     option=dict(
                         file=i_proxy_gpu_act_file_path,
-                        location=location
+                        location=model_location
                     )
                 ).set_run()
                 #
@@ -88,7 +78,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 mya_fnc_exporters.ProxyAssExporter(
                     option=dict(
                         file=i_proxy_ass_var_file_path,
-                        location=location
+                        location=model_location
                     )
                 ).set_run()
                 #
@@ -109,12 +99,12 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     i_gpu_files.append(j_proxy_gpu_act_lod_file_path)
                     #
-                    # ma_core.CmdMeshesOpt(mya_location).set_reduce_by(.5)
+                    # ma_core.CmdMeshesOpt(dcc_model_location).set_reduce_by(.5)
                     #
                     mya_fnc_exporters.ProxyGpuExporter(
                         option=dict(
                             file=j_proxy_gpu_act_lod_file_path,
-                            location=location
+                            location=model_location
                         )
                     ).set_run()
                     #
@@ -132,7 +122,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     mya_fnc_exporters.ProxyAssExporter(
                         option=dict(
                             file=j_proxy_ass_var_lod_file_path,
-                            location=location
+                            location=model_location
                         )
                     ).set_run()
                     #
@@ -159,5 +149,5 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             utl_core.Log.set_module_error_trace(
                 'proxy-xarc export',
-                'obj="{}" is non-exists'.format(mya_group.path)
+                'obj="{}" is non-exists'.format(dcc_model_group.path)
             )

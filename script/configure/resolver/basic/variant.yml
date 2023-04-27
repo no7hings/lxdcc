@@ -127,7 +127,7 @@ asset_tasks:
     surface_cfx: srf_cfxshading
     light: lighting
     light_rig: lighting
-    canera: camera
+    camera: camera
 #   sequence
 sequence_tasks: {}
 #   shot

@@ -328,7 +328,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
     def _get_ktn_obj_path_(cls, name):
         return cls.PATHSEP.join(cls._get_ktn_obj_path_args_(name))
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         return self.__class__(path)
 
     def get_descendant_paths(self):

@@ -16,7 +16,7 @@ project-root_secondary-linux-dir: '/t/prod'
 #
 asset-geometry-dir: <asset-release-version-dir>/cache
 #
-asset-look-ass-dir: <asset-geometry-dir>/ass
+asset-look-ass-dir: <asset-cache-dir>/ass
 #
 shot-maya-scene-file: <shot-maya-scene-dir>/<shot-name>.<step-name>.<task-name>.<version-name>.ma
 shot-maya-scene-src-file: <shot-maya-scene-src-dir>/<shot-name>.<step-name>.<task-name>.<version-name>.ma

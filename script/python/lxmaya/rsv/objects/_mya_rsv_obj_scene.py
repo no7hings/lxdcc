@@ -214,7 +214,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             review_mov_file = utl_dcc_objects.OsFile(review_mov_file_path)
             if preview_mov_file.get_is_exists() is True:
                 if review_mov_file.get_is_exists() is False:
-                    preview_mov_file.set_link_to(
+                    preview_mov_file.link_to(
                         review_mov_file.path
                     )
 
@@ -263,8 +263,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-maya-scene-src-file'
+            keyword_1 = 'asset-maya-scene-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
             keyword_0 = 'asset-temporary-maya-scene-src-file'
+            keyword_1 = 'asset-temporary-maya-scene-file'
         else:
             raise TypeError()
 
@@ -277,6 +279,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if with_build is True:
             mya_fnc_builders.FncAssetBuilderNew(
                 option=dict(
+                    # resource
+                    project=self._rsv_task.get('project'),
+                    asset=self._rsv_task.get('asset'),
                     # data
                     with_geometry=True,
                     with_geometry_uv_map=True,
@@ -311,6 +316,16 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             ).execute()
         #
         mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+        #
+        if self._hook_option_opt.get_as_boolean('with_scene_link') is True:
+            scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
+                keyword=keyword_1
+            )
+            scene_file_path = scene_file_rsv_unit.get_result(version=version)
+            bsc_core.StgFileOpt(scene_file_path).create_directory()
+            bsc_core.StgPathLinkMtd.link_file_to(
+                scene_src_file_path, scene_file_path
+            )
 
     def set_asset_texture_bake_create(self):
         key = 'asset texture bake create'
@@ -520,7 +535,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 #
                 utl_dcc_objects.OsFile(
                     scene_file_path
-                ).set_link_to(new_work_scene_src_file_path)
+                ).link_to(new_work_scene_src_file_path)
             else:
                 utl_core.Log.set_module_warning_trace(
                     'preview work-scene-src link create',
@@ -534,7 +549,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             utl_dcc_objects.OsFile(
                 scene_file_path
-            ).set_link_to(new_work_scene_src_file_path)
+            ).link_to(new_work_scene_src_file_path)
 
 
 class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):

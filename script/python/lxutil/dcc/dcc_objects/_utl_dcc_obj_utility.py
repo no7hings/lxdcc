@@ -40,7 +40,7 @@ class Obj(
     def icon(self):
         return self._icon_file_path
 
-    def _set_dag_create_(self, path):
+    def create_dag_fnc(self, path):
         _ = self.__class__(path)
         _._icon_file_path = utl_gui_core.RscIconFile.get('obj/group')
         return _

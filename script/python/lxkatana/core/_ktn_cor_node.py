@@ -460,10 +460,18 @@ class NGObjsMtd(object):
                 i_c = len(filters)
                 i_results = []
                 for j_f_p, j_f_o, j_f_v in filters:
-                    j_p = i.getParameter(j_f_p)
-                    if j_p is None:
-                        continue
-                    j_v = j_p.getValue(0)
+                    if j_f_p == 'node_type':
+                        j_v = i.getType()
+                    elif j_f_p == 'node_name':
+                        j_v = i.getName()
+                    elif j_f_p == 'bypassed':
+                        j_v = i.isBypassed()
+                    else:
+                        j_p = i.getParameter(j_f_p)
+                        if j_p is None:
+                            continue
+                        j_v = j_p.getValue(0)
+                    #
                     if j_f_o == 'in':
                         j_r = j_v in j_f_v
                     elif j_f_o == 'is':
@@ -480,8 +488,8 @@ class NGObjsMtd(object):
                     list_.append(i)
         return list_
     @classmethod
-    def find_nodes_by_port_filters(cls, type_name, filters, ignore_bypassed=False):
-        return cls.filter_fnc(cls.find_nodes(type_name, ignore_bypassed=ignore_bypassed), filters)
+    def filter_nodes(cls, filters, ignore_bypassed=False):
+        return cls.filter_fnc(NodegraphAPI.GetAllNodes(), filters)
 
 
 class NGObjOpt(object):
@@ -1510,9 +1518,8 @@ class NGObjOpt(object):
                 return [i for i in _ if i.getType() in include_type_names]
         return _
 
-    def find_children(self, type_name, filters):
-        _ = self.get_children(include_type_names=[type_name])
-        return NGObjsMtd.filter_fnc(_, filters)
+    def filter_children(self, filters):
+        return NGObjsMtd.filter_fnc(self._ktn_obj.getChildren(), filters)
 
     def clear_children(self, include_type_names=None):
         for i in self.get_children(include_type_names):

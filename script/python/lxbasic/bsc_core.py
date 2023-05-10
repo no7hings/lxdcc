@@ -45,9 +45,15 @@ if __name__ == '__main__':
     # )
     # print StgPathPermissionMtd.change_owner('/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002')
 
-    StgPathPermissionMtd.unlock_all_files(
-        '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/texture'
-    )
+    # StgPathPermissionMtd.change_mode(
+    #     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture', '775'
+    # )
+    # StgPathPermissionMtd.change_owner(
+    #     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture'
+    # )
+    # StgPathPermissionMtd.unlock_all_files(
+    #     '/job/PLE/bundle/thirdparty/lxdcc_rsc/master-8/script/python/.resources/icons'
+    # )
     #
     # print RawTextMtd.to_integer('geometry')
     # print RawTextOpt(
@@ -56,3 +62,7 @@ if __name__ == '__main__':
     # print RawTextOpt(
     #     'dreambae_nightare'
     # ).to_rgb_0()
+    ps = ['/cgm', '/cjd', '/shl', '/cg7', '/lib', '/lib_bck', '/nsa_dev', '/tnt', '/']
+    print DccPathDagMtd.get_dag_sibling_names(
+        '/cgm', ps
+    )

@@ -822,9 +822,11 @@ class AbsFncTextureExportDef(object):
         remove_expression=False,
         use_environ_map=False,
         repath_fnc=None,
-        #
-        copy_src=False,
-        copy_tx=False
+        # copy option
+        #   copy source file, etc. use ".tx", auto copy ".exr"
+        copy_src=True,
+        copy_scheme='separate',
+        copy_target_extension='.tx'
     ):
         if dcc_objs:
             copy_cache = []
@@ -860,9 +862,9 @@ class AbsFncTextureExportDef(object):
                             j_directory_path_dst,
                             fix_name_blank=fix_name_blank
                         )
-                        # ignore when departure same to destination
+                        # ignore when dpt ( departure ) same to dst ( destination )
                         if j_texture_path_dpt != j_texture_path_dst:
-                            # copy
+                            # do copy
                             j_file_tiles = j_texture_dpt.get_exists_files_()
                             if j_file_tiles:
                                 for k_file_tile in j_file_tiles:
@@ -870,20 +872,33 @@ class AbsFncTextureExportDef(object):
                                     if k_file_tile_path not in copy_cache:
                                         copy_cache.append(k_file_tile_path)
                                         #
-                                        k_file_tile.copy_unit_as_base_link(
-                                            directory_path_bsc=directory_path_bsc,
-                                            directory_path_dst=j_directory_path_dst,
-                                            #
-                                            fix_name_blank=fix_name_blank,
-                                            replace=True
-                                        )
+                                        if copy_src is True:
+                                            k_file_tile.copy_unit_as_base_link_with_src(
+                                                directory_path_bsc=directory_path_bsc,
+                                                directory_path_dst=j_directory_path_dst,
+                                                #
+                                                scheme=copy_scheme,
+                                                target_extension=copy_target_extension,
+                                                #
+                                                fix_name_blank=fix_name_blank,
+                                                replace=True
+                                            )
+                                        else:
+                                            k_file_tile.copy_unit_as_base_link(
+                                                directory_path_bsc=directory_path_bsc,
+                                                directory_path_dst=j_directory_path_dst,
+                                                #
+                                                fix_name_blank=fix_name_blank,
+                                                replace=True
+                                            )
                             else:
-                                utl_core.Log.set_module_warning_trace(
+                                bsc_core.LogMtd.trace_method_warning(
                                     'texture search',
                                     u'file="{}" is Non-exists'.format(j_texture_path_dpt)
                                 )
                                 continue
-                            # repath
+                            # do repath
+                            #   check is replace to ".tx", when is on, replace dst to ".tx"
                             if repath_to_tx_force is True:
                                 j_texture_tx_path_dst = j_texture_dpt.get_target_file_path(
                                     j_directory_path_dst,
@@ -893,7 +908,7 @@ class AbsFncTextureExportDef(object):
                                 if utl_dcc_objects.OsTexture(j_texture_tx_path_dst).get_is_exists() is True:
                                     j_texture_path_dst = j_texture_tx_path_dst
                                 else:
-                                    utl_core.Log.set_module_warning_trace(
+                                    bsc_core.LogMtd.trace_method_warning(
                                         'texture export',
                                         u'file="{}" is non-exists'.format(j_texture_tx_path_dst)
                                     )
@@ -920,7 +935,7 @@ class AbsFncTextureExportDef(object):
                                     u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
                                 )
                             else:
-                                utl_core.Log.set_module_warning_trace(
+                                bsc_core.LogMtd.trace_method_warning(
                                     'texture export',
                                     u'file="{}" is non-exists'.format(j_texture_path_dst)
                                 )

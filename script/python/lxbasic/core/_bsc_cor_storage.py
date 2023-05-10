@@ -1606,11 +1606,11 @@ class StgPathPermissionBaseMtd(object):
     SCHEME_MAPPER = dict(
         windows={
             'default': ['l:', 'L:'],
-            'new': ['x:', 'X:']
+            'new': ['z:', 'Z:', 'x:', 'X:']
         },
         linux={
             'default': ['/l'],
-            'new': ['/production']
+            'new': ['/production', '/job']
         }
     )
     MAP_DICT = {

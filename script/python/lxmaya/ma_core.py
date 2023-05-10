@@ -216,7 +216,6 @@ class Om2Method(object):
     @classmethod
     def _get_om2_transformation_matrix_(cls, matrix):
         return om2.MTransformationMatrix(cls._get_om2_matrix_(matrix))
-    #
     @staticmethod
     def _to_int_array_reduce(array):
         lis = []
@@ -752,14 +751,14 @@ class Om2MeshChecker(object):
         self._om2_mesh_opt = Om2MeshOpt(path)
 
     def get_unused_vertex_comp_names(self):
-        lis = []
+        list_ = []
         om2_obj_fnc = self._om2_mesh_opt._om2_obj_fnc
         om2_vertex_itr = om2.MItMeshVertex(om2_obj_fnc.object())
         for i_vertex_index in range(om2_obj_fnc.numVertices):
             om2_vertex_itr.setIndex(i_vertex_index)
             if not om2_vertex_itr.numConnectedFaces():
-                lis.append(i_vertex_index)
-        return Om2Method._get_mesh_vertex_comp_names_(lis)
+                list_.append(i_vertex_index)
+        return Om2Method._get_mesh_vertex_comp_names_(list_)
 
     def set_unused_vertices_delete(self):
         cs = self.get_unused_vertex_comp_names()

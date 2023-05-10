@@ -717,16 +717,19 @@ class AbsRsvObjDef(object):
 
     def set(self, key, value):
         self._rsv_properties.set(key, value)
-    @property
-    def type(self):
+
+    def get_type(self):
         return self.properties.get('type')
-    @property
-    def type_name(self):
-        return self.type
+    type = property(get_type)
+
+    def get_type_name(self):
+        return self.get_type()
+    type_name = property(get_type_name)
 
     def get_name(self):
         return bsc_core.DccPathDagMtd.get_dag_name(self._rsv_path, pathsep=self.PATHSEP)
     name = property(get_name)
+
     @property
     def pattern(self):
         return self._pattern
@@ -734,7 +737,7 @@ class AbsRsvObjDef(object):
     def _get_stack_key_(self):
         return self._rsv_path
 
-    def get_path_args(self):
+    def get_path_data(self):
         types = [
             'project',
             #
@@ -1708,6 +1711,7 @@ class AbsRsvExtraDef(AbsRsvDef):
 
     def _completion_branch_rsv_create_kwargs_(self, rsv_category, rsv_type, kwargs, result, kwargs_extend):
         rsv_path = self._get_main_rsv_path_(rsv_category, kwargs)
+        #
         kwargs['category'] = rsv_category
         kwargs['type'] = rsv_type
         kwargs['path'] = rsv_path
@@ -2321,7 +2325,13 @@ class AbsRsvProject(
         list_ = []
         kwargs_over = copy.copy(kwargs)
         branch = kwargs_over['branch']
-        keyword = '{}-dir'.format(branch)
+        #
+        rsv_type = branch
+        if rsv_type in kwargs:
+            if '*' in kwargs[rsv_type]:
+                kwargs.pop(rsv_type)
+        #
+        keyword = '{}-dir'.format(rsv_type)
         kwargs_over['keyword'] = keyword
         kwargs_over['pattern'] = self.get_pattern(keyword=keyword)
         rsv_matcher = self._project__create_main_rsv_matcher_(
@@ -2428,6 +2438,10 @@ class AbsRsvProject(
         list_ = []
         #
         rsv_type = self.VariantTypes.Step
+        if rsv_type in kwargs:
+            if '*' in kwargs[rsv_type]:
+                kwargs.pop(rsv_type)
+        #
         branch = self._guess_branch_(**kwargs)
         search_patterns = self._project_get_search_patterns_(branch, rsv_type)
         for i_workspace_key, i_pattern_args in search_patterns.items():
@@ -2512,6 +2526,7 @@ class AbsRsvProject(
     def _project__create_rsv_step_(self, **kwargs):
         rsv_category = self.VariantCategories.Step
         rsv_type = self.VariantTypes.Step
+        #
         result = kwargs.pop('resolver_result')
         kwargs['workspace_key'] = kwargs.pop('resolver_workspace_key')
         kwargs['pattern'] = kwargs.pop('resolver_pattern')
@@ -2555,6 +2570,10 @@ class AbsRsvProject(
         list_ = []
         #
         rsv_type = self.VariantTypes.Task
+        if rsv_type in kwargs:
+            if '*' in kwargs[rsv_type]:
+                kwargs.pop(rsv_type)
+        #
         branch = self._guess_branch_(**kwargs)
         search_patterns = self._project_get_search_patterns_(branch, rsv_type)
         for i_workspace_key, i_pattern in search_patterns.items():
@@ -3094,12 +3113,15 @@ class AbsRsvRoot(
                     j_project_raw_opt = self._get_raw_opt_(j_raw)
                     j_project_raw_opt.set('key', j_project)
                     self._create_rsv_project_(j_raw, project=j_project)
-    @property
-    def type(self):
+
+    def get_type(self):
         return 'resolver'
-    @property
-    def type_name(self):
-        return self.type
+    type = property(get_type)
+
+    def get_type_name(self):
+        return self.get_type()
+    type_name = property(get_type_name)
+
     @property
     def pathsep(self):
         return '/'
@@ -3454,7 +3476,7 @@ class AbsRsvRoot(
                 # print(';'.join(['{}={}'.format(k, v) for k, v in result.value.items() if isinstance(v, six.string_types)]))
                 return result
     @classmethod
-    def get_path_args(cls):
+    def get_path_data(cls):
         dic = collections.OrderedDict()
         return dic
     #

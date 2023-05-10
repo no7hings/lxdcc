@@ -30,8 +30,9 @@ class PtnMultiplyFileMtd(object):
             (r'%0{}d'.format(i+1), r'{}', i+1)
         )
     #
-    RE_MULTIPLY_KEYS = RE_UDIM_KEYS + RE_SEQUENCE_KEYS
+    RE_MULTIPLY_KEYS = RE_UDIM_KEYS+RE_SEQUENCE_KEYS
     PATHSEP = '/'
+
     @classmethod
     def to_fnmatch_style(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -48,6 +49,7 @@ class PtnMultiplyFileMtd(object):
                     s = '[0-9]'*i_c
                     new_name_base = new_name_base.replace(pattern[j_start:j_end], s, 1)
         return new_name_base
+
     @classmethod
     def to_re_style(cls, pattern):
         pattern_ = pattern
@@ -75,7 +77,7 @@ class PtnMultiplyFileMtd(object):
             if results:
                 if i_c == -1:
                     i_count = len(results)
-                    i_key = i_count * i_k
+                    i_key = i_count*i_k
                 else:
                     i_count = i_c
                     i_key = i_k
@@ -84,6 +86,7 @@ class PtnMultiplyFileMtd(object):
                     (i_key, i_count)
                 )
         return key_args
+
     @classmethod
     def get_is_valid(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -98,24 +101,29 @@ class PtnMultiplyFileMtd(object):
 class PtnVersion(object):
     VERSION_ZFILL_COUNT = 3
     PATTERN = 'v{}'.format('[0-9]'*VERSION_ZFILL_COUNT)
+
     def __init__(self, text):
         self._validation_(text)
         #
         self._text = text
         self._number = int(text[-self.VERSION_ZFILL_COUNT:])
+
     @classmethod
     def _validation_(cls, text):
         if not fnmatch.filter([text], cls.PATTERN):
             raise TypeError(
                 'version: "{}" is Non-match "{}"'.format(text, cls.PATTERN)
             )
+
     @classmethod
     def get_is_valid(cls, text):
         return not not fnmatch.filter([text], cls.PATTERN)
 
     def get_number(self):
         return self._number
+
     number = property(get_number)
+
     @classmethod
     def get_default(cls):
         return 'v{}'.format(str(1).zfill(cls.VERSION_ZFILL_COUNT))
@@ -143,22 +151,25 @@ class PtnVersion(object):
 
 class PtnParseMtd(object):
     RE_KEY_PATTERN = r'[{](.*?)[}]'
+
     @classmethod
     def get_keys(cls, pattern):
         lis_0 = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
         lis_1 = list(set(lis_0))
         lis_1.sort(key=lis_0.index)
         return lis_1
+
     @classmethod
     def get_value(cls, key, variants):
         if '.' in key:
             key_ = key.split('.')[0]
             if key_ in variants:
                 value_ = variants[key_]
-                exec('{} = \'{}\''.format(key_, value_))
+                exec ('{} = \'{}\''.format(key_, value_))
                 return eval(key)
         if key in variants:
             return variants[key]
+
     @classmethod
     def set_update(cls, pattern, **kwargs):
         if pattern is not None:
@@ -172,6 +183,7 @@ class PtnParseMtd(object):
                         s = s.replace('{{{}}}'.format(i_k), i_v)
             return s
         return pattern
+
     @classmethod
     def get_as_fnmatch(cls, pattern, variants=None):
         if pattern is not None:
@@ -188,6 +200,44 @@ class PtnParseMtd(object):
         return pattern
 
 
+class PtnFnmatch(object):
+    @classmethod
+    def to_re_style(cls, pat):
+        i, n = 0, len(pat)
+        res = ''
+        while i < n:
+            c = pat[i]
+            i += 1
+            if c == '*':
+                res += '.*'
+            elif c == '?':
+                res += '.'
+            elif c == '[':
+                j = i
+                if j < n and pat[j] == '!':
+                    j += 1
+                if j < n and pat[j] == ']':
+                    j += 1
+                while j < n and pat[j] != ']':
+                    j += 1
+                if j >= n:
+                    res += '\\['
+                else:
+                    stuff = pat[i:j].replace('\\', '\\\\')
+                    i = j+1
+                    if stuff[0] == '!':
+                        stuff = '^'+stuff[1:]
+                    elif stuff[0] == '^':
+                        stuff = '\\'+stuff
+                    res = '%s[%s]'%(res, stuff)
+            else:
+                res = res+re.escape(c)
+        return res
+    @classmethod
+    def get_is_valid(cls, ptn):
+        return ptn != cls.to_re_style(ptn)
+
+
 class PtnParseOpt(object):
     def __init__(self, p, key_format=None):
         self._variants = {}
@@ -201,9 +251,11 @@ class PtnParseOpt(object):
         self._fnmatch_pattern = PtnParseMtd.get_as_fnmatch(
             self._pattern, self._key_format
         )
+
     @property
     def pattern(self):
         return self._pattern
+
     @property
     def fnmatch_pattern(self):
         return self._fnmatch_pattern
@@ -212,6 +264,7 @@ class PtnParseOpt(object):
         return PtnParseMtd.get_keys(
             self._pattern
         )
+
     keys = property(get_keys)
 
     def get_value(self):

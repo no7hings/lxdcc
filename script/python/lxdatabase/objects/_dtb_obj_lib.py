@@ -36,6 +36,7 @@ class DtbBaseOpt(object):
 
     class EntityTypes(object):
         # type
+        TypeRoot = 'type_root'
         CategoryGroup = 'category_group'
         Category = 'category'
         Type = 'type'

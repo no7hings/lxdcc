@@ -507,9 +507,9 @@ class AbsOsFile(
                 )
                 return True, link_log
         else:
-            bsc_core.LogMtd.trace_warning(
-                'file-src-copy',
-                'file-path"{}" not available'.format(self.path)
+            bsc_core.LogMtd.trace_method_warning(
+                'file base link',
+                'file="{}" not available'.format(self.path)
             )
         return False, None
 
@@ -664,19 +664,7 @@ class AbsOsFile(
         return True
 
 
-class AbsOsTexture(AbsOsFile):
-    TEXTURE_COLOR_SPACE_CONFIGURE = utl_configures.get_color_space_configure()
-    TEXTURE_ACES_COLOR_SPACE_CONFIGURE = utl_configures.get_aces_color_space_configure()
-    #
-    OS_FILE_CLASS = None
-    # sequence
-    RE_SEQUENCE_PATTERN = None
-    # udim
-    RE_UDIM_PATTERN = r'.*?(<udim>).*?'
-    #
-    TX_EXT = '.tx'
-    EXR_EXT = '.exr'
-    JPG_EXT = '.jpg'
+class AbsOsTextureSeparateDef(object):
     @classmethod
     def get_directory_args_dpt_as_default_fnc(cls, texture_any, target_extension):
         target_format = target_extension[1:]
@@ -745,14 +733,63 @@ class AbsOsTexture(AbsOsFile):
         directory_path_src = '{}/src'.format(target_directory)
         directory_path_tgt = '{}/{}'.format(target_directory, target_format)
         return directory_path_src, directory_path_tgt
+    @classmethod
+    def get_directory_args_dpt_fnc(cls, texture_any, target_extension):
+        target_format = target_extension[1:]
+        if texture_any.get_extension() == target_extension:
+            if texture_any.directory.get_path_is_matched('*/{}'.format(target_format)) is True:
+                return cls.get_directory_args_dpt_as_separate_fnc(texture_any, target_extension)
+            return cls.get_directory_args_dpt_as_default_fnc(texture_any, target_extension)
+        if texture_any.directory.get_path_is_matched('*/src') is True:
+            return cls.get_directory_args_dpt_as_separate_fnc(texture_any, target_extension)
+        return cls.get_directory_args_dpt_as_default_fnc(texture_any, target_extension)
 
-    def copy_unit_tx_as_base_link_with_src(self, directory_path_bsc, directory_path_dst, fix_name_blank=False, replace=True):
-        if self.get_is_exists_file():
-            directory_args_dpt = self.get_directory_args_dpt_as_separate_fnc(
-                self, '.tx'
-            )
-            print directory_args_dpt
+
+class AbsOsTexture(
+    AbsOsFile,
+    AbsOsTextureSeparateDef
+):
+    TEXTURE_COLOR_SPACE_CONFIGURE = utl_configures.get_color_space_configure()
+    TEXTURE_ACES_COLOR_SPACE_CONFIGURE = utl_configures.get_aces_color_space_configure()
     #
+    OS_FILE_CLASS = None
+    # sequence
+    RE_SEQUENCE_PATTERN = None
+    # udim
+    RE_UDIM_PATTERN = r'.*?(<udim>).*?'
+    #
+    TX_EXT = '.tx'
+    EXR_EXT = '.exr'
+    JPG_EXT = '.jpg'
+
+    def copy_unit_as_base_link_with_src(self, directory_path_bsc, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False, replace=True):
+        if self.get_is_exists_file():
+            directory_args_dpt = self.get_directory_args_dpt_fnc(
+                self, target_extension
+            )
+            if scheme == 'default':
+                directory_args_dst = self.get_directory_args_dst_as_default_fnc(self, target_extension, directory_path_dst)
+            elif scheme == 'separate':
+                directory_args_dst = self.get_directory_args_dst_as_separate_fnc(self, target_extension, directory_path_dst)
+            else:
+                raise RuntimeError()
+            #
+            if directory_args_dpt and directory_args_dst:
+                texture_src, texture_tgt = self.get_args_as_ext_tgt_by_directory_args(
+                    target_extension, directory_args_dpt
+                )
+                directory_src_dst, directory_tgt_dst = directory_args_dst
+                #
+                if texture_src.get_is_exists() is True:
+                    texture_src.copy_unit_as_base_link(
+                        directory_path_bsc, directory_src_dst,
+                        fix_name_blank=fix_name_blank, replace=replace
+                    )
+                if texture_tgt.get_is_exists() is True:
+                    texture_tgt.copy_unit_as_base_link(
+                        directory_path_bsc, directory_tgt_dst,
+                        fix_name_blank=fix_name_blank, replace=replace
+                    )
     @classmethod
     def _get_unit_is_exists_as_ext_tgt_(cls, file_path_any, ext_tgt):
         tgt_ext_orig_path = cls._get_unit_path_src_as_ext_tgt_(file_path_any, ext_tgt)

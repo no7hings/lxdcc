@@ -576,7 +576,7 @@ class AbsTypeDef(object):
     # str(<type-pathsep>/<obj-type-pathsep>)
     PATHSEP = None
 
-    def _set_type_def_init_(self, category, name):
+    def _init_type_def_(self, category, name):
         """
         :param category: instance(<category>/<obj-category>)
         :param name: str(<type-name>)
@@ -679,7 +679,7 @@ class AbsType(AbsTypeDef):
         :param category: instance(<obj-universe>)
         :param name: str(<type-name>)
         """
-        self._set_type_def_init_(category, name)
+        self._init_type_def_(category, name)
 
     # <type-constant>
     def get_is_constant(self):
@@ -2702,7 +2702,7 @@ class AbsObjType(
     AbsObjTypePortQueryDef
 ):
     def __init__(self, category, name):
-        self._set_type_def_init_(category, name)
+        self._init_type_def_(category, name)
         self._set_obj_type_obj_def_init_()
         self._set_obj_type_port_query_def_init_()
 
@@ -3705,6 +3705,10 @@ class AbsOsFile(
     @property
     def ext(self):
         return os.path.splitext(self.path)[-1]
+
+    def get_extension(self):
+        return os.path.splitext(self.path)[-1]
+    extension = property(get_extension)
 
     @property
     def directory(self):

@@ -5,14 +5,14 @@
 			"chn_label": "",
 			"icon": "",
 			"size": [720, 960],
-        	"command": "from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.SceneOverviewToolPanel().set_window_show()"
+        	"command": ""
 		},
 		"attribute_constant": {
 			"label": "Port Constant",
 			"chn_label": "",
 			"icon": "",
 			"size": [1280, 720],
-        	"command": "from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.AttributeConstantTool().set_window_show()"
+        	"command": ""
 		},
 		"package_reloader": {
 			"label": "Reload Package(s)",

@@ -99,15 +99,29 @@ class DccPathDagMtd(object):
     @classmethod
     def get_dag_children(cls, path, paths, pathsep='/'):
         lis = []
+        # etc. r'/shl/chr/test_0/[^/]*'
+        if path == pathsep:
+            ptn = r'{1}[^{1}]*'.format(path, pathsep)
+        else:
+            ptn = r'{0}{1}[^{1}]*'.format(path, pathsep)
+        #
         for i_path in paths:
-            # r'/shl/chr/test_0/[^/]*'
-            _ = re.match(
-                r'{0}{1}[^{1}]*'.format(path, pathsep), i_path
-            )
-            if _ is not None:
-                if _.group() == i_path:
-                    lis.append(i_path)
+            if i_path != pathsep:
+                _ = re.match(
+                    ptn, i_path
+                )
+                if _ is not None:
+                    if _.group() == i_path:
+                        lis.append(i_path)
         return lis
+    @classmethod
+    def get_dag_siblings(cls, path, paths, pathsep='/'):
+        return cls.get_dag_children(
+            cls.get_dag_parent(path, pathsep), paths, pathsep
+        )
+    @classmethod
+    def get_dag_sibling_names(cls, path, paths, pathsep='/'):
+        return [cls.get_dag_name(x) for x in cls.get_dag_siblings(path, paths, pathsep)]
     @classmethod
     def set_dag_path_cleanup(cls, path, pathsep='/'):
         return re.sub(
@@ -127,9 +141,15 @@ class DccPathDagOpt(object):
     name = property(get_name)
 
     def set_name(self, name):
-        self._path = self._pathsep.join(
-            [self.get_parent_path(), name]
-        )
+        parent = self.get_parent_path()
+        if parent == self._pathsep:
+            self._path = self._pathsep.join(
+                ['', name]
+            )
+        else:
+            self._path = self._pathsep.join(
+                [self.get_parent_path(), name]
+            )
 
     def get_pathsep(self):
         return self._pathsep

@@ -36,12 +36,12 @@ class RsvUnit(rsv_abstracts.AbsRsvUnit):
         super(RsvUnit, self).__init__(*args, **kwargs)
 
 
-class RsvTag(rsv_abstracts.AbsRsvTag):
+class RsvResourceGroup(rsv_abstracts.AbsRsvResourceGroup):
     PATHSEP = '/'
     #
     PROPERTIES_CLASS = _bsc_obj_raw.Properties
     def __init__(self, *args, **kwargs):
-        super(RsvTag, self).__init__(*args, **kwargs)
+        super(RsvResourceGroup, self).__init__(*args, **kwargs)
 
 
 class RsvResource(rsv_abstracts.AbsRsvResource):
@@ -94,7 +94,7 @@ class RsvProject(rsv_abstracts.AbsRsvProject):
     #
     RSV_OBJ_STACK_CLASS = _rsv_obj_stack.EntityStack
     #
-    RSV_TAG_CLASS = RsvTag
+    RSV_RESOURCE_GROUP_CLASS = RsvResourceGroup
     RSV_RESOURCE_CLASS = RsvResource
     RSV_STEP_CLASS = RsvStep
     RSV_TASK_CLASS = RsvTask

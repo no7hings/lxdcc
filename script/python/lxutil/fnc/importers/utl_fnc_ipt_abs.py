@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 import lxbasic.objects as bsc_objects
 
 from lxutil import utl_core
@@ -10,9 +12,12 @@ class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         root='',
+        #
         material_assign_force=True,
         look_pass='default',
         version='v000',
+        #
+        auto_rename_node=True
     )
     def __init__(self, option):
         super(AbsDccLookYamlImporter, self).__init__(option)
@@ -20,9 +25,14 @@ class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             'look-yml-import',
             'file="{}"'.format(self._option['file'])
         )
-        self._raw = bsc_objects.Content(
-            value=self._option['file']
-        )
+        file_path = self.get('file')
+        if bsc_core.StgPathMtd.get_is_exists(file_path) is True:
+            self._time_tag = bsc_core.TimestampOpt(bsc_core.StgFileOpt(file_path).get_modify_timestamp()).get_as_tag_36()
+            self._raw = bsc_objects.Content(
+                value=self.get('file')
+            )
+        else:
+            raise RuntimeError()
 
     def get_look_pass_names(self):
         _ = self._raw.get_keys(

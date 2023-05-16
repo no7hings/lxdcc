@@ -64,7 +64,7 @@ def set_asset_look_properties_usd_export(rsv_task_properties):
     #
     look_yml__surface_anm__file_path = rsv_asset_look_query.get_yml_surface_anm_file()
     if look_yml__surface_anm__file_path is not None:
-        look_pass_names = utl_fnc_importers.LookYamlImporter(
+        look_pass_names = utl_fnc_importers.FncLookYamlImporter(
             option=dict(
                 file=look_yml__surface_anm__file_path,
                 root=dcc_root

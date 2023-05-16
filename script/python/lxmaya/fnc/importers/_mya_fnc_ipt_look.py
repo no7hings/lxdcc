@@ -378,67 +378,108 @@ class AssImportFnc(object):
         geometry_dcc_obj_opt.set_visibilities(mya_visibilities)
 
 
-class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
+class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
+    PLUG_NAMES = ['mtoa']
     def __init__(self, option):
-        super(LookYamlImporter, self).__init__(option)
+        super(FncLookYamlImporter, self).__init__(option)
         self._obj_index = 0
         self._name_dict = {}
         self._connections = []
     @mya_modifiers.set_undo_mark_mdf
-    def set_run(self):
+    def execute(self):
+        for i_plug_name in self.PLUG_NAMES:
+            is_plug_loaded = cmds.pluginInfo(i_plug_name, query=True, loaded=True)
+            if is_plug_loaded is False:
+                cmds.loadPlugin(i_plug_name, quiet=1)
         #
-        look_pass_name = self._option['look_pass']
-        version_name = self._option['version']
+        self._look_pass_name = self.get('look_pass')
+        self._auto_rename_node = self.get('auto_rename_node')
         #
         roots = self._raw.get_branch_keys('root')
         for i_root in roots:
-            self._set_obj_create_(
+            self.create_node_fnc(
                 'root', i_root, i_root, customize=True
             )
         #
+        method_args = [
+            (self.create_materials_fnc, None),
+            (self.create_nodes_fnc, None),
+            (self.create_transforms_fnc, None),
+            (self.create_geometries_fnc, None),
+            (self.create_connections_fnc, None),
+        ]
+        with utl_core.GuiProgressesRunner.create(
+                maximum=len(method_args), label='execute look yaml import method'
+        ) as g_p:
+            for i_method, i_args in method_args:
+                g_p.set_update()
+                if i_args:
+                    i_method(*i_args)
+                else:
+                    i_method()
+
+    def create_materials_fnc(self):
         materials = self._raw.get_branch_keys('material')
         for i_material in materials:
-            type_name = self._raw.get(
-                '{}.{}.properties.type'.format('material', i_material)
-            ).split('/')[-1]
+            if self._auto_rename_node is True:
+                type_name = self._raw.get(
+                    '{}.{}.properties.type'.format('material', i_material)
+                ).split('/')[-1]
+                #
+                new_name = '{}__{}__{}__{}'.format(
+                    self._look_pass_name, self._time_tag, type_name, len(self._name_dict)
+                )
+            else:
+                new_name = i_material
             #
-            new_name = '{}__{}__{}__{}'.format(
-                look_pass_name, version_name, type_name, len(self._name_dict)
-            )
             self._name_dict[i_material] = new_name
-            self._set_obj_create_(
+            self.create_node_fnc(
                 'material', i_material, new_name, create=True, definition=True
             )
-        #
+
+    def create_nodes_fnc(self):
         nodes = self._raw.get_branch_keys('node-graph')
         for i_node in nodes:
-            type_name = self._raw.get(
-                '{}.{}.properties.type'.format('node-graph', i_node)
-            ).split('/')[-1]
+            if self._auto_rename_node is True:
+                type_name = self._raw.get(
+                    '{}.{}.properties.type'.format('node-graph', i_node)
+                ).split('/')[-1]
+                #
+                new_name = '{}__{}__{}__{}'.format(
+                    self._look_pass_name, self._time_tag, type_name, len(self._name_dict)
+                )
+            else:
+                new_name = i_node
             #
-            new_name = '{}__{}__{}__{}'.format(
-                look_pass_name, version_name, type_name, len(self._name_dict)
-            )
             self._name_dict[i_node] = new_name
-            self._set_obj_create_(
+            self.create_node_fnc(
                 'node-graph', i_node, new_name, create=True, definition=True, clear_array_ports=True
             )
+
+    def create_transforms_fnc(self):
         # transforms
         transforms = self._raw.get_branch_keys('transform')
         for i_transform in transforms:
-            self._set_obj_create_(
+            self.create_node_fnc(
                 'transform', i_transform, i_transform, definition=True
             )
-        #
-        self._set_obj_connections_create_()
-        # geometries
+
+    def create_geometries_fnc(self):
         geometries = self._raw.get_branch_keys('geometry')
         for i_geometry in geometries:
-            self._set_obj_create_(
+            self.create_node_fnc(
                 'geometry', i_geometry, i_geometry, assigns=True
             )
 
-    def _set_obj_create_(self, scheme, obj_key, obj_path, create=False, definition=False, customize=False, assigns=False, clear_array_ports=False):
+    def create_connections_fnc(self):
+        for atr_path_src, atr_path_tgt in self._connections:
+            obj_path_src, port_path_src = bsc_core.DccAttrPathOpt(atr_path_src).to_args()
+            if obj_path_src in self._name_dict:
+                obj_path_src = self._name_dict[obj_path_src]
+            atr_path_src = bsc_core.DccAttrPathMtd.get_atr_path(obj_path_src, port_path_src)
+            ma_core.CmdPortOpt._set_connection_create_(atr_path_src, atr_path_tgt)
+
+    def create_node_fnc(self, scheme, obj_key, obj_path, create=False, definition=False, customize=False, assigns=False, clear_array_ports=False):
         if create is True:
             type_name = self._raw.get(
                 '{}.{}.properties.type'.format(scheme, obj_key)
@@ -461,7 +502,7 @@ class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                 if obj_path in self._name_dict:
                     new_name = self._name_dict[obj_path]
                     obj_path = new_name
-                self._set_obj_definition_attributes_(obj_path, definition_attributes)
+                self.set_node_definition_properties_fnc(obj_path, definition_attributes)
             #
             if customize is True:
                 customize_attributes = self._raw.get(
@@ -470,15 +511,15 @@ class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                 if obj_path in self._name_dict:
                     new_name = self._name_dict[obj_path]
                     obj_path = new_name
-                self._set_obj_customize_attributes_(obj_path, customize_attributes)
+                self.set_node_customize_properties_fnc(obj_path, customize_attributes)
 
             if assigns is True:
                 material_assigns = self._raw.get(
                     '{}.{}.properties.material-assigns'.format(scheme, obj_key),
                 )
-                self._set_obj_material_assign_create_(obj_path, material_assigns)
+                self.create_node_material_assigns_fnc(obj_path, material_assigns)
 
-    def _set_obj_customize_attributes_(self, obj_path, attributes):
+    def set_node_customize_properties_fnc(self, obj_path, attributes):
         for port_path, v in attributes.items():
             type_name = v['type'].split('/')[-1]
             value = v.get('value')
@@ -500,38 +541,31 @@ class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                     (atr_path_src, ma_core.CmdPortOpt._get_atr_path_(obj_path, port_path))
                 )
 
-    def _set_obj_definition_attributes_(self, obj_path, attributes):
+    def set_node_definition_properties_fnc(self, obj_path, attributes):
         for port_path, v in attributes.items():
             value = v.get('value')
             atr_path_src = v.get('connection')
             if atr_path_src is None:
-                port = ma_core.CmdPortOpt(obj_path, port_path)
-                if value is not None:
-                    # noinspection PyBroadException
-                    try:
-                        port.set(value)
-                    except:
-                        bsc_core.ExceptionMtd.set_print()
-                        utl_core.Log.set_module_error_trace(
-                            'attribute-set',
-                            'obj="{}", port="{}" >> value="{}"'.format(
-                                obj_path, port_path, value
+                if ma_core.CmdObjOpt._get_is_exists_(obj_path):
+                    port = ma_core.CmdPortOpt(obj_path, port_path)
+                    if value is not None:
+                        # noinspection PyBroadException
+                        try:
+                            port.set(value)
+                        except:
+                            bsc_core.ExceptionMtd.set_print()
+                            utl_core.Log.set_module_error_trace(
+                                'attribute-set',
+                                'obj="{}", port="{}" >> value="{}"'.format(
+                                    obj_path, port_path, value
+                                )
                             )
-                        )
             else:
                 self._connections.append(
                     (atr_path_src, ma_core.CmdPortOpt._get_atr_path_(obj_path, port_path))
                 )
 
-    def _set_obj_connections_create_(self):
-        for atr_path_src, atr_path_tgt in self._connections:
-            obj_path_src, port_path_src = bsc_core.DccAttrPathOpt(atr_path_src).to_args()
-            if obj_path_src in self._name_dict:
-                obj_path_src = self._name_dict[obj_path_src]
-            atr_path_src = bsc_core.DccAttrPathMtd.get_atr_path(obj_path_src, port_path_src)
-            ma_core.CmdPortOpt._set_connection_create_(atr_path_src, atr_path_tgt)
-
-    def _set_obj_material_assign_create_(self, obj_path, material_assigns):
+    def create_node_material_assigns_fnc(self, obj_path, material_assigns):
         obj = mya_dcc_objects.Mesh(obj_path)
         obj_opt = mya_dcc_operators.MeshLookOpt(obj)
         #

@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # print StgPathPermissionMtd.change_owner('/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002')
 
     # StgPathPermissionMtd.change_mode(
-    #     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture', '775'
+    #     '/production/shows/nsa_dev/assets/oth/genariceyes/user/team.srf/extend/look/yml', '777'
     # )
     # StgPathPermissionMtd.change_owner(
     #     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture'
@@ -62,7 +62,6 @@ if __name__ == '__main__':
     # print RawTextOpt(
     #     'dreambae_nightare'
     # ).to_rgb_0()
-    ps = ['/cgm', '/cjd', '/shl', '/cg7', '/lib', '/lib_bck', '/nsa_dev', '/tnt', '/']
-    print DccPathDagMtd.get_dag_sibling_names(
-        '/cgm', ps
+    print RawTextMtd.split_to(
+        'nn4y cloth.rough.<udim>.tx'
     )

@@ -107,7 +107,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
-
+        location = rsv_scene_properties.get('dcc.renderable.model')
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword = 'asset-look-yml-file'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
@@ -128,7 +128,8 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_fnc_exporters.FncLookYamlExporter(
                 option=dict(
                     file=look_yml_file_path,
-                    locations=[root]
+                    root=root,
+                    locations=[location]
                 )
             ).execute()
         else:

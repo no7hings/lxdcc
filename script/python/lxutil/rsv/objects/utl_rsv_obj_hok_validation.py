@@ -52,13 +52,13 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             #
                             if bsc_core.RawTextOpt(j_file_path).get_is_contain_space() is True:
                                 j_check_results[4] = False
-                            #
-                            if bsc_core.SystemMtd.get_is_linux():
-                                if not j_texture.path.startswith('/l'):
-                                    j_check_results[5] = False
-                            elif bsc_core.SystemMtd.get_is_windows():
-                                if not j_texture.path.lower().startswith('l:'):
-                                    j_check_results[5] = False
+                            # todo, need then?
+                            # if bsc_core.SystemMtd.get_is_linux():
+                            #     if not j_texture.path.startswith('/l'):
+                            #         j_check_results[5] = False
+                            # elif bsc_core.SystemMtd.get_is_windows():
+                            #     if not j_texture.path.lower().startswith('l:'):
+                            #         j_check_results[5] = False
                     #
                     for index, k_check_result in enumerate(j_check_results):
                         if k_check_result is False:
@@ -113,7 +113,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     validation_checker.register_node_files_result(
                         i_obj.path,
                         file_paths_5,
-                        description='"texture-root" must be "/l" or "l:"',
+                        description='"texture-base" must be "/l" or "l:"',
                         check_group=check_group,
                         check_status=validation_checker.CheckStatus.Error
                     )

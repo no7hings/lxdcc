@@ -9,5 +9,8 @@ class Util(object):
     CA_CERTS = '/l/packages/pg/prod/pgtk/9.9.9/certs/cacerts.txt'
 
 
-class StgType(object):
-    PROJECT = 'Project'
+class StgEntityTypes(object):
+    Project = 'Project'
+    Sequence = 'Sequence'
+    Asset = 'Asset'
+    Shot = 'Shot'

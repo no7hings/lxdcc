@@ -8,9 +8,9 @@ if __name__ == '__main__':
 
     print rsv_project
 
-    rsv_tags = rsv_project.get_rsv_tags(workspace='work', role=['gmt', 'sdr'])
+    rsv_tags = rsv_project.get_rsv_resource_groups(workspace='work', role=['gmt', 'sdr'])
 
-    print rsv_project.get_rsv_tags(role='ch*')
+    print rsv_project.get_rsv_resource_groups(role='ch*')
 
     # def test():
     #     for rsv_tag in rsv_tags:

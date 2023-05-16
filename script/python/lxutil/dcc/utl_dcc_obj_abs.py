@@ -51,8 +51,8 @@ class AbsOsDirectory(
             [
                 ('open folder', 'file/folder', self.set_open),
                 (),
-                ('copy path', None, self.set_copy_path_to_clipboard),
-                ('copy name', None, self.set_copy_name_to_clipboard),
+                ('copy path', 'copy', self.set_copy_path_to_clipboard),
+                ('copy name', 'copy', self.set_copy_name_to_clipboard),
             ]
         )
 

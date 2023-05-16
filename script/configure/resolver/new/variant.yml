@@ -29,6 +29,9 @@ roles:
     #
     other: oth
 # step
+#   project
+project_steps:
+    surface: srf
 #   asset
 asset_steps:
     concept: cpt
@@ -105,6 +108,9 @@ sequence_steps_extra: []
 #
 shot_steps_extra: []
 # task
+#   project
+project_tasks:
+    template: template
 #   asset
 asset_tasks:
     model: modeling

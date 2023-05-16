@@ -141,6 +141,7 @@ class StgRpcMtd(object):
             p = os.path.dirname(path)
             if SystemMtd.get_is_linux():
                 os.system('ls {}'.format(p))
+            #
             _bsc_cor_log.LogMtd.trace_method_result(
                 key,
                 'path="{}", mode="{}"'.format(path, mode)
@@ -664,7 +665,6 @@ class StgDirectoryMtd(object):
     def get_all_file_paths(cls, directory_path, include_exts=None):
         def rcs_fnc_(path_):
             _results = os.listdir(path_) or []
-            # _results.sort()
             for _i_name in _results:
                 _i_path = '{}/{}'.format(path_, _i_name)
                 if os.path.isfile(_i_path):
@@ -680,7 +680,7 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return list_
+        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
     @classmethod
     def _get_all_file_paths(cls, directory_path, include_exts=None):
         def rcs_fnc_(path_):
@@ -701,7 +701,7 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return list_
+        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
     @classmethod
     def get_all_file_paths__(cls, directory_path, include_exts=None):
         if SystemMtd.get_is_linux():
@@ -739,7 +739,6 @@ class StgDirectoryMtd(object):
     def get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(path_):
             _results = os.listdir(path_) or []
-            # _results.sort()
             for _i_name in _results:
                 _i_path = '{}/{}'.format(path_, _i_name)
                 if os.path.isdir(_i_path):
@@ -749,7 +748,7 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return list_
+        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
     @classmethod
     def _get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(d_):
@@ -764,7 +763,7 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return list_
+        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
     @classmethod
     def get_all_directory_paths__(cls, directory_path):
         if SystemMtd.get_is_linux():

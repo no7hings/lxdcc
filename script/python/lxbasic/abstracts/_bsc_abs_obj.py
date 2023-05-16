@@ -32,7 +32,7 @@ class _ContentMtd(object):
         es = len([i for i in _ if i == ''])
         k = '.'.join(key_local.split('.')[:-es+1])
         p = '.'.join(key_local.split('.')[:-es])
-        cs = bsc_core.DccPathDagMtd.get_dag_children(p, keys_all, pathsep='.')
+        cs = bsc_core.DccPathDagMtd.get_dag_child_paths(p, keys_all, pathsep='.')
         return cs.index(k)
     @classmethod
     def get_absolute_key(cls, relative_key, key_local):

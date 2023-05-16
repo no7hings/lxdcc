@@ -4,13 +4,6 @@ import os
 import glob
 
 
-class Root(object):
-    MAIN = '/'.join(
-        os.path.dirname(__file__.replace('\\', '/')).split('/')
-    )
-    DATA = '{}/.data'.format(MAIN)
-
-
 class Data(object):
     ROOT = os.path.dirname(__file__.replace('\\', '/'))
     DATA_PATH = '{}/.data'.format(ROOT)
@@ -67,12 +60,45 @@ class Applications(object):
         return cls.PATHSEP_DICT[application]
 
 
-class VariantCategories(object):
+class EntityCategories(object):
     Project = 'project'
-    Tag = 'tag'
+    ResourceGroup = 'resource_group'
     Resource = 'resource'
     Step = 'step'
     Task = 'task'
+
+
+class EntityTypes(object):
+    Project = 'project'
+    Role = 'role'
+    Asset = 'asset'
+    Sequence = 'sequence'
+    Shot = 'shot'
+    #
+    Step = 'step'
+    Task = 'task'
+    #
+    Version = 'version'
+    #
+    Projects = [
+        Project
+    ]
+    #
+    ResourceGroups = [
+        Role,
+        Sequence
+    ]
+    #
+    Resources = [
+        Asset,
+        Shot
+    ]
+    #
+    All = [
+        Asset,
+        Sequence,
+        Shot
+    ]
 
 
 class VariantTypes(object):
@@ -127,7 +153,9 @@ class VariantTypes(object):
     ]
     #
     All = [
-        Root, Project, Workspace, WorkspaceKey,
+        Root,
+        Project,
+        Workspace, WorkspaceKey,
         Branch,
         Role, Sequence,
         Asset, Shot,
@@ -138,15 +166,37 @@ class VariantTypes(object):
     ]
 
 
+class VariantKeysExtend(object):
+    Keyword = 'keyword'
+    Pattern = 'pattern'
+    Result = 'result'
+    #
+    Category = 'category'
+    Type = 'type'
+    Path = 'path'
+    #
+    Update = 'update'
+    #
+    All = [
+        Keyword, Pattern, Result,
+        Category, Type, Path,
+        Update
+    ]
+
+
 class VariantsKeys(object):
     Schemes = 'schemes'
     Roles = 'roles'
     Workspaces = 'workspaces'
     #
+    ProjectSteps = 'project_steps'
+    #
     AssetSteps = 'asset_steps'
+    #
     SequenceSteps = 'sequence_steps'
     ShotSteps = 'shot_steps'
     #
+    ProjectTasks = 'project_tasks'
     AssetTasks = 'asset_tasks'
     SequenceTasks = 'sequence_tasks'
     ShotTasks = 'shot_tasks'
@@ -155,25 +205,8 @@ class VariantsKeys(object):
         Schemes,
         Roles,
         Workspaces,
-        AssetSteps, SequenceSteps, ShotSteps,
-        AssetTasks, SequenceTasks, ShotTasks
-    ]
-
-
-class Branches(object):
-    Asset = 'asset'
-    Sequence = 'sequence'
-    Shot = 'shot'
-    #
-    Mains = [
-        Asset,
-        Shot
-    ]
-    #
-    All = [
-        Asset,
-        Sequence,
-        Shot
+        ProjectSteps, AssetSteps, SequenceSteps, ShotSteps,
+        ProjectTasks, AssetTasks, SequenceTasks, ShotTasks
     ]
 
 

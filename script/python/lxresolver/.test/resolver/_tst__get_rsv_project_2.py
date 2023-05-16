@@ -20,7 +20,7 @@ def post_fnc():
 
 
 t_s = bsc_core.TimeMtd.get_timestamp()
-for i in p.get_rsv_tags(
+for i in p.get_rsv_resource_groups(
     branch='asset'
 ):
     i.get_rsv_tasks()

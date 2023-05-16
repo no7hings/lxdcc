@@ -86,14 +86,21 @@ def __get_app_args(args):
     args_extend = args[1:]
     args_task = None
     if len(args) == 2:
-        task_arg = args[1]
-        if '.' in task_arg:
-            _ = task_arg.split('.')
-            if len(_) == 2:
-                resource, task = _
-                if os.path.exists(task_arg) is False:
+        arg_sub = args[1]
+        # when arg_sub is file path, ignore
+        if os.path.exists(arg_sub) is False:
+            task_arg = arg_sub
+            if '.' in task_arg:
+                arg_sub = task_arg.split('.')
+                if len(arg_sub) == 2:
+                    resource, task = arg_sub
                     args_task = [project, resource, task]
                     args_extend = []
+            # project task
+            else:
+                task = args[1]
+                args_task = [project, project, task]
+                args_extend = []
     #
     option = 'project={}&application={}'.format(project, application)
     return option, args_execute, args_extend, args_task

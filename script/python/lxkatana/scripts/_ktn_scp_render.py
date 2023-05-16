@@ -68,6 +68,7 @@ class ScpRenderLayer(object):
             return directory_p_opt.get_value()
 
     def get_latest_render_output_image(self):
+        # use primary pass
         directory_p = self._obj_opt.get('parameters.render.output.directory')
         directory_p_opt = bsc_core.PtnParseOpt(directory_p)
         # check is valid
@@ -274,7 +275,10 @@ class ScpRenderBuild(object):
                     )
                     #
                     i_render_output_directory_path = bsc_core.StgFileOpt(i_render_output_image_file_path).get_directory_path()
-                    i_vedio_file_path = '{}/primary.mov'.format(i_render_output_directory_path)
+                    i_video_directory_path = bsc_core.DccPathDagOpt(i_render_output_directory_path).get_parent_path()
+                    # etc.
+                    i_video_file_name = bsc_core.DccPathDagOpt(i_render_output_directory_path).get_name()
+                    i_vedio_file_path = '{}/{}.mov'.format(i_video_directory_path, i_video_file_name)
                     #
                     i_render_frames = bsc_core.RawTextOpt(i_render_frames_string).to_frames()
                     #

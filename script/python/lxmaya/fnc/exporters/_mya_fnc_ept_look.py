@@ -685,9 +685,21 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
 class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
+        root='',
         locations=[],
-        pathsep='|'
+        pathsep='|',
+        #
+        ignore_default_properties=False,
     )
+    EXCLUDE_TYPE_NAMES = [
+        'transform', 'mesh',
+        'shadingEngine',
+        'groupId',
+        'displayLayerManager', 'displayLayer',
+        'xgmSplineGuide', 'xgmSplineGuide', 'xgmGuideData', 'xgmMakeGuide', 'xgmSubdPatch',
+        #
+        'colorManagementGlobals'
+    ]
     def __init__(self, option=None):
         super(FncLookYamlExporter, self).__init__(option)
 
@@ -766,7 +778,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         nodes = group.get_descendants()
         if nodes:
             with utl_core.GuiProgressesRunner.create(
-                maximum=len(nodes), label='export look at "{}"'.format(location)
+                maximum=len(nodes), label='export look yaml at "{}"'.format(location)
             ) as g_p:
                 for i_node in nodes:
                     g_p.set_update()
@@ -775,7 +787,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         i_mesh_opt = mya_dcc_operators.MeshLookOpt(i_mesh)
                         #
                         self.update_node_fnc('geometry', i_node.path)
-                        self.update_node_properties_fnc('geometry', i_node.path)
+                        self.update_node_properties_fnc('geometry', i_node.path, customize=True)
                         self.update_geometry_material_assign_fnc(
                             'geometry', i_node.path, i_mesh_opt.get_material_assigns()
                         )
@@ -793,14 +805,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                 source_objs = j_material.get_all_source_objs()
                                 for i_source_node in source_objs:
                                     i_source_node_obj_type_name = i_source_node.type_name
-                                    if i_source_node_obj_type_name not in [
-                                        'transform', 'mesh',
-                                        'shadingEngine',
-                                        'groupId',
-                                        'displayLayer',
-                                        'xgmSplineGuide', 'xgmSplineGuide', 'xgmGuideData', 'xgmMakeGuide',
-                                        'xgmSubdPatch'
-                                    ]:
+                                    if i_source_node_obj_type_name not in self.EXCLUDE_TYPE_NAMES:
                                         if self.update_node_fnc('node-graph', i_source_node.path) is True:
                                             self.update_node_properties_fnc(
                                                 'node-graph', i_source_node.path,
@@ -810,12 +815,12 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         self.update_node_fnc('transform', i_node.path)
                         self.update_node_properties_fnc(
                             'transform', i_node.path,
-                            definition=True, definition_includes=['visibility']
+                            definition=True, customize=True, definition_includes=['visibility']
                         )
                         source_objs = i_node.get_all_source_objs()
                         for i_source_node in source_objs:
                             i_source_node_obj_type_name = i_source_node.type_name
-                            if i_source_node_obj_type_name not in ['transform', 'mesh', 'shadingEngine', 'groupId']:
+                            if i_source_node_obj_type_name not in self.EXCLUDE_TYPE_NAMES:
                                 if self.update_node_fnc('node-graph', i_source_node.path) is True:
                                     self.update_node_properties_fnc(
                                         'node-graph', i_source_node.path,
@@ -829,11 +834,13 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             value=collections.OrderedDict()
         )
 
+        root = self.get('root')
+
         locations = self.get('locations')
         if locations:
             pathsep = self.get('pathsep')
             with utl_core.GuiProgressesRunner.create(
-                maximum=len(locations), label='export look preview'
+                maximum=len(locations), label='export look yaml'
             ) as g_p:
                 for i_location in locations:
                     g_p.set_update()

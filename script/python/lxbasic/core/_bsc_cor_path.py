@@ -97,7 +97,12 @@ class DccPathDagMtd(object):
             return pathsep_tgt
         return pathsep_tgt.join(cls.get_dag_args(path, pathsep=pathsep_src))
     @classmethod
-    def get_dag_children(cls, path, paths, pathsep='/'):
+    def get_dag_child_path(cls, path, child_name, pathsep='/'):
+        if path == pathsep:
+            return pathsep + child_name
+        return pathsep.join([path, child_name])
+    @classmethod
+    def get_dag_child_paths(cls, path, paths, pathsep='/'):
         lis = []
         # etc. r'/shl/chr/test_0/[^/]*'
         if path == pathsep:
@@ -115,12 +120,28 @@ class DccPathDagMtd(object):
                         lis.append(i_path)
         return lis
     @classmethod
+    def get_dag_child_names(cls, path, paths, pathsep='/'):
+        return [cls.get_dag_name(x) for x in cls.get_dag_child_paths(path, paths, pathsep)]
+    @classmethod
     def get_dag_siblings(cls, path, paths, pathsep='/'):
-        return cls.get_dag_children(
+        return cls.get_dag_child_paths(
             cls.get_dag_parent(path, pathsep), paths, pathsep
         )
     @classmethod
     def get_dag_sibling_names(cls, path, paths, pathsep='/'):
+        """
+        etc.
+        ps = ['/cgm', '/cjd', '/shl', '/cg7', '/lib', '/lib_bck', '/nsa_dev', '/tnt', '/']
+        print(
+            DccPathDagMtd.get_dag_sibling_names(
+                '/cgm', ps
+            )
+        )
+        :param path:
+        :param paths:
+        :param pathsep:
+        :return:
+        """
         return [cls.get_dag_name(x) for x in cls.get_dag_siblings(path, paths, pathsep)]
     @classmethod
     def set_dag_path_cleanup(cls, path, pathsep='/'):

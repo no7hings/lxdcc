@@ -179,7 +179,7 @@ class UsdStageOpt(UsdBasic):
         #
         dag_path_opt = bsc_core.DccPathDagOpt(regex)
         #
-        child_paths = bsc_core.DccPathDagMtd.get_dag_children(
+        child_paths = bsc_core.DccPathDagMtd.get_dag_child_paths(
             dag_path_opt.get_parent_path(), list_
         )
         #

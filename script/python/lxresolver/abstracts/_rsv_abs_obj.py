@@ -508,8 +508,6 @@ class AbsRsvMatcher(
         list_ = []
         for i_pattern in self._match_patterns:
             i_enable, i_results = self._matcher__get_stg_paths_by_parse_pattern_(i_pattern)
-            # print(i_pattern, i_results)
-            # print('pattern is '.format(i_pattern))
             if trim is not None:
                 i_results = i_results[trim[0]:trim[1]]
             #
@@ -685,12 +683,13 @@ class AbsRsvDef(object):
     #
     Platforms = rsv_configure.Platforms
     Applications = rsv_configure.Applications
-    VariantCategories = rsv_configure.VariantCategories
+    EntityCategories = rsv_configure.EntityCategories
     VariantTypes = rsv_configure.VariantTypes
     VariantsKeys = rsv_configure.VariantsKeys
-    Branches = rsv_configure.Branches
+    EntityTypes = rsv_configure.EntityTypes
     WorkspaceKeys = rsv_configure.WorkspaceKeys
     WorkspaceMatchKeys = rsv_configure.WorkspaceMatchKeys
+    VariantKeysExtend = rsv_configure.VariantKeysExtend
 
 
 class AbsRsvObjDef(object):
@@ -787,7 +786,7 @@ class AbsRsvObj(
         self._set_obj_dag_def_init_(self._rsv_path)
         self._set_obj_gui_def_init_()
         #
-        self._rsv_matcher = self._rsv_project._project__create_rsv_matcher_(
+        self._rsv_matcher = self._rsv_project._project__project__create_rsv_matcher_(
             self._rsv_properties.value
         )
         if self.type_name in self.VariantTypes.Trunks:
@@ -944,28 +943,28 @@ class AbsRsvUnit(
         #
         if version == rsv_configure.Version.LATEST:
             kwargs['version'] = '*'
-            rsv_matcher = self.rsv_project._create_rsv_matcher_(
+            rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
                 self._pattern,
                 kwargs
             )
             return rsv_matcher.get_latest()
         elif version == rsv_configure.Version.NEW:
             kwargs['version'] = '*'
-            rsv_matcher = self.rsv_project._create_rsv_matcher_(
+            rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
                 self._pattern,
                 kwargs
             )
             return rsv_matcher.get_new()
         elif version == rsv_configure.Version.ALL:
             kwargs['version'] = '*'
-            rsv_matcher = self.rsv_project._create_rsv_matcher_(
+            rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
                 self._pattern,
                 kwargs
             )
             return rsv_matcher.get_results(trim=trim)
         #
         kwargs['version'] = version
-        rsv_matcher = self.rsv_project._create_rsv_matcher_(
+        rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
             self._pattern,
             kwargs
         )
@@ -994,7 +993,7 @@ class AbsRsvUnit(
         if version is not None:
             kwargs['version'] = version
             kwargs['workspace'] = self._rsv_project._project__guess_workspace_extra_(**kwargs)
-            rsv_matcher = self.rsv_project._create_rsv_matcher_(
+            rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
                 self._pattern,
                 kwargs
             )
@@ -1027,7 +1026,7 @@ class AbsRsvUnit(
         if version is not None:
             kwargs['version'] = version
             kwargs['workspace'] = self._rsv_project._project__guess_workspace_extra_(**kwargs)
-            rsv_matcher = self.rsv_project._create_rsv_matcher_(
+            rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
                 self._pattern,
                 kwargs
             )
@@ -1036,7 +1035,7 @@ class AbsRsvUnit(
     def get_extend_variants(self, file_path):
         variants = self._rsv_properties.value
         pattern = self._pattern
-        rsv_matcher = self._rsv_project._create_rsv_matcher_(
+        rsv_matcher = self._rsv_project._project__create_rsv_matcher_(
             pattern,
             dict(
                 type='unit',
@@ -1052,7 +1051,7 @@ class AbsRsvUnit(
         if override_variants is not None:
             kwargs.update(override_variants)
         #
-        rsv_matcher = self.rsv_project._create_rsv_matcher_(
+        rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
             self._pattern,
             kwargs
         )
@@ -1073,7 +1072,7 @@ class AbsRsvUnit(
         if extend_variants is not None:
             kwargs.update(extend_variants)
         #
-        rsv_matcher = self.rsv_project._create_rsv_matcher_(
+        rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
             self._pattern,
             kwargs
         )
@@ -1099,7 +1098,7 @@ class AbsRsvUnit(
         if extend_variants is not None:
             kwargs.update(extend_variants)
         #
-        rsv_matcher = self.rsv_project._create_rsv_matcher_(
+        rsv_matcher = self.rsv_project._project__create_rsv_matcher_(
             self._pattern,
             kwargs
         )
@@ -1347,10 +1346,10 @@ class AbsRsvTask(
                                 'usd', self._rsv_project.get_dcc_data('usd').get_value()
                             )
                             return j_rsv_scene_properties
-    # tag
-    def get_rsv_tag(self):
+    # resource group
+    def get_rsv_resource_group(self):
         return self.get_parent().get_parent().get_parent()
-    # entity
+    # resource
     def get_rsv_resource(self):
         return self.get_parent().get_parent()
     # step
@@ -1430,12 +1429,12 @@ class AbsRsvStep(
 
     def get_rsv_tasks(self, **kwargs):
         self._completion_kwargs_from_parent_(self, kwargs)
-        return self._rsv_project._project__get_rsv_tasks_(
+        return self._rsv_project._any__get_rsv_tasks_(
             **kwargs
         )
 
     def get_rsv_task(self, **kwargs):
-        rsv_obj = self.rsv_project._project__get_rsv_task_(
+        rsv_obj = self.rsv_project._entity__get_rsv_task_(
             rsv_obj=self,
             **kwargs
         )
@@ -1453,7 +1452,7 @@ class AbsRsvResource(
 
     def get_rsv_steps(self, **kwargs):
         self._completion_kwargs_from_parent_(self, kwargs)
-        return self._rsv_project._project__get_rsv_steps_(
+        return self._rsv_project._resource__get_rsv_steps_(
             **kwargs
         )
 
@@ -1462,22 +1461,22 @@ class AbsRsvResource(
         :param kwargs: step: str(<step-name>)
         :return: instance(<rsv-step>)
         """
-        rsv_obj = self.rsv_project._project__get_rsv_step_(
+        rsv_obj = self.rsv_project._entity__get_rsv_step_(
             rsv_obj=self,
             **kwargs
         )
         return rsv_obj
 
+    def get_rsv_tasks(self, **kwargs):
+        self._completion_kwargs_from_parent_(self, kwargs)
+        return self._rsv_project._any__get_rsv_tasks_(
+            **kwargs
+        )
+
     def get_rsv_task(self, **kwargs):
         rsv_step = self.get_rsv_step(**kwargs)
         if rsv_step is not None:
             return rsv_step.get_rsv_task(**kwargs)
-
-    def get_rsv_tasks(self, **kwargs):
-        self._completion_kwargs_from_parent_(self, kwargs)
-        return self._rsv_project._project__get_rsv_tasks_(
-            **kwargs
-        )
 
     def get_rsv_unit(self, **kwargs):
         """
@@ -1506,15 +1505,15 @@ class AbsRsvResource(
                 return i_rsv_unit
 
 
-class AbsRsvTag(
+class AbsRsvResourceGroup(
     AbsRsvObj
 ):
     def __init__(self, *args, **kwargs):
-        super(AbsRsvTag, self).__init__(*args, **kwargs)
+        super(AbsRsvResourceGroup, self).__init__(*args, **kwargs)
 
     def get_rsv_resources(self, **kwargs):
         self._rsv_project._project__completion_kwargs_from_parent_(
-            self.VariantCategories.Resource, self, kwargs
+            self.EntityCategories.Resource, self, kwargs
         )
         return self._rsv_project._project__get_rsv_resources_(
             **kwargs
@@ -1533,13 +1532,13 @@ class AbsRsvTag(
 
     def get_rsv_steps(self, **kwargs):
         self._completion_kwargs_from_parent_(self, kwargs)
-        return self._rsv_project._project__get_rsv_steps_(
+        return self._rsv_project._resource__get_rsv_steps_(
             **kwargs
         )
 
     def get_rsv_tasks(self, **kwargs):
         self._completion_kwargs_from_parent_(self, kwargs)
-        return self._rsv_project._project__get_rsv_tasks_(
+        return self._rsv_project._any__get_rsv_tasks_(
             **kwargs
         )
 
@@ -1547,36 +1546,28 @@ class AbsRsvTag(
 class AbsRsvExtraDef(AbsRsvDef):
     RSV_MATCH_PATTERN_CLASS = None
     @classmethod
-    def _guess_branch_0_(cls, **kwargs):
+    def _guess_entity_type_(cls, **kwargs):
         if 'branch' in kwargs:
             return kwargs['branch']
-        elif 'sequence' in kwargs:
-            if 'shot' in kwargs:
-                return cls.Branches.Shot
-            return cls.Branches.Sequence
+        # sequence or shot
         elif 'shot' in kwargs:
-            return cls.Branches.Shot
-        elif 'role' in kwargs:
-            return cls.Branches.Asset
+            return cls.EntityTypes.Shot
+        elif 'sequence' in kwargs:
+            return cls.EntityTypes.Sequence
+        # asset
         elif 'asset' in kwargs:
-            return cls.Branches.Asset
+            return cls.EntityTypes.Asset
+        elif 'role' in kwargs:
+            return cls.EntityTypes.Asset
+        return cls.EntityTypes.Project
     @classmethod
-    def _guess_branch_(cls, **kwargs):
-        if 'branch' in kwargs:
-            return kwargs['branch']
-        elif 'sequence' in kwargs:
-            if 'shot' in kwargs:
-                return cls.Branches.Shot
-            return cls.Branches.Sequence
-        elif 'shot' in kwargs:
-            return cls.Branches.Shot
-        elif 'role' in kwargs:
-            return cls.Branches.Asset
-        elif 'asset' in kwargs:
-            return cls.Branches.Asset
-        raise RuntimeError(
-            'argument key "branch" must definition in kwargs'
-        )
+    def _guess_entity_type_force_(cls, **kwargs):
+        branch = cls._guess_entity_type_(**kwargs)
+        if branch is None:
+            raise RuntimeError(
+                'argument key "branch" must definition in kwargs'
+            )
+        return branch
     @classmethod
     def _get_step_keyword_(cls, branch, workspace_key):
         return '{}-{}-step-dir'.format(branch, workspace_key)
@@ -1650,23 +1641,14 @@ class AbsRsvExtraDef(AbsRsvDef):
         kwargs_tgt['pattern'] = pattern
         return kwargs_tgt
 
-    def _get_main_rsv_obj_path__(self, variants):
-        search_keys = self._raw_opt.get('path-main-keys')
-        #
-        p_values = ['', ]
-        for i_key in search_keys:
-            if i_key in variants:
-                p_values.append(variants[i_key])
-        return self.PATHSEP.join(p_values)
-
     def _get_path_keys_(self, rsv_category):
         return self._raw_opt.get('path-{}-keys'.format(rsv_category))
 
-    def _get_main_rsv_path_(self, rsv_category, variants):
-        search_keys = self._raw_opt.get('path-{}-keys'.format(rsv_category))
+    def _get_entity_rsv_path_(self, rsv_category, variants):
+        var_keys = self._raw_opt.get('path-{}-keys'.format(rsv_category))
         #
         p_values = ['', ]
-        for i_key in search_keys:
+        for i_key in var_keys:
             if i_key in variants:
                 p_values.append(variants[i_key])
         #
@@ -1696,10 +1678,24 @@ class AbsRsvExtraDef(AbsRsvDef):
         #
         return main_path + self.PATHSEP.join(p_values)
 
+    def _cleanup_kwargs_(self, rsv_category, kwargs):
+        entity_var_keys = self._raw_opt.get('path-{}-keys'.format(rsv_category))
+        main_var_keys = self._raw_opt.get('path-main-keys')
+        keys_main = self.VariantTypes.All
+        keys_extend = self.VariantKeysExtend.All
+        keys_includes = keys_main + keys_extend
+        for k, v in kwargs.items():
+            if k in keys_includes:
+                if k in main_var_keys and k not in entity_var_keys:
+                    kwargs.pop(k)
+            # remove excludes
+            else:
+                kwargs.pop(k)
+
     def _copy_variants_as_branches_(self, variants):
         kwargs_copy = {}
-        search_keys = self._raw_opt.get('path-main-keys')
-        for i_key in search_keys:
+        var_keys = self._raw_opt.get('path-main-keys')
+        for i_key in var_keys:
             if i_key in variants:
                 kwargs_copy[i_key] = variants[i_key]
         #
@@ -1709,8 +1705,8 @@ class AbsRsvExtraDef(AbsRsvDef):
                 kwargs_copy[i_key] = variants[i_key]
         return kwargs_copy
 
-    def _completion_branch_rsv_create_kwargs_(self, rsv_category, rsv_type, kwargs, result, kwargs_extend):
-        rsv_path = self._get_main_rsv_path_(rsv_category, kwargs)
+    def _completion_rsv_entity_create_kwargs_(self, rsv_category, rsv_type, kwargs, result, kwargs_extend):
+        rsv_path = self._get_entity_rsv_path_(rsv_category, kwargs)
         #
         kwargs['category'] = rsv_category
         kwargs['type'] = rsv_type
@@ -1732,8 +1728,9 @@ class AbsRsvExtraDef(AbsRsvDef):
         kwargs['user'] = user
         #
         kwargs.update(kwargs_extend)
+        self._cleanup_kwargs_(rsv_category, kwargs)
     @staticmethod
-    def _completion_rsv_obj_create_kwargs_(kwargs, result, variants):
+    def _completion_rsv_obj_create_kwargs_(kwargs, result, kwargs_extend):
         update = bsc_core.TimePrettifyMtd.to_prettify_by_timestamp(
             bsc_core.StgFileOpt(
                 result
@@ -1747,7 +1744,7 @@ class AbsRsvExtraDef(AbsRsvDef):
         kwargs['result'] = result
         kwargs['update'] = update
         kwargs['user'] = user
-        kwargs.update(variants)
+        kwargs.update(kwargs_extend)
 
     def _set_obj_parameters_completes_(self, kwargs, parent_parameters, extend_keys=None):
         keyword = kwargs['keyword']
@@ -1801,7 +1798,7 @@ class AbsRsvProject(
     #
     RSV_OBJ_STACK_CLASS = None
     #
-    RSV_TAG_CLASS = None
+    RSV_RESOURCE_GROUP_CLASS = None
     RSV_RESOURCE_CLASS = None
     RSV_STEP_CLASS = None
     RSV_TASK_CLASS = None
@@ -1814,6 +1811,8 @@ class AbsRsvProject(
     RSV_APP_NEW_CLASS = None
     #
     PROPERTIES_CLASS = None
+    #
+    CACHE = dict()
     def __init__(self, *args, **kwargs):
         self._set_obj_def_init_()
         self._set_rsv_def_init_()
@@ -1837,7 +1836,7 @@ class AbsRsvProject(
         #
         self._static_variant_configure = bsc_objects.Configure(value=collections.OrderedDict())
         #
-        self._rsv_matcher = self._create_rsv_matcher_(
+        self._rsv_matcher = self._project__create_rsv_matcher_(
             self._pattern,
             self._rsv_properties.value
         )
@@ -1932,21 +1931,21 @@ class AbsRsvProject(
             return kwargs['branch']
         elif 'sequence' in kwargs:
             if 'shot' in kwargs:
-                return cls.Branches.Shot
-            return cls.Branches.Sequence
+                return cls.EntityTypes.Shot
+            return cls.EntityTypes.Sequence
         elif 'shot' in kwargs:
-            return cls.Branches.Shot
+            return cls.EntityTypes.Shot
         elif 'role' in kwargs:
-            return cls.Branches.Asset
+            return cls.EntityTypes.Asset
         elif 'asset' in kwargs:
-            return cls.Branches.Asset
+            return cls.EntityTypes.Asset
         #
         elif 'keyword' in kwargs:
             keyword = kwargs['keyword']
             if fnmatch.filter([keyword], 'asset-*'):
-                return cls.Branches.Asset
+                return cls.EntityTypes.Asset
             elif fnmatch.filter([keyword], 'shot-*'):
-                return cls.Branches.Shot
+                return cls.EntityTypes.Shot
             raise RuntimeError()
         raise RuntimeError()
 
@@ -1993,7 +1992,13 @@ class AbsRsvProject(
             return self.get_workspace_temporary()
         return self.get_workspace_release()
 
-    def _project_get_search_patterns_(self, branch, rsv_type):
+    def __get_project_search_pattern(self, rsv_type):
+        key = 'project-{}-search-patterns'.format(rsv_type)
+        return collections.OrderedDict(
+            [(k, self._raw_opt.unfold_value(v)) for k, v in (self._raw_opt.get(key) or {}).items()]
+        )
+
+    def __get_resource_search_patterns(self, branch, rsv_type):
         key = '{}-{}-search-patterns'.format(branch, rsv_type)
         return collections.OrderedDict(
             [(k, self._raw_opt.unfold_value(v)) for k, v in (self._raw_opt.get(key) or {}).items()]
@@ -2041,22 +2046,35 @@ class AbsRsvProject(
             '{}.{}'.format(self.VariantsKeys.Workspaces, self.WorkspaceKeys.Temporary)
         )
 
-    def get_roles(self):
+    def get_all_roles(self):
         return self._rsv_properties.get(
             self.VariantsKeys.Roles
         ).values()
 
-    def get_tags(self, branch):
-        if branch == self.Branches.Asset:
-            return self.get_roles()
-        elif branch == self.Branches.Sequence:
+    def get_all_tags(self, branch):
+        if branch == self.EntityTypes.Asset:
+            return self.get_all_roles()
+        elif branch == self.EntityTypes.Sequence:
             return []
-        elif branch == self.Branches.Shot:
+        elif branch == self.EntityTypes.Shot:
             return []
         else:
             raise RuntimeError()
 
-    def get_asset_steps(self, with_extra=False):
+    def get_all_project_steps(self, with_extra=False):
+        if with_extra is True:
+            return self._rsv_properties.get(
+                self.VariantsKeys.ProjectSteps
+            ).values() + (self._rsv_properties.get(
+                '{}_extra'.format(
+                    self.VariantsKeys.ProjectSteps
+                )
+            ) or {}).values()
+        return self._rsv_properties.get(
+            self.VariantsKeys.ProjectSteps
+        ).values()
+
+    def get_all_asset_steps(self, with_extra=False):
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.AssetSteps
@@ -2069,7 +2087,7 @@ class AbsRsvProject(
             self.VariantsKeys.AssetSteps
         ).values()
 
-    def get_sequence_steps(self, with_extra=False):
+    def get_all_sequence_steps(self, with_extra=False):
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.SequenceSteps
@@ -2082,7 +2100,7 @@ class AbsRsvProject(
             self.VariantsKeys.SequenceSteps
         ).values()
 
-    def get_shot_steps(self, with_extra=False):
+    def get_all_shot_steps(self, with_extra=False):
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.ShotSteps
@@ -2095,13 +2113,15 @@ class AbsRsvProject(
             self.VariantsKeys.ShotSteps
         ).values()
 
-    def get_steps(self, branch, with_extra=False):
-        if branch == self.Branches.Asset:
-            return self.get_asset_steps(with_extra=with_extra)
-        elif branch == self.Branches.Sequence:
-            return self.get_sequence_steps(with_extra=with_extra)
-        elif branch == self.Branches.Shot:
-            return self.get_shot_steps(with_extra=with_extra)
+    def get_all_steps(self, branch, with_extra=False):
+        if branch == self.EntityTypes.Project:
+            return self.get_all_project_steps(with_extra=with_extra)
+        elif branch == self.EntityTypes.Asset:
+            return self.get_all_asset_steps(with_extra=with_extra)
+        elif branch == self.EntityTypes.Sequence:
+            return self.get_all_sequence_steps(with_extra=with_extra)
+        elif branch == self.EntityTypes.Shot:
+            return self.get_all_shot_steps(with_extra=with_extra)
         else:
             raise RuntimeError()
 
@@ -2175,7 +2195,7 @@ class AbsRsvProject(
         root_cur = self._rsv_properties.get(root_choice)
         kwargs['root'] = root_cur
     #
-    def _project__create_rsv_matcher_(self, kwargs):
+    def _project__project__create_rsv_matcher_(self, kwargs):
         self._completion_rsv_match_kwargs_(kwargs)
         #
         pattern = kwargs['pattern']
@@ -2185,7 +2205,7 @@ class AbsRsvProject(
             kwargs
         )
 
-    def _completion_rsv_match_main_kwargs_(self, kwargs):
+    def __completion_main_rsv_matcher_kwargs_(self, kwargs):
         # root_choice
         root_choice = self._get_root_choice_(kwargs)
         kwargs['root_choice'] = root_choice
@@ -2193,8 +2213,8 @@ class AbsRsvProject(
         root_cur = self._rsv_properties.get(root_choice)
         kwargs['root'] = root_cur
 
-    def _project__create_main_rsv_matcher_(self, kwargs):
-        self._completion_rsv_match_main_kwargs_(kwargs)
+    def __create_main_rsv_matcher_(self, kwargs):
+        self.__completion_main_rsv_matcher_kwargs_(kwargs)
         #
         pattern = kwargs['pattern']
         return self.RSV_MATCHER_CLASS(
@@ -2203,28 +2223,30 @@ class AbsRsvProject(
             kwargs
         )
 
-    def _create_rsv_matcher_(self, pattern, variants_override):
+    def _project__create_rsv_matcher_(self, pattern, variants_override):
         return self.RSV_MATCHER_CLASS(
             self,
             pattern,
             variants_override
         )
-    # tag
-    def _project__get_rsv_tags_(self, **kwargs):
+    # resource group, asset group is role ..., shot group is sequence
+    def _project__get_rsv_resource_groups_(self, **kwargs):
         list_ = []
         #
         branch = kwargs['branch']
-        if branch == self.Branches.Asset:
-            rsv_type = self.VariantTypes.Role
-        elif branch == self.Branches.Shot:
-            rsv_type = self.VariantTypes.Sequence
+        if branch == self.EntityTypes.Asset:
+            rsv_type = self.EntityTypes.Role
+        elif branch == self.EntityTypes.Shot:
+            rsv_type = self.EntityTypes.Sequence
+        elif branch == self.EntityTypes.Sequence:
+            rsv_type = self.EntityTypes.Sequence
         else:
             raise TypeError()
         #
         keyword = '{}-dir'.format(rsv_type)
         kwargs['keyword'] = keyword
         kwargs['pattern'] = self.get_pattern(keyword=keyword)
-        rsv_matcher = self._project__create_main_rsv_matcher_(
+        rsv_matcher = self.__create_main_rsv_matcher_(
             kwargs
         )
         matches = rsv_matcher.get_matches()
@@ -2232,30 +2254,32 @@ class AbsRsvProject(
             _, i_variants = i_m
             i_kwargs = copy.copy(kwargs)
             i_kwargs.update(i_variants)
-            i_rsv_tag = self.get_rsv_tag(**i_kwargs)
+            i_rsv_tag = self.get_rsv_resource_group(**i_kwargs)
             if i_rsv_tag is not None:
                 if i_rsv_tag not in list_:
                     list_.append(i_rsv_tag)
         return list_
 
-    def _project__get_rsv_tag_(self, rsv_obj, **kwargs):
+    def _project__get_rsv_resource_group_(self, rsv_obj, **kwargs):
         kwargs_over = collections.OrderedDict()
         for k, v in rsv_obj.properties.value.items():
             kwargs_over[k] = v
         #
         kwargs_over.update(kwargs)
         #
-        branch = self._guess_branch_(**kwargs_over)
-        if branch == self.Branches.Asset:
-            rsv_type = self.VariantTypes.Role
-        elif branch == self.Branches.Shot:
-            rsv_type = self.VariantTypes.Sequence
+        branch = self._guess_entity_type_force_(**kwargs_over)
+        if branch == self.EntityTypes.Asset:
+            rsv_type = self.EntityTypes.Role
+        elif branch == self.EntityTypes.Shot:
+            rsv_type = self.EntityTypes.Sequence
+        elif branch == self.EntityTypes.Sequence:
+            rsv_type = self.EntityTypes.Sequence
         else:
             raise TypeError()
         #
         if rsv_type in kwargs_over:
             name = kwargs_over[rsv_type]
-            name_includes = self.get_tags(branch)
+            name_includes = self.get_all_tags(branch)
             if name_includes:
                 if name not in name_includes:
                     return
@@ -2273,7 +2297,7 @@ class AbsRsvProject(
         # asset/shot
         kwargs_over[rsv_type] = name
         #
-        obj_path = self._get_main_rsv_path_(self.VariantCategories.Tag, kwargs_over)
+        obj_path = self._get_entity_rsv_path_(self.EntityCategories.ResourceGroup, kwargs_over)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
         #
@@ -2282,44 +2306,29 @@ class AbsRsvProject(
             kwargs_over,
             extend_keys=['type', 'branch']
         )
-        return self._project__set_rsv_tag_create_(**variants)
+        return self._project__create_rsv_resource_group_(**variants)
 
-    def _project__set_rsv_tag_create_(self, **kwargs):
-        rsv_matcher = self._project__create_main_rsv_matcher_(
+    def _project__create_rsv_resource_group_(self, **kwargs):
+        rsv_matcher = self.__create_main_rsv_matcher_(
             kwargs
         )
         matches = rsv_matcher.get_matches()
         if matches:
             result, variants = matches[-1]
-            self._completion_rsv_obj_create_kwargs_(kwargs, result, variants)
-            rsv_obj = self.RSV_TAG_CLASS(self, **kwargs)
+            rsv_category = self.EntityCategories.Resource
+            rsv_type = kwargs['branch']
+            self._completion_rsv_entity_create_kwargs_(
+                rsv_category, rsv_type,
+                kwargs, result, variants
+            )
+            rsv_obj = self.RSV_RESOURCE_GROUP_CLASS(self, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
-
-    def get_rsv_tags(self, **kwargs):
-        branch = self._guess_branch_0_(**kwargs)
-        if branch is not None:
-            kwargs['branch'] = branch
-            return self._project__get_rsv_tags_(**kwargs)
-        else:
-            list_ = []
-            for i_branch in self.Branches.Mains:
-                kwargs['branch'] = i_branch
-                list_.extend(
-                    self._project__get_rsv_tags_(**kwargs)
-                )
-            return list_
-
-    def get_rsv_tag(self, **kwargs):
-        rsv_obj = self._project__get_rsv_tag_(
-            rsv_obj=self, **kwargs
-        )
-        return rsv_obj
     # resource
-    def _tag__get_rev_resource_(self, **kwargs):
-        rsv_tag = self.get_rsv_tag(**kwargs)
-        if rsv_tag:
-            return rsv_tag.get_rsv_resource(**kwargs)
+    def _group__get_rsv_resource_(self, **kwargs):
+        rsv_resource_group = self.get_rsv_resource_group(**kwargs)
+        if rsv_resource_group:
+            return rsv_resource_group.get_rsv_resource(**kwargs)
 
     def _project__get_rsv_resources_(self, **kwargs):
         list_ = []
@@ -2334,7 +2343,7 @@ class AbsRsvProject(
         keyword = '{}-dir'.format(rsv_type)
         kwargs_over['keyword'] = keyword
         kwargs_over['pattern'] = self.get_pattern(keyword=keyword)
-        rsv_matcher = self._project__create_main_rsv_matcher_(
+        rsv_matcher = self.__create_main_rsv_matcher_(
             kwargs_over
         )
         matches = rsv_matcher.get_matches()
@@ -2342,7 +2351,7 @@ class AbsRsvProject(
             _, i_variants = i_m
             i_kwargs_over = copy.copy(kwargs_over)
             i_kwargs_over.update(i_variants)
-            i_rsv_resource = self._tag__get_rev_resource_(**i_kwargs_over)
+            i_rsv_resource = self._group__get_rsv_resource_(**i_kwargs_over)
             if i_rsv_resource is not None:
                 if i_rsv_resource not in list_:
                     list_.append(i_rsv_resource)
@@ -2355,7 +2364,7 @@ class AbsRsvProject(
         #
         kwargs_over.update(kwargs)
         #
-        branch = self._guess_branch_(**kwargs_over)
+        branch = self._guess_entity_type_force_(**kwargs_over)
         rsv_type = branch
         if rsv_type in kwargs_over:
             name = kwargs_over[rsv_type]
@@ -2373,7 +2382,7 @@ class AbsRsvProject(
         # asset/shot
         kwargs_over[branch] = name
         #
-        obj_path = self._get_main_rsv_path_(self.VariantCategories.Resource, kwargs_over)
+        obj_path = self._get_entity_rsv_path_(self.EntityCategories.Resource, kwargs_over)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
         variants = self._get_rsv_obj_create_kwargs_(
@@ -2381,74 +2390,54 @@ class AbsRsvProject(
             kwargs_over,
             extend_keys=['type', 'branch']
         )
-        return self._project__set_rsv_resource_create_(**variants)
+        return self._project__create_rsv_resource_(**variants)
     #
-    def _project__set_rsv_resource_create_(self, **kwargs):
-        rsv_matcher = self._project__create_main_rsv_matcher_(
+    def _project__create_rsv_resource_(self, **kwargs):
+        rsv_matcher = self.__create_main_rsv_matcher_(
             kwargs
         )
         matches = rsv_matcher.get_matches()
         if matches:
+            rsv_category = self.EntityCategories.Resource
+            rsv_type = kwargs['branch']
             result, variants = matches[-1]
-            self._completion_rsv_obj_create_kwargs_(kwargs, result, variants)
+            self._completion_rsv_entity_create_kwargs_(
+                rsv_category, rsv_type,
+                kwargs, result, variants
+            )
             rsv_obj = self.RSV_RESOURCE_CLASS(self, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
-    #
-    def get_rsv_resources(self, **kwargs):
-        branch = self._guess_branch_0_(**kwargs)
-        if branch is not None:
-            kwargs['branch'] = branch
-            list_ = []
-            if self.VariantTypes.Role in kwargs or self.VariantTypes.Sequence in kwargs:
-                rsv_tag = self.get_rsv_tag(**kwargs)
-                list_.extend(
-                    rsv_tag.get_rsv_resources(**kwargs)
-                )
-            else:
-                rsv_tags = self.get_rsv_tags(**kwargs)
-                for i_rsv_tag in rsv_tags:
-                    list_.extend(
-                        i_rsv_tag.get_rsv_resources(**kwargs)
-                    )
-            return list_
-        else:
-            list_ = []
-            for i_branch in self.Branches.Mains:
-                kwargs['branch'] = i_branch
-                i_rsv_tags = self.get_rsv_tags(branch=i_branch)
-                for j_rsv_tag in i_rsv_tags:
-                    list_.extend(j_rsv_tag.get_rsv_resources())
-            return list_
-    #
-    def get_rsv_resource(self, **kwargs):
-        if self.VariantTypes.Role in kwargs or self.VariantTypes.Sequence in kwargs:
-            return self._tag__get_rev_resource_(**kwargs)
-        else:
-            _ = self.get_rsv_resources(**kwargs)
-            if _:
-                return _[-1]
     # step
+    #   for project step
+    def _project__get_rsv_step_(self, **kwargs):
+        return self._entity__get_rsv_step_(self, **kwargs)
+    #   for resource group step
+    def _resource_group__get_rsv_step_(self, **kwargs):
+        rsv_resource_group = self.get_rsv_resource_group(**kwargs)
+        if rsv_resource_group is not None:
+            return self._entity__get_rsv_step_(rsv_resource_group, **kwargs)
+    #   for resource step
     def _resource__get_rsv_step_(self, **kwargs):
         rsv_resource = self.get_rsv_resource(**kwargs)
         if rsv_resource is not None:
-            return rsv_resource.get_rsv_step(**kwargs)
-
-    def _project__get_rsv_steps_(self, **kwargs):
+            return self._entity__get_rsv_step_(rsv_resource, **kwargs)
+    #
+    def _entity__get_rsv_steps_(self, **kwargs):
         list_ = []
         #
-        rsv_type = self.VariantTypes.Step
+        rsv_type = self.EntityTypes.Step
         if rsv_type in kwargs:
             if '*' in kwargs[rsv_type]:
                 kwargs.pop(rsv_type)
         #
-        branch = self._guess_branch_(**kwargs)
-        search_patterns = self._project_get_search_patterns_(branch, rsv_type)
+        branch = self._guess_entity_type_force_(**kwargs)
+        search_patterns = self.__get_resource_search_patterns(branch, rsv_type)
         for i_workspace_key, i_pattern_args in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
             i_kwargs_over['pattern'] = i_pattern_args
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
-            i_rsv_matcher = self._project__create_main_rsv_matcher_(
+            i_rsv_matcher = self.__create_main_rsv_matcher_(
                 i_kwargs_over
             )
             i_matches = i_rsv_matcher.get_matches()
@@ -2459,55 +2448,65 @@ class AbsRsvProject(
                 j_kwargs_over['resolver_workspace_key'] = i_workspace_key
                 j_kwargs_over['resolver_pattern'] = i_pattern_args
                 j_kwargs_over['resolver_result'] = j_result
-                j_rsv_step = self._resource__get_rsv_step_(**j_kwargs_over)
+                if branch in self.EntityTypes.Projects:
+                    j_rsv_step = self._project__get_rsv_step_(**j_kwargs_over)
+                elif branch in self.EntityTypes.ResourceGroups:
+                    j_rsv_step = self._resource_group__get_rsv_step_(**j_kwargs_over)
+                elif branch in self.EntityTypes.Resources:
+                    j_rsv_step = self._resource__get_rsv_step_(**j_kwargs_over)
+                else:
+                    raise RuntimeError()
                 if j_rsv_step is not None:
                     if j_rsv_step not in list_:
                         list_.append(j_rsv_step)
         return list_
-    #
-    def _project__get_rsv_step_(self, rsv_obj, **kwargs):
+    #   entity
+    def _entity__get_rsv_step_(self, rsv_obj, **kwargs):
         kwargs_over = self._copy_variants_as_branches_(
             rsv_obj.properties.get_value()
         )
         #
         kwargs_over.update(kwargs)
         #
-        rsv_type = self.VariantTypes.Step
-        rsv_category = self.VariantCategories.Step
+        rsv_type = self.EntityTypes.Step
+        rsv_category = self.EntityCategories.Step
         kwargs_over['type'] = rsv_type
         if rsv_type in kwargs_over:
             name = kwargs_over[rsv_type]
             kwargs_over[rsv_type] = name
             #
-            branch = self._guess_branch_(**kwargs_over)
-            name_includes = self.get_steps(
+            branch = self._guess_entity_type_force_(**kwargs_over)
+            name_includes = self.get_all_steps(
                 branch, with_extra=True
             )
             if name_includes:
                 if name not in name_includes:
                     return
         else:
-            raise KeyError()
+            raise KeyError(
+                'key "{}" must assign a value'.format(rsv_type)
+            )
         #
-        obj_path = self._get_main_rsv_path_(rsv_category, kwargs_over)
+        obj_path = self._get_entity_rsv_path_(rsv_category, kwargs_over)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
-        return self._project__create_rsv_step_auto_(**kwargs_over)
+        return self._entity__create_rsv_step_auto_(**kwargs_over)
 
-    def _project__create_rsv_step_auto_(self, **kwargs):
+    def _entity__create_rsv_step_auto_(self, **kwargs):
+        # kwargs from upstream
         if 'resolver_result' in kwargs:
-            return self._project__create_rsv_step_(**kwargs)
-        return self._project__search_rsv_step_(**kwargs)
+            return self._entity__create_rsv_step_(**kwargs)
+        return self._entity__search_resource_rsv_step_(**kwargs)
 
-    def _project__search_rsv_step_(self, **kwargs):
-        rsv_type = self.VariantTypes.Step
-        branch = self._guess_branch_(**kwargs)
-        search_patterns = self._project_get_search_patterns_(branch, rsv_type)
+    def _entity__search_resource_rsv_step_(self, **kwargs):
+        rsv_type = self.EntityTypes.Step
+        branch = self._guess_entity_type_force_(**kwargs)
+        search_patterns = self.__get_resource_search_patterns(branch, rsv_type)
         for i_workspace_key, i_pattern_args in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
             i_kwargs_over['pattern'] = i_pattern_args
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
-            i_rsv_matcher = self._project__create_main_rsv_matcher_(
+            i_rsv_matcher = self.__create_main_rsv_matcher_(
                 i_kwargs_over
             )
             i_matches = i_rsv_matcher.get_matches()
@@ -2518,69 +2517,47 @@ class AbsRsvProject(
                 j_kwargs_over['resolver_workspace_key'] = i_workspace_key
                 j_kwargs_over['resolver_pattern'] = i_pattern_args
                 j_kwargs_over['resolver_result'] = j_result
-                j_rsv_step = self._project__create_rsv_step_(**j_kwargs_over)
+                j_rsv_step = self._entity__create_rsv_step_(**j_kwargs_over)
                 if j_rsv_step is not None:
                     return j_rsv_step
         return None
 
-    def _project__create_rsv_step_(self, **kwargs):
-        rsv_category = self.VariantCategories.Step
-        rsv_type = self.VariantTypes.Step
+    def _entity__create_rsv_step_(self, **kwargs):
+        rsv_category = self.EntityCategories.Step
+        rsv_type = self.EntityTypes.Step
         #
         result = kwargs.pop('resolver_result')
         kwargs['workspace_key'] = kwargs.pop('resolver_workspace_key')
         kwargs['pattern'] = kwargs.pop('resolver_pattern')
         variants = dict()
-        self._completion_branch_rsv_create_kwargs_(
+        self._completion_rsv_entity_create_kwargs_(
             rsv_category, rsv_type,
             kwargs, result, variants
         )
         rsv_obj = self.RSV_STEP_CLASS(self, **kwargs)
         self._project__set_rsv_obj_add_(rsv_obj)
         return rsv_obj
-    #
-    def get_rsv_steps(self, **kwargs):
-        branch = self._guess_branch_(**kwargs)
-        if branch is not None:
-            kwargs['branch'] = branch
-            return self._project__get_rsv_steps_(**kwargs)
-        else:
-            list_ = []
-            for i_branch in self.Branches.Mains:
-                kwargs['branch'] = i_branch
-                list_.extend(
-                    self._project__get_rsv_steps_(**kwargs)
-                )
-            return list_
-    #
-    def get_rsv_step(self, **kwargs):
-        if 'asset' in kwargs or 'shot' in kwargs:
-            return self._resource__get_rsv_step_(**kwargs)
-        #
-        _ = self.get_rsv_steps(**kwargs)
-        if _:
-            return _[-1]
     # task
     def _step__get_rsv_task_(self, **kwargs):
         rsv_step = self.get_rsv_step(**kwargs)
         if rsv_step is not None:
             return rsv_step.get_rsv_task(**kwargs)
 
-    def _project__get_rsv_tasks_(self, **kwargs):
+    def _any__get_rsv_tasks_(self, **kwargs):
         list_ = []
         #
-        rsv_type = self.VariantTypes.Task
+        rsv_type = self.EntityTypes.Task
         if rsv_type in kwargs:
             if '*' in kwargs[rsv_type]:
                 kwargs.pop(rsv_type)
         #
-        branch = self._guess_branch_(**kwargs)
-        search_patterns = self._project_get_search_patterns_(branch, rsv_type)
+        branch = self._guess_entity_type_force_(**kwargs)
+        search_patterns = self.__get_resource_search_patterns(branch, rsv_type)
         for i_workspace_key, i_pattern in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
             i_kwargs_over['pattern'] = i_pattern
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
-            i_rsv_matcher = self._project__create_main_rsv_matcher_(
+            i_rsv_matcher = self.__create_main_rsv_matcher_(
                 i_kwargs_over
             )
             i_matches = i_rsv_matcher.get_matches()
@@ -2597,9 +2574,9 @@ class AbsRsvProject(
                         list_.append(j_rsv_task)
         return list_
 
-    def _project__get_rsv_task_(self, rsv_obj, **kwargs):
-        rsv_category = self.VariantCategories.Task
-        rsv_type = self.VariantTypes.Task
+    def _entity__get_rsv_task_(self, rsv_obj, **kwargs):
+        rsv_category = self.EntityCategories.Task
+        rsv_type = self.EntityTypes.Task
         #
         kwargs_over = self._copy_variants_as_branches_(
             rsv_obj.properties.get_value()
@@ -2613,26 +2590,26 @@ class AbsRsvProject(
             kwargs_over[rsv_type] = name
         else:
             raise KeyError()
-        obj_path = self._get_main_rsv_path_(rsv_category, kwargs_over)
+        obj_path = self._get_entity_rsv_path_(rsv_category, kwargs_over)
         if self._rsv_obj_stack.get_object_exists(obj_path) is True:
             return self._rsv_obj_stack.get_object(obj_path)
         #
-        return self._project__create_rsv_task_auto_(**kwargs_over)
+        return self._entity__create_rsv_task_auto_(**kwargs_over)
 
-    def _project__create_rsv_task_auto_(self, **kwargs):
+    def _entity__create_rsv_task_auto_(self, **kwargs):
         if 'resolver_result' in kwargs:
-            return self._project__create_rsv_task_(**kwargs)
-        return self._project__search_rsv_task_(**kwargs)
+            return self._entity__create_rsv_task_(**kwargs)
+        return self._entity__search_rsv_task_(**kwargs)
 
-    def _project__search_rsv_task_(self, **kwargs):
-        rsv_type = self.VariantTypes.Task
-        branch = self._guess_branch_(**kwargs)
-        search_patterns = self._project_get_search_patterns_(branch, rsv_type)
+    def _entity__search_rsv_task_(self, **kwargs):
+        rsv_type = self.EntityTypes.Task
+        branch = self._guess_entity_type_force_(**kwargs)
+        search_patterns = self.__get_resource_search_patterns(branch, rsv_type)
         for i_workspace_key, i_pattern_args in search_patterns.items():
             i_kwargs_over = copy.copy(kwargs)
             i_kwargs_over['pattern'] = i_pattern_args
             i_kwargs_over['workspace'] = self.get_workspace(i_workspace_key)
-            i_rsv_matcher = self._project__create_main_rsv_matcher_(
+            i_rsv_matcher = self.__create_main_rsv_matcher_(
                 i_kwargs_over
             )
             i_matches = i_rsv_matcher.get_matches()
@@ -2643,38 +2620,102 @@ class AbsRsvProject(
                 j_kwargs_over['resolver_workspace_key'] = i_workspace_key
                 j_kwargs_over['resolver_pattern'] = i_pattern_args
                 j_kwargs_over['resolver_result'] = j_result
-                j_rsv_task = self._project__create_rsv_task_(**j_kwargs_over)
+                j_rsv_task = self._entity__create_rsv_task_(**j_kwargs_over)
                 if j_rsv_task is not None:
                     return j_rsv_task
         return None
 
-    def _project__create_rsv_task_(self, **kwargs):
-        rsv_category = self.VariantCategories.Task
-        rsv_type = self.VariantTypes.Task
+    def _entity__create_rsv_task_(self, **kwargs):
+        rsv_category = self.EntityCategories.Task
+        rsv_type = self.EntityTypes.Task
         result = kwargs.pop('resolver_result')
         kwargs['workspace_key'] = kwargs.pop('resolver_workspace_key')
         kwargs['pattern'] = kwargs.pop('resolver_pattern')
         variants = dict()
-        self._completion_branch_rsv_create_kwargs_(
+        self._completion_rsv_entity_create_kwargs_(
             rsv_category, rsv_type,
             kwargs, result, variants
         )
         rsv_obj = self.RSV_TASK_CLASS(self, **kwargs)
         self._project__set_rsv_obj_add_(rsv_obj)
         return rsv_obj
-    #
-    def _project__set_rsv_task_create_(self, **kwargs):
-        rsv_matcher = self._project__create_main_rsv_matcher_(
-            kwargs
+
+    def get_rsv_resource_groups(self, **kwargs):
+        branch = self._guess_entity_type_(**kwargs)
+        if branch is not None:
+            kwargs['branch'] = branch
+            return self._project__get_rsv_resource_groups_(**kwargs)
+        else:
+            list_ = []
+            for i_branch in self.EntityTypes.Resources:
+                kwargs['branch'] = i_branch
+                list_.extend(
+                    self._project__get_rsv_resource_groups_(**kwargs)
+                )
+            return list_
+
+    def get_rsv_resource_group(self, **kwargs):
+        rsv_obj = self._project__get_rsv_resource_group_(
+            rsv_obj=self, **kwargs
         )
-        matches = rsv_matcher.get_matches()
-        if matches:
-            result, variants = matches[-1]
-            self._completion_rsv_obj_create_kwargs_(kwargs, result, variants)
-            rsv_obj = self.RSV_TASK_CLASS(self, **kwargs)
-            self._project__set_rsv_obj_add_(rsv_obj)
-            return rsv_obj
-    #
+        return rsv_obj
+
+    def get_rsv_resources(self, **kwargs):
+        branch = self._guess_entity_type_(**kwargs)
+        if branch is not None:
+            kwargs['branch'] = branch
+            list_ = []
+            if self.EntityTypes.Role in kwargs or self.EntityTypes.Sequence in kwargs:
+                rsv_resource_group = self.get_rsv_resource_group(**kwargs)
+                list_.extend(
+                    rsv_resource_group.get_rsv_resources(**kwargs)
+                )
+            else:
+                rsv_tags = self.get_rsv_resource_groups(**kwargs)
+                for i_rsv_tag in rsv_tags:
+                    list_.extend(
+                        i_rsv_tag.get_rsv_resources(**kwargs)
+                    )
+            return list_
+        else:
+            list_ = []
+            for i_branch in self.EntityTypes.Resources:
+                kwargs['branch'] = i_branch
+                i_rsv_tags = self.get_rsv_resource_groups(branch=i_branch)
+                for j_rsv_tag in i_rsv_tags:
+                    list_.extend(j_rsv_tag.get_rsv_resources())
+            return list_
+
+    def get_rsv_resource(self, **kwargs):
+        # find resource
+        branch = self._guess_entity_type_force_(**kwargs)
+        if branch in self.EntityTypes.Resources:
+            #
+            if self.EntityTypes.Role in kwargs or self.EntityTypes.Sequence in kwargs:
+                return self._group__get_rsv_resource_(**kwargs)
+            # find in all resource group
+            _ = self.get_rsv_resources(**kwargs)
+            if _:
+                return _[-1]
+        else:
+            _ = self.get_rsv_resources(**kwargs)
+            if _:
+                return _[-1]
+
+    def get_rsv_steps(self, **kwargs):
+        branch = self._guess_entity_type_(**kwargs)
+        kwargs['branch'] = branch
+        return self._entity__get_rsv_steps_(**kwargs)
+
+    def get_rsv_step(self, **kwargs):
+        branch = self._guess_entity_type_force_(**kwargs)
+        if branch in self.EntityTypes.Projects:
+            return self._project__get_rsv_step_(**kwargs)
+        elif branch in self.EntityTypes.ResourceGroups:
+            return self._resource_group__get_rsv_step_(**kwargs)
+        elif branch in self.EntityTypes.Resources:
+            return self._resource__get_rsv_step_(**kwargs)
+
     def get_rsv_task(self, **kwargs):
         if 'step' in kwargs:
             return self._step__get_rsv_task_(**kwargs)
@@ -2682,20 +2723,11 @@ class AbsRsvProject(
         _ = self.get_rsv_tasks(**kwargs)
         if _:
             return _[-1]
-    #
+
     def get_rsv_tasks(self, **kwargs):
-        branch = self._guess_branch_(**kwargs)
-        if branch is not None:
-            kwargs['branch'] = branch
-            return self._project__get_rsv_tasks_(**kwargs)
-        else:
-            list_ = []
-            for i_branch in self.Branches.Mains:
-                kwargs['branch'] = i_branch
-                list_.extend(
-                    self._project__get_rsv_tasks_(**kwargs)
-                )
-            return list_
+        branch = self._guess_entity_type_force_(**kwargs)
+        kwargs['branch'] = branch
+        return self._any__get_rsv_tasks_(**kwargs)
     # task version
     def get_rsv_task_version(self, **kwargs):
         if 'version' in kwargs:
@@ -2704,15 +2736,15 @@ class AbsRsvProject(
         _ = self.get_rsv_task_versions(**kwargs)
         if _:
             return _[-1]
-    #
+
     def get_rsv_task_versions(self, **kwargs):
-        branch = self._guess_branch_(**kwargs)
+        branch = self._guess_entity_type_force_(**kwargs)
         if branch is not None:
             kwargs['branch'] = branch
             return self._project__get_rsv_task_versions_(**kwargs)
         else:
             list_ = []
-            for i_branch in self.Branches.Mains:
+            for i_branch in self.EntityTypes.Resources:
                 kwargs['branch'] = i_branch
                 list_.extend(
                     self._project__get_rsv_task_versions_(**kwargs)
@@ -2727,15 +2759,15 @@ class AbsRsvProject(
     def _project__get_rsv_task_versions_(self, **kwargs):
         list_ = []
         #
-        rsv_type = self.VariantTypes.Version
-        branch = self._guess_branch_(**kwargs)
+        rsv_type = self.EntityTypes.Version
+        branch = self._guess_entity_type_force_(**kwargs)
         #
         workspace_key, workspace = self._project_update_workspace_variants_(kwargs)
         #
         keyword = '{}-{}-{}-dir'.format(branch, workspace_key, rsv_type)
         kwargs['keyword'] = keyword
         kwargs['pattern'] = self.get_pattern(keyword=keyword)
-        rsv_matcher = self._project__create_main_rsv_matcher_(
+        rsv_matcher = self.__create_main_rsv_matcher_(
             kwargs
         )
         matches = rsv_matcher.get_matches()
@@ -2757,8 +2789,8 @@ class AbsRsvProject(
         #
         kwargs_over.update(kwargs)
         #
-        rsv_type = self.VariantTypes.Version
-        branch = self._guess_branch_(**kwargs_over)
+        rsv_type = self.EntityTypes.Version
+        branch = self._guess_entity_type_force_(**kwargs_over)
         #
         workspace_key, workspace = self._project_update_workspace_variants_(kwargs)
         keyword = '{}-{}-{}-dir'.format(branch, workspace_key, rsv_type)
@@ -2786,7 +2818,7 @@ class AbsRsvProject(
         return self._project__set_rsv_task_version_create_(**variants)
 
     def _project__set_rsv_task_version_create_(self, **kwargs):
-        rsv_matcher = self._project__create_main_rsv_matcher_(
+        rsv_matcher = self.__create_main_rsv_matcher_(
             kwargs
         )
         matches = rsv_matcher.get_matches()
@@ -2878,7 +2910,7 @@ class AbsRsvProject(
         return self._project__set_rsv_unit_version_create_(**variants)
 
     def _project__set_rsv_unit_version_create_(self, **kwargs):
-        rsv_matcher = self._project__create_rsv_matcher_(
+        rsv_matcher = self._project__project__create_rsv_matcher_(
             kwargs
         )
         matches = rsv_matcher.get_matches()
@@ -2963,19 +2995,19 @@ class AbsRsvProject(
         return self._rsv_obj_stack.get_objects(regex)
 
     def _project__get_rsv_obj_child_paths_(self, path):
-        return bsc_core.DccPathDagMtd.get_dag_children(path, self._rsv_obj_stack.get_keys())
+        return bsc_core.DccPathDagMtd.get_dag_child_paths(path, self._rsv_obj_stack.get_keys())
 
     def _project__get_rsv_obj_children_(self, path):
-        child_paths = bsc_core.DccPathDagMtd.get_dag_children(path, self._rsv_obj_stack.get_keys())
+        child_paths = bsc_core.DccPathDagMtd.get_dag_child_paths(path, self._rsv_obj_stack.get_keys())
         return [self._rsv_obj_stack.get_object(i) for i in child_paths]
     # gain by file-path
     def _project__get_rsv_entity_by_file_path_(self, file_path, variants_override):
         if file_path is not None:
-            for i_branch in self.Branches.Mains:
+            for i_branch in self.EntityTypes.Resources:
                 i_pattern = self.get_pattern(keyword='{}-dir'.format(i_branch))
                 i_pattern_ = '{}/{{extra}}'.format(i_pattern)
 
-                i_rsv_matcher = self._create_rsv_matcher_(
+                i_rsv_matcher = self._project__create_rsv_matcher_(
                     i_pattern_, variants_override
                 )
                 i_properties = i_rsv_matcher.get_properties_by_result(result=file_path)
@@ -2989,9 +3021,9 @@ class AbsRsvProject(
 
     def _project__get_rsv_step_by_any_file_path_(self, file_path):
         if file_path is not None:
-            rsv_type = self.VariantTypes.Step
-            for i_branch in self.Branches.All:
-                search_pattern = self._project_get_search_patterns_(i_branch, rsv_type)
+            rsv_type = self.EntityTypes.Step
+            for i_branch in self.EntityTypes.Resources:
+                search_pattern = self.__get_resource_search_patterns(i_branch, rsv_type)
                 for j_workspace_key in self.WorkspaceKeys.All:
                     if j_workspace_key in search_pattern:
                         j_pattern = search_pattern[j_workspace_key]
@@ -3000,7 +3032,7 @@ class AbsRsvProject(
                         else:
                             j_pattern_extra = j_pattern
                         #
-                        j_rsv_matcher = self._create_rsv_matcher_(
+                        j_rsv_matcher = self._project__create_rsv_matcher_(
                             j_pattern_extra, variants_override={}
                         )
                         j_properties = j_rsv_matcher.get_properties_by_result(result=file_path)
@@ -3015,9 +3047,9 @@ class AbsRsvProject(
     # scene
     def _project__get_rsv_task_by_any_file_path_(self, file_path):
         if file_path is not None:
-            rsv_type = self.VariantTypes.Task
-            for i_branch in self.Branches.All:
-                search_pattern = self._project_get_search_patterns_(i_branch, rsv_type)
+            rsv_type = self.EntityTypes.Task
+            for i_branch in self.EntityTypes.Resources:
+                search_pattern = self.__get_resource_search_patterns(i_branch, rsv_type)
                 for j_workspace_key in self.WorkspaceKeys.All:
                     if j_workspace_key in search_pattern:
                         j_pattern = search_pattern[j_workspace_key]
@@ -3025,7 +3057,7 @@ class AbsRsvProject(
                             j_pattern_extra = '{}/{{extra}}'.format(j_pattern)
                         else:
                             j_pattern_extra = j_pattern
-                        j_rsv_matcher = self._create_rsv_matcher_(
+                        j_rsv_matcher = self._project__create_rsv_matcher_(
                             j_pattern_extra, variants_override={}
                         )
                         j_properties = j_rsv_matcher.get_properties_by_result(result=file_path)
@@ -3121,7 +3153,6 @@ class AbsRsvRoot(
     def get_type_name(self):
         return self.get_type()
     type_name = property(get_type_name)
-
     @property
     def pathsep(self):
         return '/'
@@ -3210,7 +3241,7 @@ class AbsRsvRoot(
         keyword = '{}-dir'.format(rsv_type)
         kwargs_over['keyword'] = keyword
         #
-        obj_path = self._get_main_rsv_path_(self.VariantCategories.Project, kwargs_over)
+        obj_path = self._get_entity_rsv_path_(self.EntityCategories.Project, kwargs_over)
         if self._rsv_project_stack.get_object_exists(obj_path) is True:
             rsv_project = self._rsv_project_stack.get_object(obj_path)
             if 'platform' in kwargs_over:
@@ -3242,7 +3273,7 @@ class AbsRsvRoot(
         keyword = '{}-dir'.format(rsv_type)
         kwargs_over['keyword'] = keyword
         #
-        obj_path = self._get_main_rsv_path_(self.VariantCategories.Project, kwargs_over)
+        obj_path = self._get_entity_rsv_path_(self.EntityCategories.Project, kwargs_over)
         if self._rsv_project_stack.get_object_exists(obj_path) is True:
             rsv_project = self._rsv_project_stack.get_object(obj_path)
             if 'platform' in kwargs_over:
@@ -3292,7 +3323,7 @@ class AbsRsvRoot(
                     j_pattern_ = '{}/{{extra}}'.format(j_pattern)
                     j_variants['keyword'] = j_keyword
                     j_variants['pattern'] = j_pattern_
-                    j_rsv_matcher = i_rsv_project._create_rsv_matcher_(
+                    j_rsv_matcher = i_rsv_project._project__create_rsv_matcher_(
                         j_pattern_, j_variants
                     )
                     j_project_rsv_properties = j_rsv_matcher.get_properties_by_result(file_path)
@@ -3400,7 +3431,7 @@ class AbsRsvRoot(
                     i_variants = {'root': i_root}
                     i_pattern = rsv_project.get_pattern('project-dir')
                     i_pattern_ = '{}/{{extra}}'.format(i_pattern)
-                    i_rsv_matcher = rsv_project._create_rsv_matcher_(
+                    i_rsv_matcher = rsv_project._project__create_rsv_matcher_(
                         i_pattern_, i_variants
                     )
                     i_project_properties = i_rsv_matcher._get_project_properties_by_default_(file_path)
@@ -3484,7 +3515,7 @@ class AbsRsvRoot(
         list_ = []
         project = kwargs['project']
         rsv_project = self.get_rsv_project(project=project)
-        branch = rsv_project._guess_branch_(**kwargs)
+        branch = rsv_project._guess_entity_type_force_(**kwargs)
         keywords = [self._get_step_keyword_(branch, i) for i in self.WorkspaceKeys.Mains]
         for i_keyword in keywords:
             i_kwargs = rsv_project.properties.get_copy_value()
@@ -3500,7 +3531,7 @@ class AbsRsvRoot(
         list_ = []
         project = kwargs['project']
         rsv_project = self.get_rsv_project(project=project)
-        branch = rsv_project._guess_branch_(**kwargs)
+        branch = rsv_project._guess_entity_type_force_(**kwargs)
         keywords = [self._get_task_keyword_(branch, i) for i in self.WorkspaceKeys.Mains]
         #
         for i_keyword in keywords:

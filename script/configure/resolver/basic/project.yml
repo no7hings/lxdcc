@@ -57,7 +57,7 @@ shot-asset-name: '{shot_asset}'
 variant-fnmatch-patterns:
     role: '[a-z][a-z][a-z]'
     sequence: '[a-z][0-9][0-9]'
-#    step: '[a-z][a-z][a-z]'
+    step: '[a-z][a-z][a-z]*'
     version: '[a-z][0-9][0-9][0-9]*'
     version_extra: '[0-9][0-9][0-9]*'
     look_pass: '[A-Za-z]*'
@@ -86,116 +86,160 @@ project-root_primary-linux-dir: None
 project-root_secondary-dir: '{root_secondary}'
 project-root_secondary-windows-dir: None
 project-root_secondary-linux-dir: None
-# <project>
+# project
 project-dir: <project-root-dir>/<project-name>
 project-workspace-dir: <project-dir>/<workspace-name>
-# <branch>
-asset-branch-dir: <project-workspace-dir>/assets
-# <asset-tag>
-role-dir: <asset-branch-dir>/<role-name>
-# <asset>
+#   step
+project-source-step-dir: <project-dir>/<step-name>
+project-user-step-dir: <project-dir>/<step-name>
+project-release-step-dir: <project-dir>/<step-name>
+project-temporary-step-dir: <project-dir>/<step-name>
+#   step search patterns
+project-step-search-patterns:
+    source: <project-source-step-dir>
+    user: <project-user-step-dir>
+    release: <project-release-step-dir>
+#   task
+project-source-task-dir: <project-source-step-dir>/<task-name>
+project-user-task-dir: <project-user-step-dir>/<task-name>
+project-release-task-dir: <project-release-step-dir>/<task-name>
+project-temporary-task-dir: <project-temporary-step-dir>/<task-name>
+#   task search patterns
+project-task-search-patterns:
+    source: <project-source-task-dir>
+    user: <project-user-task-dir>
+    release: <project-release-task-dir>
+#   version name
+project-version-name: <project-name>.<step-name>.<task-name>.<version-name>
+#   area
+project-source-area-dir: <project-source-task-dir>
+project-user-area-dir: <project-user-task-dir>
+#   maya
+#       source
+project-source-maya-dir: <project-source-area-dir>/maya
+project-source-maya-scene-src-dir: <project-source-maya-dir>/scenes
+project-source-maya-scene-src-file: <project-source-maya-scene-src-dir>/<project-version-name>.ma
+#       user
+project-user-maya-dir: <project-user-area-dir>/maya
+project-user-maya-scene-src-dir: <project-user-maya-dir>/scenes
+project-user-maya-scene-src-file: <project-user-maya-scene-src-dir>/<project-version-name>.ma
+#   katana
+#       source
+project-source-katana-dir: <project-source-area-dir>/katana
+project-source-katana-scene-src-dir: <project-source-katana-dir>
+project-source-katana-scene-src-file: <project-source-katana-scene-src-dir>/<project-version-name>.katana
+#       user
+project-user-katana-dir: <project-user-area-dir>/katana
+project-user-katana-scene-src-dir: <project-user-katana-dir>
+project-user-katana-scene-src-file: <project-user-katana-scene-src-dir>/<project-version-name>.katana
+# asset area
+asset-area-dir: <project-workspace-dir>/assets
+# asset group
+role-dir: <asset-area-dir>/<role-name>
+# asset
 asset-dir: <role-dir>/<asset-name>
-# <asset-step>
+#   step
 asset-source-step-dir: <asset-dir>/<step-name>
 asset-user-step-dir: <asset-dir>/<step-name>
 asset-release-step-dir: <asset-dir>/<step-name>
 asset-temporary-step-dir: <asset-dir>/<step-name>
-#
+#   step search pattern
 asset-step-search-patterns:
     source: <asset-source-step-dir>
     user: <asset-user-step-dir>
     release: <asset-release-step-dir>
-# <asset-task>
+#   task
 asset-source-task-dir: <asset-source-step-dir>/<task-name>
 asset-user-task-dir: <asset-user-step-dir>/<task-name>/user.<user-name>
 asset-release-task-dir: <asset-release-step-dir>/<task-name>
 asset-temporary-task-dir: <asset-temporary-step-dir>/<task-name>
-#
+#   task search patterns
 asset-task-search-patterns:
     source: <asset-source-task-dir>
     user: <asset-user-task-dir>
     release: <asset-release-task-dir>
-# <asset-version>
+#   version name
 asset-version-name: <asset-name>.<step-name>.<task-name>.<version-name>
 asset-version_extra-name: <asset-name>.<step-name>.<task-name>.<task_extra-name>.<version-name>_<version_extra-name>
 asset-no-version-name: <asset-name>.<step-name>.<task-name>
 asset-task-version-look-pass-name: <asset-name>.<step-name>.<task-name>.<look-pass>.<version-name>
-# asset version
+#   version
 asset-source-version-dir: <asset-source-task-dir>/<asset-version-name>
 asset-user-version-dir: <asset-user-task-dir>/<asset-version-name>
 asset-release-version-dir: <asset-release-task-dir>/<asset-version-name>
 asset-release-no-version-dir: <asset-release-task-dir>/<asset-no-version-name>
 asset-temporary-version-dir: <asset-temporary-task-dir>/<asset-version-name>
 asset-temporary-no-version-dir: <asset-temporary-task-dir>/<asset-no-version-name>
-# base area
-asset-source-base_area-dir: <asset-source-task-dir>
-    # maya
-        # source
-asset-source-maya-dir: <asset-source-base_area-dir>/maya
+# area
+asset-source-area-dir: <asset-source-task-dir>
+asset-user-area-dir: <asset-user-task-dir>
+#   maya
+#       source
+asset-source-maya-dir: <asset-source-area-dir>/maya
 asset-source-maya-scene-src-dir: <asset-source-maya-dir>/scenes
 asset-source-maya-scene-src-file: <asset-source-maya-scene-src-dir>/<asset-version-name>.ma
 asset-source-maya-tmp-dir: <asset-source-maya-dir>/temporary/<user-name>
 asset-source-maya-scene-tmp-file: <asset-source-maya-tmp-dir>/<asset-version-name>.<time-tag>.ma
-        # xgen, todo: need set to shared area?
+#       xgen, todo: need set to shared area?
 asset-source-maya-xgen-cache-main-dir: <asset-source-maya-dir>/xgen
 asset-source-maya-xgen-cache-dir: <asset-source-maya-dir>/<variant>/<version-name>/xgen
 asset-source-maya-xgen-file: <asset-source-maya-dir>/<asset-version-name>__<xgen-name>.xgen
-        # ass
+#       ass
 asset-source-maya-ass-dir: <asset-source-maya-dir>/<variant>/<version-name>/ass
 asset-source-maya-ass-file: <asset-source-maya-ass-dir>/all.ass
-        # user
-asset-user-maya-dir: <asset-user-task-dir>/maya
+#       user
+asset-user-maya-dir: <asset-user-area-dir>/maya
 asset-user-maya-scene-src-dir: <asset-user-maya-dir>/scenes
 asset-user-maya-scene-src-file: <asset-user-maya-scene-src-dir>/<asset-version-name>.ma
-    # houdini
-        # source
-asset-source-houdini-dir: <asset-source-base_area-dir>/houdini
+#   houdini
+#       source
+asset-source-houdini-dir: <asset-source-area-dir>/houdini
 asset-source-houdini-scene-src-dir: <asset-source-houdini-dir>
 asset-source-houdini-scene-src-file: <asset-source-houdini-dir>/<asset-version-name>.hip
 asset-source-houdini-tmp-dir: <asset-source-houdini-dir>/temporary/<user-name>
 asset-source-houdini-scene-tmp-file: <asset-source-houdini-tmp-dir>/<asset-version-name>.hip
-        # user
-asset-user-houdini-dir: <asset-user-task-dir>/houdini
+#       user
+asset-user-houdini-dir: <asset-user-area-dir>/houdini
 asset-user-houdini-scene-src-dir: <asset-user-houdini-dir>
 asset-user-houdini-scene-src-file: <asset-user-houdini-dir>/<asset-version-name>.hip
-    # katana
-        # source
-asset-source-katana-dir: <asset-source-base_area-dir>/katana
+#   katana
+#       source
+asset-source-katana-dir: <asset-source-area-dir>/katana
 asset-source-katana-scene-src-dir: <asset-source-katana-dir>
 asset-source-katana-scene-src-file: <asset-source-katana-dir>/<asset-version-name>.katana
 asset-source-katana-tmp-dir: <asset-source-katana-dir>/temporary/<user-name>
 asset-source-katana-scene-tmp-file: <asset-source-katana-tmp-dir>/<asset-version-name>.katana
-        # user
-asset-user-katana-dir: <asset-user-task-dir>/katana
+#       user
+asset-user-katana-dir: <asset-user-area-dir>/katana
 asset-user-katana-scene-src-dir: <asset-user-katana-dir>
 asset-user-katana-scene-src-file: <asset-user-katana-dir>/<asset-version-name>.katana
 
 asset-user-katana-render-dir: <asset-user-katana-dir>/render
 asset-user-katana-render-layer-dir: <asset-user-katana-render-dir>/<asset-version-name>
-    # clarisse
-        # source
-asset-source-clarisse-dir: <asset-source-base_area-dir>/clarisse
+#   clarisse
+#       source
+asset-source-clarisse-dir: <asset-source-area-dir>/clarisse
 asset-source-clarisse-scene-src-dir: <asset-source-clarisse-dir>
 asset-source-clarisse-scene-src-file: <asset-source-clarisse-scene-src-dir>/<asset-version-name>.project
 asset-source-clarisse-tmp-dir: <asset-source-clarisse-dir>/temporary/<user-name>
 asset-source-clarisse-scene-tmp-file: <asset-source-clarisse-tmp-dir>/<asset-version-name>.project
-        # user
-asset-user-clarisse-dir: <asset-user-task-dir>/clarisse
+#       user
+asset-user-clarisse-dir: <asset-user-area-dir>/clarisse
 asset-user-clarisse-scene-src-dir: <asset-user-clarisse-dir>
 asset-user-clarisse-scene-src-file: <asset-user-clarisse-scene-src-dir>/<asset-version-name>.project
-    # nuke
-        # source
-asset-source-nuke-dir: <asset-source-base_area-dir>/nuke
+#   nuke
+#       source
+asset-source-nuke-dir: <asset-source-area-dir>/nuke
 asset-source-nuke-scene-src-dir: <asset-source-nuke-dir>
 asset-source-nuke-scene-src-file: <asset-source-nuke-scene-src-dir>/<asset-version-name>.nk
 asset-source-nuke-tmp-dir: <asset-source-nuke-dir>/temporary/<user-name>
 asset-source-nuke-scene-tmp-file: <asset-source-nuke-tmp-dir>/<asset-version-name>.nk
         # user
-asset-user-nuke-dir: <asset-user-task-dir>/nuke
+asset-user-nuke-dir: <asset-user-area-dir>/nuke
 asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<asset-version-name>.nk
 #
-asset-user-app-render-image-dir: <asset-user-task-dir>/render/<app-name>/<asset-version-name>
+asset-user-app-render-image-dir: <asset-user-area-dir>/render/<app-name>/<asset-version-name>
 # extend area ******************************************************************************************************** #
 asset-source-extend-dir: <asset-source-task-dir>
 #   zbrush
@@ -655,8 +699,30 @@ asset-usd-effect-manifest-dir: <asset-task-effect-version-dir>/manifest/usd
 asset-usd-effect-manifest-registry-file: <asset-usd-effect-manifest-dir>/registry.usda
 asset-usd-effect-manifest-file: <asset-usd-effect-manifest-dir>/<asset-name>.usda
 # <shot> ============================================================================================================= #
-shot-branch-dir: <project-workspace-dir>/shots
-sequence-dir: <shot-branch-dir>/<sequence-name>
+shot-area-dir: <project-workspace-dir>/shots
+sequence-dir: <shot-area-dir>/<sequence-name>
+# sequence
+#   step
+sequence-source-step-dir: <sequence-dir>/<step-name>
+sequence-user-step-dir: <sequence-dir>/<step-name>
+sequence-release-step-dir: <sequence-dir>/<step-name>
+sequence-temporary-step-dir: <sequence-dir>/<step-name>
+#   step search patterns
+sequence-step-search-patterns:
+    source: <sequence-source-step-dir>
+    user: <sequence-user-step-dir>
+    release: <sequence-release-step-dir>
+#   task
+sequence-source-task-dir: <sequence-source-step-dir>/<task-name>
+sequence-user-task-dir: <sequence-user-step-dir>/<task-name>
+sequence-release-task-dir: <sequence-release-step-dir>/<task-name>
+sequence-temporary-task-dir: <sequence-temporary-step-dir>/<task-name>
+#   task search patterns
+sequence-task-search-patterns:
+    source: <sequence-source-task-dir>
+    user: <sequence-user-task-dir>
+    release: <sequence-release-task-dir>
+#
 shot-dir: <sequence-dir>/<shot-name>
 # <shot-step>
 shot-source-step-dir: <shot-dir>/<step-name>

@@ -557,6 +557,6 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             )
 
 
-class LookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
+class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
     def __init__(self, option):
-        super(LookYamlImporter, self).__init__(option)
+        super(FncLookYamlImporter, self).__init__(option)

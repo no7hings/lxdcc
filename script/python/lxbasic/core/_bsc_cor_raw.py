@@ -513,32 +513,36 @@ class RawTextMtd(object):
     def set_text_join(self):
         pass
     @classmethod
-    def to_number_embedded_args(cls, string):
-        pieces = re.compile(r'(\d+)').split(unicode(string))
+    def to_number_embedded_args(cls, text):
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        #
+        pieces = re.compile(r'(\d+)').split(text)
         pieces[1::2] = map(int, pieces[1::2])
         return pieces
     @classmethod
-    def to_glob_pattern(cls, string):
-        return re.sub(r'(\d)', '[0-9]', string)
+    def to_glob_pattern(cls, text):
+        return re.sub(r'(\d)', '[0-9]', text)
     @classmethod
     def set_clear_up_to(cls, text):
         return re.sub(
-            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
+            r'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
         )
     @classmethod
-    def to_integer(cls, string):
-        if isinstance(string, six.text_type):
-            string = string.encode('utf-8')
+    def to_integer(cls, text):
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
         _ = re.sub(
-            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '0', string
+            r'[^\u4e00-\u9fa5a-zA-Z0-9]', '0', text
         ).lower()
         return int(_, 36)
     @classmethod
     def get_first_word(cls, text):
         if text:
+            if isinstance(text, six.text_type):
+                text = text.encode('utf-8')
             _ = re.findall(
-                # for unicode ur''
-                ur'[\u4e00-\u9fa5a-zA-Z0-9]', text
+                r'[\u4e00-\u9fa5a-zA-Z0-9]', text
             )
             if _:
                 return _[0]
@@ -563,11 +567,16 @@ class RawTextMtd(object):
     @classmethod
     def to_prettify(cls, text, capitalize=True):
         _ = re.sub(
-            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
+            r'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
         )
         if capitalize is True:
             return ' '.join([i if i.isupper() else i.capitalize() for i in _.split('_')])
         return ' '.join([i if i.isupper() else i.lower() for i in _.split('_')])
+    @classmethod
+    def split_to(cls, text):
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        return re.compile(r'[;,/\s]\s*').split(text)
 
 
 class RawTextOpt(object):
@@ -653,7 +662,7 @@ class RawTextOpt(object):
 
     def set_clear_to(self):
         return re.sub(
-            ur'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', self._raw
+            r'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', self._raw
         )
 
     def get_filter_by_pattern(self, pattern):

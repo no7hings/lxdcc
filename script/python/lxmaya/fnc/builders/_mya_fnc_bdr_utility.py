@@ -355,11 +355,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                 if look_yml_file_path:
                     rsv_unit_properties = look_yml_file_rsv_unit.get_properties_by_result(look_yml_file_path)
                     version = rsv_unit_properties.get('version')
-                    mya_fnc_importers.LookYamlImporter(
+                    mya_fnc_importers.FncLookYamlImporter(
                         option=dict(
                             file=look_yml_file_path
                         )
-                    ).set_run()
+                    ).execute()
     @classmethod
     def _set_work_look_preview_build_by_yml_(cls, rsv_task, with_surface_work_look_preview):
         import lxmaya.fnc.importers as mya_fnc_importers
@@ -369,11 +369,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                 look_yml_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-source-look-yml-file')
                 work_look_yml_file_path = look_yml_file_rsv_unit.get_result(version='latest')
                 if work_look_yml_file_path:
-                    mya_fnc_importers.LookYamlImporter(
+                    mya_fnc_importers.FncLookYamlImporter(
                         option=dict(
                             file=work_look_yml_file_path
                         )
-                    ).set_run()
+                    ).execute()
     @classmethod
     def _set_camera_build_by_abc_(cls, rsv_task, with_camera):
         import lxmaya.fnc.importers as mya_fnc_importers
@@ -807,11 +807,11 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
             rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
             file_path = rsv_unit.get_result(version='latest')
             if file_path:
-                mya_fnc_importers.LookYamlImporter(
+                mya_fnc_importers.FncLookYamlImporter(
                     option=dict(
                         file=file_path
                     )
-                ).set_run()
+                ).execute()
             else:
                 bsc_core.LogMtd.trace_method_warning(
                     cls.KEY,

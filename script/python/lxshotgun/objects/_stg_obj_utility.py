@@ -145,16 +145,19 @@ class StgConnector(object):
     }
     #
     def __init__(self, **kwargs):
-        self._shotgun = stg_core.ShotgunMtd().set_shotgun_instance_create()
+        self._stg_instance = stg_core.ShotgunMtd().set_shotgun_instance_create()
     @property
     def shotgun(self):
-        return self._shotgun
+        return self._stg_instance
     @classmethod
     def _get_stg_resource_type_(cls, key):
         return cls.RESOURCE_TYPE_MAPPER[key]
     @classmethod
     def _get_rsv_resource_type_(cls, key):
         return {v: k for k, v in cls.RESOURCE_TYPE_MAPPER.items()}[key]
+
+    def to_query(self, stg_entity):
+        return self.STG_OBJ_QUERY_CLS(self, stg_entity)
 
     def _set_stg_filters_completion_by_tags_(self, filters, **kwargs):
         if 'tags' in kwargs:
@@ -170,7 +173,7 @@ class StgConnector(object):
             return bsc_objects.Configure(value=_)
 
     def get_stg_projects(self):
-        return self._shotgun.find(
+        return self._stg_instance.find(
             entity_type=stg_configure.StgEntityTypes.Project,
             filters=[]
         ) or []
@@ -184,7 +187,7 @@ class StgConnector(object):
         :return:
         """
         project = kwargs['project']
-        return self._shotgun.find_one(
+        return self._stg_instance.find_one(
             entity_type=stg_configure.StgEntityTypes.Project,
             filters=[
                 ['name', 'is', project]
@@ -209,7 +212,7 @@ class StgConnector(object):
 
     def get_shotgun_entities(self, shotgun_entity_kwargs):
         list_ = []
-        _ = self._shotgun.find(**shotgun_entity_kwargs) or []
+        _ = self._stg_instance.find(**shotgun_entity_kwargs) or []
         key_pattern = ';'.join(map(lambda x: '{{{}}}'.format(x), shotgun_entity_kwargs.get('fields')))
         for i in _:
             i = {k: (v if v else 'N/a') for k, v in i.items()}
@@ -219,7 +222,7 @@ class StgConnector(object):
 
     def get_shotgun_entities_(self, **kwargs):
         list_ = []
-        _ = self._shotgun.find(**kwargs) or []
+        _ = self._stg_instance.find(**kwargs) or []
         for i in _:
             i = {k: (v if v else 'N/a') for k, v in i.items()}
             list_.append(i)
@@ -243,7 +246,7 @@ class StgConnector(object):
         #
         entity_name = kwargs[branch]
         #
-        return self._shotgun.find_one(
+        return self._stg_instance.find_one(
             entity_type=self._get_stg_resource_type_(branch),
             filters=[
                 ['project', 'is', self.get_stg_project(**kwargs)],
@@ -277,7 +280,7 @@ class StgConnector(object):
         entity_name = kwargs[branch]
         role = kwargs['role']
         #
-        _ = self._shotgun.create(
+        _ = self._stg_instance.create(
             self._get_stg_resource_type_(branch),
             dict(
                 project=self.get_stg_project(**kwargs),
@@ -325,7 +328,7 @@ class StgConnector(object):
         self._set_stg_filters_completion_by_tags_(filters, **kwargs)
         #
         for i_branch in branches:
-            return self._shotgun.find(
+            return self._stg_instance.find(
                 entity_type=self._get_stg_resource_type_(i_branch),
                 filters=filters
             )
@@ -350,7 +353,7 @@ class StgConnector(object):
         :return: [<dict>, ...] or []
         """
         branch = kwargs['branch']
-        return self._shotgun.find(
+        return self._stg_instance.find(
             entity_type='Step',
             filters=[
                 ['entity_type', 'is', self._get_stg_resource_type_(branch)]
@@ -375,7 +378,7 @@ class StgConnector(object):
         step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         kwargs['step'] = step
         #
-        results = self._shotgun.find(
+        results = self._stg_instance.find(
             entity_type='Step',
             filters=[
                 ['short_name', 'is', step],
@@ -406,7 +409,7 @@ class StgConnector(object):
             step=<step-name>
         :return:
         """
-        return self._shotgun.find(
+        return self._stg_instance.find(
             entity_type='Task',
             filters=[
                 ['entity', 'is', self.get_stg_resource(**kwargs)],
@@ -426,8 +429,16 @@ class StgConnector(object):
             task=<task-name>
         :return:
         """
+        if 'id' in kwargs:
+            return self._stg_instance.find_one(
+                entity_type='Task',
+                filters=[
+                    ['id', 'is', int(kwargs['id'])],
+                ]
+            )
+        #
         task = kwargs['task']
-        return self._shotgun.find_one(
+        return self._stg_instance.find_one(
             entity_type='Task',
             filters=[
                 ['entity', 'is', self.get_stg_resource(**kwargs)],
@@ -441,7 +452,7 @@ class StgConnector(object):
         if stg_obj:
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
 
-    def set_stg_task_create(self, **kwargs):
+    def execute_stg_task_create(self, **kwargs):
         """
         :param kwargs:
             project=<project-name>
@@ -456,7 +467,7 @@ class StgConnector(object):
             return exists_stg_task
         #
         task = kwargs['task']
-        _ = self._shotgun.create(
+        _ = self._stg_instance.create(
             'Task',
             dict(
                 project=self.get_stg_project(**kwargs),
@@ -473,28 +484,28 @@ class StgConnector(object):
     # user
     def get_stg_user(self, **kwargs):
         if 'id' in kwargs:
-            return self._shotgun.find_one(
+            return self._stg_instance.find_one(
                 entity_type='HumanUser',
                 filters=[
                     ['id', 'is', kwargs['id']]
                 ]
             )
         elif 'name' in kwargs:
-            return self._shotgun.find_one(
+            return self._stg_instance.find_one(
                 entity_type='HumanUser',
                 filters=[
                     ['name', 'is', kwargs['name']]
                 ]
             )
         elif 'user' in kwargs:
-            return self._shotgun.find_one(
+            return self._stg_instance.find_one(
                 entity_type='HumanUser',
                 filters=[
                     ['login', 'is', kwargs['user']]
                 ]
             )
         elif 'sg_nickname' in kwargs:
-            return self._shotgun.find_one(
+            return self._stg_instance.find_one(
                 entity_type='HumanUser',
                 filters=[
                     ['sg_nickname', 'is', kwargs['sg_nickname']]
@@ -508,28 +519,28 @@ class StgConnector(object):
 
     def get_stg_users(self, **kwargs):
         if 'id' in kwargs:
-            return self._shotgun.find(
+            return self._stg_instance.find(
                 entity_type='HumanUser',
                 filters=[
                     ['id', 'in', kwargs['id']]
                 ]
             )
         elif 'name' in kwargs:
-            return self._shotgun.find(
+            return self._stg_instance.find(
                 entity_type='HumanUser',
                 filters=[
                     ['name', 'in', kwargs['name']]
                 ]
             )
         elif 'user' in kwargs:
-            return self._shotgun.find(
+            return self._stg_instance.find(
                 entity_type='HumanUser',
                 filters=[
                     ['login', 'in', kwargs['user']]
                 ]
             )
         elif 'sg_nickname' in kwargs:
-            return self._shotgun.find(
+            return self._stg_instance.find(
                 entity_type='HumanUser',
                 filters=[
                     ['sg_nickname', 'in', kwargs['sg_nickname']]
@@ -538,6 +549,14 @@ class StgConnector(object):
         return []
 
     def get_stg_version(self, **kwargs):
+        if 'id' in kwargs:
+            return self._stg_instance.find_one(
+                entity_type='Version',
+                filters=[
+                    ['id', 'is', int(kwargs['id'])],
+                ]
+            )
+        #
         if 'asset' in kwargs:
             branch = 'asset'
         elif 'shot' in kwargs:
@@ -557,7 +576,7 @@ class StgConnector(object):
             version=version
         ).get_value()
         #
-        _ = self._shotgun.find_one(
+        _ = self._stg_instance.find_one(
             entity_type='Version',
             filters=[
                 ['project', 'is', self.get_stg_project(**kwargs)],
@@ -567,7 +586,7 @@ class StgConnector(object):
         return _
 
     def get_stg_versions(self, **kwargs):
-        _ = self._shotgun.find(
+        _ = self._stg_instance.find(
             entity_type='Version',
             filters=[
                 # {'type': 'Task', 'id': 20007}
@@ -581,7 +600,7 @@ class StgConnector(object):
         if stg_obj:
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
 
-    def set_stg_version_create(self, **kwargs):
+    def execute_stg_version_create(self, **kwargs):
         exists_stg_version = self.get_stg_version(**kwargs)
         if exists_stg_version:
             return exists_stg_version
@@ -605,7 +624,7 @@ class StgConnector(object):
             version=version
         ).get_value()
         #
-        _ = self._shotgun.create(
+        _ = self._stg_instance.create(
             'Version',
             dict(
                 project=self.get_stg_project(**kwargs),
@@ -625,7 +644,7 @@ class StgConnector(object):
 
     def get_stg_published_file_type(self, **kwargs):
         file_type = kwargs['file_type']
-        _ = self._shotgun.find_one(
+        _ = self._stg_instance.find_one(
             "PublishedFileType",
             [
                 ['code', 'is', file_type]
@@ -662,7 +681,7 @@ class StgConnector(object):
         #
         if file_opt.get_is_file() is True:
             if stg_version:
-                _ = self._shotgun.create(
+                _ = self._stg_instance.create(
                     'PublishedFile',
                     {
                         "path": {
@@ -692,7 +711,7 @@ class StgConnector(object):
         pass
 
     def get_stg_tag(self, tag_name):
-        _ = self._shotgun.find_one(
+        _ = self._stg_instance.find_one(
             entity_type='Tag',
             filters=[
                 ['name', 'is', tag_name]
@@ -708,7 +727,7 @@ class StgConnector(object):
 
     def set_stg_tag_create(self, tag_name):
         _ = [
-            self._shotgun.create(
+            self._stg_instance.create(
                 'Tag',
                 dict(name=tag_name)
             )
@@ -720,7 +739,7 @@ class StgConnector(object):
         return _
 
     def get_stg_playlist(self, **kwargs):
-        _ = self._shotgun.find_one(
+        _ = self._stg_instance.find_one(
             entity_type='Playlist',
             filters=[
                 ['code', 'is', kwargs['playlist']],
@@ -737,7 +756,7 @@ class StgConnector(object):
 
     def set_stg_playlist_create(self, **kwargs):
         name = kwargs['playlist']
-        _ = self._shotgun.create(
+        _ = self._stg_instance.create(
             'Playlist',
             dict(
                 code=name,
@@ -753,13 +772,13 @@ class StgConnector(object):
     def set_stg_version_movie_update(self, stg_version, movie_file_path):
         task_id = stg_version.get('sg_task').get('id')
         #
-        self._shotgun.upload(
+        self._stg_instance.upload(
             'Version', stg_version.get('id'),
             movie_file_path,
             field_name='sg_uploaded_movie'
         )
         # link to Last Version
-        self._shotgun.update(
+        self._stg_instance.update(
             'Task', task_id,
             {'sg_last_version': stg_version}
         )
@@ -770,7 +789,7 @@ class StgConnector(object):
     # look-pass
     def get_stg_look_pass(self, **kwargs):
         look_pass_code = kwargs['look_pass_code']
-        return self._shotgun.find_one(
+        return self._stg_instance.find_one(
             entity_type='CustomEntity06',
             filters=[
                 ['project', 'is', self.get_stg_project(**kwargs)],
@@ -789,7 +808,7 @@ class StgConnector(object):
         if stg_project and stg_entity:
             look_pass_code = kwargs['look_pass_code']
             _ = [
-                self._shotgun.create(
+                self._stg_instance.create(
                     'CustomEntity06',
                     dict(
                         project=stg_project,
@@ -805,7 +824,7 @@ class StgConnector(object):
             return _
 
     def get_stg_look_passes(self, **kwargs):
-        return self._shotgun.find(
+        return self._stg_instance.find(
             entity_type='CustomEntity06',
             filters=[
                 ['project', 'is', self.get_stg_project(**kwargs)]
@@ -829,7 +848,7 @@ class StgConnector(object):
         step = kwargs['step']
         step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         if step in mapper:
-            stg_entity = self._shotgun.find_one(
+            stg_entity = self._stg_instance.find_one(
                 entity_type='CustomNonProjectEntity01',
                 filters=[
                     ['sg_department', 'is', mapper[step]],
@@ -856,7 +875,7 @@ class StgConnector(object):
 
     def find_task_id(self, project, resource, task):
         if resource == project:
-            stg_task = self._shotgun.find_one(
+            stg_task = self._stg_instance.find_one(
                 entity_type='Task',
                 filters=[
                     ['entity', 'is', self.get_stg_project(project=project)],
@@ -874,7 +893,7 @@ class StgConnector(object):
             if i_stg_resource is None:
                 continue
             #
-            i_stg_task = self._shotgun.find_one(
+            i_stg_task = self._stg_instance.find_one(
                 entity_type='Task',
                 filters=[
                     ['entity', 'is', i_stg_resource],
@@ -894,7 +913,7 @@ class StgConnector(object):
             if i_stg_resource is None:
                 continue
             #
-            i_stg_task = self._shotgun.find_one(
+            i_stg_task = self._stg_instance.find_one(
                 entity_type='Task',
                 filters=[
                     ['entity', 'is', i_stg_resource],
@@ -906,7 +925,7 @@ class StgConnector(object):
 
     def get_data_from_task_id(self, task_id):
         task_id = int(task_id)
-        stg_task = self._shotgun.find_one(
+        stg_task = self._stg_instance.find_one(
             entity_type='Task',
             filters=[
                 ['id', 'is', task_id]
@@ -915,7 +934,7 @@ class StgConnector(object):
                 'project', 'entity', 'step', 'content'
             ]
         )
-        stg_project = self._shotgun.find_one(
+        stg_project = self._stg_instance.find_one(
             entity_type=stg_task['project']['type'],
             filters=[
                 ['id', 'is', stg_task['project']['id']]
@@ -924,7 +943,7 @@ class StgConnector(object):
                 'name'
             ]
         )
-        stg_step = self._shotgun.find_one(
+        stg_step = self._stg_instance.find_one(
             entity_type=stg_task['step']['type'],
             filters=[
                 ['id', 'is', stg_task['step']['id']]
@@ -946,7 +965,7 @@ class StgConnector(object):
             data[branch] = project
             return data
         if branch in {'asset', 'shot'}:
-            stg_resource = self._shotgun.find_one(
+            stg_resource = self._stg_instance.find_one(
                 entity_type=stg_task['entity']['type'],
                 filters=[
                     ['id', 'is', stg_task['entity']['id']]

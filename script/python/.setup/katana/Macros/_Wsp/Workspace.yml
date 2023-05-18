@@ -352,6 +352,8 @@ node:
                 GI_specular_depth=3
                 GI_transmission_depth=8
                 GI_volume_depth=0
+                
+                parallel_node_init=0
         #
         connections:
             - '<..aovs.output>'

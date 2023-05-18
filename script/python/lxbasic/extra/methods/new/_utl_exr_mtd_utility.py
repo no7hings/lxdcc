@@ -95,3 +95,24 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                             args_execute=['-- {}'.format(j_e_s_extend)]
                         )
         return dict_
+    @classmethod
+    def send_mails(cls, *args, **kwargs):
+        # noinspection PyUnresolvedReferences
+        from cosmos.util.message import imail
+        #
+        imail.http_mail(
+            kwargs['addresses'],
+            kwargs['subject'],
+            kwargs.get('content') or '',
+        )
+    @classmethod
+    def send_messages(cls, *args, **kwargs):
+        # noinspection PyUnresolvedReferences
+        from cosmos.util.message import ichat
+        #
+        ichat.send_message(
+            sender_name=kwargs['from_user'],
+            receivers=kwargs['to_users'],
+            title=kwargs['subject'],
+            message=kwargs.get('content') or '',
+        )

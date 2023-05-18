@@ -20,7 +20,7 @@ t = stg_connector.find_task(
     project='nsa_dev', resource='td_test', task='surface'
 )
 
-print stg_connector._shotgun.find(
+print stg_connector._stg_instance.find(
     entity_type='Step',
     filters=[
         ['short_name', 'is', 'SRF'],

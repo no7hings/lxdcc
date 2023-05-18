@@ -97,6 +97,9 @@ main:
                 GI_specular_depth=3
                 GI_transmission_depth=8
                 GI_volume_depth=0
+                
+                parallel_node_init=0
+
             tool_tip: '...'
 
         parameters/custom/render_resolution/percent:
@@ -145,6 +148,9 @@ main:
                 GI_specular_depth=3
                 GI_transmission_depth=5
                 GI_volume_depth=0
+                
+                parallel_node_init=0
+
             tool_tip: '...'
 
         parameters/low/render_resolution/percent:
@@ -193,6 +199,8 @@ main:
                 GI_specular_depth=3
                 GI_transmission_depth=5
                 GI_volume_depth=0
+                
+                parallel_node_init=0
 
             tool_tip: '...'
 
@@ -242,6 +250,9 @@ main:
                 GI_specular_depth=3
                 GI_transmission_depth=8
                 GI_volume_depth=0
+                
+                parallel_node_init=0
+
             tool_tip: '...'
 
         parameters/high/render_resolution/percent:

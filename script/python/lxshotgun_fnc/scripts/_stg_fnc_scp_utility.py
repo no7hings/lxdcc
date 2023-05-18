@@ -354,7 +354,7 @@ def set_asset_shotgun_task_create(rsv_version):
                 **kwargs
             )
             if stg_task is None:
-                stg_connector.set_stg_task_create(
+                stg_connector.execute_stg_task_create(
                     **kwargs
                 )
         else:
@@ -382,7 +382,7 @@ def set_asset_shot_version_create(rsv_version):
         **kwargs
     )
     if stg_task is not None:
-        stg_connector.set_stg_version_create(
+        stg_connector.execute_stg_version_create(
             **kwargs
         )
     else:

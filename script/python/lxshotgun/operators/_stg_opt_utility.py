@@ -96,8 +96,12 @@ class StgImageOpt(object):
 
 
 class AbsStgObjOpt(object):
-    def __init__(self, stg_obj_query):
-        self._stg_obj_query = stg_obj_query
+    def __init__(self, *args):
+        self._stg_obj_query = args[0]
+
+    def get_stg_connector(self):
+        return self._stg_obj_query._stg_connector
+
     @property
     def shotgun(self):
         return self._stg_obj_query.shotgun
@@ -120,14 +124,19 @@ class StgProjectOpt(AbsStgObjOpt):
         self.shotgun.create_stg_resource(**kwargs)
 
 
+class StgResourceOpt(AbsStgObjOpt):
+    def __init__(self, *args, **kwargs):
+        super(StgResourceOpt, self).__init__(*args, **kwargs)
+
+    def get_cc_stg_users(self):
+        return self._stg_obj_query.get('addressings_cc') or []
+
+
 class StgTaskOpt(AbsStgObjOpt):
     def __init__(self, stg_obj_query):
         super(StgTaskOpt, self).__init__(stg_obj_query)
 
-    def get_stg_assignees(self):
-        return self._stg_obj_query.get('task_assignees') or []
-
-    def set_stg_assignees_append(self, stg_user):
+    def append_assign_stg_user(self, stg_user):
         self._stg_obj_query.set_stg_obj_append(
             'task_assignees', stg_user
         )
@@ -135,11 +144,18 @@ class StgTaskOpt(AbsStgObjOpt):
     def get_stg_status(self):
         return self._stg_obj_query.get('sg_status_list')
 
-    def get_stg_last_version(self):
+    def get_last_stg_version(self):
         return self._stg_obj_query.get('sg_last_version')
 
-    def set_stg_last_version(self, stg_version):
+    def set_last_stg_version(self, stg_version):
         self._stg_obj_query.set_update('sg_last_version', stg_version)
+
+    def get_assign_stg_users(self):
+        return self._stg_obj_query.get('task_assignees') or []
+
+    def get_cc_stg_users(self):
+        # print [self._stg_obj_query._stg_connector.to_query(i).get('name').decode('utf-8') for i in stg_users_assign+stg_users_cc]
+        return self._stg_obj_query.get('addressings_cc') or []
 
 
 class StgVersionOpt(AbsStgObjOpt):
@@ -149,7 +165,7 @@ class StgVersionOpt(AbsStgObjOpt):
     def get_stg_tags(self):
         return self._stg_obj_query.get('tags') or []
 
-    def set_stg_tags_append(self, stg_tag):
+    def append_stg_tags_(self, stg_tag):
         self._stg_obj_query.set_stg_obj_append(
             'tags', stg_tag
         )
@@ -226,10 +242,10 @@ class StgVersionOpt(AbsStgObjOpt):
     def get_stg_todo(self):
         return self._stg_obj_query.get('sg_todo')
 
-    def get_movie(self):
+    def get_stg_movie(self):
         return self._stg_obj_query.get('sg_uploaded_movie')
 
-    def set_movie_upload(self, file_path):
+    def upload_stg_movie(self, file_path):
         if os.path.isfile(file_path):
             self._stg_obj_query.set_upload('sg_uploaded_movie', file_path)
             # todo: use environ map
@@ -263,33 +279,46 @@ class StgVersionOpt(AbsStgObjOpt):
             key, _
         )
 
-    def set_link_model_version(self, stg_version):
+    def set_link_model_stg_version(self, stg_version):
         self._stg_obj_query.set(
             'sg_model_version', stg_version
         )
 
-    def set_stg_notice_users_extend(self, stg_users):
+    def extend_custom_notice_stg_users(self, stg_users):
         self._stg_obj_query.set_stg_obj_extend(
             'sg_custom_notice', stg_users
         )
 
-    def set_stg_playlists_extend(self, stg_playlists):
+    def extend_stg_playlists(self, stg_playlists):
         self._stg_obj_query.set_stg_obj_extend(
             'playlists', stg_playlists
         )
 
-    def set_stg_last_version_update(self):
+    def update_stg_last_version(self):
         stg_version = self._stg_obj_query._stg_obj
         task_id = stg_version.get('sg_task').get('id')
         stg_connector = self._stg_obj_query._stg_connector
         # link to Last Version
-        stg_connector._shotgun.update(
+        stg_connector._stg_instance.update(
             'Task', task_id,
             {'sg_last_version': stg_version}
         )
 
-    def get_all_carbon_copy_user(self):
-        pass
+    def get_stg_resource(self):
+        return self._stg_obj_query.get('entity')
+
+    def get_stg_resource_query(self):
+        return self.get_stg_connector().to_query(
+            self.get_stg_resource()
+        )
+
+    def get_stg_task(self):
+        return self._stg_obj_query.get('sg_task')
+
+    def get_stg_task_query(self):
+        return self.get_stg_connector().to_query(
+            self.get_stg_task()
+        )
 
 
 class StgLookPassOpt(AbsStgObjOpt):

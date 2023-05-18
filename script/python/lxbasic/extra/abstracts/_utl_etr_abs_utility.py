@@ -29,6 +29,12 @@ class AbsEtrBase(object):
     @classmethod
     def get_app_execute_mapper(cls, *args, **kwargs):
         raise NotImplementedError()
+    @classmethod
+    def send_mails(cls, *args, **kwargs):
+        raise NotImplementedError()
+    @classmethod
+    def send_messages(cls, *args, **kwargs):
+        raise NotImplementedError()
 
 
 class AbsEtrIde(object):

@@ -138,8 +138,9 @@ class StgRpcMtd(object):
         if os.path.exists(path) is True:
             clt = cls.get_client()
             clt.chmod(path, mode)
-            p = os.path.dirname(path)
+            #
             if SystemMtd.get_is_linux():
+                p = os.path.dirname(path)
                 os.system('ls {}'.format(p))
             #
             _bsc_cor_log.LogMtd.trace_method_result(

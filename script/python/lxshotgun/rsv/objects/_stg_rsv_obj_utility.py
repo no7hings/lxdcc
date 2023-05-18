@@ -4,6 +4,7 @@ from urllib import quote, unquote
 import datetime
 
 import parse
+import six
 
 from lxbasic import bsc_core
 
@@ -85,7 +86,19 @@ class RsvStgTaskOpt(object):
         self._rsv_task = rsv_task
         self._stg_connector = stg_objects.StgConnector()
 
-    def set_stg_task_create(self):
+    def get_version_name(self, version):
+        p = self._rsv_task.properties
+        return '{project}.{resource}.{step}.{task}.{version}'.format(
+            **dict(
+                project=p.get('project'),
+                resource=p.get(p.get('branch')),
+                step=p.get('step'),
+                task=p.get('task'),
+                version=version,
+            )
+        )
+
+    def execute_stg_task_create(self):
         from lxutil import utl_core
         #
         kwargs = self._rsv_task.properties.value
@@ -108,7 +121,7 @@ class RsvStgTaskOpt(object):
                     **kwargs
                 )
                 if stg_task is None:
-                    self._stg_connector.set_stg_task_create(
+                    self._stg_connector.execute_stg_task_create(
                         **kwargs
                     )
             else:
@@ -122,7 +135,7 @@ class RsvStgTaskOpt(object):
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
 
-    def set_stg_version_create(
+    def execute_stg_version_create(
         self,
         version,
         version_type=None,
@@ -134,6 +147,8 @@ class RsvStgTaskOpt(object):
         notice=None,
         create_shotgun_playlists=False
     ):
+        import lxbasic.extra.methods as bsc_etr_methods
+
         branch = self._rsv_task.get('branch')
         stg_version_kwargs = self._rsv_task.properties.copy_value
         stg_version_kwargs['version'] = version
@@ -147,14 +162,14 @@ class RsvStgTaskOpt(object):
             **stg_version_kwargs
         )
         if stg_version_query is None:
-            self._stg_connector.set_stg_version_create(
+            self._stg_connector.execute_stg_version_create(
                 **stg_version_kwargs
             )
             stg_version_query = self._stg_connector.get_stg_version_query(
                 **stg_version_kwargs
             )
         # task set last version
-        stg_task_opt.set_stg_last_version(stg_version_query.stg_obj)
+        stg_task_opt.set_last_stg_version(stg_version_query.stg_obj)
         # version
         stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
         #
@@ -184,21 +199,21 @@ class RsvStgTaskOpt(object):
         if movie_file:
             movie_file_opt = bsc_core.StgFileOpt(movie_file)
             if movie_file_opt.get_is_exists() is True:
-                stg_version_opt.set_movie_upload(movie_file)
+                stg_version_opt.upload_stg_movie(movie_file)
             else:
                 utl_core.Log.set_module_warning_trace(
-                    'upload movie',
-                    u'file="{}" is non-exists'.format(movie_file)
+                    'shotgun movie upload',
+                    'file="{}" is non-exists'.format(movie_file)
                 )
         else:
-            if not stg_version_opt.get_movie():
+            if not stg_version_opt.get_stg_movie():
                 f = '/l/resource/td/media_place_holder/no_prevew.mov'
                 f_opt = bsc_core.StgFileOpt(
                     f
                 )
                 f_opt.map_to_current()
                 if f_opt.get_is_exists() is True:
-                    stg_version_opt.set_movie_upload(f)
+                    stg_version_opt.upload_stg_movie(f)
         #
         if todo:
             stg_version_opt.set_stg_todo(todo)
@@ -216,12 +231,60 @@ class RsvStgTaskOpt(object):
                 name=notice
             )
             if stg_users:
-                stg_version_opt.set_stg_notice_users_extend(
+                stg_version_opt.extend_custom_notice_stg_users(
                     stg_users
                 )
+                #
+                mail_addresses = [
+                    self._stg_connector.to_query(i).get('email') for i in stg_users
+                ]
+                message_users = [
+                    self._stg_connector.to_query(i).get('login') for i in stg_users
+                ]
+                if isinstance(description, six.text_type):
+                    description = description.encode('utf-8')
+                #
+                subject = (
+                    'Shotgun version create for [{}], more information see content.'
+                ).format(
+                    self.get_version_name(version)
+                )
+                content = (
+                    'name: {name}\n'
+                    'id: {id}\n'
+                    'user: {user}\n'
+                    'type: {version_type}\n'
+                    'folder: {folder}\n'
+                    'description: {description}\n'
+                ).format(
+                    **dict(
+                        name=self.get_version_name(version),
+                        id=stg_version_query.get('id'),
+                        user=user,
+                        version_type=version_type,
+                        folder=version_directory_path,
+                        description=description or 'N/a',
+                    )
+                )
+                #
+                bsc_etr_methods.EtrBase.send_mails(
+                    addresses=mail_addresses,
+                    # addresses=['dongchangbao@papegames.net'],
+                    subject=subject,
+                    content=content
+                )
+                #
+                bsc_etr_methods.EtrBase.send_messages(
+                    from_user=user,
+                    to_users=message_users,
+                    # to_users=['dongchangbao'],
+                    subject=subject,
+                    content='{}\n{}'.format(subject, content)
+                )
+
         # batch tag
         stg_tag = self._stg_connector.get_stg_tag_force('td-batch')
-        stg_version_opt.set_stg_tags_append(
+        stg_version_opt.append_stg_tags_(
             stg_tag
         )
         #
@@ -233,7 +296,7 @@ class RsvStgTaskOpt(object):
             stg_playlist = self._stg_connector.get_stg_playlist_force(
                 playlist=playlist, **stg_version_kwargs
             )
-            stg_version_opt.set_stg_playlists_extend(
+            stg_version_opt.extend_stg_playlists(
                 [stg_playlist]
             )
 

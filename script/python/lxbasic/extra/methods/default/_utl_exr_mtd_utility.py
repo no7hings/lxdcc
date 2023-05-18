@@ -50,3 +50,9 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_app_execute_mapper(cls, *args, **kwargs):
         return {}
+    @classmethod
+    def send_mails(cls, *args, **kwargs):
+        pass
+    @classmethod
+    def send_messages(cls, *args, **kwargs):
+        pass

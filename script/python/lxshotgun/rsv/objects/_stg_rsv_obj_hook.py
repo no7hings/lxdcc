@@ -12,11 +12,11 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvShotgunHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_task_create(self):
+    def set_stg_task_create(self):
         rsv_task = self._rsv_task
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).set_stg_task_create()
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).execute_stg_task_create()
 
-    def set_qc_task_create(self):
+    def set_qc_stg_task_create(self):
         import copy
 
         import lxresolver.methods as rsv_methods
@@ -38,9 +38,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         #
         rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).set_stg_task_create()
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).execute_stg_task_create()
 
-    def set_version_create(self):
+    def execute_stg_version_create(self):
         rsv_task = self._rsv_task
         version = self._rsv_scene_properties.get('version')
         #
@@ -62,7 +62,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version_type = extra_data.get('version_type')
                 version_status = extra_data.get('version_status')
         #
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).set_stg_version_create(
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).execute_stg_version_create(
             version=version,
             user=user,
             movie_file=movie_file,
@@ -75,7 +75,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             create_shotgun_playlists=create_shotgun_playlists
         )
 
-    def set_qc_version_create(self):
+    def execute_qc_stg_version_create(self):
         import copy
         #
         kwargs = self._rsv_scene_properties.value
@@ -99,9 +99,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         description = self._hook_option_opt.get('description')
         review_mov_file_path_qc = None
         if with_qc_review_mov is True:
-            review_mov_file_path_qc = self.set_qc_review_mov_export(version_qc)
+            review_mov_file_path_qc = self.execute_qc_review_mov_export(version_qc)
         #
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).set_stg_version_create(
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).execute_stg_version_create(
             version=version_qc,
             version_type=version_type,
             movie_file=review_mov_file_path_qc,
@@ -113,7 +113,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = self._rsv_scene_properties.get('version')
         movie_file = self.get_exists_asset_review_mov_file()
         description = self._hook_option_opt.get('description')
-        _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).set_stg_version_create(
+        _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).execute_stg_version_create(
             version=version,
             movie_file=movie_file,
             description=description
@@ -317,7 +317,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if model_geometry_usd_hi_file_path:
                 file_properties = model_geometry_usd_hi_file_rsv_unit.get_properties_by_result(model_geometry_usd_hi_file_path)
                 stg_model_version = stg_connector.get_stg_version(**file_properties.value)
-                stg_version_opt.set_link_model_version(
+                stg_version_opt.set_link_model_stg_version(
                     stg_model_version
                 )
     @classmethod
@@ -329,7 +329,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         stg_connector = stg_objects.StgConnector()
         print stg_connector.get_stg_resource()
 
-    def set_review_mov_export(self):
+    def execute_review_mov_export(self):
         rsv_scene_properties = self._rsv_scene_properties
         #
         workspace = rsv_scene_properties.get('workspace')
@@ -356,7 +356,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     review_mov_file_path
                 )
 
-    def set_validation_info_export(self):
+    def execute_validation_info_export(self):
         rsv_scene_properties = self._rsv_scene_properties
         #
         workspace = rsv_scene_properties.get('workspace')
@@ -383,7 +383,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     validation_info_file_path
                 )
 
-    def set_qc_review_mov_export(self, version_qc):
+    def execute_qc_review_mov_export(self, version_qc):
         from lxbasic import bsc_core
 
         from lxutil import utl_core
@@ -439,4 +439,3 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 u'qc review mov export',
                 u'file="{}" is non-exists'.format(review_katana_mov_file_path)
             )
-

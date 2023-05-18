@@ -5,12 +5,12 @@ import lxshotgun.objects as stg_objects
 
 c = stg_objects.StgConnector()
 
-q = c.get_stg_user_query(
-    user='dongchangbao'
-)
+us = c.get_stg_users(name=['笔帽'])
 
-i = q.get('groups')
-
-print i
+print us
 
 # print urllib.urlopen(i).read()
+
+for i in us:
+    print c.to_query(i).get('email')
+    print c.to_query(i).get('login')

@@ -53,7 +53,7 @@ class StgTaskMtd(object):
                         i_task_kwargs['step'] = i_step
                         i_task_kwargs['task'] = i_task
                         #
-                        stg_connector.set_stg_task_create(
+                        stg_connector.execute_stg_task_create(
                             **i_task_kwargs
                         )
                         #
@@ -93,7 +93,7 @@ class StgTaskMtd(object):
                 i_task_kwargs['step'] = i_step
                 i_task_kwargs['task'] = i_task
                 #
-                stg_connector.set_stg_task_create(
+                stg_connector.execute_stg_task_create(
                     **i_task_kwargs
                 )
                 #

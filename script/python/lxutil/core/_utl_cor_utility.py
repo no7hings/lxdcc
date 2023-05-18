@@ -462,13 +462,13 @@ class ExceptionCatcher(object):
                 w = cls._get_window_()
                 #
                 w.set_status(cls.ValidatorStatus.Error)
-                w.set_content_add('traceback:')
+                w.add_content('traceback:')
                 bsc_core.LogMtd.error('traceback:')
                 #
-                [w.set_content_add(i) for i in exc_texts]
+                [w.add_content(i) for i in exc_texts]
                 [bsc_core.LogMtd.error(i) for i in exc_texts]
                 #
-                w.set_content_add(value)
+                w.add_content(value)
                 bsc_core.LogMtd.error(value)
                 return w
         else:

@@ -28,7 +28,7 @@ class AbsDotMtlxDef(object):
     def universe(self):
         raise NotImplementedError()
 
-    def set_restore(self):
+    def restore_all(self):
         raise NotImplementedError()
 
     def _set_dot_mtlx_def_init_(self):
@@ -46,7 +46,7 @@ class AbsDotMtlxDef(object):
             obj = obj_type.set_obj_create(obj_path)
 
     def _set_load_by_dot_mtlx_(self, file_obj, root=None, path_lstrip=None):
-        self.set_restore()
+        self.restore_all()
         file_path = file_obj.path
         universe_created = False
         if not ai.AiUniverseIsActive():
@@ -106,18 +106,18 @@ class AbsObjScene(
         return self._and_universe
 
     def set_load_from_file(self, file_path, path_lstrip=None, path_mapper=None):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         if file_obj.get_is_exists() is True:
             file_ext = file_obj.ext
             if file_ext in ['.ass']:
                 self.load_from_dot_ass_fnc(file_obj, path_lstrip)
 
     def load_from_dot_ass(self, file_path, path_lstrip=None, path_mapper=None, time_tag=None):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         self.load_from_dot_ass_fnc(file_obj, path_lstrip=path_lstrip, path_mapper=path_mapper, time_tag=time_tag)
 
     def set_load_from_dot_mtlx(self, file_path, root=None, path_lstrip=None):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         self._set_load_by_dot_mtlx_(file_obj, root=root, path_lstrip=path_lstrip)
     # node
     def _set_dcc_obj_build_(self, and_obj_mtd):
@@ -567,7 +567,7 @@ class AbsObjScene(
         pass
     # main method
     def load_from_dot_ass_fnc(self, file_obj, path_lstrip=None, path_mapper=None, time_tag=None):
-        self.set_restore()
+        self.restore_all()
         #
         if path_mapper is not None:
             self._path_mapper_opt = bsc_core.DccPathMapOpt(path_mapper)
@@ -617,8 +617,8 @@ class AbsObjScene(
             index += 1
             self._index_dict[and_obj_name] = index
 
-    def set_restore(self):
-        self._universe = self.UNIVERSE_CLASS()
+    def restore_all(self):
+        self._universe = self.UNIVERSE_CLS()
         self._path_lstrip = None
         self._path_mapper_opt = None
         self._and_universe = None

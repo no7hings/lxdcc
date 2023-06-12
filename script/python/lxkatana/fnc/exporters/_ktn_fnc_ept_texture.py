@@ -4,29 +4,30 @@ from lxutil.fnc import utl_fnc_obj_abs
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
-class TextureExporter(
-    utl_fnc_obj_abs.AbsFncTextureExportDef,
+class FncRenderTextureExporter(
+    utl_fnc_obj_abs.AbsFncRenderTextureExportDef,
     utl_fnc_obj_abs.AbsFncOptionBase,
 ):
     FIX_NAME_BLANK = 'fix_name_blank'
-    USE_TX = 'repath_to_tx_force'
+    USE_TX = 'repath_to_target_force'
     WITH_REFERENCE = 'width_reference'
     OPTION = dict(
         directory_base='',
         directory='',
         location='',
         fix_name_blank=False,
-        repath_to_tx_force=False,
         width_reference=False,
         use_environ_map=False,
+        #
+        copy_source=False,
     )
     def __init__(self, option=None):
-        super(TextureExporter, self).__init__(option)
+        super(FncRenderTextureExporter, self).__init__(option)
         self._directory_path_dst = self.get('directory')
         self._directory_path_base = self.get('directory_base')
         self._location = self.get('location')
 
-    def set_run(self):
+    def execute(self):
         from lxkatana import ktn_core
 
         import lxkatana.scripts as ktn_scripts
@@ -45,11 +46,10 @@ class TextureExporter(
         dcc_objs = texture_references.get_objs(
             include_paths=[i.path for i in dcc_shaders]
         )
-        self.copy_as_base_link_fnc(
+        self.copy_and_repath_as_base_link_fnc(
             directory_path_bsc=self._directory_path_base, directory_path_dst=self._directory_path_dst,
             dcc_objs=dcc_objs,
             fix_name_blank=self.get('fix_name_blank'),
-            repath_to_tx_force=self.get('repath_to_tx_force'),
             with_reference=self.get('width_reference'),
             #
             ignore_missing_texture=True,
@@ -57,4 +57,6 @@ class TextureExporter(
             use_environ_map=self.get('use_environ_map'),
             #
             repath_fnc=texture_references.repath_fnc,
+            #
+            copy_source=self.get('copy_source'),
         )

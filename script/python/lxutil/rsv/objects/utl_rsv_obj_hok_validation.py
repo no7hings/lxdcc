@@ -220,6 +220,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     description='"location" "{}" is non-exists'.format(dcc_location)
                 )
                 return False
+            return False
         return dcc_location
 
     def execute_shotgun_check(self, validation_checker):

@@ -224,7 +224,7 @@ class Description(XGenObj):
 
 
 class Palette(XGenObj):
-    DESCRIPTION_CLASS = Description
+    DESCRIPTION_CLS = Description
     def __init__(self, name):
         super(Palette, self).__init__(name)
     # property
@@ -250,7 +250,7 @@ class Palette(XGenObj):
         self.get_port('xgProjectPath').set(dir_path)
     # compose
     def get_description(self, name):
-        return self.DESCRIPTION_CLASS(
+        return self.DESCRIPTION_CLS(
             name=name, platte=self
         )
 
@@ -379,7 +379,7 @@ class Module(Object):
 
 
 class Port(object):
-    OS_FILE_CLASS = utl_dcc_objects.OsFile
+    OS_FILE_CLS = utl_dcc_objects.OsFile
     # noinspection PyUnusedLocal,PyShadowingBuiltins
     def __init__(self, name, platte=None, description=None, object=None):
         self._name, self._platte, self._description, self._object = name, platte, description, object
@@ -486,7 +486,7 @@ class Port(object):
         return lis
 
     def get_file_plf_objs(self):
-        return [self.OS_FILE_CLASS(i) for i in self.get_os_file_paths()]
+        return [self.OS_FILE_CLS(i) for i in self.get_os_file_paths()]
 
     def __str__(self):
         return '{}(name="{}", node="{}")'.format(

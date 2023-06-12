@@ -135,6 +135,8 @@ asset-user-nuke-scene-src-dir: <asset-user-nuke-dir>/scenes
 asset-user-nuke-scene-src-file: <asset-user-nuke-scene-src-dir>/<task_extra-name>/<asset-version-name>.nk
 # extra area
 asset-source-extend-dir: <asset-source-task-dir>/extend
+#
+asset-scene-src-dir: <asset-release-version-dir>/source
 # shot =============================================================================================================== #
 shot-area-dir: <project-dir>/sequences
 # sequence
@@ -223,3 +225,5 @@ shot-source-nuke-scene-src-file: <shot-source-nuke-scene-src-dir>/<task_extra-na
 shot-user-nuke-dir: <shot-user-task-dir>/nuke
 shot-user-nuke-scene-src-dir: <shot-user-nuke-dir>/scenes
 shot-user-nuke-scene-src-file: <shot-user-nuke-scene-src-dir>/<task_extra-name>/<shot-version-name>.nk
+#
+shot-scene-src-dir: <shot-release-version-dir>/source

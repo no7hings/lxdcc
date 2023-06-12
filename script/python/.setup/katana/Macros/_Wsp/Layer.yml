@@ -201,47 +201,47 @@ main:
         # auxiliary
         option/auxiliary_location:
             widget: path
-            value: '/root/world/geo/master/shape'
+            value: '/root/world/geo/master/aux'
             tool_tip: '...'
 
         option/auxiliary/model:
             widget: path
-            value: '/root/world/geo/master/shape/mod_shapegrp'
+            value: '/root/world/geo/master/aux/mod'
             tool_tip: '...'
 
         option/auxiliary/groom:
             widget: path
-            value: '/root/world/geo/master/shape/grm_shapegrp'
+            value: '/root/world/geo/master/aux/grm'
             tool_tip: '...'
 
         option/auxiliary/character_effect:
             widget: path
-            value: '/root/world/geo/master/shape/cfx_shapegrp'
+            value: '/root/world/geo/master/aux/cfx'
             tool_tip: '...'
 
         option/auxiliary/effect:
             widget: path
-            value: '/root/world/geo/master/shape/efx_shapegrp'
+            value: '/root/world/geo/master/aux/efx'
             tool_tip: '...'
 
         option/auxiliary/rig:
             widget: path
-            value: '/root/world/geo/master/shape/rig_shapegrp'
+            value: '/root/world/geo/master/aux/rig'
             tool_tip: '...'
 
         option/auxiliary/surface:
             widget: path
-            value: '/root/world/geo/master/shape/srf_shapegrp'
+            value: '/root/world/geo/master/aux/srf'
             tool_tip: '...'
 
         option/auxiliary/light:
             widget: path
-            value: '/root/world/geo/master/shape/rig_shapegrp'
+            value: '/root/world/geo/master/aux/rig'
             tool_tip: '...'
 
         option/auxiliary/extend:
             widget: path
-            value: '/root/world/geo/master/shape/misc'
+            value: '/root/world/geo/master/aux/misc'
             tool_tip: '...'
         # record
         record/variant_properties_opt:
@@ -305,7 +305,7 @@ node:
         #
         e_0:
             |-
-            ' - (( {{}}))'.format(getParent().option.renderable.{k}) if (getParent().paramters.setting.renderable_all and getParent().paramters.setting.renderable.{k}) else ''
+            ' - (( {{}}))'.format(getParent().option.renderable.{k}) if (getParent().parameters.setting.renderable_all and getParent().parameters.setting.renderable.{k}) else ''
         #
         expressions:
             cel:
@@ -360,7 +360,7 @@ node:
         #
         e_0:
             |-
-            ' - (( {{}}))'.format(getParent().option.auxiliary.{k}) if (getParent().paramters.setting.auxiliary_all and getParent().paramters.setting.auxiliary.{k}) else ''
+            ' - (( {{}}))'.format(getParent().option.auxiliary.{k}) if (getParent().parameters.setting.auxiliary_all and getParent().parameters.setting.auxiliary.{k}) else ''
         #
         expressions:
             cel:

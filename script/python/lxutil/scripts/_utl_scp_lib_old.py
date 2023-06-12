@@ -249,7 +249,7 @@ class AbsScpLibFileDef(object):
     @classmethod
     def _set_j_rsv_task_directory_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
-            'asset-texture-tgt-dir',
+            'asset-texture-dir',
         ]:
             cls._set_k_rsv_unit_directory_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
     @classmethod

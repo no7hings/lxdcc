@@ -1574,6 +1574,7 @@ class UsdViewLauncher(object):
         self._kwargs['application'] = 'usdview'
 
     def set_file_open(self, file_path):
+        # rez-env arnold_usd-6.1.0.1 arnold-6.1.0.1 aces pyside2 pgusd usd-20.11
         args = [
             # 'pgtk',
             # 'shotgun',
@@ -1590,9 +1591,10 @@ class UsdViewLauncher(object):
 
 
 class History(object):
+    MAXIMUM = 20
     FILE_PATH = bsc_core.StgUserMtd.get_user_history_file()
     @classmethod
-    def set_append(cls, key, value):
+    def append(cls, key, value):
         f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
         if f_o.get_is_exists() is False:
             bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
@@ -1603,33 +1605,14 @@ class History(object):
             configure = bsc_objects.Configure(
                 value=f_o.path
             )
-            values = configure.get(key) or []
-            if value in values:
-                values.remove(value)
+            values_exists = configure.get(key) or []
+            # move end
+            if value in values_exists:
+                values_exists.remove(value)
+            values_exists.append(value)
             #
-            values.append(value)
-            configure.set(key, values)
-            configure.set_save_to(cls.FILE_PATH)
-            return True
-        return False
-    @classmethod
-    def set_prepend(cls, key, value):
-        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
-        if f_o.get_is_exists() is False:
-            bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
-                {}
-            )
-        #
-        if f_o.get_is_exists() is True:
-            configure = bsc_objects.Configure(
-                value=f_o.path
-            )
-            values = configure.get(key) or []
-            if value in values:
-                values.remove(value)
-            #
-            values.insert(0, value)
-            configure.set(key, values)
+            values_exists = values_exists[-cls.MAXIMUM:]
+            configure.set(key, values_exists)
             configure.set_save_to(cls.FILE_PATH)
             return True
         return False
@@ -1645,13 +1628,14 @@ class History(object):
             configure = bsc_objects.Configure(
                 value=f_o.path
             )
-            exists_values = configure.get(key) or []
+            values_exists = configure.get(key) or []
             for i_value in values:
-                if i_value not in exists_values:
+                if i_value not in values_exists:
                     #
-                    exists_values.append(i_value)
+                    values_exists.append(i_value)
             #
-            configure.set(key, exists_values)
+            values_exists = values_exists[-cls.MAXIMUM:]
+            configure.set(key, values_exists)
             configure.set_save_to(cls.FILE_PATH)
             return True
         return False
@@ -1853,6 +1837,16 @@ print(
             return jinja2.Template(
                 bsc_core.StgFileOpt(f).set_read()
             )
+
+
+def get_is_ui_mode():
+    if bsc_core.ApplicationMtd.get_is_maya():
+        from lxmaya import ma_core
+        return ma_core.get_is_ui_mode()
+    elif bsc_core.ApplicationMtd.get_is_katana():
+        from lxkatana import ktn_core
+        return ktn_core.get_is_ui_mode()
+    return False
 
 
 if __name__ == '__main__':

@@ -480,11 +480,10 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
             ma_core.CmdPortOpt._set_connection_create_(atr_path_src, atr_path_tgt)
 
     def create_node_fnc(self, scheme, obj_key, obj_path, create=False, definition=False, customize=False, assigns=False, clear_array_ports=False):
+        type_name = self._raw.get(
+            '{}.{}.properties.type'.format(scheme, obj_key)
+        ).split('/')[-1]
         if create is True:
-            type_name = self._raw.get(
-                '{}.{}.properties.type'.format(scheme, obj_key)
-            ).split('/')[-1]
-            #
             if ma_core.CmdObjOpt._get_is_exists_(obj_path) is True:
                 ma_core.CmdObjOpt(obj_path).set_file_new()
             #
@@ -502,7 +501,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                 if obj_path in self._name_dict:
                     new_name = self._name_dict[obj_path]
                     obj_path = new_name
-                self.set_node_definition_properties_fnc(obj_path, definition_attributes)
+                self.set_node_definition_properties_fnc(type_name, obj_path, definition_attributes)
             #
             if customize is True:
                 customize_attributes = self._raw.get(
@@ -511,7 +510,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                 if obj_path in self._name_dict:
                     new_name = self._name_dict[obj_path]
                     obj_path = new_name
-                self.set_node_customize_properties_fnc(obj_path, customize_attributes)
+                self.set_node_customize_properties_fnc(type_name, obj_path, customize_attributes)
 
             if assigns is True:
                 material_assigns = self._raw.get(
@@ -519,7 +518,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                 )
                 self.create_node_material_assigns_fnc(obj_path, material_assigns)
 
-    def set_node_customize_properties_fnc(self, obj_path, attributes):
+    def set_node_customize_properties_fnc(self, type_name, obj_path, attributes):
         for port_path, v in attributes.items():
             type_name = v['type'].split('/')[-1]
             value = v.get('value')
@@ -541,7 +540,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                     (atr_path_src, ma_core.CmdPortOpt._get_atr_path_(obj_path, port_path))
                 )
 
-    def set_node_definition_properties_fnc(self, obj_path, attributes):
+    def set_node_definition_properties_fnc(self, type_name, obj_path, attributes):
         for port_path, v in attributes.items():
             value = v.get('value')
             atr_path_src = v.get('connection')
@@ -551,6 +550,10 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                     if value is not None:
                         # noinspection PyBroadException
                         try:
+                            if type_name == 'file':
+                                if port_path == 'fileTextureName':
+                                    value = bsc_core.StgPathMapMtd.map_to_current(value)
+                            #
                             port.set(value)
                         except:
                             bsc_core.ExceptionMtd.set_print()

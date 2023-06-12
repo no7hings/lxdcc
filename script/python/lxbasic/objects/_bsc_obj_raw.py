@@ -40,7 +40,7 @@ class Property(object):
 
 class Properties(bsc_abstracts.AbsContent):
     PATHSEP = '.'
-    PROPERTY_CLASS = Property
+    PROPERTY_CLS = Property
     def __init__(self, obj, raw=None):
         self._obj = obj
         #
@@ -49,7 +49,7 @@ class Properties(bsc_abstracts.AbsContent):
         super(Properties, self).__init__(value=raw)
 
     def get_property(self, key):
-        return self.PROPERTY_CLASS(self, key)
+        return self.PROPERTY_CLS(self, key)
 
 
 class Dict(bsc_abstracts.AbsContent):

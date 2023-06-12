@@ -562,7 +562,7 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
 class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLASS = bsc_objects.Properties
+    PROPERTIES_CLS = bsc_objects.Properties
     def __init__(self, file_path):
         super(DotMtlxFileReader, self).__init__(file_path)
 
@@ -603,7 +603,7 @@ class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
         lis = []
         material_assign_raws = self._get_material_assign_matches_()
         for material_assign_raw in material_assign_raws:
-            geometry_properties = self.PROPERTIES_CLASS(self, {})
+            geometry_properties = self.PROPERTIES_CLS(self, {})
             line, properties = material_assign_raw
             geometry_properties.set('type', properties['geometry_type'])
             geometry_properties.set('path', properties['geometry'])
@@ -620,7 +620,7 @@ class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
 class DotOslFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLASS = bsc_objects.Properties
+    PROPERTIES_CLS = bsc_objects.Properties
     def __init__(self, file_path):
         super(DotOslFileReader, self).__init__(file_path)
 

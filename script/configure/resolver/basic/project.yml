@@ -334,30 +334,34 @@ asset-render-katana-output-sub-dir: <asset-render-dir>/katana/output/<look-pass>
 asset-render-katana-scene-file: <asset-render-dir>/katana/<asset-name>.katana
 asset-render-mov-sub-file: <asset-render-dir>/mov/<asset-task-version-look-pass-name>.mov
 asset-render-jpg-sub-file: <asset-render-dir>/jpg/<asset-task-version-look-pass-name>.jpg
-# <asset-maya-scene>
+#
+asset-image-dir: <asset-release-version-dir>/image
+# scene
+asset-scene-src-dir: <asset-release-version-dir>/scene
+#   maya
 asset-maya-scene-dir: <asset-release-version-dir>/maya
 asset-maya-scene-file: <asset-maya-scene-dir>/<asset-name>.ma
-asset-maya-scene-src-dir: <asset-release-version-dir>/scene
+asset-maya-scene-src-dir: <asset-scene-src-dir>
 asset-maya-scene-src-file: <asset-maya-scene-src-dir>/<asset-name>.ma
 # <asset-houdini-scene>
 asset-houdini-scene-dir: <asset-release-version-dir>/houdini
 asset-houdini-scene-file: <asset-houdini-scene-dir>/<asset-name>.hip
-asset-houdini-scene-src-dir: <asset-release-version-dir>/scene
+asset-houdini-scene-src-dir: <asset-scene-src-dir>
 asset-houdini-scene-src-file: <asset-houdini-scene-src-dir>/<asset-name>.hip
 # <asset-katana-scene>
 asset-katana-scene-dir: <asset-release-version-dir>/katana
 asset-katana-scene-file: <asset-katana-scene-dir>/<asset-name>.katana
-asset-katana-scene-src-dir: <asset-release-version-dir>/scene
+asset-katana-scene-src-dir: <asset-scene-src-dir>
 asset-katana-scene-src-file: <asset-katana-scene-src-dir>/<asset-name>.katana
 #
 asset-nuke-scene-dir: <asset-release-version-dir>/nuke
 asset-nuke-scene-file: <asset-nuke-scene-dir>/<asset-name>.nk
-asset-nuke-scene-src-dir: <asset-release-version-dir>/scene
+asset-nuke-scene-src-dir: <asset-scene-src-dir>
 asset-nuke-scene-src-file: <asset-nuke-scene-src-dir>/<asset-name>.nk
 #
 asset-clarisse-scene-dir: <asset-release-version-dir>/clarisse
 asset-clarisse-scene-file: <asset-clarisse-scene-dir>/<asset-name>.project
-asset-clarisse-scene-src-dir: <asset-release-version-dir>/scene
+asset-clarisse-scene-src-dir: <asset-scene-src-dir>
 asset-clarisse-scene-src-file: <asset-clarisse-scene-src-dir>/<asset-name>.project
 #
 asset-katana-render-output-dir: <asset-render-dir>/katana-images
@@ -369,8 +373,6 @@ asset-katana-render-video-all-mov-file: <asset-katana-render-output-dir>/main/al
 #
 asset-maya-xgen-dir: <asset-release-version-dir>/maya
 asset-maya-xgen-file: <asset-maya-xgen-dir>/<asset-name>__<xgen-name>.xgen
-# <scene>
-asset-scene-src-dir: <asset-release-version-dir>/scene
 
 asset-light-dir: <asset-release-version-dir>/light
 asset-light-live_group-file: <asset-light-dir>/<asset-name>.livegroup
@@ -380,7 +382,7 @@ asset-live_group-file: <asset-live_group-dir>/<asset-name>.livegroup
 #
 asset-light-ass-file: <asset-release-version-dir>/ass/<asset-name>.ass
 #
-asset-scene-xgen-dir: <asset-release-version-dir>/scene
+asset-scene-xgen-dir: <asset-scene-src-dir>
 asset-scene-xgen-file: <asset-scene-xgen-dir>/<asset-name>__<xgen-name>.xgen
 # cache
 asset-cache-dir: <asset-release-version-dir>/cache
@@ -501,8 +503,8 @@ asset-look-klf-extra-file: <asset-look-klf-dir>/<asset-name>.json
 asset-look-yml-dir: <asset-look-dir>/yml
 asset-look-yml-file: <asset-look-yml-dir>/<asset-name>.yml
 # <asset-look-hda>
-asset-texture-src-dir: <asset-release-task-dir>/texture
-asset-texture-tgt-dir: <asset-release-version-dir>/texture
+asset-texture-base-dir: <asset-release-task-dir>/texture
+asset-texture-dir: <asset-release-version-dir>/texture
 # <asset-usd>
 asset-usd-dir: <asset-release-version-dir>/cache/usd
 asset-component-usd-dir: <asset-usd-dir>
@@ -646,8 +648,8 @@ asset-temporary-component-usd-dir: <asset-temporary-usd-dir>
 asset-temporary-component-usd-file: <asset-temporary-component-usd-dir>/<asset-name>.usda
 asset-temporary-component-registry-usd-file: <asset-temporary-component-usd-dir>/registry.usda
 #
-asset-temporary-texture-src-dir: <asset-temporary-task-dir>/texture
-asset-temporary-texture-tgt-dir: <asset-temporary-version-dir>/texture
+asset-temporary-texture-base-dir: <asset-temporary-task-dir>/texture
+asset-temporary-texture-dir: <asset-temporary-version-dir>/texture
 #
 asset-temporary-look-dir: <asset-temporary-version-dir>/look
 asset-temporary-look-klf-file: <asset-temporary-look-dir>/klf/<asset-name>.klf
@@ -698,7 +700,7 @@ asset-usd-effect-file: <asset-usd-effect-dir>/<asset-name>.usda
 asset-usd-effect-manifest-dir: <asset-task-effect-version-dir>/manifest/usd
 asset-usd-effect-manifest-registry-file: <asset-usd-effect-manifest-dir>/registry.usda
 asset-usd-effect-manifest-file: <asset-usd-effect-manifest-dir>/<asset-name>.usda
-# <shot> ============================================================================================================= #
+# <sequence and shot> ================================================================================================ #
 shot-area-dir: <project-workspace-dir>/shots
 sequence-dir: <shot-area-dir>/<sequence-name>
 # sequence
@@ -808,28 +810,28 @@ shot-review-dir: <shot-release-version-dir>/review
 shot-review-file: <shot-review-dir>/<shot-version-name>.mov
 shot-review-mov-file: <shot-review-dir>/<shot-version-name>.mov
 #
+shot-image-dir: <shot-release-version-dir>/image
+# scene
+shot-scene-src-dir: <shot-release-version-dir>/scene
+#   maya
 shot-maya-scene-dir: <shot-release-version-dir>/maya
 shot-maya-scene-file: <shot-maya-scene-dir>/<shot-name>.ma
+shot-maya-scene-src-dir: <shot-scene-src-dir>
+shot-maya-scene-src-file: <shot-maya-scene-src-dir>/<shot-name>.ma
 #
 shot-houdini-scene-dir: <shot-release-version-dir>/houdini
 shot-houdini-scene-file: <shot-houdini-scene-dir>/<shot-name>.hip
+shot-houdini-scene-src-dir: <shot-scene-src-dir>
+shot-houdini-scene-src-file: <shot-houdini-scene-src-dir>/<shot-name>.hip
 #
 shot-katana-scene-dir: <shot-release-version-dir>/katana
 shot-katana-scene-file: <shot-katana-scene-dir>/<shot-name>.katana
+shot-katana-scene-src-dir: <shot-scene-src-dir>
+shot-katana-scene-src-file: <shot-katana-scene-src-dir>/<shot-name>.katana
 #
 shot-nuke-scene-dir: <shot-release-version-dir>/nuke
 shot-nuke-scene-file: <shot-nuke-scene-dir>/<shot-name>.nk
-#
-shot-maya-scene-src-dir: <shot-release-version-dir>/scene
-shot-maya-scene-src-file: <shot-maya-scene-src-dir>/<shot-name>.ma
-#
-shot-houdini-scene-src-dir: <shot-release-version-dir>/scene
-shot-houdini-scene-src-file: <shot-houdini-scene-src-dir>/<shot-name>.hip
-#
-shot-katana-scene-src-dir: <shot-release-version-dir>/scene
-shot-katana-scene-src-file: <shot-katana-scene-src-dir>/<shot-name>.katana
-#
-shot-nuke-scene-src-dir: <shot-release-version-dir>/scene
+shot-nuke-scene-src-dir: <shot-scene-src-dir>
 shot-nuke-scene-src-file: <shot-nuke-scene-src-dir>/<shot-name>.nk
 #
 shot-camera-dir: <shot-release-version-dir>/camera

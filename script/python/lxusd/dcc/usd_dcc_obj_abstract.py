@@ -12,12 +12,10 @@ from lxuniverse import unr_configure
 
 import lxuniverse.abstracts as unr_abstracts
 
-from lxutil_gui.qt import utl_gui_qt_core
-
 
 class AbsUsdObjScene(unr_abstracts.AbsObjScene):
-    FILE_CLASS = None
-    UNIVERSE_CLASS = None
+    FILE_CLS = None
+    UNIVERSE_CLS = None
     def __init__(self):
         super(AbsUsdObjScene, self).__init__()
         self._usd_stage = None
@@ -25,14 +23,14 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
     def usd_stage(self):
         return self._usd_stage
 
-    def set_restore(self):
-        self._universe = self.UNIVERSE_CLASS()
+    def restore_all(self):
+        self._universe = self.UNIVERSE_CLS()
         self._path_lstrip = None
         #
         self._usd_stage = None
 
     def set_load_from_file(self, file_path, root=None):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         if file_obj.get_is_exists() is True:
             file_ext = file_obj.ext
             if file_ext in ['.abc']:
@@ -41,15 +39,15 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
                 self.load_from_dot_usd_fnc(file_obj, root)
 
     def set_load_from_dot_abc(self, file_path, root=None):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         self._set_load_by_dot_abc_(file_obj, root)
 
     def load_from_dot_usd(self, file_path, root=None, location_source=None):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         self.load_from_dot_usd_fnc(file_obj, root, location_source)
 
     def _set_load_by_dot_abc_(self, file_obj, root=None):
-        self.set_restore()
+        self.restore_all()
         file_path = file_obj.path
         self._usd_stage = Usd.Stage.CreateInMemory()
         self._root = root
@@ -72,7 +70,7 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
             self.node_create_fnc(i_usd_prim)
 
     def load_from_dot_usd_fnc(self, file_obj, location, location_source):
-        self.set_restore()
+        self.restore_all()
         file_path = file_obj.path
         self._usd_stage = Usd.Stage.CreateInMemory()
         usd_location = self._usd_stage.GetPseudoRoot()
@@ -112,8 +110,10 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         #
         _obj = obj_type.generate_obj(obj_path)
         _obj._usd_obj = usd_prim
-        if obj_type_name == usd_configure.ObjType.Xform:
-            _obj.set_gui_attribute('icon', utl_gui_qt_core.QtUtilMtd.get_qt_icon('obj/group'))
-        elif obj_type_name == usd_configure.ObjType.Mesh:
-            _obj.set_gui_attribute('icon', utl_gui_qt_core.QtUtilMtd.get_qt_icon('obj/mesh'))
+        if utl_core.get_is_ui_mode() is True:
+            from lxutil_gui.qt import utl_gui_qt_core
+            if obj_type_name == usd_configure.ObjType.Xform:
+                _obj.set_gui_attribute('icon', utl_gui_qt_core.QtUtilMtd.get_qt_icon('obj/group'))
+            elif obj_type_name == usd_configure.ObjType.Mesh:
+                _obj.set_gui_attribute('icon', utl_gui_qt_core.QtUtilMtd.get_qt_icon('obj/mesh'))
         return _obj

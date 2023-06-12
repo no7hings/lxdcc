@@ -37,7 +37,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         self._os_normcase_file_paths = []
         self._os_file_name_dict = {}
 

@@ -56,8 +56,8 @@ class DotMaExporter(
         file_path_tgt = self._option.get('file_path_tgt')
         #
         utl_dcc_objects.OsFile(file_path_src).set_copy_to_file(file_path_tgt)
-        #
-        self._set_xgen_collection_files_copy_(
+        # copy xgen files
+        self.copy_xgen_collection_files_fnc(
             file_path_src,
             file_path_tgt
         )

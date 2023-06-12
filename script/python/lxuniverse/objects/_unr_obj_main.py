@@ -39,7 +39,7 @@ class Type(unr_abstracts.AbsType):
 class Category(unr_abstracts.AbsCategory):
     PATHSEP = unr_configure.Category.PATHSEP
     #
-    TYPE_CLASS = Type
+    TYPE_CLS = Type
     def __init__(self, universe, name):
         super(Category, self).__init__(universe, name)
 
@@ -57,8 +57,8 @@ class PortElement(unr_abstracts.AbsPortElement):
     #
     PATHSEP = unr_configure.Port.PATHSEP
     #
-    PORT_CHANNEL_STACK_CLASS = _unr_obj_stack.PortChannelStack
-    PORT_CHANNEL_CLASS = PortChannel
+    PORT_CHANNEL_STACK_CLS = _unr_obj_stack.PortChannelStack
+    PORT_CHANNEL_CLS = PortChannel
     def __init__(self, parent, index):
         super(PortElement, self).__init__(parent, index)
 
@@ -68,11 +68,11 @@ class Port(unr_abstracts.AbsPort):
     #
     PATHSEP = unr_configure.Port.PATHSEP
     #
-    PORT_ELEMENT_STACK_CLASS = _unr_obj_stack.PortElementStack
-    PORT_ELEMENT_CLASS = PortElement
+    PORT_ELEMENT_STACK_CLS = _unr_obj_stack.PortElementStack
+    PORT_ELEMENT_CLS = PortElement
     #
-    PORT_CHANNEL_STACK_CLASS = _unr_obj_stack.PortChannelStack
-    PORT_CHANNEL_CLASS = PortChannel
+    PORT_CHANNEL_STACK_CLS = _unr_obj_stack.PortChannelStack
+    PORT_CHANNEL_CLS = PortChannel
     def __init__(self, node, type_, assign, name):
         super(Port, self).__init__(node, type_, assign, name)
 
@@ -104,11 +104,11 @@ class Obj(unr_abstracts.AbsObj):
     #
     PATHSEP = unr_configure.Obj.PATHSEP
     # port/def
-    PORT_CLASS = Port
-    PORT_STACK_CLASS = _unr_obj_stack.PrxPortStack
+    PORT_CLS = Port
+    PORT_STACK_CLS = _unr_obj_stack.PrxPortStack
     #
-    PROPERTIES_CLASS = _bsc_obj_raw.Properties
-    ATTRIBUTES_CLASS = Attributes
+    PROPERTIES_CLS = _bsc_obj_raw.Properties
+    ATTRIBUTES_CLS = Attributes
     def __init__(self, type_, path):
         super(Obj, self).__init__(type_, path)
 
@@ -126,10 +126,10 @@ class ObjType(unr_abstracts.AbsObjType):
     # type/def
     PATHSEP = unr_configure.ObjType.PATHSEP
     # obj_type/def
-    DCC_NODE_CLASS = Obj
+    DCC_NODE_CLS = Obj
     # port_query/def
-    PORT_QUERY_CLASS = PortQuery
-    PORT_QUERY_STACK_CLASS = _unr_obj_stack.PortQueryStack
+    PORT_QUERY_CLS = PortQuery
+    PORT_QUERY_STACK_CLS = _unr_obj_stack.PortQueryStack
     def __init__(self, category, name):
         super(ObjType, self).__init__(category, name)
 
@@ -139,11 +139,11 @@ class ObjCategory(unr_abstracts.AbsObjCategory):
     #
     PATHSEP = unr_configure.ObjCategory.PATHSEP
     #
-    TYPE_CLASS = ObjType
+    TYPE_CLS = ObjType
     #
     # port_query/def
-    PORT_QUERY_CLASS = PortQuery
-    PORT_QUERY_STACK_CLASS = _unr_obj_stack.PortQueryStack
+    PORT_QUERY_CLS = PortQuery
+    PORT_QUERY_STACK_CLS = _unr_obj_stack.PortQueryStack
     def __init__(self, universe, name):
         super(ObjCategory, self).__init__(universe, name)
 
@@ -169,21 +169,21 @@ class ObjBind(unr_abstracts.AbsObjBind):
 class ObjUniverse(unr_abstracts.AbsObjUniverse):
     ROOT = unr_configure.Obj.PATHSEP
     #
-    CATEGORY_STACK_CLASS = _unr_obj_stack.CategoryStack
-    CATEGORY_CLASS = Category
-    TYPE_STACK_CLASS = _unr_obj_stack.TypeStack
+    CATEGORY_STACK_CLS = _unr_obj_stack.CategoryStack
+    CATEGORY_CLS = Category
+    TYPE_STACK_CLS = _unr_obj_stack.TypeStack
     #
-    OBJ_CATEGORY_STACK_CLASS = _unr_obj_stack.ObjCategoryStack
-    OBJ_CATEGORY_CLASS = ObjCategory
-    OBJ_TYPE_STACK_CLASS = _unr_obj_stack.ObjTypeStack
+    OBJ_CATEGORY_STACK_CLS = _unr_obj_stack.ObjCategoryStack
+    OBJ_CATEGORY_CLS = ObjCategory
+    OBJ_TYPE_STACK_CLS = _unr_obj_stack.ObjTypeStack
     #
-    OBJ_STACK_CLASS = _unr_obj_stack.ObjStack
-    OBJ_STACK_CLASS_TEST = _unr_obj_stack.ObjStackTest
+    OBJ_STACK_CLS = _unr_obj_stack.ObjStack
+    OBJ_STACK_CLS_TEST = _unr_obj_stack.ObjStackTest
     #
-    OBJ_CONNECTION_STACK_CLASS = _unr_obj_stack.ObjConnectionStack
-    OBJ_CONNECTION_CLASS = ObjConnection
+    OBJ_CONNECTION_STACK_CLS = _unr_obj_stack.ObjConnectionStack
+    OBJ_CONNECTION_CLS = ObjConnection
     #
-    OBJ_BIND_STACK_CLASS = _unr_obj_stack.ObjBindStack
-    OBJ_BIND_CLASS = ObjBind
+    OBJ_BIND_STACK_CLS = _unr_obj_stack.ObjBindStack
+    OBJ_BIND_CLS = ObjBind
     def __init__(self):
         super(ObjUniverse, self).__init__()

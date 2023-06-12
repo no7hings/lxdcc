@@ -155,28 +155,28 @@ node:
         expressions:
             user/data_1/i0:
                 |-
-                '{}.tuntable.current'.format(getParent().option.variant_key)
+                '{}.turntable.current'.format(getParent().parameters.mode)
             user/data_1/i1: 'getParent().getNodeName()'
             #
             user/data_2/i0:
                 |-
-                '{}.tuntable.traget'.format(getParent().option.variant_key)
-            user/data_2/i1: 'getParent().option.target'
+                '{}.turntable.traget'.format(getParent().parameters.mode)
+            user/data_2/i1: 'getParent().parameters.target'
             #
             user/data_3/i0:
                 |-
-                '{}.tuntable.start_frame'.format(getParent().option.variant_key)
-            user/data_3/i1: 'getParent().option.start_frame'
+                '{}.turntable.start_frame'.format(getParent().parameters.mode)
+            user/data_3/i1: 'getNode("<node.rotate_opt.name>").user.parameters.start_frame'
             #
             user/data_4/i0:
                 |-
-                '{}.tuntable.end_frame'.format(getParent().option.variant_key)
-            user/data_4/i1: 'getParent().option.end_frame'
+                '{}.turntable.end_frame'.format(getParent().parameters.mode)
+            user/data_4/i1: 'getNode("<node.rotate_opt.name>").user.parameters.end_frame'
             #
             user/data_5/i0:
                 |-
-                '{}.tuntable.frame_offset'.format(getParent().option.variant_key)
-            user/data_5/i1: 'getParent().option.frame_offset'
+                '{}.turntable.frame_offset'.format(getParent().parameters.mode)
+            user/data_5/i1: 'getNode("<node.rotate_opt.name>").user.parameters.frame_offset'
         #
         connections:
             - '<..rotate_opt.output>'

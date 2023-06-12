@@ -36,7 +36,7 @@ class Setup(object):
         def fnc_():
             print 'lx-usd setup: is started'
             from lxusd import usd_setup
-            usd_setup.UsdSetup.set_environs_setup()
+            usd_setup.UsdSetup.build_environ()
             print 'lx-usd setup: is completed'
         # noinspection PyUnresolvedReferences
         from maya import cmds

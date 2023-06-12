@@ -1,3 +1,3 @@
 # coding:utf-8
-from ._dtb_scp_texture import *
+from ._dtb_scp_resource import *
 

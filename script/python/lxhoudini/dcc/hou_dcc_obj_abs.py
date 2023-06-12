@@ -76,7 +76,7 @@ class AbsHouObj(utl_abstract.AbsDccObj):
             hou_obj = hou_parent.createNode(obj_type, self.name)
             utl_core.Log.set_module_result_trace(
                 'obj create',
-                'obj="{}", type="{}"'.format(self.path, self.type)
+                'obj="{}", type="{}"'.format(self.path, obj_type)
             )
             hou_obj.moveToGoodPosition()
             return hou_obj
@@ -182,7 +182,7 @@ class AbsHouObjs(utl_abstract.AbsDccObjs):
     def get_objs(cls, **kwargs):
         lis = []
         for obj_path in cls.get_paths():
-            obj = cls.DCC_NODE_CLASS(obj_path)
+            obj = cls.DCC_NODE_CLS(obj_path)
             obj_type = obj.type
             if obj_type in cls.FILE_REFERENCE_FILE_PORT_PATHS_DICT:
                 port_paths = cls.FILE_REFERENCE_FILE_PORT_PATHS_DICT[obj_type]

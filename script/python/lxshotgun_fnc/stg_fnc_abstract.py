@@ -5,9 +5,9 @@ from . import stg_fnc_core
 
 
 class AbsStgIsp(utl_fnc_abstract.AbsChecker):
-    FNC_ISP_IGNORE_CLASS = utl_fnc_core.IspIgnore
+    FNC_ISP_IGNORE_CLS = utl_fnc_core.IspIgnore
 
-    FNC_CHECKER_LOADER_CLASS = stg_fnc_core.CheckerLoader
+    FNC_CHECKER_LOADER_CLS = stg_fnc_core.CheckerLoader
     def __init__(self, fnc_isp_path):
         super(AbsStgIsp, self).__init__(fnc_isp_path)
 

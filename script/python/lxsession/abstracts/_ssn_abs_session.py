@@ -140,7 +140,7 @@ class AbsSsnObj(
         return self._configure
     configure = property(get_configure)
 
-    def set_configure_reload(self):
+    def reload_configure(self):
         self._configure.set_reload()
     @property
     def gui_configure(self):
@@ -612,7 +612,8 @@ class AbsSsnDatabaseOptionAction(
 
     def get_database_opt(self):
         return dtb_objects.DtbResourceLibraryOpt(
-            self.option_opt.get('database_configure')
+            self.option_opt.get('database_configure'),
+            self.option_opt.get('database_configure_extend')
         )
     database_opt = property(get_database_opt)
 
@@ -993,6 +994,7 @@ class AbsSsnRsvProjectOptionMethod(
 
         self._rsv_project = None
         self._rsv_properties = None
+        self._rsv_scene_properties = None
 
         option_opt = self.get_option_opt()
 
@@ -1002,11 +1004,25 @@ class AbsSsnRsvProjectOptionMethod(
 
         if self._batch_file_path:
             self._rsv_project = self._resolver.get_rsv_project_by_any_file_path(self._batch_file_path)
+            self._rsv_scene_properties = self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
+                self._batch_file_path
+            )
         else:
             if self._file_path:
                 self._rsv_project = self._resolver.get_rsv_project_by_any_file_path(self._file_path)
-        #
-        self._rsv_properties = self._rsv_project.properties
+                self._rsv_scene_properties = self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
+                    self._file_path
+                )
+        # check is project file
+        if self._rsv_project is None:
+            raise RuntimeError(
+                'file is not valid for any project'
+            )
+        # when file is match scene file rule use scene properties
+        if self._rsv_scene_properties:
+            self._rsv_properties = self._rsv_scene_properties
+        else:
+            self._rsv_properties = self._rsv_project.properties
 
         self.__completion_option_by_rsv_properties_()
 

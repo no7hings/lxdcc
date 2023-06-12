@@ -147,7 +147,7 @@ class VersionKey(object):
 
 
 class Matcher(MtdBasic):
-    RSV_TASK_VERSION_CLASS = VersionKey
+    RSV_TASK_VERSION_CLS = VersionKey
     def __init__(self, pattern, format_variant=None):
         self._orig_parameter = format_variant
         self._rsv_pattern = self._current_pattern = pattern
@@ -226,7 +226,7 @@ class Matcher(MtdBasic):
             result, parameters = matches[-1]
             if 'version' in parameters:
                 version = parameters['version']
-                rsv_version = self.RSV_TASK_VERSION_CLASS(version)
+                rsv_version = self.RSV_TASK_VERSION_CLS(version)
                 rsv_version += 1
                 parameters['version'] = str(rsv_version)
                 return self._set_pattern_update_(self._rsv_pattern, parameters)

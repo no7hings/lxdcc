@@ -221,6 +221,8 @@ class AbsContent(object):
                 #
                 if isinstance(_v, dict):
                     rcs_fnc_(_key, _v)
+                    if not _v:
+                        lis.append(_key)
                 else:
                     lis.append(_key)
 
@@ -397,6 +399,11 @@ class AbsContent(object):
         elif isinstance(data, dict):
             self._value.update(data)
 
+    def update_from(self, content):
+        if isinstance(content, self.__class__):
+            for i_key in content._get_leaf_keys_():
+                self.set(i_key, content.get(i_key))
+
     def __str__(self):
         return json.dumps(
             self.value,
@@ -464,7 +471,7 @@ class AbsContent(object):
 class AbsFileReader(object):
     SEP = '\n'
     LINE_MATCHER_CLS = None
-    PROPERTIES_CLASS = None
+    PROPERTIES_CLS = None
     def __init__(self, file_path):
         self._file_path = file_path
         self._set_line_raw_update_()
@@ -494,7 +501,7 @@ class AbsFileReader(object):
         )
         for line in lines:
             p = parse.parse(
-                pattern_0.format, line
+                pattern_0.format, line, case_sensitive=True
             )
             if p:
                 variants = p.named

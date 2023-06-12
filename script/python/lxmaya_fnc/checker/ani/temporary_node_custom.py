@@ -23,7 +23,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
 
         nodes = _mya_dcc_obj_objs.TemporaryNodes().get_custom_nodes(reference=False)
         display_layers = [_mya_dcc_obj_obj.DisplayLayer(i) for i in self.DISPLAY_LAYER_PATHS]

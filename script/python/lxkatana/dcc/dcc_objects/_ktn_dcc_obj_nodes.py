@@ -23,7 +23,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
     INCLUDE_DCC_TYPES = [
         'NetworkMaterial'
     ]
-    DCC_NODE_CLASS = _ktn_dcc_obj_node.Material
+    DCC_NODE_CLS = _ktn_dcc_obj_node.Material
     def __init__(self, *args):
         super(Materials, self).__init__(*args)
     @classmethod
@@ -117,7 +117,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
     INCLUDE_DCC_TYPES = [
         'ArnoldShadingNode'
     ]
-    DCC_NODE_CLASS = _ktn_dcc_obj_node.AndShader
+    DCC_NODE_CLS = _ktn_dcc_obj_node.AndShader
     def __init__(self, *args):
         super(AndShaders, self).__init__(*args)
     @classmethod
@@ -153,7 +153,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
 
 
 class AbsTextureReferences(object):
-    OBJ_CLASS_DICT = {
+    OBJ_CLS_DICT = {
         'image': _ktn_dcc_obj_node.TextureReference,
         'osl_file_path': _ktn_dcc_obj_node.TextureReference,
         'osl_window_box': _ktn_dcc_obj_node.TextureReference,
@@ -285,9 +285,9 @@ class AbsTextureReferences(object):
         cls._set_real_file_path_(port, file_path)
     @classmethod
     def _get_obj_cls_(cls, shader_type_name):
-        if shader_type_name in cls.OBJ_CLASS_DICT:
-            return cls.OBJ_CLASS_DICT[shader_type_name]
-        return cls.OBJ_CLASS_DICT['custom']
+        if shader_type_name in cls.OBJ_CLS_DICT:
+            return cls.OBJ_CLS_DICT[shader_type_name]
+        return cls.OBJ_CLS_DICT['custom']
 
     def _set_customize_update_(self, exclude_paths=None, include_paths=None):
         objs = AndShaders.get_objs()

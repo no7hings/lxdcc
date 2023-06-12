@@ -22,11 +22,11 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
-            keyword_0 = 'asset-texture-src-dir'
-            keyword_1 = 'asset-texture-tgt-dir'
+            keyword_0 = 'asset-texture-base-dir'
+            keyword_1 = 'asset-texture-dir'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
-            keyword_0 = 'asset-temporary-texture-src-dir'
-            keyword_1 = 'asset-temporary-texture-tgt-dir'
+            keyword_0 = 'asset-temporary-texture-base-dir'
+            keyword_1 = 'asset-temporary-texture-dir'
         else:
             raise RuntimeError()
         #
@@ -47,7 +47,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         bsc_core.StgPathPermissionMtd.create_directory(texture_directory_path_tgt)
         #
         # TODO remove orig directory
-        mya_fnc_exporters.TextureExporter(
+        mya_fnc_exporters.FncRenderTextureExporter(
             option=dict(
                 directory_base=texture_directory_path_src,
                 directory=texture_directory_path_tgt,
@@ -55,9 +55,10 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 location=root,
                 #
                 fix_name_blank=True,
-                repath_to_tx_force=False,
                 with_reference=False,
                 #
                 use_environ_map=True,
+                #
+                copy_source=True,
             )
-        ).set_run()
+        ).execute()

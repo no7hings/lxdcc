@@ -333,7 +333,7 @@ class AbsObjStack(object):
             self._key_list[old_index] = new_key
             self._obj_list[old_index] = new_obj
 
-    def set_restore(self):
+    def restore_all(self):
         """
         clear all register <obj>
         :return: None
@@ -356,11 +356,16 @@ class AbsObjStack(object):
         self.set_object_add(obj)
         return obj
 
-    def get_object_count(self):
+    def get_count(self):
         """
         :return: int
         """
         return self._count
+
+    def get_maximum(self):
+        if self._count > 0:
+            return self._count-1
+        return 0
 
     def get_object_indices(self):
         """
@@ -442,7 +447,7 @@ class AbsCategoryDef(object):
     # str(<type-pathsep>/<obj-type-pathsep>)
     PATHSEP = None
     # class(<type>/<obj-type>)
-    TYPE_CLASS = None
+    TYPE_CLS = None
 
     def _set_category_def_init_(self, universe, name, type_stack):
         """
@@ -481,7 +486,7 @@ class AbsCategoryDef(object):
         """
         :return: str(<type-pathsep>/<obj-type-pathsep>)
         """
-        return self.TYPE_CLASS.PATHSEP
+        return self.TYPE_CLS.PATHSEP
 
     #
     def _set_type_create_as_new_(self, type_name):
@@ -489,7 +494,7 @@ class AbsCategoryDef(object):
         :param type_name: str(<type-name>/<obj-type-name>)
         :return: instance(<type>)
         """
-        return self.TYPE_CLASS(self, type_name)
+        return self.TYPE_CLS(self, type_name)
 
     def generate_type(self, type_name):
         category = self
@@ -549,14 +554,14 @@ class AbsCategoryDef(object):
         :param type_name: str(<type-name>/<obj-type-name>)
         :return: str(<type-path>/<obj-type-path>)
         """
-        type_pathsep = cls.TYPE_CLASS.PATHSEP
+        type_pathsep = cls.TYPE_CLS.PATHSEP
         return type_pathsep.join(
             [category_name, type_name]
         )
 
     @classmethod
     def _get_type_path_args_(cls, type_path):
-        type_pathsep = cls.TYPE_CLASS.PATHSEP
+        type_pathsep = cls.TYPE_CLS.PATHSEP
         return type_path.split(type_pathsep)
 
     def __str__(self):
@@ -1752,12 +1757,12 @@ class AbsPortTargetDef(object):
 
 
 class AbsPortElementDef(object):
-    PORT_ELEMENT_STACK_CLASS = None
-    PORT_ELEMENT_CLASS = None
+    PORT_ELEMENT_STACK_CLS = None
+    PORT_ELEMENT_CLS = None
 
     # init
     def _set_port_element_def_init_(self):
-        self._port_element_stack = self.PORT_ELEMENT_STACK_CLASS()
+        self._port_element_stack = self.PORT_ELEMENT_STACK_CLS()
 
     @property
     def obj(self):
@@ -1774,7 +1779,7 @@ class AbsPortElementDef(object):
         self.obj._set_port_add_(port_element)
 
     def _set_element_create_(self, index):
-        port_element = self.PORT_ELEMENT_CLASS(self, index)
+        port_element = self.PORT_ELEMENT_CLS(self, index)
         self._set_element_add_(port_element)
         return port_element
 
@@ -1801,12 +1806,12 @@ class AbsPortElementDef(object):
 
 
 class AbsPortChannelDef(object):
-    PORT_CHANNEL_STACK_CLASS = None
-    PORT_CHANNEL_CLASS = None
+    PORT_CHANNEL_STACK_CLS = None
+    PORT_CHANNEL_CLS = None
 
     # init
     def _set_port_channel_def_init_(self):
-        self._channel_stack = self.PORT_CHANNEL_STACK_CLASS()
+        self._channel_stack = self.PORT_CHANNEL_STACK_CLS()
 
     @property
     def obj(self):
@@ -1824,7 +1829,7 @@ class AbsPortChannelDef(object):
         self.obj._set_port_add_(channel)
 
     def _set_channel_create_(self, name):
-        channel = self.PORT_CHANNEL_CLASS(self, name)
+        channel = self.PORT_CHANNEL_CLS(self, name)
         self._set_channel_add_(channel)
         return channel
 
@@ -2146,7 +2151,7 @@ class AbsPort(
 # obj/type/def
 class AbsObjTypeObjDef(object):
     # class(<obj>)
-    DCC_NODE_CLASS = None
+    DCC_NODE_CLS = None
 
     def _set_obj_type_obj_def_init_(self):
         pass
@@ -2193,20 +2198,20 @@ class AbsObjTypeObjDef(object):
         return obj
 
     def generate_obj(self, obj_oath):
-        obj = self.DCC_NODE_CLASS(self, obj_oath)
+        obj = self.DCC_NODE_CLS(self, obj_oath)
         self.universe._set_obj_add_(obj)
         return obj
 
     @property
     def obj_pathsep(self):
-        return self.DCC_NODE_CLASS.PATHSEP
+        return self.DCC_NODE_CLS.PATHSEP
 
     @classmethod
     def _get_obj_path_(cls, obj_path_args):
-        return cls.DCC_NODE_CLASS.PATHSEP.join(obj_path_args)
+        return cls.DCC_NODE_CLS.PATHSEP.join(obj_path_args)
 
     def _set_obj_create_(self, obj_path, **kwargs):
-        new_obj = self.DCC_NODE_CLASS(self, obj_path)
+        new_obj = self.DCC_NODE_CLS(self, obj_path)
         new_obj.set_ancestors_create()
         return new_obj
 
@@ -2228,11 +2233,11 @@ class AbsObjTypeObjDef(object):
 class AbsObjPortDef(object):
     OBJ_TOKEN = None
     #
-    PORT_CLASS = None
-    PORT_STACK_CLASS = None
+    PORT_CLS = None
+    PORT_STACK_CLS = None
 
     def _set_node_port_def_init_(self):
-        self._port_stack = self.PORT_STACK_CLASS()
+        self._port_stack = self.PORT_STACK_CLS()
 
     @property
     def universe(self):
@@ -2294,7 +2299,7 @@ class AbsObjPortDef(object):
         return self.set_port_create(type_args, port_path, unr_configure.PortAssign.OUTPUTS)
 
     def _set_port_create_(self, type_args, port_path, port_assign):
-        port = self.PORT_CLASS(
+        port = self.PORT_CLS(
             self, type_args, port_path, port_assign
         )
         return port
@@ -2410,13 +2415,13 @@ class AbsObjPortDef(object):
         return self._port_stack.get_objects(regex=regex)
 
     def get_variant(self, port_path):
-        port_path = port_path.replace('/', self.PORT_CLASS.PATHSEP)
+        port_path = port_path.replace('/', self.PORT_CLS.PATHSEP)
         port = self.get_variant_port(port_path)
         if port is not None:
             return port.get()
 
     def set_variant(self, port_path, raw):
-        port_path = port_path.replace('/', self.PORT_CLASS.PATHSEP)
+        port_path = port_path.replace('/', self.PORT_CLS.PATHSEP)
         port = self.get_variant_port(port_path)
         if port:
             return port.set(raw)
@@ -2531,11 +2536,11 @@ class AbsPortQuery(object):
 class AbsObjTypePortQueryDef(object):
     OBJ_TOKEN = None
     #
-    PORT_QUERY_CLASS = None
-    PORT_QUERY_STACK_CLASS = None
+    PORT_QUERY_CLS = None
+    PORT_QUERY_STACK_CLS = None
 
     def _set_obj_type_port_query_def_init_(self):
-        self._port_query_stack = self.PORT_QUERY_STACK_CLASS()
+        self._port_query_stack = self.PORT_QUERY_STACK_CLS()
 
     def _set_port_queries_build_(self, port_query_raw, raw_convert_method=None):
         for k, v in port_query_raw.items():
@@ -2573,7 +2578,7 @@ class AbsObjTypePortQueryDef(object):
         port_query.set(raw)
 
     def _set_port_query_create_(self, type_path, port_path, port_assign, raw):
-        return self.PORT_QUERY_CLASS(
+        return self.PORT_QUERY_CLS(
             self, type_path, port_path, port_assign, raw
         )
 
@@ -2582,7 +2587,7 @@ class AbsObjTypePortQueryDef(object):
         port_path = port_query.port_path
         port_assign = port_query.port_assign
         raw = port_query.get()
-        port_query = self.PORT_QUERY_CLASS(
+        port_query = self.PORT_QUERY_CLS(
             self, type_path, port_path, port_assign, raw
         )
         self._port_query_stack.set_object_add(port_query)
@@ -2646,13 +2651,13 @@ class AbsObjTypePortQueryDef(object):
         )
 
     def get_variant(self, port_path):
-        port_path = port_path.replace('/', self.PORT_QUERY_CLASS.PATHSEP)
+        port_path = port_path.replace('/', self.PORT_QUERY_CLS.PATHSEP)
         port_query = self.get_variant_port_query(port_path)
         if port_query:
             return port_query.get()
 
     def set_variant(self, port_path, raw):
-        port_path = port_path.replace('/', self.PORT_QUERY_CLASS.PATHSEP)
+        port_path = port_path.replace('/', self.PORT_QUERY_CLS.PATHSEP)
         port_query = self.get_variant_port_query(port_path)
         if port_query:
             return port_query.set(raw)
@@ -2668,7 +2673,7 @@ class AbsObjCategory(
         self._set_obj_type_port_query_def_init_()
 
     def _set_type_create_as_new_(self, type_name):
-        obj_type = self.TYPE_CLASS(self, type_name)
+        obj_type = self.TYPE_CLS(self, type_name)
         for port_query in self.get_port_queries():
             obj_type._set_port_query_inherit_(port_query)
         return obj_type
@@ -2713,7 +2718,7 @@ class AbsObjType(
             obj_path = self._get_obj_path_(obj_path_args)
         else:
             raise TypeError()
-        new_obj = self.DCC_NODE_CLASS(self, obj_path)
+        new_obj = self.DCC_NODE_CLS(self, obj_path)
         for port_query in self.get_port_queries():
             type_path = port_query.type.path
             port_path = port_query.port_path
@@ -2892,7 +2897,7 @@ class AbsObjTargetDef(object):
 
 
 class AbsObjPropertiesDef(object):
-    PROPERTIES_CLASS = None
+    PROPERTIES_CLS = None
 
     def _set_obj_properties_def_init_(self):
         self._obj_properties = None
@@ -2904,15 +2909,15 @@ class AbsObjPropertiesDef(object):
     @properties.setter
     def properties(self, raw):
         if isinstance(raw, dict):
-            self._obj_properties = self.PROPERTIES_CLASS(self, raw)
-        elif isinstance(raw, self.PROPERTIES_CLASS):
+            self._obj_properties = self.PROPERTIES_CLS(self, raw)
+        elif isinstance(raw, self.PROPERTIES_CLS):
             self._obj_properties = raw
         else:
             raise TypeError()
 
 
 class AbsObjAttributesDef(object):
-    ATTRIBUTES_CLASS = None
+    ATTRIBUTES_CLS = None
 
     def _set_obj_attributes_def_init_(self):
         self._obj_attributes = {}
@@ -2924,8 +2929,8 @@ class AbsObjAttributesDef(object):
     @attributes.setter
     def attributes(self, raw):
         if isinstance(raw, dict):
-            self._obj_attributes = self.ATTRIBUTES_CLASS(self, raw)
-        elif isinstance(raw, self.ATTRIBUTES_CLASS):
+            self._obj_attributes = self.ATTRIBUTES_CLS(self, raw)
+        elif isinstance(raw, self.ATTRIBUTES_CLS):
             self._obj_attributes = raw
         else:
             raise TypeError()
@@ -3131,22 +3136,22 @@ class AbsObjBind(object):
 class AbsObjUniverseDef(object):
     ROOT = None
     # <type>
-    CATEGORY_STACK_CLASS = None
-    CATEGORY_CLASS = None
-    TYPE_STACK_CLASS = None
+    CATEGORY_STACK_CLS = None
+    CATEGORY_CLS = None
+    TYPE_STACK_CLS = None
     # <obj-type>
-    OBJ_CATEGORY_STACK_CLASS = None
-    OBJ_CATEGORY_CLASS = None
-    OBJ_TYPE_STACK_CLASS = None
+    OBJ_CATEGORY_STACK_CLS = None
+    OBJ_CATEGORY_CLS = None
+    OBJ_TYPE_STACK_CLS = None
     #
-    OBJ_STACK_CLASS = None
-    OBJ_STACK_CLASS_TEST = None
+    OBJ_STACK_CLS = None
+    OBJ_STACK_CLS_TEST = None
     #
-    OBJ_CONNECTION_STACK_CLASS = None
-    OBJ_CONNECTION_CLASS = None
+    OBJ_CONNECTION_STACK_CLS = None
+    OBJ_CONNECTION_CLS = None
     #
-    OBJ_BIND_STACK_CLASS = None
-    OBJ_BIND_CLASS = None
+    OBJ_BIND_STACK_CLS = None
+    OBJ_BIND_CLS = None
     #
     Category = unr_configure.Category
     Type = unr_configure.Type
@@ -3155,17 +3160,17 @@ class AbsObjUniverseDef(object):
     #
     def _set_obj_universe_def_init_(self):
         # <type>
-        self._category_stack = self.CATEGORY_STACK_CLASS()
-        self._type_stack = self.TYPE_STACK_CLASS()
+        self._category_stack = self.CATEGORY_STACK_CLS()
+        self._type_stack = self.TYPE_STACK_CLS()
         # <obj-type>
-        self._obj_category_stack = self.OBJ_CATEGORY_STACK_CLASS()
-        self._obj_type_stack = self.OBJ_TYPE_STACK_CLASS()
+        self._obj_category_stack = self.OBJ_CATEGORY_STACK_CLS()
+        self._obj_type_stack = self.OBJ_TYPE_STACK_CLS()
         # <obj>
-        self._obj_stack = self.OBJ_STACK_CLASS()
-        self._obj_stack_test = self.OBJ_STACK_CLASS_TEST()
+        self._obj_stack = self.OBJ_STACK_CLS()
+        self._obj_stack_test = self.OBJ_STACK_CLS_TEST()
         # <obj-connection>
-        self._obj_connection_stack = self.OBJ_CONNECTION_STACK_CLASS()
-        self._obj_bind_stack = self.OBJ_BIND_STACK_CLASS()
+        self._obj_connection_stack = self.OBJ_CONNECTION_STACK_CLS()
+        self._obj_bind_stack = self.OBJ_BIND_STACK_CLS()
         #
         self._custom_raw = {}
         #
@@ -3188,7 +3193,7 @@ class AbsObjUniverseDef(object):
 
     # <category>
     def _set_category_create_as_new_(self, category_name):
-        return self.CATEGORY_CLASS(self, category_name)
+        return self.CATEGORY_CLS(self, category_name)
 
     def set_category_create(self, category_name):
         stack = self._category_stack
@@ -3217,7 +3222,7 @@ class AbsObjUniverseDef(object):
         if stack.get_object_exists(type_path) is True:
             return stack.get_object(type_path)
         #
-        category_name, type_name = self.CATEGORY_CLASS._get_type_path_args_(type_path)
+        category_name, type_name = self.CATEGORY_CLS._get_type_path_args_(type_path)
         category = self._get_category_force_(category_name)
         type_ = category._set_type_create_as_new_(type_name)
         stack.set_object_add(type_)
@@ -3227,7 +3232,7 @@ class AbsObjUniverseDef(object):
         return self._type_stack.get_objects()
 
     def get_type(self, type_string):
-        pathsep = self.CATEGORY_CLASS.PATHSEP
+        pathsep = self.CATEGORY_CLS.PATHSEP
         if pathsep in type_string:
             regex = '{}'.format(type_string)
         else:
@@ -3241,7 +3246,7 @@ class AbsObjUniverseDef(object):
 
     # <obj-category>
     def _set_obj_category_create_as_new_(self, obj_category_name):
-        return self.OBJ_CATEGORY_CLASS(self, obj_category_name)
+        return self.OBJ_CATEGORY_CLS(self, obj_category_name)
 
     def generate_obj_category(self, obj_category_name):
         stack = self._obj_category_stack
@@ -3269,7 +3274,7 @@ class AbsObjUniverseDef(object):
         return self._obj_type_stack.get_objects()
 
     def get_obj_type(self, obj_type_string):
-        pathsep = self.OBJ_CATEGORY_CLASS.PATHSEP
+        pathsep = self.OBJ_CATEGORY_CLS.PATHSEP
         if pathsep in obj_type_string:
             regex = '{}'.format(obj_type_string)
         else:
@@ -3330,7 +3335,7 @@ class AbsObjUniverseDef(object):
             else:
                 obj_path = '*{}{}'.format(obj_pathsep, regex)
             #
-            regex = self.OBJ_CATEGORY_CLASS._get_obj_token_(
+            regex = self.OBJ_CATEGORY_CLS._get_obj_token_(
                 obj_category_name, obj_type_name, obj_path
             )
             return self._obj_stack.get_objects(regex=regex)
@@ -3378,17 +3383,17 @@ class AbsObjUniverseDef(object):
             if isinstance(obj_args_, six.string_types):
                 return obj_args_
             elif isinstance(obj_args_, (tuple, list)):
-                return self.OBJ_CONNECTION_CLASS.OBJ_PATHSEP.join(obj_args_)
+                return self.OBJ_CONNECTION_CLS.OBJ_PATHSEP.join(obj_args_)
 
         #
         def get_port_path_fnc_(port_args_):
             if isinstance(port_args_, six.string_types):
                 return port_args_
             elif isinstance(port_args_, (tuple, list)):
-                return self.OBJ_CONNECTION_CLASS.PORT_PATHSEP.join(port_args_)
+                return self.OBJ_CONNECTION_CLS.PORT_PATHSEP.join(port_args_)
 
         #
-        obj_connection = self.OBJ_CONNECTION_CLASS(
+        obj_connection = self.OBJ_CONNECTION_CLS(
             self,
             get_obj_path_fnc_(source_obj_args), get_port_path_fnc_(source_port_args),
             get_obj_path_fnc_(target_obj_args), get_port_path_fnc_(target_port_args)
@@ -3488,7 +3493,7 @@ class AbsOsDirectory(
     LOG = None
     PATHSEP = '/'
     #
-    OS_FILE_CLASS = None
+    OS_FILE_CLS = None
 
     def __init__(self, path):
         self._set_obj_dag_def_init_(path)
@@ -3558,7 +3563,7 @@ class AbsOsDirectory(
         )
 
     def get_files(self, include_exts=None):
-        return [self.OS_FILE_CLASS(i) for i in self.get_file_paths(include_exts)]
+        return [self.OS_FILE_CLS(i) for i in self.get_file_paths(include_exts)]
 
     def get_all_file_paths(self, include_exts=None):
         return bsc_core.StgDirectoryMtd.get_all_file_paths__(
@@ -3621,7 +3626,7 @@ class AbsOsFile(
     # dag
     PATHSEP = '/'
     # os
-    OS_DIRECTORY_CLASS = None
+    OS_DIRECTORY_CLS = None
     #
     LOG = None
 
@@ -3640,7 +3645,7 @@ class AbsOsFile(
         return self._get_ext_split_(self.path)
     # dag
     def create_dag_fnc(self, path):
-        return self.OS_DIRECTORY_CLASS(path)
+        return self.OS_DIRECTORY_CLS(path)
 
     def _set_child_create_(self, path):
         raise TypeError()
@@ -4015,11 +4020,11 @@ class AbsValue(object):
 
 
 class AbsObjScene(object):
-    FILE_CLASS = None
-    UNIVERSE_CLASS = None
+    FILE_CLS = None
+    UNIVERSE_CLS = None
 
     def __init__(self, *args, **kwargs):
-        self._universe = self.UNIVERSE_CLASS()
+        self._universe = self.UNIVERSE_CLS()
         self._path_lstrip = None
 
     @property
@@ -4030,6 +4035,6 @@ class AbsObjScene(object):
     def path_lstrip(self):
         return self._path_lstrip
 
-    def set_restore(self):
-        self._universe = self.UNIVERSE_CLASS()
+    def restore_all(self):
+        self._universe = self.UNIVERSE_CLS()
         self._path_lstrip = None

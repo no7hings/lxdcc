@@ -5,7 +5,7 @@ from lxbasic import bsc_core
 
 from lxusd import usd_setup
 
-usd_setup.UsdSetup.set_environs_setup()
+usd_setup.UsdSetup.build_environ()
 
 from lxusd import usd_core
 
@@ -49,7 +49,7 @@ with utl_core.LogProgressRunner.create_as_bar(maximum=len(cs), label='usd combin
             i_list = i_yaml_file_opt.set_read()
             list_.extend([i_path + j for j in i_list])
         else:
-            i_file_path_ = bsc_core.StgFileMultiplyMtd.set_convert_to(
+            i_file_path_ = bsc_core.StgFileMultiplyMtd.convert_to(
                 i_file_path, ['*.####.{ext}']
             )
             i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_tiles(

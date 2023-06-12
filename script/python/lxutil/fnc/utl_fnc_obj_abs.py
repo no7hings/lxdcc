@@ -70,22 +70,22 @@ class AbsDccImporter(object):
 
 
 class AbsFncDccMeshMatcher(object):
-    FNC_DCC_MESH_CLASS = None
+    FNC_DCC_MESH_CLS = None
     #
     SRC_DCC_CACHE = bsc_objects.Content(value=dict())
     @classmethod
     def _set_geometry_cache_(cls, src_path, tgt_path):
-        if cls.FNC_DCC_MESH_CLASS is not None:
+        if cls.FNC_DCC_MESH_CLS is not None:
             cls.SRC_DCC_CACHE.set(
                 '{}.geometry'.format(src_path),
-                cls.FNC_DCC_MESH_CLASS(tgt_path).get_geometry()
+                cls.FNC_DCC_MESH_CLS(tgt_path).get_geometry()
             )
     @classmethod
     def _set_look_cache_(cls, src_path, tgt_path):
-        if cls.FNC_DCC_MESH_CLASS is not None:
+        if cls.FNC_DCC_MESH_CLS is not None:
             cls.SRC_DCC_CACHE.set(
                 '{}.look'.format(src_path),
-                cls.FNC_DCC_MESH_CLASS(tgt_path).get_look()
+                cls.FNC_DCC_MESH_CLS(tgt_path).get_look()
             )
     @classmethod
     def _get_geometry_cache_(cls, src_path):
@@ -274,7 +274,7 @@ class AbsFncDccMeshMatcher(object):
 
 
 class AbsFncUsdMeshRepairer(object):
-    FNC_USD_MESH_CLASS = None
+    FNC_USD_MESH_CLS = None
     def __init__(self, src_usd_prim, tgt_path, check_statuses):
         self._src_usd_prim = src_usd_prim
         self._src_path = src_usd_prim.GetPath().pathString
@@ -282,10 +282,10 @@ class AbsFncUsdMeshRepairer(object):
         self._check_statuses = check_statuses
     @classmethod
     def set_delete(cls, tgt_path):
-        cls.FNC_USD_MESH_CLASS.set_delete(tgt_path)
+        cls.FNC_USD_MESH_CLS.set_delete(tgt_path)
     @classmethod
     def set_remove(cls, tgt_path):
-        cls.FNC_USD_MESH_CLASS.set_remove(tgt_path)
+        cls.FNC_USD_MESH_CLS.set_remove(tgt_path)
 
     def set_run(self):
         # 1
@@ -295,41 +295,41 @@ class AbsFncUsdMeshRepairer(object):
                     utl_configure.DccMeshCheckStatus.POINTS_CHANGED
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_replace()
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_replace()
         elif self._check_statuses == '+'.join(
                 [
                     utl_configure.DccMeshCheckStatus.FACE_VERTICES_CHANGED
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_replace()
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_replace()
         elif self._check_statuses == '+'.join(
                 [
                     utl_configure.DccMeshCheckStatus.POINTS_CHANGED
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_points()
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_points()
         # 2
         elif self._check_statuses == '+'.join(
                 [
                     utl_configure.DccMeshCheckStatus.DELETION
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_create()
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_create()
         #
         elif self._check_statuses == '+'.join(
                 [
                     utl_configure.DccMeshCheckStatus.PATH_CHANGED
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_repath_to(self._tgt_path)
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_repath_to(self._tgt_path)
         elif self._check_statuses == '+'.join(
                 [
                     utl_configure.DccMeshCheckStatus.PATH_CHANGED,
                     utl_configure.DccMeshCheckStatus.FACE_VERTICES_CHANGED
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_repath_to(self._tgt_path)
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_replace(
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_repath_to(self._tgt_path)
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_replace(
                 keep_materials=True,
                 keep_properties=True,
                 keep_visibilities=True,
@@ -341,8 +341,8 @@ class AbsFncUsdMeshRepairer(object):
                     utl_configure.DccMeshCheckStatus.POINTS_CHANGED
                 ]
         ):
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_repath_to(self._tgt_path)
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_points()
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_repath_to(self._tgt_path)
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_points()
         # 3
         elif self._check_statuses == '+'.join(
                 [
@@ -351,7 +351,7 @@ class AbsFncUsdMeshRepairer(object):
         ):
             geometry = AbsFncDccMeshMatcher._get_geometry_cache_(self._src_path)
             look = AbsFncDccMeshMatcher._get_look_cache_(self._src_path)
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_exchange(
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_exchange(
                 geometry, look
             )
         elif self._check_statuses == '+'.join(
@@ -362,7 +362,7 @@ class AbsFncUsdMeshRepairer(object):
         ):
             geometry = AbsFncDccMeshMatcher._get_geometry_cache_(self._src_path)
             look = AbsFncDccMeshMatcher._get_look_cache_(self._src_path)
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_exchange(
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_exchange(
                 geometry, look
             )
         elif self._check_statuses == '+'.join(
@@ -373,19 +373,19 @@ class AbsFncUsdMeshRepairer(object):
         ):
             geometry = AbsFncDccMeshMatcher._get_geometry_cache_(self._src_path)
             look = AbsFncDccMeshMatcher._get_look_cache_(self._src_path)
-            self.FNC_USD_MESH_CLASS(self._src_usd_prim).set_exchange(
+            self.FNC_USD_MESH_CLS(self._src_usd_prim).set_exchange(
                 geometry, look
             )
 
 
 class AbsFncDccGeometryComparer(object):
-    DCC_SCENE_CLASS = None
-    DCC_SCENE_OPT_CLASS = None
+    DCC_SCENE_CLS = None
+    DCC_SCENE_OPT_CLS = None
     #
     OPTION = dict()
     #
-    FNC_DCC_MESH_MATCHER_CLASS = None
-    FNC_USD_MESH_REPAIRER_CLASS = None
+    FNC_DCC_MESH_MATCHER_CLS = None
+    FNC_USD_MESH_REPAIRER_CLS = None
     #
     CACHE = {}
     #
@@ -494,10 +494,10 @@ class AbsFncDccGeometryComparer(object):
         scene_file_path = self._file_path
         location = self._location
         #
-        self._dcc_scene_tgt = self.DCC_SCENE_CLASS()
+        self._dcc_scene_tgt = self.DCC_SCENE_CLS()
         self._dcc_scene_tgt.load_from_location(location, include_obj_type=['mesh'])
         self._dcc_universe_tgt = self._dcc_scene_tgt.universe
-        self._dcc_stage_opt_tgt = self.DCC_SCENE_OPT_CLASS(self._dcc_universe_tgt)
+        self._dcc_stage_opt_tgt = self.DCC_SCENE_OPT_CLS(self._dcc_universe_tgt)
         self._dcc_comparer_data_tgt = self._dcc_stage_opt_tgt.get_mesh_comparer_data(scene_file_path)
         #
         self._dcc_geometries_tgt = []
@@ -514,14 +514,14 @@ class AbsFncDccGeometryComparer(object):
     def get_matched_mesh(self, src_path):
         src_data = self._dcc_comparer_data_src
         tgt_data = self._dcc_comparer_data_tgt
-        return self.FNC_DCC_MESH_MATCHER_CLASS(
+        return self.FNC_DCC_MESH_MATCHER_CLS(
             src_path, src_data, tgt_data
         ).get()
     #
     def repair_mesh(self, src_path, tgt_path, check_statuses):
         src_usd_prim = self._dcc_scene_src.usd_stage.GetPrimAtPath(src_path)
         if src_usd_prim.IsValid() is True:
-            self.FNC_USD_MESH_REPAIRER_CLASS(
+            self.FNC_USD_MESH_REPAIRER_CLS(
                 src_usd_prim, tgt_path, check_statuses
             ).set_run()
         else:
@@ -530,7 +530,7 @@ class AbsFncDccGeometryComparer(object):
                     utl_configure.DccMeshCheckStatus.ADDITION
                 ]
             ):
-                self.FNC_USD_MESH_REPAIRER_CLASS.set_delete(tgt_path)
+                self.FNC_USD_MESH_REPAIRER_CLS.set_delete(tgt_path)
 
     def set_run(self):
         self._results = []
@@ -645,7 +645,7 @@ class AbsDotXgenDef(object):
         file_name_base = file_opt.name_base
         return file_name_base.split('__')[-1]
     @classmethod
-    def _set_xgen_collection_files_copy_(cls, file_path_src, file_path_tgt):
+    def copy_xgen_collection_files_fnc(cls, file_path_src, file_path_tgt):
         """
         :param file_path_src: str("maya_scene_file_path")
         :param file_path_tgt:
@@ -709,7 +709,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
         file_tgt='',
         location=''
     )
-    FNC_DCC_MESH_MATCHER_CLASS = None
+    FNC_DCC_MESH_MATCHER_CLS = None
     def __init__(self, option):
         super(AbsUsdGeometryComparer, self).__init__(option)
     @classmethod
@@ -752,7 +752,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
                     if i_obj_src.type_name == 'Mesh':
                         i_path_src = i_obj_src.path
 
-                        i_mesh_matcher = self.FNC_DCC_MESH_MATCHER_CLASS(
+                        i_mesh_matcher = self.FNC_DCC_MESH_MATCHER_CLS(
                             i_path_src, data_src, data_tgt
                         )
                         i_path_tgt, i_check_statuses = i_mesh_matcher.get()
@@ -807,16 +807,17 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
         return results
 
 
-class AbsFncTextureExportDef(object):
+class AbsFncRenderTextureExportDef(object):
+    KEY = 'texture export'
     @classmethod
-    def copy_as_base_link_fnc(
+    def copy_and_repath_as_base_link_fnc(
         cls,
         directory_path_bsc, directory_path_dst,
+        #
         dcc_objs,
         # file name auto replace " " to "_"
         fix_name_blank,
         #
-        repath_to_tx_force,
         with_reference=False,
         ignore_missing_texture=False,
         remove_expression=False,
@@ -824,16 +825,16 @@ class AbsFncTextureExportDef(object):
         repath_fnc=None,
         # copy option
         #   copy source file, etc. use ".tx", auto copy ".exr"
-        copy_src=True,
-        copy_scheme='separate',
-        copy_target_extension='.tx'
+        copy_source=False,
+        copy_source_scheme='separate',
+        target_extension='.tx',
     ):
         if dcc_objs:
             copy_cache = []
             index_mapper = {}
             # use for file with same name, etc. "/temp/a/a.exr", "/temp/b/a.exr"
             index_query = {}
-            with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label='texture export') as l_p:
+            with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
                 for i_dcc_obj in dcc_objs:
                     l_p.set_update()
                     # dpt to dst
@@ -841,6 +842,12 @@ class AbsFncTextureExportDef(object):
                         # map path to current platform
                         j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
                         j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
+                        if j_texture_dpt.get_is_exists_file() is False:
+                            bsc_core.LogMtd.trace_method_warning(
+                                cls.KEY,
+                                'file="{}" is non exists'.format(j_texture_path_dpt)
+                            )
+                            continue
                         # fix name overlay
                         if j_texture_path_dpt in index_query:
                             j_index = index_query[j_texture_path_dpt]
@@ -857,11 +864,26 @@ class AbsFncTextureExportDef(object):
                         index_mapper[j_key] = j_index
                         #
                         j_directory_path_dst = '{}/v{}'.format(directory_path_dst, j_index)
-                        #
-                        j_texture_path_dst = j_texture_dpt.get_target_file_path(
-                            j_directory_path_dst,
-                            fix_name_blank=fix_name_blank
-                        )
+                        # get dst
+                        if copy_source is True:
+                            j_texture_path_dst_src, j_texture_path_dst_tgt = j_texture_dpt.get_target_file_path_as_src(
+                                directory_path_dst=j_directory_path_dst,
+                                #
+                                scheme=copy_source_scheme,
+                                target_extension=target_extension,
+                                #
+                                fix_name_blank=fix_name_blank
+                            )
+                            ext = j_texture_dpt.ext
+                            if ext == target_extension:
+                                j_texture_path_dst = j_texture_path_dst_tgt
+                            else:
+                                j_texture_path_dst = j_texture_path_dst_src
+                        else:
+                            j_texture_path_dst = j_texture_dpt.get_target_file_path(
+                                j_directory_path_dst,
+                                fix_name_blank=fix_name_blank
+                            )
                         # ignore when dpt ( departure ) same to dst ( destination )
                         if j_texture_path_dpt != j_texture_path_dst:
                             # do copy
@@ -872,13 +894,13 @@ class AbsFncTextureExportDef(object):
                                     if k_file_tile_path not in copy_cache:
                                         copy_cache.append(k_file_tile_path)
                                         #
-                                        if copy_src is True:
+                                        if copy_source is True:
                                             k_file_tile.copy_unit_as_base_link_with_src(
                                                 directory_path_bsc=directory_path_bsc,
                                                 directory_path_dst=j_directory_path_dst,
                                                 #
-                                                scheme=copy_scheme,
-                                                target_extension=copy_target_extension,
+                                                scheme=copy_source_scheme,
+                                                target_extension=target_extension,
                                                 #
                                                 fix_name_blank=fix_name_blank,
                                                 replace=True
@@ -898,21 +920,6 @@ class AbsFncTextureExportDef(object):
                                 )
                                 continue
                             # do repath
-                            #   check is replace to ".tx", when is on, replace dst to ".tx"
-                            if repath_to_tx_force is True:
-                                j_texture_tx_path_dst = j_texture_dpt.get_target_file_path(
-                                    j_directory_path_dst,
-                                    fix_name_blank=fix_name_blank,
-                                    ext_override='.tx'
-                                )
-                                if utl_dcc_objects.OsTexture(j_texture_tx_path_dst).get_is_exists() is True:
-                                    j_texture_path_dst = j_texture_tx_path_dst
-                                else:
-                                    bsc_core.LogMtd.trace_method_warning(
-                                        'texture export',
-                                        u'file="{}" is non-exists'.format(j_texture_tx_path_dst)
-                                    )
-                            #
                             j_texture_dst = utl_dcc_objects.OsTexture(j_texture_path_dst)
                             if j_texture_dst.get_exists_files_():
                                 # environ map
@@ -931,14 +938,149 @@ class AbsFncTextureExportDef(object):
                                     remove_expression,
                                 )
                                 bsc_core.LogMtd.trace_method_result(
-                                    'texture export',
+                                    cls.KEY,
                                     u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
                                 )
                             else:
                                 bsc_core.LogMtd.trace_method_warning(
-                                    'texture export',
+                                    cls.KEY,
                                     u'file="{}" is non-exists'.format(j_texture_path_dst)
                                 )
+    @classmethod
+    def copy_and_repath_fnc(
+        cls,
+        directory_path_dst,
+        #
+        dcc_objs,
+        # file name auto replace " " to "_"
+        fix_name_blank,
+        #
+        with_reference=False,
+        ignore_missing_texture=False,
+        remove_expression=False,
+        use_environ_map=False,
+        repath_fnc=None,
+        # copy option
+        #   copy source file, etc. use ".tx", auto copy ".exr"
+        copy_source=False,
+        copy_source_scheme='separate',
+        target_extension='.tx',
+    ):
+        copy_cache = []
+        index_mapper = {}
+        # use for file with same name, etc. "/temp/a/a.exr", "/temp/b/a.exr"
+        index_query = {}
+        with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
+            for i_dcc_obj in dcc_objs:
+                l_p.set_update()
+                # dpt to dst
+                for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
+                    # map path to current platform
+                    j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
+                    j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
+                    if j_texture_dpt.get_is_exists_file() is False:
+                        bsc_core.LogMtd.trace_method_warning(
+                            cls.KEY,
+                            'file="{}" is non exists'.format(j_texture_path_dpt)
+                        )
+                        continue
+                    # fix name overlay
+                    if j_texture_path_dpt in index_query:
+                        j_index = index_query[j_texture_path_dpt]
+                    else:
+                        j_key = j_texture_dpt.name
+                        if j_key in index_mapper:
+                            j_index = index_mapper[j_key]+1
+                        else:
+                            j_index = 0
+                        #
+                        index_mapper[j_key] = j_index
+                        index_query[j_texture_path_dpt] = j_index
+                    #
+                    index_mapper[j_key] = j_index
+                    #
+                    j_directory_path_dst = '{}/v{}'.format(directory_path_dst, j_index)
+                    # get dst
+                    if copy_source is True:
+                        j_texture_path_dst_src, j_texture_path_dst_tgt = j_texture_dpt.get_target_file_path_as_src(
+                            directory_path_dst=j_directory_path_dst,
+                            #
+                            scheme=copy_source_scheme,
+                            target_extension=target_extension,
+                            #
+                            fix_name_blank=fix_name_blank
+                        )
+                        ext = j_texture_dpt.ext
+                        if ext == target_extension:
+                            j_texture_path_dst = j_texture_path_dst_tgt
+                        else:
+                            j_texture_path_dst = j_texture_path_dst_src
+                    else:
+                        j_texture_path_dst = j_texture_dpt.get_target_file_path(
+                            j_directory_path_dst,
+                            fix_name_blank=fix_name_blank
+                        )
+                    # ignore when dpt ( departure ) same to dst ( destination )
+                    if j_texture_path_dpt != j_texture_path_dst:
+                        # do copy
+                        j_file_tiles = j_texture_dpt.get_exists_files_()
+                        if j_file_tiles:
+                            for k_file_tile in j_file_tiles:
+                                k_file_tile_path = k_file_tile.path
+                                if k_file_tile_path not in copy_cache:
+                                    copy_cache.append(k_file_tile_path)
+                                    #
+                                    if copy_source is True:
+                                        k_file_tile.copy_unit_with_src(
+                                            directory_path_dst=j_directory_path_dst,
+                                            #
+                                            scheme=copy_source_scheme,
+                                            target_extension=target_extension,
+                                            #
+                                            fix_name_blank=fix_name_blank,
+                                            replace=True
+                                        )
+                                    else:
+                                        k_file_tile.copy_unit(
+                                            directory_path_dst=j_directory_path_dst,
+                                            #
+                                            fix_name_blank=fix_name_blank,
+                                            replace=True
+                                        )
+                        else:
+                            bsc_core.LogMtd.trace_method_warning(
+                                'texture search',
+                                u'file="{}" is Non-exists'.format(j_texture_path_dpt)
+                            )
+                            continue
+                        # do repath
+                        #
+                        j_texture_dst = utl_dcc_objects.OsTexture(j_texture_path_dst)
+                        if j_texture_dst.get_exists_files_():
+                            # environ map
+                            if use_environ_map is True:
+                                # noinspection PyArgumentEqualDefault
+                                j_texture_path_dst_new = utl_core.PathEnv.map_to_env(
+                                    j_texture_path_dst, pattern='[KEY]'
+                                )
+                                if j_texture_path_dst_new != j_texture_path_dst:
+                                    j_texture_path_dst = j_texture_path_dst_new
+                            #
+                            repath_fnc(
+                                i_dcc_obj,
+                                j_port_path,
+                                j_texture_path_dst,
+                                remove_expression,
+                            )
+                            bsc_core.LogMtd.trace_method_result(
+                                'texture export',
+                                u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
+                            )
+                        else:
+                            bsc_core.LogMtd.trace_method_warning(
+                                'texture export',
+                                u'file="{}" is non-exists'.format(j_texture_path_dst)
+                            )
 
 
 if __name__ == '__main__':

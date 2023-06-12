@@ -346,10 +346,10 @@ looks:
 textures:
     tx:
         src_dir:
-            keyword: asset-texture-src-dir
+            keyword: asset-texture-base-dir
             workspace: publish
         tgt_dir:
-            keyword: asset-texture-tgt-dir
+            keyword: asset-texture-dir
             workspace: publish
         work_dir:
             keyword: asset-source-texture-version-dir

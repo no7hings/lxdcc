@@ -28,7 +28,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         return outputs
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         # dcc object paths
         paths = ['frame_range']
         #

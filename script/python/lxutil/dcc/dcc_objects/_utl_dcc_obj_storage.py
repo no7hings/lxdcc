@@ -14,7 +14,7 @@ class OsDirectory_(utl_dcc_obj_abs.AbsOsDirectory):
 
 
 class OsFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLASS = OsDirectory_
+    OS_DIRECTORY_CLS = OsDirectory_
     def __init__(self, path):
         super(OsFile, self).__init__(path)
 
@@ -40,11 +40,11 @@ class OsFile(utl_dcc_obj_abs.AbsOsFile):
         self.set_copy_to_file(backup_file_path)
 
 
-OsDirectory_.OS_FILE_CLASS = OsFile
+OsDirectory_.OS_FILE_CLS = OsFile
 
 
 class OsPythonFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLASS = OsDirectory_
+    OS_DIRECTORY_CLS = OsDirectory_
     def __init__(self, path):
         super(OsPythonFile, self).__init__(path)
 
@@ -57,7 +57,7 @@ class OsPythonFile(utl_dcc_obj_abs.AbsOsFile):
 
 
 class OsMultiplyFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLASS = OsDirectory_
+    OS_DIRECTORY_CLS = OsDirectory_
     RE_MULTIPLY_PATTERNS = [r'.*?(\$F.*?)[\.]']
     def __init__(self, path):
         super(OsMultiplyFile, self).__init__(path)
@@ -82,7 +82,7 @@ class OsMultiplyFile(utl_dcc_obj_abs.AbsOsFile):
 
 
 class OsJsonFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLASS = OsDirectory_
+    OS_DIRECTORY_CLS = OsDirectory_
     def __init__(self, path):
         super(OsJsonFile, self).__init__(path)
 
@@ -99,7 +99,7 @@ class OsJsonFile(utl_dcc_obj_abs.AbsOsFile):
 
 
 class OsYamlFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLASS = OsDirectory_
+    OS_DIRECTORY_CLS = OsDirectory_
     def __init__(self, path):
         super(OsYamlFile, self).__init__(path)
 
@@ -111,7 +111,7 @@ class OsYamlFile(utl_dcc_obj_abs.AbsOsFile):
 
 
 class OsTexture(utl_dcc_obj_abs.AbsOsTexture):
-    OS_DIRECTORY_CLASS = OsDirectory_
+    OS_DIRECTORY_CLS = OsDirectory_
     RE_SEQUENCE_PATTERN = r'.*?(####).*?'
     def __init__(self, path):
         super(OsTexture, self).__init__(path)

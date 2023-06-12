@@ -234,7 +234,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 
 class AbsKtnObj(utl_abstract.AbsDccObj):
     PATHSEP = '/'
-    CONNECTION_CLASS = None
+    CONNECTION_CLS = None
     def __init__(self, path):
         if not path.startswith(self.PATHSEP):
             path = self._get_ktn_obj_path_(path)
@@ -273,7 +273,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                 ktn_obj.setName(self.name)
                 bsc_core.LogMtd.trace_method_result(
                     'obj create',
-                    'obj="{}", type="{}"'.format(self.path, self.type)
+                    'obj="{}", type="{}"'.format(self.path, obj_type_name)
                 )
                 return ktn_obj
 
@@ -437,7 +437,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     target_ktn_obj = target_ktn_port.getNode()
                     source_port = self.__class__(source_ktn_obj.getName()).get_output_port(source_ktn_port.getName())
                     target_port = self.__class__(target_ktn_obj.getName()).get_input_port(target_ktn_port.getName())
-                    lis.append(self.CONNECTION_CLASS(source_port, target_port))
+                    lis.append(self.CONNECTION_CLS(source_port, target_port))
         return lis
     #
     def get_sources(self):
@@ -587,7 +587,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     )
         #
         lis = []
-        port_pathsep = self.PORT_CLASS.PATHSEP
+        port_pathsep = self.PORT_CLS.PATHSEP
         root_ktn_port = self.ktn_obj.getParameters()
         for i in root_ktn_port.getChildren():
             rcs_fnc_(i, None)
@@ -645,7 +645,7 @@ class AbsKtnObjs(utl_abstract.AbsDccObjs):
         for i in cls.INCLUDE_DCC_TYPES:
             _ = NodegraphAPI.GetAllNodesByType(i) or []
             for ktn_node in _:
-                obj_path = cls.DCC_NODE_CLASS._get_ktn_obj_path_(ktn_node.getName())
+                obj_path = cls.DCC_NODE_CLS._get_ktn_obj_path_(ktn_node.getName())
                 lis.append(obj_path)
         return lis
 

@@ -26,6 +26,6 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         shading_engines = _mya_dcc_obj_objs.Materials().get_custom_nodes()
         self._set_objs_check_(shading_engines)

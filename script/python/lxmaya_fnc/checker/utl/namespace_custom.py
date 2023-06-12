@@ -90,6 +90,6 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         self._repair_method_0(*args)
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         namespaces = _mya_dcc_obj_scene.Scene().get_namespaces()
         self._set_objs_check_(namespaces)

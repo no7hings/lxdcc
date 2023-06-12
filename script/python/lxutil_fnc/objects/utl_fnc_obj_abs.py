@@ -15,11 +15,11 @@ import lxutil_fnc.dcc.dcc_objects as utl_fnc_dcc_objects
 
 
 class AbsTaskMethodsLoader(object):
-    CONFIGURE_CLASS = None
+    CONFIGURE_CLS = None
     METHODS_CONFIGURE_PATH = None
     def __init__(self, task_properties, options=None):
         self._task_properties = task_properties
-        self._configure = self.CONFIGURE_CLASS(None, self.METHODS_CONFIGURE_PATH)
+        self._configure = self.CONFIGURE_CLS(None, self.METHODS_CONFIGURE_PATH)
         #
         if isinstance(options, dict):
             for k, v in options.items():
@@ -152,12 +152,12 @@ class AbsMethodDef(object):
 
 
 class AbsMethodCheckDef(object):
-    FNC_ISP_IGNORE_CLASS = None
+    FNC_ISP_IGNORE_CLS = None
     #
-    DCC_NODE_CLASS = utl_dcc_objects.Obj
-    CONTENT_CLASS = bsc_objects.Content
+    DCC_NODE_CLS = utl_dcc_objects.Obj
+    CONTENT_CLS = bsc_objects.Content
     def _set_method_check_def_init_(self):
-        self._error_obj_content = self.CONTENT_CLASS(
+        self._error_obj_content = self.CONTENT_CLS(
             value=collections.OrderedDict()
         )
         #
@@ -342,7 +342,7 @@ class AbsMethodCheckDef(object):
         self._is_check_passed = False
         self._is_check_ignored = False
         #
-        self._error_obj_content = self.CONTENT_CLASS(
+        self._error_obj_content = self.CONTENT_CLS(
             value=collections.OrderedDict()
         )
 

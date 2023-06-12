@@ -129,8 +129,8 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 lis.append(ktn_node)
         return lis
     #
-    FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = unv_objects.ObjUniverse
+    FILE_CLS = utl_dcc_objects.OsFile
+    UNIVERSE_CLS = unv_objects.ObjUniverse
     def __init__(self, *args, **kwargs):
         super(Scene, self).__init__(*args, **kwargs)
 

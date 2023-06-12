@@ -21,7 +21,7 @@ if __name__ == '__main__':
     #
     # print CfgFileMtd.get_yaml('clarisse/gui/menu')
     #
-    # print CfgFileMtd.get_yaml('database/library/basic')
+    # print CfgFileMtd.get_yaml('database/library/resource-basic')
     #
     # print CfgFileMtd.get_yaml('storage/asset-system-workspace')
 
@@ -45,9 +45,6 @@ if __name__ == '__main__':
     # )
     # print StgPathPermissionMtd.change_owner('/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture/main/v002')
 
-    # StgPathPermissionMtd.change_mode(
-    #     '/production/shows/nsa_dev/assets/oth/genariceyes/user/team.srf/extend/look/yml', '777'
-    # )
     # StgPathPermissionMtd.change_owner(
     #     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/texture'
     # )
@@ -62,6 +59,16 @@ if __name__ == '__main__':
     # print RawTextOpt(
     #     'dreambae_nightare'
     # ).to_rgb_0()
-    print RawTextMtd.split_to(
-        'nn4y cloth.rough.<udim>.tx'
-    )
+    # print RawTextMtd.to_integer(
+    #     'l_out_eye_001_hishape'
+    # )
+    # StgPathPermissionMtd.create_directory(
+    #     '/production/library/resource', 777
+    # )
+    # print ImgFileOpt(
+    #     '/production/library/resource/all/atlas/sword_fern_pjvef2/v0001/image/preview.png'
+    # ).get_thumbnail(ext='.png')
+
+    # print RscFileMtd.get(
+    #     'asset/library/preview_sphere.usda'
+    # )

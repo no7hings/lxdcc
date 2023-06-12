@@ -419,9 +419,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version = rsv_scene_properties.get('version')
             #
             if workspace == rsv_scene_properties.get('workspaces.release'):
-                keyword_0 = 'asset-texture-tgt-dir'
+                keyword_0 = 'asset-texture-dir'
             elif workspace == rsv_scene_properties.get('workspaces.temporary'):
-                keyword_0 = 'asset-temporary-texture-tgt-dir'
+                keyword_0 = 'asset-temporary-texture-dir'
             else:
                 raise RuntimeError()
             #
@@ -466,10 +466,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             if workspace == rsv_scene_properties.get('workspaces.release'):
                 keyword_0 = 'asset-maya-scene-file'
-                keyword_1 = 'asset-texture-tgt-dir'
+                keyword_1 = 'asset-texture-dir'
             elif workspace == rsv_scene_properties.get('workspaces.temporary'):
                 keyword_0 = 'asset-temporary-maya-scene-file'
-                keyword_1 = 'asset-temporary-texture-tgt-dir'
+                keyword_1 = 'asset-temporary-texture-dir'
             else:
                 raise TypeError()
             #

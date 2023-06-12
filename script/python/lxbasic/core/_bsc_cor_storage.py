@@ -63,28 +63,33 @@ class StgRpcMtd(object):
             )
         return True
     @classmethod
-    def delete(cls, path):
-        if os.path.exists(path) is True:
+    def delete(cls, file_path):
+        if os.path.exists(file_path) is True:
             timeout = 25
             cost_time = 0
             start_time = time.time()
             clt = cls.get_client()
-            clt.rm_file(path)
-            while os.path.exists(path) is False:
+            clt.rm_file(file_path)
+            # delete, check is exists
+            p = os.path.dirname(file_path)
+            while os.path.exists(file_path) is True:
                 cost_time = int(time.time()-start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
                         _bsc_cor_log.LogMtd.trace_method_error(
                             'rpc delete',
-                            'path="{}" is timeout, cost time {}s'.format(path, cost_time)
+                            'path="{}" is timeout, cost time {}s'.format(file_path, cost_time)
                         )
                     )
+                #
+                if SystemMtd.get_is_linux():
+                    os.system('ls {}'.format(p))
                 #
                 time.sleep(1)
             #
             _bsc_cor_log.LogMtd.trace_method_result(
                 'rpc delete',
-                'path="{}" is completed, cost time {}s'.format(path, cost_time)
+                'path="{}" is completed, cost time {}s'.format(file_path, cost_time)
             )
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
@@ -512,20 +517,20 @@ class StgUserMtd(object):
 class StgExtraMtd(object):
     @classmethod
     def set_directory_open(cls, path):
+        path = _bsc_cor_raw.auto_encode(path)
         if SystemMtd.get_is_windows():
-            cmd = u'explorer "{}"'.format(path.replace('/', '\\'))
-            # subprocess.Popen(cmd, shell=True)
+            cmd = 'explorer "{}"'.format(path.replace('/', '\\'))
         elif SystemMtd.get_is_linux():
-            cmd = u'nautilus "{}"'.format(path)
-            # subprocess.Popen(cmd, shell=True)
+            cmd = 'nautilus "{}"'.format(path)
         else:
             raise SystemError()
 
         t_0 = threading.Thread(
             target=functools.partial(
-                _bsc_cor_process.SubProcessMtd.set_run_with_result, cmd
+                _bsc_cor_process.SubProcessMtd.execute_as_block, cmd
             )
         )
+        t_0.setDaemon(True)
         t_0.start()
         # t_0.join()
     @classmethod
@@ -629,7 +634,6 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             results = os.listdir(directory_path) or []
-            # results.sort()
             for i_name in results:
                 i_path = '{}/{}'.format(directory_path, i_name)
                 if os.path.isfile(i_path):
@@ -639,7 +643,7 @@ class StgDirectoryMtd(object):
                             continue
                     #
                     list_.append(i_path)
-        return list_
+        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
     @classmethod
     def _get_file_paths(cls, directory_path, include_exts=None):
         import scandir
@@ -655,7 +659,7 @@ class StgDirectoryMtd(object):
                             continue
                     #
                     list_.append(i_path)
-        return list_
+        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
     @classmethod
     def get_file_paths__(cls, directory_path, include_exts=None):
         if SystemMtd.get_is_linux():
@@ -831,6 +835,9 @@ class StgFileMultiplyMtd(object):
     methods using for multiply file
     etc. "/tmp/image.1001.exr" convert to "/tmp/image.####.exr"
     """
+    PATHSEP = _bsc_cor_pattern.PtnMultiplyFileMtd.PATHSEP
+    P = '[0-9]'
+    CACHE = dict()
     @classmethod
     def get_match_args(cls, file_name, name_pattern):
         new_file_name = file_name
@@ -849,15 +856,15 @@ class StgFileMultiplyMtd(object):
                 )
             return new_file_name, map(int, numbers)
     @classmethod
-    def set_merge_to(cls, file_paths, name_patterns):
+    def merge_to(cls, file_paths, name_patterns):
         list_ = []
         for i_file_path in file_paths:
-            i_file_path = cls.set_convert_to(i_file_path, name_patterns)
+            i_file_path = cls.convert_to(i_file_path, name_patterns)
             if i_file_path not in list_:
                 list_.append(i_file_path)
         return list_
     @classmethod
-    def set_convert_to(cls, file_path, name_patterns):
+    def convert_to(cls, file_path, name_patterns):
         """
         use for convert "/tmp/image.1001.exr" to "/tmp/image.####.exr"
         :param file_path:
@@ -871,48 +878,51 @@ class StgFileMultiplyMtd(object):
                 **dict(ext=file_opt.ext[1:])
             )
             if _bsc_cor_pattern.PtnMultiplyFileMtd.get_is_valid(i_name_pattern):
-                match_args = StgFileMultiplyMtd.get_match_args(
+                i_match_args = StgFileMultiplyMtd.get_match_args(
                     file_opt.name, i_name_pattern
                 )
-                if match_args:
-                    file_name_, numbers = match_args
+                if i_match_args:
+                    i_file_name, _ = i_match_args
                     #
-                    file_path_ = '{}/{}'.format(file_opt.directory_path, file_name_)
-                    return file_path_
+                    i_file_path = '{}/{}'.format(file_opt.directory_path, i_file_name)
+                    return i_file_path
         return file_path
     @classmethod
-    def get_exists_tiles(cls, file_path):
-        P = '[0-9]'
+    def to_glob_pattern(cls, name_base):
+        if name_base in cls.CACHE:
+            return cls.CACHE[name_base]
         re_keys = _bsc_cor_pattern.PtnMultiplyFileMtd.RE_MULTIPLY_KEYS
-        pathsep = _bsc_cor_pattern.PtnMultiplyFileMtd.PATHSEP
         #
-        directory_path = os.path.dirname(file_path)
-        #
-        name_base = os.path.basename(file_path)
         name_base_new = name_base
         for i_keyword, i_re_format, i_count in re_keys:
             i_results = re.finditer(i_re_format.format(i_keyword), name_base, re.IGNORECASE) or []
             for j_result in i_results:
                 j_start, j_end = j_result.span()
                 if i_count == -1:
-                    s = P
+                    s = cls.P
                 else:
-                    s = P*i_count
+                    s = cls.P*i_count
                 #
                 name_base_new = name_base_new.replace(name_base[j_start:j_end], s, 1)
+        cls.CACHE[name_base] = name_base_new
+        return name_base_new
+    @classmethod
+    def get_exists_tiles(cls, file_path):
+        if os.path.isfile(file_path):
+            return [file_path]
         #
+        directory_path = os.path.dirname(file_path)
+        #
+        name_base = os.path.basename(file_path)
+        name_base_new = cls.to_glob_pattern(name_base)
         if name_base != name_base_new:
-            glob_pattern = pathsep.join([directory_path, name_base_new])
-            #
+            glob_pattern = cls.PATHSEP.join([directory_path, name_base_new])
             list_ = StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
-            if list_:
-                list_.sort()
-        else:
-            if os.path.isfile(file_path):
-                list_ = [file_path]
-            else:
-                list_ = []
-        return list_
+            return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        return []
+    @classmethod
+    def get_exists(cls, file_path):
+        return not not cls.get_exists_tiles(file_path)
 
 
 class StgDirectoryMultiplyMtd(object):
@@ -1039,6 +1049,9 @@ class StgPathOpt(object):
     def map_to_current(self):
         self._path = StgPathMapMtd.map_to_current(self._path)
 
+    def set_modify_time(self, timestamp):
+        os.utime(self.get_path(), (timestamp, timestamp))
+
     def __str__(self):
         return self._path
 
@@ -1123,6 +1136,11 @@ class StgDirectoryOpt(StgPathOpt):
     def set_create(self):
         StorageMtd.create_directory(
             self.path
+        )
+
+    def get_file_paths(self, include_exts=None):
+        return StgDirectoryMtd.get_file_paths__(
+            self.path, include_exts
         )
 
     def get_all_file_paths(self, include_exts=None):
@@ -1229,6 +1247,9 @@ class StgFileOpt(StgPathOpt):
         return os.path.splitext(self.path)[-1]
     ext = property(get_ext)
 
+    def get_format(self):
+        return self.get_ext()[1:]
+
     def get_is_match_name_pattern(self, name_pattern):
         _ = fnmatch.filter([self.name], name_pattern)
         if _:
@@ -1280,7 +1301,7 @@ class StgFileOpt(StgPathOpt):
             with open(self.path, 'w') as f:
                 f.write(raw)
 
-    def set_append(self, raw):
+    def append(self, raw):
         with open(self.path, 'w') as f:
             f.write(raw)
 
@@ -1459,6 +1480,14 @@ class StgTmpThumbnailMtd(object):
         key = cls.get_key(file_path)
         region = StgTmpBaseMtd.get_save_region(key)
         return '{}/.thumbnail/{}/{}/{}{}'.format(
+            directory_path, region, key, width, ext
+        )
+    @classmethod
+    def get_qt_file_path_(cls, file_path, width=128, ext='.jpg'):
+        directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
+        key = cls.get_key(file_path)
+        region = StgTmpBaseMtd.get_save_region(key)
+        return '{}/.qt-thumbnail/{}/{}/{}{}'.format(
             directory_path, region, key, width, ext
         )
 

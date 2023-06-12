@@ -9,8 +9,6 @@ from lxbasic import bsc_core
 
 from lxutil import utl_abstract, utl_core
 
-from lxutil_gui.qt import utl_gui_qt_core
-
 from lxmaya import ma_configure, ma_core
 
 
@@ -403,10 +401,10 @@ class AbsMyaObjConnection(utl_abstract.AbsDccObjConnection):
 
 class AbsMaShapeDef(object):
     PATHSEP = None
-    TRANSFORM_CLASS = None
+    TRANSFORM_CLS = None
     def _set_ma_shape_def_init_(self, shape_path):
         transform_path = self.PATHSEP.join(shape_path.split(self.PATHSEP)[:-1])
-        self._transform = self.TRANSFORM_CLASS(transform_path)
+        self._transform = self.TRANSFORM_CLS(transform_path)
     @property
     def transform(self):
         return self._transform
@@ -457,7 +455,9 @@ class AbsMyaObj(
         return cmds.nodeType(self.get_path(), apiType=1)
     @property
     def icon(self):
-        return utl_gui_qt_core.QtMayaMtd.get_qt_icon(self.type)
+        if ma_core.get_is_ui_mode():
+            from lxutil_gui.qt import utl_gui_qt_core
+            return utl_gui_qt_core.QtMayaMtd.get_qt_icon(self.type)
     @classmethod
     def _get_full_path_(cls, path):
         if cmds.objExists(path) is True:
@@ -636,17 +636,17 @@ class AbsMyaObj(
                 #
                 utl_core.Log.set_module_result_trace(
                     'parent set',
-                    u'obj="{}"'.format(parent_obj.path)
+                    'obj="{}"'.format(parent_obj.path)
                 )
             else:
                 utl_core.Log.set_module_warning_trace(
                     'parent set',
-                    u'obj="{}" is non-changed'.format(parent_obj.path)
+                    'obj="{}" is already child for "{}"'.format(self.get_path(), parent_obj.get_path())
                 )
         else:
             utl_core.Log.set_module_warning_trace(
                 'parent set',
-                u'obj="{}" is non-exists'.format(parent_obj.path)
+                'obj="{}" is non-exists'.format(parent_obj.path)
             )
 
     def get_dcc_instance(self, obj_type, obj_path=None, *args, **kwargs):
@@ -682,7 +682,7 @@ class AbsMyaObj(
             name = self.name
             utl_core.Log.set_module_result_trace(
                 'obj create',
-                'obj="{}", type="{}"'.format(self.path, self.type)
+                'obj="{}", type="{}"'.format(self.path, obj_type)
             )
             if parent_path is not None:
                 return cmds.createNode(obj_type, name=name, parent=parent_path, skipSelect=1)

@@ -22,9 +22,9 @@ class CheckerLoader(utl_fnc_abstract.AbsCheckerLoader):
 
 
 class ExporterConfigure(utl_fnc_abstract.AbsExporterConfigure):
-    CONFIGURE_CLASS = bsc_objects.Configure
+    CONFIGURE_CLS = bsc_objects.Configure
     #
-    PROPERTIES_CLASS = bsc_objects.Properties
+    PROPERTIES_CLS = bsc_objects.Properties
     #
     METHODS_CONFIGURE_PATH = ma_fnc_configure.Scheme.EXPORTERS_CONFIGURE_PATH
     def __init__(self, *args):

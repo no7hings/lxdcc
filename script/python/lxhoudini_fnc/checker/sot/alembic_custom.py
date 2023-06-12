@@ -47,7 +47,7 @@ class Method(hou_fnc_abstract.AbsHouIspOp):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
 
         alembics = []
         _ = hou_dcc_objects.Alembics().get_objs()

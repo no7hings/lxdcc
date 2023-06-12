@@ -266,7 +266,7 @@ class AbsDccObjConnection(object):
 
 
 class AbsDccObjSourceDef(object):
-    CONNECTION_CLASS = None
+    CONNECTION_CLS = None
     SOURCE_OBJ_CLS = None
     def __init__(self, *args):
         pass
@@ -292,7 +292,7 @@ class AbsDccObjSourceDef(object):
         #
         source_obj_cls = self._get_source_obj_cls_()
         connection_raw = self._get_source_connection_raw_(*args, **kwargs)
-        pathsep = self.CONNECTION_CLASS.PORT_PATHSEP
+        pathsep = self.CONNECTION_CLS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
             source_obj_path, source_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
@@ -303,7 +303,7 @@ class AbsDccObjSourceDef(object):
             source = source_obj_cls(source_obj_path).get_port(source_port_path)
             target = source_obj_cls(target_obj_path).get_port(target_port_path)
             lis.append(
-                self.CONNECTION_CLASS(source, target)
+                self.CONNECTION_CLS(source, target)
             )
         return lis
 
@@ -369,7 +369,7 @@ class AbsDccObjSourceDef(object):
 
 
 class AbsDccObjTargetDef(object):
-    CONNECTION_CLASS = None
+    CONNECTION_CLS = None
     def __init__(self, *args):
         pass
 
@@ -387,7 +387,7 @@ class AbsDccObjTargetDef(object):
         """
         lis = []
         connection_raw = self._get_target_connection_raw_(*args, **kwargs)
-        pathsep = self.CONNECTION_CLASS.PORT_PATHSEP
+        pathsep = self.CONNECTION_CLS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
             source_obj_path, source_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
@@ -398,7 +398,7 @@ class AbsDccObjTargetDef(object):
             source = self.__class__(source_obj_path).get_port(source_port_path)
             target = self.__class__(target_obj_path).get_port(target_port_path)
             lis.append(
-                self.CONNECTION_CLASS(source, target)
+                self.CONNECTION_CLS(source, target)
             )
         return lis
 
@@ -462,8 +462,8 @@ class AbsDccObj(
     # AbsObjGuiDef
 ):
     # attribute
-    PORT_CLASS = None
-    CONNECTION_CLASS = None
+    PORT_CLS = None
+    CONNECTION_CLS = None
     def __init__(self, path):
         self._set_obj_dag_def_init_(path)
         if self.path.startswith(self.PATHSEP):
@@ -492,8 +492,8 @@ class AbsDccObj(
         raise NotImplementedError()
     # attribute ****************************************************************************************************** #
     def get_port(self, port_path, port_assign=unr_configure.PortAssign.VARIANTS):
-        if self.PORT_CLASS is not None:
-            return self.PORT_CLASS(
+        if self.PORT_CLS is not None:
+            return self.PORT_CLS(
                 self,
                 port_path,
                 port_assign
@@ -571,7 +571,7 @@ class AbsDccObj(
 
 # dcc scene ********************************************************************************************************** #
 class AbsDccScene(AbsDccObjDef):
-    REFERENCE_FILE_CLASS = None
+    REFERENCE_FILE_CLS = None
     def __init__(self):
         self._reference_files = []
     @property
@@ -604,8 +604,8 @@ class AbsDccScene(AbsDccObjDef):
 
 
 class AbsFileReferenceDef(object):
-    PORT_CLASS = None
-    OS_FILE_CLASS = None
+    PORT_CLS = None
+    OS_FILE_CLS = None
     def _set_file_reference_def_init_(self, file_path):
         self.set_file_path(file_path)
         self._file_attribute_name = None
@@ -622,7 +622,7 @@ class AbsFileReferenceDef(object):
 
     def set_file_path(self, file_path):
         if file_path is not None:
-            self._file = self.OS_FILE_CLASS(file_path)
+            self._file = self.OS_FILE_CLS(file_path)
         else:
             self._file = None
 
@@ -634,7 +634,7 @@ class AbsFileReferenceDef(object):
     def get_file(self):
         file_path = self.get_file_path()
         if file_path is not None:
-            return self.OS_FILE_CLASS(file_path)
+            return self.OS_FILE_CLS(file_path)
 
     def get_file_port_path(self):
         return self._file_attribute_name
@@ -645,7 +645,7 @@ class AbsFileReferenceDef(object):
 
     def get_file_port(self):
         if self._file_attribute_name:
-            return self.PORT_CLASS(self, self._file_attribute_name)
+            return self.PORT_CLS(self, self._file_attribute_name)
 
     def get_is_multiply_reference(self):
         raise NotImplementedError()
@@ -660,11 +660,11 @@ class AbsFileReferenceDef(object):
         return self._reference_raw.keys()
 
     def get_file_ports(self):
-        return [self.PORT_CLASS(self, i) for i in self.get_file_port_paths()]
+        return [self.PORT_CLS(self, i) for i in self.get_file_port_paths()]
 
     def set_os_file_path_add(self, port_path, file_path):
         self._reference_raw.setdefault(port_path, []).append(file_path)
-        os_file = self.OS_FILE_CLASS(file_path)
+        os_file = self.OS_FILE_CLS(file_path)
         os_file.reference_attribute_name = port_path
         self._file_paths.append(file_path)
         self._files.append(os_file)
@@ -690,7 +690,7 @@ class AbsFileReferenceDef(object):
         ]
 
     def _set_file_create_(self, file_plf_path, port_dcc_path=None):
-        os_file = self.OS_FILE_CLASS(file_plf_path)
+        os_file = self.OS_FILE_CLS(file_plf_path)
         os_file.set_relevant_dcc_port_path(port_dcc_path)
         return os_file
 
@@ -699,12 +699,12 @@ class AbsDccObjs(object):
     INCLUDE_DCC_TYPES = []
     EXCLUDE_DCC_PATHS = []
     #
-    DCC_NODE_CLASS = None
+    DCC_NODE_CLS = None
     def __init__(self, *args):
         pass
     @classmethod
     def _set_obj_create_(cls, path_):
-        return cls.DCC_NODE_CLASS(path_)
+        return cls.DCC_NODE_CLS(path_)
     @classmethod
     def get_paths(cls, **kwargs):
         raise NotImplementedError()
@@ -723,14 +723,14 @@ class AbsSetup(object):
     def __init__(self, root):
         self._root = root
     @classmethod
-    def _set_environ_(cls, key, value):
+    def set_environ_fnc(cls, key, value):
         os.environ[key] = value
         utl_core.Log.set_module_result_trace(
             'environ set',
             u'key="{}", value="{}"'.format(key, value)
         )
     @classmethod
-    def _set_environ_add_(cls, key, value):
+    def add_environ_fnc(cls, key, value):
         if key in os.environ:
             v = os.environ[key]
             if value not in v:
@@ -746,7 +746,7 @@ class AbsSetup(object):
                 u'key="{}", value="{}"'.format(key, value)
             )
     @classmethod
-    def _set_python_setup_(cls, path):
+    def add_python_env_fnc(cls, path):
         python_paths = sys.path
         if path not in python_paths:
             sys.path.insert(0, path)
@@ -755,11 +755,14 @@ class AbsSetup(object):
                 u'value="{}"'.format(path)
             )
     @classmethod
-    def _set_library_setup_(cls, *args):
-        [cls._set_environ_add_('LD_LIBRARY_PATH', i) for i in args]
+    def add_library_env_fnc(cls, *args):
+        if bsc_core.PlatformMtd.get_is_windows():
+            [cls.add_environ_fnc('PATH', i) for i in args]
+        elif bsc_core.PlatformMtd.get_is_linux():
+            [cls.add_environ_fnc('LD_LIBRARY_PATH', i) for i in args]
     @classmethod
-    def _set_bin_setup_(cls, *args):
-        [cls._set_environ_add_('PATH', i) for i in args]
+    def add_bin_fnc(cls, *args):
+        [cls.add_environ_fnc('PATH', i) for i in args]
 
     def set_run(self):
         raise NotImplementedError()

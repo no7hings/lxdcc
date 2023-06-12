@@ -248,6 +248,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
     BIN = '/job/PLE/support/wrappers/paper-bin'
     def __init__(self, *args, **kwargs):
         super(AbsRsvAppNew, self).__init__(*args, **kwargs)
+        self._bin_source = bsc_core.StgPathMapMtd.map_to_current(self.BIN_SOURCE)
 
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:
@@ -298,7 +299,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
                 args.extend(args_execute)
             if isinstance(args_extend, (set, tuple, list)):
                 args.extend(args_extend)
-            return ' '.join([self.BIN] + list(args))
+            return ' '.join([self._bin_source] + list(args))
 
     def _test_(self):
         pass

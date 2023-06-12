@@ -22,6 +22,6 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         references = _mya_dcc_obj_objs.References.get_custom_nodes(reference=False)
         self._set_objs_check_(references)

@@ -14,24 +14,20 @@ class LogMtd(object):
         return time.strftime(cls.TIME_FORMAT, time.localtime(time.time()))
     @classmethod
     def get(cls, text):
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
+        text = _bsc_cor_raw.auto_encode(text)
         return '{} {}'.format(cls.get_time(), text)
     #
     @classmethod
     def get_result(cls, text):
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.get('''        | {}'''.format(text))
     @classmethod
     def get_warning(cls, text):
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.get('''warning | {}'''.format(text))
     @classmethod
     def get_error(cls, text):
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.get(''' error  | {}'''.format(text))
     #
     @classmethod
@@ -67,34 +63,22 @@ class LogMtd(object):
     #
     @classmethod
     def get_method_result(cls, name, text):
-        if isinstance(name, six.text_type):
-            name = name.encode('utf-8')
-        #
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
-        #
+        name = _bsc_cor_raw.auto_encode(name)
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.get_result(
             '<{}> {}'.format(name, text)
         )
     @classmethod
     def get_method_warning(cls, name, text):
-        if isinstance(name, six.text_type):
-            name = name.encode('utf-8')
-        #
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
-        #
+        name = _bsc_cor_raw.auto_encode(name)
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.get_warning(
             '<{}> {}'.format(name, text)
         )
     @classmethod
     def get_method_error(cls, name, text):
-        if isinstance(name, six.text_type):
-            name = name.encode('utf-8')
-        #
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
-        #
+        name = _bsc_cor_raw.auto_encode(name)
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.get_error(
             '<{}> {}'.format(name, text)
         )
@@ -106,34 +90,22 @@ class LogMtd(object):
         :param text: str/unicode
         :return:
         """
-        if isinstance(name, six.text_type):
-            name = name.encode('utf-8')
-        #
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
-        #
+        name = _bsc_cor_raw.auto_encode(name)
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.trace_result(
             '<{}> {}'.format(name, text)
         )
     @classmethod
     def trace_method_warning(cls, name, text):
-        if isinstance(name, six.text_type):
-            name = name.encode('utf-8')
-        #
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
-        #
+        name = _bsc_cor_raw.auto_encode(name)
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.trace_warning(
             '<{}> {}'.format(name, text)
         )
     @classmethod
     def trace_method_error(cls, name, text):
-        if isinstance(name, six.text_type):
-            name = name.encode('utf-8')
-        #
-        if isinstance(text, six.text_type):
-            text = text.encode('utf-8')
-        #
+        name = _bsc_cor_raw.auto_encode(name)
+        text = _bsc_cor_raw.auto_encode(text)
         return cls.trace_error(
             '<{}> {}'.format(name, text)
         )

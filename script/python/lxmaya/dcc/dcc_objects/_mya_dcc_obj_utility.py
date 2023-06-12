@@ -9,7 +9,7 @@ from lxmaya import ma_configure
 
 from lxutil import utl_core
 
-from .. import mya_dcc_obj_abs
+from lxmaya.dcc import mya_dcc_obj_abs
 
 
 class Port(mya_dcc_obj_abs.AbsMyaPort):

@@ -7,8 +7,8 @@ from lxhoudini_fnc import hou_fnc_core
 
 
 class AbsHouIspOp(utl_fnc_abstract.AbsChecker):
-    FNC_CHECKER_LOADER_CLASS = hou_fnc_core.CheckerLoader
-    FNC_ISP_IGNORE_CLASS = utl_fnc_core.IspIgnore
+    FNC_CHECKER_LOADER_CLS = hou_fnc_core.CheckerLoader
+    FNC_ISP_IGNORE_CLS = utl_fnc_core.IspIgnore
     def __init__(self, fnc_isp_path):
         super(AbsHouIspOp, self).__init__(fnc_isp_path)
 

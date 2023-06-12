@@ -19,7 +19,7 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
             output='',
             quality=1.0,
             width=2048,
-            lut_directory='/l/packages/pg/third_party/ocio/aces/1.0.3/baked/maya/sRGB_for_ACEScg_Maya.csp',
+            lut_directory='/job/PLE/bundle/thirdparty/aces/1.2/baked/maya/sRGB_for_ACEScg_Maya.csp',
             comment='test',
             start_frame=1001,
         )
@@ -29,8 +29,6 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
             '/opt/rv/bin/rvio',
             '{input}',
             '-vv',
-            # '-overlay frameburn .4 1.0 30.0',
-            # '-dlut "{lut_directory}"',
             '-o "{output}"',
             '-outparams comment="{comment}"',
             '-quality {quality}',
@@ -61,10 +59,21 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
                         cmd_args.extend(
                             ['-dlut "{lut_directory}"']
                         )
+
+                    #
+                    if '####' in input_:
+                        cmd_args.extend(
+                            [
+                                '-overlay frameburn .4 1.0 30.0',
+                            ]
+                        )
                     #
                     default_kwargs['input'] = '"{}"'.format(input_)
 
-        default_kwargs['output'] = kwargs['output']
+        output = kwargs['output']
+        output_opt = bsc_core.StgFileOpt(output)
+        output_opt.create_directory()
+        default_kwargs['output'] = output
         bsc_core.SubProcessMtd.set_run_with_result(
             ' '.join(cmd_args).format(**default_kwargs)
         )

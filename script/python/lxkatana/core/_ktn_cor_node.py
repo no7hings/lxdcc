@@ -2546,7 +2546,7 @@ class NGObjCustomizePortOpt(object):
                 i_ktn_group_port, scheme=scheme, name=i_p, value=v, default=v
             )
 
-    def set_port_add(self, key, value):
+    def add_port(self, key, value):
         pass
     @classmethod
     def _set_port_add_as_enable_(cls):

@@ -20,8 +20,8 @@ class Port(mya_dcc_obj_abs.AbsMyaPort):
 
 
 class Node(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     def __init__(self, path):
         super(Node, self).__init__(path)
     # dag
@@ -46,18 +46,29 @@ class Node(mya_dcc_obj_abs.AbsMyaObj):
         # noinspection PyArgumentList
         return [self.__class__(i) for i in self.get_descendant_paths(*args, **kwargs)]
 
+    def get_parent_path(self):
+        if self.get_is_exists() is True:
+            _ = cmds.listRelatives(self.get_path(), parent=1, fullPath=1)
+            if _:
+                return _[0]
+
+    def get_parent(self):
+        _ = self.get_parent_path()
+        if _:
+            return self.__class__(_)
+
 
 class DisplayLayer(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
-    DCC_NODE_CLASS = Node
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    CONNECTION_CLS = _mya_dcc_obj_utility.Connection
+    DCC_NODE_CLS = Node
     def __init__(self, path):
         super(DisplayLayer, self).__init__(path)
 
     def get_objs(self):
         lis = []
         for path in self.get_node_paths():
-            lis.append(self.DCC_NODE_CLASS(path))
+            lis.append(self.DCC_NODE_CLS(path))
         return lis
 
     def get_node_paths(self):
@@ -67,8 +78,8 @@ class DisplayLayer(mya_dcc_obj_abs.AbsMyaObj):
 
 
 class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    OS_FILE_CLASS = utl_dcc_objects.OsFile
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    OS_FILE_CLS = utl_dcc_objects.OsFile
     def __init__(self, path):
         super(Reference, self).__init__(self._get_full_path_(path))
 
@@ -141,8 +152,8 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
 
 class Material(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     #
     SHADING_NODE_TYPES = ['mesh', 'pgYetiMaya', 'nurbsHair']
     OBJ_TYPE = 'shadingEngine'
@@ -183,19 +194,22 @@ class Material(mya_dcc_obj_abs.AbsMyaObj):
 
 
 class Shader(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     #
     CATEGORY_DICT = {}
-    for _category in ['shader', 'texture', 'light', 'utility']:
-        _ = cmds.listNodeTypes(_category) or []
-        for _i in _:
-            CATEGORY_DICT[_i] = _category
-    #
     def __init__(self, path):
         super(Shader, self).__init__(path)
+    @classmethod
+    def cache_category(cls):
+        if not cls.CATEGORY_DICT:
+            for i_category in ['shader', 'texture', 'light', 'utility']:
+                for j_type in cmds.listNodeTypes(i_category) or []:
+                    cls.CATEGORY_DICT[j_type] = i_category
 
     def set_create(self, obj_type):
+        self.__class__.cache_category()
+        #
         if self.get_is_exists() is False:
             name = self.name
             utl_core.Log.set_module_result_trace(
@@ -224,15 +238,18 @@ class Shader(mya_dcc_obj_abs.AbsMyaObj):
 
 class AndShader(Shader):
     CATEGORY_DICT = {}
-    for _category in ['shader', 'texture', 'light', 'utility']:
-        _ = cmds.listNodeTypes('rendernode/arnold/' + _category) or []
-        for _i in _:
-            CATEGORY_DICT[_i] = _category
-    #
     def __init__(self, path):
         super(AndShader, self).__init__(path)
+    @classmethod
+    def cache_category(cls):
+        if not cls.CATEGORY_DICT:
+            for i_category in ['shader', 'texture', 'light', 'utility']:
+                for j_type in cmds.listNodeTypes('rendernode/arnold/'+i_category) or []:
+                    cls.CATEGORY_DICT[j_type] = i_category
 
     def set_create(self, obj_type):
+        self.__class__.cache_category()
+        #
         if self.get_is_exists() is False:
             name = self.name
             utl_core.Log.set_module_result_trace(
@@ -260,16 +277,16 @@ class AndShader(Shader):
 
 
 class FileReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    OS_FILE_CLASS = utl_dcc_objects.OsFile
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    OS_FILE_CLS = utl_dcc_objects.OsFile
     def __init__(self, path, file_path=None):
         super(FileReference, self).__init__(self._get_full_path_(path))
         self._set_file_reference_def_init_(file_path)
 
 
 class TextureReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    OS_FILE_CLASS = utl_dcc_objects.OsTexture
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    OS_FILE_CLS = utl_dcc_objects.OsTexture
     def __init__(self, path, file_path=None):
         super(TextureReference, self).__init__(self._get_full_path_(path), file_path)
 
@@ -287,15 +304,15 @@ class TextureReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
 
 class Alembic(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    OS_FILE_CLASS = utl_dcc_objects.OsFile
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    OS_FILE_CLS = utl_dcc_objects.OsFile
     def __init__(self, path):
         super(Alembic, self).__init__(path)
 
 
 class Set(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     def __init__(self, path):
         super(Set, self).__init__(path)
 

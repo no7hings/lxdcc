@@ -1185,7 +1185,7 @@ class ScpWspAssetLightRig(AbsWsp):
 
         import lxresolver.commands as rsv_commands
 
-        import lxshotgun.rsv.objects as stg_rsv_objects
+        import lxshotgun.rsv.scripts as stg_rsv_scripts
 
         if project == 'current':
             project = bsc_etr_methods.EtrBase.get_project()
@@ -1198,7 +1198,7 @@ class ScpWspAssetLightRig(AbsWsp):
         if rsv_project is None:
             return
         #
-        defaults, currents = stg_rsv_objects.RsvStgProjectOpt(
+        defaults, currents = stg_rsv_scripts.RsvStgProjectOpt(
             rsv_project
         ).get_light_args()
         return ['/{}/{}'.format(project, i) for i in defaults], ['/{}/{}'.format(project, i) for i in currents]

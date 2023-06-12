@@ -25,6 +25,6 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         nodes = [_mya_dcc_obj_obj.Node(i) for i in cmds.ls(type='skinCluster', long=1)]
         self._set_objs_check_(nodes)

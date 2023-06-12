@@ -52,7 +52,18 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         return {}
     @classmethod
     def send_mails(cls, *args, **kwargs):
-        pass
+        bsc_core.MsgBaseMtd.send_mail(
+            addresses=kwargs['addresses'],
+            subject=kwargs['subject'],
+            content=kwargs.get('content') or '',
+        )
+    @classmethod
+    def send_feishu(cls, *args, **kwargs):
+        bsc_core.MsgBaseMtd.send_feishu(
+            addresses=kwargs['addresses'],
+            subject=kwargs['subject'],
+            content=kwargs.get('content') or '',
+        )
     @classmethod
     def send_messages(cls, *args, **kwargs):
         pass

@@ -7,7 +7,7 @@ from lxbasic import bsc_core
 # )
 #
 # for k, v in dic.items():
-#     print bsc_core.RawIntArrayMtd.set_merge_to(v)
+#     print bsc_core.RawIntArrayMtd.merge_to(v)
 
 # print bsc_core.StgFileMultiplyMtd.get_match_args(
 #     'A.1001.1001.exr', '*.<udim>.%04d.*'

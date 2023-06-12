@@ -7,7 +7,7 @@ from lxusd.dcc import usd_dcc_obj_abstract
 
 
 class Scene(usd_dcc_obj_abstract.AbsUsdObjScene):
-    FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = unv_objects.ObjUniverse
+    FILE_CLS = utl_dcc_objects.OsFile
+    UNIVERSE_CLS = unv_objects.ObjUniverse
     def __init__(self):
         super(Scene, self).__init__()

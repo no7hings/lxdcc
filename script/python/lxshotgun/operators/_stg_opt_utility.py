@@ -25,7 +25,7 @@ class ImgFileOpt(object):
         else:
             raise SystemError()
 
-    def set_convert_to(self, output_file_path=None, color_space='Linear'):
+    def convert_to(self, output_file_path=None, color_space='Linear'):
         if os.path.isfile(self._rv_io_path):
             arguments = [self._rv_io_path]
             #

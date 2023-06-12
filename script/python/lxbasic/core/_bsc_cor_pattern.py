@@ -49,7 +49,6 @@ class PtnMultiplyFileMtd(object):
                     s = '[0-9]'*i_c
                     new_name_base = new_name_base.replace(pattern[j_start:j_end], s, 1)
         return new_name_base
-
     @classmethod
     def to_re_style(cls, pattern):
         pattern_ = pattern
@@ -66,7 +65,6 @@ class PtnMultiplyFileMtd(object):
                 r'(\d{{{}}})'.format(i_count)
             )
         return re_pattern_
-
     @classmethod
     def get_args(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -86,7 +84,6 @@ class PtnMultiplyFileMtd(object):
                     (i_key, i_count)
                 )
         return key_args
-
     @classmethod
     def get_is_valid(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -201,6 +198,8 @@ class PtnParseMtd(object):
 
 
 class PtnFnmatch(object):
+    CACHE = dict()
+    CACHE_MAX = 100
     @classmethod
     def to_re_style(cls, pat):
         i, n = 0, len(pat)
@@ -236,6 +235,22 @@ class PtnFnmatch(object):
     @classmethod
     def get_is_valid(cls, ptn):
         return ptn != cls.to_re_style(ptn)
+    @classmethod
+    def filter(cls, texts, pattern):
+        list_ = []
+        try:
+            re_pat = cls.CACHE[pattern]
+        except KeyError:
+            res = fnmatch.translate(pattern)
+            if len(cls.CACHE) >= cls.CACHE_MAX:
+                cls.CACHE.clear()
+            cls.CACHE[pattern] = re_pat = re.compile(res, re.IGNORECASE)
+        #
+        match = re_pat.match
+        for i_text in texts:
+            if match(i_text):
+                list_.append(i_text)
+        return list_
 
 
 class PtnParseOpt(object):
@@ -301,7 +316,7 @@ class PtnParseOpt(object):
             paths = _bsc_cor_raw.RawTextsOpt(paths).set_sort_to()
         for i_path in paths:
             i_p = parse.parse(
-                self._pattern, i_path
+                self._pattern, i_path, case_sensitive=True
             )
             if i_p:
                 i_r = i_p.named
@@ -311,9 +326,14 @@ class PtnParseOpt(object):
                     list_.append(i_r)
         return list_
 
+    def get_is_matched(self, result):
+        return not not fnmatch.filter(
+            [result], self._fnmatch_pattern
+        )
+
     def get_variants(self, result):
         i_p = parse.parse(
-            self._pattern, result
+            self._pattern, result, case_sensitive=True
         )
         if i_p:
             i_r = i_p.named

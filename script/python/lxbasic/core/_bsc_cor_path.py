@@ -162,15 +162,22 @@ class DccPathDagOpt(object):
     name = property(get_name)
 
     def set_name(self, name):
+        self._path = self.get_path_as_new_name(name)
+
+    def get_path_as_new_name(self, name):
         parent = self.get_parent_path()
         if parent == self._pathsep:
-            self._path = self._pathsep.join(
+            return self._pathsep.join(
                 ['', name]
             )
-        else:
-            self._path = self._pathsep.join(
-                [self.get_parent_path(), name]
-            )
+        return self._pathsep.join(
+            [self.get_parent_path(), name]
+        )
+
+    def rename_to(self, name):
+        return self.__class__(
+            self.get_path_as_new_name(name)
+        )
 
     def get_pathsep(self):
         return self._pathsep

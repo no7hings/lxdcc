@@ -29,24 +29,24 @@ class Connection(ktn_dcc_obj_abs.AbsKtnObjConnection):
 
 
 class Node(ktn_dcc_obj_abs.AbsKtnObj):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
+    PORT_CLS = Port
+    CONNECTION_CLS = Connection
     def __init__(self, path):
         super(Node, self).__init__(path)
 
 
 class FileReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
-    OS_FILE_CLASS = utl_dcc_objects.OsFile
+    PORT_CLS = Port
+    CONNECTION_CLS = Connection
+    OS_FILE_CLS = utl_dcc_objects.OsFile
     def __init__(self, path):
         super(FileReference, self).__init__(path)
 
 
 class TextureReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
-    OS_FILE_CLASS = utl_dcc_objects.OsTexture
+    PORT_CLS = Port
+    CONNECTION_CLS = Connection
+    OS_FILE_CLS = utl_dcc_objects.OsTexture
     def __init__(self, path):
         super(TextureReference, self).__init__(path)
     # noinspection PyMethodMayBeStatic
@@ -58,8 +58,8 @@ class TextureReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
 
 
 class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
+    PORT_CLS = Port
+    CONNECTION_CLS = Connection
     def __init__(self, path):
         super(AndShader, self).__init__(path)
 
@@ -186,8 +186,8 @@ class AndStandardSurface(AndShader):
 
 
 class AndRamp(AndShader):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
+    PORT_CLS = Port
+    CONNECTION_CLS = Connection
     def __init__(self, path):
         super(AndRamp, self).__init__(path)
         self._ramp_dict = {}
@@ -382,8 +382,8 @@ class AndRamp(AndShader):
 
 
 class Material(ktn_dcc_obj_abs.AbsKtnObj):
-    PORT_CLASS = Port
-    CONNECTION_CLASS = Connection
+    PORT_CLS = Port
+    CONNECTION_CLS = Connection
     #
     SOURCE_OBJ_CLS = AndShader
     def __init__(self, path):

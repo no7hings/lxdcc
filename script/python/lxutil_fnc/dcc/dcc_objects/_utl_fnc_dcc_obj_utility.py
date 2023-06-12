@@ -9,9 +9,9 @@ from lxutil_fnc.dcc import utl_fnc_dcc_abstract
 
 
 class Scene(utl_fnc_dcc_abstract.AbsObjScene):
-    FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = unv_objects.ObjUniverse
+    FILE_CLS = utl_dcc_objects.OsFile
+    UNIVERSE_CLS = unv_objects.ObjUniverse
     #
-    CONFIGURE_CLASS = bsc_objects.Configure
+    CONFIGURE_CLS = bsc_objects.Configure
     def __init__(self):
         super(Scene, self).__init__()

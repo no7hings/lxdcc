@@ -197,6 +197,29 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     g_p.set_update()
 
 
+class FncGeometryFbxImporter(utl_fnc_obj_abs.AbsFncOptionBase):
+    OPTION = dict(
+        file=''
+    )
+    PLUG_NAME = 'fbxmaya'
+    def __init__(self, option=None):
+        super(FncGeometryFbxImporter, self).__init__(option)
+
+    def execute(self):
+        """
+        FBXImport -f "/production/library/resource/all/3d_asset/cement_bollard_with_base_sdfx4/v0001/geometry/fbx/cement_bollard_with_base_sdfx4.fbx" -caller "FBXMayaTranslator";
+        :return:
+        """
+        cmds.loadPlugin(self.PLUG_NAME, quiet=1)
+        mel.eval(
+            'FBXImport -f "{file}";'.format(
+                **dict(
+                    file=self.get('file')
+                )
+            )
+        )
+
+
 class GeometryUsdImporter0(object):
     """
 -apiSchema	-api	string (multi)	none	Imports the given API schemas' attributes as Maya custom attributes. This only recognizes API schemas that have been applied to prims on the stage. The attributes will properly round-trip if you re-export back to USD.

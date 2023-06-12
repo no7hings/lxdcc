@@ -5,19 +5,19 @@ import lxuniverse.abstracts as unr_abstracts
 
 
 class AbsObjScene(unr_abstracts.AbsObjScene):
-    CONFIGURE_CLASS = None
+    CONFIGURE_CLS = None
     def __init__(self):
         super(AbsObjScene, self).__init__()
 
     def set_restore(self):
-        self._universe = self.UNIVERSE_CLASS()
+        self._universe = self.UNIVERSE_CLS()
 
     def set_load_from_configure(self, file_path):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         self._set_load_by_configure_(file_obj)
 
     def set_load_from_configure_(self, file_path):
-        file_obj = self.FILE_CLASS(file_path)
+        file_obj = self.FILE_CLS(file_path)
         self._set_load_by_configure__(file_obj)
 
     def _set_load_by_configure__(self, file_obj):
@@ -36,7 +36,7 @@ class AbsObjScene(unr_abstracts.AbsObjScene):
         self.set_restore()
         #
         file_path = file_obj.path
-        configure = self.CONFIGURE_CLASS(None, file_path)
+        configure = self.CONFIGURE_CLS(None, file_path)
         configure.set_flatten()
         rcs_fnc_(configure.get('methods'))
 

@@ -15,8 +15,6 @@ from lxutil import utl_core
 
 from . import ma_configure
 
-from PySide2 import QtWidgets
-
 from lxmaya.core import *
 
 
@@ -2572,7 +2570,7 @@ class QtControlOpt(object):
                 visible=boolean,
             )
 
-    def set_restore(self):
+    def restore_all(self):
         cmds.workspaceControl(
             self._name,
             edit=True,
@@ -2598,7 +2596,7 @@ class QtControlOpt(object):
 
     def set_create(self, width, height):
         if self.get_is_exists():
-            self.set_restore()
+            self.restore_all()
             # self.set_visible(True)
         else:
             cmds.workspaceControl(
@@ -2614,6 +2612,7 @@ class QtControlOpt(object):
         return wrapInstance(long(ptr), base)
 
     def to_qt_widget(self):
+        from PySide2 import QtWidgets
         ptr = OpenMayaUI.MQtUtil.findControl(self._name)
         if ptr is not None:
             return self._to_qt_instance_(

@@ -457,7 +457,7 @@ def set_asset_look_preview_workspace_post_create(rsv_task_properties):
     )
     #
     texture_directory_unit = rsv_task.get_rsv_unit(
-        keyword='asset-texture-tgt-dir'
+        keyword='asset-texture-dir'
     )
     #
     texture_directory_path = texture_directory_unit.get_result(version=version)

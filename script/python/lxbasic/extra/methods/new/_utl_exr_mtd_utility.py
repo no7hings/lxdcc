@@ -97,22 +97,45 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         return dict_
     @classmethod
     def send_mails(cls, *args, **kwargs):
-        # noinspection PyUnresolvedReferences
-        from cosmos.util.message import imail
+        import pkgutil
         #
-        imail.http_mail(
-            kwargs['addresses'],
-            kwargs['subject'],
-            kwargs.get('content') or '',
+        if pkgutil.find_loader('cosmos'):
+            # noinspection PyUnresolvedReferences
+            from cosmos.util.message import imail
+            #
+            imail.http_mail(
+                kwargs['addresses'],
+                kwargs['subject'],
+                kwargs.get('content') or '',
+            )
+        else:
+            bsc_core.MsgBaseMtd.send_mail(
+                addresses=kwargs['addresses'],
+                subject=kwargs['subject'],
+                content=kwargs.get('content') or '',
+            )
+    @classmethod
+    def send_feishu(cls, *args, **kwargs):
+        bsc_core.MsgBaseMtd.send_feishu(
+            addresses=kwargs['addresses'],
+            subject=kwargs['subject'],
+            content=kwargs.get('content') or '',
         )
     @classmethod
     def send_messages(cls, *args, **kwargs):
-        # noinspection PyUnresolvedReferences
-        from cosmos.util.message import ichat
+        import pkgutil
         #
-        ichat.send_message(
-            sender_name=kwargs['from_user'],
-            receivers=kwargs['to_users'],
-            title=kwargs['subject'],
-            message=kwargs.get('content') or '',
-        )
+        if pkgutil.find_loader('cosmos'):
+            # noinspection PyUnresolvedReferences
+            from cosmos.util.message import ichat
+            #
+            ichat.send_message(
+                sender_name='sg_new_version',
+                receivers=kwargs['to_users'],
+                title=kwargs['subject'],
+                message=kwargs.get('content') or '',
+            )
+        else:
+            bsc_core.LogMtd.trace_method_warning(
+                'send messages failed, module "cosmos" is not found'
+            )

@@ -27,6 +27,8 @@ from ._bsc_cor_configure import *
 
 from ._bsc_cor_resource import *
 
+from ._bsc_cor_message import *
+
 from ._bsc_cor_database import *
 
 from ._bsc_cor_image import *

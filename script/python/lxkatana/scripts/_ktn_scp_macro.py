@@ -1436,7 +1436,7 @@ class LxLight(object):
     def set_refresh_light_rig(self):
         from lxkatana import ktn_core
 
-        import lxshotgun.rsv.objects as stg_rsv_objects
+        import lxshotgun.rsv.scripts as stg_rsv_scripts
 
         contents = []
 
@@ -1454,7 +1454,7 @@ class LxLight(object):
             name = obj_opt.get('lights.light_rig.name')
             index = obj_opt.get('lights.light_rig.index') or 0
 
-            light_rig_rsv_assets = stg_rsv_objects.RsvStgProjectOpt(
+            light_rig_rsv_assets = stg_rsv_scripts.RsvStgProjectOpt(
                 rsv_project
             ).get_standard_light_rig_rsv_assets()
             if light_rig_rsv_assets:

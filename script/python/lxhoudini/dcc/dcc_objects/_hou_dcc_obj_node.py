@@ -17,22 +17,22 @@ class Port(hou_dcc_obj_abs.AbsHouPort):
 
 
 class Node(hou_dcc_obj_abs.AbsHouObj):
-    PORT_CLASS = Port
+    PORT_CLS = Port
     def __init__(self, path):
         super(Node, self).__init__(path)
 
 
 class FileReference(hou_dcc_obj_abs.AbsHouFileReferenceObj):
-    PORT_CLASS = Port
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsFile
+    PORT_CLS = Port
+    OS_FILE_CLS = _hou_dcc_obj_os.OsFile
     def __init__(self, path, file_path=None):
         super(FileReference, self).__init__(path)
         self._set_file_reference_def_init_(file_path)
 
 
 class ImageReference(hou_dcc_obj_abs.AbsHouFileReferenceObj):
-    PORT_CLASS = Port
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsTexture
+    PORT_CLS = Port
+    OS_FILE_CLS = _hou_dcc_obj_os.OsTexture
     def __init__(self, path, file_path=None):
         super(ImageReference, self).__init__(path, file_path)
 
@@ -78,7 +78,7 @@ class Geometry(Node):
 
 
 class Camera(hou_dcc_obj_abs.AbsHouObj):
-    PORT_CLASS = Port
+    PORT_CLS = Port
     def __init__(self, path):
         super(Camera, self).__init__(path)
 
@@ -87,21 +87,21 @@ class Camera(hou_dcc_obj_abs.AbsHouObj):
 
 
 class ArOperate(hou_dcc_obj_abs.AbsHouObj):
-    PORT_CLASS = Port
+    PORT_CLS = Port
     def __init__(self, path):
         super(ArOperate, self).__init__(path)
 
 
 class ArMaterial(hou_dcc_obj_abs.AbsHouFileReferenceObj):
-    PORT_CLASS = Port
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsTexture
+    PORT_CLS = Port
+    OS_FILE_CLS = _hou_dcc_obj_os.OsTexture
     def __init__(self, path):
         super(ArMaterial, self).__init__(path)
 
 
 class AndMaterialx(hou_dcc_obj_abs.AbsHouFileReferenceObj):
-    PORT_CLASS = Port
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsTexture
+    PORT_CLS = Port
+    OS_FILE_CLS = _hou_dcc_obj_os.OsTexture
     def __init__(self, path):
         super(AndMaterialx, self).__init__(path)
 
@@ -122,7 +122,7 @@ class AndMaterialx(hou_dcc_obj_abs.AbsHouFileReferenceObj):
         return []
 
     def get_textures(self):
-        return [self.OS_FILE_CLASS(i) for i in self.get_texture_paths()]
+        return [self.OS_FILE_CLS(i) for i in self.get_texture_paths()]
 
     def get_file_plf_objs(self):
         lis = []
@@ -139,9 +139,9 @@ class AndMaterialx(hou_dcc_obj_abs.AbsHouFileReferenceObj):
 
 
 class Alembic(hou_dcc_obj_abs.AbsHouFileReferenceObj):
-    PORT_CLASS = Port
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsFile
-    MATERIALX_CLASS = AndMaterialx
+    PORT_CLS = Port
+    OS_FILE_CLS = _hou_dcc_obj_os.OsFile
+    MATERIALX_CLS = AndMaterialx
     def __init__(self, path, file_path=None):
         super(Alembic, self).__init__(path, file_path)
 
@@ -154,7 +154,7 @@ class Alembic(hou_dcc_obj_abs.AbsHouFileReferenceObj):
                 if hou_node is not None:
                     opt_type = hou_node.type().nameWithCategory()
                     if opt_type == 'arnold::Driver/materialx':
-                        materialx = self.MATERIALX_CLASS(ar_opt_obj_path)
+                        materialx = self.MATERIALX_CLS(ar_opt_obj_path)
                         materialx.set_file_port_raw_add('filename')
                         return materialx.get_geometry_paths()
         return []
@@ -172,10 +172,10 @@ class Alembic(hou_dcc_obj_abs.AbsHouFileReferenceObj):
 
 
 class AlembicArchive(hou_dcc_obj_abs.AbsHouFileReferenceObj):
-    PORT_CLASS = Port
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsFile
-    MATERIALX_CLASS = AndMaterialx
-    CAMERA_CLASS = Camera
+    PORT_CLS = Port
+    OS_FILE_CLS = _hou_dcc_obj_os.OsFile
+    MATERIALX_CLS = AndMaterialx
+    CAMERA_CLS = Camera
     def __init__(self, path, file_path=None):
         super(AlembicArchive, self).__init__(path, file_path)
 
@@ -195,4 +195,4 @@ class AlembicArchive(hou_dcc_obj_abs.AbsHouFileReferenceObj):
         return lis
 
     def get_cameras(self):
-        return [self.CAMERA_CLASS(i) for i in self.get_camera_paths()]
+        return [self.CAMERA_CLS(i) for i in self.get_camera_paths()]

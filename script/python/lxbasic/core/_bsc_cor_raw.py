@@ -1,6 +1,7 @@
 # coding:utf-8
 import hashlib
 
+import six
 from ._bsc_cor_utility import *
 
 
@@ -217,7 +218,7 @@ class RawNestedArrayMtd(object):
 
 class RawIntArrayMtd(object):
     @staticmethod
-    def set_merge_to(array):
+    def merge_to(array):
         """
         :param array: etc.[1, 2, 3, 5, 6, 9]
         :return: etc.[(1, 3), (5, 6), 9]
@@ -399,7 +400,7 @@ class RawFramesMtd(object):
     @classmethod
     def to_text(cls, frames):
         lis = []
-        _ = RawIntArrayMtd.set_merge_to(
+        _ = RawIntArrayMtd.merge_to(
             frames
         )
         for i in _:
@@ -509,9 +510,13 @@ class RawIntegerOpt(object):
         return ''.join(reversed(base36))
 
 
+def auto_encode(text):
+    if isinstance(text, six.text_type):
+        return text.encode('utf-8')
+    return text
+
+
 class RawTextMtd(object):
-    def set_text_join(self):
-        pass
     @classmethod
     def to_number_embedded_args(cls, text):
         if isinstance(text, six.text_type):
@@ -524,8 +529,9 @@ class RawTextMtd(object):
     def to_glob_pattern(cls, text):
         return re.sub(r'(\d)', '[0-9]', text)
     @classmethod
-    def set_clear_up_to(cls, text):
+    def clear_up_to(cls, text):
         return re.sub(
+            # keep chinese word and english word
             r'[^\u4e00-\u9fa5a-zA-Z0-9]', '_', text
         )
     @classmethod
@@ -533,7 +539,7 @@ class RawTextMtd(object):
         if isinstance(text, six.text_type):
             text = text.encode('utf-8')
         _ = re.sub(
-            r'[^\u4e00-\u9fa5a-zA-Z0-9]', '0', text
+            r'[^a-zA-Z0-9]', '0', text
         ).lower()
         return int(_, 36)
     @classmethod

@@ -34,7 +34,7 @@ class Method(stg_fnc_abstract.AbsStgIsp):
         obj.set_delete()
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         # dcc object paths
         paths = []
         # obj 是DCC节点的抽象实例，直接使用定义好的就行

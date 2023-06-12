@@ -84,17 +84,19 @@ class TrdCmdProcess(threading.Thread):
         self.__set_status_update(self.Status.Running)
         results = []
         try:
+            # single process
             if isinstance(self._cmd, six.string_types):
-                results = _bsc_cor_process.SubProcessMtd.set_run_as_block(
-                    self._cmd
+                results = _bsc_cor_process.SubProcessMtd.execute_as_block(
+                    self._cmd, clear_environ='auto'
                 )
                 self.__set_status_update(self.Status.Completed)
                 self.__set_completed(results)
+            # many process execute one by one
             elif isinstance(self._cmd, (set, tuple, list)):
                 for i_cmd in self._cmd:
                     results.extend(
-                        _bsc_cor_process.SubProcessMtd.set_run_as_block(
-                            i_cmd
+                        _bsc_cor_process.SubProcessMtd.execute_as_block(
+                            i_cmd, clear_environ='auto'
                         )
                     )
                 self.__set_status_update(self.Status.Completed)

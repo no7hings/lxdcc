@@ -45,24 +45,24 @@ class DdlContent(object):
 
 
 class AbsDdlObj(object):
-    DDL_PROPERTIES_CLASS = None
-    DDL_PROPERTY_CLASS = None
+    DDL_PROPERTIES_CLS = None
+    DDL_PROPERTY_CLS = None
     #
-    DDL_CONTENT_CLASS = None
+    DDL_CONTENT_CLS = None
     def __init__(self, raw):
-        self._ddl_properties = self.DDL_PROPERTIES_CLASS(self, raw)
+        self._ddl_properties = self.DDL_PROPERTIES_CLS(self, raw)
     @property
     def properties(self):
         return self._ddl_properties
 
     def get_property(self, key):
         value = self._ddl_properties.get(key)
-        return self.DDL_PROPERTY_CLASS(key, value)
+        return self.DDL_PROPERTY_CLS(key, value)
 
 
 class DdlLogQuery(AbsDdlObj):
-    DDL_PROPERTIES_CLASS = bsc_objects.Properties
-    DDL_PROPERTY_CLASS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = bsc_objects.Properties
+    DDL_PROPERTY_CLS = bsc_objects.Property
     def __init__(self, obj, index, raw):
         self._obj = obj
         self._index = index
@@ -79,11 +79,11 @@ class DdlLogQuery(AbsDdlObj):
 
 
 class DdlTaskQuery(AbsDdlObj):
-    DDL_PROPERTIES_CLASS = bsc_objects.Properties
-    DDL_PROPERTY_CLASS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = bsc_objects.Properties
+    DDL_PROPERTY_CLS = bsc_objects.Property
     #
-    DDL_CONTENT_CLASS = DdlContent
-    DDL_LOG_CLASS = DdlLogQuery
+    DDL_CONTENT_CLS = DdlContent
+    DDL_LOG_CLS = DdlLogQuery
     def __init__(self, job, index, raw):
         self._job = job
         self._job_id = job.id
@@ -108,7 +108,7 @@ class DdlTaskQuery(AbsDdlObj):
         raws = _
         if raws:
             for id_, raw in enumerate(raws):
-                obj = self.DDL_CONTENT_CLASS(self, id_, raw)
+                obj = self.DDL_CONTENT_CLS(self, id_, raw)
                 lis.append(obj)
         return lis
 
@@ -119,7 +119,7 @@ class DdlTaskQuery(AbsDdlObj):
         raws = _
         if raws:
             for id_, raw in enumerate(raws):
-                obj = self.DDL_LOG_CLASS(self, id_, raw)
+                obj = self.DDL_LOG_CLS(self, id_, raw)
                 lis.append(obj)
         return lis
 
@@ -153,13 +153,13 @@ class DdlTaskQuery(AbsDdlObj):
 
 
 class DdlJobQuery(AbsDdlObj):
-    DDL_PROPERTIES_CLASS = bsc_objects.Properties
-    DDL_PROPERTY_CLASS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = bsc_objects.Properties
+    DDL_PROPERTY_CLS = bsc_objects.Property
     #
-    DDL_CONTENT_CLASS = DdlContent
-    DDL_LOG_CLASS = DdlLogQuery
+    DDL_CONTENT_CLS = DdlContent
+    DDL_LOG_CLS = DdlLogQuery
     #
-    TASK_CLASS = DdlTaskQuery
+    TASK_CLS = DdlTaskQuery
     def __init__(self, job_id):
         self._job_id = job_id
         _ = CON.Tasks.connectionProperties.__get__(
@@ -185,7 +185,7 @@ class DdlJobQuery(AbsDdlObj):
         #
         tasks_raw = _['Tasks']
         for task_index, task_raw in enumerate(tasks_raw):
-            ddl_task = self.TASK_CLASS(self, task_index, task_raw)
+            ddl_task = self.TASK_CLS(self, task_index, task_raw)
             lis.append(ddl_task)
         return lis
 
@@ -197,7 +197,7 @@ class DdlJobQuery(AbsDdlObj):
         raws = _
         if raws:
             for id_, raw in enumerate(raws):
-                obj = self.DDL_CONTENT_CLASS(self, id_, raw)
+                obj = self.DDL_CONTENT_CLS(self, id_, raw)
                 lis.append(obj)
         return lis
 
@@ -209,7 +209,7 @@ class DdlJobQuery(AbsDdlObj):
         raws = _
         if raws:
             for id_, raw in enumerate(raws):
-                obj = self.DDL_CONTENT_CLASS(self, id_, raw)
+                obj = self.DDL_CONTENT_CLS(self, id_, raw)
                 lis.append(obj)
         return lis
 
@@ -241,10 +241,10 @@ class DdlJobQuery(AbsDdlObj):
 
 
 class DdlJobSender(AbsDdlObj):
-    DDL_PROPERTIES_CLASS = bsc_objects.Properties
-    DDL_PROPERTY_CLASS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = bsc_objects.Properties
+    DDL_PROPERTY_CLS = bsc_objects.Property
     #
-    DDL_CONTENT_CLASS = DdlContent
+    DDL_CONTENT_CLS = DdlContent
     #
     CONFIGURE_FILE_PATH = ddl_configure.Data.JOB_CONFIGURE_FILE
     def __init__(self):
@@ -313,10 +313,10 @@ class DdlJobSender(AbsDdlObj):
 
 
 class AbsDdlJobSender(AbsDdlObj):
-    DDL_PROPERTIES_CLASS = bsc_objects.Properties
-    DDL_PROPERTY_CLASS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = bsc_objects.Properties
+    DDL_PROPERTY_CLS = bsc_objects.Property
     #
-    DDL_CONTENT_CLASS = DdlContent
+    DDL_CONTENT_CLS = DdlContent
     #
     CONFIGURE_FILE_PATH = None
     def __init__(self):

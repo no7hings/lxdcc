@@ -105,8 +105,8 @@ class Shape(
     mya_dcc_obj_abs.AbsMyaObj,
     mya_dcc_obj_abs.AbsMaShapeDef
 ):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    TRANSFORM_CLASS = Transform
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    TRANSFORM_CLS = Transform
     def __init__(self, path):
         if cmds.objExists(path) is True:
             if cmds.nodeType(path) == ma_configure.Util.TRANSFORM_TYPE:
@@ -184,8 +184,8 @@ class Camera(Shape):
 
 
 class Light(Shape):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    CONNECTION_CLASS = _mya_dcc_obj_utility.Connection
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     def __init__(self, path):
         super(Light, self).__init__(path)
 

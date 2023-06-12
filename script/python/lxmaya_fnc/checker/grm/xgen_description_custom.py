@@ -32,7 +32,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         self._file_reference_dict = ma_core._ma_type__get_file_reference_dict_('xgmDescription')
         nodes = _mya_dcc_obj_objs.XgenDescriptions.get_objs()
         self._set_objs_check_(nodes)

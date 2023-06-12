@@ -57,8 +57,10 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
 
     def set_create(self, matrix=None):
         if self.obj.get_is_exists() is False:
-            parent_path = self.obj.get_parent_path()
-            name = self.obj.name
+            path = self.obj.get_path()
+            path_opt = bsc_core.DccPathDagOpt(path)
+            parent_path = path_opt.get_parent_path()
+            name = path_opt.get_name()
             if parent_path != ma_configure.Util.OBJ_PATHSEP:
                 if cmds.objExists(parent_path) is True:
                     om2_obj = ma_core.Om2Method._get_om2_transform_()

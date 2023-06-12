@@ -54,7 +54,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         #
         self._color_space_dict = {}
         #

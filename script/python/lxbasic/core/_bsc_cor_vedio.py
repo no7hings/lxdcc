@@ -184,7 +184,7 @@ class VdoFileOpt(object):
                 return thumbnail_file_path, ' '.join(cmd_args)
         return thumbnail_file_path, None
 
-    def set_convert_to(self):
+    def convert_to(self):
         pass
 
     def set_mov_create_from(self, image_file_path, width=1024, fps=24, block=False):

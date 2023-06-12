@@ -130,6 +130,7 @@ class StgObjQuery(object):
 
 
 class StgConnector(object):
+    TASK_DATA_CACHE = dict()
     StgEntityTypes = stg_configure.StgEntityTypes
     #
     STG_OBJ_QUERY_CLS = StgObjQuery
@@ -190,7 +191,7 @@ class StgConnector(object):
         return self._stg_instance.find_one(
             entity_type=stg_configure.StgEntityTypes.Project,
             filters=[
-                ['name', 'is', project]
+                ['name', 'is', str(project).upper()]
             ]
         )
 
@@ -229,6 +230,13 @@ class StgConnector(object):
         return list_
     # entity
     def get_stg_resource(self, **kwargs):
+        if 'id' in kwargs:
+            return self._stg_instance.find_one(
+                entity_type=kwargs['type'],
+                filters=[
+                    ['id', 'is', int(kwargs['id'])],
+                ]
+            )
         """
         :param kwargs:
             project=<project-name>
@@ -431,7 +439,7 @@ class StgConnector(object):
         """
         if 'id' in kwargs:
             return self._stg_instance.find_one(
-                entity_type='Task',
+                entity_type=kwargs['type'],
                 filters=[
                     ['id', 'is', int(kwargs['id'])],
                 ]
@@ -497,6 +505,7 @@ class StgConnector(object):
                     ['name', 'is', kwargs['name']]
                 ]
             )
+        # login name
         elif 'user' in kwargs:
             return self._stg_instance.find_one(
                 entity_type='HumanUser',
@@ -925,6 +934,10 @@ class StgConnector(object):
 
     def get_data_from_task_id(self, task_id):
         task_id = int(task_id)
+        # cache for task
+        if task_id in StgConnector.TASK_DATA_CACHE:
+            return StgConnector.TASK_DATA_CACHE[task_id]
+        #
         stg_task = self._stg_instance.find_one(
             entity_type='Task',
             filters=[
@@ -934,55 +947,61 @@ class StgConnector(object):
                 'project', 'entity', 'step', 'content'
             ]
         )
-        stg_project = self._stg_instance.find_one(
-            entity_type=stg_task['project']['type'],
-            filters=[
-                ['id', 'is', stg_task['project']['id']]
-            ],
-            fields=[
-                'name'
-            ]
-        )
-        stg_step = self._stg_instance.find_one(
-            entity_type=stg_task['step']['type'],
-            filters=[
-                ['id', 'is', stg_task['step']['id']]
-            ],
-            fields=[
-                'short_name'
-            ]
-        )
-        project = str(stg_project['name']).lower()
-        branch = self._get_rsv_resource_type_(stg_task['entity']['type'])
+        stg_task_query = self.to_query(stg_task)
+        task = stg_task_query.get('content')
+        stg_project = stg_task_query.get('project')
+        stg_project_query = self.to_query(stg_project)
+        project = str(stg_project_query.get('name')).lower()
+        stg_step = stg_task_query.get('step')
+        stg_step_query = self.to_query(stg_step)
+        step = str(stg_step_query.get('short_name')).lower()
+        stg_resource = stg_task_query.get('entity')
+        stg_resource_query = self.to_query(stg_resource)
+        branch = self._get_rsv_resource_type_(stg_resource_query.get('type'))
         if branch in {'project'}:
             data = dict(
                 project=project,
                 branch=branch,
                 resource=project,
-                step=str(stg_step['short_name']).lower(),
-                task=stg_task['content']
+                step=step,
+                task=task
             )
             data[branch] = project
+            StgConnector.TASK_DATA_CACHE[task_id] = data
             return data
-        if branch in {'asset', 'shot'}:
-            stg_resource = self._stg_instance.find_one(
-                entity_type=stg_task['entity']['type'],
-                filters=[
-                    ['id', 'is', stg_task['entity']['id']]
-                ],
-                fields=[
-                    'code'
-                ]
-            )
-            resource = stg_resource['code']
+        elif branch in {'sequence'}:
+            resource = stg_resource_query.get('code')
             data = dict(
                 project=project,
                 branch=branch,
                 resource=resource,
-                step=str(stg_step['short_name']).lower(),
+                step=step,
                 task=stg_task['content']
             )
             data[branch] = resource
+            StgConnector.TASK_DATA_CACHE[task_id] = data
+            return data
+        elif branch in {'asset', 'shot'}:
+            resource = stg_resource_query.get('code')
+            data = dict(
+                project=project,
+                branch=branch,
+                resource=resource,
+                step=step,
+                task=stg_task['content']
+            )
+            data[branch] = resource
+            stg_resource_query = self.to_query(stg_resource)
+            if branch == 'asset':
+                role = stg_resource_query.get('sg_asset_type')
+                data['role'] = role
+            elif branch == 'shot':
+                stg_sequence = stg_resource_query.get('sg_sequence')
+                if stg_sequence is None:
+                    raise RuntimeError()
+                stg_sequence_query = self.to_query(stg_sequence)
+                data['sequence'] = stg_sequence_query.get('code')
+            StgConnector.TASK_DATA_CACHE[task_id] = data
             return data
 
 

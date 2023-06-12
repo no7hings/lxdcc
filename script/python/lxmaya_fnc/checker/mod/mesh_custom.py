@@ -28,7 +28,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         root = _mya_dcc_obj_dag.Group('|master|hi')
         mesh_paths = root.get_all_shape_paths(include_obj_type='mesh')
         mesh_objs = [_mya_dcc_obj_geometry.Mesh(i) for i in mesh_paths]

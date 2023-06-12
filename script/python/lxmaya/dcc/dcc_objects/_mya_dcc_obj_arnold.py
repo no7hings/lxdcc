@@ -12,8 +12,8 @@ from ...dcc.dcc_objects import _mya_dcc_obj_utility
 
 
 class AndMaterialx(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
-    OS_FILE_CLASS = utl_dcc_objects.OsFile
+    PORT_CLS = _mya_dcc_obj_utility.Port
+    OS_FILE_CLS = utl_dcc_objects.OsFile
     def __init__(self, path):
         super(AndMaterialx, self).__init__(path)
 
@@ -32,6 +32,6 @@ class AndMaterialx(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
 
 class AndStringReplace(mya_dcc_obj_abs.AbsMyaObj):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
+    PORT_CLS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(AndStringReplace, self).__init__(path)

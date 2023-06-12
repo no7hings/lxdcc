@@ -12,6 +12,6 @@ class Meshes(mya_dcc_obj_abs.AbsMyaObjs):
         'mesh',
     ]
     #
-    DCC_NODE_CLASS = _mya_dcc_obj_geometry.Mesh
+    DCC_NODE_CLS = _mya_dcc_obj_geometry.Mesh
     def __init__(self, *args):
         super(Meshes, self).__init__(*args)

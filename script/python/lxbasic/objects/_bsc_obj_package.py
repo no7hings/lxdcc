@@ -23,6 +23,7 @@ class PackageContextNew(object):
         linux=['{root}/{package_name}/{version}/paper_configure_bundle.py']
     )
     def __init__(self, args):
+        self._bin_source = bsc_core.StgPathMapMtd.map_to_current(self.BIN_SOURCE)
         self._args = args
 
         self._platform = bsc_core.PlatformMtd.get_current()
@@ -72,7 +73,7 @@ class PackageContextNew(object):
 
     def get_resolved_packages_data(self):
         if self._args:
-            results = bsc_core.SubProcessMtd.set_run_as_block('{} {} -v'.format(self.BIN_SOURCE, self._args))
+            results = bsc_core.SubProcessMtd.execute_as_block('{} {} -v'.format(self._bin_source, self._args))
             package_start_index = None
             package_end_index = None
             index_maximum = len(results)-1
@@ -240,7 +241,7 @@ class PackageContextNew(object):
         if args:
             if isinstance(args_execute, (set, tuple, list)):
                 args.extend(args_execute)
-            return ' '.join([self.BIN_SOURCE] + list(args))
+            return ' '.join([self._bin_source] + list(args))
 
 
 if __name__ == '__main__':

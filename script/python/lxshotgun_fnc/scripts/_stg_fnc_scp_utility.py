@@ -115,7 +115,7 @@ def set_asset_look_pass_update(rsv_task_properties):
             )
             stg_operators.ImgFileOpt(
                 i_beauty_image_file
-            ).set_convert_to(
+            ).convert_to(
                 i_render_mov_sub_file_path, color_space=color_space
             )
             #
@@ -127,7 +127,7 @@ def set_asset_look_pass_update(rsv_task_properties):
             )
             stg_operators.ImgFileOpt(
                 i_beauty_image_file
-            ).set_convert_to(
+            ).convert_to(
                 i_render_jpg_sub_file_path, color_space=color_space
             )
             #

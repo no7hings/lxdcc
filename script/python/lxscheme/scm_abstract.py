@@ -106,7 +106,7 @@ class AbsContentDef(object):
 
 
 class AbsSchemeFileLoader(AbsContentDef):
-    CONTENT_CLASS = None
+    CONTENT_CLS = None
     def __init__(self, *args):
         self._file_path = args[0]
         #
@@ -154,12 +154,12 @@ class AbsSchemeFileLoader(AbsContentDef):
     def get_content(self, key_path, default_value=None):
         key = key_path.split(self.PATHSEP)[-1]
         value = self.get(key_path, default_value)
-        return self.CONTENT_CLASS(
+        return self.CONTENT_CLS(
             key, value
         )
 
     def _set_content_create_(self, key, value):
-        return self.CONTENT_CLASS(
+        return self.CONTENT_CLS(
             key, value
         )
 

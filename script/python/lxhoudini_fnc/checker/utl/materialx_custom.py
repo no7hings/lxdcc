@@ -26,7 +26,7 @@ class Method(hou_fnc_abstract.AbsHouIspOp):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
 
         materialxs = hou_dcc_objects.Materialxs().get_objs()
         self._set_objs_check_(materialxs)

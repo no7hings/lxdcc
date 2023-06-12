@@ -16,8 +16,8 @@ class ImgFileOpt(object):
     def get_thumbnail_file_path_(self, width=128, ext='.jpg'):
         return _bsc_cor_storage.StgTmpThumbnailMtd.get_file_path_(self._file_path, width, ext)
 
-    def get_thumbnail(self, width=128):
-        thumbnail_file_path = self.get_thumbnail_file_path()
+    def get_thumbnail(self, width=128, ext='.jpg'):
+        thumbnail_file_path = self.get_thumbnail_file_path_(width, ext)
         if os.path.isfile(self._file_path):
             if os.path.exists(thumbnail_file_path) is False:
                 directory_path = os.path.dirname(thumbnail_file_path)
@@ -30,12 +30,14 @@ class ImgFileOpt(object):
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
                 ]
-                _bsc_cor_process.SubProcessMtd.set_run(
+                _bsc_cor_process.SubProcessMtd.set_run_with_result(
                     ' '.join(cmd_args)
                 )
         return thumbnail_file_path
 
     def get_thumbnail_create_args(self, width=128, ext='.jpg'):
+        if self._file_path.endswith(ext):
+            return self._file_path, None
         thumbnail_file_path = self.get_thumbnail_file_path_(width, ext)
         if os.path.exists(thumbnail_file_path) is False:
             if os.path.exists(self._file_path):
@@ -118,7 +120,7 @@ class ImgFileOpt(object):
 
         return u' '.join(cmd_args)
 
-    def set_convert_to(self, file_path_tgt):
+    def convert_to(self, file_path_tgt):
         file_opt_src = _bsc_cor_storage.StgFileOpt(self._file_path)
         if file_opt_src.get_is_file() is True:
             file_opt_tgt = _bsc_cor_storage.StgFileOpt(file_path_tgt)
@@ -329,7 +331,7 @@ class ImgOiioMtd(object):
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
-    def set_convert_to(cls, file_path_src, file_path_tgt):
+    def convert_to(cls, file_path_src, file_path_tgt):
         option = dict(
             input=file_path_src,
             output=file_path_tgt,
@@ -654,7 +656,7 @@ class ImgFileOiioOpt(object):
     def format(self):
         return self
 
-    def set_convert_to(self, output_file_path):
+    def convert_to(self, output_file_path):
         if os.path.exists(self.path):
             if SystemMtd.get_is_windows():
                 pass

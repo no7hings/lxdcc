@@ -20,6 +20,6 @@ class Content(scm_abstract.AbsContentDef):
 
 
 class FileScheme(scm_abstract.AbsSchemeFileLoader):
-    CONTENT_CLASS = Content
+    CONTENT_CLS = Content
     def __init__(self, *args):
         super(FileScheme, self).__init__(*args)

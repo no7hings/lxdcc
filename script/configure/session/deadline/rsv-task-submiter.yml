@@ -107,5 +107,5 @@ output:
         Shell: "default"
         ShellExecute: True
         Executable: ''
-        Software: ''
+        Software: <option.extra.application>
         ErrorCatch: "job-kill"

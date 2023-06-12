@@ -118,7 +118,7 @@ class HoudiniXmlAction(HoudiniXml):
 
 
 class HoudiniXmlMenu(HoudiniXml):
-    ACTION_CLASS = HoudiniXmlAction
+    ACTION_CLS = HoudiniXmlAction
     XML_HEAD = 'subMenu'
     def __init__(self, key, sub=False):
         super(HoudiniXmlMenu, self).__init__()
@@ -134,7 +134,7 @@ class HoudiniXmlMenu(HoudiniXml):
         self._name = text
 
     def set_action_add(self, key):
-        action = self.ACTION_CLASS(key)
+        action = self.ACTION_CLS(key)
         self._children.append(action)
         return action
 
@@ -147,7 +147,7 @@ class HoudiniXmlMenu(HoudiniXml):
         return self._children
 
     def set_separator_add(self):
-        action = self.ACTION_CLASS()
+        action = self.ACTION_CLS()
         action.set_is_separator(True)
         self._children.append(action)
         return action
@@ -174,7 +174,7 @@ class HoudiniXmlMenu(HoudiniXml):
 
 
 class HoudiniXmlMainMenuBar(HoudiniXml):
-    MENU_CLASS = HoudiniXmlMenu
+    MENU_CLS = HoudiniXmlMenu
     XML_HEAD = 'menuBar'
     def __init__(self):
         super(HoudiniXmlMainMenuBar, self).__init__()
@@ -185,7 +185,7 @@ class HoudiniXmlMainMenuBar(HoudiniXml):
         return self._menus
 
     def set_menu_add(self, name):
-        menu = self.MENU_CLASS(name)
+        menu = self.MENU_CLS(name)
         self._menus.append(menu)
         return menu
 
@@ -276,6 +276,6 @@ class OcioSetup(utl_abstract.AbsSetup):
         super(OcioSetup, self).__init__(root)
 
     def set_run(self):
-        self._set_environ_(
+        self.set_environ_fnc(
             'OCIO', '{}/config.ocio'.format(self._root)
         )

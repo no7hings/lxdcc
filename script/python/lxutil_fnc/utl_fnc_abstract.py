@@ -13,7 +13,7 @@ from lxutil.dcc.dcc_objects import _utl_dcc_obj_utility
 
 
 class AbsTaskMethodCreator(object):
-    CONFIGURE_CLASS = None
+    CONFIGURE_CLS = None
     METHODS_CONFIGURE = None
     METHODS_CONFIGURE_PATH = None
     #
@@ -258,9 +258,9 @@ class AbsStpLoader(object):
 
 # inspection object definition
 class AbsIspObjDef(object):
-    FNC_ISP_IGNORE_CLASS = None
+    FNC_ISP_IGNORE_CLS = None
     #
-    FNC_OBJ_CLASS = _utl_dcc_obj_utility.Obj
+    FNC_OBJ_CLS = _utl_dcc_obj_utility.Obj
     def _set_isp_obj_def_init_(self):
         self._error_obj_raw_dict = {}
         #
@@ -275,7 +275,7 @@ class AbsIspObjDef(object):
 
     def set_error_obj_raw_add(self, error_obj, check_index):
         if isinstance(error_obj, six.string_types):
-            error_obj = self.FNC_OBJ_CLASS(error_obj)
+            error_obj = self.FNC_OBJ_CLS(error_obj)
         #
         obj_path = error_obj.path
         obj_is_ignored = self._get_object_is_ignored_at_(error_obj, check_index)
@@ -316,7 +316,7 @@ class AbsIspObjDef(object):
                         port.set_create(raw_type='string')
                     if port.get_is_exists() is True:
                         raw = port.get()
-                        validation_ignore = self.FNC_ISP_IGNORE_CLASS(raw)
+                        validation_ignore = self.FNC_ISP_IGNORE_CLS(raw)
                         validation_ignore.set(self.loader.key, check_index, boolean)
                         port.set(validation_ignore.raw_string)
                         #
@@ -338,7 +338,7 @@ class AbsIspObjDef(object):
                     return False
                 else:
                     raw = port.get()
-                    validation_ignore = self.FNC_ISP_IGNORE_CLASS(raw)
+                    validation_ignore = self.FNC_ISP_IGNORE_CLS(raw)
                     return validation_ignore.get(self.loader.key, check_index)
         return False
 
@@ -366,7 +366,7 @@ class AbsIspObjDef(object):
 
 # inspection object with component definition
 class AbsIspObjCompDef(object):
-    FNC_OBJ_CLASS = _utl_dcc_obj_utility.Obj
+    FNC_OBJ_CLS = _utl_dcc_obj_utility.Obj
     def _set_isp_obj_component_def_init_(self):
         self._error_obj_comp_raw_dict = {}
 
@@ -394,7 +394,7 @@ class AbsIspObjCompDef(object):
             obj_path = obj.path
             for sub_obj in error_obj_comps:
                 if isinstance(sub_obj, six.string_types):
-                    sub_obj = self.FNC_OBJ_CLASS(sub_obj)
+                    sub_obj = self.FNC_OBJ_CLS(sub_obj)
                 self.set_error_obj_comp_raw_add(
                     obj_path, check_index, sub_obj
                 )
@@ -488,11 +488,11 @@ class AbsChecker(
     AbsIspObjFileDef,
     AbsIspObjSourceDef
 ):
-    FNC_CHECKER_LOADER_CLASS = None
+    FNC_CHECKER_LOADER_CLS = None
     #
     EXCEPT_DCC_PATHS = []
     def __init__(self, method_key, *args):
-        self.op_isp_loader = self.FNC_CHECKER_LOADER_CLASS(
+        self.op_isp_loader = self.FNC_CHECKER_LOADER_CLS(
             method_key
         )
         #
@@ -585,10 +585,10 @@ class AbsConfigureDef(
     unr_abstracts.AbsObjGuiDef
 ):
     PATHSEP = '/'
-    PROPERTIES_CLASS = None
+    PROPERTIES_CLS = None
     def _set_configure_def_init_(self, key, raw):
         self._key = key
-        self._properties = self.PROPERTIES_CLASS(key, raw)
+        self._properties = self.PROPERTIES_CLS(key, raw)
         #
         path = self.get('path')
         self._set_obj_dag_def_init_(path)
@@ -639,11 +639,11 @@ class AbsConfigureDef(
 
 
 class AbsTaskMethodConfigure(AbsConfigureDef):
-    CONFIGURE_CLASS = None
+    CONFIGURE_CLS = None
     #
     METHODS_CONFIGURE_PATH = None
     def __init__(self, key):
-        methods_configure = self.CONFIGURE_CLASS(None, self.METHODS_CONFIGURE_PATH)
+        methods_configure = self.CONFIGURE_CLS(None, self.METHODS_CONFIGURE_PATH)
         methods_configure.set_flatten()
         value = methods_configure.get(key)
         if value is None:
@@ -661,9 +661,9 @@ class AbsExporterConfigure(AbsTaskMethodConfigure):
 
 
 class AbsTaskMethod(object):
-    METHOD_CONFIGURE_CLASS = None
+    METHOD_CONFIGURE_CLS = None
     def __init__(self, key):
-        self._configure = self.METHOD_CONFIGURE_CLASS(key)
+        self._configure = self.METHOD_CONFIGURE_CLS(key)
     @property
     def configure(self):
         return self._configure

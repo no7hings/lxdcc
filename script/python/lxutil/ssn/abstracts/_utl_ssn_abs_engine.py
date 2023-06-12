@@ -37,7 +37,7 @@ class AbsSsnRsvApplication(object):
         """
         copy scene file to publish workspace:
             when target is exists, ignore;
-            when file's workspace is "publish" return current file
+            when file's workspace match "release" return current file
 
         :param version_scheme: str(<version-scheme>), "match" or "new"
         :param ext_extras: list(<ext>)
@@ -96,9 +96,11 @@ class AbsSsnRsvApplication(object):
             if scene_src_file_opt_src.get_is_exists() is True:
                 scene_src_file_opt_tgt = bsc_core.StgFileOpt(scene_src_file_path_tgt)
                 if scene_src_file_opt_tgt.get_is_exists() is False:
+                    # copy scene file
                     bsc_core.StgPathPermissionMtd.copy_to_file(
                         scene_src_file_path_src, scene_src_file_path_tgt
                     )
+                    # when is '.ma', collection xgen
                     if application == 'maya':
                         utl_fnc_exporters.DotMaExporter(
                             option=dict(
@@ -126,7 +128,7 @@ class AbsSsnRsvApplication(object):
         """
         copy scene file to output workspace:
             when target is exists, ignore;
-            when file's workspace is "output" return current file
+            when file's workspace match "temporary" return current file
 
         :param version_scheme: str(<version-scheme>), "match" or "new"
         :param ext_extras: list(<ext>)

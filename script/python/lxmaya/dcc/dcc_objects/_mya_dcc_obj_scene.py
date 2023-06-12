@@ -23,8 +23,6 @@ from lxmaya import ma_configure, ma_core
 
 from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag
 
-from lxutil_gui.qt import utl_gui_qt_core
-
 
 class Namespace(
     utl_abstract.AbsDccObjDef,
@@ -73,10 +71,10 @@ class Namespace(
 
 
 class Scene(utl_dcc_obj_abs.AbsObjScene):
-    FILE_CLASS = utl_dcc_objects.OsFile
-    UNIVERSE_CLASS = unv_objects.ObjUniverse
+    FILE_CLS = utl_dcc_objects.OsFile
+    UNIVERSE_CLS = unv_objects.ObjUniverse
     #
-    NAMESPACE_CLASS = Namespace
+    NAMESPACE_CLS = Namespace
     RENDER_ATTR_DICT = {
         'renderer': 'defaultRenderGlobals.currentRenderer',
         'imagePrefix': 'defaultRenderGlobals.imageFilePrefix',
@@ -181,7 +179,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         return ma_core._ma__get_namespace_paths_()
     @classmethod
     def get_namespaces(cls):
-        return [cls.NAMESPACE_CLASS(i) for i in cls.get_namespace_paths()]
+        return [cls.NAMESPACE_CLS(i) for i in cls.get_namespace_paths()]
     @classmethod
     def set_current_frame(cls, frame):
         cmds.currentTime(frame)
@@ -318,7 +316,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         :return:
         """
         utl_core.Log.set_module_result_trace(
-            'scene-file open',
+            'scene open',
             u'file="{}" is started'.format(file_path)
         )
         if ignore_format is True:
@@ -337,7 +335,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 type=cls._get_file_type_name_(file_path)
             )
         utl_core.Log.set_module_result_trace(
-            'scene-file open',
+            'scene open',
             u'file="{}" is completed'.format(file_path)
         )
     @classmethod
@@ -514,7 +512,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 cmds.setAttr('hardwareRenderingGlobals.ssaoEnable', 1)
     #
     def load_from_location_fnc(self, root, include_obj_type):
-        self.set_restore()
+        self.restore_all()
         #
         root_dag_path = bsc_core.DccPathDagOpt(root)
         root_mya_dag_path = root_dag_path.translate_to(ma_configure.Util.OBJ_PATHSEP)
@@ -539,9 +537,11 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)
         obj = obj_type.set_obj_create(dcc_obj_path)
-        obj.set_gui_attribute(
-            'icon', utl_gui_qt_core.QtMayaMtd.get_qt_icon(obj_type_name)
-        )
+        if ma_core.get_is_ui_mode():
+            from lxutil_gui.qt import utl_gui_qt_core
+            obj.set_gui_attribute(
+                'icon', utl_gui_qt_core.QtMayaMtd.get_qt_icon(obj_type_name)
+            )
         return obj
     # clear
     @classmethod

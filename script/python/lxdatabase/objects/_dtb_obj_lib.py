@@ -36,7 +36,7 @@ class DtbBaseOpt(object):
 
     class EntityTypes(object):
         # type
-        TypeRoot = 'type_root'
+        CategoryRoot = 'category_root'
         CategoryGroup = 'category_group'
         Category = 'category'
         Type = 'type'
@@ -44,6 +44,7 @@ class DtbBaseOpt(object):
         TagGroup = 'tag_group'
         Tag = 'tag'
         # node
+        ResourceGroup = 'resource_group'
         Resource = 'resource'
         Version = 'version'
         Storage = 'storage'
@@ -58,6 +59,7 @@ class DtbBaseOpt(object):
 
     class Kinds(object):
         # type, use for "resource" classification, one "resource" can have one or more "type"
+        ResourceCategoryRoot = 'resource-category-root'
         ResourceCategoryGroup = 'resource-category-group'
         ResourceCategory = 'resource-category'
         ResourceType = 'resource-type'
@@ -72,6 +74,7 @@ class DtbBaseOpt(object):
         ResourcePropertyTag = 'resource-property-tag'
         ResourceUserTag = 'resource-user-tag'
         ResourceFileTag = 'resource-file-tag'
+        ResourceFormatTag = 'resource-format-tag'
         # resource
         Resource = 'resource'
         Asset = 'asset'
@@ -83,6 +86,7 @@ class DtbBaseOpt(object):
 
     EntityTypeCategoryMapper = {
         # type
+        EntityTypes.CategoryRoot: EntityCategories.Type,
         EntityTypes.CategoryGroup: EntityCategories.Type,
         EntityTypes.Category: EntityCategories.Type,
         EntityTypes.Type: EntityCategories.Type,
@@ -109,6 +113,10 @@ class DtbBaseOpt(object):
 
         # if os.path.isfile(database) is False:
         #     raise RuntimeError()
+
+        bsc_core.LogMtd.trace_result(
+            'setup database from: {}'.format(database)
+        )
 
         self._dtb_file_path = database
         self._dtb_file_opt = bsc_core.StgFileOpt(
@@ -144,11 +152,16 @@ class DtbBaseOpt(object):
             if 'path' in data:
                 path = data.get('path')
                 if path.startswith('/'):
-                    path_opt = bsc_core.DccPathDagOpt(path)
-                    group = path_opt.get_parent_path()
-                    data['group'] = group
-                    name = path_opt.get_name()
-                    data['name'] = name
+                    if path == '/':
+                        data['group'] = ''
+                        data['name'] = ''
+                    else:
+                        #
+                        path_opt = bsc_core.DccPathDagOpt(path)
+                        group = path_opt.get_parent_path()
+                        data['group'] = group
+                        name = path_opt.get_name()
+                        data['name'] = name
                 else:
                     data['name'] = path
             else:
@@ -162,7 +175,14 @@ class DtbBaseOpt(object):
         data['entity_category'] = entity_category
         data['entity_type'] = entity_type
         table_opt = self._dtb_opt.get_table_opt(entity_category)
-        return table_opt.add(**data)
+        table_opt.add(**data)
+        self.accept()
+        return self.get_entity(
+            entity_type=entity_type,
+            filters=[
+                ('path', 'is', path)
+            ]
+        )
 
     def get_entity(self, entity_type, filters, new_connection=True):
         entity_category = self.EntityTypeCategoryMapper[entity_type]
@@ -196,25 +216,36 @@ class DtbBaseOpt(object):
 
 
 class DtbResourceLibraryOpt(DtbBaseOpt):
-    def __init__(self, configure_file_path):
-        self._dtb_cfg_file_path = configure_file_path
-        self._dtb_cfg_opt = bsc_objects.Configure(value=configure_file_path)
+    def __init__(self, configure_file, configure_file_extend=None):
+        self._dtb_cfg_file_path = configure_file
+        self._dtb_cfg_file_path_extend = configure_file_extend
+        self._dtb_cfg_opt = bsc_objects.Configure(value=configure_file)
+        if configure_file_extend is not None:
+            if bsc_core.StgFileOpt(configure_file_extend).get_is_file() is False:
+                raise RuntimeError()
+            #
+            self._dtb_cfg_opt.update_from(
+                bsc_objects.Configure(value=configure_file_extend)
+            )
 
         self._dtb_cfg_opt.set_flatten()
 
         self._dtb_pattern_kwargs = {}
         if bsc_core.SystemMtd.get_is_linux():
-            self._dtb_root = self._dtb_cfg_opt.get('option.variants.root-linux')
+            self._dtb_stg_root = self._dtb_cfg_opt.get('option.variants.root-linux')
         elif bsc_core.SystemMtd.get_is_windows():
-            self._dtb_root = self._dtb_cfg_opt.get('option.variants.root-windows')
+            self._dtb_stg_root = self._dtb_cfg_opt.get('option.variants.root-windows')
         else:
             raise NotImplementedError()
         #
-        self._dtb_pattern_kwargs['root'] = self._dtb_root
-        db_file_pattern = self._dtb_cfg_opt.get('patterns.database-file')
+        if not self._dtb_stg_root:
+            raise RuntimeError()
+        #
+        self._dtb_pattern_kwargs['root'] = self._dtb_stg_root
+        db_file_pattern = self._dtb_cfg_opt.get('database.file')
         if db_file_pattern is None:
             return
-
+        #
         super(DtbResourceLibraryOpt, self).__init__(
             db_file_pattern.format(
                 **self._dtb_pattern_kwargs
@@ -229,9 +260,13 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         return self._dtb_cfg_opt
     database_configure_opt = property(get_database_configure_opt)
 
-    def get_root(self):
-        return self._dtb_root
-    root = property(get_root)
+    def get_database_configure_extend(self):
+        return self._dtb_cfg_file_path_extend
+    database_configure_extend = property(get_database_configure_extend)
+
+    def get_stg_root(self):
+        return self._dtb_stg_root
+    stg_root = property(get_stg_root)
 
     def get_pattern(self, keyword):
         return self._dtb_cfg_opt.get(
@@ -310,6 +345,306 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                         )
                     )
 
+    def create_category_root(self, path):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.CategoryRoot,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        gui_name = 'All'
+        options = dict(kind=self.Kinds.ResourceCategoryRoot, gui_icon_name='database/all')
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.CategoryRoot,
+            data=dict(
+                path=path,
+                gui_name=gui_name,
+                **options
+            )
+        )
+
+    def create_category_group(self, path):
+        path_opt = bsc_core.DccPathDagOpt(path)
+        if not self.get_entity(
+            entity_type=self.EntityTypes.CategoryRoot,
+            filters=[
+                ('path', 'is', path_opt.get_parent_path()),
+            ]
+        ):
+            raise RuntimeError()
+        #
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.CategoryGroup,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        name = path_opt.get_name()
+        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        options = dict(kind=self.Kinds.ResourceCategoryGroup, gui_icon_name='database/groups')
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.CategoryGroup,
+            data=dict(
+                path=path,
+                gui_name=gui_name,
+                **options
+            )
+        )
+
+    def create_category(self, path):
+        path_opt = bsc_core.DccPathDagOpt(path)
+        if not self.get_entity(
+            entity_type=self.EntityTypes.CategoryGroup,
+            filters=[
+                ('path', 'is', path_opt.get_parent_path()),
+            ]
+        ):
+            raise RuntimeError()
+        #
+
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Category,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        name = path_opt.get_name()
+        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        options = dict(kind=self.Kinds.ResourceCategory, gui_icon_name='database/group')
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Category,
+            data=dict(
+                path=path,
+                gui_name=gui_name,
+                **options
+            )
+        )
+
+    def create_type(self, path):
+        path_opt = bsc_core.DccPathDagOpt(path)
+        if not self.get_entity(
+            entity_type=self.EntityTypes.Category,
+            filters=[
+                ('path', 'is', path_opt.get_parent_path()),
+            ]
+        ):
+            raise RuntimeError()
+        #
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Type,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        name = path_opt.get_name()
+        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        options = dict(kind=self.Kinds.ResourceType, gui_icon_name='database/object')
+        options['gui_name'] = gui_name
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Type,
+            data=dict(
+                path=path,
+                **options
+            )
+        )
+
+    def create_type_assign(self, node_path, value, kind):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Types,
+            filters=[
+                ('path', 'is', '{}->{}'.format(node_path, value)),
+            ]
+        )
+        if _:
+            return False, _
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Types,
+            data=dict(
+                kind=kind,
+                #
+                node=node_path,
+                value=value
+            )
+        )
+
+    def get_type_force(self, path):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Type,
+            filters=[
+                ('path', 'is', path),
+                ('kind', 'is', self.Kinds.ResourceType)
+            ]
+        )
+        if _:
+            return False, _
+        #
+        method_args = [
+            self.create_category_root,
+            self.create_category_group,
+            self.create_category,
+            self.create_type,
+        ]
+        path_opt = bsc_core.DccPathDagOpt(path)
+        components = path_opt.get_components()
+        components.reverse()
+        results = []
+        for seq, i in enumerate(components):
+            i_kwargs = dict(path=i.get_path())
+            i_method = method_args[seq]
+            results.append(i_method(**i_kwargs))
+        #
+        return results[-1]
+
+    def create_resource(self, path, **kwargs):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Resource,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        path_opt = bsc_core.DccPathDagOpt(path)
+        name = path_opt.get_name()
+        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        options = dict(kind=self.Kinds.Resource, gui_icon_name='database/object')
+        options['gui_name'] = gui_name
+        options.update(kwargs)
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Resource,
+            data=dict(
+                path=path,
+                **options
+            )
+        )
+
+    def create_version(self, path):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Version,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        path_opt = bsc_core.DccPathDagOpt(path)
+        name = path_opt.get_name()
+        gui_name = name
+        options = dict(kind=self.Kinds.Version, gui_icon_name='database/object')
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Version,
+            data=dict(
+                path=path,
+                gui_name=gui_name,
+                **options
+            )
+        )
+
+    def create_property(self, node_path, port_path, value, kind):
+        atr_path = '.'.join([node_path, port_path])
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Attribute,
+            filters=[
+                ('path', 'is', atr_path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Attribute,
+            data=dict(
+                kind=kind,
+                node=node_path,
+                port=port_path,
+                value=value
+            )
+        )
+
+    def create_storage(self, path, kind):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Storage,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        #
+        path_opt = bsc_core.DccPathDagOpt(path)
+        name = path_opt.get_name()
+        gui_name = name
+        options = dict(kind=kind, gui_icon_name='database/object')
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Storage,
+            data=dict(
+                path=path,
+                gui_name=gui_name,
+                **options
+            )
+        )
+
+    def get_property(self, node_path, port_path):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Attribute,
+            filters=[
+                ('path', 'is', '{}.{}'.format(node_path, port_path)),
+            ]
+        )
+        if _:
+            return _.value
+
+    def create_tag(self, path, kind):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Tag,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+        if _:
+            return False, _
+        options = dict(kind=kind, gui_icon_name='database/object')
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Tag,
+            data=dict(
+                path=path,
+                **options
+            )
+        )
+
+    def create_tag_assign(self, node_path, value, kind):
+        _ = self.get_entity(
+            entity_type=self.EntityTypes.Tags,
+            filters=[
+                ('path', 'is', '{}->{}'.format(node_path, value)),
+            ]
+        )
+        if _:
+            return False, _
+        return True, self.add_entity(
+            entity_type=self.EntityTypes.Tags,
+            data=dict(
+                kind=kind,
+                #
+                node=node_path,
+                value=value
+            )
+        )
+
 
 class DtbNodeOpt(object):
     def __init__(self, dtb_opt, dtb_entity):
@@ -337,9 +672,26 @@ class DtbNodeOpt(object):
 
 
 if __name__ == '__main__':
-    dtb = DtbResourceLibraryOpt('/data/e/myworkspace/td/lynxi/script/python/lxdatabase/.data/dtb-library-basic.yml')
-
-    dtb.setup_entity_categories()
-    dtb.setup_entities()
-
-    dtb.accept()
+    for i_key in [
+        # 'surface',
+        # 'atlas',
+        # 'displacement',
+        '3d_asset',
+        '3d_plant'
+    ]:
+        dtb_opt_ = DtbResourceLibraryOpt(
+            bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
+            bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(i_key)),
+        )
+        #
+        dtb_opt_.setup_entity_categories()
+        dtb_opt_.setup_entities()
+        dtb_opt_.accept()
+    # dtb_opt_.create_category_group('atlas')
+    # dtb_opt_.create_category('fern', '/atlas')
+    # dtb_opt_.create_type('other', '/atlas/fern')
+    # dtb_opt_.create_category_root()
+    # print dtb_opt_.get_type_force('/atlas/fern/other')
+    # print dtb_opt_.create_resource('/atlas/sword_fern_pjvef2')
+    # print dtb_opt_.create_resource_property('/atlas/sword_fern_pjvef2.version', '/atlas/sword_fern_pjvef2/v0001')
+    # print dtb_opt_.create_version('/atlas/sword_fern_pjvef2/v0001')

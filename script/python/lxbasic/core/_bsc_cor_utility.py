@@ -417,9 +417,9 @@ class StgPathMapMtd(object):
     @classmethod
     def map_to_linux(cls, path):
         """
-print Path.map_to_linux(
-    'l:/a'
-)
+        print Path.map_to_linux(
+            'l:/a'
+        )
         :param path:
         :return:
         """
@@ -565,6 +565,12 @@ class StorageMtd(object):
     @classmethod
     def get_is_exists(cls, path):
         return os.path.exists(path)
+    @classmethod
+    def get_is_file(cls, path):
+        return os.path.isfile(path)
+    @classmethod
+    def get_is_directory(cls, path):
+        return os.path.isdir(path)
     @classmethod
     def get_file_realpath(cls, file_path_src, file_path_tgt):
         directory_path_src = os.path.dirname(file_path_src)

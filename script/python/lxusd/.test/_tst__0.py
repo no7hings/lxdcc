@@ -5,7 +5,7 @@ from lxbasic import bsc_core
 
 from lxusd import usd_setup
 
-usd_setup.UsdSetup.set_environs_setup()
+usd_setup.UsdSetup.build_environ()
 
 from lxusd import usd_core
 

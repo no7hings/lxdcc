@@ -34,19 +34,20 @@ def set_asset_texture_tx_export(task_properties, force=False):
             version=version
         )
         #
-        ktn_fnc_exporters.TextureExporter(
+        ktn_fnc_exporters.FncRenderTextureExporter(
             option=dict(
                 directory_base=texture_directory_path_src,
                 directory=texture_directory_path_tgt,
                 #
                 fix_name_blank=True,
-                repath_to_tx_force=True,
                 with_reference=False,
                 use_environ_map=True,
                 #
-                ignore_missing_texture=False
+                ignore_missing_texture=False,
+                #
+                copy_source=True,
             )
-        ).set_run()
+        ).execute()
 
 
 def set_asset_texture_export(task_properties, force=False):
@@ -81,14 +82,15 @@ def set_asset_texture_export(task_properties, force=False):
             version=version
         )
         #
-        ktn_fnc_exporters.TextureExporter(
+        ktn_fnc_exporters.FncRenderTextureExporter(
             option=dict(
                 directory_base=texture_directory_path_src,
                 directory=texture_directory_path_tgt,
                 #
                 fix_name_blank=True,
-                repath_to_tx_force=False,
                 with_reference=False,
                 use_environ_map=True,
+                #
+                copy_source=True,
             )
-        ).set_run()
+        ).execute()

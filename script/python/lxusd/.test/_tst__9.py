@@ -34,12 +34,14 @@ for i_seq, i_prim in enumerate(prim_opt.get_children()):
 
     print i_file_path
 
-    i_file_path_m = bsc_core.StgFileMultiplyMtd.set_convert_to(
+    i_file_path_m = bsc_core.StgFileMultiplyMtd.convert_to(
         i_file_path, ['*.####.{ext}']
     )
     i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_tiles(
         i_file_path_m
     )
+
+    print i_file_tile_paths
     # for j_seq, j_file_path in enumerate(i_file_tile_paths):
     #     j_cmd = usd_core.UsdProcess.get_command(
     #         'method=cache-hierarchy&location={}&file={}'.format(i_path, j_file_path)

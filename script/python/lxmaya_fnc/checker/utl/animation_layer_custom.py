@@ -25,6 +25,6 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
             obj.set_delete()
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         nodes = _mya_dcc_obj_objs.AnimationLayers.get_custom_nodes(reference=False)
         self._set_objs_check_(nodes)

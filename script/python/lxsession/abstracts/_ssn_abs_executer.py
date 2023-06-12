@@ -12,7 +12,7 @@ class AbsHookExecutor(object):
     SHELL_PATTERN = '-- lxhook-engine -o "{option}"'
     DEADLINE_PATTERN = '-- lxhook-engine -o "{option}&start_index=<STARTFRAME>&end_index=<ENDFRAME>"'
     #
-    SUBMITTER_CLASS = None
+    SUBMITTER_CLS = None
     def __init__(self, session):
         self._session = session
 
@@ -28,14 +28,14 @@ class AbsHookExecutor(object):
             session, name, dict(platform=bsc_core.SystemMtd.get_platform())
         )
 
-    def _submit_deadline_job_(self, session, name, option_extra_dict):
+    def _submit_deadline_job_(self, session, name, option_extra_variants):
         hook_option_opt = session.get_option_opt()
         hook_option = session.get_option()
         option_hook_key = hook_option_opt.get('option_hook_key')
         #
         ddl_configure = session.get_ddl_configure()
         #
-        self._ddl_submiter = self.SUBMITTER_CLASS()
+        self._ddl_submiter = self.SUBMITTER_CLS()
         self._ddl_submiter.set_option(
             batch_name=session.get_batch_name(),
             type=session.get_type(),
@@ -49,7 +49,7 @@ class AbsHookExecutor(object):
         )
         # update task properties
         self._ddl_submiter.set_option_extra(
-            **option_extra_dict
+            **option_extra_variants
         )
         #
         self._ddl_submiter.option.set('deadline.group', ddl_configure.get('group'))

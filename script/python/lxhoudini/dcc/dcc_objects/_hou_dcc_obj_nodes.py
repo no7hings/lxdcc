@@ -17,8 +17,8 @@ from ...dcc.dcc_objects import _hou_dcc_obj_os, _hou_dcc_obj_node
 
 
 class AbsFileReferences(object):
-    DCC_FILE_REFERENCE_NODE_CLASS = None
-    SCENE_CLASS = None
+    DCC_FILE_REFERENCE_NODE_CLS = None
+    SCENE_CLS = None
     # file type
     INCLUDE_DCC_FILE_TYPES = []
     EXCLUDE_DCC_FILE_TYPES = []
@@ -58,7 +58,7 @@ class AbsFileReferences(object):
                     dcc_file_type = hou_parm.parmTemplate().fileType()
                     if self._get_type_is_available_(dcc_file_type) is True:
                         node_path = hou_parm.node().path()
-                        node = self.DCC_FILE_REFERENCE_NODE_CLASS(node_path)
+                        node = self.DCC_FILE_REFERENCE_NODE_CLS(node_path)
                         # attribute name
                         attribute_path = hou_parm.path()
                         port_path = attribute_path.split(PORT_PATHSEP)[-1]
@@ -72,7 +72,7 @@ class AbsFileReferences(object):
 
 
 class FileReferences_(AbsFileReferences):
-    DCC_FILE_REFERENCE_NODE_CLASS = _hou_dcc_obj_node.FileReference
+    DCC_FILE_REFERENCE_NODE_CLS = _hou_dcc_obj_node.FileReference
     INCLUDE_DCC_FILE_TYPES = [
         hou.fileType.Any,
         hou.fileType.Geometry,
@@ -88,7 +88,7 @@ class FileReferences_(AbsFileReferences):
 
 
 class FileReferences(object):
-    DCC_NODE_CLASS_DICT = {
+    DCC_NODE_CLS_DICT = {
         'custom': _hou_dcc_obj_node.FileReference,
         'arnold::Driver/materialx': _hou_dcc_obj_node.AndMaterialx,
     }
@@ -99,9 +99,9 @@ class FileReferences(object):
         self._node_raw = {}
 
     def _get_obj_cls_(self, obj_type_path):
-        if obj_type_path in self.DCC_NODE_CLASS_DICT:
-            return self.DCC_NODE_CLASS_DICT[obj_type_path]
-        return self.DCC_NODE_CLASS_DICT['custom']
+        if obj_type_path in self.DCC_NODE_CLS_DICT:
+            return self.DCC_NODE_CLS_DICT[obj_type_path]
+        return self.DCC_NODE_CLS_DICT['custom']
 
     def __get_by_definition_(self):
         for hou_port, plf_path in hou.fileReferences():
@@ -138,7 +138,7 @@ class FileReferences(object):
 
 
 class TextureReferences(AbsFileReferences):
-    DCC_FILE_REFERENCE_NODE_CLASS = _hou_dcc_obj_node.ImageReference
+    DCC_FILE_REFERENCE_NODE_CLS = _hou_dcc_obj_node.ImageReference
     INCLUDE_DCC_FILE_TYPES = [
         hou.fileType.Image
     ]
@@ -153,7 +153,7 @@ class TextureReferences(AbsFileReferences):
 
 
 class References(object):
-    OS_FILE_CLASS = _hou_dcc_obj_os.OsFile
+    OS_FILE_CLS = _hou_dcc_obj_os.OsFile
     def __init__(self, *args):
         pass
 
@@ -178,7 +178,7 @@ class References(object):
         for hou_parm, path in hou.fileReferences():
             if hou_parm is None:
                 plf_path = self.get_houdini_absolutely_path_with_path(path)
-                os_file = self.OS_FILE_CLASS(plf_path)
+                os_file = self.OS_FILE_CLS(plf_path)
                 lis.append(os_file)
         return lis
 
@@ -188,7 +188,7 @@ class Alembics(hou_dcc_obj_abs.AbsHouObjs):
     INCLUDE_DCC_TYPES = [
         'Sop/alembic',
     ]
-    DCC_NODE_CLASS = _hou_dcc_obj_node.Alembic
+    DCC_NODE_CLS = _hou_dcc_obj_node.Alembic
     FILE_REFERENCE_FILE_PORT_PATHS_DICT = {
         'Sop/alembic': ['fileName']
     }
@@ -200,7 +200,7 @@ class Materialxs(hou_dcc_obj_abs.AbsHouObjs):
     INCLUDE_DCC_TYPES = [
         'arnold::Driver/materialx',
     ]
-    DCC_NODE_CLASS = _hou_dcc_obj_node.AndMaterialx
+    DCC_NODE_CLS = _hou_dcc_obj_node.AndMaterialx
     FILE_REFERENCE_FILE_PORT_PATHS_DICT = {
         'arnold::Driver/materialx': ['filename']
     }

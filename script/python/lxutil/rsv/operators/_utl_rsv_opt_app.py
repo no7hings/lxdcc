@@ -72,7 +72,6 @@ class RsvMayaOpt(AbsRsvAppOpt):
         )
         self._execute_command_use_thread_(
             cmd,
-            # clear_environ=True,
             environs_extend=self.get_environs_extend()
         )
 
@@ -88,7 +87,6 @@ class RsvMayaOpt(AbsRsvAppOpt):
         )
         self._execute_command_use_thread_(
             cmd,
-            # clear_environ=True,
             environs_extend=self.get_environs_extend()
         )
 
@@ -106,7 +104,6 @@ class RsvHoudiniOpt(AbsRsvAppOpt):
         )
         self._execute_command_use_thread_(
             cmd,
-            # clear_environ=True,
             environs_extend=self.get_environs_extend()
         )
 
@@ -127,7 +124,6 @@ class RsvKatanaOpt(AbsRsvAppOpt):
         )
         self._execute_command_use_thread_(
             cmd,
-            # clear_environ=True,
             environs_extend=self.get_environs_extend()
         )
 
@@ -143,6 +139,5 @@ class RsvKatanaOpt(AbsRsvAppOpt):
         )
         self._execute_command_use_thread_(
             cmd,
-            # clear_environ=True,
             environs_extend=self.get_environs_extend()
         )

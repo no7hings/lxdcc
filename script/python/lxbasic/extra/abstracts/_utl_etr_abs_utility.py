@@ -33,6 +33,9 @@ class AbsEtrBase(object):
     def send_mails(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
+    def send_feishu(cls, *args, **kwargs):
+        raise NotImplementedError()
+    @classmethod
     def send_messages(cls, *args, **kwargs):
         raise NotImplementedError()
 

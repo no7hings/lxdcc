@@ -15,10 +15,10 @@ class ScpTextureCreate(object):
         s = and_setup.MtoaSetup('/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019')
         s.set_run()
         # xgen lib
-        s._set_environ_add_(
+        s.add_environ_fnc(
             'LD_LIBRARY_PATH', '/l/packages/pg/prod/maya/2019.2/platform-linux/Application/plug-ins/xgen/lib'
         )
-        s._set_environ_add_(
+        s.add_environ_fnc(
             'LD_LIBRARY_PATH', '/l/packages/pg/prod/maya/2019.2/platform-linux/Application/lib'
         )
         # ocio

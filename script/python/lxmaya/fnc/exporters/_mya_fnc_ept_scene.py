@@ -87,7 +87,7 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             self._results = [file_path]
         #
         if with_xgen_collection is True:
-            utl_fnc_exporters.DotMaExporter._set_xgen_collection_files_copy_(
+            utl_fnc_exporters.DotMaExporter.copy_xgen_collection_files_fnc(
                 file_path_src=mya_dcc_objects.Scene.get_current_file_path(),
                 file_path_tgt=file_path
             )
@@ -331,7 +331,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
                 )
                 # stg_operators.ImgFileOpt(
                 #     jpg_seq_file
-                # ).set_convert_to(mov_file_path)
+                # ).convert_to(mov_file_path)
         else:
             jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
             exist_files = jpg_seq_file.get_exists_files_()
@@ -364,7 +364,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
                 )
                 # stg_operators.ImgFileOpt(
                 #     utl_dcc_objects.OsFile(jpg_seq_file_path)
-                # ).set_convert_to(mov_file_path)
+                # ).convert_to(mov_file_path)
 
         self._results = [mov_file_path]
 

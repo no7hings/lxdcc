@@ -15,10 +15,10 @@ class AbsArnoldSetup(utl_abstract.AbsSetup):
         super(AbsArnoldSetup, self).__init__(root)
     @classmethod
     def _set_procedural_setup_(cls, *args):
-        [cls._set_environ_add_('ARNOLD_PROCEDURAL_PATH', i) for i in args]
+        [cls.add_environ_fnc('ARNOLD_PROCEDURAL_PATH', i) for i in args]
     @classmethod
     def _set_plugin_setup_(cls, *args):
-        [cls._set_environ_add_('ARNOLD_PLUGIN_PATH', i) for i in args]
+        [cls.add_environ_fnc('ARNOLD_PLUGIN_PATH', i) for i in args]
 
     def set_run(self):
         NotImplementedError()
@@ -29,11 +29,11 @@ class MtoaSetup(AbsArnoldSetup):
         super(MtoaSetup, self).__init__(root)
 
     def set_run(self):
-        self._set_python_setup_('{}/scripts'.format(self._root))
-        self._set_library_setup_('{}/bin'.format(self._root))
+        self.add_python_env_fnc('{}/scripts'.format(self._root))
+        self.add_library_env_fnc('{}/bin'.format(self._root))
         self._set_procedural_setup_('{}/procedurals'.format(self._root))
         self._set_plugin_setup_('{}/plugins'.format(self._root), '{}/procedurals'.format(self._root))
-        self._set_bin_setup_('{}/bin'.format(self._root))
+        self.add_bin_fnc('{}/bin'.format(self._root))
 
 
 class KtoaSetup(AbsArnoldSetup):

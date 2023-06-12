@@ -91,8 +91,8 @@ class Component(utl_abstract.AbsObjGuiDef):
 
 
 class Mesh(_mya_dcc_obj_dag.Shape):
-    COMPONENT_CLASS = MeshComponent
-    PORT_CLASS = _mya_dcc_obj_utility.Port
+    COMPONENT_CLS = MeshComponent
+    PORT_CLS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(Mesh, self).__init__(path)
     @staticmethod
@@ -165,7 +165,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
         return cls._get_comp_names_(indices, 'vtx')
 
     def get_component(self, cmp_name):
-        return self.COMPONENT_CLASS(
+        return self.COMPONENT_CLS(
             self, cmp_name
         )
     # normal locked
@@ -194,7 +194,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_edge_zero_length_comp_names(self):
         pre_selection_paths = cmds.ls(selection=1, long=1) or []
@@ -211,7 +211,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_face_n_side_comp_names(self):
         pre_selection_paths = cmds.ls(selection=1, long=1) or []
@@ -226,7 +226,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_face_non_triangulable_comp_names(self):
         pre_selection_paths = cmds.ls(selection=1, long=1) or []
@@ -241,7 +241,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_face_holed_comp_names(self):
         pre_selection_paths = cmds.ls(selection=1, long=1) or []
@@ -256,7 +256,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_face_lamina_comp_names(self):
         pre_selection_paths = cmds.ls(selection=1, long=1) or []
@@ -271,7 +271,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @classmethod
     def _get_mesh_open_edge_indices_(cls, path, round_count=8):
         lis_ = []
@@ -312,11 +312,11 @@ class Mesh(_mya_dcc_obj_dag.Shape):
     # non-manifold
     def get_edge_non_manifold_comp_names(self):
         _ = cmds.polyInfo(self.path, nonManifoldEdges=1) or []
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     #
     def get_vertex_non_manifold_comp_names(self):
         _ = cmds.polyInfo(self.path, nonManifoldVertices=1) or []
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     # map
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_map_face_non_uv_comp_names(self):
@@ -332,7 +332,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     @_mya_mdf_utility.set_undo_mark_mdf
     def get_map_face_zero_area_comp_names(self):
         pre_selection_paths = cmds.ls(selection=1, long=1) or []
@@ -351,7 +351,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
             cmds.select(pre_selection_paths)
         else:
             cmds.select(clear=1)
-        return [i.split(self.COMPONENT_CLASS.PATHSEP)[-1] for i in _]
+        return [i.split(self.COMPONENT_CLS.PATHSEP)[-1] for i in _]
     #
     def get_display_smooth_iterations(self):
         return self.get_port('displaySmoothMesh').get()
@@ -391,24 +391,24 @@ class Mesh(_mya_dcc_obj_dag.Shape):
 
 
 class Curve(_mya_dcc_obj_dag.Shape):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
+    PORT_CLS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(Curve, self).__init__(path)
 
 
 class Geometry(_mya_dcc_obj_dag.Shape):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
+    PORT_CLS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(Geometry, self).__init__(path)
 
 
 class XgenPalette(_mya_dcc_obj_dag.Shape):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
+    PORT_CLS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(XgenPalette, self).__init__(path)
 
 
 class XgenSplineGuide(_mya_dcc_obj_dag.Shape):
-    PORT_CLASS = _mya_dcc_obj_utility.Port
+    PORT_CLS = _mya_dcc_obj_utility.Port
     def __init__(self, path):
         super(XgenSplineGuide, self).__init__(path)

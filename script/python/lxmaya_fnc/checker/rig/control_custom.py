@@ -42,7 +42,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
         pass
 
     def set_check_run(self):
-        self.set_restore()
+        self.restore_all()
         sets = cmds.ls('*_controllers_grp', type='objectSet', long=1)
         node_paths = [j for i in sets for j in cmds.sets(i, query=1) or [] if cmds.nodeType(j) == 'transform']
         nodes = [_mya_dcc_obj_dag.Transform(i) for i in node_paths]

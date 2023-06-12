@@ -27,7 +27,7 @@ __all__ = [
 
 
 class Scene(utl_abstract.AbsDccScene):
-    REFERENCE_FILE_CLASS = _hou_dcc_obj_os.OsFile
+    REFERENCE_FILE_CLS = _hou_dcc_obj_os.OsFile
     def __init__(self):
         super(Scene, self).__init__()
     @property

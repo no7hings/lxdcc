@@ -23,7 +23,7 @@ option:
         group: ''
         #
         pool: ''
-        pool2: ''
+        secondary_pool: ''
         #
         command: ''
 #
@@ -39,7 +39,7 @@ output:
         ChunkSize: "1"
         Priority: 50
         Pool: <option.deadline.pool>
-        SecondaryPool: <option.deadline.pool2>
+        SecondaryPool: <option.deadline.secondary_pool>
         #
         Group: <option.deadline.group>
         #

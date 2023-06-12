@@ -38,7 +38,7 @@ option:
         group: "subprogress"
         #
         pool: "subprogress"
-        pool2: ""
+        secondary_pool: ""
         command: ""
 #
 job:
@@ -53,7 +53,7 @@ job:
         ChunkSize: "1"
         Priority: 50
         Pool: <option.job.pool>
-        SecondaryPool: <option.job.pool2>
+        SecondaryPool: <option.job.secondary_pool>
         #
         Group: <option.job.group>
         #

@@ -51,6 +51,12 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     def get_app_execute_mapper(cls, *args, **kwargs):
         return {}
     @classmethod
+    def get_application_configure_file(cls, *args, **kwargs):
+        return
+    @classmethod
+    def get_deadline_configure_file(cls, *args, **kwargs):
+        return
+    @classmethod
     def send_mails(cls, *args, **kwargs):
         bsc_core.MsgBaseMtd.send_mail(
             addresses=kwargs['addresses'],
@@ -67,3 +73,4 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def send_messages(cls, *args, **kwargs):
         pass
+

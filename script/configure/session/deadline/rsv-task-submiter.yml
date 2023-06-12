@@ -31,17 +31,20 @@ option:
         version: ''
     #
     deadline:
-#        batch_name: '[<option.group>][<option.extra.workspace>][<option.type>][<option.time_tag>]'
         batch_name: '[<option.group>][<option.extra.workspace>][<option.time_tag>]'
         job_name: '[<option.name>][<option.extra.workspace>][<option.engine>][<option.hook>]'
         #
         output_directory: ''
         output_file: ''
         #
+        priority: 50
+        #
         group: ''
         #
         pool: ''
-        pool2: ''
+        secondary_pool: ''
+        #
+        machine_limit: 10
         #
         command: ''
 #
@@ -55,9 +58,9 @@ output:
         Frame: "0"
         Department: <option.extra.step>
         ChunkSize: "1"
-        Priority: 50
+        Priority: <option.deadline.priority>
         Pool: <option.deadline.pool>
-        SecondaryPool: <option.deadline.pool2>
+        SecondaryPool: <option.deadline.secondary_pool>
         #
         Group: <option.deadline.group>
         #
@@ -67,7 +70,7 @@ output:
         OutputFilename0: <option.deadline.output_file>
         #
         UserName: <option.user>
-        MachineLimit: 10
+        MachineLimit: <option.deadline.machine_limit>
         #
         Comment: ''
         #
@@ -107,5 +110,5 @@ output:
         Shell: "default"
         ShellExecute: True
         Executable: ''
-        Software: <option.extra.application>
+        Software: ''
         ErrorCatch: "job-kill"

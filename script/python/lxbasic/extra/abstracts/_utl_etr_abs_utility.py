@@ -30,6 +30,12 @@ class AbsEtrBase(object):
     def get_app_execute_mapper(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
+    def get_application_configure_file(cls, *args, **kwargs):
+        raise NotImplementedError()
+    @classmethod
+    def get_deadline_configure_file(cls, *args, **kwargs):
+        raise NotImplementedError()
+    @classmethod
     def send_mails(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
@@ -59,3 +65,4 @@ class AbsEtrUsd(object):
     @classmethod
     def registry_set(cls, file_path):
         raise NotImplementedError()
+

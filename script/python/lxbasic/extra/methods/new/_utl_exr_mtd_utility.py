@@ -48,7 +48,6 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             PAPER_SHOW_NAME=project.upper(),
             PAPER_DB_NAME='production'
         )
-
     @classmethod
     def get_shotgun_step_name(cls, task):
         return str(task).upper()
@@ -76,7 +75,8 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         dict_ = {}
         platform = bsc_core.SystemMtd.get_platform()
         package_data = rsv_project.get_package_data()
-        cfg_file_path = package_data['configure-files'][platform]
+        cfg_file_path = package_data['application-configure-file'][platform]
+        cfg_file_path = bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
         data = bsc_core.StgFileOpt(cfg_file_path).set_read()
         if data:
             for i_app, i_data in data.items():
@@ -95,6 +95,18 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                             args_execute=['-- {}'.format(j_e_s_extend)]
                         )
         return dict_
+    @classmethod
+    def get_application_configure_file(cls, rsv_project):
+        platform = bsc_core.SystemMtd.get_platform()
+        package_data = rsv_project.get_package_data()
+        cfg_file_path = package_data['application-configure-file'][platform]
+        return bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
+    @classmethod
+    def get_deadline_configure_file(cls, rsv_project):
+        platform = bsc_core.SystemMtd.get_platform()
+        package_data = rsv_project.get_package_data()
+        cfg_file_path = package_data['deadline-configure-file'][platform]
+        return bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
     @classmethod
     def send_mails(cls, *args, **kwargs):
         import pkgutil
@@ -139,3 +151,8 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             bsc_core.LogMtd.trace_method_warning(
                 'send messages failed, module "cosmos" is not found'
             )
+
+
+class _DeadlineCfg(object):
+    def get(self, tag, step, key):
+        pass

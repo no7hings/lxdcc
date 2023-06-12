@@ -47,7 +47,7 @@ method:
         group: "all"
         #
         pool: "all"
-        pool2: ''
+        secondary_pool: ''
         #
         command: ''
 #
@@ -63,7 +63,7 @@ job:
         ChunkSize: "1"
         Priority: 50
         Pool: <method.job.pool>
-        SecondaryPool: <method.job.pool2>
+        SecondaryPool: <method.job.secondary_pool>
         #
         Group: <method.job.group>
         #

@@ -32,7 +32,7 @@ option:
         group: "32g"
         #
         pool: "srf"
-        pool2: ""
+        secondary_pool: ""
         command: ""
         frames: ""
 #
@@ -48,7 +48,7 @@ job:
         ChunkSize: "1"
         Priority: 50
         Pool: <option.job.pool>
-        SecondaryPool: <option.job.pool2>
+        SecondaryPool: <option.job.secondary_pool>
         #
         Group: <option.job.group>
         #

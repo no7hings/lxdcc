@@ -5,6 +5,8 @@ from lxbasic import bsc_core
 
 import lxbasic.extra.methods as bsc_etr_methods
 
+import lxbasic.objects as bsc_objects
+
 import lxresolver.commands as rsv_commands
 
 
@@ -28,12 +30,12 @@ class AbsHookExecutor(object):
             session, name, dict(platform=bsc_core.SystemMtd.get_platform())
         )
 
-    def _submit_deadline_job_(self, session, name, option_extra_variants):
+    def _submit_deadline_job_(self, session, name, option_extra_variants, deadline_configure=None):
         hook_option_opt = session.get_option_opt()
         hook_option = session.get_option()
         option_hook_key = hook_option_opt.get('option_hook_key')
         #
-        ddl_configure = session.get_ddl_configure()
+        ssn_ddl_configure = session.get_ddl_configure()
         #
         self._ddl_submiter = self.SUBMITTER_CLS()
         self._ddl_submiter.set_option(
@@ -51,11 +53,36 @@ class AbsHookExecutor(object):
         self._ddl_submiter.set_option_extra(
             **option_extra_variants
         )
+        # load deadline options from session configure
+        self._ddl_submiter.option.set('deadline.group', ssn_ddl_configure.get('group'))
+        self._ddl_submiter.option.set('deadline.pool', ssn_ddl_configure.get('pool'))
+        # job software
+        deadline_job_software = ssn_ddl_configure.get('job_software')
+        if deadline_job_software:
+            self._ddl_submiter.job_plug.set(
+                'Software', deadline_job_software
+            )
+        # load deadline options from deadline configure
+        if deadline_configure is not None:
+            # "job_context" default is not discard
+            deadline_job_context = ssn_ddl_configure.get('job_context')
+            if deadline_job_context:
+                content_0 = deadline_configure.get_content(deadline_job_context)
+                step = option_extra_variants.get('step')
+                if step:
+                    content_1 = content_0.get_content(step)
+
+                else:
+                    content_1 = content_0.get_content('default')
+                #
+                if content_1:
+                    self._ddl_submiter.option.set('deadline.priority', content_1.get('priority'))
+                    self._ddl_submiter.option.set('deadline.group', content_1.get('group'))
+                    self._ddl_submiter.option.set('deadline.pool', content_1.get('pool'))
+                    self._ddl_submiter.option.set('deadline.secondary_pool', content_1.get('secondary_pool'))
+                    self._ddl_submiter.option.set('deadline.machine_limit', content_1.get('machine_limit'))
         #
-        self._ddl_submiter.option.set('deadline.group', ddl_configure.get('group'))
-        self._ddl_submiter.option.set('deadline.pool', ddl_configure.get('pool'))
-        #
-        error_limit = ddl_configure.get('error_limit')
+        error_limit = ssn_ddl_configure.get('error_limit')
         if error_limit is not None:
             self._ddl_submiter.job_info.set(
                 'FailureDetectionTaskErrors', error_limit
@@ -132,11 +159,14 @@ class AbsHookExecutor(object):
                 )
                 self._ddl_submiter.job_info.set('JobDependencies', dependent_ddl_job_ids_string_new)
                 self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
-        # td enable
+        # when "td_enable" is discard, override deadline pool and group options
         td_enable = hook_option_opt.get('td_enable') or False
         if td_enable is True:
             self._ddl_submiter.job_info.set(
                 'Pool', 'td'
+            )
+            self._ddl_submiter.job_info.set(
+                'SecondaryPool', 'td'
             )
             self._ddl_submiter.job_info.set(
                 'Group', 'td'
@@ -144,11 +174,14 @@ class AbsHookExecutor(object):
             self._ddl_submiter.job_info.set(
                 'Whitelist', bsc_core.SystemMtd.get_host()
             )
-        # localhost enable
+        # when "localhost" is discard, override deadline pool and group options
         localhost_enable = hook_option_opt.get('localhost_enable') or False
         if localhost_enable is True:
             self._ddl_submiter.job_info.set(
                 'Pool', 'artist'
+            )
+            self._ddl_submiter.job_info.set(
+                'SecondaryPool', 'artist'
             )
             self._ddl_submiter.job_info.set(
                 'Group', 'artist'
@@ -233,6 +266,7 @@ class AbsHookExecutor(object):
         return command
 
 
+# project job
 class AbsRsvProjectMethodHookExecutor(AbsHookExecutor):
     def __init__(self, *args, **kwargs):
         super(AbsRsvProjectMethodHookExecutor, self).__init__(*args, **kwargs)
@@ -241,15 +275,24 @@ class AbsRsvProjectMethodHookExecutor(AbsHookExecutor):
         session = self.get_session()
         rsv_properties = session.get_rsv_properties()
         if rsv_properties:
+            rsv_project = session.get_rsv_project()
+            deadline_configure = None
+            deadline_configure_file_path = bsc_etr_methods.EtrBase.get_deadline_configure_file(
+                rsv_project
+            )
+            if deadline_configure_file_path:
+                if bsc_core.StgPathMtd.get_is_exists(deadline_configure_file_path):
+                    deadline_configure = bsc_objects.Configure(value=deadline_configure_file_path)
             job_name = session.get_ddl_job_name()
             return self._submit_deadline_job_(
-                session, job_name, rsv_properties.value
+                session, job_name, rsv_properties.value, deadline_configure
             )
 
     def set_run(self):
         return self.execute_with_deadline()
 
 
+# task job
 class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
     def __init__(self, *args, **kwargs):
         super(AbsRsvTaskMethodHookExecutor, self).__init__(*args, **kwargs)
@@ -266,9 +309,18 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
             file_path=scene_file_path
         )
         if rsv_scene_properties:
+            rsv_project = session.get_rsv_project()
+            deadline_configure = None
+            deadline_configure_file_path = bsc_etr_methods.EtrBase.get_deadline_configure_file(
+                rsv_project
+            )
+            if deadline_configure_file_path:
+                if bsc_core.StgPathMtd.get_is_exists(deadline_configure_file_path):
+                    deadline_configure = bsc_objects.Configure(value=deadline_configure_file_path)
+            #
             job_name = session._get_rsv_task_version_(rsv_scene_properties)
             return self._submit_deadline_job_(
-                session, job_name, rsv_scene_properties.value
+                session, job_name, rsv_scene_properties.value, deadline_configure
             )
 
     def set_run(self):

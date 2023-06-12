@@ -2,9 +2,13 @@
 package-data:
     scheme: new
     #
-    configure-files:
-        windows: 'x:/CFG/SHOW-CFG/NSA_DEV/presets/global.applications.json'
-        linux: '/job/CFG/SHOW-CFG/NSA_DEV/presets/global.applications.json'
+    application-configure-file:
+        windows: 'x:/CFG/SHOW-CFG/{project.upper()}/presets/global.applications.json'
+        linux: '/job/CFG/SHOW-CFG/{project.upper()}/presets/global.applications.json'
+    #
+    deadline-configure-file:
+        windows: 'x:/CFG/SHOW-CFG/{project.upper()}/presets/global.farm.deadline.json'
+        linux: '/job/CFG/SHOW-CFG/{project.upper()}/presets/global.farm.deadline.json'
     #
     package-root-patterns:
         windows: [ '{home}/packages', 'x:/PLE/bundle/internal', 'x:/PLE/bundle/thirdparty' ]

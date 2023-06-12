@@ -2,7 +2,11 @@
 package-data:
     scheme: default
     #
-    configure-files:
+    application-configure-file:
+        windows: ''
+        linux: ''
+    #
+    deadline-configure-file:
         windows: ''
         linux: ''
     #

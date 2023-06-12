@@ -984,6 +984,7 @@ class ValidationChecker(object):
         return ''.join(list_)
 
 
+# session for rsv project deadline job
 class AbsSsnRsvProjectOptionMethod(
     AbsSsnOptionMethod,
     AbsSsnRsvDef
@@ -1225,6 +1226,9 @@ class AbsSsnRsvTaskOptionMethod(
 
     def get_rsv_task(self):
         return self._rsv_task
+
+    def get_rsv_project(self):
+        return self._rsv_task.get_rsv_project()
 
     def get_rsv_version_name(self):
         return self._get_rsv_task_version_(

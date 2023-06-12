@@ -331,7 +331,7 @@ class ScpRenderBuild(object):
                                 start_frame=i_render_frames[0],
                                 end_frame=i_render_frames[-1],
                                 #
-                                option_hook_key_extend=[i_render_node, 'video'],
+                                option_hook_key_extend=[i_render_node, 'movie'],
                                 #
                                 dependencies=[option_hook_key],
                                 #

@@ -69,7 +69,7 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
                         )
                     #
                     default_kwargs['input'] = '"{}"'.format(input_)
-
+        #
         output = kwargs['output']
         output_opt = bsc_core.StgFileOpt(output)
         output_opt.create_directory()

@@ -1,27 +1,30 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
+import lxbasic.objects as bsc_objects
+
 import lxbasic.extra.abstracts as bsc_etr_abstracts
 
 
 class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_base_packages_extend(cls):
-        return ['lxdcc']
+        return ['lxdcc', 'lxdcc_gui', 'lxdcc_lib', 'lxdcc_rsc']
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
-        import lxbasic.objects as bsc_objects
-
         args_execute = bsc_objects.PackageContextNew.convert_args_execute(
             args_execute
         )
 
         args = [
-            '/job/PLE/support/wrappers/paper-bin',
+            bsc_objects.PackageContextNew.get_bin_source(),
             ' '.join(packages_extend or []),
             ' '.join(args_execute or [])
         ]
         return ' '.join(args)
+    @classmethod
+    def packages_completed_to(cls, packages):
+        return bsc_objects.PackageContextNew()._get_valid_packages(packages)
     @classmethod
     def get_project_environs_extend(cls, project):
         return dict(
@@ -153,6 +156,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             )
 
 
-class _DeadlineCfg(object):
-    def get(self, tag, step, key):
-        pass
+if __name__ == '__main__':
+    print EtrBase.packages_completed_to(
+        ['lxdcc', 'arnold']
+    )

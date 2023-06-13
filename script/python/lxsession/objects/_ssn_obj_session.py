@@ -21,7 +21,6 @@ class ToolSession(ssn_abstracts.AbsSsnObj):
         super(ToolSession, self).__init__(*args, **kwargs)
 
 
-
 class OptionActionSession(ssn_abstracts.AbsSsnOptionAction):
     def __init__(self, *args, **kwargs):
         super(OptionActionSession, self).__init__(*args, **kwargs)

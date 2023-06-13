@@ -16,14 +16,14 @@ class AbsRsvAppOpt(object):
     @classmethod
     def _execute_command_(cls, cmd, **sub_progress_kwargs):
         bsc_core.LogMtd.trace_method_result(
-            'sub-progress run with result',
+            'sub-progress',
             'command=`{}` is started'.format(cmd.decode('utf-8'))
         )
         bsc_core.SubProcessMtd.set_run_with_result(
             cmd, **sub_progress_kwargs
         )
         bsc_core.LogMtd.trace_method_result(
-            'sub-progress run with result',
+            'sub-progress',
             'command=`{}` is completed'.format(cmd.decode('utf-8'))
         )
     @classmethod

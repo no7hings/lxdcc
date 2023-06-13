@@ -7,6 +7,11 @@ from lxbasic.core import _bsc_cor_raw, _bsc_cor_pattern
 
 
 class LogMtd(object):
+    DEFAULT_CODING = sys.getdefaultencoding()
+    #
+    SystemMtd.trace(
+        'lynxi logger is initialization, default coding is "{}"'.format(DEFAULT_CODING)
+    )
     ENABLE = True
     TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
     @classmethod

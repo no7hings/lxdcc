@@ -50,9 +50,6 @@ QT_PROGRESS_CREATE_METHOD = None
 
 class Log(object):
     DEFAULT_CODING = sys.getdefaultencoding()
-    bsc_core.SystemMtd.trace(
-        'lynxi logger is initialization, default coding is "{}"'.format(DEFAULT_CODING)
-    )
     # reload(sys)
     # if hasattr(sys, 'setdefaultencoding'):
     #     sys.setdefaultencoding('utf-8')
@@ -494,14 +491,14 @@ class SubProcessRunner(object):
     @classmethod
     def set_run_with_result(cls, cmd, **sub_progress_kwargs):
         Log.set_module_result_trace(
-            'sub-progress run with result',
+            'sub-progress',
             u'command=`{}` is started'.format(cmd.decode('utf-8'))
         )
         bsc_core.SubProcessMtd.set_run_with_result(
             cmd, **sub_progress_kwargs
         )
         # Log.set_module_result_trace(
-        #     'sub-progress run with result',
+        #     'sub-progress',
         #     u'command=`{}` is completed'.format(cmd)
         # )
     @classmethod
@@ -740,7 +737,7 @@ class Environ(object):
     def __init__(self):
         pass
     @classmethod
-    def get_td_enable(cls):
+    def get_is_td_enable(cls):
         _ = cls.get(cls.TD_ENABLE_KEY)
         if _ == cls.TRUE:
             return True

@@ -9,10 +9,11 @@ import getopt
 
 argv = sys.argv
 
+KEY = 'lxhook-python'
+
 
 def main():
     try:
-        sys.stdout.write('execute lxhook-python from: "{}"\n'.format(__file__))
         opts, args = getopt.getopt(
             argv[1:],
             'ho:',
@@ -45,6 +46,11 @@ def __print_help():
 
 def __execute_with_option(option):
     from lxbasic import bsc_core
+    #
+    bsc_core.LogMtd.trace_method_result(
+        KEY,
+        'execute from: {}'.format(__file__)
+    )
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     #

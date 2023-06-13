@@ -12,20 +12,20 @@ def get_module(framework_scheme):
 
 if bsc_core.EnvExtraMtd.get_scheme() == 'default':
     bsc_core.LogMtd.trace_method_result(
-        'extra script imported',
-        'scheme="default"'
+        'extra script',
+        'load scheme: "default"'
     )
     from .default import *
 elif bsc_core.EnvExtraMtd.get_scheme() == 'new':
     bsc_core.LogMtd.trace_method_result(
-        'extra script imported',
-        'scheme="new"'
+        'extra script',
+        'load scheme: "new"'
     )
     from .new import *
 else:
     bsc_core.LogMtd.trace_method_result(
-        'extra script imported',
-        'scheme="default"'
+        'extra script',
+        'load scheme: "default"'
     )
     from .default import *
 

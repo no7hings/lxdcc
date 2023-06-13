@@ -7,10 +7,11 @@ import getopt
 
 argv = sys.argv
 
+KEY = 'lxhook-command'
+
 
 def main():
     try:
-        sys.stdout.write('execute lxhook-command from: "{}"\n'.format(__file__))
         opts, args = getopt.getopt(
             argv[1:],
             'ho:',
@@ -44,6 +45,11 @@ def __print_help():
 def __execute_with_option(option):
     from lxbasic import bsc_core
     #
+    bsc_core.LogMtd.trace_method_result(
+        KEY,
+        'execute from: {}'.format(__file__)
+    )
+    #
     option_opt = bsc_core.ArgDictStringOpt(option)
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
@@ -60,7 +66,7 @@ def __execute_hook(option):
     #
     from lxutil import utl_core
     #
-    import lxbasic.extra.methods as utl_etr_methods
+    import lxbasic.extra.methods as bsc_etr_methods
     #
     import lxsession.commands as ssn_commands
     #
@@ -72,24 +78,33 @@ def __execute_hook(option):
         session, fnc = hook_args
         #
         opt_packages_extend = []
-        framework_packages_extend = utl_etr_methods.EtrBase.get_base_packages_extend()
+        # extend package from base
+        framework_packages_extend = bsc_etr_methods.EtrBase.get_base_packages_extend()
         if framework_packages_extend:
-            opt_packages_extend.extend(framework_packages_extend)
-        # add extend packages
+            opt_packages_extend.extend(
+                bsc_etr_methods.EtrBase.packages_completed_to(framework_packages_extend)
+            )
+        # extend packages from session
         hook_packages_extend = session.get_packages_extend()
         if hook_packages_extend:
-            opt_packages_extend.extend(hook_packages_extend)
+            bsc_core.LogMtd.trace_method_result(
+                KEY,
+                'extend packages from session: {}'.format(', '.join(hook_packages_extend))
+            )
+            opt_packages_extend.extend(
+                bsc_etr_methods.EtrBase.packages_completed_to(hook_packages_extend)
+            )
         #
-        opt_cmd = utl_etr_methods.EtrBase.get_base_command(
+        opt_cmd = bsc_etr_methods.EtrBase.get_base_command(
             args_execute=['-- lxhook-python -o "{}"'.format(option)],
             packages_extend=opt_packages_extend
         )
-        #
+        # extend resource paths
         environs_extend = {}
         _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
         if _:
             environs_extend['PAPER_EXTEND_RESOURCES'] = (_, 'prepend')
-        # run opt_cmd by subprocess
+        # run command by subprocess
         utl_core.SubProcessRunner.set_run_with_result_use_thread(
             opt_cmd, environs_extend=environs_extend
         )

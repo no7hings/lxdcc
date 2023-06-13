@@ -908,3 +908,22 @@ class RawMatrix33Opt(object):
             for col in range(0, 3):
                 m[row][col] = m1[row][0] * m2[0][col] + m1[row][1] * m2[1][col] + m1[row][2] * m2[2][col]
         return m
+
+
+class RawIndexMtd(object):
+    @classmethod
+    def to_next(cls, maximum, minimum, value):
+        idx = max(min(value, maximum), minimum)
+        if idx == maximum:
+            idx = minimum
+        else:
+            idx += 1
+        return idx
+    @classmethod
+    def to_previous(cls, maximum, minimum, value):
+        idx = max(min(value, maximum), minimum)
+        if idx == minimum:
+            idx = maximum
+        else:
+            idx -= 1
+        return idx

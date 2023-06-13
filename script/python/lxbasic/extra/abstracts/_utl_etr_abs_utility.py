@@ -6,7 +6,10 @@ class AbsEtrBase(object):
     def get_base_packages_extend(cls):
         raise NotImplementedError()
     @classmethod
-    def get_base_command(cls, args_execute=None, packages_extend=None):
+    def get_base_command(cls, *args, **kwargs):
+        raise NotImplementedError()
+    @classmethod
+    def packages_completed_to(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
     def get_project_environs_extend(cls, project):

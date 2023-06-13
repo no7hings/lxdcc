@@ -5,6 +5,7 @@ from lxbasic import bsc_core
 
 
 class PackageContextNew(object):
+    KEY = 'package context'
     BIN_SOURCE = '/job/PLE/support/wrappers/paper-bin'
     USER_ROOT_PATTERNS = dict(
         windows=['{home}/packages'],
@@ -22,9 +23,16 @@ class PackageContextNew(object):
         windows=['{root}/{package_name}/{version}/paper_configure_bundle.py'],
         linux=['{root}/{package_name}/{version}/paper_configure_bundle.py']
     )
-    def __init__(self, args):
+    @classmethod
+    def get_bin_source(cls):
+        return bsc_core.StgPathMapMtd.map_to_current(cls.BIN_SOURCE)
+
+    def __init__(self, *args):
         self._bin_source = bsc_core.StgPathMapMtd.map_to_current(self.BIN_SOURCE)
-        self._args = args
+        if args:
+            self._args = args[0]
+        else:
+            self._args = None
 
         self._platform = bsc_core.PlatformMtd.get_current()
 
@@ -107,14 +115,14 @@ class PackageContextNew(object):
             return '0.{}'.format(float(_[-1]))
         return version
 
-    def _get_replace_package(self, package, beta_enable=False):
+    def _get_replace_package(self, package, use_beta=False):
         package_name, package_version = package.split('@')
         package_virtual_version = self._get_virtual_version(package_version)
         package_data = {}
         user_package_roots = self.get_user_package_roots()
         pre_release_package_roots = self.get_pre_release_package_roots()
         package_roots = user_package_roots
-        if beta_enable is True:
+        if use_beta is True:
             package_roots += pre_release_package_roots
         package_file_patterns = self._get_package_file_patterns()
         #
@@ -145,14 +153,14 @@ class PackageContextNew(object):
             package_latest = package_data[keys[-1]]
             return package_latest
 
-    def _get_valid_package(self, package, beta_enable=False):
+    def _get_valid_package(self, package, use_beta=False):
         if '@' not in package:
             package_name = package
             package_data = {}
             user_package_roots = self.get_user_package_roots()
             pre_release_package_roots = self.get_pre_release_package_roots()
             package_roots = user_package_roots
-            if beta_enable is True:
+            if use_beta is True:
                 package_roots += pre_release_package_roots
             #
             release_package_roots = self.get_release_package_roots()
@@ -189,34 +197,46 @@ class PackageContextNew(object):
                 return package_latest
         return package
 
-    def _get_packages(self, packages_extend=None, beta_enable=False):
+    def _get_packages(self, packages_extend=None, use_beta=False):
         list_ = []
-        #
+        # package from configure
         resolved_packages = self.get_resolved_packages_data()
         #
         for i_p in resolved_packages:
-            i_replace_package = self._get_replace_package(i_p, beta_enable=beta_enable)
+            i_replace_package = self._get_replace_package(i_p, use_beta=use_beta)
             if i_replace_package is not None:
                 bsc_core.LogMtd.trace_method_result(
-                    'package replace',
-                    'package="{}"'.format(i_replace_package)
+                    self.KEY,
+                    'replace package: "{}"'.format(i_replace_package)
                 )
                 list_.append(i_replace_package)
             else:
                 list_.append(i_p)
-
-        for i_p in packages_extend or []:
-            i_package = self._get_valid_package(i_p, beta_enable=beta_enable)
-            if i_package is not None:
-                bsc_core.LogMtd.trace_method_result(
-                    'package resolve',
-                    'package="{}"'.format(i_package)
-                )
-                list_.append(i_package)
+        # package from extend
+        list_.extend(
+            self._get_valid_packages(packages_extend or [])
+        )
         return list_
 
-    def get_args(self, packages_extend=None, beta_enable=False):
-        return self._get_packages(packages_extend, beta_enable)
+    def _get_valid_packages(self, packages, use_beta=False):
+        list_ = []
+        for i_p in packages:
+            i_package = self._get_valid_package(i_p, use_beta=use_beta)
+            if i_package is not None:
+                bsc_core.LogMtd.trace_method_result(
+                    self.KEY,
+                    'resolve package: "{}"'.format(i_package)
+                )
+                list_.append(i_package)
+            else:
+                bsc_core.LogMtd.trace_method_warning(
+                    self.KEY,
+                    'package: "{}" is invalid'
+                )
+        return list_
+
+    def get_args(self, packages_extend=None, use_beta=False):
+        return self._get_packages(packages_extend, use_beta)
     @classmethod
     def convert_args_execute(cls, args_execute=None):
         if isinstance(args_execute, (set, tuple, list)):
@@ -228,7 +248,7 @@ class PackageContextNew(object):
             ]
         return args_execute
 
-    def get_command(self, args_execute=None, packages_extend=None, beta_enable=False):
+    def get_command(self, args_execute=None, packages_extend=None, use_beta=False):
         if isinstance(args_execute, (set, tuple, list)):
             # replace first argument to "--join-cmd", etc. "-- maya", "-c maya" to "--join-cmd maya"
             args_execute = [
@@ -237,7 +257,7 @@ class PackageContextNew(object):
                 for y_seq, y in enumerate(x.split(' '))
             ]
         #
-        args = self.get_args(packages_extend, beta_enable)
+        args = self.get_args(packages_extend, use_beta)
         if args:
             if isinstance(args_execute, (set, tuple, list)):
                 args.extend(args_execute)

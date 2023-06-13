@@ -15,7 +15,7 @@ class EnvironMtd(object):
     TRUE = 'true'
     FALSE = 'false'
     @classmethod
-    def get_rez_beta(cls):
+    def get_is_beta_enable(cls):
         _ = cls.get('REZ_BETA')
         if _ == '1':
             return True
@@ -139,7 +139,7 @@ class EnvExtraMtd(EnvironMtd):
         else:
             cls.set(cls.BETA_ENABLE_KEY, cls.FALSE)
     @classmethod
-    def get_td_enable(cls):
+    def get_is_td_enable(cls):
         _ = cls.get(cls.TD_ENABLE_KEY)
         if _ == cls.TRUE:
             return True

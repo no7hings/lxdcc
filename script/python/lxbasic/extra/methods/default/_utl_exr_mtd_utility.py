@@ -19,6 +19,9 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         ]
         return ' '.join(args)
     @classmethod
+    def packages_completed_to(cls, packages):
+        return packages
+    @classmethod
     def get_project_environs_extend(cls, project):
         return dict(
             PG_SHOW=project.upper(),
@@ -73,4 +76,3 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def send_messages(cls, *args, **kwargs):
         pass
-

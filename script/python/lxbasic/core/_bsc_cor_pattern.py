@@ -313,7 +313,7 @@ class PtnParseOpt(object):
             )
         ) or []
         if sort is True:
-            paths = _bsc_cor_raw.RawTextsOpt(paths).set_sort_to()
+            paths = _bsc_cor_raw.RawTextsOpt(paths).sort_by_number()
         for i_path in paths:
             i_p = parse.parse(
                 self._pattern, i_path, case_sensitive=True
@@ -360,7 +360,7 @@ class PtnParseOpt(object):
             )
         ) or []
         if sort is True:
-            paths = _bsc_cor_raw.RawTextsOpt(paths).set_sort_to()
+            paths = _bsc_cor_raw.RawTextsOpt(paths).sort_by_number()
         return paths
 
     def set_key_format(self, key, value):

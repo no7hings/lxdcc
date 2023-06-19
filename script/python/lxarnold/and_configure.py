@@ -327,7 +327,7 @@ class ObjProperty(object):
     ]
 
 
-class MeshProperty(object):
+class GeometryProperties(object):
     ALL = [
         'opaque',
         'matte',
@@ -383,6 +383,37 @@ class MeshProperty(object):
         'step_size': 'aiStepSize',
         'volume_padding': 'aiVolumePadding',
     }
+
+    PROPERTIES_TYPE_MAPPER = dict(
+        opaque=unr_configure.Type.CONSTANT_BOOLEAN,
+        matte=None,
+        # visibility
+        self_shadows=None,
+        # export
+        sss_setname=None,
+        trace_sets=None,
+        # volume
+        step_size=None,
+        volume_padding=None,
+        smoothing=None,
+        # mesh-subdiv
+        subdiv_type=None,
+        subdiv_iterations=None,
+        subdiv_adaptive_error=None,
+        subdiv_adaptive_metric=None,
+        subdiv_adaptive_space=None,
+        subdiv_uv_smoothing=None,
+        subdiv_smooth_derivs=None,
+        subdiv_frustum_ignore=None,
+        # mesh-displacement
+        disp_height=None,
+        disp_padding=None,
+        disp_zero_value=None,
+        disp_autobump=None,
+        # curve
+        mode=None,
+        min_pixel_width=None,
+    )
 
 
 class Visibility(object):

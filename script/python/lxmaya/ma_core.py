@@ -1994,10 +1994,11 @@ class CmdPortOpt(object):
         if _:
             a = bsc_core.DccAttrPathOpt(_)
             obj_path = a.obj_path
-            port_path = a.port_path
-            return self.PATHSEP.join(
-                [CmdObjOpt(obj_path).get_path(), port_path]
-            )
+            if CmdObjOpt._get_is_exists_(obj_path) is True:
+                port_path = a.port_path
+                return self.PATHSEP.join(
+                    [CmdObjOpt(obj_path).get_path(), port_path]
+                )
 
     def set_disconnect(self):
         source = self.get_source()
@@ -2013,11 +2014,13 @@ class CmdPortOpt(object):
         return fnmatch.filter(
             [self.get_port_path()], pattern
         ) != []
+
     def get_is_naming_matches(self, patterns):
         for i in patterns:
             if self.get_is_naming_match(i) is True:
                 return True
         return False
+
     def __str__(self):
         return '{}(path="{}")'.format(
             self.get_type_name(), self.get_path()

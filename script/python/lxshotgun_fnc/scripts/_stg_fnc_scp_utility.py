@@ -160,19 +160,19 @@ def set_asset_look_pass_update(rsv_task_properties):
             i_stats_file = utl_dcc_objects.OsFile(i_stats_file_path)
             if i_stats_file.get_is_exists() is True:
                 i_stg_look_pass_opt.set_link_render_stats_file(
-                    i_stats_file.get_exists_file_paths()[0]
+                    i_stats_file.get_exists_unit_paths()[0]
                 )
             #
             i_profile_file_path = '{}.profile.####.json'.format(i_render_output_sub_directory_path)
             i_profile_file = utl_dcc_objects.OsFile(i_profile_file_path)
             if i_profile_file.get_is_exists() is True:
                 i_stg_look_pass_opt.set_link_render_profile_file(
-                    i_profile_file.get_exists_file_paths()[0]
+                    i_profile_file.get_exists_unit_paths()[0]
                 )
             #
             i_stats_file_opt = and_operators.StatsFileOpt(
                 utl_dcc_objects.OsFile(
-                    i_stats_file.get_exists_file_paths()[0]
+                    i_stats_file.get_exists_unit_paths()[0]
                 )
             )
             #
@@ -224,7 +224,7 @@ def set_asset_render_info_update(rsv_task_properties):
         if stats_file.get_is_exists() is True:
             stats_file_opt = and_operators.StatsFileOpt(
                 utl_dcc_objects.OsFile(
-                    stats_file.get_exists_file_paths()[0]
+                    stats_file.get_exists_unit_paths()[0]
                 )
             )
             #

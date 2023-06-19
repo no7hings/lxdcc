@@ -208,14 +208,14 @@ class AbsSsnObj(
         #
         # use for python 2
         bsc_core.LogMtd.trace_method_result(
-            'option-hook execute', 'file="{}" is started'.format(
+            'option-hook', 'start for : "{}"'.format(
                 file_path
             )
         )
         kwargs['__name__'] = '__main__'
         execfile(file_path, kwargs)
         bsc_core.LogMtd.trace_method_result(
-            'option-hook execute', 'file="{}" is completed'.format(
+            'option-hook', 'for: "{}"'.format(
                 file_path
             )
         )

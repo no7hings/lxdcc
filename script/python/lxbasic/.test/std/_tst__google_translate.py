@@ -11,7 +11,6 @@ GOOGLE_TRANSLATE_URL = 'https://translate.google.com/?hl=en&sl={from_language}&t
 
 
 def translate(text, from_language="auto", to_language="auto"):
-
     text = quote(text)
     url = GOOGLE_TRANSLATE_URL.format(
         **dict(

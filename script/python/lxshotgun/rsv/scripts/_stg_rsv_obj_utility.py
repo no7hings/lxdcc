@@ -98,6 +98,12 @@ class RsvStgTaskOpt(object):
             )
         )
 
+    def get_version_id(self):
+        stg_version = self._stg_connector.get_stg_version_query(
+            **self._rsv_task.properties.get_value()
+        )
+        return
+
     def execute_stg_task_create(self):
         from lxutil import utl_core
         #
@@ -225,7 +231,24 @@ class RsvStgTaskOpt(object):
                 stg_version_opt.set_description(unquote(description))
             else:
                 stg_version_opt.set_description(description)
-        # value is list
+        # batch tag
+        stg_tag = self._stg_connector.get_stg_tag_force('td-batch')
+        stg_version_opt.append_stg_tags_(
+            stg_tag
+        )
+        #
+        if create_shotgun_playlists is True:
+            date_tag = datetime.datetime.now().strftime('%Y-%m-%d')
+            playlist = '{}-{}-Review'.format(
+                date_tag, stg_version_kwargs['step'].upper()
+            )
+            stg_playlist = self._stg_connector.get_stg_playlist_force(
+                playlist=playlist, **stg_version_kwargs
+            )
+            stg_version_opt.extend_stg_playlists(
+                [stg_playlist]
+            )
+        # notice latest, value is list
         if notice:
             stg_users = self._stg_connector.get_stg_users(
                 name=notice
@@ -238,7 +261,7 @@ class RsvStgTaskOpt(object):
                 mail_addresses = [
                     self._stg_connector.to_query(i).get('email') for i in stg_users
                 ]
-                message_users = [
+                message_receivers = [
                     self._stg_connector.to_query(i).get('login') for i in stg_users
                 ]
                 if isinstance(description, six.text_type):
@@ -275,43 +298,26 @@ class RsvStgTaskOpt(object):
                     )
                 )
                 #
-                bsc_etr_methods.EtrBase.send_mails(
+                bsc_etr_methods.EtrBase.send_mail(
                     addresses=mail_addresses,
+                    receivers=message_receivers,
                     # addresses=['dongchangbao@papegames.net'],
                     subject=subject,
                     content=content
                 )
                 bsc_etr_methods.EtrBase.send_feishu(
                     addresses=mail_addresses,
-                    # addresses=['dongchangbao@papegames.net'],
+                    receivers=message_receivers,
+                    # addresses=['dongchangbao'],
                     subject=subject,
                     content=content
                 )
-                #
-                # bsc_etr_methods.EtrBase.send_messages(
-                #     from_user=user,
-                #     to_users=message_users,
-                #     # to_users=['dongchangbao'],
-                #     subject=subject,
-                #     content='{}\n{}'.format(subject, content)
-                # )
-        # batch tag
-        stg_tag = self._stg_connector.get_stg_tag_force('td-batch')
-        stg_version_opt.append_stg_tags_(
-            stg_tag
-        )
-        #
-        if create_shotgun_playlists is True:
-            date_tag = datetime.datetime.now().strftime('%Y-%m-%d')
-            playlist = '{}-{}-Review'.format(
-                date_tag, stg_version_kwargs['step'].upper()
-            )
-            stg_playlist = self._stg_connector.get_stg_playlist_force(
-                playlist=playlist, **stg_version_kwargs
-            )
-            stg_version_opt.extend_stg_playlists(
-                [stg_playlist]
-            )
+                bsc_etr_methods.EtrBase.send_chat(
+                    receivers=message_receivers,
+                    # receivers=['dongchangbao'],
+                    subject=subject,
+                    content='{}\n{}'.format(subject, content)
+                )
 
     def set_stg_description_update(self):
         pass

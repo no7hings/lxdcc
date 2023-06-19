@@ -704,9 +704,7 @@ class UsdGeometryOpt(object):
 
     def set_visible(self, boolean):
         p = self._usd_geometry.GetVisibilityAttr()
-        if p:
-            pass
-        else:
+        if not p:
             p = self._usd_geometry.CreateVisibilityAttr(
                 UsdGeom.Tokens.inherited,
                 True

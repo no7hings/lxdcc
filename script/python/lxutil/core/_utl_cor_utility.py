@@ -173,13 +173,13 @@ class MethodLogging(object):
         self._result = result
 
     def __enter__(self):
-        Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             self._module, self._result, ' is started'
         )
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             self._module, self._result, ' is completed'
         )
 
@@ -265,7 +265,7 @@ class LogProgressRunner(object):
         #
         self._p = 0
         #
-        Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             self._label,
             'is started'
         )
@@ -282,7 +282,7 @@ class LogProgressRunner(object):
         if self._p != p:
             self._p = p
             if self._use_as_progress_bar is True:
-                Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     u'{}'.format(self._label),
                     u'is running {} {}%, cost time {}'.format(
                         self._get_progress_bar_string_(percent),
@@ -292,7 +292,7 @@ class LogProgressRunner(object):
                     )
                 )
             else:
-                Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     u'{}'.format(self._label),
                     u'is running {}%, cost time {}'.format(
                         p,
@@ -313,7 +313,7 @@ class LogProgressRunner(object):
         self._maximum = 0
         #
         cost_timestamp = bsc_core.TimeMtd.get_timestamp() - self._start_timestamp
-        Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             self._label,
             'is completed, cost time {}'.format(
                 bsc_core.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
@@ -490,22 +490,22 @@ class SubProcessRunner(object):
         pass
     @classmethod
     def set_run_with_result(cls, cmd, **sub_progress_kwargs):
-        Log.set_module_result_trace(
-            'sub-progress',
-            u'command=`{}` is started'.format(cmd.decode('utf-8'))
+        bsc_core.LogMtd.trace_method_result(
+            'sub-process',
+            'start for: `{}`'.format(cmd.decode('utf-8'))
         )
         bsc_core.SubProcessMtd.set_run_with_result(
             cmd, **sub_progress_kwargs
         )
-        # Log.set_module_result_trace(
-        #     'sub-progress',
-        #     u'command=`{}` is completed'.format(cmd)
-        # )
+        bsc_core.LogMtd.trace_method_result(
+            'sub-process',
+            'complete for: `{}`'.format(cmd)
+        )
     @classmethod
     def set_run(cls, cmd):
-        Log.set_module_result_trace(
-            'sub-progress run',
-            u'command=`{}`'.format(cmd)
+        bsc_core.LogMtd.trace_method_result(
+            'sub-process',
+            'execute for: `{}`'.format(cmd)
         )
         return bsc_core.SubProcessMtd.set_run(
             cmd
@@ -758,7 +758,7 @@ class Environ(object):
     @classmethod
     def set(cls, key, value):
         os.environ[key] = value
-        Log.set_module_result_trace(
+        bsc_core.LogMtd.trace_method_result(
             'environ set',
             u'key="{}", value="{}"'.format(key, value)
         )
@@ -768,13 +768,13 @@ class Environ(object):
             v = os.environ[key]
             if value not in v:
                 os.environ[key] += os.pathsep + value
-                Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'environ add',
                     u'key="{}", value="{}"'.format(key, value)
                 )
         else:
             os.environ[key] = value
-            Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'environ-set',
                 u'key="{}", value="{}"'.format(key, value)
             )
@@ -988,7 +988,7 @@ class AppLauncher(object):
         #
         configure_file_path = self._get_application_configure_file_path_(**kwargs)
         if configure_file_path:
-            Log.set_module_result_trace(
+            bsc_core.LogMtd.trace_method_result(
                 'launcher-configure search',
                 'project="{project}", application="{application}"'.format(
                     **kwargs
@@ -1716,7 +1716,7 @@ class Modifier(object):
                 raise TypeError()
             # noinspection PyBroadException
             try:
-                Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'fnc run',
                     'fnc="{}" is started'.format(
                         fnc_path
@@ -1725,7 +1725,7 @@ class Modifier(object):
                 #
                 _result = fnc(*args, **kwargs)
                 #
-                Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'fnc run',
                     'fnc="{}" is completed'.format(
                         fnc_path
@@ -1755,7 +1755,7 @@ class Modifier(object):
                 raise TypeError()
             # noinspection PyBroadException
             try:
-                Log.set_module_result_trace(
+                bsc_core.LogMtd.trace_method_result(
                     'fnc run',
                     'fnc="{}" is started'.format(
                         fnc_path
@@ -1765,7 +1765,7 @@ class Modifier(object):
                 _result = fnc(*args, **kwargs)
                 #
                 if _result is True:
-                    Log.set_module_result_trace(
+                    bsc_core.LogMtd.trace_method_result(
                         'fnc run',
                         'fnc="{}" is completed'.format(
                             fnc_path

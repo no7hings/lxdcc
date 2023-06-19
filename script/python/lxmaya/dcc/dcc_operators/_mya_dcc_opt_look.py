@@ -181,9 +181,9 @@ class MeshLookOpt(AbsLookOpt):
     def get_properties(self, renderer='arnold'):
         properties = collections.OrderedDict()
         if renderer == 'arnold':
-            for key in and_configure.MeshProperty.ALL:
-                if key in and_configure.MeshProperty.MAYA_DICT:
-                    dcc_port_path = and_configure.MeshProperty.MAYA_DICT[key]
+            for key in and_configure.GeometryProperties.ALL:
+                if key in and_configure.GeometryProperties.MAYA_DICT:
+                    dcc_port_path = and_configure.GeometryProperties.MAYA_DICT[key]
                     port = self._obj.get_port(dcc_port_path)
                     if port.get_is_exists() is True:
                         value = port.get()
@@ -197,8 +197,8 @@ class MeshLookOpt(AbsLookOpt):
     def set_properties(self, properties, renderer='arnold'):
         if renderer == 'arnold':
             for key, value in properties.items():
-                if key in and_configure.MeshProperty.MAYA_DICT:
-                    dcc_port_path = and_configure.MeshProperty.MAYA_DICT[key]
+                if key in and_configure.GeometryProperties.MAYA_DICT:
+                    dcc_port_path = and_configure.GeometryProperties.MAYA_DICT[key]
                     self._obj.get_port(dcc_port_path).set(value)
 
     def get_visibilities(self, renderer='arnold'):

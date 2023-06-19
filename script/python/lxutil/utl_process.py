@@ -38,9 +38,9 @@ if __name__ == '__main__':
     # /production/shows/nsa_dev/assets/oth/genariceyes/user/work.wengmengdi/maya/scenes/srf_anishading/genariceyes.srf.srf_anishading.v001_002.ma
     cmd = MayaProcess.get_command(
         'method=collection-and-repath-texture&file={}&scene_directory={}&texture_directory={}'.format(
-            '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/td_test.srf.surfacing.v007/source/td_test.ma',
-            '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/td_test.srf.surfacing.v007/maya',
-            '/production/shows/nsa_dev/assets/chr/td_test/shared/srf/surfacing/td_test.srf.surfacing.v007/texture'
+            '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/source/nikki.ma',
+            '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/maya',
+            '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/texture'
         )
     )
 

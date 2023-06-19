@@ -59,7 +59,7 @@ class DictMtd(object):
     def sort_string_key_to(cls, dict_):
         dict_1 = collections.OrderedDict()
         keys = dict_.keys()
-        keys = _bsc_cor_raw.RawTextsMtd.set_sort_to(keys)
+        keys = _bsc_cor_raw.RawTextsMtd.sort_by_number(keys)
         for i_key in keys:
             dict_1[i_key] = dict_[i_key]
         return dict_1

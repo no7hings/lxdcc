@@ -29,7 +29,7 @@ class SubProcessMtd(object):
                         k, v
                     )
                     _bsc_cor_log.LogMtd.trace_method_result(
-                        'sub-process execute',
+                        'sub-process',
                         'environ set: "{}"="{}"'.format(k, v)
                     )
                 elif isinstance(v, tuple):
@@ -39,7 +39,7 @@ class SubProcessMtd(object):
                             k, v
                         )
                         _bsc_cor_log.LogMtd.trace_method_result(
-                            'sub-process execute',
+                            'sub-process',
                             'environ set: "{}"="{}"'.format(k, v)
                         )
                     elif i_opt == 'append':
@@ -47,7 +47,7 @@ class SubProcessMtd(object):
                             k, i_v
                         )
                         _bsc_cor_log.LogMtd.trace_method_result(
-                            'sub-process execute',
+                            'sub-process',
                             'environ append: "{}"="{}"'.format(k, i_v)
                         )
                     elif i_opt == 'prepend':
@@ -55,7 +55,7 @@ class SubProcessMtd(object):
                             k, i_v
                         )
                         _bsc_cor_log.LogMtd.trace_method_result(
-                            'sub-process execute',
+                            'sub-process',
                             'environ prepend: "{}"="{}"'.format(k, i_v)
                         )
             return environs

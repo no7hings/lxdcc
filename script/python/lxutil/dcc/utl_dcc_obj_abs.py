@@ -189,7 +189,7 @@ class AbsOsFile(
         return u'D41D8CD98F00B204E9800998ECF8427E'
 
     def get_is_exists(self):
-        return self.get_exists_file_paths_() != []
+        return self.get_exists_unit_paths() != []
 
     def get_is_udim(self):
         return self._get_is_udim_(self.path)
@@ -351,55 +351,27 @@ class AbsOsFile(
         get_add_fnc_(include_exts, ext)
         _ = list_ + add_list_
         return _
-    @classmethod
-    def _get_unit_file_paths__(cls, file_path):
-        re_keys = cls.RE_MULTIPLY_KEYS
-        pathsep = cls.PATHSEP
-        #
-        directory_path = os.path.dirname(file_path)
-
-        name_base = os.path.basename(file_path)
-        name_base_new = name_base
-        for k, c in re_keys:
-            i_r = re.finditer(k, name_base, re.IGNORECASE) or []
-            for i in i_r:
-                start, end = i.span()
-                if c == -1:
-                    s = '[0-9]'
-                    name_base_new = name_base_new.replace(name_base[start:end], s, 1)
-                else:
-                    s = '[0-9]' * c
-                    name_base_new = name_base_new.replace(name_base[start:end], s, 1)
-        #
-        if name_base != name_base_new:
-            glob_pattern = pathsep.join([directory_path, name_base_new])
-            list_ = bsc_core.StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
-            if list_:
-                list_.sort()
-        else:
-            if os.path.isfile(file_path):
-                list_ = [file_path]
-            else:
-                list_ = []
-        return list_
 
     def get_exists_file_paths(self, *args, **kwargs):
         return self._get_exists_file_paths__(self.path, **kwargs)
 
     def get_exists_files(self, *args, **kwargs):
-        return [self.__class__(i) for i in self.get_exists_file_paths(*args, **kwargs)]
+        return [self.__class__(i) for i in self.get_exists_unit_paths(*args, **kwargs)]
+    @classmethod
+    def get_exists_unit_paths_fnc(cls, file_path):
+        return bsc_core.StgFileMultiplyMtd.get_exists_unit_paths(file_path)
 
-    def get_exists_file_paths_(self):
-        return self._get_unit_file_paths__(self.path)
+    def get_exists_unit_paths(self):
+        return self.get_exists_unit_paths_fnc(self.path)
 
-    def get_exists_files_(self):
-        return [self.__class__(i) for i in self.get_exists_file_paths()]
+    def get_exists_units(self):
+        return [self.__class__(i) for i in self.get_exists_unit_paths()]
 
     def get_permissions(self, *args, **kwargs):
-        return [bsc_core.StorageMtd.get_permission(i) for i in self.get_exists_file_paths()]
+        return [bsc_core.StorageMtd.get_permission(i) for i in self.get_exists_unit_paths()]
 
     def get_modify_timestamp(self, *args, **kwargs):
-        exists_file_paths = self.get_exists_file_paths_(*args, **kwargs)
+        exists_file_paths = self.get_exists_unit_paths(*args, **kwargs)
         timestamps = [int(os.stat(i).st_mtime) for i in exists_file_paths]
         if timestamps:
             return sum(timestamps)/len(timestamps)
@@ -414,7 +386,7 @@ class AbsOsFile(
         return bsc_core.TimestampOpt(timestamp).get_as_tag()
 
     def get_timestamp_is_same_to(self, file_tgt):
-        for i_src in self.get_exists_files_():
+        for i_src in self.get_exists_units():
             i_tgt = self.__class__(
                 '{}/{}{}'.format(file_tgt.directory.path, i_src.name_base, file_tgt.ext)
             )
@@ -448,7 +420,7 @@ class AbsOsFile(
             pass
         return None
 
-    def copy_unit(self, directory_path_dst, fix_name_blank=False, replace=True):
+    def copy_unit_to(self, directory_path_dst, fix_name_blank=False, replace=True):
         name = self.name
         if fix_name_blank is True:
             if ' ' in name:
@@ -530,7 +502,7 @@ class AbsOsFile(
         return False, None
 
     def copy_as_base_link(self, directory_path_bsc, directory_path_dst, fix_name_blank=False, replace=True):
-        files = self.get_exists_files_()
+        files = self.get_exists_units()
         for i_file in files:
             i_file.copy_unit_as_base_link(
                 directory_path_bsc=directory_path_bsc,
@@ -668,13 +640,13 @@ class AbsOsFile(
         )
 
     def get_is_writeable(self):
-        for i in self.get_exists_file_paths_():
+        for i in self.get_exists_unit_paths():
             if bsc_core.StorageMtd.get_is_writeable(i) is False:
                 return False
         return True
 
     def get_is_readable(self):
-        for i in self.get_exists_file_paths_():
+        for i in self.get_exists_unit_paths():
             if bsc_core.StorageMtd.get_is_readable(i) is False:
                 return False
         return True
@@ -779,7 +751,7 @@ class AbsOsTexture(
     JPG_EXT = '.jpg'
 
     def get_target_file_path_as_src(self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False):
-        if self.get_is_exists_file():
+        if self.get_exists_unit_paths():
             directory_args_dpt = self.get_directory_args_dpt_fnc(
                 self, target_extension
             )
@@ -836,12 +808,13 @@ class AbsOsTexture(
                 directory_src_dst, directory_tgt_dst = directory_args_dst
                 #
                 if texture_src.get_is_exists() is True:
-                    texture_src.copy_unit(
+                    texture_src.copy_unit_to(
                         directory_src_dst,
                         fix_name_blank=fix_name_blank, replace=replace
                     )
+                #
                 if texture_tgt.get_is_exists() is True:
-                    texture_tgt.copy_unit(
+                    texture_tgt.copy_unit_to(
                         directory_tgt_dst,
                         fix_name_blank=fix_name_blank, replace=replace
                     )
@@ -920,7 +893,7 @@ class AbsOsTexture(
     @classmethod
     def _get_unit_format_convert_used_color_space_src_(cls, file_path_src):
         return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-            cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_tx_color_space(file_path_src)
+            cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
         )
     @classmethod
     def _get_unit_tx_create_used_color_space_src_(cls, file_path_src):
@@ -932,12 +905,12 @@ class AbsOsTexture(
             file_opt = bsc_core.StgFileOpt(file_path_src)
             if file_opt.get_is_match_name_pattern('*.z_disp.*.exr'):
                 return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                    cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_tx_color_space(file_path_src)
+                    cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
                 )
             return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
         # not "exr"
         return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-            cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_tx_color_space(file_path_src)
+            cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
         )
     @classmethod
     def _get_unit_is_exists_as_tgt_ext_by_src_(cls, file_path_src, ext_tgt, search_directory_path=None):
@@ -998,7 +971,7 @@ class AbsOsTexture(
                 search_directory_path=search_directory_path,
             ) is False:
                 return and_core.AndTextureOpt_(file_path_src).get_unit_tx_create_cmd(
-                    color_space=color_space_src,
+                    color_space_src=color_space_src,
                     use_aces=use_aces,
                     aces_file=aces_file,
                     aces_color_spaces=aces_color_spaces,
@@ -1018,7 +991,7 @@ class AbsOsTexture(
             aces_render_color_space = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
             aces_file = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
             return and_core.AndTextureOpt_(file_path_src).get_unit_tx_create_cmd(
-                color_space=color_space_src,
+                color_space_src=color_space_src,
                 use_aces=use_aces,
                 aces_file=aces_file,
                 aces_color_spaces=aces_color_spaces,
@@ -1030,10 +1003,12 @@ class AbsOsTexture(
     def _get_unit_create_cmd_as_ext_tgt_by_src_force_(cls, file_path_src, ext_tgt, search_directory_path=None, width=None):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != ext_tgt:
+            # tx use arnold
             if ext_tgt == cls.TX_EXT:
                 return cls._get_unit_tx_create_cmd_by_src_force_(
                     file_path_src, search_directory_path
                 )
+            # other use oiio
             else:
                 return bsc_core.ImgFileOpt(
                     file_path_src
@@ -1115,7 +1090,7 @@ class AbsOsTexture(
     def _get_path_src_as_ext_tgt_(cls, file_path_any, ext_tgt, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_any)
         if ext_any == ext_tgt:
-            _ = cls._get_unit_file_paths__(file_path_any)
+            _ = cls.get_exists_unit_paths_fnc(file_path_any)
             if _:
                 ext_src = cls._get_unit_ext_src_as_ext_tgt_(_[0], ext_tgt, search_directory_path)
                 if ext_src is not None:
@@ -1172,7 +1147,7 @@ class AbsOsTexture(
         src, tgt = self.__class__(path_src), self.__class__(path_tgt)
         # if src.ext == ext_tgt:
         #     src = None
-        # if not self._get_unit_file_paths__(path_tgt):
+        # if not self.get_exists_unit_paths_fnc(path_tgt):
         #     tgt = None
         return src, tgt
 
@@ -1184,7 +1159,7 @@ class AbsOsTexture(
         src, tgt = self.__class__(path_src), self.__class__(path_tgt)
         # if src.ext == ext_tgt:
         #     src = None
-        # if not self._get_unit_file_paths__(path_tgt):
+        # if not self.get_exists_unit_paths_fnc(path_tgt):
         #     tgt = None
         return src, tgt
 
@@ -1241,26 +1216,9 @@ class AbsOsTexture(
             list_.sort()
         return list_
 
-    def get_exists_file_paths(self, with_tx=True):
-        if with_tx is True:
-            return self._get_exists_file_paths_(self.path, include_exts=[self.TX_EXT])
-        return self._get_exists_file_paths_(self.path)
-
-    def get_exists_files(self, with_tx=True):
-        return [self.__class__(i) for i in self.get_exists_file_paths(with_tx)]
-
-    def get_exists_file_paths_(self):
-        return self._get_unit_file_paths__(self.path)
-
-    def get_exists_files_(self):
-        return [self.__class__(i) for i in self.get_exists_file_paths_()]
-
-    def get_permissions(self, with_tx=True):
-        return [bsc_core.StorageMtd.get_permission(i) for i in self.get_exists_file_paths(with_tx)]
-
     def _get_tgt_ext_is_exists_(self, ext_tgt):
         # TODO: if ext is ".tx", "*.1001.exr" is exists and "*.1001.tx" is lost
-        _ = self.get_exists_files_()
+        _ = self.get_exists_units()
         if _:
             # find orig ext
             orig_ext = None
@@ -1279,7 +1237,7 @@ class AbsOsTexture(
     def _get_tgt_ext_orig_path_(self, ext_tgt):
         ext = self.ext
         if ext == ext_tgt:
-            _ = self.get_exists_files_()
+            _ = self.get_exists_units()
             for i in _:
                 print self._get_unit_ext_src_as_ext_tgt_(i.path, ext_tgt), 'AAA'
         return ext_tgt
@@ -1376,7 +1334,7 @@ class AbsOsTexture(
                 self.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space(file_path)
             )
 
-    def get_tx_color_space(self):
+    def get_color_space_src(self):
         _ = self._get_exists_file_paths_(self._path)
         if _:
             file_path = _[0]
@@ -1385,7 +1343,7 @@ class AbsOsTexture(
             elif self.get_ext_is_exr():
                 return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
             return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_tx_color_space(file_path)
+                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path)
             )
 
     def get_best_color_space(self):
@@ -1393,7 +1351,7 @@ class AbsOsTexture(
         if _:
             file_path = _[0]
             return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_tx_color_space(file_path)
+                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path)
             )
 
     def get_purpose(self):

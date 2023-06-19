@@ -70,5 +70,5 @@ if __name__ == '__main__':
     # ).get_thumbnail(ext='.png')
 
     # print RscFileMtd.get(
-    #     'asset/library/preview_sphere.usda'
+    #     'asset/library/geometry_sphere.usda'
     # )

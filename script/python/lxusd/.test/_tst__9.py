@@ -37,7 +37,7 @@ for i_seq, i_prim in enumerate(prim_opt.get_children()):
     i_file_path_m = bsc_core.StgFileMultiplyMtd.convert_to(
         i_file_path, ['*.####.{ext}']
     )
-    i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_tiles(
+    i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_unit_paths(
         i_file_path_m
     )
 

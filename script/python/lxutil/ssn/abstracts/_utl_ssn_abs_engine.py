@@ -52,7 +52,7 @@ class AbsSsnRsvApplication(object):
         workspace_user = rsv_project.get_workspace_user()
         workspace_temporary = rsv_project.get_workspace_temporary()
         # current workspace
-        workspace_key_cur = rsv_project.WorkspaceKeys.Release
+        workspace_key_cdt = rsv_project.WorkspaceKeys.Release
         workspace_cur = workspace_release
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is None:
@@ -89,7 +89,7 @@ class AbsSsnRsvApplication(object):
                 raise RuntimeError()
             #
             rsv_task.create_directory(
-                workspace_key=workspace_key_cur
+                workspace_key=workspace_key_cdt
             )
             #
             scene_src_file_opt_src = bsc_core.StgFileOpt(scene_src_file_path_src)
@@ -143,14 +143,14 @@ class AbsSsnRsvApplication(object):
         workspace_user = rsv_project.get_workspace_user()
         workspace_temporary = rsv_project.get_workspace_temporary()
         # current workspace
-        workspace_key_cur = rsv_project.WorkspaceKeys.Temporary
-        cur_workspace = workspace_temporary
+        workspace_key_cdt = rsv_project.WorkspaceKeys.Temporary
+        workspace_cdt = workspace_temporary
         rsv_scene_properties = self.get_rsv_scene_properties()
         if rsv_scene_properties is None:
             raise RuntimeError()
         #
         workspace = rsv_scene_properties.get('workspace')
-        if workspace == cur_workspace:
+        if workspace == workspace_cdt:
             return self._any_scene_file_path
         # copy to current workspace
         elif workspace in [workspace_source, workspace_user, workspace_release]:
@@ -180,7 +180,7 @@ class AbsSsnRsvApplication(object):
                 raise RuntimeError()
             #
             rsv_task.create_directory(
-                workspace_key=workspace_key_cur
+                workspace_key=workspace_key_cdt
             )
             #
             scene_src_file_opt_src = bsc_core.StgFileOpt(scene_src_file_path_src)
@@ -208,22 +208,3 @@ class AbsSsnRsvApplication(object):
                 return scene_src_file_path_tgt
         else:
             raise RuntimeError()
-
-    def get_virtual_publish_scene_src_file(self, keyword):
-        cur_workspace = 'publish'
-        rsv_scene_properties = self.get_rsv_scene_properties()
-        if rsv_scene_properties is not None:
-            workspace = rsv_scene_properties.get('workspace')
-            if workspace == cur_workspace:
-                return self._any_scene_file_path
-            elif workspace == 'work':
-                rsv_task = self.get_rsv_task()
-                branch = rsv_scene_properties.get('branch')
-                application = rsv_scene_properties.get('application')
-                rsv_unit = rsv_task.get_rsv_unit(keyword=keyword)
-                rsv_unit_result = rsv_unit.get_result(version='latest')
-                rsv_unit_properties = rsv_unit.get_properties_by_result(rsv_unit_result)
-                print rsv_unit_properties
-
-    def get_virtual_output_scene_src_file_(self, keyword):
-        pass

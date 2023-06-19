@@ -3821,11 +3821,15 @@ class AbsOsFile(
                             'file copy',
                             u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
                         )
-
-                    return False, self.LOG.set_module_error_trace(
-                        'file copy',
-                        u'file="{}" is not readable'.format(self.path)
-                    )
+                    else:
+                        bsc_core.StgPathPermissionMtd.unlock(
+                            self.path
+                        )
+                        shutil.copy2(self.path, file_path_tgt)
+                        return True, self.LOG.set_module_result_trace(
+                            'file copy',
+                            u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
+                        )
                 except:
                     bsc_core.ExceptionMtd.set_print()
                     return False, self.LOG.set_module_error_trace(

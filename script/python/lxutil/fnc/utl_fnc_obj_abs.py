@@ -837,12 +837,12 @@ class AbsFncRenderTextureExportDef(object):
             with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
                 for i_dcc_obj in dcc_objs:
                     l_p.set_update()
-                    # dpt to dst
+                    # dpt to dst, file path can be is multiply
                     for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
                         # map path to current platform
                         j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
                         j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
-                        if j_texture_dpt.get_is_exists_file() is False:
+                        if j_texture_dpt.get_exists_unit_paths() is False:
                             bsc_core.LogMtd.trace_method_warning(
                                 cls.KEY,
                                 'file="{}" is non exists'.format(j_texture_path_dpt)
@@ -887,15 +887,15 @@ class AbsFncRenderTextureExportDef(object):
                         # ignore when dpt ( departure ) same to dst ( destination )
                         if j_texture_path_dpt != j_texture_path_dst:
                             # do copy
-                            j_file_tiles = j_texture_dpt.get_exists_files_()
-                            if j_file_tiles:
-                                for k_file_tile in j_file_tiles:
-                                    k_file_tile_path = k_file_tile.path
+                            j_file_units_dpt = j_texture_dpt.get_exists_units()
+                            if j_file_units_dpt:
+                                for k_file_unit_dpt in j_file_units_dpt:
+                                    k_file_tile_path = k_file_unit_dpt.path
                                     if k_file_tile_path not in copy_cache:
                                         copy_cache.append(k_file_tile_path)
                                         #
                                         if copy_source is True:
-                                            k_file_tile.copy_unit_as_base_link_with_src(
+                                            k_file_unit_dpt.copy_unit_as_base_link_with_src(
                                                 directory_path_bsc=directory_path_bsc,
                                                 directory_path_dst=j_directory_path_dst,
                                                 #
@@ -906,7 +906,7 @@ class AbsFncRenderTextureExportDef(object):
                                                 replace=True
                                             )
                                         else:
-                                            k_file_tile.copy_unit_as_base_link(
+                                            k_file_unit_dpt.copy_unit_as_base_link(
                                                 directory_path_bsc=directory_path_bsc,
                                                 directory_path_dst=j_directory_path_dst,
                                                 #
@@ -921,7 +921,7 @@ class AbsFncRenderTextureExportDef(object):
                                 continue
                             # do repath
                             j_texture_dst = utl_dcc_objects.OsTexture(j_texture_path_dst)
-                            if j_texture_dst.get_exists_files_():
+                            if j_texture_dst.get_exists_units():
                                 # environ map
                                 if use_environ_map is True:
                                     # noinspection PyArgumentEqualDefault
@@ -978,7 +978,7 @@ class AbsFncRenderTextureExportDef(object):
                     # map path to current platform
                     j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
                     j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
-                    if j_texture_dpt.get_is_exists_file() is False:
+                    if j_texture_dpt.get_exists_units() is False:
                         bsc_core.LogMtd.trace_method_warning(
                             cls.KEY,
                             'file="{}" is non exists'.format(j_texture_path_dpt)
@@ -1023,15 +1023,15 @@ class AbsFncRenderTextureExportDef(object):
                     # ignore when dpt ( departure ) same to dst ( destination )
                     if j_texture_path_dpt != j_texture_path_dst:
                         # do copy
-                        j_file_tiles = j_texture_dpt.get_exists_files_()
-                        if j_file_tiles:
-                            for k_file_tile in j_file_tiles:
-                                k_file_tile_path = k_file_tile.path
+                        j_file_units_dpt = j_texture_dpt.get_exists_units()
+                        if j_file_units_dpt:
+                            for k_file_unit_dpt in j_file_units_dpt:
+                                k_file_tile_path = k_file_unit_dpt.path
                                 if k_file_tile_path not in copy_cache:
                                     copy_cache.append(k_file_tile_path)
                                     #
                                     if copy_source is True:
-                                        k_file_tile.copy_unit_with_src(
+                                        k_file_unit_dpt.copy_unit_with_src(
                                             directory_path_dst=j_directory_path_dst,
                                             #
                                             scheme=copy_source_scheme,
@@ -1041,7 +1041,7 @@ class AbsFncRenderTextureExportDef(object):
                                             replace=True
                                         )
                                     else:
-                                        k_file_tile.copy_unit(
+                                        k_file_unit_dpt.copy_unit_to(
                                             directory_path_dst=j_directory_path_dst,
                                             #
                                             fix_name_blank=fix_name_blank,
@@ -1056,7 +1056,7 @@ class AbsFncRenderTextureExportDef(object):
                         # do repath
                         #
                         j_texture_dst = utl_dcc_objects.OsTexture(j_texture_path_dst)
-                        if j_texture_dst.get_exists_files_():
+                        if j_texture_dst.get_exists_units():
                             # environ map
                             if use_environ_map is True:
                                 # noinspection PyArgumentEqualDefault

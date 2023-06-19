@@ -114,8 +114,8 @@ class DtbBaseOpt(object):
         # if os.path.isfile(database) is False:
         #     raise RuntimeError()
 
-        bsc_core.LogMtd.trace_result(
-            'setup database from: {}'.format(database)
+        bsc_core.LogMtd.trace_method_result(
+            'database', 'setup from: {}'.format(database)
         )
 
         self._dtb_file_path = database

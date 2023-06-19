@@ -21,6 +21,7 @@ class TextureColorSpaceConfigure(AbsCfg):
         super(TextureColorSpaceConfigure, self).__init__(configure)
 
     def _set_build_(self):
+        self._keys = []
         self._color_space_dict = {}
         self._purpose_dict = {}
         purposes = self._configure.get_branch_keys('tx')
@@ -39,11 +40,12 @@ class TextureColorSpaceConfigure(AbsCfg):
         #
         return and_core.AndTextureOpt_(file_path).get_color_space()
 
-    def get_tx_color_space(self, file_path):
+    def get_color_space_src(self, file_path):
         from lxarnold import and_core
         #
         file_opt = bsc_core.StgFileOpt(file_path)
         _ = 'auto'
+        # check is match configure, when not use "auto"
         for i_name_pattern in self.get_name_patterns():
             if file_opt.get_is_match_name_pattern(i_name_pattern) is True:
                 _ = self._color_space_dict[i_name_pattern]

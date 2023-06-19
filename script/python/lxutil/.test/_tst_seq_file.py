@@ -21,7 +21,7 @@
 #
 # f = dcc_objects.OsFile('/l/prod/shl/work/assets/chr/shuitao/srf/surfacing/houdini/caustic/v003_half02/caustic.(0001-0600)%04d.exr')
 #
-# print f.get_exists_files()
+# print f.get_exists_units()
 
 
 import parse

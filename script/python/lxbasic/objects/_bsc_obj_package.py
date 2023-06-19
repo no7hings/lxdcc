@@ -149,11 +149,11 @@ class PackageContextNew(object):
         if package_data:
             package_data[package_virtual_version] = package
             keys = package_data.keys()
-            keys = bsc_core.RawTextsMtd.set_sort_to(keys)
+            keys = bsc_core.RawTextsMtd.sort_by_number(keys)
             package_latest = package_data[keys[-1]]
             return package_latest
 
-    def _get_valid_package(self, package, use_beta=False):
+    def _completed_package_to(self, package, use_beta=False):
         if '@' not in package:
             package_name = package
             package_data = {}
@@ -192,10 +192,27 @@ class PackageContextNew(object):
             #
             if package_data:
                 keys = package_data.keys()
-                keys = bsc_core.RawTextsMtd.set_sort_to(keys)
+                keys = bsc_core.RawTextsMtd.sort_by_number(keys)
                 package_latest = package_data[keys[-1]]
                 return package_latest
         return package
+
+    def _completed_packages_to(self, packages, use_beta=False):
+        list_ = []
+        for i_p in packages:
+            i_package = self._completed_package_to(i_p, use_beta=use_beta)
+            if i_package is not None:
+                bsc_core.LogMtd.trace_method_result(
+                    self.KEY,
+                    'resolve package: "{}"'.format(i_package)
+                )
+                list_.append(i_package)
+            else:
+                bsc_core.LogMtd.trace_method_warning(
+                    self.KEY,
+                    'package: "{}" is invalid'
+                )
+        return list_
 
     def _get_packages(self, packages_extend=None, use_beta=False):
         list_ = []
@@ -214,25 +231,8 @@ class PackageContextNew(object):
                 list_.append(i_p)
         # package from extend
         list_.extend(
-            self._get_valid_packages(packages_extend or [])
+            self._completed_packages_to(packages_extend or [])
         )
-        return list_
-
-    def _get_valid_packages(self, packages, use_beta=False):
-        list_ = []
-        for i_p in packages:
-            i_package = self._get_valid_package(i_p, use_beta=use_beta)
-            if i_package is not None:
-                bsc_core.LogMtd.trace_method_result(
-                    self.KEY,
-                    'resolve package: "{}"'.format(i_package)
-                )
-                list_.append(i_package)
-            else:
-                bsc_core.LogMtd.trace_method_warning(
-                    self.KEY,
-                    'package: "{}" is invalid'
-                )
         return list_
 
     def get_args(self, packages_extend=None, use_beta=False):

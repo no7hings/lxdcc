@@ -48,7 +48,7 @@ class StgRpcMtd(object):
                     )
                 #
                 if SystemMtd.get_is_linux():
-                    os.system('ls {}'.format(p))
+                    os.system('ls {} > /dev/null'.format(p))
                 #
                 time.sleep(1)
             #
@@ -83,7 +83,7 @@ class StgRpcMtd(object):
                     )
                 #
                 if SystemMtd.get_is_linux():
-                    os.system('ls {}'.format(p))
+                    os.system('ls {} > /dev/null'.format(p))
                 #
                 time.sleep(1)
             #
@@ -119,7 +119,7 @@ class StgRpcMtd(object):
                         )
                     )
                 if SystemMtd.get_is_linux():
-                    os.system('ls {}'.format(p))
+                    os.system('ls {} > /dev/null'.format(p))
                 #
                 time.sleep(1)
             # noinspection PyArgumentEqualDefault
@@ -146,7 +146,7 @@ class StgRpcMtd(object):
             #
             if SystemMtd.get_is_linux():
                 p = os.path.dirname(path)
-                os.system('ls {}'.format(p))
+                os.system('ls {} > /dev/null'.format(p))
             #
             _bsc_cor_log.LogMtd.trace_method_result(
                 key,
@@ -160,7 +160,7 @@ class StgRpcMtd(object):
             clt.chown(path, user, group)
             p = os.path.dirname(path)
             if SystemMtd.get_is_linux():
-                os.system('ls {}'.format(p))
+                os.system('ls {} > /dev/null'.format(p))
             _bsc_cor_log.LogMtd.trace_method_result(
                 key,
                 'path="{}", user="{}", group="{}"'.format(path, user, group)
@@ -643,7 +643,9 @@ class StgDirectoryMtd(object):
                             continue
                     #
                     list_.append(i_path)
-        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        if list_:
+            list_.sort()
+        return list_
     @classmethod
     def _get_file_paths(cls, directory_path, include_exts=None):
         import scandir
@@ -659,7 +661,9 @@ class StgDirectoryMtd(object):
                             continue
                     #
                     list_.append(i_path)
-        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        if list_:
+            list_.sort()
+        return list_
     @classmethod
     def get_file_paths__(cls, directory_path, include_exts=None):
         if SystemMtd.get_is_linux():
@@ -685,7 +689,9 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        if list_:
+            list_.sort()
+        return list_
     @classmethod
     def _get_all_file_paths(cls, directory_path, include_exts=None):
         def rcs_fnc_(path_):
@@ -706,7 +712,9 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        if list_:
+            list_.sort()
+        return list_
     @classmethod
     def get_all_file_paths__(cls, directory_path, include_exts=None):
         if SystemMtd.get_is_linux():
@@ -753,7 +761,9 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        if list_:
+            list_.sort()
+        return list_
     @classmethod
     def _get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(d_):
@@ -768,7 +778,9 @@ class StgDirectoryMtd(object):
         list_ = []
         if os.path.isdir(directory_path):
             rcs_fnc_(directory_path)
-        return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+        if list_:
+            list_.sort()
+        return list_
     @classmethod
     def get_all_directory_paths__(cls, directory_path):
         if SystemMtd.get_is_linux():
@@ -891,10 +903,9 @@ class StgFileMultiplyMtd(object):
     def to_glob_pattern(cls, name_base):
         if name_base in cls.CACHE:
             return cls.CACHE[name_base]
-        re_keys = _bsc_cor_pattern.PtnMultiplyFileMtd.RE_MULTIPLY_KEYS
         #
         name_base_new = name_base
-        for i_keyword, i_re_format, i_count in re_keys:
+        for i_keyword, i_re_format, i_count in _bsc_cor_pattern.PtnMultiplyFileMtd.RE_MULTIPLY_KEYS:
             i_results = re.finditer(i_re_format.format(i_keyword), name_base, re.IGNORECASE) or []
             for j_result in i_results:
                 j_start, j_end = j_result.span()
@@ -907,22 +918,21 @@ class StgFileMultiplyMtd(object):
         cls.CACHE[name_base] = name_base_new
         return name_base_new
     @classmethod
-    def get_exists_tiles(cls, file_path):
+    def get_exists_unit_paths(cls, file_path):
         if os.path.isfile(file_path):
             return [file_path]
-        #
-        directory_path = os.path.dirname(file_path)
         #
         name_base = os.path.basename(file_path)
         name_base_new = cls.to_glob_pattern(name_base)
         if name_base != name_base_new:
+            directory_path = os.path.dirname(file_path)
             glob_pattern = cls.PATHSEP.join([directory_path, name_base_new])
             list_ = StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
-            return _bsc_cor_raw.RawTextsMtd.set_sort_to(list_)
+            return list_
         return []
     @classmethod
-    def get_exists(cls, file_path):
-        return not not cls.get_exists_tiles(file_path)
+    def get_is_exists(cls, file_path):
+        return not not cls.get_exists_unit_paths(file_path)
 
 
 class StgDirectoryMultiplyMtd(object):

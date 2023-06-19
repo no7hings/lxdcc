@@ -9,6 +9,9 @@ import lxbasic.extra.abstracts as bsc_etr_abstracts
 class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_base_packages_extend(cls):
+        return ['lxdcc']
+    @classmethod
+    def get_builtin_packages_extend(cls):
         return ['lxdcc', 'lxdcc_gui', 'lxdcc_lib', 'lxdcc_rsc']
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
@@ -24,7 +27,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         return ' '.join(args)
     @classmethod
     def packages_completed_to(cls, packages):
-        return bsc_objects.PackageContextNew()._get_valid_packages(packages)
+        return bsc_objects.PackageContextNew()._completed_packages_to(packages)
     @classmethod
     def get_project_environs_extend(cls, project):
         return dict(
@@ -111,42 +114,48 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         cfg_file_path = package_data['deadline-configure-file'][platform]
         return bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
     @classmethod
-    def send_mails(cls, *args, **kwargs):
+    def send_mail(cls, *args, **kwargs):
         import pkgutil
-        #
         if pkgutil.find_loader('cosmos'):
             # noinspection PyUnresolvedReferences
-            from cosmos.util.message import imail
-            #
-            imail.http_mail(
-                kwargs['addresses'],
-                kwargs['subject'],
-                kwargs.get('content') or '',
+            from cosmos.message import imsg
+            imsg.send_email(
+                receivers=kwargs['receivers'],
+                title=kwargs['subject'],
+                message=kwargs.get('content') or '',
             )
         else:
-            bsc_core.MsgBaseMtd.send_mail(
+            bsc_core.MsgBaseMtd.send_mail_(
                 addresses=kwargs['addresses'],
                 subject=kwargs['subject'],
                 content=kwargs.get('content') or '',
             )
     @classmethod
     def send_feishu(cls, *args, **kwargs):
-        bsc_core.MsgBaseMtd.send_feishu(
-            addresses=kwargs['addresses'],
-            subject=kwargs['subject'],
-            content=kwargs.get('content') or '',
-        )
-    @classmethod
-    def send_messages(cls, *args, **kwargs):
         import pkgutil
-        #
         if pkgutil.find_loader('cosmos'):
             # noinspection PyUnresolvedReferences
-            from cosmos.util.message import ichat
-            #
+            from cosmos.message import imsg
+            imsg.send_message(
+                receivers=kwargs['receivers'],
+                title=kwargs['subject'],
+                message=kwargs.get('content') or '',
+            )
+        else:
+            bsc_core.MsgBaseMtd.send_feishu_(
+                receivers=kwargs['receivers'],
+                subject=kwargs['subject'],
+                content=kwargs.get('content') or '',
+            )
+    @classmethod
+    def send_chat(cls, *args, **kwargs):
+        import pkgutil
+        if pkgutil.find_loader('cosmos'):
+            # noinspection PyUnresolvedReferences
+            from cosmos.message import ichat
             ichat.send_message(
                 sender_name='sg_new_version',
-                receivers=kwargs['to_users'],
+                receivers=kwargs['receivers'],
                 title=kwargs['subject'],
                 message=kwargs.get('content') or '',
             )

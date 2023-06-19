@@ -178,83 +178,6 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             directory_path
         )
 
-    def execute_new_registry_json_export(self):
-        from lxbasic import bsc_core
-        #
-        rsv_scene_properties = self._rsv_scene_properties
-        #
-        workspace = rsv_scene_properties.get('workspace')
-        version = rsv_scene_properties.get('version')
-        #
-        if workspace == rsv_scene_properties.get('workspaces.release'):
-            file_rsv_unit = self._rsv_task.get_rsv_unit(
-                keyword='{branch}-new-registry-json-file'
-            )
-            file_path = file_rsv_unit.get_result(version=version)
-            raw = dict(
-                files=self.get_new_registry_file_data_fnc(
-                    self._rsv_task, version
-                ),
-                info=self.get_new_registry_info_data_fnc(
-                    user=self._hook_option_opt.get('user')
-                )
-            )
-            bsc_core.StgFileOpt(file_path).set_write(
-                raw
-            )
-    @classmethod
-    def get_new_registry_file_data_fnc(cls, rsv_task, version):
-        directory_rsv_unit = rsv_task.get_rsv_unit(
-            keyword='{branch}-release-version-dir'
-        )
-        directory_path = directory_rsv_unit.get_result(
-            version=version
-        )
-        dict_ = {}
-        args = [
-            '{branch}-maya-scene-src-file',
-            '{branch}-maya-scene-file',
-            '{branch}-katana-scene-src-file',
-            '{branch}-katana-scene-file',
-            '{branch}-cache-usd-dir',
-            '{branch}-component-usd-file',
-            '{branch}-component-registry-usd-file',
-            '{branch}-cache-ass-dir',
-            '{branch}-look-ass-file',
-            '{branch}-look-dir',
-            '{branch}-look-klf-file',
-        ]
-        for i_keyword in args:
-            i_keyword = i_keyword.format(
-                **rsv_task.properties.get_value()
-            )
-            i_rsv_unit = rsv_task.get_rsv_unit(
-                keyword=i_keyword
-            )
-            i_result = i_rsv_unit.get_exists_result(version=version)
-            if i_result:
-                i_roles = i_keyword.split('-')[1:-1]
-                i_locations = []
-                i_key = i_result[len(directory_path)+1:]
-                if i_keyword.endswith('-file'):
-                    i_roles.append('file')
-                elif i_keyword.endswith('-dir'):
-                    i_roles.append('folder')
-                dict_[i_key] = dict(
-                    roles=i_roles,
-                    locations=i_locations
-                )
-        return dict_
-    @classmethod
-    def get_new_registry_info_data_fnc(cls, user, time_cost=0):
-        return dict(
-            date=bsc_core.TimeMtd.get_time(exact=True),
-            user=user,
-            db_id=69018,
-            db_name='production',
-            time_cost=time_cost
-        )
-
     def execute_shotgun_file_export(self):
         import lxshotgun.objects as stg_objects
         #
@@ -320,14 +243,6 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 stg_version_opt.set_link_model_stg_version(
                     stg_model_version
                 )
-    @classmethod
-    def get_deadline_job_info(cls, step):
-        from lxutil import utl_core
-        #
-        import lxshotgun.objects as stg_objects
-        #
-        stg_connector = stg_objects.StgConnector()
-        print stg_connector.get_stg_resource()
 
     def execute_review_mov_export(self):
         rsv_scene_properties = self._rsv_scene_properties
@@ -439,3 +354,98 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 u'qc review mov export',
                 u'file="{}" is non-exists'.format(review_katana_mov_file_path)
             )
+    # for new pipeline
+    @classmethod
+    def get_new_registry_file_data_fnc(cls, rsv_task, version):
+        directory_rsv_unit = rsv_task.get_rsv_unit(
+            keyword='{branch}-release-version-dir'
+        )
+        directory_path = directory_rsv_unit.get_result(
+            version=version
+        )
+        dict_ = {}
+        args = [
+            # scene
+            #   maya
+            '{branch}-maya-scene-src-file',
+            '{branch}-maya-scene-file',
+            #   katana
+            '{branch}-katana-scene-src-file',
+            '{branch}-katana-scene-file',
+            # cache
+            '{branch}-cache-dir',
+            '{branch}-cache-usd-dir',
+            '{branch}-component-usd-file',
+            '{branch}-component-registry-usd-file',
+            #   ass
+            '{branch}-cache-ass-dir',
+            # look
+            '{branch}-look-dir',
+            '{branch}-look-klf-file',
+            '{branch}-look-yml-file',
+            '{branch}-look-ass-file',
+            # texture
+            '{branch}-texture-dir',
+        ]
+        for i_keyword in args:
+            i_keyword = i_keyword.format(
+                **rsv_task.properties.get_value()
+            )
+            i_rsv_unit = rsv_task.get_rsv_unit(
+                keyword=i_keyword
+            )
+            i_result = i_rsv_unit.get_exists_result(version=version)
+            if i_result:
+                i_roles = i_keyword.split('-')[1:-1]
+                i_locations = []
+                i_key = i_result[len(directory_path)+1:]
+                if i_keyword.endswith('-file'):
+                    i_roles.append('file')
+                elif i_keyword.endswith('-dir'):
+                    i_roles.append('folder')
+                #
+                dict_[i_key] = dict(
+                    roles=i_roles,
+                    locations=i_locations
+                )
+        return dict_
+    @classmethod
+    def get_new_registry_info_data_fnc(cls, user, time_cost=0):
+        return dict(
+            date=bsc_core.TimeMtd.get_time(exact=True),
+            user=user,
+            db_id=69018,
+            db_name='production',
+            time_cost=time_cost
+        )
+
+    def execute_new_registry_json_export(self):
+        from lxbasic import bsc_core
+        #
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        #
+        if workspace == rsv_scene_properties.get('workspaces.release'):
+            file_rsv_unit = self._rsv_task.get_rsv_unit(
+                keyword='{branch}-new-registry-json-file'
+            )
+            file_path = file_rsv_unit.get_result(version=version)
+            raw = dict(
+                files=self.get_new_registry_file_data_fnc(
+                    self._rsv_task, version
+                ),
+                info=self.get_new_registry_info_data_fnc(
+                    user=self._hook_option_opt.get('user')
+                )
+            )
+            bsc_core.StgFileOpt(file_path).set_write(
+                raw
+            )
+    @classmethod
+    def get_new_dependency_file_data_fnc(cls, rsv_task, version):
+        pass
+
+    def execute_new_dependency_export(self):
+        pass

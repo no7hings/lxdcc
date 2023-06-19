@@ -11,6 +11,9 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     def get_base_packages_extend(cls):
         return ['lxdcc']
     @classmethod
+    def get_builtin_packages_extend(cls):
+        return []
+    @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
         args = [
             'rez-env',
@@ -60,19 +63,23 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     def get_deadline_configure_file(cls, *args, **kwargs):
         return
     @classmethod
-    def send_mails(cls, *args, **kwargs):
-        bsc_core.MsgBaseMtd.send_mail(
+    def send_mail(cls, *args, **kwargs):
+        bsc_core.MsgBaseMtd.send_mail_(
             addresses=kwargs['addresses'],
             subject=kwargs['subject'],
             content=kwargs.get('content') or '',
         )
     @classmethod
     def send_feishu(cls, *args, **kwargs):
-        bsc_core.MsgBaseMtd.send_feishu(
-            addresses=kwargs['addresses'],
+        bsc_core.MsgBaseMtd.send_feishu_(
+            receivers=kwargs['receivers'],
             subject=kwargs['subject'],
             content=kwargs.get('content') or '',
         )
     @classmethod
-    def send_messages(cls, *args, **kwargs):
-        pass
+    def send_chat(cls, *args, **kwargs):
+        bsc_core.MsgBaseMtd.send_chat_(
+            receivers=kwargs['receivers'],
+            subject=kwargs['subject'],
+            content=kwargs.get('content') or '',
+        )

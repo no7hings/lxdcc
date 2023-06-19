@@ -147,7 +147,7 @@ class DccTexturesOpt(object):
                 for i_texture_src in queue:
                     l_p.set_update()
                     if i_texture_src.get_is_exists_as_tx() is False:
-                        i_texture_tiles = i_texture_src.get_exists_files_()
+                        i_texture_tiles = i_texture_src.get_exists_units()
                         if i_texture_tiles:
                             for j_texture_tile in i_texture_tiles:
                                 if j_texture_tile.get_is_exists_as_tx() is False:
@@ -174,7 +174,7 @@ class DccTexturesOpt(object):
             for i_texture in queue:
                 g_p.set_update()
                 if i_texture.get_is_exists_as_tx() is False:
-                    i_texture_tiles = i_texture.get_exists_files_()
+                    i_texture_tiles = i_texture.get_exists_units()
                     if i_texture_tiles:
                         for j_texture_tile in i_texture_tiles:
                             lis.append(j_texture_tile.path)
@@ -312,7 +312,7 @@ class DccTexturesOpt(object):
                 for i_texture in queue:
                     l_p.set_update()
                     if i_texture.get_is_exists_as_tx() is False:
-                        i_texture_tiles = i_texture.get_exists_files_()
+                        i_texture_tiles = i_texture.get_exists_units()
                         if i_texture_tiles:
                             for j_texture_tile in i_texture_tiles:
                                 utl_dcc_objects.OsTexture._set_unit_jpg_create_(
@@ -334,7 +334,7 @@ class DccTexturesOpt(object):
             for i_texture in queue:
                 g_p.set_update()
                 if i_texture.get_is_exists_as_tgt_ext(ext_tgt) is False:
-                    i_texture_tiles = i_texture.get_exists_files_()
+                    i_texture_tiles = i_texture.get_exists_units()
                     if i_texture_tiles:
                         for j_texture_tile in i_texture_tiles:
                             lis.append(j_texture_tile.path)
@@ -394,10 +394,10 @@ class DccTexturesOpt(object):
                 else:
                     check_file_obj = tgt_stg_file = i_args
                 #
-                if check_file_obj.get_exists_files_() or force is True:
+                if check_file_obj.get_exists_units() or force is True:
                     self._set_port_repath_(i_port, tgt_stg_file)
-                    color_space = tgt_stg_file.get_tx_color_space()
-                    if tgt_stg_file.get_exists_files_() is True:
+                    color_space = tgt_stg_file.get_color_space_src()
+                    if tgt_stg_file.get_exists_units() is True:
                         i_port.obj.set_color_space(color_space)
                 else:
                     utl_core.Log.set_module_warning_trace(
@@ -582,7 +582,7 @@ class DccTexturesOpt(object):
                     j_port = i_obj.get_port(j_port_path)
                     src_texture_file_obj = utl_dcc_objects.OsTexture(j_file_path)
                     tgt_texture_file_obj = src_texture_file_obj.get_target_file(directory_path_tgt)
-                    for src_texture_file_tile_obj in src_texture_file_obj.get_exists_files_():
+                    for src_texture_file_tile_obj in src_texture_file_obj.get_exists_units():
                         tgt_texture_file_tile_obj = src_texture_file_tile_obj.get_target_file(
                             directory_path_tgt
                         )
@@ -642,7 +642,7 @@ class DccTexturesOpt(object):
                     if stg_files:
                         for stg_file in stg_files:
                             if stg_file.get_is_exists() is True:
-                                color_space = stg_file.get_tx_color_space()
+                                color_space = stg_file.get_color_space_src()
                                 i_dcc_node.set_color_space(color_space)
 
     def set_tx_repath_to_orig(self):

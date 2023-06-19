@@ -81,8 +81,22 @@ def __execute_hook(option):
         # extend package from base
         framework_packages_extend = bsc_etr_methods.EtrBase.get_base_packages_extend()
         if framework_packages_extend:
+            bsc_core.LogMtd.trace_method_result(
+                KEY,
+                'extend packages from framework: {}'.format(', '.join(framework_packages_extend))
+            )
             opt_packages_extend.extend(
                 bsc_etr_methods.EtrBase.packages_completed_to(framework_packages_extend)
+            )
+        # extend package from builtin
+        builtin_package_extend = bsc_etr_methods.EtrBase.get_builtin_packages_extend()
+        if builtin_package_extend:
+            bsc_core.LogMtd.trace_method_result(
+                KEY,
+                'extend packages from builtin: {}'.format(', '.join(builtin_package_extend))
+            )
+            opt_packages_extend.extend(
+                bsc_etr_methods.EtrBase.packages_completed_to(builtin_package_extend)
             )
         # extend packages from session
         hook_packages_extend = session.get_packages_extend()

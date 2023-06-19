@@ -711,11 +711,11 @@ class RawTextOpt(object):
 
 class RawTextsMtd(object):
     @classmethod
-    def set_sort_to(cls, texts):
+    def sort_by_number(cls, texts):
         texts.sort(key=lambda x: RawTextMtd.to_number_embedded_args(x))
         return texts
     @classmethod
-    def set_sort_by_initial(cls, texts):
+    def sort_by_initial(cls, texts):
         texts.sort(key=lambda x: x[0].lower())
         return texts
 
@@ -724,10 +724,8 @@ class RawTextsOpt(object):
     def __init__(self, raw):
         self._raw = raw
 
-    def set_sort_to(self):
-        _ = self._raw
-        _.sort(key=lambda x: RawTextMtd.to_number_embedded_args(x))
-        return _
+    def sort_by_number(self):
+        return RawTextsMtd.sort_by_number(self._raw)
 
 
 class RawStringUnderlineOpt(object):

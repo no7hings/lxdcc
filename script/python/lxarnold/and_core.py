@@ -866,7 +866,7 @@ class AndTextureOpt_(AndImageOpt):
                 cmd
             )
 
-    def get_unit_tx_create_cmd(self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space, search_directory_path=None):
+    def get_unit_tx_create_cmd(self, color_space_src, use_aces, aces_file, aces_color_spaces, aces_render_color_space, search_directory_path=None):
         file_path_src = self._file_path
         cmd_args = [
             'maketx',
@@ -877,18 +877,18 @@ class AndTextureOpt_(AndImageOpt):
             '--oiio'
         ]
         if use_aces is True:
-            if color_space in aces_color_spaces:
-                if color_space != aces_render_color_space:
+            if color_space_src in aces_color_spaces:
+                if color_space_src != aces_render_color_space:
                     cmd_args += [
                         '--colorengine ocio',
                         '--colorconfig "{}"'.format(aces_file),
                         #
-                        '--colorconvert "{}" "{}"'.format(color_space, aces_render_color_space),
+                        '--colorconvert "{}" "{}"'.format(color_space_src, aces_render_color_space),
                     ]
             else:
                 raise TypeError(
                     u'file="{}", aces color-space="{}" is not available'.format(
-                        file_path_src, color_space
+                        file_path_src, color_space_src
                     )
                 )
         #
@@ -940,7 +940,7 @@ class AndTextureOpt_(AndImageOpt):
             '--colorengine ocio',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
             '--colorconvert "{color_space_src}" "{color_space_tgt}"',
-            '--format exr',
+            '--format {format_tgt}',
             '"{file_src}"',
             '-o "{file_tgt}"'
         ]

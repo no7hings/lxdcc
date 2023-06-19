@@ -272,7 +272,7 @@ class AbsFileReferences(object):
                 file_ = utl_dcc_objects.OsFile(file_path)
                 # sequence
                 if obj.get('useFrameExtension'):
-                    exists_file_paths = file_.get_exists_file_paths()
+                    exists_file_paths = file_.get_exists_unit_paths()
                     if port.get_is_locked():
                         port.set_unlock()
                     #
@@ -280,7 +280,7 @@ class AbsFileReferences(object):
                 #
                 if file_.get_is_udim():
                     if obj.get('uvTilingMode') == 3:
-                        exists_file_paths = file_.get_exists_file_paths()
+                        exists_file_paths = file_.get_exists_unit_paths()
                         if port.get_is_locked():
                             port.set_unlock()
                         #
@@ -402,7 +402,7 @@ class AbsFileReferences(object):
         path_dict = {}
         for n in self.get_objs():
             for f in n.get_file_plf_objs():
-                sub_files = f.get_exists_files_()
+                sub_files = f.get_exists_units()
                 for sf in sub_files:
                     normcase_file_path = sf.normcase_path
                     if normcase_file_path in path_dict:

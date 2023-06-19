@@ -6,6 +6,9 @@ class AbsEtrBase(object):
     def get_base_packages_extend(cls):
         raise NotImplementedError()
     @classmethod
+    def get_builtin_packages_extend(cls):
+        raise NotImplementedError()
+    @classmethod
     def get_base_command(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
@@ -39,13 +42,13 @@ class AbsEtrBase(object):
     def get_deadline_configure_file(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
-    def send_mails(cls, *args, **kwargs):
+    def send_mail(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
     def send_feishu(cls, *args, **kwargs):
         raise NotImplementedError()
     @classmethod
-    def send_messages(cls, *args, **kwargs):
+    def send_chat(cls, *args, **kwargs):
         raise NotImplementedError()
 
 

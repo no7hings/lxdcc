@@ -110,7 +110,7 @@ class RsvUsdAssetSetCreator(object):
                 )
             )
             if paths:
-                paths = bsc_core.RawTextsOpt(paths).set_sort_to()
+                paths = bsc_core.RawTextsOpt(paths).sort_by_number()
             #
             for i_location in paths:
                 i_shot_asset = i_location.split('/')[-1]
@@ -758,7 +758,7 @@ class RsvUsdShotSetCreator(object):
             '/assets/efx/effects/*'
         )
         if paths:
-            paths = bsc_core.RawTextsOpt(paths).set_sort_to()
+            paths = bsc_core.RawTextsOpt(paths).sort_by_number()
         return paths
 
 

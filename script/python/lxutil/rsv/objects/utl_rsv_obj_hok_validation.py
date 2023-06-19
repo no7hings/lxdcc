@@ -31,7 +31,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 ]
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     j_texture = utl_dcc_objects.OsTexture(j_file_path)
-                    j_texture_tiles = j_texture.get_exists_files_()
+                    j_texture_tiles = j_texture.get_exists_units()
                     if j_file_path in check_dict:
                         j_check_results = check_dict[j_file_path]
                     else:
@@ -160,7 +160,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 ]
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     j_texture = utl_dcc_objects.OsTexture(j_file_path)
-                    j_texture_tiles = j_texture.get_exists_files_()
+                    j_texture_tiles = j_texture.get_exists_units()
                     if j_file_path in check_dict:
                         j_check_results = check_dict[j_file_path]
                     else:

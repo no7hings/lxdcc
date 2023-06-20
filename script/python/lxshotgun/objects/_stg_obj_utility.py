@@ -2,6 +2,7 @@
 import collections
 
 import datetime
+import re
 
 from lxbasic import bsc_core
 
@@ -382,6 +383,13 @@ class StgConnector(object):
             step=<step-name>
         :return:
         """
+        if 'id' in kwargs:
+            return self._stg_instance.find_one(
+                entity_type='Step',
+                filters=[
+                    ['id', 'is', int(kwargs['id'])],
+                ]
+            )
         step = kwargs['step']
         step = bsc_etr_methods.EtrBase.get_shotgun_step_name(step)
         kwargs['step'] = step
@@ -413,8 +421,10 @@ class StgConnector(object):
     # task
     def get_stg_tasks(self, **kwargs):
         """
+        find tasks filter by entity and step
         :param kwargs:
-            step=<step-name>
+            asset/sequence/shot=str
+            step=str
         :return:
         """
         return self._stg_instance.find(
@@ -439,7 +449,7 @@ class StgConnector(object):
         """
         if 'id' in kwargs:
             return self._stg_instance.find_one(
-                entity_type=kwargs['type'],
+                entity_type='Task',
                 filters=[
                     ['id', 'is', int(kwargs['id'])],
                 ]

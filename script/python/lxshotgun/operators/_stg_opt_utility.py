@@ -132,6 +132,16 @@ class StgResourceOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('addressings_cc') or []
 
 
+class StgStepOpt(AbsStgObjOpt):
+    def __init__(self, stg_obj_query):
+        super(StgStepOpt, self).__init__(stg_obj_query)
+
+    def get_downstream_stg_steps(self):
+        ids = self._stg_obj_query.get('sg_downstream_ids')
+        print ids
+        # return [self.get_stg_connector().get_stg_step(id=i) for i in ids]
+
+
 class StgTaskOpt(AbsStgObjOpt):
     def __init__(self, stg_obj_query):
         super(StgTaskOpt, self).__init__(stg_obj_query)

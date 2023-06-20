@@ -35,8 +35,8 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             PG_SHOW=project.upper(),
         )
     @classmethod
-    def get_shotgun_step_name(cls, task):
-        return task
+    def get_shotgun_step_name(cls, step):
+        return step
     @classmethod
     def set_project(cls, project):
         bsc_core.EnvExtraMtd.set(

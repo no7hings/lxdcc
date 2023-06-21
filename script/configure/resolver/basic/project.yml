@@ -466,6 +466,9 @@ asset-camera-dir: <asset-release-version-dir>/camera
 asset-camera-main-abc-file: <asset-camera-dir>/abc/main.abc
 asset-camera-main-usd-file: <asset-camera-dir>/usd/main.usd
 #
+asset-camera-abc-file: <asset-camera-dir>/abc/main.abc
+asset-camera-usd-file: <asset-camera-dir>/usd/main.usd
+#
 asset-camera-persp-yml-file: <asset-camera-dir>/yml/persp.yml
 asset-camera-persp-abc-file: <asset-camera-dir>/abc/persp.abc
 # <asset-hair>

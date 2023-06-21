@@ -120,6 +120,12 @@ class StgObjQuery(object):
     def get_storage_name(self):
         return self.get('tank_name')
 
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
     def __str__(self):
         return '{}(type={}, id={})'.format(
             self.__class__.__name__,
@@ -168,7 +174,7 @@ class StgConnector(object):
             )
 
     def get_stg_entity_scheme(self, stg_type, key):
-        _ = self.shotgun.schema_field_read(
+        _ = self._stg_instance.schema_field_read(
             entity_type=stg_type, field_name=key
         )
         if isinstance(_, dict):

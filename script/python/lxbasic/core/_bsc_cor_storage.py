@@ -1507,7 +1507,7 @@ class StgTmpYamlMtd(object):
     def get_key(cls, file_path):
         return UuidMtd.get_by_file(file_path)
     @classmethod
-    def get_file_path(cls, file_path, tag):
+    def get_file_path(cls, file_path, tag='untitled'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
         key = cls.get_key(file_path)
         region = StgTmpBaseMtd.get_save_region(key)
@@ -1521,11 +1521,25 @@ class StgTmpTextMtd(object):
     def get_key(cls, file_path):
         return UuidMtd.get_by_file(file_path)
     @classmethod
-    def get_file_path(cls, file_path, tag):
+    def get_file_path(cls, file_path, tag='untitled'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
         key = cls.get_key(file_path)
         region = StgTmpBaseMtd.get_save_region(key)
         return '{}/.txt/{}/{}/{}{}'.format(
+            directory_path, tag, region, key, '.txt'
+        )
+
+
+class StgTmpInfoMtd(object):
+    @classmethod
+    def get_key(cls, file_path):
+        return UuidMtd.get_by_file(file_path)
+    @classmethod
+    def get_file_path(cls, file_path, tag='untitled'):
+        directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
+        key = cls.get_key(file_path)
+        region = StgTmpBaseMtd.get_save_region(key)
+        return '{}/.info/{}/{}/{}{}'.format(
             directory_path, tag, region, key, '.txt'
         )
 
@@ -1562,6 +1576,9 @@ class StgPathPermissionDefaultMtd(object):
         )
     @classmethod
     def unlock_all_directories(cls, path):
+        pass
+    @classmethod
+    def lock_all_files(cls, path):
         pass
     @classmethod
     def unlock_all_files(cls, path):
@@ -1621,6 +1638,15 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
         for i in ds:
             StgRpcMtd.change_mode(
                 i, '775'
+            )
+    @classmethod
+    def lock_all_files(cls, path):
+        fs = StgDirectoryMtd.get_all_file_paths__(
+            path
+        )
+        for i in fs:
+            StgRpcMtd.change_mode(
+                i, '555'
             )
     @classmethod
     def unlock_all_files(cls, path):
@@ -1736,6 +1762,11 @@ class StgPathPermissionMtd(object):
         StgPathPermissionBaseMtd.get_method(
             path
         ).unlock_all_directories(path)
+    @classmethod
+    def lock_all_files(cls, path):
+        StgPathPermissionBaseMtd.get_method(
+            path
+        ).lock_all_files(path)
     @classmethod
     def unlock_all_files(cls, path):
         StgPathPermissionBaseMtd.get_method(

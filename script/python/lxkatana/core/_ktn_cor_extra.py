@@ -13,7 +13,7 @@ class EventOpt(object):
         self._handler = handler
         self._event_type = event_type
 
-    def set_register(self):
+    def register(self):
         self.set_unregister()
         #
         Utils.EventModule.RegisterEventHandler(
@@ -240,7 +240,7 @@ class EventMtd(object):
         #
         for handler, event_type in ss:
             event_opt = EventOpt(handler=handler, event_type=event_type)
-            event_opt.set_register()
+            event_opt.register()
 
 
 class ArnoldEventMtd(object):
@@ -481,7 +481,7 @@ class VariablesSetting(object):
             return _ktn_cor_node.NGPortOpt(p).get()
         return []
 
-    def set_register(self, key, values):
+    def register(self, key, values):
         ktn_port = self._ktn_obj.getParameter('variables')
         group_ktn_port = ktn_port.getChild(key)
         if group_ktn_port is not None:
@@ -506,7 +506,7 @@ class VariablesSetting(object):
 
     def set_register_by_configure(self, dic):
         for k, v in dic.items():
-            self.set_register(k, v)
+            self.register(k, v)
 
     def get_variants(self):
         dic = collections.OrderedDict()

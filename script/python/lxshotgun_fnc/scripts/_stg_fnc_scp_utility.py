@@ -19,7 +19,7 @@ def set_version_log_module_result_trace(rsv_task_properties, module, result):
     )
 
 
-def execute_link_export(rsv_task_properties):
+def execute_version_link(rsv_task_properties):
     raise RuntimeError(
         'this method is removed'
     )

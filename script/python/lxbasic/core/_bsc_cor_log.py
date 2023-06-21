@@ -67,50 +67,55 @@ class LogMtd(object):
             return text
     #
     @classmethod
-    def get_method_result(cls, name, text):
+    def get_method_result(cls, name, *args):
         name = _bsc_cor_raw.auto_encode(name)
-        text = _bsc_cor_raw.auto_encode(text)
+        text = ''.join(_bsc_cor_raw.auto_encode(i) for i in args)
         return cls.get_result(
             '<{}> {}'.format(name, text)
         )
     @classmethod
-    def get_method_warning(cls, name, text):
+    def get_method_warning(cls, name, *args):
         name = _bsc_cor_raw.auto_encode(name)
-        text = _bsc_cor_raw.auto_encode(text)
+        text = ''.join(_bsc_cor_raw.auto_encode(i) for i in args)
         return cls.get_warning(
             '<{}> {}'.format(name, text)
         )
     @classmethod
-    def get_method_error(cls, name, text):
+    def get_method_error(cls, name, *args):
+        """
+        :param name: str/unicode
+        :param args: str/unicode, ...
+        :return:
+        """
         name = _bsc_cor_raw.auto_encode(name)
-        text = _bsc_cor_raw.auto_encode(text)
+        text = ''.join(_bsc_cor_raw.auto_encode(i) for i in args)
         return cls.get_error(
             '<{}> {}'.format(name, text)
         )
     #
     @classmethod
-    def trace_method_result(cls, name, text):
+    def trace_method_result(cls, name, *args):
         """
         :param name: str/unicode
-        :param text: str/unicode
+        :param args: str/unicode, ...
         :return:
         """
         name = _bsc_cor_raw.auto_encode(name)
-        text = _bsc_cor_raw.auto_encode(text)
+        text = ''.join(_bsc_cor_raw.auto_encode(i) for i in args)
         return cls.trace_result(
             '<{}> {}'.format(name, text)
         )
     @classmethod
-    def trace_method_warning(cls, name, text):
+    def trace_method_warning(cls, name, *args):
         name = _bsc_cor_raw.auto_encode(name)
-        text = _bsc_cor_raw.auto_encode(text)
+        text = ''.join(_bsc_cor_raw.auto_encode(i) for i in args)
         return cls.trace_warning(
             '<{}> {}'.format(name, text)
         )
     @classmethod
-    def trace_method_error(cls, name, text):
+    def trace_method_error(cls, name, *args):
         name = _bsc_cor_raw.auto_encode(name)
-        text = _bsc_cor_raw.auto_encode(text)
+        text = ''.join(_bsc_cor_raw.auto_encode(i) for i in args)
         return cls.trace_error(
             '<{}> {}'.format(name, text)
         )
@@ -239,6 +244,6 @@ if __name__ == '__main__':
 
     c = 100
     with LogProgress.create_as_bar(maximum=c, label='test') as l_p:
-        for i in range(c):
+        for _i in range(c):
             l_p.set_update()
 

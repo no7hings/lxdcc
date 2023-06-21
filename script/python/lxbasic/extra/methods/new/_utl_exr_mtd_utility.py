@@ -119,13 +119,13 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         if pkgutil.find_loader('cosmos'):
             # noinspection PyUnresolvedReferences
             from cosmos.message import imsg
-            imsg.send_email(
+            return imsg.send_email(
                 receivers=kwargs['receivers'],
                 title=kwargs['subject'],
                 message=kwargs.get('content') or '',
             )
         else:
-            bsc_core.MsgBaseMtd.send_mail_(
+            return bsc_core.MsgBaseMtd.send_mail_(
                 addresses=kwargs['addresses'],
                 subject=kwargs['subject'],
                 content=kwargs.get('content') or '',
@@ -136,13 +136,14 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         if pkgutil.find_loader('cosmos'):
             # noinspection PyUnresolvedReferences
             from cosmos.message import imsg
-            imsg.send_message(
+            return imsg.send_message(
                 receivers=kwargs['receivers'],
                 title=kwargs['subject'],
+                style='normal',
                 message=kwargs.get('content') or '',
             )
         else:
-            bsc_core.MsgBaseMtd.send_feishu_(
+            return bsc_core.MsgBaseMtd.send_feishu_(
                 receivers=kwargs['receivers'],
                 subject=kwargs['subject'],
                 content=kwargs.get('content') or '',
@@ -153,16 +154,31 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         if pkgutil.find_loader('cosmos'):
             # noinspection PyUnresolvedReferences
             from cosmos.message import ichat
-            ichat.send_message(
+            return ichat.send_message(
                 sender_name='sg_new_version',
                 receivers=kwargs['receivers'],
                 title=kwargs['subject'],
                 message=kwargs.get('content') or '',
             )
-        else:
-            bsc_core.LogMtd.trace_method_warning(
-                'send messages failed, module "cosmos" is not found'
+        bsc_core.LogMtd.trace_method_warning(
+            'send messages failed', 'module "cosmos" is not found'
+        )
+        return False
+    @classmethod
+    def register_version_file_dependency(cls, *args, **kwargs):
+        import pkgutil
+        if pkgutil.find_loader('cosmos'):
+            # noinspection PyUnresolvedReferences
+            from cosmos.pipeline import dependency
+            return dependency.create_version_depends(
+                version_id=kwargs['version_id'],
+                file_type=kwargs['keyword'],
+                depend_file_paths=[kwargs['result']],
             )
+        bsc_core.LogMtd.trace_method_warning(
+            'register dependency failed', 'module "cosmos" is not found'
+        )
+        return False
 
 
 if __name__ == '__main__':

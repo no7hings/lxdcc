@@ -1,9 +1,9 @@
 # coding:utf-8
+import copy
 from urllib import quote, unquote
 
 import datetime
 
-import parse
 import six
 
 from lxbasic import bsc_core
@@ -98,11 +98,12 @@ class RsvStgTaskOpt(object):
             )
         )
 
-    def get_version_id(self):
-        stg_version = self._stg_connector.get_stg_version_query(
-            **self._rsv_task.properties.get_value()
+    def get_stg_version(self, version):
+        kwargs = copy.copy(self._rsv_task.properties.get_value())
+        kwargs['version'] = version
+        return self._stg_connector.get_stg_version(
+            **kwargs
         )
-        return
 
     def execute_stg_task_create(self):
         from lxutil import utl_core

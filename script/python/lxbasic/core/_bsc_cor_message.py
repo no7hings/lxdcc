@@ -111,6 +111,7 @@ class MsgBaseMtd(object):
             'send mail',
             'result is "{}"'.format(result.get('message') or 'fail')
         )
+        return result
     @classmethod
     def send_feishu_(cls, sender='shotgun', receivers=None, subject=None, content=None, attachments=None):
         def to_receives_fnc_(receivers_):
@@ -134,6 +135,7 @@ class MsgBaseMtd(object):
             'send mail',
             'result is "{}"'.format(result.get('message') or 'fail')
         )
+        return result
     @classmethod
     def send_chat_(cls, sender, receivers, subject, content):
         pass

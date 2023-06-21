@@ -7,12 +7,23 @@ import lxshotgun.operators as stg_operators
 
 c = stg_objects.StgConnector()
 
-q = c.get_stg_step_query(
+r_q = c.get_stg_resource_query(
+    project='nsa_dev', asset='nikki'
+)
+r_o = stg_operators.StgResourceOpt(r_q)
+
+s_q = c.get_stg_step_query(
     step='srf'
 )
 
-print q
+s_o = stg_operators.StgStepOpt(s_q)
 
-o = stg_operators.StgStepOpt(q)
+downstream_stg_steps = s_o.get_downstream_stg_steps()
+print s_o.get_notice_stg_users()
 
-print o.get_downstream_stg_steps()
+print r_o.get_stg_tasks(downstream_stg_steps)
+
+print r_o.get_stg_shots()
+
+print r_o.get_shot_stg_tasks(downstream_stg_steps)
+

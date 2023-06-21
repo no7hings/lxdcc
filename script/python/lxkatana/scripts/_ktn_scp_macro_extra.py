@@ -496,7 +496,7 @@ class ScpWspVariantRegister(AbsWsp):
         key = self._get_key_()
         values = self.get_variant_values()
         if values:
-            ktn_core.VariablesSetting().set_register(
+            ktn_core.VariablesSetting().register(
                 key, values
             )
 

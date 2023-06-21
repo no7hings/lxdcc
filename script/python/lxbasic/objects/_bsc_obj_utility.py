@@ -507,7 +507,7 @@ class UndoGroup(object):
         self._keys = []
         self._fnc_dict = collections.OrderedDict()
 
-    def set_register(self, key, fnc):
+    def register(self, key, fnc):
         self._keys.append(key)
         self._fnc_dict[key] = fnc
 
@@ -538,9 +538,9 @@ class UndoStack(object):
         print 'undo group close: "{}"'.format(self._cur_group._key)
         self._cur_group = None
 
-    def set_register(self, key, fnc):
+    def register(self, key, fnc):
         if self._cur_group is not None:
-            self._cur_group.set_register(key, fnc)
+            self._cur_group.register(key, fnc)
         else:
             self._keys.append(key)
             self._fncs.append(fnc)

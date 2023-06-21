@@ -50,6 +50,9 @@ class AbsEtrBase(object):
     @classmethod
     def send_chat(cls, *args, **kwargs):
         raise NotImplementedError()
+    @classmethod
+    def register_version_file_dependency(cls, *args, **kwargs):
+        raise NotImplementedError()
 
 
 class AbsEtrIde(object):

@@ -83,3 +83,6 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             subject=kwargs['subject'],
             content=kwargs.get('content') or '',
         )
+    @classmethod
+    def register_version_file_dependency(cls, *args, **kwargs):
+        pass

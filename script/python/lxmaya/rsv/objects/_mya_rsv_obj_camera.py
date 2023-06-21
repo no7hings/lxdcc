@@ -14,7 +14,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccCameraHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_camera_main_abc_export(self):
+    def execute_asset_camera_abc_export(self):
         key = 'camera main abc export'
         #
         rsv_scene_properties = self._rsv_scene_properties

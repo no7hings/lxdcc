@@ -7,8 +7,37 @@ from lxutil.rsv import utl_rsv_obj_abstract
 
 from lxshotgun.rsv.scripts import _stg_rsv_obj_utility
 
+import lxbasic.extra.methods as bsc_etr_methods
+
 
 class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
+    REGISTER_KEYWORDS = [
+        # scene
+        #   maya
+        '{branch}-maya-scene-src-file',
+        '{branch}-maya-scene-file',
+        #   katana
+        '{branch}-katana-scene-src-file',
+        '{branch}-katana-scene-file',
+        # cache
+        #   usd
+        '{branch}-cache-dir',
+        '{branch}-cache-usd-dir',
+        '{branch}-component-usd-file',
+        '{branch}-component-registry-usd-file',
+        #   ass
+        '{branch}-cache-ass-dir',
+        # look
+        '{branch}-look-dir',
+        '{branch}-look-klf-file',
+        '{branch}-look-yml-file',
+        '{branch}-look-ass-file',
+        # camera
+        '{branch}-camera-abc-file',
+        '{branch}-camera-usd-file',
+        # texture
+        '{branch}-texture-dir',
+    ]
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvShotgunHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -119,7 +148,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             description=description
         )
 
-    def execute_link_export(self):
+    def execute_version_link(self):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
         rsv_scene_properties = self._rsv_scene_properties
@@ -153,7 +182,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             no_version_directory_path, replace=True
         )
 
-    def execute_lock_export(self):
+    def execute_version_lock(self):
         from lxbasic import bsc_core
         #
         rsv_scene_properties = self._rsv_scene_properties
@@ -175,6 +204,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
         bsc_core.StgPathPermissionMtd.lock_all_directories(
+            directory_path
+        )
+        bsc_core.StgPathPermissionMtd.lock_all_files(
             directory_path
         )
 
@@ -364,30 +396,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
         dict_ = {}
-        args = [
-            # scene
-            #   maya
-            '{branch}-maya-scene-src-file',
-            '{branch}-maya-scene-file',
-            #   katana
-            '{branch}-katana-scene-src-file',
-            '{branch}-katana-scene-file',
-            # cache
-            '{branch}-cache-dir',
-            '{branch}-cache-usd-dir',
-            '{branch}-component-usd-file',
-            '{branch}-component-registry-usd-file',
-            #   ass
-            '{branch}-cache-ass-dir',
-            # look
-            '{branch}-look-dir',
-            '{branch}-look-klf-file',
-            '{branch}-look-yml-file',
-            '{branch}-look-ass-file',
-            # texture
-            '{branch}-texture-dir',
-        ]
-        for i_keyword in args:
+        for i_keyword in cls.REGISTER_KEYWORDS:
             i_keyword = i_keyword.format(
                 **rsv_task.properties.get_value()
             )
@@ -418,8 +427,8 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             db_name='production',
             time_cost=time_cost
         )
-
-    def execute_new_registry_json_export(self):
+    # register
+    def execute_new_registry_json_create(self):
         from lxbasic import bsc_core
         #
         rsv_scene_properties = self._rsv_scene_properties
@@ -445,7 +454,35 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
     @classmethod
     def get_new_dependency_file_data_fnc(cls, rsv_task, version):
-        pass
+        data = []
+        for i_keyword in cls.REGISTER_KEYWORDS:
+            i_keyword = i_keyword.format(
+                **rsv_task.properties.get_value()
+            )
+            i_rsv_unit = rsv_task.get_rsv_unit(
+                keyword=i_keyword
+            )
+            i_result = i_rsv_unit.get_exists_result(version=version)
+            if i_result:
+                data.append(
+                    (i_keyword, i_result)
+                )
+        return data
 
-    def execute_new_dependency_export(self):
-        pass
+    def execute_new_dependency_create(self):
+        rsv_scene_properties = self._rsv_scene_properties
+        #
+        workspace = rsv_scene_properties.get('workspace')
+        version = rsv_scene_properties.get('version')
+        #
+        if workspace == rsv_scene_properties.get('workspaces.release'):
+            data = self.get_new_dependency_file_data_fnc(self._rsv_task, version)
+            stg_version = _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).get_stg_version(version)
+            for i in data:
+                i_keyword, i_result = i
+                bsc_etr_methods.EtrBase.register_version_file_dependency(
+                    version_id=stg_version['id'],
+                    keyword=i_keyword,
+                    result=i_result
+                )
+

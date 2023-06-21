@@ -76,10 +76,10 @@ def set_camera_export_by_any_scene_file(option):
                 #
                 with_camera_main_abc = option_opt.get('with_camera_main_abc') or False
                 if with_camera_main_abc is True:
-                    set_asset_camera_main_abc_export(rsv_version, option)
+                    execute_asset_camera_abc_export(rsv_version, option)
 
 
-def set_asset_camera_main_abc_export(rsv_version, option):
+def execute_asset_camera_abc_export(rsv_version, option):
     from lxbasic import bsc_core
     #
     import lxmaya.fnc.exporters as mya_fnc_exporters

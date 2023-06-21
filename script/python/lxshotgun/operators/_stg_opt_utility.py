@@ -97,14 +97,21 @@ class StgImageOpt(object):
 
 class AbsStgObjOpt(object):
     def __init__(self, *args):
+        if args[0] is None:
+            raise RuntimeError(
+                'entity "None" is not available'
+            )
         self._stg_obj_query = args[0]
 
     def get_stg_connector(self):
         return self._stg_obj_query._stg_connector
+    #
+    connector = property(get_stg_connector)
 
-    @property
-    def shotgun(self):
+    def get_shogun(self):
         return self._stg_obj_query.shotgun
+    shotgun = property(get_shogun)
+
     @property
     def query(self):
         return self._stg_obj_query
@@ -131,6 +138,52 @@ class StgResourceOpt(AbsStgObjOpt):
     def get_cc_stg_users(self):
         return self._stg_obj_query.get('addressings_cc') or []
 
+    def get_stg_tasks(self, stg_steps=None):
+        filters = [
+            ['entity', 'is', self._stg_obj_query.stg_obj]
+        ]
+        # when "stg_steps" argument type is list, use step filter mode
+        if isinstance(stg_steps, list):
+            # when "stg_steps" is [] return []
+            if not stg_steps:
+                return []
+            filters.append(
+                ['step', 'in', stg_steps]
+            )
+        return self.shotgun.find(
+            entity_type='Task',
+            filters=filters
+        )
+
+    def get_stg_shots(self):
+        if self.query.type == 'Asset':
+            return self._stg_obj_query.get(
+                'shots'
+            )
+
+    def get_shot_stg_tasks(self, stg_steps=None):
+        list_ = []
+        if self.query.type == 'Asset':
+            stg_shots = self.get_stg_shots()
+            for i_stg_shot in stg_shots:
+                i_filters = [
+                    ['entity', 'is', i_stg_shot]
+                ]
+                # when "stg_steps" argument type is list, use step filter mode
+                if isinstance(stg_steps, list):
+                    # when "stg_steps" is [] return []
+                    if not stg_steps:
+                        return []
+                    i_filters.append(
+                        ['step', 'in', stg_steps]
+                    )
+                i_stg_tasks = self.shotgun.find(
+                    entity_type='Task',
+                    filters=i_filters
+                )
+                list_.extend(i_stg_tasks)
+        return list_
+
 
 class StgStepOpt(AbsStgObjOpt):
     def __init__(self, stg_obj_query):
@@ -138,8 +191,12 @@ class StgStepOpt(AbsStgObjOpt):
 
     def get_downstream_stg_steps(self):
         ids = self._stg_obj_query.get('sg_downstream_ids')
-        print ids
-        # return [self.get_stg_connector().get_stg_step(id=i) for i in ids]
+        if ids:
+            return [self.connector.get_stg_step(id=i) for i in ids.split(',')]
+        return []
+
+    def get_notice_stg_users(self):
+        return self._stg_obj_query.get('sg_notice_to_people')
 
 
 class StgTaskOpt(AbsStgObjOpt):
@@ -166,6 +223,51 @@ class StgTaskOpt(AbsStgObjOpt):
     def get_cc_stg_users(self):
         # print [self._stg_obj_query._stg_connector.to_query(i).get('name').decode('utf-8') for i in stg_users_assign+stg_users_cc]
         return self._stg_obj_query.get('addressings_cc') or []
+
+    def get_notice_stg_users(self):
+        list_ = []
+        stg_steps = []
+        stg_tasks = []
+        c = self.connector
+        # task
+        stg_task = self.query.stg_obj
+        stg_tasks.append(stg_task)
+        # step
+        stg_step = self.query.get('step')
+        stg_steps.append(stg_step)
+        stg_step_o = StgStepOpt(c.to_query(stg_step))
+        #   downstream steps notice
+        downstream_stg_steps = stg_step_o.get_downstream_stg_steps()
+        stg_steps.extend(downstream_stg_steps)
+        # resource
+        stg_resource = self.query.get('entity')
+        stg_resource_o = StgResourceOpt(c.to_query(stg_resource))
+        #   resource cc
+        resource_cc_stg_users = stg_resource_o.get_cc_stg_users()
+        list_.extend(resource_cc_stg_users)
+        #   downstream tasks
+        resource_downstream_stg_tasks = stg_resource_o.get_stg_tasks(
+            stg_steps=downstream_stg_steps
+        )
+        stg_tasks.extend(resource_downstream_stg_tasks)
+        if stg_resource['type'] == 'Asset':
+            shot_downstream_stg_tasks = stg_resource_o.get_shot_stg_tasks(
+                stg_steps=downstream_stg_steps
+            )
+            stg_tasks.extend(shot_downstream_stg_tasks)
+        # all step notice
+        for i_stg_step in stg_steps:
+            i_stg_step_o = StgStepOpt(c.to_query(i_stg_step))
+            i_step_notice_stg_user = i_stg_step_o.get_notice_stg_users()
+            list_.extend(i_step_notice_stg_user)
+        # all task assign and cc
+        for i_stg_task in stg_tasks:
+            i_stg_task_o = StgTaskOpt(c.to_query(i_stg_task))
+            i_task_assign_stg_users = i_stg_task_o.get_assign_stg_users()
+            list_.extend(i_task_assign_stg_users)
+            i_task_cc_stg_users = i_stg_task_o.get_cc_stg_users()
+            list_.extend(i_task_cc_stg_users)
+        return list_
 
 
 class StgVersionOpt(AbsStgObjOpt):
@@ -318,7 +420,7 @@ class StgVersionOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('entity')
 
     def get_stg_resource_query(self):
-        return self.get_stg_connector().to_query(
+        return self.connector.to_query(
             self.get_stg_resource()
         )
 
@@ -326,7 +428,7 @@ class StgVersionOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('sg_task')
 
     def get_stg_task_query(self):
-        return self.get_stg_connector().to_query(
+        return self.connector.to_query(
             self.get_stg_task()
         )
 

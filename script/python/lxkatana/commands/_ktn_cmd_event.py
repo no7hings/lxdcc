@@ -82,7 +82,7 @@ class EventMtd(object):
         #
         for i_fnc, event_type, event_id in ss:
             event_opt = ktn_core.EventOpt(handler=i_fnc, event_type=event_type)
-            event_opt.set_register()
+            event_opt.register()
     @classmethod
     def set_arnold_ramp_write(cls, ktn_obj_opt):
         cls._set_arnold_ramp_write_(ktn_obj_opt)

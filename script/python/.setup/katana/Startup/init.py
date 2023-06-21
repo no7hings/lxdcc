@@ -59,7 +59,7 @@ class ArnoldSetup(object):
             event_opt = ktn_core.EventOpt(
                 handler=handler, event_type=event_type
             )
-            event_opt.set_register()
+            event_opt.register()
     @classmethod
     def set_callbacks_register(cls):
         pass

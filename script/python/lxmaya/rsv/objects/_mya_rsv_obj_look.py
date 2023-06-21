@@ -92,7 +92,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 'obj="{}" is non-exists'.format(mya_root.path)
             )
 
-    def export_asset_look_yml(self):
+    def execute_asset_look_yml_export(self):
         from lxbasic import bsc_core
 
         from lxutil import utl_core

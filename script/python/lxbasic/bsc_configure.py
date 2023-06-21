@@ -95,6 +95,19 @@ class SubProcessStatus(enum.EnumMeta):
     Error = -15
 
 
+class StatusRgba(object):
+    Red = 255, 0, 63, 255
+    Orange = 255, 127, 63, 255
+    Yellow = 255, 255, 63, 255
+    Green = 63, 255, 127, 255
+    Blue = 63, 127, 255, 255
+    Purple = 127, 127, 255, 255
+    Gray = 127, 127, 127, 255
+    White = 255, 255, 255, 255
+    Black = 0, 0, 0, 255
+    Opacity = 0, 0, 0, 0
+
+
 class Platform(object):
     Windows = 'windows'
     Linux = 'linux'

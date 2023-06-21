@@ -1022,7 +1022,7 @@ class LxCamera(object):
                 'shot',
                 'asset_free', 'shot_free'
             ]
-            ktn_core.VariablesSetting().set_register(
+            ktn_core.VariablesSetting().register(
                 key, values
             )
         elif camera_scheme in ['prop']:
@@ -1032,7 +1032,7 @@ class LxCamera(object):
                 'shot',
                 'asset_free', 'shot_free'
             ]
-            ktn_core.VariablesSetting().set_register(
+            ktn_core.VariablesSetting().register(
                 key, values
             )
 
@@ -1310,7 +1310,7 @@ class LxVariant(object):
         from lxkatana import ktn_core
         key = self._get_key_()
         values = self._get_values_(self._ktn_obj)
-        ktn_core.VariablesSetting().set_register(
+        ktn_core.VariablesSetting().register(
             key, values
         )
 

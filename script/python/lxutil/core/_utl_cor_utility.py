@@ -174,13 +174,13 @@ class MethodLogging(object):
 
     def __enter__(self):
         bsc_core.LogMtd.trace_method_result(
-            self._module, self._result, ' is started'
+            self._module, self._result+' is started'
         )
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         bsc_core.LogMtd.trace_method_result(
-            self._module, self._result, ' is completed'
+            self._module, self._result+' is completed'
         )
 
 
@@ -584,7 +584,7 @@ class CommandMonitor(object):
         w.set_window_title(label)
         #
         status_button = w.get_status_button()
-        c_t = bsc_core.PrcCmdThread_(command)
+        c_t = bsc_core.TrdCmdProcess_(command)
         status_button.set_statuses([c_t.get_status()])
         status_button.set_initialization(1)
         c_t.status_changed.set_connect_to(lambda x: w.set_status_at(0, x))

@@ -118,6 +118,11 @@ def __execute_hook(option):
         _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
         if _:
             environs_extend['PAPER_EXTEND_RESOURCES'] = (_, 'prepend')
+        #
+        hook_environs_extend = session.get_environs_extend()
+        if hook_environs_extend:
+            for k, v in hook_environs_extend:
+                environs_extend[k] = v
         # run command by subprocess
         utl_core.SubProcessRunner.set_run_with_result_use_thread(
             opt_cmd, environs_extend=environs_extend

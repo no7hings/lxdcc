@@ -13,7 +13,7 @@ central:
     groups:
         Utility(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 layout_selected:
@@ -26,7 +26,7 @@ central:
                     click_method: set_selected_layout
         scene:
             name: Scene(s)
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 create_system_workspace:
@@ -65,7 +65,7 @@ central:
                     click_method: set_dcc_workspace_load
         geometry:
             name: Geometry(s)
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 import_work_set_usd:
@@ -87,7 +87,7 @@ central:
                     click_method: set_set_usd_import
         look:
             name: Look(s)
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 create_material:
@@ -190,7 +190,7 @@ central:
         #
         Texture(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Load Texture-tx(s):
@@ -215,7 +215,7 @@ central:
                     click_command: 'import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
         Light(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 load_light_rig:
@@ -229,7 +229,7 @@ central:
                     click_method: set_light_rig_import
         td:
             name: TD(s)
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 method_runner_panel:

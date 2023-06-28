@@ -489,12 +489,12 @@ class SubProcessRunner(object):
     def __init__(self):
         pass
     @classmethod
-    def set_run_with_result(cls, cmd, **sub_progress_kwargs):
+    def execute_with_result(cls, cmd, **sub_progress_kwargs):
         bsc_core.LogMtd.trace_method_result(
             'sub-process',
             'start for: `{}`'.format(cmd.decode('utf-8'))
         )
-        bsc_core.SubProcessMtd.set_run_with_result(
+        bsc_core.SubProcessMtd.execute_with_result(
             cmd, **sub_progress_kwargs
         )
         bsc_core.LogMtd.trace_method_result(
@@ -524,7 +524,7 @@ class SubProcessRunner(object):
     def set_run_with_result_use_thread(cls, cmd, **sub_progress_kwargs):
         t_0 = threading.Thread(
             target=functools.partial(
-                cls.set_run_with_result,
+                cls.execute_with_result,
                 cmd=cmd,
                 **sub_progress_kwargs
             )
@@ -1026,7 +1026,7 @@ class AppLauncher(object):
     # run methods
     @classmethod
     def _set_run_with_result_as_rez_(cls, *run_args, **sub_progress_kwargs):
-        SubProcessRunner.set_run_with_result(
+        SubProcessRunner.execute_with_result(
             ' '.join(['rez-env'] + list(run_args)),
             **sub_progress_kwargs
         )
@@ -1590,73 +1590,84 @@ class UsdViewLauncher(object):
 class History(object):
     MAXIMUM = 20
     FILE_PATH = bsc_core.StgUserMtd.get_user_history_file()
+    CACHE = None
     @classmethod
-    def append(cls, key, value):
-        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
+    def pre_run(cls):
+        f_o = cls.get_file_opt()
         if f_o.get_is_exists() is False:
             bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
-        #
+    @classmethod
+    def get_file_opt(cls):
+        return bsc_core.StgPathOpt(cls.FILE_PATH)
+    @classmethod
+    def get_content(cls):
+        if cls.CACHE is not None:
+            return cls.CACHE
+        cls.CACHE = bsc_objects.Content(
+            value=cls.FILE_PATH
+        )
+        return cls.CACHE
+    @classmethod
+    def set_one(cls, key, value):
+        cls.pre_run()
+        f_o = cls.get_file_opt()
         if f_o.get_is_exists() is True:
-            configure = bsc_objects.Configure(
-                value=f_o.path
-            )
-            values_exists = configure.get(key) or []
+            c = cls.get_content()
+            c.set(key, value)
+            c.set_save_to(cls.FILE_PATH)
+    @classmethod
+    def get_one(cls, key):
+        cls.pre_run()
+        f_o = cls.get_file_opt()
+        if f_o.get_is_exists() is True:
+            c = cls.get_content()
+            return c.get(key)
+    @classmethod
+    def append(cls, key, value):
+        cls.pre_run()
+        f_o = cls.get_file_opt()
+        if f_o.get_is_exists() is True:
+            c = cls.get_content()
+            values_exists = c.get(key) or []
             # move end
             if value in values_exists:
                 values_exists.remove(value)
             values_exists.append(value)
             #
             values_exists = values_exists[-cls.MAXIMUM:]
-            configure.set(key, values_exists)
-            configure.set_save_to(cls.FILE_PATH)
+            c.set(key, values_exists)
+            c.set_save_to(cls.FILE_PATH)
             return True
         return False
     @classmethod
-    def set_extend(cls, key, values):
-        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
-        if f_o.get_is_exists() is False:
-            bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
-                {}
-            )
+    def extend(cls, key, values):
+        cls.pre_run()
         #
+        f_o = cls.get_file_opt()
         if f_o.get_is_exists() is True:
-            configure = bsc_objects.Configure(
-                value=f_o.path
-            )
-            values_exists = configure.get(key) or []
+            c = cls.get_content()
+            values_exists = c.get(key) or []
             for i_value in values:
                 if i_value not in values_exists:
-                    #
                     values_exists.append(i_value)
             #
             values_exists = values_exists[-cls.MAXIMUM:]
-            configure.set(key, values_exists)
-            configure.set_save_to(cls.FILE_PATH)
+            c.set(key, values_exists)
+            c.set_save_to(cls.FILE_PATH)
             return True
         return False
     @classmethod
-    def get(cls, key):
-        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
-        if f_o.get_is_exists() is False:
-            bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
-                {}
-            )
-            return []
-        #
-        configure = bsc_objects.Configure(
-            value=f_o.path
-        )
-        return configure.get(key) or []
+    def get_all(cls, key):
+        c = cls.get_content()
+        return c.get(key) or []
     @classmethod
     def get_latest(cls, key):
-        f_o = bsc_core.StgPathOpt(cls.FILE_PATH)
+        f_o = cls.get_file_opt()
         if f_o.get_is_exists() is True:
-            configure = bsc_objects.Configure(
-                value=f_o.path
-            )
-            _ = configure.get(key) or []
+            c = cls.get_content()
+            _ = c.get(key)
             if _:
                 return _[-1]
 
@@ -1852,18 +1863,18 @@ if __name__ == '__main__':
     #         '/l/temp/td/dongchangbao/plug/maya/lynxinode/plug-ins/lxConvertNode.py'
     #     )
     # print(a)
-    c = Jinja.get_configure(
+    c_ = Jinja.get_configure(
         'test/test'
     )
     t = Jinja.get_template(
         'test/test'
     )
     print(
-        c
+        c_
     )
     print(
         t.render(
-            **c.get_value()
+            **c_.get_value()
         )
     )
     print(

@@ -45,6 +45,7 @@ class Status(enum.IntEnum):
 
 
 class ShowStatus(enum.IntEnum):
+    Unknown = -1
     Started = 0
     Loading = 1
     Waiting = 2
@@ -52,6 +53,7 @@ class ShowStatus(enum.IntEnum):
     Completed = 4
     Failed = 5
     Stopped = 6
+    Killed = 7
 
 
 class ValidatorStatus(enum.IntEnum):

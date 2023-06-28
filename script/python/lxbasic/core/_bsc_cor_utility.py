@@ -245,6 +245,20 @@ class SystemMtd(TimeMtd):
             return os.environ.get('HOME')
         else:
             raise SystemError()
+    @classmethod
+    def get_environment(cls):
+        dict_ = {}
+        file_path = '{}/.lynxi/environment.txt'.format(cls.get_home_directory())
+        if os.path.isfile(file_path) is True:
+            with open(file_path) as f:
+                raw = f.read()
+                f.close()
+                if raw:
+                    for i in raw.split('\n'):
+                        if i:
+                            i_k, i_v = i.split('=', 1)
+                            dict_[i_k] = i_v
+        return dict_
     #
     @classmethod
     def get_system_includes(cls, system_keys):

@@ -156,7 +156,7 @@ class VdoFileOpt(object):
                 ]
                 #
                 if block is True:
-                    _bsc_cor_process.SubProcessMtd.set_run_with_result(
+                    _bsc_cor_process.SubProcessMtd.execute_with_result(
                         ' '.join(cmd_args)
                     )
                 else:
@@ -201,7 +201,7 @@ class VdoFileOpt(object):
             ]
             cmd = ' '.join(cmd_args)
             if block is True:
-                _bsc_cor_process.SubProcessMtd.set_run_with_result(
+                _bsc_cor_process.SubProcessMtd.execute_with_result(
                     cmd
                 )
             else:
@@ -219,7 +219,7 @@ class VdoFileOpt(object):
                 user=SystemMtd.get_user_name()
             )
         )
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             cmd
         )
 
@@ -229,7 +229,7 @@ class VdoFileOpt(object):
             u'-i "{}"'.format(self.path),
         ]
         cmd = ' '.join(cmd_args)
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             cmd
         )
 
@@ -660,7 +660,7 @@ class VdoRvioOpt(object):
             # maximum = 2048?
             # '-resize {width}x0'
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**self._option)
         )
 
@@ -676,7 +676,7 @@ class VdoRvioOpt(object):
             '-outparams timecode={start_frame}',
             '-quality {quality}',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**self._option)
         )
 
@@ -692,6 +692,6 @@ class VdoRvioOpt(object):
             '-quality {quality}',
             '-copyright "©2013-2022 Papergames. All rights reserved."'
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**self._option)
         )

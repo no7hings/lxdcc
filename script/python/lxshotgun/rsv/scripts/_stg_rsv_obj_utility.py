@@ -309,7 +309,7 @@ class RsvStgTaskOpt(object):
                 bsc_etr_methods.EtrBase.send_feishu(
                     addresses=mail_addresses,
                     receivers=message_receivers,
-                    # addresses=['dongchangbao'],
+                    # receivers=['dongchangbao'],
                     subject=subject,
                     content=content
                 )

@@ -92,7 +92,7 @@ class AbsJobSender(object):
         if self._shell_command is not None:
             from lxutil import utl_core
             if with_result is True:
-                utl_core.SubProcessRunner.set_run_with_result(self._shell_command)
+                utl_core.SubProcessRunner.execute_with_result(self._shell_command)
             else:
                 utl_core.SubProcessRunner.set_run(self._shell_command)
 
@@ -189,7 +189,7 @@ class AbsJobSender2(object):
         if self._shell_command is not None:
             from lxutil import utl_core
             if with_result is True:
-                utl_core.SubProcessRunner.set_run_with_result(self._shell_command)
+                utl_core.SubProcessRunner.execute_with_result(self._shell_command)
             else:
                 utl_core.SubProcessRunner.set_run(self._shell_command)
 

@@ -30,7 +30,7 @@ class ImgFileOpt(object):
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
                 ]
-                _bsc_cor_process.SubProcessMtd.set_run_with_result(
+                _bsc_cor_process.SubProcessMtd.execute_with_result(
                     ' '.join(cmd_args)
                 )
         return thumbnail_file_path
@@ -80,7 +80,7 @@ class ImgFileOpt(object):
                 u'-o "{}"'.format(jpg_file_path),
             ]
             if block is True:
-                _bsc_cor_process.SubProcessMtd.set_run_with_result(
+                _bsc_cor_process.SubProcessMtd.execute_with_result(
                     ' '.join(cmd_args)
                 )
                 return True
@@ -136,7 +136,7 @@ class ImgFileOpt(object):
                 '--threads 1',
                 u'-o "{}"'.format(file_opt_tgt.path),
             ]
-            _bsc_cor_process.SubProcessMtd.set_run_with_result(
+            _bsc_cor_process.SubProcessMtd.execute_with_result(
                 ' '.join(cmd_args)
             )
     @classmethod
@@ -157,7 +157,7 @@ class ImgFileOpt(object):
             '--threads 1',
             u'-o "{output}"',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
 
@@ -176,7 +176,7 @@ class ImgOiioMtd(object):
             '--fit {size}',
             u'-o "{output}"',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
@@ -193,7 +193,7 @@ class ImgOiioMtd(object):
             # u'-i "{}"'.format(file_path_src),
             u'-o "{output}"',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
@@ -211,7 +211,7 @@ class ImgOiioMtd(object):
             '--over',
             u'-o "{output}"',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
@@ -269,7 +269,7 @@ class ImgOiioMtd(object):
             u'-o "{output}"',
         ]
         # print ' '.join(cmd_args).format(**option)
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
@@ -327,7 +327,7 @@ class ImgOiioMtd(object):
             u'-o "{output}"',
         ]
         # print ' '.join(cmd_args).format(**option)
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
@@ -342,7 +342,7 @@ class ImgOiioMtd(object):
             '--ch R,G,B,A=1.0',
             u'-o "{output}"',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
     @classmethod
@@ -362,7 +362,7 @@ class ImgOiioMtd(object):
             '--colorconvert "{from_color_space}" "{to_color_space}"',
             u'-o "{output}"',
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
 

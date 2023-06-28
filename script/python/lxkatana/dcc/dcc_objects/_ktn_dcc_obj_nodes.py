@@ -93,7 +93,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
                 dic[k] = nme_objs[0]
         return dic
     @classmethod
-    def _set_pre_run_(cls):
+    def pre_run_fnc(cls):
         _ = NodegraphAPI.GetAllNodesByType('NetworkMaterialEdit') or []
         if _:
             gp = utl_core.GuiProgressesRunner(maximum=len(_))
@@ -137,7 +137,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
                 lis.append(i)
         return lis
     @classmethod
-    def _set_pre_run_(cls):
+    def pre_run_fnc(cls):
         _ = NodegraphAPI.GetAllNodesByType('NetworkMaterialEdit') or []
         if _:
             for i_ktn_obj in _:

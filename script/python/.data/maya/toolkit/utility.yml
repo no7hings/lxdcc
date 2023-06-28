@@ -8,7 +8,7 @@ central:
     groups:
         Geometry(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Open Database-geometry Manager Panel:
@@ -23,7 +23,7 @@ central:
                     click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.PnlHashGeometry().set_window_show()'
         Texture(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Load Texture-tx(s):
@@ -67,7 +67,7 @@ central:
                     click_method: set_texture_tiles_preview_generate
         Light(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 load_light_rig:

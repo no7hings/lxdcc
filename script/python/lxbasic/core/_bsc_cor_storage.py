@@ -553,7 +553,7 @@ class StgExtraMtd(object):
 
         t_0 = threading.Thread(
             target=functools.partial(
-                _bsc_cor_process.SubProcessMtd.set_run_with_result, cmd
+                _bsc_cor_process.SubProcessMtd.execute_with_result, cmd
             )
         )
         t_0.start()
@@ -1547,7 +1547,7 @@ class StgTmpInfoMtd(object):
 class StgPathPermissionDefaultMtd(object):
     @classmethod
     def create_directory(cls, path, mode):
-        StgPathMtd.create_directory(path, mode)
+        StgPathMtd.create_directory(path)
     @classmethod
     def change_mode(cls, path, mode):
         pass

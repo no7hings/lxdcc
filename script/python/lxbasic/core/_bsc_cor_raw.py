@@ -582,7 +582,12 @@ class RawTextMtd(object):
     def split_to(cls, text):
         if isinstance(text, six.text_type):
             text = text.encode('utf-8')
-        return re.compile(r'[;,/\s]\s*').split(text)
+        return re.compile(r'[;,/\-\s]\s*').split(text)
+    @classmethod
+    def find_words(cls, text):
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        return re.findall(r'\b[A-Za-z]+\b', text)
 
 
 class RawTextOpt(object):

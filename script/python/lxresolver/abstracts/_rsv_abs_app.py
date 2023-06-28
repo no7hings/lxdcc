@@ -164,17 +164,23 @@ class AbsRsvAppDef(object):
         )
         if cmd:
             bsc_core.LogMtd.trace_method_result(
-                'execute app command',
+                'execute app',
                 'command=`{}` is started'.format(cmd)
             )
-            bsc_core.SubProcessMtd.set_run_with_result(cmd, **sub_progress_kwargs)
+            bsc_core.SubProcessMtd.execute_with_result(
+                cmd,
+                **sub_progress_kwargs
+            )
     @classmethod
     def execute_with_result(cls, command, **sub_progress_kwargs):
         bsc_core.LogMtd.trace_method_result(
-            'execute app command',
+            'execute app',
             'command=`{}` is started'.format(command)
         )
-        bsc_core.SubProcessMtd.set_run_with_result(command, **sub_progress_kwargs)
+        bsc_core.SubProcessMtd.execute_with_result(
+            command,
+            **sub_progress_kwargs
+        )
     @classmethod
     def execute_with_result_use_thread(cls, command, **sub_progress_kwargs):
         t_0 = threading.Thread(

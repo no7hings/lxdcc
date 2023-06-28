@@ -8,7 +8,7 @@ central:
     groups:
         Scene(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Import Model Scene:
@@ -26,7 +26,7 @@ central:
                     click_command: ''
         Geometry(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Import Model Geometry:
@@ -86,7 +86,7 @@ central:
                     click_command: ''
         Look(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Import Surface Look:
@@ -130,7 +130,7 @@ central:
                     click_command: ''
         Texture(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Load Texture-tx(s):
@@ -155,7 +155,7 @@ central:
                     click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
         Light(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 load_light_rig:
@@ -169,7 +169,7 @@ central:
                     click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; from lxutil import utl_core; mya_dcc_objects.Scene.set_file_reference(utl_core.Path.map_to_current("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma"))'
         TD(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Open Asset Comparer-panel:

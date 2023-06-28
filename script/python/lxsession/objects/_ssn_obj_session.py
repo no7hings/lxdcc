@@ -80,3 +80,8 @@ class RsvUnitActionSession(ssn_abstracts.AbsSsnRsvUnitAction):
 class ApplicationSession(ssn_abstracts.AbsApplicationSession):
     def __init__(self, *args, **kwargs):
         super(ApplicationSession, self).__init__(*args, **kwargs)
+
+
+class CommandSession(ssn_abstracts.AbsCommandSession):
+    def __init__(self, *args, **kwargs):
+        super(CommandSession, self).__init__(*args, **kwargs)

@@ -20,8 +20,8 @@ class SubProcessMtd(object):
     def get_environs(cls, **kwargs):
         environs_extend = kwargs.get('environs_extend', {})
         if environs_extend:
-            environs = dict(os.environ)
-            environs = {str(k): str(v) for k, v in environs.items()}
+            environs_old = dict(os.environ)
+            environs = {str(k): str(v) for k, v in environs_old.items()}
             env_opt = _bsc_cor_environ.EnvironsOpt(environs)
             for k, v in environs_extend.items():
                 if isinstance(v, six.string_types):
@@ -60,6 +60,11 @@ class SubProcessMtd(object):
                         )
             return environs
     @classmethod
+    def get_clear_environs(cls, keys_exclude):
+        environs_old = dict(os.environ)
+        environs = {k: v for k, v in environs_old.items() if k not in keys_exclude}
+        return environs
+    @classmethod
     def check_command_clear_environ(cls, cmd):
         # todo, read form configure?
         if fnmatch.filter(
@@ -84,7 +89,7 @@ class SubProcessMtd(object):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 startupinfo=cls.NO_WINDOW,
-                env=dict()
+                env=SystemMtd.get_environment()
             )
         else:
             environs_extend = kwargs.get('environs_extend', {})
@@ -193,7 +198,7 @@ class SubProcessMtd(object):
         #
         s_p.stdout.close()
     @classmethod
-    def set_run_with_result(cls, cmd, **kwargs):
+    def execute_with_result(cls, cmd, **kwargs):
         if SystemMtd.get_is_windows():
             cls.execute_with_result_in_windows(cmd, **kwargs)
         elif SystemMtd.get_is_linux():
@@ -213,7 +218,7 @@ class SubProcessMtd(object):
     def set_run_with_result_use_thread(cls, cmd):
         t_0 = threading.Thread(
             target=functools.partial(
-                cls.set_run_with_result,
+                cls.execute_with_result,
                 cmd=cmd
             )
         )

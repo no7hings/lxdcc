@@ -8,7 +8,7 @@ central:
     groups:
         Unused(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             #
             items:
@@ -93,7 +93,7 @@ central:
         #
         Unknown(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Plug-in(s):
@@ -125,7 +125,7 @@ central:
         #
         Unload(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Reference(s):

@@ -74,7 +74,7 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
         output_opt = bsc_core.StgFileOpt(output)
         output_opt.create_directory()
         default_kwargs['output'] = output
-        bsc_core.SubProcessMtd.set_run_with_result(
+        bsc_core.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**default_kwargs)
         )
 

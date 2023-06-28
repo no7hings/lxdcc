@@ -138,7 +138,7 @@ class HoudiniXmlMenu(HoudiniXml):
         self._children.append(action)
         return action
 
-    def set_menu_add(self, key):
+    def create_menu(self, key):
         menu = self.__class__(key, True)
         self._children.append(menu)
         return menu
@@ -184,7 +184,7 @@ class HoudiniXmlMainMenuBar(HoudiniXml):
     def menus(self):
         return self._menus
 
-    def set_menu_add(self, name):
+    def create_menu(self, name):
         menu = self.MENU_CLS(name)
         self._menus.append(menu)
         return menu
@@ -225,8 +225,8 @@ class HoudiniSetupCreator(object):
         self._file_path = file_path
 
     def set_main_menu_xml_create(self):
-        def set_menu_add_fnc_(tool_config_, seq):
-            _menu = self._menu_bar.set_menu_add('tool_menu_{}'.format(seq))
+        def create_menu_fnc_(tool_config_, seq):
+            _menu = self._menu_bar.create_menu('tool_menu_{}'.format(seq))
             _menu.name = tool_config_.get('menu.name')
             _tools = tool_config_.get('menu.tools')
             for _i_key in _tools:
@@ -236,7 +236,7 @@ class HoudiniSetupCreator(object):
                     _i_name = tool_config_.get('tool.{}.name'.format(_i_key))
                     _i_children = tool_config_.get('tool.{}.items'.format(_i_key))
                     if _i_children:
-                        _i_menu = _menu.set_menu_add(_i_key)
+                        _i_menu = _menu.create_menu(_i_key)
                         _i_menu.name = _i_name
                         for _j_key in _i_children:
                             if _j_key == 'separator':
@@ -259,7 +259,7 @@ class HoudiniSetupCreator(object):
         #
         configure_file_path = utl_configure.MainData.get_configure_file('houdini/menu/main')
         configure = bsc_objects.Configure(value=configure_file_path)
-        set_menu_add_fnc_(configure, 0)
+        create_menu_fnc_(configure, 0)
         #
         main_menu_xml_file = '{}/MainMenuCommon.xml'.format(self._file_path)
         self.set_file_write(main_menu_xml_file, self._menu_bar.__str__())

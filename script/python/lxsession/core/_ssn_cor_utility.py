@@ -57,14 +57,24 @@ class SsnHookEngineMtd(object):
 class SsnHookFileMtd(object):
     BRANCH = 'hooks'
     @classmethod
-    def get_python(cls, key):
+    def get_python(cls, key, search_paths=None):
         return bsc_core.RscFileMtd.get(
-            '{}/{}.py'.format(cls.BRANCH, key)
+            '{}/{}.py'.format(cls.BRANCH, key), search_paths
         )
     @classmethod
-    def get_yaml(cls, key):
+    def get_shell(cls, key, search_paths=None):
+        if bsc_core.PlatformMtd.get_is_linux():
+            return bsc_core.RscFileMtd.get(
+                '{}/{}.sh'.format(cls.BRANCH, key), search_paths
+            )
+        elif bsc_core.PlatformMtd.get_is_windows():
+            return bsc_core.RscFileMtd.get(
+                '{}/{}.bat'.format(cls.BRANCH, key), search_paths
+            )
+    @classmethod
+    def get_yaml(cls, key, search_paths=None):
         return bsc_core.RscFileMtd.get(
-            '{}/{}.yml'.format(cls.BRANCH, key)
+            '{}/{}.yml'.format(cls.BRANCH, key), search_paths
         )
     @classmethod
     def get_command(cls, key):

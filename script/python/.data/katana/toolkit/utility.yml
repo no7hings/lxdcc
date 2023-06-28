@@ -8,7 +8,7 @@ central:
     groups:
         scene:
             name: Scene(s)
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Create Dcc-workspace:
@@ -22,7 +22,7 @@ central:
         #
         texture:
             name: Texture(s)
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Load Texture-tx(s):

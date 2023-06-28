@@ -1036,7 +1036,7 @@ class AbsOsTexture(
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
         )
-        bsc_core.SubProcessMtd.set_run_with_result(
+        bsc_core.SubProcessMtd.execute_with_result(
             cmd
         )
     @classmethod
@@ -1063,7 +1063,7 @@ class AbsOsTexture(
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
         )
-        bsc_core.SubProcessMtd.set_run_with_result(cmd)
+        bsc_core.SubProcessMtd.execute_with_result(cmd)
     @classmethod
     def _get_unit_tx_create_cmd_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
         from lxarnold import and_core
@@ -1084,7 +1084,7 @@ class AbsOsTexture(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt
         )
-        bsc_core.SubProcessMtd.set_run_with_result(cmd)
+        bsc_core.SubProcessMtd.execute_with_result(cmd)
     # find path source use multipy path
     @classmethod
     def _get_path_src_as_ext_tgt_(cls, file_path_any, ext_tgt, search_directory_path=None):

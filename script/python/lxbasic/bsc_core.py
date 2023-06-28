@@ -72,3 +72,4 @@ if __name__ == '__main__':
     # print RscFileMtd.get(
     #     'asset/library/geometry_sphere.usda'
     # )
+    print SystemMtd.get_environment()

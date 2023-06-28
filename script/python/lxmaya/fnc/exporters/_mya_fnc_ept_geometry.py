@@ -407,7 +407,7 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionBase):
         self._camera_shape_paths = g.get_all_shape_paths(include_obj_type='camera')
         self._camera_transform_paths = map(lambda x: mya_dcc_objects.Shape(x).transform.path, self._camera_shape_paths)
 
-    def _set_pre_run_(self):
+    def pre_run_fnc(self):
         for i in self._camera_shape_paths:
             i_camera_shape = mya_dcc_objects.Shape(i)
             i_camera_shape.get_port('overscan').set(1)
@@ -422,7 +422,7 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionBase):
             )
 
     def set_run(self):
-        self._set_pre_run_()
+        self.pre_run_fnc()
         option = self.get_option()
         GeometryAbcExporter(
             file_path=option.get('file'),

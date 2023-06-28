@@ -54,7 +54,7 @@ class ImgFileOpt(object):
                     )
                 ]
             #
-            utl_core.SubProcessRunner.set_run_with_result(
+            utl_core.SubProcessRunner.execute_with_result(
                 ' '.join(arguments)
             )
             utl_core.Log.set_module_result_trace(
@@ -72,7 +72,7 @@ class ImgFileOpt(object):
             arguments = [self._rv_ls_path]
             if self._obj.get_is_exists() is True:
                 arguments += ['-x', '"{}"'.format(self._obj.path)]
-                utl_core.SubProcessRunner.set_run_with_result(
+                utl_core.SubProcessRunner.execute_with_result(
                     ' '.join(arguments)
                 )
 

@@ -1,6 +1,10 @@
 # coding:utf-8
 import fnmatch
 
+import os
+
+import subprocess
+
 from lxbasic import bsc_configure, bsc_core
 
 import lxbasic.objects as bsc_objects
@@ -16,29 +20,39 @@ import lxshotgun.objects as stg_objects
 import lxdatabase.objects as dtb_objects
 
 
-class AbsSsnGuiDef(object):
+class AbsSsnConfigureBaseDef(object):
     @property
     def configure(self):
         raise NotImplementedError()
 
-    def _set_gui_def_init_(self):
+    def _init_configure_base_def_(self):
+        self._basic_configure = self.configure.get_content(
+            'option'
+        )
         self._gui_configure = self.configure.get_content(
             'option.gui'
         )
 
+    def get_basic_configure(self):
+        return self._basic_configure
+    basic_configure = property(get_basic_configure)
+
     def get_gui_configure(self):
         return self._gui_configure
     gui_configure = property(get_gui_configure)
+
     @property
     def gui_group_name(self):
         return self._gui_configure.get(
             'group_name'
         )
-    @property
-    def gui_name(self):
+
+    def get_gui_name(self):
         return self._gui_configure.get(
             'name'
         )
+    gui_name = property(get_gui_name)
+
     @property
     def gui_icon_name(self):
         return self._gui_configure.get(
@@ -63,7 +77,7 @@ class AbsSsnRezDef(object):
 
 class AbsSsnObj(
     AbsSsnRezDef,
-    AbsSsnGuiDef,
+    AbsSsnConfigureBaseDef,
 ):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
@@ -113,11 +127,12 @@ class AbsSsnObj(
         self._variants['platform'] = self._platform
         self._variants['application'] = self._application
         #
-        self._hook_python_file = None
-        self._hook_yaml_file = None
+        self._hook_yaml_file_path = None
+        self._hook_python_file_path = None
+        self._hook_shell_file_path = None
 
         self._set_rez_def_init_()
-        self._set_gui_def_init_()
+        self._init_configure_base_def_()
 
     def get_type(self):
         return self._type
@@ -135,6 +150,7 @@ class AbsSsnObj(
 
     def get_group(self):
         return self.get_type()
+    group = property(get_group)
 
     def get_configure(self):
         return self._configure
@@ -142,12 +158,6 @@ class AbsSsnObj(
 
     def reload_configure(self):
         self._configure.set_reload()
-    @property
-    def gui_configure(self):
-        return self._configure.get_content('option.gui')
-    @property
-    def utl_gui_configure(self):
-        return self._configure.get_content('option.gui')
     #
     def get_platform(self):
         return self._platform
@@ -159,6 +169,7 @@ class AbsSsnObj(
 
     def get_user(self):
         return self._user
+    user = property(get_user)
     @property
     def system(self):
         return self._system
@@ -178,22 +189,23 @@ class AbsSsnObj(
     def set_run(self):
         if self.get_is_loadable():
             if self.get_is_executable():
-                self._set_pre_run_()
-                self.set_execute()
-                self._set_post_run_()
+                self.pre_run_fnc()
+                self.execute()
+                self.post_run_fnc()
 
-    def _set_pre_run_(self):
+    def pre_run_fnc(self):
         pass
 
-    def set_execute(self):
-        self._set_file_execute_(
-            self._hook_python_file, dict(session=self)
-        )
+    def execute(self):
+        if self._hook_python_file_path:
+            self.execute_python_file_fnc(
+                self._hook_python_file_path, session=self
+            )
 
-    def _set_post_run_(self):
+    def post_run_fnc(self):
         pass
 
-    def _set_debug_run_(self):
+    def execute_use_debug(self):
         try:
             self.set_run()
         except Exception:
@@ -201,11 +213,10 @@ class AbsSsnObj(
             utl_core.ExceptionCatcher.set_create()
             raise
     @staticmethod
-    def _set_file_execute_(file_path, kwargs):
+    def execute_python_file_fnc(file_path, **kwargs):
         # use for python 3
         # with open(file_path, 'r') as f:
         #     exec (f.read())
-        #
         # use for python 2
         bsc_core.LogMtd.trace_method_result(
             'option-hook', 'start for : "{}"'.format(
@@ -215,10 +226,56 @@ class AbsSsnObj(
         kwargs['__name__'] = '__main__'
         execfile(file_path, kwargs)
         bsc_core.LogMtd.trace_method_result(
-            'option-hook', 'for: "{}"'.format(
+            'option-hook', 'complete for: "{}"'.format(
                 file_path
             )
         )
+    @staticmethod
+    def execute_python_command(cmd, **kwargs):
+        # noinspection PyUnusedLocal
+        session = kwargs['session']
+        exec cmd
+    @staticmethod
+    def execute_shell_file_fnc(file_path, **kwargs):
+        bsc_core.LogMtd.trace_method_result(
+            'option-hook', 'start for : "{}"'.format(
+                file_path
+            )
+        )
+        session = kwargs['session']
+        if bsc_core.PlatformMtd.get_is_linux():
+            # cmds = ['bash', '-l', '-c', file_path]
+            cmds = ['gnome-terminal', '-t', '"{}"'.format(session.gui_configure.get('name')), '--', 'bash', '-l', '"{}"'.format(file_path)]
+            # subprocess.Popen(
+            #     cmds,
+            #     shell=False,
+            #     # env=dict(),
+            # )
+            bsc_core.SubProcessMtd.execute_as_block(
+                ' '.join(cmds)
+            )
+        elif bsc_core.PlatformMtd.get_is_windows():
+            cmds = ['start', 'cmd',  '/k', file_path]
+            subprocess.Popen(
+                cmds,
+                shell=True,
+                # env=dict()
+            )
+        bsc_core.LogMtd.trace_method_result(
+            'option-hook', 'complete for: "{}"'.format(
+                file_path
+            )
+        )
+    @classmethod
+    def execute_shell_command(cls, cmd, **kwargs):
+        session = kwargs['session']
+        if bsc_core.PlatformMtd.get_is_linux():
+            # cmds = ['bash', '-l', '-c', file_path]
+            cmds = ['gnome-terminal', '-t', session.gui_configure.get('name'), '--', 'bash', '-l', '-c', cmd]
+            subprocess.Popen(cmds, shell=False)
+        elif bsc_core.PlatformMtd.get_is_windows():
+            cmds = ['start', 'cmd', '/k', cmd]
+            subprocess.Popen(cmds, shell=True)
 
     def get_is_system_matched(self, system_key):
         return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
@@ -234,27 +291,49 @@ class AbsSsnObj(
     def set_execute_fnc(self, fnc):
         pass
 
-    def set_hook_python_file(self, file_path):
-        self._hook_python_file = file_path
+    def set_configure_yaml_file(self, file_path):
+        self._hook_yaml_file_path = file_path
 
-    def get_hook_python_file(self):
-        return self._hook_python_file
+    def get_configure_yaml_file(self):
+        return self._hook_yaml_file_path
 
-    def set_hook_yaml_file(self, file_path):
-        self._hook_yaml_file = file_path
+    def set_python_script_file(self, file_path):
+        self._hook_python_file_path = file_path
 
-    def get_hook_yaml_file(self):
-        return self._hook_yaml_file
+    def get_python_script_file(self):
+        return self._hook_python_file_path
 
-    def set_hook_python_file_open(self):
-        bsc_etr_methods.EtrBase.open_ide(
-            self._hook_python_file
-        )
+    def get_python_script(self):
+        if self._hook_python_file_path:
+            return bsc_core.StgFileOpt(self._hook_python_file_path).set_read()
 
-    def set_hook_yaml_file_open(self):
-        bsc_etr_methods.EtrBase.open_ide(
-            self._hook_yaml_file
-        )
+    def set_shell_script_file(self, file_path):
+        self._hook_shell_file_path = file_path
+
+    def get_shell_script_file(self):
+        return self._hook_shell_file_path
+
+    def get_shell_script(self):
+        pass
+
+    def open_configure_file(self):
+        if self._hook_yaml_file_path:
+            bsc_etr_methods.EtrBase.open_ide(
+                self._hook_yaml_file_path
+            )
+
+    def open_configure_directory(self):
+        if self._hook_yaml_file_path:
+            bsc_core.StgFileOpt(self._hook_yaml_file_path).set_open_in_system()
+
+    def open_python_script_file(self):
+        if self._hook_python_file_path:
+            bsc_etr_methods.EtrBase.open_ide(
+                self._hook_python_file_path
+            )
+
+    def open_execute_file(self):
+        pass
 
     def set_reload(self):
         self._configure.set_reload()
@@ -273,6 +352,11 @@ class AbsSsnObj(
     def get_packages_extend(self):
         return self._configure.get(
             'hook_option.rez.extend_packages'
+        ) or []
+
+    def get_environs_extend(self):
+        return self._configure.get(
+            'hook_option.rez.extend_environs'
         ) or []
 
     def get_is_match_condition(self, match_dict):
@@ -475,7 +559,7 @@ class AbsSsnOptionExecuteDef(object):
         executor = self.get_executor()
         executor.set_run_with_shell(block)
 
-    def get_execute_shell_command(self):
+    def get_shell_script_command(self):
         return self.get_executor().get_shell_command()
 
 
@@ -651,7 +735,7 @@ class AbsSsnShellExecuteDef(object):
     def set_execute_by_shell(self, block=False):
         self.get_executor().set_run_with_shell(block)
 
-    def get_execute_shell_command(self):
+    def get_shell_script_command(self):
         return self.get_executor().get_shell_command()
 
     def __set_execute_option_completion_(self):
@@ -662,7 +746,7 @@ class AbsSsnShellExecuteDef(object):
         if rez_extend_packages:
             self.option_opt.set('rez_extend_packages', rez_extend_packages)
         #
-        rez_add_environs = self.configure.get('hook_option.rez.add_environ') or []
+        rez_add_environs = self.configure.get('hook_option.rez.add_environs') or []
 
 
 class AbsSsnOptionToolPanel(
@@ -1263,6 +1347,29 @@ class AbsOptionRsvTaskBatcherSession(
 class AbsApplicationSession(AbsSsnObj):
     def __init__(self, *args, **kwargs):
         super(AbsApplicationSession, self).__init__(*args, **kwargs)
+
+
+class AbsCommandSession(AbsSsnObj):
+    def __init__(self, *args, **kwargs):
+        super(AbsCommandSession, self).__init__(*args, **kwargs)
+
+    def execute(self):
+        type_ = self.basic_configure.get('type')
+        if type_ == 'shell-command':
+            shell_file_path = self.get_shell_script_file()
+            if shell_file_path:
+                self.execute_shell_file_fnc(shell_file_path, session=self)
+            else:
+                command = self.basic_configure.get('command')
+                if command:
+                    self.execute_shell_command(command, session=self)
+        elif type_ == 'python-command':
+            python_file_path = self.get_python_script_file()
+            if python_file_path:
+                self.execute_python_file_fnc(python_file_path, session=self)
+            else:
+                command = self.basic_configure.get('command')
+                self.execute_python_command(command, session=self)
 
 
 if __name__ == '__main__':

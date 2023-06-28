@@ -156,7 +156,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                 )
             )
 
-    def set_execute(self):
+    def execute(self):
         NodegraphAPI.UserParameters.ExecuteButton(
             self.get_ktn_obj(), self.port_path
         )
@@ -635,11 +635,11 @@ class AbsKtnObjs(utl_abstract.AbsDccObjs):
     def __init__(self, *args):
         pass
     @classmethod
-    def _set_pre_run_(cls):
+    def pre_run_fnc(cls):
         pass
     @classmethod
     def get_paths(cls, **kwargs):
-        cls._set_pre_run_()
+        cls.pre_run_fnc()
         #
         lis = []
         for i in cls.INCLUDE_DCC_TYPES:

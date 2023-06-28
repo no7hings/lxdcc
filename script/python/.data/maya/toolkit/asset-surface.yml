@@ -8,7 +8,7 @@ central:
     groups:
         Scene(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 create_system_workspace:
@@ -39,7 +39,7 @@ central:
         #
         Geometry(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Export Work Geometry UV-map (usd):
@@ -91,7 +91,7 @@ central:
         #
         Texture(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Load Texture-tx(s):
@@ -118,7 +118,7 @@ central:
         #
         Look(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 Export Work Look:
@@ -163,7 +163,7 @@ central:
         #
         Light(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 load_light_rig:
@@ -178,7 +178,7 @@ central:
         #
         TD(s):
             name: <..key>
-            type: PrxExpandedGroup
+            type: PrxHToolGroup
             path: /<...key>
             items:
                 asset_comparer:

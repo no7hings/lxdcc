@@ -7,10 +7,11 @@ import os
 
 import getopt
 
+KEY = 'lxapp'
+
 
 def main(argv):
     try:
-        sys.stdout.write('execute lxapp from: "{}"\n'.format(__file__))
         opt_kwargs_0, opt_args_0 = getopt.getopt(
             argv[1:],
             'h',
@@ -45,6 +46,12 @@ def main(argv):
 
 
 def __get_app_args(args):
+    from lxbasic import bsc_core
+    #
+    bsc_core.LogMtd.trace_method_result(
+        KEY,
+        'execute from: {}'.format(__file__)
+    )
     # etc. nsa_dev.maya
     launcher_arg = args[0]
     if '.' not in launcher_arg:
@@ -189,7 +196,8 @@ def __execute_with_option(option, args_execute=None, args_extend=None, args_task
             args_extend=args_extend,
             packages_extend=opt_packages_extend,
             #
-            environs_extend=environs_extend
+            environs_extend=environs_extend,
+            # clear_environ='auto'
         )
 
 

@@ -18,7 +18,7 @@ class OslFileMtd(object):
             Bin.get_oslc(),
             '-o "{}" "{}"'.format(compile_file_path, file_opt.path),
         ]
-        _bsc_cor_process.SubProcessMtd.set_run_with_result(' '.join(cmd_args))
+        _bsc_cor_process.SubProcessMtd.execute_with_result(' '.join(cmd_args))
     @classmethod
     def get_info(cls, file_path):
         dic = collections.OrderedDict()

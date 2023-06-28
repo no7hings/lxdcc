@@ -857,7 +857,7 @@ class AndTextureOpt_(AndImageOpt):
         )
         #
         if block is True:
-            bsc_core.SubProcessMtd.set_run_with_result(
+            bsc_core.SubProcessMtd.execute_with_result(
                 cmd
             )
             return True

@@ -25,7 +25,7 @@ elif bsc_core.EnvExtraMtd.get_scheme() == 'new':
 else:
     bsc_core.LogMtd.trace_method_result(
         'extra script',
-        'load scheme: "default"'
+        'load scheme: "new"'
     )
     from .default import *
 

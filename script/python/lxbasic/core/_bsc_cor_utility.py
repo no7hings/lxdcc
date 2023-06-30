@@ -295,6 +295,10 @@ class SystemMtd(TimeMtd):
         import grp
         return grp.getgrnam(group_name).gr_gid
     @classmethod
+    def get_group(cls, group_id):
+        import grp
+        return grp.getgrgid(group_id)
+    @classmethod
     def trace(cls, text):
         return sys.stdout.write(text+'\n')
     @classmethod

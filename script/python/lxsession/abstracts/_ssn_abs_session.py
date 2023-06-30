@@ -1,5 +1,6 @@
 # coding:utf-8
 import fnmatch
+import functools
 
 import os
 
@@ -131,6 +132,8 @@ class AbsSsnObj(
         self._hook_python_file_path = None
         self._hook_shell_file_path = None
 
+        self._gui_widget = None
+
         self._set_rez_def_init_()
         self._init_configure_base_def_()
 
@@ -198,7 +201,7 @@ class AbsSsnObj(
 
     def execute(self):
         if self._hook_python_file_path:
-            self.execute_python_file_fnc(
+            self.execute_python_file(
                 self._hook_python_file_path, session=self
             )
 
@@ -213,7 +216,7 @@ class AbsSsnObj(
             utl_core.ExceptionCatcher.set_create()
             raise
     @staticmethod
-    def execute_python_file_fnc(file_path, **kwargs):
+    def execute_python_file(file_path, **kwargs):
         # use for python 3
         # with open(file_path, 'r') as f:
         #     exec (f.read())
@@ -231,12 +234,12 @@ class AbsSsnObj(
             )
         )
     @staticmethod
-    def execute_python_command(cmd, **kwargs):
+    def execute_python_script(cmd, **kwargs):
         # noinspection PyUnusedLocal
         session = kwargs['session']
         exec cmd
     @staticmethod
-    def execute_shell_file_fnc(file_path, **kwargs):
+    def execute_shell_file_use_terminal(file_path, **kwargs):
         bsc_core.LogMtd.trace_method_result(
             'option-hook', 'start for : "{}"'.format(
                 file_path
@@ -245,13 +248,11 @@ class AbsSsnObj(
         session = kwargs['session']
         if bsc_core.PlatformMtd.get_is_linux():
             # cmds = ['bash', '-l', '-c', file_path]
-            cmds = ['gnome-terminal', '-t', '"{}"'.format(session.gui_configure.get('name')), '--', 'bash', '-l', '"{}"'.format(file_path)]
-            # subprocess.Popen(
-            #     cmds,
-            #     shell=False,
-            #     # env=dict(),
-            # )
-            bsc_core.SubProcessMtd.execute_as_block(
+            cmds = [
+                'gnome-terminal', '-t', '"{}"'.format(session.gui_configure.get('name')),
+                '-e "bash -l {}"'.format(file_path)
+            ]
+            bsc_core.SubProcessMtd.execute(
                 ' '.join(cmds)
             )
         elif bsc_core.PlatformMtd.get_is_windows():
@@ -267,15 +268,38 @@ class AbsSsnObj(
             )
         )
     @classmethod
-    def execute_shell_command(cls, cmd, **kwargs):
+    def execute_shell_script_use_terminal(cls, cmd, **kwargs):
         session = kwargs['session']
         if bsc_core.PlatformMtd.get_is_linux():
             # cmds = ['bash', '-l', '-c', file_path]
             cmds = ['gnome-terminal', '-t', session.gui_configure.get('name'), '--', 'bash', '-l', '-c', cmd]
-            subprocess.Popen(cmds, shell=False)
+            bsc_core.SubProcessMtd.execute(
+                ' '.join(cmds)
+            )
         elif bsc_core.PlatformMtd.get_is_windows():
             cmds = ['start', 'cmd', '/k', cmd]
-            subprocess.Popen(cmds, shell=True)
+            bsc_core.SubProcessMtd.execute(
+                ' '.join(cmds)
+            )
+    @classmethod
+    def execute_shell_script(cls, cmd, use_thread=True):
+        if use_thread is True:
+            bsc_core.SubProcessMtd.execute_use_thread(cmd)
+        else:
+            bsc_core.SubProcessMtd.execute(cmd)
+
+    def set_gui(self, widget):
+        self._gui_widget = widget
+
+    def gui_execute_shell_script(self, cmd):
+        if self._gui_widget is not None:
+            self._gui_widget._run_fnc_use_thread_(
+                functools.partial(
+                    bsc_core.SubProcessMtd.execute, cmd
+                )
+            )
+        else:
+            bsc_core.SubProcessMtd.execute_use_thread(cmd)
 
     def get_is_system_matched(self, system_key):
         return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
@@ -387,6 +411,15 @@ class AbsSsnObj(
                     if i_condition != i_input:
                         return False
         return True
+    @classmethod
+    def open_url(cls, url):
+        bsc_core.UrlMtd.open_in_chrome(url)
+
+    def open_file(self, path):
+        pass
+
+    def open_directory(self, path):
+        pass
 
     def __str__(self):
         return self._configure.get_str_as_yaml_style()
@@ -1358,18 +1391,18 @@ class AbsCommandSession(AbsSsnObj):
         if type_ == 'shell-command':
             shell_file_path = self.get_shell_script_file()
             if shell_file_path:
-                self.execute_shell_file_fnc(shell_file_path, session=self)
+                self.execute_shell_file_use_terminal(shell_file_path, session=self)
             else:
                 command = self.basic_configure.get('command')
                 if command:
-                    self.execute_shell_command(command, session=self)
+                    self.execute_shell_script_use_terminal(command, session=self)
         elif type_ == 'python-command':
             python_file_path = self.get_python_script_file()
             if python_file_path:
-                self.execute_python_file_fnc(python_file_path, session=self)
+                self.execute_python_file(python_file_path, session=self)
             else:
                 command = self.basic_configure.get('command')
-                self.execute_python_command(command, session=self)
+                self.execute_python_script(command, session=self)
 
 
 if __name__ == '__main__':

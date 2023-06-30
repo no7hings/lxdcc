@@ -1163,6 +1163,11 @@ class StgDirectoryOpt(StgPathOpt):
             self._path
         )
 
+    def get_directory_paths(self):
+        return StgDirectoryMtd.get_directory_paths__(
+            self._path
+        )
+
     def set_copy_to_directory(self, directory_path_tgt, replace=False):
         directory_path_src = self.path
         file_paths_src = self.get_all_file_paths()
@@ -1309,7 +1314,7 @@ class StgFileOpt(StgPathOpt):
                 )
         else:
             with open(self.path, 'w') as f:
-                f.write(raw)
+                f.write(raw.encode('utf-8'))
 
     def append(self, raw):
         with open(self.path, 'w') as f:

@@ -87,7 +87,7 @@ def set_hook_execute(key):
 
 def get_option_hook_args(option, search_paths=None):
     def execute_fnc():
-        session.execute_python_file_fnc(
+        session.execute_python_file(
             python_file_path, session=session
         )
     #

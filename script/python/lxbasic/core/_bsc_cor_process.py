@@ -14,8 +14,6 @@ class SubProcessMtd(object):
     #
     ENVIRON_MARK = copy.copy(os.environ)
     #
-    def __init__(self):
-        pass
     @classmethod
     def get_environs(cls, **kwargs):
         environs_extend = kwargs.get('environs_extend', {})
@@ -260,3 +258,32 @@ class SubProcessMtd(object):
             raise subprocess.CalledProcessError(s_p.returncode, cmd)
         s_p.wait()
         return output.decode('utf-8').splitlines()
+    @classmethod
+    def execute(cls, cmd):
+        s_p = subprocess.Popen(
+            cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=cls.NO_WINDOW,
+        )
+        #
+        output, unused_err = s_p.communicate()
+        #
+        if s_p.returncode != 0:
+            for i in output.decode('utf-8').splitlines():
+                sys.stderr.write(i+'\n')
+            raise subprocess.CalledProcessError(s_p.returncode, cmd)
+        s_p.wait()
+        return output.decode('utf-8').splitlines()
+    @classmethod
+    def execute_use_thread(cls, cmd):
+        t_0 = threading.Thread(
+            target=functools.partial(
+                cls.execute,
+                cmd=cmd
+            )
+        )
+        t_0.start()

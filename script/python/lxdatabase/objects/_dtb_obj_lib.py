@@ -83,6 +83,32 @@ class DtbBaseOpt(object):
         # storage
         Directory = 'directory'
         File = 'file'
+        All = [
+            ResourceCategoryRoot,
+            ResourceCategoryGroup,
+            ResourceCategory,
+            ResourceType,
+            # tag, use for "resource" filter, one "resource" can have one or more "tag"
+            ResourceSemanticTagGroup,
+            ResourceUserTagGroup,
+            ResourcePropertyTagGroup,
+            ResourceStorageTagGroup,
+            #
+            ResourcePrimarySemanticTag,
+            ResourceSecondarySemanticTag,
+            ResourcePropertyTag,
+            ResourceUserTag,
+            ResourceFileTag,
+            ResourceFormatTag,
+            # resource
+            Resource,
+            Asset,
+            # version
+            Version,
+            # storage
+            Directory,
+            File,
+        ]
 
     EntityTypeCategoryMapper = {
         # type
@@ -316,7 +342,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             if 'gui_name' in i_kwargs:
                 i_gui_name = i_kwargs['gui_name']
             else:
-                i_gui_name = bsc_core.RawStringUnderlineOpt(i_name).to_prettify()
+                i_gui_name = bsc_core.RawStrUnderlineOpt(i_name).to_prettify()
 
             self.add_entity(
                 entity_type=i_entity_type,
@@ -335,7 +361,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 i_child_names = i_children.get('names') or []
                 i_child_options = i_children.get('options') or {}
                 for j_child_name in i_child_names:
-                    j_child_gui_name = bsc_core.RawStringUnderlineOpt(j_child_name).to_prettify()
+                    j_child_gui_name = bsc_core.RawStrUnderlineOpt(j_child_name).to_prettify()
                     self.add_entity(
                         entity_type=i_child_entity_type,
                         data=dict(
@@ -386,7 +412,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             return False, _
         #
         name = path_opt.get_name()
-        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        gui_name = bsc_core.RawStrUnderlineOpt(name).to_prettify()
         options = dict(kind=self.Kinds.ResourceCategoryGroup, gui_icon_name='database/groups')
         return True, self.add_entity(
             entity_type=self.EntityTypes.CategoryGroup,
@@ -418,7 +444,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             return False, _
         #
         name = path_opt.get_name()
-        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        gui_name = bsc_core.RawStrUnderlineOpt(name).to_prettify()
         options = dict(kind=self.Kinds.ResourceCategory, gui_icon_name='database/group')
         return True, self.add_entity(
             entity_type=self.EntityTypes.Category,
@@ -427,6 +453,14 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 gui_name=gui_name,
                 **options
             )
+        )
+
+    def get_categories(self, category_group):
+        return self.get_entities(
+            entity_type=self.EntityTypes.Category,
+            filters=[
+                ('group', 'is', '/{}'.format(category_group)),
+            ]
         )
 
     def create_type(self, path):
@@ -449,7 +483,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             return False, _
         #
         name = path_opt.get_name()
-        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        gui_name = bsc_core.RawStrUnderlineOpt(name).to_prettify()
         options = dict(kind=self.Kinds.ResourceType, gui_icon_name='database/object')
         options['gui_name'] = gui_name
         return True, self.add_entity(
@@ -458,6 +492,14 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 path=path,
                 **options
             )
+        )
+
+    def get_types(self, category_group, category):
+        return self.get_entities(
+            entity_type=self.EntityTypes.Type,
+            filters=[
+                ('group', 'is', '/{}/{}'.format(category_group, category)),
+            ]
         )
 
     def create_type_assign(self, node_path, value, kind):
@@ -519,7 +561,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         #
         path_opt = bsc_core.DccPathDagOpt(path)
         name = path_opt.get_name()
-        gui_name = bsc_core.RawStringUnderlineOpt(name).to_prettify()
+        gui_name = bsc_core.RawStrUnderlineOpt(name).to_prettify()
         options = dict(kind=self.Kinds.Resource, gui_icon_name='database/object')
         options['gui_name'] = gui_name
         options.update(kwargs)
@@ -576,6 +618,9 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         )
 
     def create_storage(self, path, kind):
+        if kind not in self.Kinds.All:
+            raise RuntimeError()
+        #
         _ = self.get_entity(
             entity_type=self.EntityTypes.Storage,
             filters=[
@@ -644,6 +689,16 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 value=value
             )
         )
+    @classmethod
+    def guess_type_args(cls, keys):
+        c_max = 4
+        c = len(keys)
+        if c < 3:
+            keys += ['other']*(c_max-c-1)
+        elif c > 3:
+            keys = keys[:2]+['_'.join(keys[2:])]
+        #
+        return keys
 
 
 class DtbNodeOpt(object):
@@ -672,16 +727,18 @@ class DtbNodeOpt(object):
 
 
 if __name__ == '__main__':
-    for i_key in [
+    for _i_key in [
         # 'surface',
         # 'atlas',
         # 'displacement',
-        '3d_asset',
-        '3d_plant'
+        # '3d_asset',
+        # '3d_plant',
+        'imperfection',
+        'texture'
     ]:
         dtb_opt_ = DtbResourceLibraryOpt(
             bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(i_key)),
+            bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(_i_key)),
         )
         #
         dtb_opt_.setup_entity_categories()

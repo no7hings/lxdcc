@@ -1421,39 +1421,54 @@ class StgGzipFileOpt(StgFileOpt):
 
 class StgZipFileOpt(StgFileOpt):
     def __init__(self, file_path):
-        self._file_path = file_path
-
-    def get_path(self):
-        return self._file_path
-    path = property(get_path)
+        super(StgZipFileOpt, self).__init__(file_path)
 
     def get_element_names(self):
-        file_path = self.get_path()
         if self.get_is_exists() is True:
+            file_path = self.get_path()
             if zipfile.is_zipfile(file_path):
                 with zipfile.ZipFile(file_path) as z:
                     return z.namelist()
-        # else:
-        #     from unrar import rarfile
-        #     if rarfile.is_rarfile(file_path):
-        #         with rarfile.RarFile(file_path) as r:
-        #             return r.namelist()
         return []
 
-    def set_element_extract_to(self, element_name, element_file_path):
+    def extract_element_to(self, element_name, element_file_path):
         if self.get_is_exists() is True:
-            if zipfile.is_zipfile(self.path):
-                with zipfile.ZipFile(self.path) as z:
+            file_path = self.get_path()
+            if zipfile.is_zipfile(file_path):
+                with zipfile.ZipFile(file_path) as z:
                     directory_path = os.path.dirname(element_file_path)
                     f = z.extract(element_name, directory_path)
                     os.rename(f, element_file_path)
-        # else:
-        #     from unrar import rarfile
-        #     if rarfile.is_rarfile(self.path):
-        #         with rarfile.RarFile(self.path) as r:
-        #             directory_path = os.path.dirname(element_file_path)
-        #             f = r.extract(element_name, directory_path)
-        #             os.rename(f, element_file_path)
+
+
+class StgRarFileOpt(StgFileOpt):
+    def __init__(self, file_path):
+        super(StgRarFileOpt, self).__init__(file_path)
+
+    def get_element_names(self):
+        from unrar import rarfile
+        file_path = self.get_path()
+        if rarfile.is_rarfile(file_path):
+            with rarfile.RarFile(file_path) as r:
+                return r.namelist()
+        return []
+
+    def extract_element_to(self, element_name, element_file_path):
+        from unrar import rarfile
+        file_path = self.get_path()
+        if rarfile.is_rarfile(file_path):
+            with rarfile.RarFile(file_path) as r:
+                directory_path = os.path.dirname(element_file_path)
+                f = r.extract(element_name, directory_path)
+                os.rename(f, element_file_path)
+
+    def extract_all_elements_to(self, directory_path):
+        from unrar import rarfile
+
+        file_path = self.get_path()
+        if rarfile.is_rarfile(file_path):
+            with rarfile.RarFile(file_path) as r:
+                r.extractall(directory_path)
 
 
 # temp

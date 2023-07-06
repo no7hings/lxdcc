@@ -2604,7 +2604,7 @@ class QtControlOpt(object):
         else:
             cmds.workspaceControl(
                 self._name,
-                label=bsc_core.RawStringUnderlineOpt(self._name).to_prettify(capitalize=False),
+                label=bsc_core.RawStrUnderlineOpt(self._name).to_prettify(capitalize=False),
                 dockToMainWindow=['right', False],
                 initialWidth=width, initialHeight=height,
                 widthProperty='free', heightProperty='free'

@@ -69,6 +69,36 @@ class UsdShaderOpt(object):
             _ = self._usd_fnc.CreateInput('file', Sdf.ValueTypeNames.Asset)
         _.Set(file_path)
 
+    def set_metallic(self, value):
+        _ = self._usd_fnc.GetInput('metallic')
+        if _ is None:
+            _ = self._usd_fnc.CreateInput('metallic', Sdf.ValueTypeNames.Float)
+        _.Set(value)
+
+    def set_ior(self, value):
+        _ = self._usd_fnc.GetInput('ior')
+        if _ is None:
+            _ = self._usd_fnc.CreateInput('ior', Sdf.ValueTypeNames.Float)
+        _.Set(value)
+
+    def set_as_float(self, key, value):
+        _ = self._usd_fnc.GetInput(key)
+        if _ is None:
+            _ = self._usd_fnc.CreateInput(key, Sdf.ValueTypeNames.Float)
+        _.Set(value)
+
+    def set_as_float3(self, key, value):
+        _ = self._usd_fnc.GetInput(key)
+        if _ is None:
+            _ = self._usd_fnc.CreateInput(key, Sdf.ValueTypeNames.Float3)
+        _.Set(value)
+
+    def set_as_float4(self, key, value):
+        _ = self._usd_fnc.GetInput(key)
+        if _ is None:
+            _ = self._usd_fnc.CreateInput(key, Sdf.ValueTypeNames.Float4)
+        _.Set(value)
+
     def set_as_asset(self, key, value):
         _ = self._usd_fnc.GetInput(key)
         if _ is None:

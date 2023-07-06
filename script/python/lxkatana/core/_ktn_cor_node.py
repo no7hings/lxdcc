@@ -1240,7 +1240,7 @@ class NGObjOpt(object):
             #
             self.set_port_hint(
                 i_port_path_src, dict(
-                    text=bsc_core.RawStringUnderlineOpt(
+                    text=bsc_core.RawStrUnderlineOpt(
                         bsc_core.DccPortPathMtd.get_dag_name(i_port_path_src)
                     ).to_prettify(capitalize=False)
                 )
@@ -1545,7 +1545,7 @@ class NGObjOpt(object):
                         node = self._ktn_obj
                         exec script
 
-    def set_input_port_create(self, port_path, **create_kwargs):
+    def generate_input_port(self, port_path, **create_kwargs):
         _ = self._ktn_obj.getInputPort(port_path)
         if _ is not None:
             return _
@@ -1555,25 +1555,25 @@ class NGObjOpt(object):
         for i in ports_data:
             if isinstance(i, six.string_types):
                 i_name = i
-                self.set_input_port_create(i_name)
+                self.generate_input_port(i_name)
             elif isinstance(i, dict):
                 i_name = i.keys()[0]
                 i_metadata = i.values()[0]
-                self.set_input_port_create(i_name)
+                self.generate_input_port(i_name)
                 i_port = self._ktn_obj.getInputPort(i_name)
                 for j_k, j_v in i_metadata.items():
                     i_port.addOrUpdateMetadata(
                         j_k, j_v
                     )
 
-    def set_output_port_create(self, port_path):
+    def generate_output_port(self, port_path):
         _ = self._ktn_obj.getOutputPort(port_path)
         if _ is None:
             self._ktn_obj.addOutputPort(port_path)
 
     def create_output_ports_by_data(self, ports_data):
         for i in ports_data:
-            self.set_output_port_create(i)
+            self.generate_output_port(i)
 
     def get_parent(self):
         return self._ktn_obj.getParent()
@@ -1625,7 +1625,7 @@ class NGObjOpt(object):
             if i_ktn_group_port is None:
                 i_ktn_group_port = current_group_port.createChildGroup(i_group_name)
                 #
-                i_group_label = bsc_core.RawStringUnderlineOpt(i_group_name).to_prettify(capitalize=False)
+                i_group_label = bsc_core.RawStrUnderlineOpt(i_group_name).to_prettify(capitalize=False)
                 i_ktn_group_port.setHintString(
                     str(
                         dict(
@@ -1643,7 +1643,7 @@ class NGObjOpt(object):
             ktn_group = group_ktn_obj.createChildGroup(port_name)
             label = data.get('label', None)
             if label is None:
-                label = bsc_core.RawStringUnderlineOpt(port_name).to_prettify(capitalize=False)
+                label = bsc_core.RawStrUnderlineOpt(port_name).to_prettify(capitalize=False)
             #
             hint_dict = {'label': label}
             lock = data.get('lock')
@@ -1692,7 +1692,7 @@ class NGObjOpt(object):
         tool_tip = data['tool_tip']
         lock = data['lock']
         if label != ' ':
-            label = bsc_core.RawStringUnderlineOpt(name).to_prettify(capitalize=False)
+            label = bsc_core.RawStrUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = group_ktn_obj.getChild(name)
         if ktn_port is None:
             if widget in {'proxy'}:
@@ -1801,7 +1801,7 @@ class NGObjOpt(object):
                                 dict(
                                     widget='capsule',
                                     options=list(value),
-                                    displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(value)),
+                                    displayText=map(lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(value)),
                                     exclusive=True,
                                     colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(value)],
                                     equalPartitionWidths=True,
@@ -1819,7 +1819,7 @@ class NGObjOpt(object):
                                 dict(
                                     widget='capsule',
                                     options=list(value),
-                                    displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(value)),
+                                    displayText=map(lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(value)),
                                     exclusive=False,
                                     colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(value)],
                                     equalPartitionWidths=True,
@@ -2255,7 +2255,7 @@ class NGPortOpt(object):
         hint_dict.update(
             dict(
                 options=list(strings),
-                displayText=map(lambda x: bsc_core.RawStringUnderlineOpt(x).to_prettify(), list(strings)),
+                displayText=map(lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(strings)),
                 colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(strings)],
             )
         )
@@ -2533,7 +2533,7 @@ class NGObjCustomizePortOpt(object):
                 if i_g is None:
                     i_g = c_g.createChildGroup(i_p_n)
                 #
-                i_g_l = bsc_core.RawStringUnderlineOpt(i_p_n).to_prettify(capitalize=False)
+                i_g_l = bsc_core.RawStrUnderlineOpt(i_p_n).to_prettify(capitalize=False)
                 i_g.setHintString(
                     str(
                         str({'label': i_g_l})
@@ -2553,7 +2553,7 @@ class NGObjCustomizePortOpt(object):
         pass
     @classmethod
     def _set_type_port_add_(cls, group_ktn_obj, name, scheme, value, default):
-        label = bsc_core.RawStringUnderlineOpt(name).to_prettify(capitalize=False)
+        label = bsc_core.RawStrUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = group_ktn_obj.getChild(name)
         if ktn_port is None:
             if isinstance(default, (bool, )):
@@ -2620,12 +2620,12 @@ class NGMacro(object):
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
 
-    def set_input_port_create(self, port_path):
+    def generate_input_port(self, port_path):
         _ = self._ktn_obj.getInputPort(port_path)
         if _ is None:
             self._ktn_obj.addInputPort(port_path)
 
-    def set_output_port_create(self, port_path):
+    def generate_output_port(self, port_path):
         _ = self._ktn_obj.getOutputPort(port_path)
         if _ is None:
             self._ktn_obj.addOutputPort(port_path)
@@ -2641,11 +2641,11 @@ class NGMacro(object):
         )
         #
         for i_input_port_path in input_ports:
-            NGObjOpt(self._ktn_obj).set_input_port_create(i_input_port_path)
+            NGObjOpt(self._ktn_obj).generate_input_port(i_input_port_path)
         #
         output_ports = configure.get('output_ports') or []
         for i_output_port_path in output_ports:
-            NGObjOpt(self._ktn_obj).set_output_port_create(i_output_port_path)
+            NGObjOpt(self._ktn_obj).generate_output_port(i_output_port_path)
         #
         parameters = configure.get('parameters') or {}
         for k, v in parameters.items():

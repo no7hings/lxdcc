@@ -85,11 +85,11 @@ class PtnMultiplyFileMtd(object):
                 )
         return key_args
     @classmethod
-    def get_is_valid(cls, pattern):
+    def get_is_valid(cls, p):
         re_keys = cls.RE_MULTIPLY_KEYS
         #
         for i_k, i_f, i_c in re_keys:
-            results = re.findall(i_f.format(i_k), pattern, re.IGNORECASE) or []
+            results = re.findall(i_f.format(i_k), p, re.IGNORECASE) or []
             if results:
                 return True
         return False
@@ -150,8 +150,8 @@ class PtnParseMtd(object):
     RE_KEY_PATTERN = r'[{](.*?)[}]'
 
     @classmethod
-    def get_keys(cls, pattern):
-        lis_0 = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
+    def get_keys(cls, p):
+        lis_0 = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), p)
         lis_1 = list(set(lis_0))
         lis_1.sort(key=lis_0.index)
         return lis_1
@@ -168,24 +168,24 @@ class PtnParseMtd(object):
             return variants[key]
 
     @classmethod
-    def set_update(cls, pattern, **kwargs):
-        if pattern is not None:
-            keys = cls.get_keys(pattern)
+    def set_update(cls, p, **kwargs):
+        if p is not None:
+            keys = cls.get_keys(p)
             variants = kwargs
-            s = pattern
+            s = p
             if keys:
                 for i_k in keys:
                     i_v = cls.get_value(i_k, variants)
                     if i_v is not None and i_v != '*':
                         s = s.replace('{{{}}}'.format(i_k), i_v)
             return s
-        return pattern
+        return p
 
     @classmethod
-    def get_as_fnmatch(cls, pattern, variants=None):
-        if pattern is not None:
-            keys = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), pattern)
-            s = pattern
+    def get_as_fnmatch(cls, p, variants=None):
+        if p is not None:
+            keys = re.findall(re.compile(cls.RE_KEY_PATTERN, re.S), p)
+            s = p
             if keys:
                 for i_k in keys:
                     i_v = '*'
@@ -194,7 +194,7 @@ class PtnParseMtd(object):
                             i_v = variants[i_k]
                     s = s.replace('{{{}}}'.format(i_k), i_v)
             return s
-        return pattern
+        return p
 
 
 class PtnFnmatch(object):
@@ -236,15 +236,15 @@ class PtnFnmatch(object):
     def get_is_valid(cls, ptn):
         return ptn != cls.to_re_style(ptn)
     @classmethod
-    def filter(cls, texts, pattern):
+    def filter(cls, texts, p):
         list_ = []
         try:
-            re_pat = cls.CACHE[pattern]
+            re_pat = cls.CACHE[p]
         except KeyError:
-            res = fnmatch.translate(pattern)
+            res = fnmatch.translate(p)
             if len(cls.CACHE) >= cls.CACHE_MAX:
                 cls.CACHE.clear()
-            cls.CACHE[pattern] = re_pat = re.compile(res, re.IGNORECASE)
+            cls.CACHE[p] = re_pat = re.compile(res, re.IGNORECASE)
         #
         match = re_pat.match
         for i_text in texts:
@@ -255,21 +255,21 @@ class PtnFnmatch(object):
 
 class PtnParseOpt(object):
     def __init__(self, p, key_format=None):
+        self._pattern_origin = p
         self._variants = {}
         self._pattern = p
 
-        if isinstance(key_format, dict):
-            self._key_format = key_format
-        else:
-            self._key_format = {}
+        self._key_format = key_format or {}
 
+        self._fnmatch_pattern_origin = PtnParseMtd.get_as_fnmatch(
+            self._pattern_origin, self._key_format
+        )
         self._fnmatch_pattern = PtnParseMtd.get_as_fnmatch(
             self._pattern, self._key_format
         )
-
-    @property
-    def pattern(self):
+    def get_pattern(self):
         return self._pattern
+    pattern = property(get_pattern)
 
     @property
     def fnmatch_pattern(self):
@@ -279,7 +279,6 @@ class PtnParseOpt(object):
         return PtnParseMtd.get_keys(
             self._pattern
         )
-
     keys = property(get_keys)
 
     def get_value(self):
@@ -314,16 +313,24 @@ class PtnParseOpt(object):
         ) or []
         if sort is True:
             paths = _bsc_cor_raw.RawTextsOpt(paths).sort_by_number()
-        for i_path in paths:
-            i_p = parse.parse(
-                self._pattern, i_path, case_sensitive=True
-            )
-            if i_p:
-                i_r = i_p.named
-                if i_r:
-                    i_r.update(self._variants)
-                    i_r['result'] = i_path
-                    list_.append(i_r)
+        #
+        if self.get_keys():
+            for i_path in paths:
+                i_p = parse.parse(
+                    self._pattern, i_path, case_sensitive=True
+                )
+                if i_p:
+                    i_r = i_p.named
+                    if i_r:
+                        i_r.update(self._variants)
+                        i_r['result'] = i_path
+                        i_r['pattern'] = self._pattern_origin
+                        list_.append(i_r)
+        else:
+            for i_path in paths:
+                i_r = dict(result=i_path)
+                i_r.update(self._variants)
+                list_.append(i_r)
         return list_
 
     def get_is_matched(self, result):

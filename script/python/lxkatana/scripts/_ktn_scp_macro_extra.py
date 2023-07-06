@@ -619,7 +619,7 @@ class ScpWspVariantResolve(AbsWsp):
                     i_variant_value_pre = variant_dict_pre[i_variant_key]
                 i_condition_key = 'variant_{}'.format(i_index)
                 condition_capsule_data.append(
-                    (i_condition_key, bsc_core.RawStringUnderlineOpt(i_variant_key).to_prettify())
+                    (i_condition_key, bsc_core.RawStrUnderlineOpt(i_variant_key).to_prettify())
                 )
                 condition_keys.append(i_condition_key)
                 self._obj_opt.set(

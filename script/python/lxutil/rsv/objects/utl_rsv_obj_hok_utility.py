@@ -539,7 +539,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_resize'] = i_f_tgt
             i_f_opt_tgt.create_directory()
-            bsc_core.ImgOiioMtd.set_fit_to(i_f_src, i_f_tgt, (2048, 2048))
+            bsc_core.ImgOiioMtd.fit_to(i_f_src, i_f_tgt, (2048, 2048))
             utl_core.Log.set_module_result_trace(
                 'image resize',
                 u'file="{}"'.format(

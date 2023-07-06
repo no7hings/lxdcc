@@ -585,10 +585,15 @@ class RawTextMtd(object):
             text = text.encode('utf-8')
         return re.compile(r'[;,/\-\s]\s*').split(text)
     @classmethod
+    def split_any_to(cls, text):
+        if isinstance(text, six.text_type):
+            text = text.encode('utf-8')
+        return re.findall(r'[A-Z](?:[a-z]+)?|(?:[0-9]+)', text)
+    @classmethod
     def find_words(cls, text):
         if isinstance(text, six.text_type):
             text = text.encode('utf-8')
-        return re.findall(r'\b[A-Za-z]+\b', text)
+        return re.findall(r'[A-Za-z]+', text)
 
 
 class RawTextOpt(object):
@@ -715,6 +720,25 @@ class RawTextOpt(object):
         return fnmatch.filter([self._raw], p)
 
 
+class RawStrCamelcaseMtd(object):
+    def __init__(self, string):
+        self._string = string
+    @classmethod
+    def to_prettify(cls, string):
+        return ' '.join([i.capitalize() for i in re.findall(r'[a-zA-Z][a-z]*[0-9]*', string)])
+    @classmethod
+    def to_underline(cls, string):
+        return re.sub(re.compile(r'([a-z]|\d)([A-Z])'), r'\1_\2', string).lower()
+
+
+class RawStrUnderlineMtd(object):
+    @classmethod
+    def find_words(cls, string):
+        if isinstance(string, six.text_type):
+            string = auto_encode(string)
+        return re.findall(r'([A-Za-z]+)', string)
+
+
 class RawTextsMtd(object):
     @classmethod
     def sort_by_number(cls, texts):
@@ -734,7 +758,7 @@ class RawTextsOpt(object):
         return RawTextsMtd.sort_by_number(self._raw)
 
 
-class RawStringUnderlineOpt(object):
+class RawStrUnderlineOpt(object):
     def __init__(self, string):
         self._string = string
 
@@ -790,7 +814,12 @@ class RawSizeMtd(object):
             w = max(min(width, maximum), minimum)
             return w, w
     @classmethod
-    def set_fit_to(cls, size_0, size_1):
+    def fit_to(cls, size_0, size_1):
+        """
+        :param size_0: tuple(w, h), etc. image size
+        :param size_1: tuple(w, h), etc. window size
+        :return:
+        """
         w_0, h_0 = size_0
         w_1, h_1 = size_1
         p_0 = float(w_0) / float(h_0)
@@ -824,7 +853,7 @@ class RawSizeMtd(object):
 
 class RawRectMtd(object):
     @classmethod
-    def set_fit_to(cls, pos, size_0, size_1):
+    def fit_to(cls, pos, size_0, size_1):
         x_0, y_0 = pos
         w_0, h_0 = size_0
         w_1, h_1 = size_1

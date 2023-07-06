@@ -164,7 +164,7 @@ class ImgFileOpt(object):
 
 class ImgOiioMtd(object):
     @classmethod
-    def set_fit_to(cls, file_path_src, file_path_tgt, size):
+    def fit_to(cls, file_path_src, file_path_tgt, size):
         option = dict(
             input=file_path_src,
             output=file_path_tgt,
@@ -360,6 +360,21 @@ class ImgOiioMtd(object):
             # '--iscolorspace "{from_color_space}"',
             # '--tocolorspace "{to_color_space}"',
             '--colorconvert "{from_color_space}" "{to_color_space}"',
+            u'-o "{output}"',
+        ]
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def r_to_rgb(cls, file_path_src, file_path_tgt):
+        option = dict(
+            input=file_path_src,
+            output=file_path_tgt,
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            u'-i "{input}"',
+            '--ch 0,0,0',
             u'-o "{output}"',
         ]
         _bsc_cor_process.SubProcessMtd.execute_with_result(

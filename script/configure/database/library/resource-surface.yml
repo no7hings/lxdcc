@@ -4,6 +4,7 @@ option:
         /:
             entity_type: 'category_root'
             options: {kind: 'resource-category-root', gui_icon_name: 'database/all'}
+        #
         /surface:
             entity_type: 'category_group'
             options: {kind: 'resource-category-group', gui_icon_name: 'database/groups'}

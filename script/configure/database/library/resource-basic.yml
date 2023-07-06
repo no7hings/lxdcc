@@ -186,14 +186,14 @@ patterns:
     texture-dir: '<.version-dir>/texture'
     texture-original-dir: '<.texture-dir>/original'
     texture-original-src-dir: '<.texture-original-dir>/src'
-    texture-original-src-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.{file_format}'
-    texture-original-src-lod-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.lod_{lod_level.zfill(2)}.{file_format}'
+    texture-original-src-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.{ext}'
+    texture-original-src-lod-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.lod_{lod_level.zfill(2)}.{ext}'
     #
-    texture-original-extra-src-file: '<.texture-original-src-dir>/{resource}.{key_extra}.{texture_type_tag}.{file_format}'
+    texture-original-extra-src-file: '<.texture-original-src-dir>/{resource}.{key_extra}.{texture_type_tag}.{ext}'
     #
     texture-acescg-dir: '<.texture-dir>/acescg'
     texture-acescg-src-dir: '<.texture-acescg-dir>/src'
-    texture-acescg-src-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.{file_format}'
+    texture-acescg-src-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.{ext}'
     texture-acescg-src-exr-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.exr'
     texture-acescg-tx-dir: '<.texture-acescg-dir>/tx'
     texture-acescg-tx-file: '<.texture-acescg-tx-dir>/{resource}.{texture_type_tag}.tx'
@@ -238,7 +238,9 @@ storages:
 #
 category_groups:
     - '/surface'
-    - '/atlas'
+    - '/imperfection'
     - '/displacement'
+    - '/texture'
+    - '/atlas'
     - '/3d_asset'
     - '/3d_plant'

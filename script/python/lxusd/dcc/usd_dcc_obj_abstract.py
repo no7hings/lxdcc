@@ -108,7 +108,7 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)
         #
-        _obj = obj_type.generate_obj(obj_path)
+        _obj = obj_type.create_obj(obj_path)
         _obj._usd_obj = usd_prim
         if utl_core.get_is_ui_mode() is True:
             from lxutil_gui.qt import utl_gui_qt_core

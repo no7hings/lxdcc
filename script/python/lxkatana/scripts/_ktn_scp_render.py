@@ -273,6 +273,12 @@ class ScpRenderBuild(object):
                     ).get(
                         '/root.renderSettings.outputs.primary.locationSettings.renderLocation'
                     )
+                    if i_render_output_image_file_path is None:
+                        raise RuntimeError(
+                            bsc_core.LogMtd.trace_method_error(
+                                'aov layer "primary" is not found'
+                            )
+                        )
                     #
                     i_render_output_directory_path = bsc_core.StgFileOpt(i_render_output_image_file_path).get_directory_path()
                     i_video_directory_path = bsc_core.DccPathDagOpt(i_render_output_directory_path).get_parent_path()

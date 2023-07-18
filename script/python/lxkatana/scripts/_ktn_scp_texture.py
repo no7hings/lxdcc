@@ -9,6 +9,48 @@ from lxkatana import ktn_core
 
 
 class ScpTextureImportFromDatabase(object):
+    """
+# coding:utf-8
+import lxkatana
+
+lxkatana.set_reload()
+
+from lxbasic import bsc_core
+
+from lxutil import utl_core
+
+from lxkatana import ktn_core
+
+import lxdatabase.objects as dtb_objects
+
+import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
+import lxdatabase.scripts as dtb_scripts
+
+import lxkatana.scripts as ktn_scripts
+
+data = {
+    'specular_roughness': u'/production/library/resource/all/surface/mossy_ground_umkkfcolw/v0001/texture/acescg/tx/mossy_ground_umkkfcolw.roughness.tx',
+    'normal': u'/production/library/resource/all/surface/mossy_ground_umkkfcolw/v0001/texture/acescg/tx/mossy_ground_umkkfcolw.normal.tx',
+    'diffuse_color': u'/production/library/resource/all/surface/mossy_ground_umkkfcolw/v0001/texture/acescg/tx/mossy_ground_umkkfcolw.albedo.tx',
+    'displacement': u'/production/library/resource/all/surface/mossy_ground_umkkfcolw/v0001/texture/acescg/tx/mossy_ground_umkkfcolw.displacement.tx',
+    'metalness': '',
+    'specular': '',
+    'opacity': '',
+    'transmission': '',
+}
+
+tab_opt = ktn_core.GuiNodeGraphTabOpt()
+ktn_group = tab_opt.get_current_group()
+
+ktn_group_opt = ktn_core.NGObjOpt(ktn_group)
+resource_name = 'resource_name'
+ktn_scripts.ScpTextureImportFromDatabase(
+    ktn_group_opt.get_path(),
+    resource_name,
+    data,
+).create_auto()
+    """
     TEXTURE_MAPPER = {
         'albedo': 'base_color',
     }
@@ -22,7 +64,7 @@ class ScpTextureImportFromDatabase(object):
             'option.root', self._root_opt.get_path(),
         )
         self._cfg.set(
-            'option.resource', resource.lower()
+            'option.resource', resource
         )
         self._cfg.set(
             'option.time_tag', bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100)
@@ -82,7 +124,7 @@ class ScpTextureImportFromDatabase(object):
         mtl_grp_path = self._cfg.get('node.material_group.path')
         mtl_type_name = self._cfg.get('node.material.type')
         mtl_path = self._cfg.get('node.material.path')
-        mtl_grp_ktn_obj, is_create = ktn_core.NGObjOpt._get_create_args_(mtl_grp_path, mtl_grp_type_name)
+        mtl_grp_ktn_obj, is_create = ktn_core.NGObjOpt._get_node_create_args_(mtl_grp_path, mtl_grp_type_name)
         if is_create is True:
             mtl_grp_obj_opt = ktn_core.NGObjOpt(mtl_grp_ktn_obj)
             mtl_grp_obj_opt.set_color((.25, .25, .75))
@@ -144,7 +186,7 @@ class ScpTextureImportFromDatabase(object):
         #
         w, h = 320, 80
         #
-        node_bdp_ktn_obj, is_create = ktn_core.NGObjOpt._get_create_args_(node_bdp_path, node_bdp_type_name)
+        node_bdp_ktn_obj, is_create = ktn_core.NGObjOpt._get_node_create_args_(node_bdp_path, node_bdp_type_name)
         if is_create is True:
             resource = self._cfg.get('option.resource')
             node_bdp_obj_opt = ktn_core.NGObjOpt(node_bdp_ktn_obj)
@@ -177,7 +219,7 @@ class ScpTextureImportFromDatabase(object):
     def create_node_group(self, key):
         type_name = self._cfg.get('node.{}.type'.format(key))
         path = self._cfg.get('node.{}.path'.format(key))
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_create_args_(path, type_name)
+        ktn_obj, is_create = ktn_core.NGObjOpt._get_node_create_args_(path, type_name)
         if is_create is True:
             obj_opt = ktn_core.NGObjOpt(ktn_obj)
             obj_opt.set_color((.25, .25, .5))
@@ -252,6 +294,40 @@ class ScpTextureImportFromDatabase(object):
             )
         return ktn_obj
     @classmethod
+    def _create_node_(cls, data, extend_kwargs=None, to_view_center=False):
+        type_name = data['type']
+        path = data['path']
+        if isinstance(extend_kwargs, dict):
+            path = path.format(**extend_kwargs)
+        #
+        ktn_obj, is_create = ktn_core.NGObjOpt._get_node_create_args_(path, type_name)
+        if is_create is True:
+            obj_opt = ktn_core.NGObjOpt(ktn_obj)
+            if to_view_center is True:
+                obj_opt.move_to_view_center()
+            #
+            obj_opt.set_attributes(dict(ns_viewState=0.0))
+            obj_opt.set_color(bsc_core.RawTextOpt(type_name).to_rgb_(maximum=1.0, s_p=25, v_p=25))
+            #
+            obj_opt.set_shader_parameters_by_data(
+                data.get('shader_parameters') or {},
+                extend_kwargs=extend_kwargs
+            )
+            obj_opt.set_shader_expressions_by_data(
+                data.get('shader_expressions') or {},
+                extend_kwargs=extend_kwargs
+            )
+            obj_opt.set_shader_hints_by_data(
+                data.get('shader_hints') or {},
+                extend_kwargs=extend_kwargs
+            )
+            #
+            ktn_core.NGObjOpt._create_connections_by_data_(
+                data.get('connections') or [],
+                extend_kwargs=extend_kwargs
+            )
+        return ktn_obj
+    @classmethod
     def _create_shader_node_graph_node_connections_(cls, data, extend_kwargs=None):
         ktn_core.NGObjOpt._create_connections_by_data_(
             data.get('connections') or [],
@@ -261,7 +337,10 @@ class ScpTextureImportFromDatabase(object):
     def create_shader_node_graph(self, key, sub_key, extend_kwargs=None):
         data = self._cfg.get('{}.{}.node_graph'.format(key, sub_key)) or {}
         for k, v in data.items():
-            self._create_shader_(v, extend_kwargs)
+            if 'shader_type' in v:
+                self._create_shader_(v, extend_kwargs)
+            else:
+                self._create_node_(v, extend_kwargs)
 
     def create_shader_node_graph_connections(self, key, sub_key, extend_kwargs=None):
         data = self._cfg.get('{}.{}.node_graph'.format(key, sub_key)) or {}

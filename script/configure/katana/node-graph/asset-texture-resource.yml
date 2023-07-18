@@ -66,15 +66,19 @@ node:
             #   base
             - 'outputs.texture.base.metalness'
             #   diffuse
+            - 'outputs.texture.diffuse.diffuse'
             - 'outputs.texture.diffuse.diffuse_color'
             - 'outputs.texture.diffuse.diffuse_roughness'
             #   specular
+            - 'outputs.texture.specular.specular'
             - 'outputs.texture.specular.specular_color'
             - 'outputs.texture.specular.specular_roughness'
             #   transmission
+            - 'outputs.texture.transmission.transmission'
             - 'outputs.texture.transmission.transmission_color'
             - 'outputs.texture.transmission.transmission_roughness'
             #   subsurface
+            - 'outputs.texture.subsurface.subsurface'
             - 'outputs.texture.subsurface.subsurface_color'
             #   geometry
             - 'outputs.texture.geometry.normal'
@@ -441,7 +445,7 @@ node:
     #
     arnold_texture_triplanar_translate:
         tag: 'texture_triplanar_translate'
-        type: 'ArnoldShadingNode'
+        type: ArnoldShadingNode
         shader_type: 'user_data_rgb'
         path: '<..node_group.path>/<.tag>__<option.time_tag>_AND_NOD'
         #
@@ -453,7 +457,7 @@ node:
     #
     arnold_texture_triplanar_rotate:
         tag: 'texture_triplanar_rotate'
-        type: 'ArnoldShadingNode'
+        type: ArnoldShadingNode
         shader_type: 'user_data_rgb'
         path: '<..node_group.path>/<.tag>__<option.time_tag>_AND_NOD'
         #
@@ -465,7 +469,7 @@ node:
     #
     arnold_texture_triplanar_scale:
         tag: 'texture_triplanar_scale'
-        type: 'ArnoldShadingNode'
+        type: ArnoldShadingNode
         shader_type: 'user_data_rgb'
         path: '<..node_group.path>/<.tag>__<option.time_tag>_AND_NOD'
         #
@@ -486,26 +490,36 @@ node:
 #  texture
 arnold_texture:
     # diffuse
-    albedo:
+    #   color
+    diffuse_color:
         tag: 'diffuse_color'
         #
         node_graph:
             #
             image:
-                type: 'ArnoldShadingNode'
+                type: ArnoldShadingNode
                 shader_type: 'image'
                 path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_AND_NOD'
                 #
                 shader_parameters:
                     filename: '{texture}'
                     ignore_missing_textures: True
+                    missing_texture_color: [0.8, 0.8, 0.8, 1.0]
                 #
                 connections:
                     - '<node.node_passthrough.path>.outputs.texture.uv_map.uv_map_coords'
                     - '<.path>.uvcoords'
+            #
+            image_dot:
+                type: Dot
+                path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_DOT'
+                #
+                connections:
+                    - '<..image.path>.out'
+                    - '<.path>.input'
             # use uv-map transform
             uv_map:
-                type: 'ArnoldShadingNode'
+                type: ArnoldShadingNode
                 shader_type: 'uv_transform'
                 path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_AND_NOD'
                 #
@@ -525,11 +539,11 @@ arnold_texture:
                 #
                 connections:
                     # connections from "image"
-                    - '<..image.path>.out'
+                    - '<..image_dot.path>.output'
                     - '<.path>.passthrough'
             # use tri-planar when no uv-map
             triplanar:
-                type: 'ArnoldShadingNode'
+                type: ArnoldShadingNode
                 shader_type: 'triplanar'
                 path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_AND_NOD'
                 #
@@ -558,7 +572,7 @@ arnold_texture:
                     - '<.path>.scale'
             #
             mode_switch:
-                type: 'ArnoldShadingNode'
+                type: ArnoldShadingNode
                 shader_type: 'switch_rgba'
                 path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_AND_NOD'
                 #
@@ -571,51 +585,200 @@ arnold_texture:
                     #
                     - '<..triplanar.path>.out'
                     - '<.path>.input1'
+            #
+            output_dot:
+                type: Dot
+                path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_DOT'
+                #
+                connections:
+                    - '<..mode_switch.path>.out'
+                    - '<.path>.input'
         #
         connections:
             # connect node to group
-            - '<.node_graph.mode_switch.path>.out'
+            - '<.node_graph.output_dot.path>.output'
             - '<node.node_group.path>.outputs.texture.diffuse.diffuse_color'
             # connect node-group to shader
             - '<node.node_group.path>.outputs.texture.diffuse.diffuse_color'
             - '<node.arnold_surface_shader.path>.base_color'
-    # specular
-    roughness:
-        tag: 'specular_roughness'
+    # basic
+    #   metalness
+    metalness:
+        tag: 'metalness'
         #
         node_graph:
-            image: '$...albedo.node_graph.image'
-            # use uv-map transform
-            uv_map: '$...albedo.node_graph.uv_map'
-            # use tri-planar when no uv-map
-            triplanar: '$...albedo.node_graph.triplanar'
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [0.0, 0.0, 0.0, 1.0]
             #
-            mode_switch: '$...albedo.node_graph.mode_switch'
+            image_dot: '$...diffuse_color.node_graph.image_dot'
+            # use uv-map transform
+            uv_map: '$...diffuse_color.node_graph.uv_map'
+            # use tri-planar when no uv-map
+            triplanar: '$...diffuse_color.node_graph.triplanar'
+            #
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
+            #
+            output_dot: '$...diffuse_color.node_graph.output_dot'
         #
         connections:
             # connect node to group
-            - '<.node_graph.mode_switch.path>.out'
+            - '<.node_graph.output_dot.path>.output'
+            - '<node.node_group.path>.outputs.texture.base.metalness'
+            # connect node-group to shader
+            - '<node.node_group.path>.outputs.texture.base.metalness'
+            - '<node.arnold_surface_shader.path>.metalness'
+    # specular
+    #   specular
+    specular:
+        tag: 'specular'
+        #
+        node_graph:
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [1.0, 1.0, 1.0, 1.0]
+            #
+            image_dot: '$...diffuse_color.node_graph.image_dot'
+            # use uv-map transform
+            uv_map: '$...diffuse_color.node_graph.uv_map'
+            # use tri-planar when no uv-map
+            triplanar: '$...diffuse_color.node_graph.triplanar'
+            #
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
+            #
+            output_dot: '$...diffuse_color.node_graph.output_dot'
+        #
+        connections:
+            # connect node to group
+            - '<.node_graph.output_dot.path>.output'
+            - '<node.node_group.path>.outputs.texture.specular.specular'
+            # connect node-group to shader
+            - '<node.node_group.path>.outputs.texture.specular.specular'
+            - '<node.arnold_surface_shader.path>.specular'
+    #   roughness
+    specular_roughness:
+        tag: 'specular_roughness'
+        #
+        node_graph:
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [0.2, 0.2, 0.2, 1.0]
+            #
+            image_dot: '$...diffuse_color.node_graph.image_dot'
+            # use uv-map transform
+            uv_map: '$...diffuse_color.node_graph.uv_map'
+            # use tri-planar when no uv-map
+            triplanar: '$...diffuse_color.node_graph.triplanar'
+            #
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
+            #
+            output_dot: '$...diffuse_color.node_graph.output_dot'
+        #
+        connections:
+            # connect node to group
+            - '<.node_graph.output_dot.path>.output'
             - '<node.node_group.path>.outputs.texture.specular.specular_roughness'
             # connect node-group to shader
             - '<node.node_group.path>.outputs.texture.specular.specular_roughness'
             - '<node.arnold_surface_shader.path>.specular_roughness'
+    # transmission
+    #   transmission
+    transmission:
+        tag: 'transmission'
+        #
+        node_graph:
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [0.2, 0.2, 0.2, 1.0]
+            #
+            image_dot: '$...diffuse_color.node_graph.image_dot'
+            # use uv-map transform
+            uv_map: '$...diffuse_color.node_graph.uv_map'
+            # use tri-planar when no uv-map
+            triplanar: '$...diffuse_color.node_graph.triplanar'
+            #
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
+            #
+            output_dot: '$...diffuse_color.node_graph.output_dot'
+        #
+        connections:
+            # connect node to group
+            - '<.node_graph.output_dot.path>.output'
+            - '<node.node_group.path>.outputs.texture.transmission.transmission'
+            # connect node-group to shader
+            - '<node.node_group.path>.outputs.texture.transmission.transmission'
+            - '<node.arnold_surface_shader.path>.transmission'
     # geometry
+    #   opacity
+    opacity:
+        tag: 'geometry_opacity'
+        #
+        node_graph:
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [1.0, 1.0, 1.0, 1.0]
+            #
+            image_dot: '$...diffuse_color.node_graph.image_dot'
+            # use uv-map transform
+            uv_map: '$...diffuse_color.node_graph.uv_map'
+            # use tri-planar when no uv-map
+            triplanar: '$...diffuse_color.node_graph.triplanar'
+            #
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
+            #
+            output_dot: '$...diffuse_color.node_graph.output_dot'
+        #
+        connections:
+            # connect node to group
+            - '<.node_graph.output_dot.path>.output'
+            - '<node.node_group.path>.outputs.texture.geometry.opacity'
+            # connect node-group to shader
+            - '<node.node_group.path>.outputs.texture.geometry.opacity'
+            - '<node.arnold_surface_shader.path>.opacity'
+    #   normal
     normal:
         tag: 'geometry_normal'
         #
         node_graph:
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [0.0, 0.0, 0.0, 1.0]
             #
-            image: '$...albedo.node_graph.image'
+            image_dot: '$...diffuse_color.node_graph.image_dot'
             # use uv-map transform
-            uv_map: '$...albedo.node_graph.uv_map'
+            uv_map: '$...diffuse_color.node_graph.uv_map'
             # use tri-planar when no uv-map
-            triplanar: '$...albedo.node_graph.triplanar'
+            triplanar: '$...diffuse_color.node_graph.triplanar'
             #
-            mode_switch: '$...albedo.node_graph.mode_switch'
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
             #
             normal:
                 tag: 'texture_normal'
-                type: 'ArnoldShadingNode'
+                type: ArnoldShadingNode
                 shader_type: 'normal_map'
                 path: '<node.node_group.path>/texture_<..key>__<option.time_tag>_AND_NOD'
                 #
@@ -647,43 +810,29 @@ arnold_texture:
             # connect node-group to shader
             - '<node.node_group.path>.outputs.texture.geometry.normal'
             - '<node.arnold_surface_shader.path>.normal'
-    # geometry opacity
-    translucency:
-        tag: 'geometry_opacity'
-        #
-        node_graph:
-            #
-            image: '$...albedo.node_graph.image'
-            # use uv-map transform
-            uv_map: '$...albedo.node_graph.uv_map'
-            # use tri-planar when no uv-map
-            triplanar: '$...albedo.node_graph.triplanar'
-            #
-            mode_switch: '$...albedo.node_graph.mode_switch'
-        #
-        connections:
-            # connect node to group
-            - '<.node_graph.mode_switch.path>.out'
-            - '<node.node_group.path>.outputs.texture.geometry.opacity'
-            # connect node-group to shader
-            - '<node.node_group.path>.outputs.texture.geometry.opacity'
-            - '<node.arnold_surface_shader.path>.opacity'
-    #
+    #   displacement
     displacement:
         tag: 'geometry_displacement'
         #
         node_graph:
+            image:
+                $: '....diffuse_color.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [0.0, 0.0, 0.0, 1.0]
             #
-            image: '$...albedo.node_graph.image'
+            image_dot: '$...diffuse_color.node_graph.image_dot'
             # use uv-map transform
-            uv_map: '$...albedo.node_graph.uv_map'
+            uv_map: '$...diffuse_color.node_graph.uv_map'
             # use tri-planar when no uv-map
-            triplanar: '$...albedo.node_graph.triplanar'
+            triplanar: '$...diffuse_color.node_graph.triplanar'
             #
-            mode_switch: '$...albedo.node_graph.mode_switch'
+            mode_switch: '$...diffuse_color.node_graph.mode_switch'
             #
             displacement:
-                type: 'ArnoldShadingNode'
+                type: ArnoldShadingNode
                 shader_type: 'range'
                 path: '<node.node_group.path>/texture_<..key>__<option.time_tag>_AND_NOD'
                 #
@@ -714,7 +863,7 @@ arnold_texture:
             - '<node.node_group.path>.outputs.arnold_shader.arnold_displacement'
 
 usd_texture:
-    albedo:
+    diffuse_color:
         tag: 'diffuse_color'
         node_graph:
             image:
@@ -729,10 +878,10 @@ usd_texture:
             - '<.node_graph.image.path>.rgb'
             - '<node.usd_shader.path>.diffuseColor'
     #
-    roughness:
+    specular_roughness:
         tag: 'specular_roughness'
         node_graph:
-            image: '$...albedo.node_graph.image'
+            image: '$...diffuse_color.node_graph.image'
         #
         connections:
             - '<.node_graph.image.path>.rgb'

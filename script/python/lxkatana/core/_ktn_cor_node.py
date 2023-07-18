@@ -541,7 +541,7 @@ class NGObjOpt(object):
     def _get_is_parent_for_(cls, parent_ktn_obj, child_ktn_obj):
         return child_ktn_obj.getParent().getName() == parent_ktn_obj.getName()
     @classmethod
-    def _get_create_args_(cls, path, type_name):
+    def _get_node_create_args_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
         name = path_opt.name
         parent_opt = path_opt.get_parent()
@@ -637,7 +637,7 @@ class NGObjOpt(object):
         return ktn_obj, False
     @classmethod
     def _get_shader_create_args_(cls, path, type_name, shader_type_name):
-        ktn_obj, is_create = cls._get_create_args_(path, type_name)
+        ktn_obj, is_create = cls._get_node_create_args_(path, type_name)
         if is_create is True:
             type_ktn_port = ktn_obj.getParameter('nodeType')
             if type_ktn_port is not None:
@@ -646,7 +646,7 @@ class NGObjOpt(object):
         return ktn_obj, is_create
     @classmethod
     def _get_usd_shader_create_args_(cls, path, shader_type_name):
-        ktn_obj, is_create = cls._get_create_args_(path, 'UsdShadingNode')
+        ktn_obj, is_create = cls._get_node_create_args_(path, 'UsdShadingNode')
         if is_create is True:
             type_ktn_port = ktn_obj.getParameter('nodeType')
             if type_ktn_port is not None:
@@ -1057,7 +1057,10 @@ class NGObjOpt(object):
         return branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
     @Modifier.undo_run
     def gui_layout_shader_graph(self, scheme=(NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
-        graph_dara = self.get_gui_layout_data(inner=True, size=size)
+        graph_dara = self.get_gui_layout_data(
+            inner=True,
+            size=size
+        )
         #
         NGLayoutOpt(
             graph_dara,
@@ -1067,6 +1070,7 @@ class NGObjOpt(object):
                 expanded=expanded,
                 collapsed=collapsed,
                 shader_view_state=shader_view_state,
+                # use_one_by_one=True
             )
         ).run()
     @Modifier.undo_run
@@ -1189,6 +1193,7 @@ class NGObjOpt(object):
             # turn off the expression-flag
             if self.get_is_expression(i_value_key) is True:
                 self.set_expression_enable(i_value_key, False)
+            #
             self.set(i_value_key, i_value)
 
     def set_arnold_geometry_properties_by_data(self, data, extend_kwargs=None):

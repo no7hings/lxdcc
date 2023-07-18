@@ -1,4 +1,6 @@
 # coding:utf-8
+import os.path
+
 from ._bsc_cor_utility import *
 
 from lxbasic.core import _bsc_cor_raw, _bsc_cor_time, _bsc_cor_process, _bsc_cor_storage
@@ -26,7 +28,7 @@ class ImgFileOpt(object):
                 #
                 cmd_args = [
                     Bin.get_oiiotool(),
-                    u'-i "{}"'.format(self._file_path),
+                    '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
                 ]
@@ -36,19 +38,71 @@ class ImgFileOpt(object):
         return thumbnail_file_path
 
     def get_thumbnail_create_args(self, width=128, ext='.jpg'):
-        if self._file_path.endswith(ext):
-            return self._file_path, None
         thumbnail_file_path = self.get_thumbnail_file_path_(width, ext)
         if os.path.exists(thumbnail_file_path) is False:
             if os.path.exists(self._file_path):
+                # create target directory first
                 directory_path = os.path.dirname(thumbnail_file_path)
                 if os.path.exists(directory_path) is False:
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
                     Bin.get_oiiotool(),
-                    u'-i "{}"'.format(self._file_path),
+                    '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     '--resize {}x0'.format(width),
+                    '-o "{}"'.format(thumbnail_file_path)
+                ]
+                return thumbnail_file_path, ' '.join(cmd_args)
+        return thumbnail_file_path, None
+    @classmethod
+    def _create_background_(cls, width, background_rgba=(0, 0, 0, 255)):
+        force = False
+        file_path = _bsc_cor_storage.StgTmpThumbnailMtd.get_file_path_(
+            'background-{}'.format('-'.join(map(str, background_rgba))), width, '.png'
+        )
+        directory_path = os.path.dirname(file_path)
+        if os.path.exists(directory_path) is False:
+            os.makedirs(directory_path)
+        #
+        if os.path.isfile(file_path) is False or force is True:
+            r, g, b, a = background_rgba
+            ImgOiioMtd.create_png_as_fill(
+                file_path, (width, width), (r/255.0, g/255.0, b/255.0, a/255.0)
+            )
+        return file_path
+
+    def get_thumbnail_jpg_create_args_with_background_over(self, width=128, background_rgba=(0, 0, 0, 255)):
+        force = False
+        #
+        thumbnail_file_path = self.get_thumbnail_file_path_(width, '.jpg')
+        if os.path.isfile(self._file_path):
+            ext_src = os.path.splitext(self._file_path)[-1]
+            if ext_src == '.jpg':
+                return self.get_thumbnail_create_args(width, ext='.jpg')
+            #
+            info = ImgFileOiioOpt(self._file_path).get_info()
+            if info:
+                channel_count = int(info['channel_count'])
+                if channel_count < 4:
+                    return self.get_thumbnail_create_args(width, ext='.jpg')
+            #
+            if os.path.exists(thumbnail_file_path) is False or force is True:
+                directory_path = os.path.dirname(thumbnail_file_path)
+                if os.path.exists(directory_path) is False:
+                    os.makedirs(directory_path)
+                #
+                background_file_path = self._create_background_(width, background_rgba)
+                #
+                cmd_args = [
+                    Bin.get_oiiotool(),
+                    '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
+                    # use fit, move to center
+                    '--fit {}x{}'.format(width, width),
+                    # may be png has no alpha channel
+                    # '--ch R,G,B,A=0',
+                    background_file_path,
+                    '--over',
+                    '--ch R,G,B',
                     '-o "{}"'.format(thumbnail_file_path)
                 ]
                 return thumbnail_file_path, ' '.join(cmd_args)
@@ -130,11 +184,11 @@ class ImgFileOpt(object):
             )
             cmd_args = [
                 Bin.get_oiiotool(),
-                u'-i "{}"'.format(file_opt_src.path),
+                '-i "{}"'.format(_bsc_cor_raw.auto_encode(file_opt_src.get_path())),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
                 '--threads 1',
-                u'-o "{}"'.format(file_opt_tgt.path),
+                '-o "{}"'.format(_bsc_cor_raw.auto_encode(file_opt_tgt.get_path())),
             ]
             _bsc_cor_process.SubProcessMtd.execute_with_result(
                 ' '.join(cmd_args)
@@ -142,20 +196,20 @@ class ImgFileOpt(object):
     @classmethod
     def r_to_rgb(cls, file_path_src, file_path_tgt):
         option = dict(
-            input=file_path_src,
-            output=file_path_tgt,
+            input=_bsc_cor_raw.auto_encode(file_path_src),
+            output=_bsc_cor_raw.auto_encode(file_path_tgt),
             time_mark=_bsc_cor_time.TimestampMtd.to_string(
                 cls.TIME_MARK_PATTERN, _bsc_cor_storage.StgFileOpt(file_path_src).get_modify_timestamp()
             )
         )
         cmd_args = [
             Bin.get_oiiotool(),
-            u'-i "{input}"',
+            '-i "{input}"',
             '--ch 0,0,0',
             '--attrib:type=string DateTime "{time_mark}"',
             '--adjust-time ',
             '--threads 1',
-            u'-o "{output}"',
+            '-o "{output}"',
         ]
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
@@ -192,6 +246,22 @@ class ImgOiioMtd(object):
             '--fill:color={color} {size}',
             # u'-i "{}"'.format(file_path_src),
             u'-o "{output}"',
+        ]
+        _bsc_cor_process.SubProcessMtd.execute_with_result(
+            ' '.join(cmd_args).format(**option)
+        )
+    @classmethod
+    def create_png_as_fill(cls, file_path, size, rgba):
+        option = dict(
+            size='{}x{}'.format(*size),
+            color='{},{},{}'.format(*rgba),
+            output=_bsc_cor_raw.auto_encode(file_path)
+        )
+        cmd_args = [
+            Bin.get_oiiotool(),
+            '--create {size} 4',
+            '--fill:color={color} {size}',
+            '-o "{output}"',
         ]
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
@@ -348,34 +418,19 @@ class ImgOiioMtd(object):
     @classmethod
     def set_color_space_convert_to(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
         option = dict(
-            input=file_path_src,
-            output=file_path_tgt,
+            input=_bsc_cor_raw.auto_encode(file_path_src),
+            output=_bsc_cor_raw.auto_encode(file_path_tgt),
             from_color_space=color_space_src,
             to_color_space=color_space_tgt,
         )
         cmd_args = [
             Bin.get_oiiotool(),
-            u'-i "{input}"',
+            '-i "{input}"',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
             # '--iscolorspace "{from_color_space}"',
             # '--tocolorspace "{to_color_space}"',
             '--colorconvert "{from_color_space}" "{to_color_space}"',
-            u'-o "{output}"',
-        ]
-        _bsc_cor_process.SubProcessMtd.execute_with_result(
-            ' '.join(cmd_args).format(**option)
-        )
-    @classmethod
-    def r_to_rgb(cls, file_path_src, file_path_tgt):
-        option = dict(
-            input=file_path_src,
-            output=file_path_tgt,
-        )
-        cmd_args = [
-            Bin.get_oiiotool(),
-            u'-i "{input}"',
-            '--ch 0,0,0',
-            u'-o "{output}"',
+            '-o "{output}"',
         ]
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
@@ -641,7 +696,6 @@ class ImgFileOiioOpt(object):
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))
         _ = p.stdout.readlines()
-        print _
     #
     def __init__(self, file_path):
         if os.path.isfile(file_path):
@@ -649,9 +703,9 @@ class ImgFileOiioOpt(object):
             self._info = self._get_info_(self._file_path)
         else:
             raise OSError()
-    @property
-    def info(self):
+    def get_info(self):
         return self._info
+    info = property(get_info)
     #
     @property
     def path(self):
@@ -678,8 +732,8 @@ class ImgFileOiioOpt(object):
             elif SystemMtd.get_is_linux():
                 if os.path.exists(output_file_path) is False:
                     subprocess.Popen(
-                        u'ffmpeg -framerate 1 -i "{}" -c:v libx264 -r 30 -pix_fmt yuv420p "{}"'.format(
-                            self.path, output_file_path
+                        'ffmpeg -framerate 1 -i "{}" -c:v libx264 -r 30 -pix_fmt yuv420p "{}"'.format(
+                            _bsc_cor_raw.auto_encode(self._file_path), output_file_path
                         ),
                         shell=True
                     )

@@ -79,7 +79,7 @@ ktn_scripts.ScpWorkspaceCreate.new()
             s.load_look_auto()
             bsc_core.LogMtd.ENABLE = True
         #
-        ktn_obj, i_create = ktn_core.NGObjOpt._get_create_args_(
+        ktn_obj, i_create = ktn_core.NGObjOpt._get_node_create_args_(
             '/rootNode/workspace', 'Workspace_Wsp'
         )
         if i_create is True:

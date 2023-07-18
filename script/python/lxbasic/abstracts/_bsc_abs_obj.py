@@ -367,12 +367,14 @@ class AbsContent(object):
                 self.set(key, value.replace('\\$', '$'))
 
     def _unfold_inherit_and_override_(self, key, keys_all):
+        # etc. $: <key-path>
         if fnmatch.filter([key], '*$'):
             value = self.get(key)
             if fnmatch.filter([value], '.*'):
                 key_inherit = _ContentMtd.get_absolute_key(value, key)
             else:
                 key_inherit = value
+            #
             if key_inherit not in keys_all:
                 raise KeyError('key="{}" is non-exists'.format(key_inherit))
             #

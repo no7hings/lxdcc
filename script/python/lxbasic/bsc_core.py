@@ -78,20 +78,21 @@ if __name__ == '__main__':
     # ).extract_all_elements_to(
     #     '/l/temp/zeqi/tex/test'
     # )
-    # for i in [
-    #     'DirtAWipes007',
-    #     'Dirt007AWipes',
-    # ]:
-    #     print i, RawTextMtd.find_words(i)
-    p = '/production/library/resource/all/imperfection/{resource_name}/v001/texture/original/src/{resource_name}.mask.jpg'
-    p_o = PtnParseOpt(p)
-    for i in p_o.get_matches():
-        i_f_src = i['result']
-        i_f_o_src = StgFileOpt(i_f_src)
-        i_n = i_f_o_src.get_name().replace('mask', 'roughness')
-        i_f_tgt = '{}/{}'.format(i_f_o_src.get_directory_path(), i_n)
-        print i_f_tgt
-        ImgOiioMtd.r_to_rgb(
-            i_f_src,
-            i_f_tgt
-        )
+    for i in [
+        'DirtAWipes007',
+        'Dirt007AWipes',
+        'tube coral_v2 2'
+    ]:
+        print RawTextMtd.clear_up_to(i)
+        print i, RawTextMtd.split_any_to(i)
+    # p = '/production/library/resource/all/imperfection/{resource_name}/v001/texture/original/src/{resource_name}.mask.jpg'
+    # p_o = PtnParseOpt(p)
+    # for i in p_o.get_matches():
+    #     i_f_src = i['result']
+    #     i_f_o_src = StgFileOpt(i_f_src)
+    #     i_n = i_f_o_src.get_name().replace('mask', 'roughness')
+    #     i_f_tgt = '{}/{}'.format(i_f_o_src.get_directory_path(), i_n)
+    #     ImgFileOpt.r_to_rgb(
+    #         i_f_src,
+    #         i_f_tgt
+    #     )

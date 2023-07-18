@@ -136,7 +136,7 @@ class ScpMacro(object):
         type_name = data['type']
         path = data['path']
         force_update = data.get('force_update', False)
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_create_args_(path, type_name)
+        ktn_obj, is_create = ktn_core.NGObjOpt._get_node_create_args_(path, type_name)
         obj_opt = ktn_core.NGObjOpt(ktn_obj)
         if is_create is True or force_update is True:
             if (not type_name.endswith('_Wsp')) and (not type_name.endswith('_Wsp_Usr')):

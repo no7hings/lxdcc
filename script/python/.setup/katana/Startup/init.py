@@ -51,8 +51,8 @@ class ArnoldSetup(object):
     def set_events_register(cls):
         from lxkatana import ktn_core
         ss = [
-            (ktn_core.ArnoldEventMtd.create_material_fnc, ktn_core.EventOpt.EventType.NodeCreate),
-            (ktn_core.ArnoldEventMtd.create_image_fnc, ktn_core.EventOpt.EventType.NodeCreate),
+            (ktn_core.ArnoldEventMtd.on_material_create, ktn_core.EventOpt.EventType.NodeCreate),
+            (ktn_core.ArnoldEventMtd.on_image_create, ktn_core.EventOpt.EventType.NodeCreate),
         ]
         #
         for handler, event_type in ss:

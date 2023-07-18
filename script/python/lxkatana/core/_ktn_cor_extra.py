@@ -244,16 +244,13 @@ class EventMtd(object):
 
 
 class ArnoldEventMtd(object):
-    N = 'texture_directory'
     DIRECTORY_KEY = 'user.extra.texture_directory'
     DIRECTORY_VALUE = '/texture_directory'
-
     @classmethod
-    def create_material_fnc(cls, *args, **kwargs):
+    def on_material_create(cls, *args, **kwargs):
         if kwargs['nodeType'] == 'NetworkMaterialCreate':
             node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
             cls._create_material_(node_opt)
-
     @classmethod
     def _create_material_(cls, node_opt):
         """
@@ -303,14 +300,12 @@ class ArnoldEventMtd(object):
                 )
 
         connect_fnc_()
-
     @classmethod
-    def create_image_fnc(cls, *args, **kwargs):
+    def on_image_create(cls, *args, **kwargs):
         if kwargs['nodeType'] == 'ArnoldShadingNode':
             node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
             if node_opt.get('nodeType') in ['image']:
                 cls._create_image_(node_opt)
-
     @classmethod
     def _create_image_(cls, node_opt):
         """
@@ -344,6 +339,7 @@ class ArnoldEventMtd(object):
                 if _parent_type == 'NetworkMaterialCreate':
                     if not _parent_opt.get(_key):
                         return False
+                    #
                     node_opt.set_expression(
                         _key, 'getParent().{}'.format(_key)
                     )

@@ -1845,6 +1845,12 @@ print(
             return jinja2.Template(
                 bsc_core.StgFileOpt(f).set_read()
             )
+    @classmethod
+    def get_result(cls, key, variants):
+        t = Jinja.get_template(key)
+        return t.render(
+            **variants
+        )
 
 
 def get_is_ui_mode():
@@ -1858,25 +1864,14 @@ def get_is_ui_mode():
 
 
 if __name__ == '__main__':
-    pass
-    # a = File.set_read(
-    #         '/l/temp/td/dongchangbao/plug/maya/lynxinode/plug-ins/lxConvertNode.py'
-    #     )
-    # print(a)
-    c_ = Jinja.get_configure(
-        'test/test'
-    )
-    t = Jinja.get_template(
-        'test/test'
-    )
     print(
-        c_
-    )
-    print(
-        t.render(
-            **c_.get_value()
+        Jinja.get_result(
+            'katana/images',
+            dict(
+                images=[
+                    dict(name='diffuse', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=0),
+                    dict(name='roughness', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=210)
+                ]
+            )
         )
-    )
-    print(
-        Jinja.get_template('arnold/katana-ui-template-v002')
     )

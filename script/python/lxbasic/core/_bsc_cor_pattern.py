@@ -348,6 +348,7 @@ class PtnParseOpt(object):
                 i_r.update(self._variants)
                 i_r['result'] = result
                 return i_r
+        return self._variants
 
     def _get_exists_results_(self):
         return glob.glob(

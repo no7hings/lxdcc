@@ -81,7 +81,7 @@ if __name__ == '__main__':
     for i in [
         'DirtAWipes007',
         'Dirt007AWipes',
-        'tube coral_v2 2'
+        'tube coral_v2 2.2'
     ]:
         print RawTextMtd.clear_up_to(i)
         print i, RawTextMtd.split_any_to(i)

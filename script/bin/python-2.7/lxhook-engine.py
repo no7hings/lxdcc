@@ -92,7 +92,7 @@ def __execute_option_hook(hook_option):
         raise RuntimeError(
             utl_core.Log.set_module_error_trace(
                 'hook-run',
-                u'engine="{}" is not available'.format(hook_engine)
+                'engine="{}" is not available'.format(hook_engine)
             )
         )
     #
@@ -125,6 +125,12 @@ def __execute_option_hook(hook_option):
     )
     #
     application = hook_engine.split('-')[0]
+    if application == 'katana':
+        # todo: use configure
+        katana_version = option_opt.get('katana_version')
+        if katana_version:
+            if katana_version >= '4.5':
+                application = 'katana4.5'
     #
     rsv_app = rsv_project.get_rsv_app(
         application=application

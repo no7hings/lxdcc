@@ -36,11 +36,35 @@ if __name__ == '__main__':
     #     cmd, clear_environ='auto'
     # )
     # /production/shows/nsa_dev/assets/oth/genariceyes/user/work.wengmengdi/maya/scenes/srf_anishading/genariceyes.srf.srf_anishading.v001_002.ma
+    # cmd = MayaProcess.get_command(
+    #     'method=collection-and-repath-texture&file={}&scene_directory={}&texture_directory={}'.format(
+    #         '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/source/nikki.ma',
+    #         '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/maya',
+    #         '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/texture'
+    #     )
+    # )
+    #
+    # bsc_core.SubProcessMtd.execute_with_result_in_linux(
+    #     cmd, clear_environ='auto'
+    # )
+
+    # cmd = MayaProcess.get_command(
+    #     'method=scene-to-usd&scene={}&usd={}&auto_rename=True'.format(
+    #         '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
+    #         '/production/library/resource/all/test/grass_g010/v0001/geometry/usd/grass_g010.usd'
+    #     )
+    # )
+    #
+    # bsc_core.SubProcessMtd.execute_with_result_in_linux(
+    #     cmd, clear_environ='auto'
+    # )
+
     cmd = MayaProcess.get_command(
-        'method=collection-and-repath-texture&file={}&scene_directory={}&texture_directory={}'.format(
-            '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/source/nikki.ma',
-            '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/maya',
-            '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/texture'
+        'method=scene-to-ass&scene={}&ass={}&auto_rename=True&texture_directory={}&texture_search_directory={}'.format(
+            '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
+            '/production/library/resource/all/test/grass_g010/v0001/proxy/grass_g010.ass',
+            '/production/library/resource/all/test/grass_g010/v0001/texture/source',
+            '/production/library/resource/share/texture/plant-unorganized/tx',
         )
     )
 

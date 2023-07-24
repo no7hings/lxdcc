@@ -153,7 +153,7 @@ class StgConnector(object):
     }
     #
     def __init__(self, **kwargs):
-        self._stg_instance = stg_core.ShotgunMtd().set_shotgun_instance_create()
+        self._stg_instance = stg_core.ShotgunMtd().create_shotgun_instance()
     @property
     def shotgun(self):
         return self._stg_instance

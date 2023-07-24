@@ -6,7 +6,7 @@ from lxshotgun import stg_configure
 
 class ShotgunMtd(object):
     @classmethod
-    def set_shotgun_instance_create(cls):
+    def create_shotgun_instance(cls):
         # noinspection PyUnresolvedReferences
         from shotgun_api3 import shotgun
         #
@@ -19,7 +19,4 @@ class ShotgunMtd(object):
             )
         )
         return _
-    @classmethod
-    def set_shotgun_engine_setup(cls):
-        pass
 

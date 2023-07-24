@@ -681,10 +681,10 @@ def _get_channels_count_(file_path):
 class AndImageOpt(object):
     @classmethod
     def _get_info_(cls, file_path):
-        _f = file_path.encode("UTF8")
+        _f = bsc_core.auto_encode(file_path)
         width, height = _get_resolution_(_f) or (0, 0)
         dic = dict(
-            bit=cls._get_bit_(file_path) or 0,
+            bit=cls._get_bit_(_f) or 0,
             type=cls._get_type_(_f),
             channel_count=_get_channels_count_(_f),
             width=width,
@@ -915,8 +915,8 @@ class AndTextureOpt_(AndImageOpt):
     @classmethod
     def get_format_convert_as_aces_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
         option = dict(
-            file_src=file_path_src,
-            file_tgt=file_path_tgt,
+            file_src=bsc_core.auto_encode(file_path_src),
+            file_tgt=bsc_core.auto_encode(file_path_tgt),
             color_space_src=color_space_src,
             color_space_tgt=color_space_tgt,
             format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
@@ -949,8 +949,8 @@ class AndTextureOpt_(AndImageOpt):
     @classmethod
     def get_create_exr_as_acescg_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt, use_update_mode=True):
         option = dict(
-            file_src=file_path_src,
-            file_tgt=file_path_tgt,
+            file_src=bsc_core.auto_encode(file_path_src),
+            file_tgt=bsc_core.auto_encode(file_path_tgt),
             color_space_src=color_space_src,
             color_space_tgt=color_space_tgt,
             format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
@@ -996,8 +996,8 @@ class AndTextureOpt_(AndImageOpt):
     def get_create_tx_as_acescg_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt, use_update_mode=True):
         cmd_args = [
             'maketx',
-            u'"{}"'.format(file_path_src),
-            u'-o "{}"'.format(file_path_tgt),
+            '"{}"'.format(bsc_core.auto_encode(file_path_src)),
+            '-o "{}"'.format(bsc_core.auto_encode(file_path_tgt)),
             '-v',
             '-u',
             '--unpremult',

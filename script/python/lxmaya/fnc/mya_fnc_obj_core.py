@@ -146,7 +146,7 @@ class FncUsdMesh(FncUsdObj):
                         uv_maps = geometry['uv_maps']
                         mya_mesh_opt.set_uv_maps(uv_maps)
                     else:
-                        old_mya_mesh._set_path_update_()
+                        old_mya_mesh._update_path_()
                         old_mya_mesh.set_uv_maps_transfer_to(mya_mesh.path, clear_history=True)
                     #
                     material_assigns = look['material_assigns']
@@ -157,7 +157,7 @@ class FncUsdMesh(FncUsdObj):
                     mya_mesh_look_opt.set_properties(properties)
                     mya_mesh_look_opt.set_visibilities(visibilities)
             #
-            old_mya_transform._set_path_update_()
+            old_mya_transform._update_path_()
             old_mya_transform.set_delete()
 
     def set_exchange(self, geometry, look):
@@ -190,7 +190,7 @@ class FncUsdMesh(FncUsdObj):
                         uv_maps = geometry['uv_maps']
                         mya_mesh_opt.set_uv_maps(uv_maps)
                     else:
-                        old_mya_mesh._set_path_update_()
+                        old_mya_mesh._update_path_()
                         old_mya_mesh.set_uv_maps_transfer_to(mya_mesh.path, clear_history=True)
 
                     mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(mya_mesh)
@@ -203,7 +203,7 @@ class FncUsdMesh(FncUsdObj):
                     mya_mesh_look_opt.set_properties(properties)
                     mya_mesh_look_opt.set_visibilities(visibilities)
                 #
-                old_mya_transform._set_path_update_()
+                old_mya_transform._update_path_()
                 old_mya_transform.set_delete()
 
     def set_points(self):

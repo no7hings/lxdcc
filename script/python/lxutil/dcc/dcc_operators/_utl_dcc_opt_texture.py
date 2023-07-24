@@ -532,37 +532,41 @@ class DccTexturesOpt(object):
         #
         self._set_repath_queue_run_(repath_queue)
 
-    def set_search_from_(self, directory_paths_tgt):
-        objs = self._objs
+    def set_search_from_(self, directory_paths_tgt, below_enable=False):
+        dcc_objs = self._objs
 
         repath_queue = []
 
-        search_opt = bsc_core.StgFileSearchOpt()
-        search_opt.set_search_directories(directory_paths_tgt)
-        if objs:
+        search_opt = bsc_core.StgFileSearchOpt(
+            ignore_name_case=True,
+            ignore_ext_case=True,
+            ignore_ext=True
+        )
+        search_opt.set_search_directories(directory_paths_tgt, below_enable=below_enable)
+        if dcc_objs:
             g_p = utl_core.GuiProgressesRunner(
-                maximum=len(objs)
+                maximum=len(dcc_objs)
             )
-            for i_obj in objs:
+            for i_dcc_obj in dcc_objs:
                 g_p.set_update()
-                for j_port_path, j_texture_path_tgt in i_obj.reference_raw.items():
+                for j_port_path, j_texture_path_tgt in i_dcc_obj.reference_raw.items():
                     j_texture_src = utl_dcc_objects.OsTexture(j_texture_path_tgt)
                     j_result = search_opt.get_result(j_texture_src.path)
                     if j_result:
-                        j_port = i_obj.get_port(j_port_path)
+                        j_port = i_dcc_obj.get_port(j_port_path)
                         tgt_texture_tgt = utl_dcc_objects.OsTexture(j_result)
                         #
                         repath_queue.append(
                             (j_port, tgt_texture_tgt)
                         )
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.LogMtd.trace_method_result(
                             'file-search',
-                            u'file="{}" >> "{}"'.format(j_texture_src.path, tgt_texture_tgt.path)
+                            'file="{}" >> "{}"'.format(j_texture_src.path, tgt_texture_tgt.path)
                         )
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.LogMtd.trace_method_warning(
                             'file-search',
-                            u'file="{}" target is not found'.format(j_texture_src.path)
+                            'file="{}" target is not found'.format(j_texture_src.path)
                         )
 
             #

@@ -300,6 +300,7 @@ class ScpRenderBuild(object):
                             user=user, time_tag=time_tag,
                             td_enable=td_enable, rez_beta=rez_beta,
                             #
+                            katana_version=hook_option_opt.get('katana_version'),
                             render_file=render_file_path,
                             render_output_directory=i_render_output_directory_path,
                             render_node=i_render_node,

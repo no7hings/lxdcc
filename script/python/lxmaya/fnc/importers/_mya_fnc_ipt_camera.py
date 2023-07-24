@@ -89,7 +89,7 @@ class CameraAbcImporter(
                     #
                     i_obj.set_parent_path(mya_location)
             #
-            i_obj._set_path_update_()
+            i_obj._update_path_()
             dcc_dag_path = bsc_core.DccPathDagOpt(i_obj.path).clear_namespace_to()
             self._results.append(dcc_dag_path.path)
         #

@@ -197,6 +197,8 @@ patterns:
     texture-acescg-src-exr-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.exr'
     texture-acescg-tx-dir: '<.texture-acescg-dir>/tx'
     texture-acescg-tx-file: '<.texture-acescg-tx-dir>/{resource}.{texture_type_tag}.tx'
+    #
+    texture-source-dir: '<.texture-dir>/source'
     # geometry
     geometry-dir: '<.version-dir>/geometry'
     geometry-fbx-dir: '<.geometry-dir>/fbx'
@@ -208,6 +210,15 @@ patterns:
     #
     geometry-abc-dir: '<.geometry-dir>/abc'
     geometry-usd-dir: '<.geometry-dir>/usd'
+    # scene
+    scene-dir: '<.version-dir>/scene'
+    scene-maya-dir: '<.scene-dir>/maya'
+    scene-maya-file: '<.scene-maya-dir>/{resource}.ma'
+    scene-maya-src-dir: '<.scene-dir>/maya/source'
+    scene-maya-src-file: '<.scene-maya-src-dir>/{resource}.ma'
+    # proxy
+    proxy-dir: '<.version-dir>/proxy'
+    proxy-ass-dir: '<.proxy-dir>/ass'
 #
 storages:
     # texture
@@ -222,6 +233,10 @@ storages:
     texture_acescg_tx_directory:
         kind: directory
         keyword: 'texture-acescg-tx-dir'
+
+    texture_source_directory:
+        kind: directory
+        keyword: 'texture-source-dir'
     # geometry
     geometry_fbx_directory:
         kind: directory
@@ -234,7 +249,18 @@ storages:
     geometry_usd_directory:
         kind: directory
         keyword: 'geometry-usd-dir'
-    # cache
+    # scene
+    scene_maya_directory:
+        kind: directory
+        keyword: 'scene-maya-dir'
+    #
+    scene_maya_src_directory:
+        kind: directory
+        keyword: 'scene-maya-src-dir'
+    # proxy
+    proxy_ass_directory:
+        kind: directory
+        keyword: 'proxy-ass-dir'
 #
 category_groups:
     - '/surface'
@@ -244,3 +270,5 @@ category_groups:
     - '/atlas'
     - '/3d_asset'
     - '/3d_plant'
+    - '/3d_proxy'
+    - '/test'

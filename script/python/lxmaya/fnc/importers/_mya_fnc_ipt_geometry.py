@@ -337,7 +337,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 else:
                     obj.set_delete()
 
-            obj._set_path_update_()
+            obj._update_path_()
         #
         namespace_obj.set_delete()
 

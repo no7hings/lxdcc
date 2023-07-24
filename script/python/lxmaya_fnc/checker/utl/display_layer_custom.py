@@ -20,7 +20,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
     # noinspection PyMethodMayBeStatic
     def _repair_method_0(self, *args):
         obj = args[0]
-        obj._set_path_update_()
+        obj._update_path_()
         if obj.get_is_exists():
             obj.set_delete()
 

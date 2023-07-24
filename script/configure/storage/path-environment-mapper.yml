@@ -5,9 +5,16 @@ windows:
     PAPER_PRODUCTION_ROOT:
         - 'x:/shows'
         - 'X:/shows'
+    #
+    PAPER_PRODUCTION_RESOURCE:
+        - 'x:/library/resource'
+        - 'X:/library/resource'
 
 linux:
     PG_PROJ_ROOT:
         - '/l/prod'
     PAPER_PRODUCTION_ROOT:
         - '/production/shows'
+    #
+    PAPER_PRODUCTION_RESOURCE:
+        - '/production/library/resource'

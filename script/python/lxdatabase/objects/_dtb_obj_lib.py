@@ -733,8 +733,10 @@ if __name__ == '__main__':
         # 'displacement',
         # '3d_asset',
         # '3d_plant',
-        'imperfection',
-        'texture'
+        # 'imperfection',
+        # 'texture'
+        # 'test'
+        '3d_proxy',
     ]:
         dtb_opt_ = DtbResourceLibraryOpt(
             bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),

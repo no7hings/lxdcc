@@ -466,7 +466,7 @@ class AbsMyaObj(
             return path
         return path
 
-    def _set_path_update_(self):
+    def _update_path_(self):
         if self.unique_id:
             _ = cmds.ls(self.unique_id, long=1)
             if _:
@@ -523,7 +523,7 @@ class AbsMyaObj(
             self.set_parent(new_parent_dcc_obj)
             new_name = new_dcc_path_dag_opt.name
             if new_name != self.name:
-                self._set_path_update_()
+                self._update_path_()
                 self.set_rename(new_name)
 
     def get_is_file_reference(self):

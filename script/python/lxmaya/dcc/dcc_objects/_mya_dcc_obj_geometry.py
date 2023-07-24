@@ -380,7 +380,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
                 obj = self.__class__(box)
                 transform = obj.transform
                 transform.set_rename(self.transform.name)
-                transform._set_path_update_()
+                transform._update_path_()
                 transform.set_parent_path(self.transform.get_parent_path())
 
     def get_visible(self):

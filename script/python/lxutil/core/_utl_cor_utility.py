@@ -1870,7 +1870,7 @@ if __name__ == '__main__':
             dict(
                 images=[
                     dict(name='diffuse', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=0),
-                    dict(name='roughness', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=210)
+                    dict(name='roughness', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=240)
                 ]
             )
         )

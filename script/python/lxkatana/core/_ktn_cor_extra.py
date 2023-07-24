@@ -1,6 +1,16 @@
 # coding:utf-8
 from ._ktn_cor_utility import *
 
+import fnmatch
+
+import sys
+
+from lxbasic import bsc_core
+
+import lxbasic.objects as bsc_objects
+
+from lxutil import utl_core
+
 from lxkatana.core import _ktn_cor_node
 
 

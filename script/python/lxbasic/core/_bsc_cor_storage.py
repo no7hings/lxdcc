@@ -1,6 +1,7 @@
 # coding:utf-8
 import os.path
 
+import six
 from ._bsc_cor_utility import *
 
 from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_time, _bsc_cor_log, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
@@ -1073,21 +1074,14 @@ class StgFileSearchOpt(object):
         self._ignore_ext = ignore_ext
         self._search_dict = collections.OrderedDict()
 
-    def set_search_directories(self, directory_paths):
+    def set_search_directories(self, directory_paths, below_enable=False):
         self._search_dict = collections.OrderedDict()
         for i in directory_paths:
-            for j in StgDirectoryMtd.get_all_file_paths__(i):
-                j_directory_path, j_name_base, j_ext = StorageMtd.get_file_args(j)
-                if self._ignore_name_case is True:
-                    j_name_base = j_name_base.lower()
-                if self._ignore_ext_case is True:
-                    j_ext = j_ext.lower()
-
-                self._search_dict[u'{}/{}{}'.format(j_directory_path, j_name_base, j_ext)] = j
+            self.append_search_directory(i, below_enable=below_enable)
         #
         self._set_key_sort_()
 
-    def set_search_directory_append(self, directory_path, below_enable=False):
+    def append_search_directory(self, directory_path, below_enable=False):
         if below_enable is True:
             _ = StgDirectoryMtd.get_all_file_paths__(directory_path)
         else:
@@ -1099,7 +1093,13 @@ class StgFileSearchOpt(object):
                 i_name_base = i_name_base.lower()
             if self._ignore_ext_case is True:
                 i_ext = i_ext.lower()
-            self._search_dict[u'{}/{}{}'.format(i_directory_path, i_name_base, i_ext)] = i
+            # noinspection PyBroadException
+            try:
+                self._search_dict['{}/{}{}'.format(i_directory_path, i_name_base, i_ext)] = i
+            except:
+                _bsc_cor_log.LogMtd.trace_error(
+                    'file "{}" is not valid'.format(i)
+                )
         # sort
         self._set_key_sort_()
 
@@ -1119,24 +1119,24 @@ class StgFileSearchOpt(object):
 
         file_path_keys = self._search_dict.keys()
 
-        match_pattern_0 = u'*/{}{}'.format(name_base_pattern, ext_src)
+        match_pattern_0 = '*/{}{}'.format(name_base_pattern, ext_src)
         matches_0 = fnmatch.filter(
             file_path_keys, match_pattern_0
         )
         if matches_0:
             file_path_tgt = self._search_dict[matches_0[-1]]
             directory_path_tgt, name_base_tgt, ext_tgt = StorageMtd.get_file_args(file_path_tgt)
-            return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
+            return '{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
         #
         if self._ignore_ext is True:
-            match_pattern_1 = u'*/{}.*'.format(name_base_pattern)
+            match_pattern_1 = '*/{}.*'.format(name_base_pattern)
             matches_1 = fnmatch.filter(
                 file_path_keys, match_pattern_1
             )
             if matches_1:
                 file_path_tgt = self._search_dict[matches_1[-1]]
                 directory_path_tgt, name_base_tgt, ext_tgt = StorageMtd.get_file_args(file_path_tgt)
-                return u'{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
+                return '{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
 
 
 class StgDirectoryOpt(StgPathOpt):

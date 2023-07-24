@@ -27,10 +27,10 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
     # noinspection PyMethodMayBeStatic
     def _repair_method_0(self, *args):
         obj = args[0]
-        obj._set_path_update_()
+        obj._update_path_()
         if obj.get_is_exists():
             transform = obj.transform
-            transform._set_path_update_()
+            transform._update_path_()
             new_name = '{}_geo'.format(transform.name)
             transform.set_rename(new_name)
     # Geometry-transform-transformation(Translate, Rotate, Scale) is Non-default
@@ -77,7 +77,7 @@ class Method(ma_fnc_abstract.AbsMyaChecker):
     @_mya_mdf_utility.set_undo_mark_mdf
     def _repair_method_3(self, *args):
         obj = args[0]
-        obj._set_path_update_()
+        obj._update_path_()
         if obj.get_is_exists():
             obj.set_history_clear()
 

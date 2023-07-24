@@ -140,7 +140,7 @@ class ProxyAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 )
                 _, is_create = i_osl_color_correct.get_dcc_instance('osl_color_correct')
                 if is_create is True:
-                    i_osl_color_correct._set_path_update_()
+                    i_osl_color_correct._update_path_()
                     i_input_port = i_osl_color_correct.get_port('input')
                     i_output_port = i_osl_color_correct.get_port('outColor')
                     i_input_port.set_source(i_source)

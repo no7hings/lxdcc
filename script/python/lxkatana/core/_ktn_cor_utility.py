@@ -1,6 +1,12 @@
 # coding:utf-8
 import six
 
+import os
+
+import fnmatch
+
+import sys
+
 import collections
 
 import threading
@@ -15,10 +21,6 @@ import lxbasic.objects as bsc_objects
 
 from lxutil import utl_core
 
-import fnmatch
-
-import sys
-
 
 def get_is_ui_mode():
     return Configuration.get('KATANA_UI_MODE') == '1'
@@ -29,6 +31,10 @@ if get_is_ui_mode():
     from UI4 import App
     # noinspection PyUnresolvedReferences
     from Katana import UserNodes
+
+
+def get_katana_version():
+    return os.environ['KATANA_VERSION']
 
 
 class ResolutionOpt(object):

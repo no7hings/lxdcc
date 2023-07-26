@@ -270,5 +270,6 @@ category_groups:
     - '/atlas'
     - '/3d_asset'
     - '/3d_plant'
+    - '/3d_plant_proxy'
     - '/3d_proxy'
     - '/test'

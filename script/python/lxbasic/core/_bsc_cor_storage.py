@@ -1125,8 +1125,7 @@ class StgFileSearchOpt(object):
         )
         if matches_0:
             file_path_tgt = self._search_dict[matches_0[-1]]
-            directory_path_tgt, name_base_tgt, ext_tgt = StorageMtd.get_file_args(file_path_tgt)
-            return '{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
+            return file_path_tgt
         #
         if self._ignore_ext is True:
             match_pattern_1 = '*/{}.*'.format(name_base_pattern)
@@ -1135,8 +1134,7 @@ class StgFileSearchOpt(object):
             )
             if matches_1:
                 file_path_tgt = self._search_dict[matches_1[-1]]
-                directory_path_tgt, name_base_tgt, ext_tgt = StorageMtd.get_file_args(file_path_tgt)
-                return '{}/{}{}'.format(directory_path_tgt, name_base_src, ext_tgt)
+                return file_path_tgt
 
 
 class StgDirectoryOpt(StgPathOpt):

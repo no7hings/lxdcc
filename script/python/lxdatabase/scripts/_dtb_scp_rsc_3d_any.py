@@ -21,6 +21,7 @@ class ScpResourcesAddFor3dPlant(object):
         ('YeCao', 'wild_grass'),
         ('YeGya', 'wild_flower')
     ]
+    TYPE_DICT = {}
     def __init__(self):
         pass
     @classmethod
@@ -138,11 +139,9 @@ class ScpResourcesAddFor3dPlant(object):
             bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(category_group))
         )
         #
-        dtb_opt.get_type_force(type_dtb_path)
-        #
         variants = {'directory': directory_path_src}
         #
-        resource_p = '{directory}/{name}/{name}_{number}_Model_{lod}'
+        resource_p = '{directory}/{name}_{var}/{name}_{var}_{number}_Model_{lod}'
         resource_p_opt = bsc_core.PtnParseOpt(resource_p)
         resource_p_opt.set_update(**variants)
         #
@@ -161,9 +160,15 @@ class ScpResourcesAddFor3dPlant(object):
         for i in cls.NAME_REPLACE:
             name = name.replace(i[0], i[1])
 
-        resource_name = '{}{}'.format(name, str(int(variants['number'])).zfill(3)).lower()
+        var = variants['var']
+        var = var.lower()
 
-        print resource_name
+        type_dtb_path = '{}_{}'.format(type_dtb_path, var)
+        dtb_opt.get_type_force(type_dtb_path)
+
+        resource_name = '{}_{}{}_rsc'.format(name, var, str(int(variants['number'])).zfill(3)).lower()
+
+        print type_dtb_path, resource_name
 
         resource_dtb_path = '/{}/{}'.format(category_group, resource_name)
         version_name = 'v0001'
@@ -179,7 +184,7 @@ class ScpResourcesAddFor3dPlant(object):
             dtb_opt, resource_dtb_path, [type_dtb_path]
         )
 
-        preview_p = '{directory}/{name}/{name}_{number}_Model_{lod}/{name}_{number}_Model_{lod}.jpg'
+        preview_p = '{directory}/{name}_{var}/{name}_{var}_{number}_Model_{lod}/{name}_{var}_{number}_Model_{lod}.jpg'
         # preview
         preview_p_opt = bsc_core.PtnParseOpt(preview_p)
         preview_p_opt.set_update(**variants)
@@ -191,7 +196,7 @@ class ScpResourcesAddFor3dPlant(object):
                 version_dtb_path, 'image_preview_file', preview_file_path, kind=dtb_opt.Kinds.Version
             )
         # scene
-        scene_p = '{directory}/{name}/{name}_{number}_Model_{lod}/{name}_{number}_Model_{lod}_Shader_Ar_Static.ma'
+        scene_p = '{directory}/{name}_{var}/{name}_{var}_{number}_Model_{lod}/{name}_{var}_{number}_Model_{lod}_Shader_Ar_Static.ma'
         scene_p_opt = bsc_core.PtnParseOpt(scene_p)
         scene_p_opt.set_update(**variants)
         scene_file_paths_src = scene_p_opt.get_match_results()
@@ -205,12 +210,12 @@ class ScpResourcesAddFor3dPlant(object):
 
 if __name__ == '__main__':
     for i_d, i_t in [
-        # ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/Cao', '/3d_proxy/grass/lawn'),
-        # ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/GuanMu', '/3d_proxy/shrub/forest'),
-        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/JueLei', '/3d_proxy/fern/forest'),
-        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/Shu', '/3d_proxy/tree/forest'),
-        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/YeCao', '/3d_proxy/grass/wild'),
-        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/YeHua', '/3d_proxy/flower/wild'),
+        # ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/Cao', '/3d_plant_proxy/grass/lawn'),
+        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/GuanMu', '/3d_plant_proxy/shrub/forest'),
+        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/JueLei', '/3d_plant_proxy/fern/forest'),
+        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/Shu', '/3d_plant_proxy/tree/forest'),
+        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/YeCao', '/3d_plant_proxy/grass/wild'),
+        ('/l/temp/td/lib_extract/Asrlry/Assetlibrary/Model/ZhiWu/YeHua', '/3d_plant_proxy/flower/wild'),
     ]:
         ScpResourcesAddFor3dPlant().add_3d_from(
             i_d, i_t

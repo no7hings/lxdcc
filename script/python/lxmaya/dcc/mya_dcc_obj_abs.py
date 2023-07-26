@@ -767,6 +767,11 @@ class AbsMyaObj(
     def set_visible(self, boolean):
         self.get_port('visibility').set(boolean)
 
+    def make_identity(self, translate=1, rotate=1, scale=1):
+        cmds.makeIdentity(
+            self._path, apply=1, translate=translate, rotate=rotate, scale=scale
+        )
+
 
 class AbsMyaFileReferenceObj(
     AbsMyaObj,

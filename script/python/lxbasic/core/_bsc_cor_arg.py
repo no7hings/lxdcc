@@ -90,7 +90,7 @@ class ArgDictStringOpt(object):
         return self._option_dict
     value = property(get_value)
 
-    def get(self, key, as_array=False, as_integer=False):
+    def get(self, key, as_array=False, as_integer=False, as_float=False):
         if key in self._option_dict:
             _ = self._option_dict[key]
             if as_integer is True:
@@ -107,6 +107,20 @@ class ArgDictStringOpt(object):
                         return 0
                     return 0
                 return 0
+            elif as_float is True:
+                if isinstance(_, int):
+                    return float(_)
+                elif isinstance(_, float):
+                    return _
+                elif isinstance(_, six.string_types):
+                    if _:
+                        if str(_).isdigit():
+                            return float(_)
+                        elif _bsc_cor_raw.RawTextOpt(_).get_is_float():
+                            return float(_)
+                        return 0.0
+                    return 0.0
+                return 0.0
             if as_array is True:
                 if isinstance(_, (tuple, list)):
                     return _
@@ -126,6 +140,9 @@ class ArgDictStringOpt(object):
 
     def get_as_integer(self, key):
         return self.get(key, as_integer=True)
+
+    def get_as_float(self, key):
+        return self.get(key, as_float=True)
 
     def pop(self, key):
         if key in self._option_dict:

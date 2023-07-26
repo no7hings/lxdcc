@@ -59,8 +59,17 @@ if __name__ == '__main__':
     #     cmd, clear_environ='auto'
     # )
 
+    # print bsc_core.ArgDictStringOpt(
+    #     'method=scene-to-ass&scene={}&ass={}&auto_rename=True&texture_directory={}&texture_search_directory={}&scale=0.1'.format(
+    #         '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
+    #         '/production/library/resource/all/test/grass_g010/v0001/proxy/grass_g010.ass',
+    #         '/production/library/resource/all/test/grass_g010/v0001/texture/source',
+    #         '/production/library/resource/share/texture/plant-unorganized/tx',
+    #     )
+    # ).get_as_float('scale')
+
     cmd = MayaProcess.get_command(
-        'method=scene-to-ass&scene={}&ass={}&auto_rename=True&texture_directory={}&texture_search_directory={}'.format(
+        'method=scene-to-ass&scene={}&ass={}&auto_rename=True&texture_directory={}&texture_search_directory={}&scale=0.1'.format(
             '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
             '/production/library/resource/all/test/grass_g010/v0001/proxy/grass_g010.ass',
             '/production/library/resource/all/test/grass_g010/v0001/texture/source',

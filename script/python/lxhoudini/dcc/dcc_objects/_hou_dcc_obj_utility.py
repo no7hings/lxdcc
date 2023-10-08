@@ -17,7 +17,7 @@ from lxhoudini import hou_core
 
 from lxhoudini.dcc.dcc_objects import _hou_dcc_obj_os
 
-from lxutil_gui.qt import utl_gui_qt_core
+from lxutil_gui.qt import gui_qt_core
 
 
 __all__ = [
@@ -78,13 +78,13 @@ class Scene(utl_abstract.AbsDccScene):
     def get_scene_is_dirty(cls):
         return hou.hipFile.hasUnsavedChanges()
     @classmethod
-    def set_file_new(cls):
+    def new_file(cls):
         hou.hipFile.clear(suppress_save_prompt=True)
     @classmethod
     def set_new_file_create_with_dialog_(cls, file_path):
         hou.hipFile.clear(suppress_save_prompt=False)
     @classmethod
-    def set_file_new_with_dialog(cls, file_path, post_method=None):
+    def new_file_with_dialog(cls, file_path, post_method=None):
         def pos_method_run_fnc_():
             if isinstance(post_method, (types.FunctionType, types.MethodType)):
                 post_method(file_path)
@@ -131,7 +131,7 @@ class Scene(utl_abstract.AbsDccScene):
     def set_file_open_with_dialog(cls, file_path):
         pass
     @classmethod
-    def set_file_save_to(cls, file_path):
+    def save_file_to(cls, file_path):
         hou.hipFile.save(file_path)
         utl_core.Log.set_module_result_trace(
             'scene save',
@@ -141,16 +141,16 @@ class Scene(utl_abstract.AbsDccScene):
     def set_file_save_with_dialog(cls):
         if cls.get_scene_is_dirty():
             if cls.get_is_default():
-                f = utl_gui_qt_core.QtWidgets.QFileDialog()
+                f = gui_qt_core.QtWidgets.QFileDialog()
                 s = f.getSaveFileName(
-                    utl_gui_qt_core.QtHoudiniMtd.get_qt_main_window(),
+                    gui_qt_core.QtHoudiniMtd.get_qt_main_window(),
                     caption='Save File',
                     dir=hou.hipFile.path(),
                     filter="Houdini Files (*.hip, *.hipnc)"
                 )
                 if s:
                     _ = s[0]
-                    cls.set_file_save_to(_)
+                    cls.save_file_to(_)
             else:
                 pass
     @classmethod
@@ -162,7 +162,7 @@ class Scene(utl_abstract.AbsDccScene):
     def get_is_default(cls):
         return cls.get_current_file_path() == cls.get_default_file_path()
     @classmethod
-    def set_file_open(cls, file_path):
+    def open_file(cls, file_path):
         hou.hipFile.load(file_path)
 
 

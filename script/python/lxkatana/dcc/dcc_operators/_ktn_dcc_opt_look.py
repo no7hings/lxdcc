@@ -5,7 +5,7 @@ from lxbasic import bsc_core
 
 from lxutil.dcc import utl_dcc_opt_abs
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
@@ -66,7 +66,7 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
         #     print source_obj.get_properties()
 
     def get_properties(self):
-        properties = bsc_objects.Properties(self)
+        properties = ctt_objects.Properties(self)
         properties.set(
             'type', self.get_type_name(),
         )
@@ -83,7 +83,7 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
         return self._obj.get_port('parameters').get_children()
 
     def get_attributes(self):
-        attributes = bsc_objects.Properties(self)
+        attributes = ctt_objects.Properties(self)
         ports = self.get_ports()
         for port in ports:
             enable_port = port.get_child('enable')
@@ -136,7 +136,7 @@ class MaterialAssignOpt(utl_dcc_opt_abs.AbsObjOpt):
     def set_material_path(self, path):
         self.obj.set('args.materialAssign.value', path)
 
-    def set_material(self, material):
+    def assign_material(self, material):
         self.set_material_path(
             MaterialOpt(material).get_sg_path()
         )

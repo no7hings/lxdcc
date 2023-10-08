@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_configure
 
@@ -11,6 +11,7 @@ from lxutil import utl_abstract
 class HoudiniXml(object):
     XML_HEAD = 'subMenu'
     INDENT_COUNT = 4
+
     def __init__(self):
         self._indent = 0
 
@@ -52,7 +53,7 @@ class HoudiniXml(object):
                 else:
                     k, v = i
                     lis.append(
-                        (self.get_indent_count() + 1, '<{}>{}</{}>'.format(k, v, k), os.linesep)
+                        (self.get_indent_count()+1, '<{}>{}</{}>'.format(k, v, k), os.linesep)
                     )
             lis.append(
                 (self.get_indent_count(), '</{}>'.format(self.get_head()), os.linesep)
@@ -66,6 +67,7 @@ class HoudiniXml(object):
 
 class HoudiniXmlAction(HoudiniXml):
     XML_HEAD = 'scriptItem', 'separatorItem'
+
     def __init__(self, key=None):
         super(HoudiniXmlAction, self).__init__()
         self._key = key
@@ -76,12 +78,15 @@ class HoudiniXmlAction(HoudiniXml):
     @property
     def name(self):
         return self._name
+
     @name.setter
     def name(self, text):
         self._name = text
+
     @property
     def python_command(self):
         return self._python_command
+
     @python_command.setter
     def python_command(self, text):
         self._python_command = text
@@ -120,15 +125,18 @@ class HoudiniXmlAction(HoudiniXml):
 class HoudiniXmlMenu(HoudiniXml):
     ACTION_CLS = HoudiniXmlAction
     XML_HEAD = 'subMenu'
+
     def __init__(self, key, sub=False):
         super(HoudiniXmlMenu, self).__init__()
         self._key = key
         self._name = None
         self._sub = sub
         self._children = []
+
     @property
     def name(self):
         return self._name
+
     @name.setter
     def name(self, text):
         self._name = text
@@ -168,7 +176,7 @@ class HoudiniXmlMenu(HoudiniXml):
                 ('insertBefore', 'help_menu')
             ]
         for i in self.get_actions():
-            i.set_indent_count(self.get_indent_count() + 1)
+            i.set_indent_count(self.get_indent_count()+1)
             lis.append(i)
         return lis
 
@@ -176,6 +184,7 @@ class HoudiniXmlMenu(HoudiniXml):
 class HoudiniXmlMainMenuBar(HoudiniXml):
     MENU_CLS = HoudiniXmlMenu
     XML_HEAD = 'menuBar'
+
     def __init__(self):
         super(HoudiniXmlMainMenuBar, self).__init__()
         self._menus = []
@@ -254,11 +263,12 @@ class HoudiniSetupCreator(object):
                         _i_action = _menu.set_action_add(_i_key)
                         _i_action.name = _i_name
                         _i_action.python_command = _i_command
+
         #
         self._menu_bar = HoudiniXmlMainMenuBar()
         #
         configure_file_path = utl_configure.MainData.get_configure_file('houdini/menu/main')
-        configure = bsc_objects.Configure(value=configure_file_path)
+        configure = ctt_objects.Configure(value=configure_file_path)
         create_menu_fnc_(configure, 0)
         #
         main_menu_xml_file = '{}/MainMenuCommon.xml'.format(self._file_path)

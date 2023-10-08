@@ -4,11 +4,12 @@ from ._bsc_cor_utility import *
 from lxbasic.core import _bsc_cor_raw
 
 
-class OrderedYamlMtd(object):
+class YamlMtd(object):
     @classmethod
-    def set_dump(cls, raw, stream=None, Dumper=yaml.SafeDumper, object_pairs_hook=collections.OrderedDict, **kwargs):
-        class _Cls(Dumper):
+    def dump(cls, raw, stream=None, **kwargs):
+        class _Cls(yaml.SafeDumper):
             pass
+
         # noinspection PyUnresolvedReferences
         def _fnc(dumper_, data_):
             return dumper_.represent_mapping(
@@ -16,19 +17,42 @@ class OrderedYamlMtd(object):
                 data_.items(),
             )
 
-        _Cls.add_representer(object_pairs_hook, _fnc)
+        _Cls.add_representer(collections.OrderedDict, _fnc)
         return yaml.dump(raw, stream, _Cls, **kwargs)
+
     @classmethod
-    def set_load(cls, stream, Loader=yaml.SafeLoader, object_pairs_hook=collections.OrderedDict):
-        class _Cls(Loader):
+    def load(cls, stream):
+        class _Cls(yaml.SafeLoader):
             pass
+
         # noinspection PyArgumentList
         def _fnc(loader_, node_):
             loader_.flatten_mapping(node_)
-            return object_pairs_hook(loader_.construct_pairs(node_))
+            return collections.OrderedDict(loader_.construct_pairs(node_))
+
         # noinspection PyUnresolvedReferences
         _Cls.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _fnc)
         return yaml.load(stream, _Cls)
+
+
+class YamlFileOpt(object):
+    def __init__(self, file_path):
+        self._file_path = file_path
+
+    def write(self, raw):
+        with open(self._file_path, 'w') as y:
+            YamlMtd.dump(
+                raw,
+                y,
+                indent=4,
+                default_flow_style=False,
+            )
+
+    def read(self):
+        with open(self._file_path) as y:
+            raw = YamlMtd.load(y)
+            y.close()
+            return raw
 
 
 class DictMtd(object):
@@ -40,13 +64,15 @@ class DictMtd(object):
             skipkeys=True,
             sort_keys=True
         )
+
     @classmethod
     def get_as_yaml_style(cls, dict_):
-        return OrderedYamlMtd.set_dump(
+        return YamlMtd.dump(
             dict_,
             indent=4,
             default_flow_style=False
         )
+
     @classmethod
     def sort_key_to(cls, dict_):
         dict_1 = collections.OrderedDict()
@@ -55,6 +81,7 @@ class DictMtd(object):
         for i_key in keys:
             dict_1[i_key] = dict_[i_key]
         return dict_1
+
     @classmethod
     def sort_string_key_to(cls, dict_):
         dict_1 = collections.OrderedDict()
@@ -63,6 +90,7 @@ class DictMtd(object):
         for i_key in keys:
             dict_1[i_key] = dict_[i_key]
         return dict_1
+
     @classmethod
     def sort_key_by_value_to(cls, dict_):
         value_to_key_dict = {v: k for k, v in dict_.items()}
@@ -73,6 +101,7 @@ class DictMtd(object):
             i_key = value_to_key_dict[i_value]
             dict_1[i_key] = i_value
         return dict_1
+
     @classmethod
     def deduplication_value_to(cls, dict_):
         dict_1 = {}
@@ -81,3 +110,54 @@ class DictMtd(object):
             v_1.sort(key=v_0.index)
             dict_1[k] = v_1
         return dict_1
+
+
+class DictOpt(object):
+    PATHSEP = '.'
+
+    def __init__(self, value):
+        if not isinstance(value, dict):
+            raise RuntimeError()
+
+        self._value = value
+
+    def get(self, key, default=None):
+        ks = key.split(self.PATHSEP)
+        if len(ks) == 1:
+            return self._value.get(key, default)
+        v_cur = self._value
+        for i_k in ks:
+            if isinstance(v_cur, dict):
+                if i_k in v_cur:
+                    v_cur = v_cur[i_k]
+                else:
+                    return default
+            else:
+                return default
+        return v_cur
+
+    def set(self, key, value):
+        ks = key.split(self.PATHSEP)
+        if len(ks) == 1:
+            self._value[key] = value
+        else:
+            v_cur = self._value
+            #
+            maximum = len(ks)-1
+            for seq, k in enumerate(ks):
+                if seq == maximum:
+                    v_cur[k] = value
+                else:
+                    if k not in v_cur:
+                        v_cur[k] = collections.OrderedDict()
+                    #
+                    v_cur = v_cur[k]
+
+    def to_dict(self):
+        return self._value
+
+    def __str__(self):
+        return json.dumps(
+            self._value,
+            indent=4
+        )

@@ -52,12 +52,12 @@ class LookPropertiesUsdExporter(utl_fnc_obj_abs.AbsDccExporter):
                             #
                             if j_dcc_port.get_is_element() is False and j_dcc_port.get_is_channel() is False:
                                 j_port_path = 'arnold:{}'.format(j_dcc_port.name)
-                                i_usd_geometry_opt.set_customize_port_create(
+                                i_usd_geometry_opt.create_customize_port(
                                     j_port_path, j_dcc_port.type, j_dcc_port.get()
                                 )
         #
         self._usd_stage_opt.set_flatten()
-        self._usd_stage_opt.set_export_to(
+        self._usd_stage_opt.export_to(
             self._file_path
         )
 

@@ -42,11 +42,11 @@ if __name__ == '__main__':
     d_acescg_src_opt.set_create()
 
     jpg_file_paths = d_original_src_opt.get_all_file_paths(
-        include_exts=['.jpg']
+        ext_includes=['.jpg']
     )
     jpg_file_path_mapper = bsc_core.StorageMtd.to_file_deduplication_mapper(jpg_file_paths)
     exr_file_paths = d_original_src_opt.get_all_file_paths(
-        include_exts=['.exr']
+        ext_includes=['.exr']
     )
     exr_file_path_mapper = bsc_core.StorageMtd.to_file_deduplication_mapper(exr_file_paths)
 

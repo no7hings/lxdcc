@@ -29,9 +29,9 @@ import threading
 
 from lxbasic import bsc_core
 
-from lxbasic.abstracts import _bsc_abs_obj
+import lxcontent.abstracts as ctt_abstracts
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -45,10 +45,11 @@ class MtdBasic(object):
     PATTERN_KEY_RE_PATTERN = r'[{](.*?)[}]'
     #
     VERSION_ZFILL_COUNT = 3
-    VERSION_FNMATCH_PATTERN = 'v{}'.format('[0-9]' * VERSION_ZFILL_COUNT)
+    VERSION_FNMATCH_PATTERN = 'v{}'.format('[0-9]'*VERSION_ZFILL_COUNT)
     #
     URL_PATTERN = 'url://resolver?{parameters}'
     URL_PARAMETERS_PATTERN = '{key}={value}'
+
     @classmethod
     def _set_pattern_update_(cls, parse_pattern, **format_variant):
         if parse_pattern is not None:
@@ -62,6 +63,7 @@ class MtdBasic(object):
                             s = s.replace('{{{}}}'.format(key), format_variant[key])
             return s
         return parse_pattern
+
     @classmethod
     def _get_scheme_raw_(cls, file_path):
         if os.path.exists(file_path):
@@ -71,7 +73,7 @@ class MtdBasic(object):
                     return json.load(j, object_pairs_hook=collections.OrderedDict)
             elif ext in ['.yml']:
                 with open(file_path) as y:
-                    return bsc_core.OrderedYamlMtd.set_load(y)
+                    return bsc_core.YamlMtd.load(y)
             else:
                 raise TypeError(
                     'ext: "{}" is not available'.format(ext)
@@ -80,6 +82,7 @@ class MtdBasic(object):
             raise TypeError(
                 'file="{}" is Non-exists'.format(file_path)
             )
+
     @classmethod
     def _get_rsv_pattern_real_value_(cls, value, dic):
         def _rcs_fnc(v_):
@@ -97,11 +100,14 @@ class MtdBasic(object):
                         _r = _r.replace(u'<{}>'.format(_k), _v)
                 return _r
             return v_
+
         return _rcs_fnc(value)
+
     @classmethod
     def set_version_validation(cls, text):
         if not fnmatch.filter([text], cls.VERSION_FNMATCH_PATTERN):
             raise TypeError('version: "{}" is Non-match "{}"'.format(text, cls.VERSION_FNMATCH_PATTERN))
+
     @classmethod
     def _get_parameter_by_url_(cls, url):
         dic = {}
@@ -122,6 +128,7 @@ class MtdBasic(object):
         else:
             raise TypeError(u'url: "{}" is Non-available')
         return dic
+
     @classmethod
     def _get_rsv_task_unit_obj_path_(cls, **kwargs):
         keys = [
@@ -140,12 +147,14 @@ class MtdBasic(object):
             #
             'unit',
         ]
-        return '/' + '/'.join([kwargs[key] for key in keys if key in kwargs])
+        return '/'+'/'.join([kwargs[key] for key in keys if key in kwargs])
+
     @classmethod
     def _str_to_number_embedded_args_(cls, string):
         pieces = re.compile(r'(\d+)').split(unicode(string))
         pieces[1::2] = map(int, pieces[1::2])
         return pieces
+
     @classmethod
     def _get_fnmatch_pattern_by_parse_pattern_(cls, pattern):
         keys = cls._get_keys_by_parse_pattern_(pattern)
@@ -155,6 +164,7 @@ class MtdBasic(object):
                 s = s.replace('{{{}}}'.format(i_key), '*')
             return True, s
         return False, s
+
     @classmethod
     def _update_fnmatch_pattern_by_parse_pattern_(cls, parse_pattern, **kwargs):
         keys = cls._get_keys_by_parse_pattern_(parse_pattern)
@@ -167,12 +177,14 @@ class MtdBasic(object):
                     s = s.replace('{{{}}}'.format(i_key), '*')
             return s
         return s
+
     @classmethod
     def _get_keys_by_parse_pattern_(cls, pattern):
         lis_0 = re.findall(re.compile(cls.PATTERN_KEY_RE_PATTERN, re.S), pattern)
         lis_1 = list(set(lis_0))
         lis_1.sort(key=lis_0.index)
         return lis_1
+
     @classmethod
     def _get_stg_paths_by_parse_pattern_(cls, pattern, trim=None):
         if pattern is not None:
@@ -191,6 +203,7 @@ class MtdBasic(object):
             else:
                 return [glob_pattern]
         return []
+
     @classmethod
     def _set_name_check_(cls, rsv_type, name):
         _ = re.findall(
@@ -205,6 +218,7 @@ class MtdBasic(object):
                 )
             return False
         return True
+
     @classmethod
     def _set_rsv_obj_sort_(cls, rsv_objs):
         list_ = []
@@ -232,12 +246,15 @@ class RsvThread(threading.Thread):
         self._kwargs = kwargs
         #
         self._data = None
+
     #
     def set_data(self, data):
         self._data = data
+
     #
     def get_data(self):
         return self._data
+
     #
     def run(self):
         THREAD_MAXIMUM.acquire()
@@ -255,6 +272,7 @@ class RsvSceneProperties(object):
 class RawOpt(object):
     PATHSEP = '.'
     PATTERN_REF_RE_PATTERN = r'[<](.*?)[>]'
+
     def __init__(self, dict_):
         self._dict = dict_
         self._keys_exclude = []
@@ -270,6 +288,7 @@ class RawOpt(object):
                 lis.append(_key)
                 if isinstance(_v, dict):
                     rcs_fnc_(_key, _v)
+
         #
         lis = []
         rcs_fnc_(None, self._dict)
@@ -298,7 +317,7 @@ class RawOpt(object):
         ks = key_path.split(self.PATHSEP)
         v = self._dict
         #
-        maximum = len(ks) - 1
+        maximum = len(ks)-1
         for seq, k in enumerate(ks):
             if seq == maximum:
                 v[k] = value
@@ -325,10 +344,11 @@ class RawOpt(object):
                         _r = _r.replace(u'<{}>'.format(_k), _v)
                 return _r
             return v_
+
         return rcs_fnc_(value)
 
     def get_content_as_unfold(self, key):
-        c = bsc_objects.Configure(value=collections.OrderedDict())
+        c = ctt_objects.Configure(value=collections.OrderedDict())
         keys = self.get_keys('{}.*'.format(key))
         for i_key in keys:
             i_value = self.get_as_unfold(i_key)
@@ -338,7 +358,7 @@ class RawOpt(object):
 
     def get_as_unfold(self, key):
         keys_all = self.get_all_keys()
-        return _bsc_abs_obj._ContentMtd.unfold_fnc(
+        return ctt_abstracts.ContentMtd.unfold_fnc(
             key, keys_all, self._keys_exclude, self.get
         )
 
@@ -347,14 +367,17 @@ class RawOpt(object):
 class AbsRsvVersionKey(object):
     VERSION_ZFILL_COUNT = 3
     VERSION_FNMATCH_PATTERN = 'v{}'.format('[0-9]'*VERSION_ZFILL_COUNT)
+
     def __init__(self, text):
         MtdBasic.set_version_validation(text)
         #
         self._text = text
         self._number = int(text[-self.VERSION_ZFILL_COUNT:])
+
     @property
     def number(self):
         return self._number
+
     @classmethod
     def valid_fnc(cls, text):
         return not not fnmatch.filter([text], cls.VERSION_FNMATCH_PATTERN)
@@ -383,6 +406,7 @@ class AbsRsvVersionKey(object):
 class AbsRsvPattern(object):
     def __init__(self, raw):
         self._raw = raw
+
     @property
     def raw(self):
         return self._raw
@@ -414,6 +438,7 @@ class AbsRsvPattern(object):
 
 class AbsRsvPropertiesDef(object):
     PROPERTIES_CLS = None
+
     def _set_rsv_properties_def_init_(self):
         pass
 
@@ -431,6 +456,7 @@ class AbsRsvMatcher(
     RSV_MATCH_PATTERN_CLS = None
     #
     RSV_VERSION_KEY_CLS = None
+
     def __init__(self, rsv_obj, pattern, format_dict=None):
         self._set_rsv_properties_def_init_()
         #
@@ -454,6 +480,7 @@ class AbsRsvMatcher(
         #
         self._results = []
         self._matches = []
+
     #
     def _matcher__get_fnmatch_pattern_by_parse_pattern_(self, pattern):
         dict_ = self._rsv_project.get_variant('variant-fnmatch-patterns')
@@ -474,6 +501,7 @@ class AbsRsvMatcher(
         if '*' in s:
             return True, s
         return False, s
+
     #
     def _matcher__get_stg_paths_by_parse_pattern_(self, pattern, trim=None):
         if pattern is not None:
@@ -569,7 +597,7 @@ class AbsRsvMatcher(
                             patterns *= v_c
                             for i_index in range(c):
                                 for seq, i_v in enumerate(v):
-                                    j_index = c*seq + i_index
+                                    j_index = c*seq+i_index
                                     if i_v != '*':
                                         patterns[j_index] = patterns[j_index].replace(u'{{{}}}'.format(key), i_v)
             # print(patterns)
@@ -608,6 +636,7 @@ class AbsRsvMatcher(
             format_dict = copy.copy(self._match_variants)
             format_dict.update(parameters)
             return self.__get_path_by_local_variants_(format_dict)
+
     @classmethod
     def _get_properties_by_result_(cls, pattern, properties, result):
         p = parse.parse(
@@ -635,6 +664,7 @@ class AbsRsvMatcher(
             properties_,
             result
         )
+
     @classmethod
     def _get_variants_by_result_(cls, pattern, properties, result):
         p = parse.parse(
@@ -667,6 +697,7 @@ class AbsRsvMatcher(
     def get_current(self):
         format_dict = copy.copy(self._match_variants)
         return self.__get_path_by_local_variants_(format_dict)
+
     @classmethod
     def _set_rsv_version_key_create_(cls, version):
         return cls.RSV_VERSION_KEY_CLS(version)
@@ -694,6 +725,7 @@ class AbsRsvDef(object):
 
 class AbsRsvObjDef(object):
     PATHSEP = '/'
+
     def _set_obj_def_init_(self):
         self._rsv_properties = None
         self._rsv_path = None
@@ -704,9 +736,11 @@ class AbsRsvObjDef(object):
         self._keyword = properties.get('keyword')
         self._pattern = properties.get('pattern')
         self._rsv_properties = properties
+
     @property
     def rsv_matcher(self):
         return self._rsv_matcher
+
     @property
     def properties(self):
         return self._rsv_properties
@@ -719,14 +753,17 @@ class AbsRsvObjDef(object):
 
     def get_type(self):
         return self.properties.get('type')
+
     type = property(get_type)
 
     def get_type_name(self):
         return self.get_type()
+
     type_name = property(get_type_name)
 
     def get_name(self):
         return bsc_core.DccPathDagMtd.get_dag_name(self._rsv_path, pathsep=self.PATHSEP)
+
     name = property(get_name)
 
     @property
@@ -771,6 +808,7 @@ class AbsRsvObj(
         for k, v in rsv_parent.properties.get_value().items():
             if k not in cls.VariantTypes.VariableTypes:
                 kwargs[k] = v
+
     #
     def __init__(self, *args, **kwargs):
         self._set_rsv_properties_def_init_()
@@ -793,23 +831,24 @@ class AbsRsvObj(
             self.set_gui_menu_raw(
                 [
                     ('{}-directory'.format(self.type_name),),
-                    ('Open Directory', 'file/folder', (self._get_source_directory_is_enable_, self._open_source_directory_open_, False)),
+                    ('Open Directory', 'file/open-folder',
+                     (self._get_source_directory_is_enable_, self._open_source_directory_open_, False)),
                 ]
             )
         elif self.type_name in self.VariantTypes.Branches:
             self.set_gui_menu_raw(
                 [
                     [
-                        'Open Directory', 'file/folder',
+                        'Open Directory', 'file/open-folder',
                         [
                             ('{}-directory'.format(self.type_name),),
-                            ('Source', 'file/folder',
+                            ('Source', 'file/open-folder',
                              (self._get_source_directory_is_enable_, self._open_source_directory_open_, False)),
-                            ('User', 'file/folder',
+                            ('User', 'file/open-folder',
                              (self._get_user_directory_is_enable_, self._open_user_directory_open_, False)),
-                            ('Release', 'file/folder',
+                            ('Release', 'file/open-folder',
                              (self._get_release_directory_is_enable_, self._open_release_directory_open_, False)),
-                            ('Temporary', 'file/folder',
+                            ('Temporary', 'file/open-folder',
                              (self._get_temporary_directory_is_enable_, self._open_temporary_directory_open_, False)),
                         ]
                     ]
@@ -832,6 +871,7 @@ class AbsRsvObj(
             key = '{branch}-{workspace_key}-{type}-dir'.format(**kwargs)
             return self._rsv_project.get_pattern(key)
         return self._pattern
+
     # source
     def _get_source_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
@@ -847,6 +887,7 @@ class AbsRsvObj(
     def _open_source_directory_open_(self):
         directory_path = self._get_source_directory_path_()
         bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+
     # user
     def _get_user_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
@@ -863,6 +904,7 @@ class AbsRsvObj(
     def _open_user_directory_open_(self):
         directory_path = self._get_user_directory_path_()
         bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+
     # release
     def _get_release_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
@@ -878,6 +920,7 @@ class AbsRsvObj(
     def _open_release_directory_open_(self):
         directory_path = self._get_release_directory_path_()
         bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+
     # temporary
     def _get_temporary_directory_path_(self):
         kwargs = copy.copy(self.properties.value)
@@ -893,9 +936,11 @@ class AbsRsvObj(
     def _open_temporary_directory_open_(self):
         directory_path = self._get_temporary_directory_path_()
         bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+
     @property
     def rsv_project(self):
         return self._rsv_project
+
     @property
     def icon(self):
         return bsc_core.RscIconFileMtd.get('file/folder')
@@ -1009,6 +1054,7 @@ class AbsRsvUnit(
 
     def get_other_result(self, **kwargs):
         pass
+
     #
     def _set_exists_results_filter_(self, results):
         keyword = self.properties.get('keyword')
@@ -1016,6 +1062,7 @@ class AbsRsvUnit(
             return [i for i in results if os.path.isfile(i)]
         elif keyword.endswith('-dir'):
             return [i for i in results if os.path.isdir(i)]
+
     #
     def _get_results_(self):
         pass
@@ -1156,7 +1203,7 @@ class AbsRsvUnitVersion(
         super(AbsRsvUnitVersion, self).__init__(*args, **kwargs)
         self.set_gui_menu_raw(
             [
-                ('{}-directory'.format(self.type_name), ),
+                ('{}-directory'.format(self.type_name),),
                 ('Open Directory', 'file/folder', (True, self._open_source_directory_open_, False)),
             ]
         )
@@ -1179,6 +1226,7 @@ class AbsRsvTaskVersion(
 
     def get_rsv_task(self):
         return self.get_parent()
+
     # unit
     def get_rsv_unit(self, **kwargs):
         return self.rsv_project._project__get_rsv_unit_(
@@ -1200,11 +1248,12 @@ class AbsRsvTask(
         #     [
         #         (),
         #         [
-        #             'Open Work-scene-src-directory', 'file/folder',
+        #             'Open Work-scene-src-directory', 'file/open-folder',
         #             self.get_work_scene_src_directory_open_menu_raw()
         #         ]
         #     ]
         # )
+
     @property
     def icon(self):
         return bsc_core.RscIconFileMtd.get('file/file')
@@ -1216,13 +1265,15 @@ class AbsRsvTask(
 
             def set_directory_open_fnc_():
                 bsc_core.StgDirectoryOpt(_directory_path).set_open_in_system()
+
             #
             _branch = self.properties.get('branch')
             _keyword = '{}-work-{}-scene-src-dir'.format(_branch, application_)
             _rsv_unit = self.get_rsv_unit(keyword=_keyword)
             _directory_path = _rsv_unit.get_result()
             list_.append(
-                (application_, 'application/{}'.format(application_), (get_directory_is_exists_fnc_, set_directory_open_fnc_, False))
+                (application_, 'application/{}'.format(application_),
+                 (get_directory_is_exists_fnc_, set_directory_open_fnc_, False))
             )
 
         list_ = []
@@ -1232,6 +1283,7 @@ class AbsRsvTask(
 
     def get_directory_path(self):
         return self.properties.get('result')
+
     # todo: remove old fnc, use "get_rsv_scene_properties_by_any_scene_file_path"
     def get_properties_by_work_scene_src_file_path(self, file_path):
         return self._get_properties_by_scene_file_path_(
@@ -1248,6 +1300,7 @@ class AbsRsvTask(
             override_variants=dict(workspace=self._rsv_project.get_workspace_release()),
             file_path_keys=['any_scene_file', 'scene_src_file', 'source_file']
         )
+
     #
     def get_properties_by_scene_file_path(self, file_path):
         return self._get_properties_by_scene_file_path_(
@@ -1272,6 +1325,7 @@ class AbsRsvTask(
             override_variants=dict(workspace=self._rsv_project.get_workspace_temporary()),
             file_path_keys=['any_scene_file', 'output_scene_file']
         )
+
     #
     def _get_properties_by_scene_file_path_(self, file_path, key_format, override_variants, file_path_keys):
         if file_path is not None:
@@ -1302,6 +1356,7 @@ class AbsRsvTask(
                     #
                     task_unit_properties.set('dcc.pathsep', self.Applications.get_pathsep(i_application))
                     return task_unit_properties
+
     #
     def get_rsv_scene_properties_by_any_scene_file_path(self, file_path):
         if file_path is not None:
@@ -1346,15 +1401,19 @@ class AbsRsvTask(
                                 'usd', self._rsv_project.get_dcc_data('usd').get_value()
                             )
                             return j_rsv_scene_properties
+
     # resource group
     def get_rsv_resource_group(self):
         return self.get_parent().get_parent().get_parent()
+
     # resource
     def get_rsv_resource(self):
         return self.get_parent().get_parent()
+
     # step
     def get_rsv_step(self):
         return self.get_parent()
+
     # version
     def get_rsv_version(self, **kwargs):
         return self.rsv_project._project__get_rsv_task_version_(
@@ -1368,6 +1427,7 @@ class AbsRsvTask(
         return self._rsv_project._project__get_rsv_task_versions_(
             **kwargs_over
         )
+
     # unit
     def get_rsv_unit(self, **kwargs):
         return self.rsv_project._project__get_rsv_unit_(
@@ -1447,6 +1507,7 @@ class AbsRsvResource(
 ):
     def __init__(self, *args, **kwargs):
         super(AbsRsvResource, self).__init__(*args, **kwargs)
+
     @property
     def icon(self):
         return bsc_core.RscIconFileMtd.get('resolver/asset')
@@ -1546,6 +1607,7 @@ class AbsRsvResourceGroup(
 
 class AbsRsvExtraDef(AbsRsvDef):
     RSV_MATCH_PATTERN_CLS = None
+
     @classmethod
     def _guess_entity_type_(cls, **kwargs):
         if 'branch' in kwargs:
@@ -1561,6 +1623,7 @@ class AbsRsvExtraDef(AbsRsvDef):
         elif 'role' in kwargs:
             return cls.EntityTypes.Asset
         return cls.EntityTypes.Project
+
     @classmethod
     def _guess_entity_type_force_(cls, **kwargs):
         branch = cls._guess_entity_type_(**kwargs)
@@ -1569,12 +1632,15 @@ class AbsRsvExtraDef(AbsRsvDef):
                 'argument key "branch" must definition in kwargs'
             )
         return branch
+
     @classmethod
     def _get_step_keyword_(cls, branch, workspace_key):
         return '{}-{}-step-dir'.format(branch, workspace_key)
+
     @classmethod
     def _get_task_keyword_(cls, branch, workspace_key):
         return '{}-{}-task-dir'.format(branch, workspace_key)
+
     @classmethod
     def _read_raw_(cls, file_path):
         if os.path.exists(file_path):
@@ -1584,7 +1650,7 @@ class AbsRsvExtraDef(AbsRsvDef):
                     return json.load(j, object_pairs_hook=collections.OrderedDict)
             elif ext in ['.yml']:
                 with open(file_path) as y:
-                    return bsc_core.OrderedYamlMtd.set_load(y)
+                    return bsc_core.YamlMtd.load(y)
             else:
                 raise TypeError(
                     'ext: "{}" is not available'.format(ext)
@@ -1593,9 +1659,11 @@ class AbsRsvExtraDef(AbsRsvDef):
             raise TypeError(
                 'file="{}" is not found'.format(file_path)
             )
+
     @classmethod
     def _get_raw_opt_(cls, raw):
         return RawOpt(raw)
+
     @staticmethod
     def _completion_keyword_by_variants_(variants):
         """
@@ -1612,6 +1680,7 @@ class AbsRsvExtraDef(AbsRsvDef):
     def init_rsv_extra(self, raw):
         self._raw = raw
         self._raw_opt = RawOpt(self._raw)
+
     #
     def _set_rsv_def_init_(self):
         self._raw = collections.OrderedDict()
@@ -1665,7 +1734,7 @@ class AbsRsvExtraDef(AbsRsvDef):
             else:
                 raise KeyError('key: "{}" is non-exists'.format(i_key))
         #
-        return main_path + self.PATHSEP.join(p_values)
+        return main_path+self.PATHSEP.join(p_values)
 
     def _get_unit_rsv_path_(self, main_path, variants):
         search_keys_extend = self._raw_opt.get('path-unit-keys_extend')
@@ -1677,14 +1746,14 @@ class AbsRsvExtraDef(AbsRsvDef):
             else:
                 raise KeyError('key: "{}" is non-exists'.format(i_key))
         #
-        return main_path + self.PATHSEP.join(p_values)
+        return main_path+self.PATHSEP.join(p_values)
 
     def _cleanup_kwargs_(self, rsv_category, kwargs):
         entity_var_keys = self._raw_opt.get('path-{}-keys'.format(rsv_category))
         main_var_keys = self._raw_opt.get('path-main-keys')
         keys_main = self.VariantTypes.All
         keys_extend = self.VariantKeysExtend.All
-        keys_includes = keys_main + keys_extend
+        keys_includes = keys_main+keys_extend
         for k, v in kwargs.items():
             if k in keys_includes:
                 if k in main_var_keys and k not in entity_var_keys:
@@ -1730,6 +1799,7 @@ class AbsRsvExtraDef(AbsRsvDef):
         #
         kwargs.update(kwargs_extend)
         self._cleanup_kwargs_(rsv_category, kwargs)
+
     @staticmethod
     def _completion_rsv_obj_create_kwargs_(kwargs, result, kwargs_extend):
         update = bsc_core.TimePrettifyMtd.to_prettify_by_timestamp(
@@ -1775,6 +1845,7 @@ class AbsRsvExtraDef(AbsRsvDef):
         if keyword not in self._patterns_dict:
             raise KeyError(u'keyword: "{}" is Non-registered'.format(keyword))
         return self._patterns_dict[keyword]
+
     # todo: remove this method
     def get_value(self, key):
         return self._raw_opt.get(key)
@@ -1814,6 +1885,7 @@ class AbsRsvProject(
     PROPERTIES_CLS = None
     #
     CACHE = dict()
+
     def __init__(self, *args, **kwargs):
         self._set_obj_def_init_()
         self._set_rsv_def_init_()
@@ -1833,9 +1905,9 @@ class AbsRsvProject(
         #
         self._root_dict = collections.OrderedDict()
         self._root_step_choice = None
-        self._root_configure = bsc_objects.Configure(value=collections.OrderedDict())
+        self._root_configure = ctt_objects.Configure(value=collections.OrderedDict())
         #
-        self._static_variant_configure = bsc_objects.Configure(value=collections.OrderedDict())
+        self._static_variant_configure = ctt_objects.Configure(value=collections.OrderedDict())
         #
         self._rsv_matcher = self._project__create_rsv_matcher_(
             self._pattern,
@@ -1846,7 +1918,7 @@ class AbsRsvProject(
         raw.update(project_raw)
         self.init_rsv_extra(raw)
         #
-        self._configure = bsc_objects.Configure(value=self._raw)
+        self._configure = ctt_objects.Configure(value=self._raw)
         self._root_choices = self._configure.get('root-choices')
         self._root_step_choice = self._configure.get_content(
             'root-step-choice'
@@ -1926,6 +1998,7 @@ class AbsRsvProject(
         self._rsv_properties.set_update(
             self._static_variant_configure.get_value()
         )
+
     @classmethod
     def _project_get_branch_extra_(cls, **kwargs):
         if 'branch' in kwargs:
@@ -2004,15 +2077,19 @@ class AbsRsvProject(
         return collections.OrderedDict(
             [(k, self._raw_opt.unfold_value(v)) for k, v in (self._raw_opt.get(key) or {}).items()]
         )
+
     @property
     def resolver(self):
         return self._rsv_root
+
     @property
     def pathsep(self):
         return '/'
+
     @property
     def path(self):
         return self._rsv_path
+
     @property
     def icon(self):
         return bsc_core.RscIconFileMtd.get('resolver/project')
@@ -2026,21 +2103,25 @@ class AbsRsvProject(
         return self._rsv_properties.get(
             '{}.{}'.format(self.VariantsKeys.Workspaces, workspace_key)
         )
+
     # etc. "work"
     def get_workspace_source(self):
         return self._rsv_properties.get(
             '{}.{}'.format(self.VariantsKeys.Workspaces, self.WorkspaceKeys.Source)
         )
+
     #
     def get_workspace_user(self):
         return self._rsv_properties.get(
             '{}.{}'.format(self.VariantsKeys.Workspaces, self.WorkspaceKeys.User)
         )
+
     # etc. "publish"
     def get_workspace_release(self):
         return self._rsv_properties.get(
             '{}.{}'.format(self.VariantsKeys.Workspaces, self.WorkspaceKeys.Release)
         )
+
     # etc. "output"
     def get_workspace_temporary(self):
         return self._rsv_properties.get(
@@ -2066,7 +2147,7 @@ class AbsRsvProject(
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.ProjectSteps
-            ).values() + (self._rsv_properties.get(
+            ).values()+(self._rsv_properties.get(
                 '{}_extra'.format(
                     self.VariantsKeys.ProjectSteps
                 )
@@ -2079,7 +2160,7 @@ class AbsRsvProject(
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.AssetSteps
-            ).values() + (self._rsv_properties.get(
+            ).values()+(self._rsv_properties.get(
                 '{}_extra'.format(
                     self.VariantsKeys.AssetSteps
                 )
@@ -2092,7 +2173,7 @@ class AbsRsvProject(
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.SequenceSteps
-            ).values() + (self._rsv_properties.get(
+            ).values()+(self._rsv_properties.get(
                 '{}_extra'.format(
                     self.VariantsKeys.SequenceSteps
                 )
@@ -2105,7 +2186,7 @@ class AbsRsvProject(
         if with_extra is True:
             return self._rsv_properties.get(
                 self.VariantsKeys.ShotSteps
-            ).values() + (self._rsv_properties.get(
+            ).values()+(self._rsv_properties.get(
                 '{}_extra'.format(
                     self.VariantsKeys.ShotSteps
                 )
@@ -2169,9 +2250,11 @@ class AbsRsvProject(
 
     def get_url(self, keyword, **kwargs):
         pass
+
     #
     def get_platform(self):
         return
+
     #
     def get_root(self):
         return
@@ -2195,6 +2278,7 @@ class AbsRsvProject(
         # root
         root_cur = self._rsv_properties.get(root_choice)
         kwargs['root'] = root_cur
+
     #
     def _project__project__create_rsv_matcher_(self, kwargs):
         self._completion_rsv_match_kwargs_(kwargs)
@@ -2230,6 +2314,7 @@ class AbsRsvProject(
             pattern,
             variants_override
         )
+
     # resource group, asset group is role ..., shot group is sequence
     def _project__get_rsv_resource_groups_(self, **kwargs):
         list_ = []
@@ -2325,6 +2410,7 @@ class AbsRsvProject(
             rsv_obj = self.RSV_RESOURCE_GROUP_CLS(self, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
+
     # resource
     def _group__get_rsv_resource_(self, **kwargs):
         rsv_resource_group = self.get_rsv_resource_group(**kwargs)
@@ -2357,6 +2443,7 @@ class AbsRsvProject(
                 if i_rsv_resource not in list_:
                     list_.append(i_rsv_resource)
         return list_
+
     #
     def _project__get_rsv_resource_(self, rsv_obj, **kwargs):
         kwargs_over = collections.OrderedDict()
@@ -2392,6 +2479,7 @@ class AbsRsvProject(
             extend_keys=['type', 'branch']
         )
         return self._project__create_rsv_resource_(**variants)
+
     #
     def _project__create_rsv_resource_(self, **kwargs):
         rsv_matcher = self.__create_main_rsv_matcher_(
@@ -2409,20 +2497,24 @@ class AbsRsvProject(
             rsv_obj = self.RSV_RESOURCE_CLS(self, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
+
     # step
     #   for project step
     def _project__get_rsv_step_(self, **kwargs):
         return self._entity__get_rsv_step_(self, **kwargs)
+
     #   for resource group step
     def _resource_group__get_rsv_step_(self, **kwargs):
         rsv_resource_group = self.get_rsv_resource_group(**kwargs)
         if rsv_resource_group is not None:
             return self._entity__get_rsv_step_(rsv_resource_group, **kwargs)
+
     #   for resource step
     def _resource__get_rsv_step_(self, **kwargs):
         rsv_resource = self.get_rsv_resource(**kwargs)
         if rsv_resource is not None:
             return self._entity__get_rsv_step_(rsv_resource, **kwargs)
+
     #
     def _entity__get_rsv_steps_(self, **kwargs):
         list_ = []
@@ -2461,6 +2553,7 @@ class AbsRsvProject(
                     if j_rsv_step not in list_:
                         list_.append(j_rsv_step)
         return list_
+
     #   entity
     def _entity__get_rsv_step_(self, rsv_obj, **kwargs):
         kwargs_over = self._copy_variants_as_branches_(
@@ -2538,6 +2631,7 @@ class AbsRsvProject(
         rsv_obj = self.RSV_STEP_CLS(self, **kwargs)
         self._project__set_rsv_obj_add_(rsv_obj)
         return rsv_obj
+
     # task
     def _step__get_rsv_task_(self, **kwargs):
         rsv_step = self.get_rsv_step(**kwargs)
@@ -2729,6 +2823,7 @@ class AbsRsvProject(
         branch = self._guess_entity_type_force_(**kwargs)
         kwargs['branch'] = branch
         return self._any__get_rsv_tasks_(**kwargs)
+
     # task version
     def get_rsv_task_version(self, **kwargs):
         if 'version' in kwargs:
@@ -2829,6 +2924,7 @@ class AbsRsvProject(
             rsv_obj = self.RSV_TASK_VERSION_CLS(self, **kwargs)
             self._project__set_rsv_obj_add_(rsv_obj)
             return rsv_obj
+
     # unit
     def get_rsv_task_unit(self, **kwargs):
         rsv_task = self.get_rsv_task(**kwargs)
@@ -2926,9 +3022,10 @@ class AbsRsvProject(
         rsv_task = self.get_rsv_task(**kwargs)
         if rsv_task is not None:
             return rsv_task.get_rsv_version(**kwargs)
+
     # app
     def get_rsv_app(self, application):
-        configure = bsc_objects.Configure(value=self.get_package_data())
+        configure = ctt_objects.Configure(value=self.get_package_data())
         scheme = configure.get('scheme')
         if scheme == 'default':
             return self.RSV_APP_DEFAULT_CLS(
@@ -2957,7 +3054,7 @@ class AbsRsvProject(
             'dcc-data.{}'.format(application)
         )
         extend_data = self._raw_opt.get('dcc-data.dcc-extend') or {}
-        extend_c = bsc_objects.Content(value=extend_data)
+        extend_c = ctt_objects.Content(value=extend_data)
         for i_k in extend_c.get_leaf_keys():
             i_v = extend_c.get(i_k)
             main_data.set(
@@ -2965,7 +3062,7 @@ class AbsRsvProject(
             )
         extend_data_over = self._raw_opt.get('dcc-data.{}-extend'.format(application)) or {}
         if extend_data_over:
-            extend_data_over_c = bsc_objects.Content(value=extend_data_over)
+            extend_data_over_c = ctt_objects.Content(value=extend_data_over)
             for i_k in extend_data_over_c.get_leaf_keys():
                 i_v = extend_data_over_c.get(i_k)
                 main_data.set(
@@ -2979,7 +3076,6 @@ class AbsRsvProject(
     def _project__set_rsv_obj_add_(self, rsv_obj):
         self._rsv_obj_stack.set_object_add(rsv_obj)
         if rsv_core.TRACE_RESULT_ENABLE is True:
-
             bsc_core.LogMtd.trace_method_result(
                 'resolver',
                 u'{}="{}"'.format(rsv_obj.type, rsv_obj.path)
@@ -3001,6 +3097,7 @@ class AbsRsvProject(
     def _project__get_rsv_obj_children_(self, path):
         child_paths = bsc_core.DccPathDagMtd.get_dag_child_paths(path, self._rsv_obj_stack.get_keys())
         return [self._rsv_obj_stack.get_object(i) for i in child_paths]
+
     # gain by file-path
     def _project__get_rsv_entity_by_file_path_(self, file_path, variants_override):
         if file_path is not None:
@@ -3045,6 +3142,7 @@ class AbsRsvProject(
                             i_rsv_step = self.get_rsv_step(**j_kwargs_over)
                             if i_rsv_step is not None:
                                 return i_rsv_step
+
     # scene
     def _project__get_rsv_task_by_any_file_path_(self, file_path):
         if file_path is not None:
@@ -3070,6 +3168,7 @@ class AbsRsvProject(
                             i_rsv_task = self.get_rsv_task(**j_kwargs_over)
                             if i_rsv_task is not None:
                                 return i_rsv_task
+
     # output
     def get_rsv_task_by_output_file_path(self, file_path):
         return self._project__get_rsv_task_by_any_file_path_(
@@ -3118,6 +3217,7 @@ class AbsRsvRoot(
     RSV_PROJECT_CLS = None
 
     RSV_VERSION_KEY_CLS = None
+
     def __init__(self):
         self._set_rsv_def_init_()
         self._set_obj_dag_def_init_('/')
@@ -3149,20 +3249,26 @@ class AbsRsvRoot(
 
     def get_type(self):
         return 'resolver'
+
     type = property(get_type)
 
     def get_type_name(self):
         return self.get_type()
+
     type_name = property(get_type_name)
+
     @property
     def pathsep(self):
         return '/'
+
     @property
     def path(self):
         return '/'
+
     @property
     def name(self):
         return ''
+
     @property
     def icon(self):
         return bsc_core.RscIconFileMtd.get('resolver/root')
@@ -3176,15 +3282,18 @@ class AbsRsvRoot(
 
     def _set_child_create_(self, path):
         return self._rsv_project_stack.get_object(path)
+
     @property
     def pattern_dict(self):
         return self._patterns_dict
+
     @classmethod
     def get_platform(cls):
         if platform.system() == 'Windows':
             return 'windows'
         elif platform.system() == 'Linux':
             return 'linux'
+
     @classmethod
     def _get_rsv_kwargs_(cls, **kwargs):
         dic = {}
@@ -3305,6 +3414,7 @@ class AbsRsvRoot(
                 u'{}="{}"'.format(obj_type, obj_path)
             )
         return rsv_project
+
     # scene
     def get_rsv_project_by_any_file_path(self, file_path):
         return self._root__get_rsv_project_by_any_file_path_(file_path)
@@ -3336,6 +3446,7 @@ class AbsRsvRoot(
                             return i_rsv_project
         #
         return self._resolver__get_rsv_project_use_default_(file_path)
+
     # = rsv_project.get_rsv_resources
     def get_rsv_resources(self, **kwargs):
         kwargs_over = self._get_rsv_kwargs_(**kwargs)
@@ -3343,6 +3454,7 @@ class AbsRsvRoot(
             rsv_project = self.get_rsv_project(**kwargs_over)
             if rsv_project:
                 return rsv_project.get_rsv_resources(**kwargs_over)
+
     # = rsv_project.get_rsv_resource
     def get_rsv_resource(self, **kwargs):
         kwargs_over = self._get_rsv_kwargs_(**kwargs)
@@ -3350,6 +3462,7 @@ class AbsRsvRoot(
             rsv_project = self.get_rsv_project(**kwargs_over)
             if rsv_project:
                 return rsv_project.get_rsv_resource(**kwargs_over)
+
     #
     def get_rsv_step(self, **kwargs):
         kwargs_over = self._get_rsv_kwargs_(**kwargs)
@@ -3357,6 +3470,7 @@ class AbsRsvRoot(
             rsv_project = self.get_rsv_project(**kwargs_over)
             if rsv_project:
                 return rsv_project.get_rsv_step(**kwargs_over)
+
     # = rsv_project.get_rsv_task
     def get_rsv_task(self, **kwargs):
         kwargs_over = self._get_rsv_kwargs_(**kwargs)
@@ -3378,6 +3492,7 @@ class AbsRsvRoot(
             rsv_project = self.get_rsv_project(**kwargs_over)
             if rsv_project:
                 return rsv_project.get_rsv_task_version(**kwargs_over)
+
     # = rsv_project.get_rsv_unit
     def get_rsv_unit(self, **kwargs):
         kwargs_over = self._get_rsv_kwargs_(**kwargs)
@@ -3385,6 +3500,7 @@ class AbsRsvRoot(
             rsv_project = self.get_rsv_project(**kwargs_over)
             if rsv_project:
                 return rsv_project.get_rsv_unit(**kwargs_over)
+
     #
     def get_result(self, **kwargs):
         rsv_unit = self.get_rsv_unit(**kwargs)
@@ -3420,6 +3536,7 @@ class AbsRsvRoot(
                     u'file="{}" is not available'.format(file_path)
                 )
         return None
+
     #
     def _resolver__get_rsv_project_use_default_(self, file_path):
         rsv_project = self.get_rsv_project(project='default')
@@ -3455,6 +3572,7 @@ class AbsRsvRoot(
                     u'file="{}" is not available'.format(file_path)
                 )
         return None
+
     #
     def _get_rsv_task_properties_by_work_scene_src_file_path_(self, file_path):
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
@@ -3472,11 +3590,13 @@ class AbsRsvRoot(
                     u'file="{}" is not available'.format(file_path)
                 )
         return None
+
     #
     def _get_rsv_task_properties_by_scene_src_file_path_(self, file_path):
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
             return rsv_task.get_properties_by_scene_src_file_path(file_path)
+
     #
     def _get_rsv_task_properties_by_scene_file_path_(self, file_path):
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
@@ -3492,6 +3612,7 @@ class AbsRsvRoot(
         rsv_task = self.get_rsv_task_by_any_file_path(file_path)
         if rsv_task is not None:
             return rsv_task.get_properties_by_output_scene_file_path(file_path)
+
     #
     def get_task_properties_by_any_scene_file_path(self, file_path):
         methods = [
@@ -3507,10 +3628,12 @@ class AbsRsvRoot(
             if result is not None:
                 # print(';'.join(['{}={}'.format(k, v) for k, v in result.value.items() if isinstance(v, six.string_types)]))
                 return result
+
     @classmethod
     def get_path_data(cls):
         dic = collections.OrderedDict()
         return dic
+
     #
     def get_rsv_resource_step_directory_paths(self, **kwargs):
         list_ = []

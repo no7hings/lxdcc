@@ -1,27 +1,30 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
 
 class AbsDdlQuery(object):
     CONFIGURE_FILE_PATH = None
+
     @classmethod
     def _get_option_(cls, option_pattern, **option_kwargs):
         # type=method&name=database&configure=cjd&engine=houdini-python&script=set_geometry_unify_by_usd_file
         return option_pattern.format(
             **option_kwargs
         )
+
     @classmethod
     def get_script_option(cls, **kwargs):
         return bsc_core.ArgDictStringMtd.to_string(
             **kwargs
         )
+
     #
     def __init__(self, key, extend_option_kwargs=None):
-        self._configure = bsc_objects.Configure(
+        self._configure = ctt_objects.Configure(
             value=self.CONFIGURE_FILE_PATH
         )
         #
@@ -75,8 +78,9 @@ class AbsDdlRsvTaskQuery(AbsDdlQuery):
 class AbsDdlSubmiter(object):
     CON = None
     CONFIGURE_FILE_PATH = None
+
     def __init__(self):
-        self._configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        self._configure = ctt_objects.Configure(value=self.CONFIGURE_FILE_PATH)
         #
         self._option = self._configure.get_content('option')
         #
@@ -88,6 +92,7 @@ class AbsDdlSubmiter(object):
 
     def get_option(self):
         return self._option
+
     option = property(get_option)
 
     def set_option(self, **kwargs):
@@ -105,18 +110,21 @@ class AbsDdlSubmiter(object):
                     'option.extra.{}'.format(k),
                     kwargs[k]
                 )
+
     #
     def get_job_info(self):
         return self._job_info
+
     job_info = property(get_job_info)
 
     def get_job_plug(self):
         return self._job_plug
+
     job_plug = property(get_job_plug)
 
     def set_job_info_extra(self, raw):
         if isinstance(raw, dict):
-            content = bsc_objects.Content(value=raw)
+            content = ctt_objects.Content(value=raw)
             for seq, k in enumerate(content._get_leaf_keys_()):
                 self.job_info.set(
                     'ExtraInfoKeyValue{}'.format(seq),

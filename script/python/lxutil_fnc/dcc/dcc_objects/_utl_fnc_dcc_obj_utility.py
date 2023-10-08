@@ -1,7 +1,7 @@
 # coding:utf-8
-import lxbasic.objects as bsc_objects
-
 import lxuniverse.objects as unv_objects
+
+import lxcontent.objects as ctt_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -12,6 +12,7 @@ class Scene(utl_fnc_dcc_abstract.AbsObjScene):
     FILE_CLS = utl_dcc_objects.OsFile
     UNIVERSE_CLS = unv_objects.ObjUniverse
     #
-    CONFIGURE_CLS = bsc_objects.Configure
+    CONFIGURE_CLS = ctt_objects.Configure
+
     def __init__(self):
         super(Scene, self).__init__()

@@ -12,11 +12,12 @@ from lxutil import utl_core, utl_abstract
 
 from lxkatana import ktn_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class AbsKtnPort(utl_abstract.AbsDccPort):
     PATHSEP = '.'
+
     def __init__(self, node, name, port_assign):
         super(AbsKtnPort, self).__init__(node, name, port_assign)
 
@@ -31,12 +32,15 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 
     def get_ktn_obj(self):
         return self.obj.ktn_obj
+
     @property
     def ktn_obj(self):
         return self.obj.ktn_obj
+
     @property
     def ktn_port(self):
         return self._get_ktn_port_()
+
     @property
     def type(self):
         ktn_port = self._get_ktn_port_()
@@ -50,7 +54,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 
     def set_create(self, *args):
         ktn_port = self._get_ktn_port_()
-        parent = bsc_core.DccPortPathMtd.get_dag_parent(
+        parent = bsc_core.DccPortPathMtd.get_dag_parent_path(
             path=self._port_path, pathsep=self.PATHSEP
         )
         if ktn_port is None:
@@ -112,6 +116,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 
     def get_expression(self):
         return self.ktn_port.getExpression()
+
     @classmethod
     def _set_constant_value_(cls, ktn_port, value, time=0):
         _value = value
@@ -119,11 +124,13 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             _value = str(value)
         #
         ktn_port.setValue(_value, time)
+
     @classmethod
     def _set_array_value_(cls, ktn_port, value, time=0):
         size = len(value)
         ktn_port.resizeArray(size)
         [ktn_port.getChildByIndex(i).setValue(value[i], time) for i in range(size)]
+
     @classmethod
     def _set_connect_(cls, source, target, validation=False):
         if validation is True:
@@ -145,6 +152,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                     source.path, target.path
                 )
             )
+
     @classmethod
     def _set_disconnect_(cls, source, target):
         if source.ktn_port is not None and target.ktn_port is not None:
@@ -218,7 +226,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         _ = self.ktn_port.getChildren() or []
         for i in _:
             list_.append(
-               self.get_child(i.getName())
+                self.get_child(i.getName())
             )
         return list_
 
@@ -235,21 +243,25 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 class AbsKtnObj(utl_abstract.AbsDccObj):
     PATHSEP = '/'
     CONNECTION_CLS = None
+
     def __init__(self, path):
         if not path.startswith(self.PATHSEP):
             path = self._get_ktn_obj_path_(path)
         else:
             path = path
         super(AbsKtnObj, self).__init__(path)
+
     @property
     def type(self):
         ktn_obj = NodegraphAPI.GetNode(self.name)
         if ktn_obj is not None:
             return ktn_obj.getType()
         return ''
+
     @property
     def icon(self):
         return utl_core.Icon.get_katana_obj()
+
     @property
     def ktn_obj(self):
         return self._get_ktn_obj_()
@@ -307,6 +319,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     def get_is_exists(self):
         return NodegraphAPI.GetNode(self.name) is not None
+
     @classmethod
     def _get_ktn_obj_path_args_(cls, name):
         def _rcs_fnc(name_):
@@ -319,11 +332,13 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     _parent_name = _parent.getName()
                     list_.append(_parent_name)
                     _rcs_fnc(_parent_name)
+
         #
         list_ = [name]
         _rcs_fnc(name)
         list_.reverse()
         return list_
+
     @classmethod
     def _get_ktn_obj_path_(cls, name):
         return cls.PATHSEP.join(cls._get_ktn_obj_path_args_(name))
@@ -342,6 +357,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     for _i in _:
                         _i_path = '{}{}{}'.format(self.path, pathsep, _i.getName())
                         _rcs_fnc(lis_, _i_path)
+
         lis = []
         pathsep = self.pathsep
         _rcs_fnc(lis, self.name)
@@ -439,9 +455,11 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     target_port = self.__class__(target_ktn_obj.getName()).get_input_port(target_ktn_port.getName())
                     lis.append(self.CONNECTION_CLS(source_port, target_port))
         return lis
+
     #
     def get_sources(self):
         pass
+
     @ktn_core.Modifier.undo_debug_run
     def set_source_objs_layout(self, layout=('r-l', 't-b'), size=(320, 960)):
         def rcs_fnc_(obj_, column_):
@@ -461,6 +479,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                         ktn_obj_stack.append(_i_ktn_obj)
                         _i_ktn_objs.append(_i_ktn_obj)
                         rcs_fnc_(_i, column_)
+
         #
         ktn_obj = self.ktn_obj
         ktn_obj_stack = []
@@ -585,6 +604,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     lis.append(
                         self.get_port(_port_path)
                     )
+
         #
         lis = []
         port_pathsep = self.PORT_CLS.PATHSEP
@@ -595,7 +615,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
         return lis
 
     def get_attributes(self):
-        attributes = bsc_objects.Properties(self)
+        attributes = ctt_objects.Properties(self)
         ports = self.get_leaf_ports()
         for port in ports:
             attributes.set(
@@ -608,8 +628,9 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     def __get_ktn_port_(self, port_path):
         return NodegraphAPI.GetNode(self.path).getParameter(port_path)
+
     @ktn_core.Modifier.undo_debug_run
-    def set_customize_attributes_create(self, attributes):
+    def create_customize_attributes(self, attributes):
         ktn_core.NGObjCustomizePortOpt(self._get_ktn_obj_()).set_ports_add(attributes)
 
     def set_input_port_add(self, port_path):
@@ -634,9 +655,11 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 class AbsKtnObjs(utl_abstract.AbsDccObjs):
     def __init__(self, *args):
         pass
+
     @classmethod
     def pre_run_fnc(cls):
         pass
+
     @classmethod
     def get_paths(cls, **kwargs):
         cls.pre_run_fnc()
@@ -678,6 +701,7 @@ class AbsSGKtnObj(utl_abstract.AbsDccObj):
     @property
     def type(self):
         return ''
+
     @property
     def icon(self):
         return ''

@@ -1,7 +1,7 @@
 # coding:utf-8
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
-c = bsc_objects.Configure(value={})
+c = ctt_objects.Configure(value={})
 print c
 
 c.set('a', '\\<A\\>')

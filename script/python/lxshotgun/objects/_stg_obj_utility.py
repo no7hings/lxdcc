@@ -2,17 +2,18 @@
 import collections
 
 import datetime
+
 import re
 
 from lxbasic import bsc_core
+
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
 from lxshotgun import stg_configure, stg_core
 
 import lxbasic.extra.methods as bsc_etr_methods
-
-import lxbasic.objects as bsc_objects
 
 
 class StgObjQuery(object):
@@ -21,19 +22,24 @@ class StgObjQuery(object):
         self._stg_obj = stg_obj
         self._type = self._stg_obj.get('type')
         self._id = self._stg_obj.get('id')
+
     @property
     def stg_connector(self):
         return self._stg_connector
+
     @property
     def shotgun(self):
         return self._stg_connector.shotgun
+
     #
     @property
     def type(self):
         return self._type
+
     @property
     def id(self):
         return self._id
+
     @property
     def stg_obj(self):
         return self._stg_obj
@@ -151,15 +157,19 @@ class StgConnector(object):
         #
         'asset': StgEntityTypes.Asset, 'shot': StgEntityTypes.Shot,
     }
+
     #
     def __init__(self, **kwargs):
         self._stg_instance = stg_core.ShotgunMtd().create_shotgun_instance()
+
     @property
     def shotgun(self):
         return self._stg_instance
+
     @classmethod
     def _get_stg_resource_type_(cls, key):
         return cls.RESOURCE_TYPE_MAPPER[key]
+
     @classmethod
     def _get_rsv_resource_type_(cls, key):
         return {v: k for k, v in cls.RESOURCE_TYPE_MAPPER.items()}[key]
@@ -178,7 +188,7 @@ class StgConnector(object):
             entity_type=stg_type, field_name=key
         )
         if isinstance(_, dict):
-            return bsc_objects.Configure(value=_)
+            return ctt_objects.Configure(value=_)
 
     def get_stg_projects(self):
         return self._stg_instance.find(
@@ -211,9 +221,11 @@ class StgConnector(object):
         stg_obj = self.get_stg_project(**kwargs)
         if stg_obj:
             return self.STG_OBJ_QUERY_CLS(self, stg_obj)
+
     # tag/role
     def get_stg_role(self, **kwargs):
         pass
+
     #
     def get_stg_entity_(self, **kwargs):
         pass
@@ -235,6 +247,7 @@ class StgConnector(object):
             i = {k: (v if v else 'N/a') for k, v in i.items()}
             list_.append(i)
         return list_
+
     # entity
     def get_stg_resource(self, **kwargs):
         if 'id' in kwargs:
@@ -360,6 +373,7 @@ class StgConnector(object):
             self.STG_OBJ_QUERY_CLS(self, i)
             for i in self.get_stg_resources(**kwargs)
         ]
+
     # step
     def get_stg_steps(self, **kwargs):
         """
@@ -424,6 +438,7 @@ class StgConnector(object):
 
     def set_stg_step_create(self, **kwargs):
         pass
+
     # task
     def get_stg_tasks(self, **kwargs):
         """
@@ -505,6 +520,7 @@ class StgConnector(object):
             u'task="{}"'.format(task)
         )
         return _
+
     # user
     def get_stg_user(self, **kwargs):
         if 'id' in kwargs:
@@ -724,7 +740,7 @@ class StgConnector(object):
                         "entity": stg_entity,
                         "path_cache": bsc_core.StgPathMapMtd.map_to_current(file_path),
                         "version_number": version_number,
-                     }
+                    }
                 )
                 utl_core.Log.set_module_result_trace(
                     'shotgun entity create',
@@ -811,6 +827,7 @@ class StgConnector(object):
             'stg-version-movie-update',
             u'file="{}"'.format(movie_file_path)
         )
+
     # look-pass
     def get_stg_look_pass(self, **kwargs):
         look_pass_code = kwargs['look_pass_code']

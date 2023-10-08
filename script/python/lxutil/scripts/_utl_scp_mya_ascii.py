@@ -20,20 +20,26 @@ from lxutil import utl_core
 
 class Uuid(object):
     BASIC = '4908BDB4-911F-3DCE-904E-96E4792E75F1'
+
     @classmethod
     def get_new(cls):
         return str(uuid.uuid1()).upper()
+
     @classmethod
     def get_by_hash_value(cls, hash_value):
         return str(uuid.uuid3(uuid.UUID(Uuid.BASIC), str(hash_value))).upper()
+
     @classmethod
     def get_by_string(cls, string):
         return str(uuid.uuid3(uuid.UUID(Uuid.BASIC), str(string))).upper()
+
     @classmethod
     def get_by_file(cls, file_path):
         if os.path.isfile(file_path):
             timestamp = os.stat(file_path).st_mtime
-            return str(uuid.uuid3(uuid.UUID(Uuid.BASIC), 'file="{}"; timestamp={}; version=2.0'.format(file_path, timestamp))).upper()
+            return str(
+                uuid.uuid3(uuid.UUID(Uuid.BASIC), 'file="{}"; timestamp={}; version=2.0'.format(file_path, timestamp))
+                ).upper()
         return str(uuid.uuid3(uuid.UUID(Uuid.BASIC), str('file="{}"'.format(file_path)))).upper()
 
 
@@ -48,12 +54,13 @@ class Hash(object):
         elif max_value < 4294967296:
             o = 'i'
         return o
+
     @classmethod
     def get_hash_value(cls, raw, as_unique_id=False):
         raw_str = str(raw)
         pack_array = [ord(i) for i in raw_str]
         s = hashlib.md5(
-            struct.pack('%s%s' % (len(pack_array), cls.get_pack_format(max(pack_array))), *pack_array)
+            struct.pack('%s%s'%(len(pack_array), cls.get_pack_format(max(pack_array))), *pack_array)
         ).hexdigest()
         if as_unique_id is True:
             return Uuid.get_by_hash_value(s)
@@ -64,6 +71,7 @@ class LineMatcher(object):
     def __init__(self, pattern):
         self._pattern = pattern
         self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
+
     @classmethod
     def _get_fnmatch_pattern_(cls, variant):
         if variant is not None:
@@ -76,12 +84,15 @@ class LineMatcher(object):
                     s = s.replace('{{{}}}'.format(key), '*')
             return s
         return variant
+
     @property
     def parse_pattern(self):
         return self._pattern
+
     @property
     def pattern(self):
         return self._fnmatch_pattern
+
     @property
     def fnmatch_pattern(self):
         return self._fnmatch_pattern
@@ -90,6 +101,7 @@ class LineMatcher(object):
 class AbsFileReader(object):
     SEP = '\n'
     LINE_MATCHER_CLS = None
+
     def __init__(self, file_path):
         self._file_path = file_path
         self._set_line_raw_update_()
@@ -110,15 +122,19 @@ class AbsFileReader(object):
             'file read is completed',
             u'file="{}"'.format(self._file_path)
         )
+
     @classmethod
     def _get_lines_(cls, raw, sep):
         return [r'{}{}'.format(i, sep) for i in raw.split(sep)]
+
     @property
     def file_path(self):
         return self._file_path
+
     @property
     def lines(self):
         return self._lines
+
     @classmethod
     def _get_matches_(cls, pattern, lines):
         lis = []
@@ -154,6 +170,7 @@ class DotMaMeshMtd(object):
                 data = ports[port_path].get('data')
                 cls._set_edge_vertices_update_(data, vertex_indices)
         return vertex_indices
+
     @classmethod
     def _set_edge_vertices_update_(cls, data, vertex_indices):
         for i in data.split('\n'):
@@ -162,6 +179,7 @@ class DotMaMeshMtd(object):
             for j in _:
                 vertex_index = int(j)
                 vertex_indices.append(vertex_index)
+
     @classmethod
     def get_face_vertices(cls, ports):
         edge_vertex_indices = cls.get_edge_vertices(ports)
@@ -181,13 +199,18 @@ class DotMaMeshMtd(object):
         if port_paths:
             for port_path in port_paths:
                 data = ports[port_path].get('data')
-                cls._set_face_vertices_update_(data, face_vertex_counts, face_vertex_indices, face_edge_indices, edge_vertex_indices)
+                cls._set_face_vertices_update_(
+                    data, face_vertex_counts, face_vertex_indices, face_edge_indices, edge_vertex_indices
+                    )
         # print 'edge_vertex_indices =', edge_vertex_indices
         # print 'face_edge_indices =', face_edge_indices
         # print 'face_vertex_indices =', face_vertex_indices
         return face_vertex_counts, face_vertex_indices
+
     @classmethod
-    def _set_face_vertices_update_(cls, data, face_vertex_counts, face_vertex_indices, face_edge_indices, edge_vertex_indices):
+    def _set_face_vertices_update_(
+            cls, data, face_vertex_counts, face_vertex_indices, face_edge_indices, edge_vertex_indices
+            ):
         for i in data.split('\n'):
             i = i.lstrip().rstrip()
             if i.startswith('f'):
@@ -204,6 +227,7 @@ class DotMaMeshMtd(object):
                     face_vertex_indices.append(vertex_index)
                     #
                     face_edge_indices.append(edge_index)
+
     @classmethod
     def get_points(cls, ports):
         all_port_names = ports.keys()
@@ -216,6 +240,7 @@ class DotMaMeshMtd(object):
                 data = ports[port_path].get('data')
                 cls._set_points_update_(data, points)
         return points
+
     @classmethod
     def _set_points_update_(cls, data, points):
         for i in data.split('\n'):
@@ -241,6 +266,7 @@ class DotMaFileReader(AbsFileReader):
         'aiVolume': 'filename',
         'aiStandIn': 'dso',
     }
+
     def __init__(self, file_path):
         super(DotMaFileReader, self).__init__(file_path)
         self._file_lines = self._get_file_lines_()
@@ -251,7 +277,9 @@ class DotMaFileReader(AbsFileReader):
 
     def _get_references_(self):
         lis = []
-        pattern = self.LINE_MATCHER_CLS(u'file -rdi {a} -ns "{namespace}" -rfn "{obj}"{b}-typ{c}"{file_type}"{d}"{file}"{r}')
+        pattern = self.LINE_MATCHER_CLS(
+            u'file -rdi {a} -ns "{namespace}" -rfn "{obj}"{b}-typ{c}"{file_type}"{d}"{file}"{r}'
+            )
         lines = fnmatch.filter(
             self.lines, pattern.fnmatch_pattern
         )
@@ -307,7 +335,7 @@ class DotMaFileReader(AbsFileReader):
         _rcs_fnc(obj_parent_name)
         #
         path_args.reverse()
-        return '/' + '/'.join(path_args)
+        return '/'+'/'.join(path_args)
 
     def _get_obj_by_path_(self, obj_path):
         _ = obj_path.split('/')
@@ -317,8 +345,8 @@ class DotMaFileReader(AbsFileReader):
             self.LINE_MATCHER_CLS('createNode {obj_type} -n "{obj_name}";\n')
         ]:
             pattern = matcher.parse_pattern.format(
-                    **dict(obj_type='*', obj_name=obj_name, obj_parent_name='*')
-                )
+                **dict(obj_type='*', obj_name=obj_name, obj_parent_name='*')
+            )
             results = fnmatch.filter(
                 self._obj_lines, pattern
             )
@@ -397,12 +425,14 @@ class DotMaFileReader(AbsFileReader):
             for _obj_path, _obj_properties in _child_objs.items():
                 dic[_obj_path] = _obj_properties
                 rcs_fnc_(_obj_path)
+
         #
         dic = collections.OrderedDict()
         obj = self._get_obj_by_path_(obj_path)
         if obj:
             rcs_fnc_(obj_path)
         return dic
+
     @classmethod
     def _set_obj_filter_(cls, objs, root, obj_types):
         dic = collections.OrderedDict()
@@ -432,7 +462,7 @@ class DotMaFileReader(AbsFileReader):
             )
             if p:
                 line_index = self._lines.index(line)
-                unique_id = self._get_uuid_at_line_(self._lines[line_index + 1])
+                unique_id = self._get_uuid_at_line_(self._lines[line_index+1])
                 obj_variants = p.named
                 obj_name_matcher = self.LINE_MATCHER_CLS(
                     '{obj_name}" -p "{obj_parent_name}'
@@ -442,7 +472,7 @@ class DotMaFileReader(AbsFileReader):
                 obj_path = obj_name
                 obj_parent_name = None
                 if fnmatch.filter(
-                    [obj_name], obj_name_matcher.fnmatch_pattern
+                        [obj_name], obj_name_matcher.fnmatch_pattern
                 ):
                     name_p = parse.parse(
                         obj_name_matcher.parse_pattern, obj_name
@@ -482,13 +512,13 @@ class DotMaFileReader(AbsFileReader):
         dic = collections.OrderedDict()
         obj_line_index = self._obj_lines.index(line)
         start_index = self._lines.index(line)
-        if (obj_line_index + 1) < len(self._obj_lines):
-            next_line = self._obj_lines[obj_line_index + 1]
+        if (obj_line_index+1) < len(self._obj_lines):
+            next_line = self._obj_lines[obj_line_index+1]
         else:
             next_line = 'select -ne :time1;\n'
         #
         end_index = self._lines.index(next_line)
-        return self._lines[start_index + 2:end_index]
+        return self._lines[start_index+2:end_index]
 
     def _get_obj_ports_(self, obj_path, obj_properties):
         dic = collections.OrderedDict()
@@ -515,9 +545,12 @@ class DotMaFileReader(AbsFileReader):
 
     def _get_port_properties_at_line_(self, line):
         matchers = [
-            (self.LINE_MATCHER_CLS('\tsetAttr -ch {capacity} ".{port_path}" -type "{data_type}" \n\t\t{data};\n'), None, None),
+            (self.LINE_MATCHER_CLS('\tsetAttr -ch {capacity} ".{port_path}" -type "{data_type}" \n\t\t{data};\n'), None,
+             None),
             (self.LINE_MATCHER_CLS('\tsetAttr -s {size} -ch {capacity} ".{port_path}";\n'), 'array', None),
-            (self.LINE_MATCHER_CLS('\tsetAttr -s {size} -ch {capacity} ".{port_path}" -type "{data_type}" \n\t\t{data};\n'), 'array',None),
+            (self.LINE_MATCHER_CLS(
+                '\tsetAttr -s {size} -ch {capacity} ".{port_path}" -type "{data_type}" \n\t\t{data};\n'
+                ), 'array', None),
             (self.LINE_MATCHER_CLS('\tsetAttr -s {size} -ch {capacity} ".{port_path}"\n\t\t{data};\n'), 'array', None),
             (self.LINE_MATCHER_CLS('\tsetAttr ".{port_path}" -type "{data_type}" \n\t\t{data};\n'), None, None),
             (self.LINE_MATCHER_CLS('\tsetAttr ".{port_path}"\n\t\t{data};\n'), None, None),
@@ -646,6 +679,7 @@ class DotMaFileReader(AbsFileReader):
 
 class DotAssFileReader(AbsFileReader):
     LINE_MATCHER_CLS = LineMatcher
+
     def __init__(self, file_path):
         super(DotAssFileReader, self).__init__(file_path)
 
@@ -709,6 +743,7 @@ class DotAssFileReader(AbsFileReader):
 class DotUsdaFileReader(AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = LineMatcher
+
     def __init__(self, file_path):
         super(DotUsdaFileReader, self).__init__(file_path)
 

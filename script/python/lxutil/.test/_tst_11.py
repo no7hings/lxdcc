@@ -1,7 +1,7 @@
 # coding:utf-8
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
-c = bsc_objects.Content(None, {})
+c = ctt_objects.Content(None, {})
 
 c.set('test.a', 'a')
 

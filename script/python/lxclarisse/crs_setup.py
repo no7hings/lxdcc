@@ -2,17 +2,19 @@
 # noinspection PyUnresolvedReferences
 import ix
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
-from lxutil_gui import utl_gui_core
+from lxutil_gui import gui_core
 
 
 class MenuSetup(object):
     def __init__(self):
         pass
+
     @classmethod
     def _get_menu_bar_(cls):
         return ix.application.get_main_menu()
+
     @classmethod
     def _add_menu_(cls, path):
         path += '>'
@@ -21,15 +23,17 @@ class MenuSetup(object):
         if item:
             return item
         return menu_bar.add_command(path)
+
     @classmethod
     def _add_separator_(cls, path):
         name = path.split('>')[-1]
-        path = '>'.join(path.split('>')[:-1]) + '>{{{}}}'.format(name)
+        path = '>'.join(path.split('>')[:-1])+'>{{{}}}'.format(name)
         menu_bar = cls._get_menu_bar_()
         item = menu_bar.get_item(path)
         if item:
             return item
         return cls._get_menu_bar_().add_command(path)
+
     @classmethod
     def _add_action_(cls, path, command):
         menu_bar = cls._get_menu_bar_()
@@ -39,9 +43,10 @@ class MenuSetup(object):
         return cls._get_menu_bar_().add_command_as_script(
             ix.application.get_default_scripting_engine_class_name(), path, command, '', ''
         )
+
     @classmethod
     def _create_by_yaml_(cls, file_path):
-        c = bsc_objects.Configure(
+        c = ctt_objects.Configure(
             value=file_path
         )
 
@@ -60,7 +65,7 @@ class MenuSetup(object):
                     i_icon_name = c.get('{}.icon_name'.format(i_key))
                     if i_icon_name:
                         i_item.set_icon(
-                            utl_gui_core.RscIconFile.get(i_icon_name)
+                            gui_core.RscIconFile.get(i_icon_name)
                         )
                 elif i_type == 'separator':
                     i_item = cls._add_separator_(i_path)
@@ -70,11 +75,10 @@ class MenuSetup(object):
                     i_icon_name = c.get('{}.icon_name'.format(i_key))
                     if i_icon_name:
                         i_item.set_icon(
-                            utl_gui_core.RscIconFile.get(i_icon_name)
+                            gui_core.RscIconFile.get(i_icon_name)
                         )
 
                 print 'add {}: "{}"'.format(i_type, '.'.join(i_args))
 
     def set_setup(self):
         pass
-

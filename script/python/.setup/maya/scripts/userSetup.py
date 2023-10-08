@@ -10,7 +10,7 @@ class Setup(object):
             return True
         return False
     @classmethod
-    def setup_menu(cls):
+    def setup_qt_menu(cls):
         def fnc_():
             print 'lx-dcc menu setup: is started'
             from lxmaya import ma_setup
@@ -76,7 +76,7 @@ class Setup(object):
         if cls.get_is_maya():
             cls.setup_arnold()
             cls.setup_usd()
-            cls.setup_menu()
+            cls.setup_qt_menu()
             cls.setup_workspace_environment()
             cls.setup_workspace_gui()
             #

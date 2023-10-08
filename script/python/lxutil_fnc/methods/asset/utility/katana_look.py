@@ -9,8 +9,6 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
     def set_check_run(self):
         from lxbasic import bsc_core
         #
-        import lxbasic.objects as bsc_objects
-        #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects

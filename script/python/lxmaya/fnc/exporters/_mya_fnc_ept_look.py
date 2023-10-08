@@ -30,7 +30,7 @@ import lxutil.scripts as utl_scripts
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -331,8 +331,8 @@ class LookAssignExporter(object):
                 self._look_content.set_type_value(self._look, var, seq, obj_type)
                 self._look_content.set_path_value(self._look, var, seq, path)
                 material_assigns = look_opt.get_material_assigns()
-                properties = look_opt.get_properties()
-                visibilities = look_opt.get_visibilities()
+                properties = look_opt.get_render_properties()
+                visibilities = look_opt.get_render_visibilities()
                 self._look_content.set_material_assigns_value(self._look, var, seq, material_assigns)
                 self._look_content.set_properties_value(self._look, var, seq, properties)
                 self._look_content.set_visibilities_value(self._look, var, seq, visibilities)
@@ -347,8 +347,8 @@ class LookAssignExporter(object):
                 path = xgen_description_opt.get_path(lstrip=self._path_lstrip)
                 name = xgen_description_opt.get_name()
                 material_assigns = look_opt.get_material_assigns()
-                properties = look_opt.get_properties()
-                visibilities = look_opt.get_visibilities()
+                properties = look_opt.get_render_properties()
+                visibilities = look_opt.get_render_visibilities()
                 # key
                 self._look_content.set_name_key(self._look, var, seq, name)
                 # value
@@ -419,7 +419,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         c = and_configure.Visibility.MAYA_VISIBILITY_DICT
         cmd_obj_opt = ma_core.CmdObjOpt(mya_set.path)
         for k, v in c.items():
-            cmd_obj_opt.set_customize_attribute_create(v, False)
+            cmd_obj_opt.create_customize_attribute(v, False)
     @classmethod
     def convert_preview_shaders_fnc(cls, directory, mya_mesh):
         beauty_texture_exr_path_pattern = '{}/*_{}_[0-9][0-9][0-9][0-9].exr'.format(
@@ -495,11 +495,12 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         image.set('uvTilingMode', 3)
         #
         mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(mya_mesh)
-        mya_mesh_look_opt.set_material(material.path)
+        mya_mesh_look_opt.assign_material_to_path(material.path)
         if ma_core.get_is_ui_mode() is True:
             mel.eval('generateUvTilePreview {}'.format(image.path))
     @classmethod
     def create_arnold_options_fnc(cls):
+        cmds.loadPlugin('mtoa', quiet=1)
         # noinspection PyUnresolvedReferences
         import mtoa.core as core
         core.createOptions()
@@ -658,7 +659,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         # file_path = mya_dcc_objects.Scene.get_current_file_path()
         # import os
         # base, ext = os.path.splitext(file_path)
-        # mya_dcc_objects.Scene.set_file_save_to(
+        # mya_dcc_objects.Scene.save_file_to(
         #     '{}.bck.ma'.format(base)
         # )
 
@@ -802,8 +803,8 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                     definition_includes=['surfaceShader', 'displacementShader', 'volumeShader']
                                 )
                                 #
-                                source_objs = j_material.get_all_source_objs()
-                                for i_source_node in source_objs:
+                                j_source_objs = j_material.get_all_source_objs()
+                                for i_source_node in j_source_objs:
                                     i_source_node_obj_type_name = i_source_node.type_name
                                     if i_source_node_obj_type_name not in self.EXCLUDE_TYPE_NAMES:
                                         if self.update_node_fnc('node-graph', i_source_node.path) is True:
@@ -817,8 +818,8 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             'transform', i_node.path,
                             definition=True, customize=True, definition_includes=['visibility']
                         )
-                        source_objs = i_node.get_all_source_objs()
-                        for i_source_node in source_objs:
+                        j_source_objs = i_node.get_all_source_objs()
+                        for i_source_node in j_source_objs:
                             i_source_node_obj_type_name = i_source_node.type_name
                             if i_source_node_obj_type_name not in self.EXCLUDE_TYPE_NAMES:
                                 if self.update_node_fnc('node-graph', i_source_node.path) is True:
@@ -830,7 +831,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def execute(self):
         file_path = self.get('file')
 
-        self._raw = bsc_objects.Content(
+        self._raw = ctt_objects.Content(
             value=collections.OrderedDict()
         )
 

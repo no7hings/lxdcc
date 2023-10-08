@@ -19,6 +19,8 @@ class Root(object):
     BIN = '{}/bin'.format(MAIN)
     PYTHON = '{}/python'.format(MAIN)
     CONFIGURE = '{}/configure'.format(MAIN)
+    EXECUTE = '{}/execute'.format(MAIN)
+
     @classmethod
     def get_configure_file(cls, key):
         return '{root}/{key}.yml'.format(**dict(root=Root.CONFIGURE, key=key))
@@ -97,17 +99,48 @@ class SubProcessStatus(enum.EnumMeta):
     Error = -15
 
 
-class StatusRgba(object):
+class Rgba(object):
+    # 63+48=111
+    # 127+48=175
     Red = 255, 0, 63, 255
+    DarkRed = 159, 0, 63, 255
+    LightRed = 255, 47, 111, 255
     Orange = 255, 127, 63, 255
+    DarkOrange = 159, 95, 63, 255
+    LightOrange = 255, 175, 111, 255
     Yellow = 255, 255, 63, 255
+    DarkYellow = 159, 159, 63, 255
+    LightYellow = 255, 255, 111, 255
     Green = 63, 255, 127, 255
+    DarkGreen = 63, 159, 95, 255
+    LightGreen = 111, 255, 175, 255
     Blue = 63, 127, 255, 255
+    DarkBlue = 63, 95, 159, 255
+    LightBlue = 111, 175, 255
+    BabyBlue = 63, 255, 255, 255
+    DarkBabyBlue = 63, 159, 159, 255
+    LightBabyBlue = 111, 255, 255, 255
     Purple = 127, 127, 255, 255
+    DarkPurple = 95, 95, 159, 255
+    LightPurple = 175, 175, 255, 255
+    Pink = 255, 127, 127, 255
+    DarkPink = 159, 95, 79, 255
+    LightPink = 255, 175, 175, 255
     Gray = 127, 127, 127, 255
     White = 255, 255, 255, 255
     Black = 0, 0, 0, 255
     Opacity = 0, 0, 0, 0
+
+    All = [
+        Red, DarkRed, LightRed,
+        LightOrange, Orange, DarkOrange,
+        LightYellow, Yellow, DarkYellow,
+        LightGreen, Green, DarkGreen,
+        LightBlue, Blue, DarkBlue,
+        LightPurple, Purple, DarkPurple,
+        LightPink, Pink, DarkPink,
+        Gray, White, Black, Opacity
+    ]
 
 
 class Platform(object):

@@ -7,7 +7,7 @@ import sys
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
@@ -60,7 +60,7 @@ class CallbackOpt(object):
         self._function = function
         self._callback_type = callback_type
 
-    def set_add(self):
+    def append(self):
         Callbacks.addCallback(
             callbackType=self._callback_type,
             callbackFcn=self._function
@@ -434,7 +434,7 @@ class CallbackMtd(object):
         ]
         for function, callback_type in ss:
             callback_opt = CallbackOpt(function=function, callback_type=callback_type)
-            callback_opt.set_add()
+            callback_opt.append()
 
     @classmethod
     def add_callbacks(cls, data):
@@ -444,27 +444,27 @@ class CallbackMtd(object):
     @classmethod
     def add_as_startup_complete(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onStartupComplete)
-        callback_opt.set_add()
+        callback_opt.append()
 
     @classmethod
     def add_as_scene_new(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onNewScene)
-        callback_opt.set_add()
+        callback_opt.append()
 
     @classmethod
     def add_as_scene_open(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneLoad)
-        callback_opt.set_add()
+        callback_opt.append()
 
     @classmethod
     def add_as_scene_save(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onSceneSave)
-        callback_opt.set_add()
+        callback_opt.append()
 
     @classmethod
     def add_as_render_setup(cls, fnc):
         callback_opt = CallbackOpt(function=fnc, callback_type=Callbacks.Type.onRenderSetup)
-        callback_opt.set_add()
+        callback_opt.append()
 
 
 class VariablesSetting(object):
@@ -528,7 +528,7 @@ class VariablesSetting(object):
 
 class WorkspaceSetting(object):
     def __init__(self):
-        self._cfg = bsc_objects.Configure(
+        self._cfg = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml(
                 'katana/script/scene'
             )

@@ -2,7 +2,6 @@
 import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects)
 p = utl_dcc_objects.PyReloader(
     [
-        'lxscheme',
         'lxuniverse', 'lxresolver',
         'lxarnold',
         'lxutil', 'lxutil_gui',

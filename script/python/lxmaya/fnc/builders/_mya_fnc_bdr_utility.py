@@ -221,7 +221,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                     #
                     ma_core.CmdObjOpt(
                         bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
-                    ).set_customize_attributes_create(customize_attributes)
+                    ).create_customize_attributes(customize_attributes)
     @classmethod
     def _set_model_act_geometry_dyn_connect_(cls, with_model_act_geometry_dyn_connect):
         GeometryAlembicBlender(
@@ -414,7 +414,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                 # print user_directory_path
                 file_path = '{}/{}.ma'.format(user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()]))
 
-                mya_dcc_objects.Scene.set_file_save_to(file_path)
+                mya_dcc_objects.Scene.save_file_to(file_path)
     @classmethod
     def _set_render_(cls, render_resolution):
         mya_dcc_objects.Scene.set_render_resolution(
@@ -698,7 +698,7 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 ma_core.CmdObjOpt(
                     bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
-                ).set_customize_attributes_create(customize_attributes)
+                ).create_customize_attributes(customize_attributes)
     @classmethod
     def build_groom_geometry_fnc(cls, rsv_task, space, with_groom_grow):
         import lxmaya.fnc.importers as mya_fnc_importers

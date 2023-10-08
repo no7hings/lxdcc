@@ -8,9 +8,11 @@ class TimeExtraMtd(object):
     TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
     TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S_%f'
     DATA_TAG_FORMAT = u'%Y_%m%d'
+
     @classmethod
     def get_time_tag_36(cls, multiply=1):
         return _bsc_cor_raw.RawIntegerOpt(int(time.time()*multiply)).set_encode_to_36()
+
     @classmethod
     def get_time_tag_36_(cls, multiply=1):
         s = time.time()
@@ -45,13 +47,15 @@ class TimePrettifyMtd(object):
         (u'周六', 'Saturday'),
         (u'周天', 'Sunday'),
     ]
+
     @classmethod
     def to_prettify_by_timestamp(cls, timestamp, language=0):
         if isinstance(timestamp, float):
             return cls.to_prettify_by_timetuple(
                 time.localtime(timestamp),
                 language=language,
-                )
+            )
+
     @classmethod
     def to_prettify_by_time_tag(cls, time_tag, language=0):
         year = int(time_tag[:4])
@@ -73,16 +77,17 @@ class TimePrettifyMtd(object):
                 timetuple,
                 language=language
             )
+
     @classmethod
     def to_prettify_by_timetuple(cls, timetuple, language=0):
         year, month, day, hour, minute, second, week, dayCount, isDst = timetuple
         cur_timetuple = time.localtime(time.time())
         year_, month_, day_, hour_, minute_, second_, week_, dayCount_, isDst_ = cur_timetuple
         #
-        monday = day - week
-        monday_ = day_ - week_
+        monday = day-week
+        monday_ = day_-week_
         year_str = [u'{}年'.format(str(year).zfill(4)), str(year).zfill(4)][language]
-        month_str = cls.MONTH[int(month) - 1][language]
+        month_str = cls.MONTH[int(month)-1][language]
         day_str = [u'{}日'.format(str(day).zfill(2)), str(day).zfill(2)][language]
         if cur_timetuple[:1] == timetuple[:1]:
             if cur_timetuple[:2] == timetuple[:2]:
@@ -94,7 +99,7 @@ class TimePrettifyMtd(object):
                             '{}:{}:{}'.format(str(hour).zfill(2), str(minute).zfill(2), str(second).zfill(2))
                         ][language]
                         return time_str
-                    elif day_ == day + 1:
+                    elif day_ == day+1:
                         sub_str = [u'昨天', 'Yesterday'][language]
                         return sub_str
                     return week_str
@@ -110,6 +115,14 @@ class TimePrettifyMtd(object):
     def time_tag2timestamp(self, time_tag):
         pass
 
+    @classmethod
+    def to_timetuple(cls, any_time, time_format):
+        import datetime
+
+        return datetime.datetime.strptime(
+            any_time, time_format
+        ).timetuple()
+
 
 class TimestampMtd(object):
     @classmethod
@@ -121,10 +134,12 @@ class TimestampMtd(object):
 
 
 class TimestampOpt(object):
-    TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
-    TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S'
+    TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+    TIME_TAG_FORMAT = '%Y_%m%d_%H%M_%S'
+
     def __init__(self, timestamp):
         self._timestamp = timestamp
+
     @property
     def timestamp(self):
         return self._timestamp
@@ -141,9 +156,9 @@ class TimestampOpt(object):
             time.localtime(self._timestamp)
         )
 
-    def get_as_tag_36(self):
+    def get_as_tag_36(self, multiply=1):
         return _bsc_cor_raw.RawIntegerOpt(
-            int(self._timestamp)
+            int(self._timestamp*multiply)
         ).set_encode_to_36()
 
     def get_as_tag_36_(self, multiply=1):

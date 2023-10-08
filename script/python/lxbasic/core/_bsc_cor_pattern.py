@@ -49,6 +49,7 @@ class PtnMultiplyFileMtd(object):
                     s = '[0-9]'*i_c
                     new_name_base = new_name_base.replace(pattern[j_start:j_end], s, 1)
         return new_name_base
+
     @classmethod
     def to_re_style(cls, pattern):
         pattern_ = pattern
@@ -65,6 +66,7 @@ class PtnMultiplyFileMtd(object):
                 r'(\d{{{}}})'.format(i_count)
             )
         return re_pattern_
+
     @classmethod
     def get_args(cls, pattern):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -84,6 +86,7 @@ class PtnMultiplyFileMtd(object):
                     (i_key, i_count)
                 )
         return key_args
+
     @classmethod
     def get_is_valid(cls, p):
         re_keys = cls.RE_MULTIPLY_KEYS
@@ -200,6 +203,7 @@ class PtnParseMtd(object):
 class PtnFnmatch(object):
     CACHE = dict()
     CACHE_MAX = 100
+
     @classmethod
     def to_re_style(cls, pat):
         i, n = 0, len(pat)
@@ -232,9 +236,11 @@ class PtnFnmatch(object):
             else:
                 res = res+re.escape(c)
         return res
+
     @classmethod
     def get_is_valid(cls, ptn):
         return ptn != cls.to_re_style(ptn)
+
     @classmethod
     def filter(cls, texts, p):
         list_ = []
@@ -253,7 +259,7 @@ class PtnFnmatch(object):
         return list_
 
 
-class PtnParseOpt(object):
+class AbsPtnParseOpt(object):
     def __init__(self, p, key_format=None):
         self._pattern_origin = p
         self._variants = {}
@@ -267,18 +273,24 @@ class PtnParseOpt(object):
         self._fnmatch_pattern = PtnParseMtd.get_as_fnmatch(
             self._pattern, self._key_format
         )
+
     def get_pattern(self):
         return self._pattern
+
     pattern = property(get_pattern)
 
-    @property
-    def fnmatch_pattern(self):
-        return self._fnmatch_pattern
+    def get_fnmatch_pattern(self):
+        return PtnParseMtd.get_as_fnmatch(
+            self._pattern, self._key_format
+        )
+
+    fnmatch_pattern = property(get_fnmatch_pattern)
 
     def get_keys(self):
         return PtnParseMtd.get_keys(
             self._pattern
         )
+
     keys = property(get_keys)
 
     def get_value(self):
@@ -303,6 +315,23 @@ class PtnParseOpt(object):
                 self._pattern, **kwargs
             )
         )
+
+    def get_variants(self, result):
+        i_p = parse.parse(
+            self._pattern, result, case_sensitive=True
+        )
+        if i_p:
+            i_r = i_p.named
+            if i_r:
+                i_r.update(self._variants)
+                i_r['result'] = result
+                return i_r
+        return self._variants
+
+
+class PtnParseOpt(AbsPtnParseOpt):
+    def __init__(self, p, key_format=None):
+        super(PtnParseOpt, self).__init__(p, key_format)
 
     def get_matches(self, sort=False):
         list_ = []
@@ -337,18 +366,6 @@ class PtnParseOpt(object):
         return not not fnmatch.filter(
             [result], self._fnmatch_pattern
         )
-
-    def get_variants(self, result):
-        i_p = parse.parse(
-            self._pattern, result, case_sensitive=True
-        )
-        if i_p:
-            i_r = i_p.named
-            if i_r:
-                i_r.update(self._variants)
-                i_r['result'] = result
-                return i_r
-        return self._variants
 
     def _get_exists_results_(self):
         return glob.glob(
@@ -393,3 +410,14 @@ class PtnParseOpt(object):
 
     def __str__(self):
         return self._pattern
+
+
+class PtnDocParseOpt(AbsPtnParseOpt):
+    def __init__(self, p, key_format=None):
+        super(PtnDocParseOpt, self).__init__(p, key_format)
+
+    def get_matched_lines(self, lines):
+        return fnmatch.filter(
+            lines,
+            self.get_fnmatch_pattern()
+        )

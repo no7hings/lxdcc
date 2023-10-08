@@ -21,7 +21,7 @@ def post_fnc():
 
 t_s = bsc_core.TimeMtd.get_timestamp()
 r = bsc_objects.GainThreadsRunner()
-r.run_finished.set_connect_to(post_fnc)
+r.run_finished.connect_to(post_fnc)
 for i in p.get_rsv_resource_groups(
     branch='asset'
 ):

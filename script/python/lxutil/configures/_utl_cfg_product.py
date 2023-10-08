@@ -7,9 +7,9 @@ from lxutil import utl_core
 class AbsCfg(object):
     def __init__(self, configure):
         self._configure = configure
-        self._set_build_()
+        self._gui_build_()
 
-    def _set_build_(self):
+    def _gui_build_(self):
         raise NotImplementedError()
 
     def __str__(self):
@@ -20,7 +20,7 @@ class TextureColorSpaceConfigure(AbsCfg):
     def __init__(self, configure):
         super(TextureColorSpaceConfigure, self).__init__(configure)
 
-    def _set_build_(self):
+    def _gui_build_(self):
         self._keys = []
         self._color_space_dict = {}
         self._purpose_dict = {}
@@ -70,7 +70,7 @@ class TextureAcesColorSpaceConfigure(AbsCfg):
     def get_is_enable(cls):
         return utl_core.Environ.get('OCIO') is not None
 
-    def _set_build_(self):
+    def _gui_build_(self):
         self._convert_dict = self._configure.get('aces.convert')
 
     def get_all_color_spaces(self):

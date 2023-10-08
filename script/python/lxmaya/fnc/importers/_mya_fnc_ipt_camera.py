@@ -87,7 +87,7 @@ class CameraAbcImporter(
                     if obj_tgt.get_is_exists() is True:
                         obj_tgt.set_delete()
                     #
-                    i_obj.set_parent_path(mya_location)
+                    i_obj.parent_to_path(mya_location)
             #
             i_obj._update_path_()
             dcc_dag_path = bsc_core.DccPathDagOpt(i_obj.path).clear_namespace_to()

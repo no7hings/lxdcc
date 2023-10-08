@@ -78,7 +78,7 @@ class AssetWorkspaceOpt(object):
                 material_assign_dcc_path, pass_name
             )
             material_assign_dcc_opt = _ktn_dcc_opt_look.MaterialAssignOpt(dcc_material_assign)
-            material_assign_dcc_opt.set_material(dcc_material)
+            material_assign_dcc_opt.assign_material(dcc_material)
             material_assign_dcc_opt.set_geometry_path_append(geometry.path)
 
             shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
@@ -248,7 +248,7 @@ class AssetWorkspaceOpt(object):
                 material_assign_dcc_path, pass_name
             )
             material_assign_dcc_opt = _ktn_dcc_opt_look.MaterialAssignOpt(dcc_material_assign)
-            material_assign_dcc_opt.set_material(dcc_material)
+            material_assign_dcc_opt.assign_material(dcc_material)
             material_assign_dcc_opt.set_geometry_path_append(geometry.path)
 
             shader_dcc_name = '{}__surface__override'.format(dcc_material.name)
@@ -392,7 +392,7 @@ class AssetWorkspaceOpt(object):
                 material_assign_dcc_path, pass_name
             )
             material_assign_dcc_opt = _ktn_dcc_opt_look.MaterialAssignOpt(dcc_material_assign)
-            material_assign_dcc_opt.set_material(dcc_material)
+            material_assign_dcc_opt.assign_material(dcc_material)
             material_assign_dcc_opt.set_geometry_path_append(geometry.path)
 
             shader_dcc_name = '{}__surface__override'.format(dcc_material.name)

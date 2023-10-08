@@ -1,13 +1,14 @@
 # coding:utf-8
-import os.path
-
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_time, _bsc_cor_process, _bsc_cor_storage
+import os
+
+from lxbasic.core import _bsc_cor_raw, _bsc_cor_time, _bsc_cor_process, _bsc_cor_storage, _bsc_cor_executes
 
 
 class ImgFileOpt(object):
     TIME_MARK_PATTERN = '%Y:%m:%d %H:%M:%S'
+
     def __init__(self, file_path):
         self._file_path = file_path
         self._file_path_opt = _bsc_cor_storage.StgFileOpt(self._file_path)
@@ -27,7 +28,7 @@ class ImgFileOpt(object):
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
-                    Bin.get_oiiotool(),
+                    _bsc_cor_executes.Executes.oiiotool(),
                     '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
@@ -47,13 +48,14 @@ class ImgFileOpt(object):
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
-                    Bin.get_oiiotool(),
+                    _bsc_cor_executes.Executes.oiiotool(),
                     '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
                 ]
                 return thumbnail_file_path, ' '.join(cmd_args)
         return thumbnail_file_path, None
+
     @classmethod
     def _create_background_(cls, width, background_rgba=(0, 0, 0, 255)):
         force = False
@@ -94,7 +96,7 @@ class ImgFileOpt(object):
                 background_file_path = self._create_background_(width, background_rgba)
                 #
                 cmd_args = [
-                    Bin.get_oiiotool(),
+                    _bsc_cor_executes.Executes.oiiotool(),
                     '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     # use fit, move to center
                     '--fit {}x{}'.format(width, width),
@@ -125,7 +127,7 @@ class ImgFileOpt(object):
                 self.TIME_MARK_PATTERN, _bsc_cor_storage.StgFileOpt(file_path).get_modify_timestamp()
             )
             cmd_args = [
-                Bin.get_oiiotool(),
+                _bsc_cor_executes.Executes.oiiotool(),
                 u'-i "{}"'.format(file_path),
                 '--resize {}x0'.format(width),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
@@ -157,12 +159,18 @@ class ImgFileOpt(object):
             self.TIME_MARK_PATTERN, file_path_src_opt.get_modify_timestamp()
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             u'-i "{}"'.format(file_path_src_opt.path),
             '--attrib:type=string DateTime "{}"'.format(time_mark),
             '--adjust-time ',
             '--threads 1',
         ]
+        if ext == '.jpg':
+            cmd_args.extend(
+                [
+                    '--ch R,G,B',
+                ]
+            )
         if isinstance(width, (int, float)):
             cmd_args += [
                 '--resize {}x0'.format(width),
@@ -183,7 +191,7 @@ class ImgFileOpt(object):
                 self.TIME_MARK_PATTERN, file_opt_src.get_modify_timestamp()
             )
             cmd_args = [
-                Bin.get_oiiotool(),
+                _bsc_cor_executes.Executes.oiiotool(),
                 '-i "{}"'.format(_bsc_cor_raw.auto_encode(file_opt_src.get_path())),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
@@ -193,6 +201,7 @@ class ImgFileOpt(object):
             _bsc_cor_process.SubProcessMtd.execute_with_result(
                 ' '.join(cmd_args)
             )
+
     @classmethod
     def r_to_rgb(cls, file_path_src, file_path_tgt):
         option = dict(
@@ -203,7 +212,7 @@ class ImgFileOpt(object):
             )
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '-i "{input}"',
             '--ch 0,0,0',
             '--attrib:type=string DateTime "{time_mark}"',
@@ -225,7 +234,7 @@ class ImgOiioMtd(object):
             size='{}x{}'.format(*size)
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             u'-i "{input}"',
             '--fit {size}',
             u'-o "{output}"',
@@ -233,6 +242,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def set_create_as_flat_color(cls, file_path_tgt, size, rgba):
         option = dict(
@@ -241,7 +251,7 @@ class ImgOiioMtd(object):
             output=file_path_tgt
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             # u'-i "{}"'.format(file_path_src),
@@ -250,6 +260,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def create_png_as_fill(cls, file_path, size, rgba):
         option = dict(
@@ -258,7 +269,7 @@ class ImgOiioMtd(object):
             output=_bsc_cor_raw.auto_encode(file_path)
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             '-o "{output}"',
@@ -266,6 +277,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def set_over_by(cls, file_path_fgd, file_path_bgd, file_path_tgt, offset_fgd):
         option = dict(
@@ -275,7 +287,7 @@ class ImgOiioMtd(object):
             offset_foreground='-{}-{}'.format(*offset_fgd)
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             u'"{foreground}" --originoffset {offset_foreground}',
             u'"{background}"',
             '--over',
@@ -284,6 +296,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def set_guide_create(cls):
         file_path_tgt = '/data/f/test_rvio/test_6.exr'
@@ -305,7 +318,7 @@ class ImgOiioMtd(object):
         box_args = []
         border_rgb = 1, 1, 1
         max_c = sum([i[1] for i in guide_data])
-        i_x_0, i_y_0 = 0, h - g_h
+        i_x_0, i_y_0 = 0, h-g_h
         for i in guide_data:
             i_text, i_c = i
             i_background_rgb = _bsc_cor_raw.RawTextOpt(i_text).to_rgb(maximum=1)
@@ -313,8 +326,8 @@ class ImgOiioMtd(object):
             box_args.append(
                 '--box:color={},{},{},1:fill=1'.format(*i_background_rgb)
             )
-            i_p = i_c / float(max_c)
-            i_x_1, i_y_1 = int(i_x_0 + i_p * w), h - 1
+            i_p = i_c/float(max_c)
+            i_x_1, i_y_1 = int(i_x_0+i_p*w), h-1
             box_args.append(
                 '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
             )
@@ -322,8 +335,8 @@ class ImgOiioMtd(object):
             box_args.append(
                 '--box:color={},{},{},1'.format(*border_rgb)
             )
-            i_p = i_c / float(max_c)
-            i_x_1, i_y_1 = int(i_x_0 + i_p * w), h - 1
+            i_p = i_c/float(max_c)
+            i_x_1, i_y_1 = int(i_x_0+i_p*w), h-1
             box_args.append(
                 '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
             )
@@ -331,7 +344,7 @@ class ImgOiioMtd(object):
 
         option['box'] = ' '.join(box_args)
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             '{box}',
@@ -342,6 +355,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def test(cls):
         file_path_tgt = '/data/f/test_rvio/test_6.exr'
@@ -380,8 +394,8 @@ class ImgOiioMtd(object):
             box_args.append(
                 '--box:color={},{},{},1'.format(*border_rgb)
             )
-            i_p = i_c / float(max_c)
-            i_x_1, i_y_1 = int(i_x_0 + i_p * w), h - 1
+            i_p = i_c/float(max_c)
+            i_x_1, i_y_1 = int(i_x_0+i_p*w), h-1
             box_args.append(
                 '{},{},{},{}'.format(i_x_0, i_y_0, i_x_1, i_y_1)
             )
@@ -389,7 +403,7 @@ class ImgOiioMtd(object):
 
         option['box'] = ' '.join(box_args)
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             '{box}',
@@ -400,6 +414,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def convert_to(cls, file_path_src, file_path_tgt):
         option = dict(
@@ -407,7 +422,7 @@ class ImgOiioMtd(object):
             output=file_path_tgt,
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             u'-i "{input}"',
             '--ch R,G,B,A=1.0',
             u'-o "{output}"',
@@ -415,6 +430,7 @@ class ImgOiioMtd(object):
         _bsc_cor_process.SubProcessMtd.execute_with_result(
             ' '.join(cmd_args).format(**option)
         )
+
     @classmethod
     def set_color_space_convert_to(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
         option = dict(
@@ -424,7 +440,7 @@ class ImgOiioMtd(object):
             to_color_space=color_space_tgt,
         )
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '-i "{input}"',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
             # '--iscolorspace "{from_color_space}"',
@@ -674,12 +690,13 @@ class ImgFileOiioOpt(object):
     TYPE_DICT = {
         'uint8': 'uint', 'uint10': 'uint', 'uint12': 'uint', 'uint16': 'uint', 'uint32': 'uint',
         'sint16': 'sint', 'sint8': 'sint', 'sint32': 'sint',
-        'half': 'half',  'float': 'float', 'double': 'double'
+        'half': 'half', 'float': 'float', 'double': 'double'
     }
+
     @classmethod
     def _get_info_(cls, file_path):
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '--info:verbose=1 "{}"'.format(file_path),
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))
@@ -688,14 +705,16 @@ class ImgFileOiioOpt(object):
             p = parse.parse(cls.INFO_PATTERN, _[0])
             if p:
                 return p.named
+
     @classmethod
     def _get_metadata_(cls, file_path):
         cmd_args = [
-            Bin.get_oiiotool(),
+            _bsc_cor_executes.Executes.oiiotool(),
             '--info:verbose=1 "{}"'.format(file_path),
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))
         _ = p.stdout.readlines()
+
     #
     def __init__(self, file_path):
         if os.path.isfile(file_path):
@@ -703,9 +722,12 @@ class ImgFileOiioOpt(object):
             self._info = self._get_info_(self._file_path)
         else:
             raise OSError()
+
     def get_info(self):
         return self._info
+
     info = property(get_info)
+
     #
     @property
     def path(self):
@@ -713,14 +735,17 @@ class ImgFileOiioOpt(object):
 
     def get_size(self):
         return int(self._info['width']), int(self._info['height'])
+
     size = property(get_size)
 
     @property
     def bit(self):
         return self.BIT_DICT[self._info['type']]
+
     @property
     def type(self):
         return self.TYPE_DICT[self._info['type']]
+
     @property
     def format(self):
         return self

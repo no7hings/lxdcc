@@ -55,7 +55,7 @@ def set_asset_xgen_export(rsv_version):
     scene_file_unit = rsv_version.get_rsv_unit(keyword='asset-maya-scene-file')
     scene_file_path = scene_file_unit.get_result(version=rsv_version.get('version'))
 
-    mya_dcc_objects.Scene.set_file_open(scene_file_path)
+    mya_dcc_objects.Scene.open_file(scene_file_path)
 
     project_directory_path = rsv_version.get_directory_path()
 

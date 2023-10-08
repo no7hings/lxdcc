@@ -1,0 +1,169 @@
+option:
+    root: '/rootNode'
+    category: 'workspace'
+    type: 'property_set_opt'
+    type_abr: 'prt_set_opt'
+    create_type: 'PropertySet_Opt'
+    description:
+        |-
+        Set property
+    variant_key: ''
+    #
+    auto_color: False
+    #
+    color:
+        r: .5
+        g: .125
+        b: .125
+#
+main:
+    type: OpScript
+    name: '<option.type>'
+    path: '<option.root>/<.name>'
+    input: '<.path>.i0'
+    output: '<.path>.out'
+    #
+    clear_start: 'user'
+    #
+    attributes:
+        ns_colorr: <option.color.r>
+        ns_colorg: <option.color.g>
+        ns_colorb: <option.color.b>
+        ns_linkColorR: <option.color.r>
+        ns_linkColorG: <option.color.g>
+        ns_linkColorB: <option.color.b>
+        #
+        comment: '<option.description>'
+    #
+    input_ports: []
+    #
+    output_ports: []
+    #
+    ports:
+        # basic
+        user/type:
+            widget: string
+            value: '<option.create_type>'
+            tool_tip: '...'
+            lock: True
+
+        user/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        user/script_visible:
+            widget: boolean
+            value: False
+            tool_tip: '...'
+
+        user/setting/attribute:
+            widget: string
+            value: 'geometry.arbitrary.ist_*.scope'
+            tool_tip: '...'
+
+        user/setting/value:
+            widget: string
+            value: 'point'
+            tool_tip: '...'
+
+    port_hints:
+        script: {
+            conditionalVisOps: {"conditionalVisOp": "equalTo", conditionalVisPath: "../user/script_visible", conditionalVisValue: 1}
+        }
+        user: {label: 'parameters'}
+
+    parameters:
+        CEL: '/root/world/geo/master//*{attr("type") == "usd point instancer"}'
+        script/lua:
+            |-
+            function rcs_fnc(all_atr_ss, ss, atr_p_s, index, maximum)
+                if index <= maximum then
+                    local s = ss[index]
+                    if s ~= '' then
+                        local atr_s = s
+                        if atr_p_s ~= nil then
+                            atr_s = atr_p_s..'.'..s
+                        end
+                        if index == maximum then
+                            if (pystring.find(s, '*') == -1) then
+                                table.insert(all_atr_ss, atr_s)
+                            else
+                                local atr_ss = filter_fnc(atr_p_s, s)
+                                for i, i_atr_s in ipairs(atr_ss) do
+                                    table.insert(all_atr_ss, i_atr_s)
+                                end
+                            end
+                        else
+                            if (pystring.find(s, '*') == -1) then
+                                rcs_fnc(all_atr_ss, ss, atr_s, index+1, maximum)
+                            else
+                                local atr_ss = filter_fnc(atr_p_s, s)
+                                for i, i_atr_s in ipairs(atr_ss) do
+                                    rcs_fnc(all_atr_ss, ss, i_atr_s, index+1, maximum)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            
+            function filter_fnc(atr_s, p)
+                local all_atr_ss = {}
+                local atr = Interface.GetAttr(atr_s)
+                local c = atr:getNumberOfChildren()
+                local re_p = string.gsub(p, '*', '.*')
+                for j=0, c-1 do
+                    local i_s = atr:getChildName(j)
+                    local i_match = string.match(i_s, re_p)
+                    if i_match ~= nil then
+                        local i_atr_s = atr_s..'.'..i_s
+                        table.insert(all_atr_ss, i_atr_s)
+                    end
+                end
+                return all_atr_ss
+            end
+            
+            function loop_fnc(p)
+                if p ~= '' then
+                    local all_atr_ss = {}
+                    local ss = pystring.split(p, '.')
+                    local m = table.getn(ss)
+                    rcs_fnc(all_atr_ss, ss, nil, 1, m)
+                    return all_atr_ss
+                end
+                return {}
+            end
+            
+            
+            function set_fnc(atr_ss, value)
+                for i, i_atr_s in ipairs(atr_ss) do
+                    local i_atr = Interface.GetAttr(i_atr_s)
+                    if i_atr ~= nil then
+                        if (Attribute.IsInt(i_atr)) then
+                            local atr_value = tonumber(value)
+                            Interface.SetAttr(i_atr_s, IntAttribute(atr_value))
+                        elseif (Attribute.IsFloat(i_atr)) then
+                            local atr_value = tonumber(value)
+                            Interface.SetAttr(i_atr_s, FloatAttribute(atr_value))
+                        elseif (Attribute.IsDouble(i_atr)) then
+                            local atr_value = tonumber(value)
+                            Interface.SetAttr(i_atr_s, DoubleAttribute(atr_value))
+                        elseif (Attribute.IsString(i_atr)) then
+                            local atr_value = tostring(value)
+                            Interface.SetAttr(i_atr_s, StringAttribute(atr_value))
+                        end
+                    end
+                end
+            end
+            
+            function main()
+                if (Interface.GetOpArg('user.enable'):getValue() == 1) then
+                    local atr_p = Interface.GetOpArg('user.setting.attribute'):getValue()
+                    local value = Interface.GetOpArg('user.setting.value'):getValue()
+                    local atr_ss = loop_fnc(atr_p)
+                    set_fnc(atr_ss, value)
+                end
+            end
+            
+            main()

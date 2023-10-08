@@ -19,7 +19,7 @@ from lxmaya import ma_configure, ma_core
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
-from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag, _mya_dcc_obj_xgen, _mya_dcc_obj_arnold
+from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag, _mya_dcc_obj_xgen, _mya_dcc_obj_arnold, _mya_dcc_obj_look
 
 
 class Nodes(object):
@@ -142,7 +142,7 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
         'defaultLightSet',
         'defaultObjectSet'
     ]
-    DCC_NODE_CLS = _mya_dcc_obj_obj.Material
+    DCC_NODE_CLS = _mya_dcc_obj_look.Material
     def __init__(self, *args):
         super(Materials, self).__init__(*args)
 

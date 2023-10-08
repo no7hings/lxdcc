@@ -1,4 +1,6 @@
 # coding:utf-8
+import fnmatch
+
 from ._bsc_cor_utility import *
 
 from lxbasic.core import _bsc_cor_raw
@@ -19,6 +21,7 @@ class DccPathDagMtd(object):
             return [pathsep, ]
         # is <obj>, etc: "/obj"
         return path.split(pathsep)
+
     @classmethod
     def get_dag_name(cls, path, pathsep='/'):
         """
@@ -31,8 +34,9 @@ class DccPathDagMtd(object):
             return pathsep
         # is <obj>, etc: "/obj"
         return cls.get_dag_args(path, pathsep)[-1]
+
     @classmethod
-    def get_dag_parent(cls, path, pathsep='/'):
+    def get_dag_parent_path(cls, path, pathsep='/'):
         """
         :param path:
         :param pathsep:
@@ -52,6 +56,13 @@ class DccPathDagMtd(object):
                 return pathsep
             else:
                 return pathsep.join(dag_args[:-1])
+
+    @classmethod
+    def get_dag_parent_name(cls, path, pathsep):
+        return cls.get_dag_name(
+            cls.get_dag_parent_path(path, pathsep), pathsep
+        )
+
     @classmethod
     def get_dag_component_paths(cls, path, pathsep='/'):
         """
@@ -59,19 +70,22 @@ class DccPathDagMtd(object):
         :param pathsep:
         :return: list[str(<obj-path>)]
         """
+
         def _rcs_fnc(lis_, path_):
             if path_ is not None:
                 lis_.append(path_)
-                _parent_path = cls.get_dag_parent(path_, pathsep)
+                _parent_path = cls.get_dag_parent_path(path_, pathsep)
                 if _parent_path:
                     _rcs_fnc(lis_, _parent_path)
 
         lis = []
         _rcs_fnc(lis, path)
         return lis
+
     @classmethod
     def get_dag_name_with_namespace_clear(cls, name, namespacesep=':'):
         return name.split(namespacesep)[-1]
+
     @classmethod
     def get_dag_path_with_namespace_clear(cls, path, pathsep='/', namespacesep=':'):
         dag_args = cls.get_dag_args(path, pathsep)
@@ -79,6 +93,7 @@ class DccPathDagMtd(object):
         for i in dag_args:
             lis.append(cls.get_dag_name_with_namespace_clear(i, namespacesep))
         return cls.get_dag_path(lis, pathsep)
+
     @classmethod
     def get_dag_path_lstrip(cls, path, lstrip=None):
         if lstrip is not None:
@@ -88,19 +103,23 @@ class DccPathDagMtd(object):
                 return ''
             return path
         return path
+
     @classmethod
     def get_dag_path(cls, dag_args, pathsep='/'):
         return pathsep.join(dag_args)
+
     @classmethod
     def get_dag_pathsep_replace(cls, path, pathsep_src='/', pathsep_tgt='/'):
         if path == pathsep_src:
             return pathsep_tgt
         return pathsep_tgt.join(cls.get_dag_args(path, pathsep=pathsep_src))
+
     @classmethod
     def get_dag_child_path(cls, path, child_name, pathsep='/'):
         if path == pathsep:
-            return pathsep + child_name
+            return pathsep+child_name
         return pathsep.join([path, child_name])
+
     @classmethod
     def get_dag_child_paths(cls, path, paths, pathsep='/'):
         lis = []
@@ -119,14 +138,17 @@ class DccPathDagMtd(object):
                     if _.group() == i_path:
                         lis.append(i_path)
         return lis
+
     @classmethod
     def get_dag_child_names(cls, path, paths, pathsep='/'):
         return [cls.get_dag_name(x) for x in cls.get_dag_child_paths(path, paths, pathsep)]
+
     @classmethod
     def get_dag_siblings(cls, path, paths, pathsep='/'):
         return cls.get_dag_child_paths(
-            cls.get_dag_parent(path, pathsep), paths, pathsep
+            cls.get_dag_parent_path(path, pathsep), paths, pathsep
         )
+
     @classmethod
     def get_dag_sibling_names(cls, path, paths, pathsep='/'):
         """
@@ -143,6 +165,7 @@ class DccPathDagMtd(object):
         :return:
         """
         return [cls.get_dag_name(x) for x in cls.get_dag_siblings(path, paths, pathsep)]
+
     @classmethod
     def set_dag_path_cleanup(cls, path, pathsep='/'):
         return re.sub(
@@ -151,6 +174,29 @@ class DccPathDagMtd(object):
 
 
 class DccPathDagOpt(object):
+    PLANT_HSV_MAPPER = dict(
+        tree_leaf=(120.0, 0.5, 0.15),
+        tree_stem=(40.0, 0.5, 0.15),
+        tree_flower=(300.0, 0.25, 0.75),
+        #
+        shrub_leaf=(110.0, 0.5, 0.15),
+        shrub_stem=(60.0, 0.5, 0.15),
+        shrub_flower=(300.0, 0.25, 0.75),
+        #
+        fern_leaf=(100, 0.8, 0.2),
+        fern_stem=(100, 0.85, 0.25),
+        fern_flower=(300.0, 0.25, 0.75),
+        #
+        flower_leaf=(90, 0.85, 0.25),
+        flower_stem=(90, 0.9, 0.3),
+        flower_petal=(300.0, 0.25, 0.75),
+        flower_calyx=(100.0, 0.25, 0.75),
+        #
+        grass_leaf=(80, 0.85, 0.25),
+        grass_stem=(80.0, 0.9, 0.3),
+        grass_flower=(300.0, 0.25, 0.75),
+    )
+
     def __init__(self, path):
         self._pathsep = path[0]
         self._path = path
@@ -159,6 +205,7 @@ class DccPathDagOpt(object):
         return DccPathDagMtd.get_dag_name(
             path=self._path, pathsep=self._pathsep
         )
+
     name = property(get_name)
 
     def set_name(self, name):
@@ -181,14 +228,17 @@ class DccPathDagOpt(object):
 
     def get_pathsep(self):
         return self._pathsep
+
     pathsep = property(get_pathsep)
 
     def get_path(self):
         return self._path
+
     path = property(get_path)
 
     def get_value(self):
         return self._path
+
     value = property(get_value)
 
     def get_root(self):
@@ -198,13 +248,13 @@ class DccPathDagOpt(object):
         return self.path == self.pathsep
 
     def get_parent_path(self):
-        return DccPathDagMtd.get_dag_parent(
+        return DccPathDagMtd.get_dag_parent_path(
             path=self._path, pathsep=self._pathsep
         )
 
-    def set_parent_path(self, path):
+    def parent_to_path(self, path):
         # noinspection PyAugmentAssignment
-        self._path = path + self._path
+        self._path = path+self._path
 
     def get_ancestor_paths(self):
         return self.get_component_paths()[1:]
@@ -269,6 +319,19 @@ class DccPathDagOpt(object):
             return u'{}...{}/{}'.format(d[:(int(maximum/2)-3)], d[-(int(maximum/2)):], n)
         return p
 
+    def get_rgb(self, maximum=255):
+        return _bsc_cor_raw.RawTextOpt(
+            self.get_name()
+        ).to_rgb__(maximum=maximum, s_p=50, v_p=100)
+
+    def get_plant_rgb(self, maximum=255):
+        for k, v in self.PLANT_HSV_MAPPER.items():
+            if fnmatch.filter([self._path], '*{}*'.format(k)):
+                return _bsc_cor_raw.RawColorMtd.hsv2rgb(
+                    v[0], v[1], v[2], maximum
+                )
+        return 0.25, 0.75, 0.5
+
     def __str__(self):
         return self._path
 
@@ -297,6 +360,7 @@ for i in [
 ]:
     print s.get(i)
     """
+
     def __init__(self, mapper, pathsep='/'):
         self._mapper = mapper
         self._mapper_reverse = {v: k for k, v in mapper.items()}
@@ -307,7 +371,7 @@ for i in [
             if path == k:
                 return v
             elif path.startswith(
-                k+self._pathsep
+                    k+self._pathsep
             ):
                 return v+path[len(k):]
         return path
@@ -327,11 +391,13 @@ class DccPortPathMtd(object):
     @classmethod
     def get_dag_args(cls, path, pathsep='.'):
         return path.split(pathsep)
+
     @classmethod
     def get_dag_name(cls, path, pathsep='.'):
         return cls.get_dag_args(path, pathsep)[-1]
+
     @classmethod
-    def get_dag_parent(cls, path, pathsep):
+    def get_dag_parent_path(cls, path, pathsep):
         dag_args = cls.get_dag_args(path, pathsep)
         if len(dag_args) == 1:
             return None
@@ -345,6 +411,7 @@ class DccAttrPathMtd(object):
     @classmethod
     def get_atr_path(cls, obj_path, port_path, port_pathsep='.'):
         return port_pathsep.join([obj_path, port_path])
+
     @classmethod
     def set_atr_path_split(cls, path, pathsep='.'):
         _ = path.split(pathsep)
@@ -358,12 +425,15 @@ class DccAttrPathOpt(object):
         _ = self._path.split(self._port_pathsep)
         self._obj_path = _[0]
         self._port_path = self._port_pathsep.join(_[1:])
+
     @property
     def path(self):
         return self._path
+
     @property
     def obj_path(self):
         return self._obj_path
+
     @property
     def port_path(self):
         return self._port_path
@@ -391,7 +461,7 @@ class MeshFaceVertexIndicesOpt(object):
         vertex_index_start = 0
         for i_count in counts:
             vertex_index_end = vertex_index_start+i_count
-            for j in range(vertex_index_end - vertex_index_start):
+            for j in range(vertex_index_end-vertex_index_start):
                 lis.append(self._raw[vertex_index_end-j-1])
             #
             vertex_index_start += i_count
@@ -412,20 +482,22 @@ class MeshFaceShellMtd(object):
     @classmethod
     def get_connected_face_indices(cls, face_to_vertex_dict, vertex_to_face_dict, face_index):
         return set(j for i in face_to_vertex_dict[face_index] for j in vertex_to_face_dict[i])
+
     @classmethod
     def get_face_and_vertex_query_dict(cls, vertex_counts, vertex_indices):
         face_to_vertex_dict = {}
         vertex_to_face_dict = {}
         vertex_index_start = 0
         for i_face_index, i_vertex_count in enumerate(vertex_counts):
-            vertex_index_end = vertex_index_start + i_vertex_count
-            for j in range(vertex_index_end - vertex_index_start):
-                j_vertex_index = vertex_indices[vertex_index_start + j]
+            vertex_index_end = vertex_index_start+i_vertex_count
+            for j in range(vertex_index_end-vertex_index_start):
+                j_vertex_index = vertex_indices[vertex_index_start+j]
                 vertex_to_face_dict.setdefault(j_vertex_index, []).append(i_face_index)
                 face_to_vertex_dict.setdefault(i_face_index, []).append(j_vertex_index)
             #
             vertex_index_start += i_vertex_count
         return face_to_vertex_dict, vertex_to_face_dict
+
     @classmethod
     def get_shell_dict_from_face_vertices(cls, vertex_counts, vertex_indices):
         # StgFileOpt(
@@ -459,10 +531,12 @@ class MeshFaceShellMtd(object):
             _less_face_indices -= _cur_search_face_indices
             #
             cur_connected_face_indices = set()
-            [cur_connected_face_indices.update(cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, i)) for i in _cur_search_face_indices]
+            [cur_connected_face_indices.update(
+                cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, i)
+                ) for i in _cur_search_face_indices]
 
-            cur_int = cur_connected_face_indices & _cur_shell_face_indices
-            cur_dif = cur_connected_face_indices - _cur_shell_face_indices
+            cur_int = cur_connected_face_indices&_cur_shell_face_indices
+            cur_dif = cur_connected_face_indices-_cur_shell_face_indices
             if cur_int:
                 if cur_dif:
                     _cur_shell_face_indices.update(cur_dif)
@@ -473,7 +547,9 @@ class MeshFaceShellMtd(object):
                         _cur_shell_index += 1
                         #
                         _cur_face_index = min(_less_face_indices)
-                        _cur_search_face_indices = cls.get_connected_face_indices(face_to_vertex_dict, vertex_to_face_dict, _cur_face_index)
+                        _cur_search_face_indices = cls.get_connected_face_indices(
+                            face_to_vertex_dict, vertex_to_face_dict, _cur_face_index
+                            )
                         _cur_shell_face_indices = set()
                         _cur_shell_face_indices.update(_cur_search_face_indices)
             #

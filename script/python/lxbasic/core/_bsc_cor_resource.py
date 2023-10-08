@@ -1,4 +1,6 @@
 # coding:utf-8
+import os
+
 from lxbasic.core._bsc_cor_utility import *
 
 from lxbasic.core import _bsc_cor_environ, _bsc_cor_storage
@@ -7,11 +9,13 @@ from lxbasic.core import _bsc_cor_environ, _bsc_cor_storage
 class RscFileMtd(object):
     CACHE = {}
     ENVIRON_KEY = 'PAPER_EXTEND_RESOURCES'
+
     @classmethod
     def get_search_directories(cls):
         return _bsc_cor_environ.EnvironMtd.get_as_array(
             cls.ENVIRON_KEY
         )
+
     @classmethod
     def get(cls, key, search_paths=None):
         """
@@ -40,6 +44,7 @@ class RscFileMtd(object):
                         value = i_results[0]
                         cls.CACHE[key] = value
                         return value
+
     @classmethod
     def get_all(cls, key):
         for i_path in cls.get_search_directories():
@@ -51,15 +56,31 @@ class RscFileMtd(object):
                 )
                 return i_results
 
+    @classmethod
+    def get_all_keys_at(cls, branch, key, ext_includes):
+        set_ = set()
+        for i_path_root in cls.get_search_directories():
+            i_path_branch = '{}/{}'.format(i_path_root, branch)
+            i_path = '{}/{}/{}'.format(i_path_root, branch, key)
+            i_path_opt = _bsc_cor_storage.StgDirectoryOpt(i_path)
+            if i_path_opt.get_is_directory() is True:
+                all_file_paths = i_path_opt.get_all_file_paths(ext_includes)
+                set_.update(map(lambda x: os.path.splitext(x[len(i_path_branch)+1:])[0], all_file_paths))
+        list_ = list(set_)
+        list_.sort()
+        return list_
+
 
 class RscIconFileMtd(object):
     BRANCH = 'icons'
     ICON_KEY_PATTERN = r'[@](.*?)[@]'
+
     @classmethod
     def get(cls, key):
         return RscFileMtd.get(
             '{}/{}.*'.format(cls.BRANCH, key)
         )
+
     @classmethod
     def get_(cls, key):
         _ = re.findall(
@@ -67,6 +88,12 @@ class RscIconFileMtd(object):
         )
         if _:
             cls.get(_)
+
+    @classmethod
+    def get_all_keys_at(cls, key):
+        return RscFileMtd.get_all_keys_at(
+            cls.BRANCH, key, ext_includes={'.png', '.svg'}
+        )
 
 
 if __name__ == '__main__':

@@ -16,18 +16,18 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                 self._set_new_check_run_()
 
     def _set_old_check_run_(self):
-        import lxbasic.objects as bsc_objects
+        import lxcontent.objects as ctt_objects
 
         from lxutil import utl_configure
-        #
+
         import lxresolver.operators as rsv_operators
-        #
+
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-        #
+
         import lxkatana.fnc.comparers as ktn_fnc_comparers
-        #
+
         from lxresolver import rsv_configure
-        #
+
         task_properties = self.task_properties
         #
         root = task_properties.get('dcc.root')
@@ -95,7 +95,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             if not geometry_usd_check_raw:
                 self.set_obj_check_result_at(obj.path, check_tag='error', index=1)
             else:
-                set_usd_configure = bsc_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
+                set_usd_configure = ctt_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
                 file_paths_6 = []
                 for element_label in set_usd_configure.get_branch_keys('elements'):
                     v = set_usd_configure.get('elements.{}'.format(element_label))

@@ -34,11 +34,11 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
         # save file first
-        ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+        ktn_dcc_objects.Scene.save_file_to(scene_src_file_path)
 
         ktn_scripts.ScpWorkspaceCreate.new()
 
-        ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+        ktn_dcc_objects.Scene.save_file_to(scene_src_file_path)
         #
         if self._hook_option_opt.get_as_boolean('with_scene_link') is True:
             scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
@@ -71,7 +71,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         scene_file_path = scene_file_rsv_unit.get_result(
             version=version
         )
-        ktn_dcc_objects.Scene.set_file_save_to(scene_file_path)
+        ktn_dcc_objects.Scene.save_file_to(scene_file_path)
         return scene_file_path
 
     def get_scene_src_file_path(self):
@@ -126,7 +126,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         render_file_path = scene_file_path
         # save file first
-        ktn_dcc_objects.Scene.set_file_save_to(render_file_path)
+        ktn_dcc_objects.Scene.save_file_to(render_file_path)
         #
         katana_workspace = ktn_dcc_objects.AssetWorkspace()
         # create workspace
@@ -270,7 +270,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         renderer_node_opt.execute_port('create')
         #
-        ktn_dcc_objects.Scene.set_file_save()
+        ktn_dcc_objects.Scene.save_file()
 
     def set_scene_src_link(self):
         from lxbasic import bsc_core
@@ -379,7 +379,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             extend_variants=dict(var='hi')
         )
         if geometry_usd_var_file_path_hi:
-            s.set_sublayer_append(geometry_usd_var_file_path_hi)
+            s.append_sublayer(geometry_usd_var_file_path_hi)
             #
             file_properties = geometry_usd_var_file_rsv_unit.get_properties_by_result(
                 geometry_usd_var_file_path_hi
@@ -390,7 +390,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 extend_variants=dict(var='shape')
             )
             if geometry_usd_var_file_path_shape:
-                s.set_sublayer_append(geometry_usd_var_file_path_shape)
+                s.append_sublayer(geometry_usd_var_file_path_shape)
             else:
                 bsc_core.LogMtd.trace_method_warning(
                     u'front camera setup',
@@ -443,7 +443,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             extend_variants=dict(var='hi')
         )
         if geometry_usd_var_file_path_hi:
-            s.set_sublayer_append(geometry_usd_var_file_path_hi)
+            s.append_sublayer(geometry_usd_var_file_path_hi)
             #
             file_properties = geometry_usd_var_file_rsv_unit.get_properties_by_result(
                 geometry_usd_var_file_path_hi
@@ -454,7 +454,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 extend_variants=dict(var='shape')
             )
             if geometry_usd_var_file_path_shape:
-                s.set_sublayer_append(geometry_usd_var_file_path_shape)
+                s.append_sublayer(geometry_usd_var_file_path_shape)
             else:
                 bsc_core.LogMtd.trace_method_warning(
                     u'front camera setup',

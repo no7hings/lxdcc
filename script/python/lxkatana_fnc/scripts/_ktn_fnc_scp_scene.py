@@ -52,13 +52,13 @@ def set_scene_export_by_any_scene_file(option):
             #
             create_scene_src = option_opt.get('create_scene_src') or False
             if create_scene_src is True:
-                ktn_dcc_objects.Scene.set_file_new()
+                ktn_dcc_objects.Scene.new_file()
                 execute_asset_scene_src_create(rsv_task_properties)
             #
             scene_src_file = utl_dcc_objects.OsFile(any_scene_file_path)
             if scene_src_file.get_is_exists() is True:
                 if create_scene_src is False:
-                    ktn_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                    ktn_dcc_objects.Scene.open_file(any_scene_file_path)
                 # texture
                 with_texture = option_opt.get('with_texture') or False
                 if with_texture is True:
@@ -102,14 +102,14 @@ def execute_asset_scene_src_create(rsv_task_properties):
     any_scene_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_katana_src_file(
         version=version
     )
-    ktn_dcc_objects.Scene.set_file_save_to(any_scene_file_path)
+    ktn_dcc_objects.Scene.save_file_to(any_scene_file_path)
     result = _ktn_fnc_scp_utility.set_asset_workspace_create(
         rsv_task_properties
     )
     if result is True:
-        ktn_dcc_objects.Scene.set_file_save_to(any_scene_file_path)
+        ktn_dcc_objects.Scene.save_file_to(any_scene_file_path)
         ktn_fnc_importers.LookAssImporter._set_pst_run_()
-        ktn_dcc_objects.Scene.set_file_save()
+        ktn_dcc_objects.Scene.save_file()
 
 
 def execute_asset_scene_export(rsv_task_properties):
@@ -124,5 +124,5 @@ def execute_asset_scene_export(rsv_task_properties):
         version=version
     )
     if scene_file_path:
-        ktn_dcc_objects.Scene.set_file_save_to(scene_file_path)
+        ktn_dcc_objects.Scene.save_file_to(scene_file_path)
         return scene_file_path

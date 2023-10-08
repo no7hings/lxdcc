@@ -13,12 +13,12 @@ from lxutil import utl_core, utl_abstract
 class AbsArnoldSetup(utl_abstract.AbsSetup):
     def __init__(self, root):
         super(AbsArnoldSetup, self).__init__(root)
-    @classmethod
-    def _set_procedural_setup_(cls, *args):
-        [cls.add_environ_fnc('ARNOLD_PROCEDURAL_PATH', i) for i in args]
-    @classmethod
-    def _set_plugin_setup_(cls, *args):
-        [cls.add_environ_fnc('ARNOLD_PLUGIN_PATH', i) for i in args]
+
+    def add_procedurals(self, *args):
+        [self.add_environ_fnc('ARNOLD_PROCEDURAL_PATH', i) for i in map(self._path_process_, args)]
+
+    def add_plugins(self, *args):
+        [self.add_environ_fnc('ARNOLD_PLUGIN_PATH', i) for i in map(self._path_process_, args)]
 
     def set_run(self):
         NotImplementedError()
@@ -29,11 +29,13 @@ class MtoaSetup(AbsArnoldSetup):
         super(MtoaSetup, self).__init__(root)
 
     def set_run(self):
-        self.add_python_env_fnc('{}/scripts'.format(self._root))
-        self.add_library_env_fnc('{}/bin'.format(self._root))
-        self._set_procedural_setup_('{}/procedurals'.format(self._root))
-        self._set_plugin_setup_('{}/plugins'.format(self._root), '{}/procedurals'.format(self._root))
-        self.add_bin_fnc('{}/bin'.format(self._root))
+        self.add_pythons('{root}/scripts')
+        self.add_libraries('{root}/bin')
+        self.add_procedurals('{root}/procedurals')
+        self.add_plugins(
+            '{root}/plugins', '{root}/procedurals'
+        )
+        self.add_bin_fnc('{root}/bin')
 
 
 class KtoaSetup(AbsArnoldSetup):
@@ -47,6 +49,7 @@ class KtoaSetup(AbsArnoldSetup):
 class MayaSetup(object):
     def __init__(self):
         pass
+
     @classmethod
     def _set_maya_ae_setup_(cls):
         from lxmaya import ma_ae_setup
@@ -70,6 +73,7 @@ class MayaSetup(object):
                 'maya-ae setup',
                 'path="{}"'.format(', '.join(lis))
             )
+
     @classmethod
     def run(cls):
         raw = os.environ.get('MAYA_PLUG_IN_PATH')

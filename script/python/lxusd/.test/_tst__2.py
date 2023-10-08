@@ -17,7 +17,7 @@ f_src = '{}/geo/hi.usd'.format(dir_)
 
 f_tgt = '{}/geo_extra/{}.usd'.format(dir_, color_scheme)
 
-s = usd_core.UsdStageOpt._set_file_open_(f_src)
+s = usd_core.UsdStageOpt._open_file_(f_src)
 
 usd_fnc_exporter.GeometryDisplayColorExporter(
     option=dict(

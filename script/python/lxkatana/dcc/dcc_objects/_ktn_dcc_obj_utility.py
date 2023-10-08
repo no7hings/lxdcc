@@ -19,7 +19,7 @@ import lxuniverse.objects as unv_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-from lxutil_gui.qt import utl_gui_qt_core
+from lxutil_gui.qt import gui_qt_core
 
 
 class Scene(utl_dcc_obj_abs.AbsObjScene):
@@ -32,7 +32,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def set_file_path(cls, file_path):
         pass
     @classmethod
-    def set_file_open(cls, file_path):
+    def open_file(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         bsc_core.LogMtd.trace_method_result(
             'katana-file open',
@@ -44,7 +44,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             u'file="{}" is completed'.format(file_path)
         )
     @classmethod
-    def set_file_save(cls):
+    def save_file(cls):
         file_path = cls.get_current_file_path()
         bsc_core.LogMtd.trace_method_result(
             'katana-file save',
@@ -59,7 +59,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         else:
             pass
     @classmethod
-    def set_file_save_to(cls, file_path):
+    def save_file_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         file_obj.create_directory()
         bsc_core.LogMtd.trace_method_result(
@@ -73,7 +73,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         )
     @classmethod
     def set_file_export_to(cls, file_path):
-        # cls.set_file_save()
+        # cls.save_file()
         src_file_path = cls.get_current_file_path()
         src_file_obj = utl_dcc_objects.OsFile(src_file_path)
         src_file_obj.set_copy_to_file(
@@ -83,7 +83,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     def get_scene_is_dirty(cls):
         return KatanaFile.IsFileDirty()
     @classmethod
-    def set_file_new(cls):
+    def new_file(cls):
         return KatanaFile.New()
     @classmethod
     def set_current_frame(cls, frame):
@@ -135,14 +135,14 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         super(Scene, self).__init__(*args, **kwargs)
 
     def load_from_location_fnc(self, ktn_obj, root, include_obj_type=None):
-        self._scene_graph_opt = ktn_core.SGStageOpt(ktn_obj)
+        self._scene_graph_opt = ktn_core.KtnStageOpt(ktn_obj)
         tvl = self._scene_graph_opt._get_traversal_(root)
         while tvl.valid():
             i_obj_path = tvl.getLocationPath()
             i_obj_type_name = tvl.getLocationData().getAttrs().getChildByName('type').getData()[0]
             # print i_obj_type_name
             _obj = self._set_obj_create_(i_obj_type_name, i_obj_path)
-            _obj.obj_opt = self._scene_graph_opt.get_obj_opt(i_obj_path)
+            _obj.obj_opt = self._scene_graph_opt.generate_obj_opt(i_obj_path)
             tvl.next()
 
     def _set_obj_create_(self, obj_type_name, obj_path):
@@ -150,21 +150,21 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)
-        _obj = obj_type.set_obj_create(obj_path)
+        _obj = obj_type.create_obj(obj_path)
         #
         if ktn_core.get_is_ui_mode() is True:
             _obj.set_gui_attribute(
-                'icon', utl_gui_qt_core.QtKatanaMtd.get_qt_icon(obj_type_name)
+                'icon', gui_qt_core.QtKatanaMtd.get_qt_icon(obj_type_name)
             )
         return _obj
     @classmethod
     def set_file_open_with_dialog(cls, file_path):
         def yes_fnc_():
-            cls.set_file_save()
-            cls.set_file_open(file_path)
+            cls.save_file()
+            cls.open_file(file_path)
         #
         def no_fnc_():
-            cls.set_file_open(file_path)
+            cls.open_file(file_path)
         #
         w = utl_core.DialogWindow.set_create(
             label='Save',
@@ -184,32 +184,32 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         if result is True:
             pass
     @classmethod
-    def set_file_new_with_dialog(cls, file_path, post_method=None):
+    def new_file_with_dialog(cls, file_path, post_method=None):
         def pos_method_run_fnc_():
             if isinstance(post_method, (types.FunctionType, types.MethodType)):
                 post_method(file_path)
         #
         def yes_fnc_():
-            cls.set_file_save()
+            cls.save_file()
             #
-            cls.set_file_new()
+            cls.new_file()
             #
             f = utl_dcc_objects.OsFile(file_path)
             f.create_directory()
             #
             pos_method_run_fnc_()
             #
-            cls.set_file_save_to(file_path)
+            cls.save_file_to(file_path)
         #
         def no_fnc_():
-            cls.set_file_new()
+            cls.new_file()
             #
             f = utl_dcc_objects.OsFile(file_path)
             f.create_directory()
             #
             pos_method_run_fnc_()
             #
-            cls.set_file_save_to(file_path)
+            cls.save_file_to(file_path)
         #
         if cls.get_scene_is_dirty() is True:
             w = utl_core.DialogWindow.set_create(
@@ -230,7 +230,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
     @classmethod
     def save_file_with_dialog(cls):
         def yes_fnc_():
-            cls.set_file_save()
+            cls.save_file()
         #
         def no_fnc_():
             pass
@@ -257,7 +257,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             if result is True:
                 pass
     @classmethod
-    def set_file_import(cls, file_path):
+    def import_file_from(cls, file_path):
         KatanaFile.Import(file_path)
 
 

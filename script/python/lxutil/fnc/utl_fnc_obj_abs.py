@@ -17,11 +17,12 @@ import lxutil.objects as utl_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class AbsExporter(object):
     OPTION = dict()
+
     def __init__(self, option=None):
         self._option = copy.deepcopy(self.OPTION)
         if isinstance(option, dict):
@@ -40,6 +41,7 @@ class AbsExporter(object):
 
 class AbsDccExporter(object):
     OPTION = dict()
+
     def __init__(self, file_path, root=None, option=None):
         #
         self._file_path = file_path
@@ -72,7 +74,8 @@ class AbsDccImporter(object):
 class AbsFncDccMeshMatcher(object):
     FNC_DCC_MESH_CLS = None
     #
-    SRC_DCC_CACHE = bsc_objects.Content(value=dict())
+    SRC_DCC_CACHE = ctt_objects.Content(value=dict())
+
     @classmethod
     def _set_geometry_cache_(cls, src_path, tgt_path):
         if cls.FNC_DCC_MESH_CLS is not None:
@@ -80,6 +83,7 @@ class AbsFncDccMeshMatcher(object):
                 '{}.geometry'.format(src_path),
                 cls.FNC_DCC_MESH_CLS(tgt_path).get_geometry()
             )
+
     @classmethod
     def _set_look_cache_(cls, src_path, tgt_path):
         if cls.FNC_DCC_MESH_CLS is not None:
@@ -87,11 +91,13 @@ class AbsFncDccMeshMatcher(object):
                 '{}.look'.format(src_path),
                 cls.FNC_DCC_MESH_CLS(tgt_path).get_look()
             )
+
     @classmethod
     def _get_geometry_cache_(cls, src_path):
         return cls.SRC_DCC_CACHE.get(
             '{}.geometry'.format(src_path)
         )
+
     @classmethod
     def _get_look_cache_(cls, src_path):
         return cls.SRC_DCC_CACHE.get(
@@ -275,14 +281,17 @@ class AbsFncDccMeshMatcher(object):
 
 class AbsFncUsdMeshRepairer(object):
     FNC_USD_MESH_CLS = None
+
     def __init__(self, src_usd_prim, tgt_path, check_statuses):
         self._src_usd_prim = src_usd_prim
         self._src_path = src_usd_prim.GetPath().pathString
         self._tgt_path = tgt_path
         self._check_statuses = check_statuses
+
     @classmethod
     def set_delete(cls, tgt_path):
         cls.FNC_USD_MESH_CLS.set_delete(tgt_path)
+
     @classmethod
     def set_remove(cls, tgt_path):
         cls.FNC_USD_MESH_CLS.set_remove(tgt_path)
@@ -391,6 +400,7 @@ class AbsFncDccGeometryComparer(object):
     #
     RSV_KEYWORD = 'asset-geometry-usd-payload-file'
     DCC_NAMESPACE = 'usd'
+
     def __init__(self, file_path, location=None, location_source=None):
         self._file_path = file_path
         self._location = location
@@ -436,11 +446,12 @@ class AbsFncDccGeometryComparer(object):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
+
         #
         self._dcc_scene_src = usd_dcc_objects.Scene()
         self._dcc_universe_src = self._dcc_scene_src.universe
         self._dcc_stage_opt_src = usd_dcc_operators.SceneOpt(self._dcc_scene_src.usd_stage, self.DCC_NAMESPACE)
-        self._dcc_comparer_data_src = bsc_objects.Content(
+        self._dcc_comparer_data_src = ctt_objects.Content(
             value={}
         )
         #
@@ -450,20 +461,23 @@ class AbsFncDccGeometryComparer(object):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
+
         #
         self._dcc_scene_tgt = usd_dcc_objects.Scene()
         self._dcc_universe_tgt = self._dcc_scene_tgt.universe
         self._dcc_stage_opt_tgt = usd_dcc_operators.SceneOpt(self._dcc_scene_tgt.usd_stage, self.DCC_NAMESPACE)
-        self._dcc_comparer_data_tgt = bsc_objects.Content(
+        self._dcc_comparer_data_tgt = ctt_objects.Content(
             value={}
         )
         #
         self._dcc_geometries_tgt = []
+
     #
     def update_source_fnc(self):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #
         import lxusd.dcc.dcc_operators as usd_dcc_operators
+
         #
         usd_file_path = self._source_file_path
         if usd_file_path is not None:
@@ -504,12 +518,14 @@ class AbsFncDccGeometryComparer(object):
         mesh_type = self._dcc_universe_tgt.get_obj_type('mesh')
         if mesh_type is not None:
             self._dcc_geometries_tgt = mesh_type.get_objs()
+
     #
     def get_geometry_src(self, dcc_geometry_path):
         return self._dcc_universe_src.get_obj(dcc_geometry_path)
 
     def get_geometry_tgt(self, dcc_geometry_path):
         return self._dcc_universe_tgt.get_obj(dcc_geometry_path)
+
     #
     def get_matched_mesh(self, src_path):
         src_data = self._dcc_comparer_data_src
@@ -517,6 +533,7 @@ class AbsFncDccGeometryComparer(object):
         return self.FNC_DCC_MESH_MATCHER_CLS(
             src_path, src_data, tgt_data
         ).get()
+
     #
     def repair_mesh(self, src_path, tgt_path, check_statuses):
         src_usd_prim = self._dcc_scene_src.usd_stage.GetPrimAtPath(src_path)
@@ -526,9 +543,9 @@ class AbsFncDccGeometryComparer(object):
             ).set_run()
         else:
             if check_statuses == '+'.join(
-                [
-                    utl_configure.DccMeshCheckStatus.ADDITION
-                ]
+                    [
+                        utl_configure.DccMeshCheckStatus.ADDITION
+                    ]
             ):
                 self.FNC_USD_MESH_REPAIRER_CLS.set_delete(tgt_path)
 
@@ -540,7 +557,9 @@ class AbsFncDccGeometryComparer(object):
             self.update_target_fnc
         ]
         if methods:
-            with utl_core.GuiProgressesRunner.create(maximum=len(methods), label='execute geometry-comparer method') as g_p:
+            with utl_core.GuiProgressesRunner.create(
+                    maximum=len(methods), label='execute geometry-comparer method'
+                    ) as g_p:
                 for method in methods:
                     g_p.set_update()
                     method()
@@ -549,7 +568,9 @@ class AbsFncDccGeometryComparer(object):
         tgt_dcc_geometries = self._dcc_geometries_tgt
         #
         if src_dcc_geometries:
-            with utl_core.GuiProgressesRunner.create(maximum=len(src_dcc_geometries), label='gain geometry-comparer result') as g_p:
+            with utl_core.GuiProgressesRunner.create(
+                    maximum=len(src_dcc_geometries), label='gain geometry-comparer result'
+                    ) as g_p:
                 for i_src_geometry in src_dcc_geometries:
                     g_p.set_update()
                     if i_src_geometry.type_name == 'Mesh':
@@ -577,7 +598,9 @@ class AbsFncDccGeometryComparer(object):
             self.update_target_fnc
         ]
         if methods:
-            with utl_core.GuiProgressesRunner.create(maximum=len(methods), label='execute geometry-comparer method') as g_p:
+            with utl_core.GuiProgressesRunner.create(
+                    maximum=len(methods), label='execute geometry-comparer method'
+                    ) as g_p:
                 for method in methods:
                     g_p.set_update()
                     method()
@@ -587,7 +610,9 @@ class AbsFncDccGeometryComparer(object):
         #
         dcc_geometry_paths = []
         if dcc_geometries_src:
-            with utl_core.GuiProgressesRunner.create(maximum=len(dcc_geometries_src), label='gain geometry-comparer result') as g_p:
+            with utl_core.GuiProgressesRunner.create(
+                    maximum=len(dcc_geometries_src), label='gain geometry-comparer result'
+                    ) as g_p:
                 for i_src_geometry in dcc_geometries_src:
                     g_p.set_update()
                     if i_src_geometry.type_name == 'Mesh':
@@ -601,7 +626,7 @@ class AbsFncDccGeometryComparer(object):
         # addition
         dcc_geometry_paths_src = [i.path for i in dcc_geometries_src]
         dcc_geometry_paths_tgt = [i.path for i in dcc_geometries_tgt]
-        addition_geometry_paths = list(set(dcc_geometry_paths_tgt) - set(dcc_geometry_paths_src) - set(dcc_geometry_paths))
+        addition_geometry_paths = list(set(dcc_geometry_paths_tgt)-set(dcc_geometry_paths_src)-set(dcc_geometry_paths))
         for i_tgt_geometry_path in addition_geometry_paths:
             lis.append(
                 (i_tgt_geometry_path, i_tgt_geometry_path, utl_configure.DccMeshCheckStatus.ADDITION)
@@ -611,6 +636,7 @@ class AbsFncDccGeometryComparer(object):
 
 class AbsFncOptionBase(object):
     OPTION = dict()
+
     def __init__(self, option=None):
         self._option = copy.copy(self.OPTION)
         if isinstance(option, dict):
@@ -619,6 +645,7 @@ class AbsFncOptionBase(object):
 
     def get_option(self):
         return self._option
+
     option = property(get_option)
 
     def get(self, key):
@@ -631,10 +658,12 @@ class AbsDotXgenDef(object):
         d = os.path.splitext(maya_scene_file_path)[0]
         glob_pattern = '{}__*.xgen'.format(d)
         return glob.glob(glob_pattern) or []
+
     @classmethod
     def _get_xgen_collection_names_(cls, maya_scene_file_path):
         file_paths = cls._get_xgen_collection_file_paths_(maya_scene_file_path)
         return [cls._get_xgen_collection_name_(i) for i in file_paths]
+
     @classmethod
     def _get_xgen_collection_name_(cls, xgen_collection_file_path):
         """
@@ -644,6 +673,7 @@ class AbsDotXgenDef(object):
         file_opt = bsc_core.StgFileOpt(xgen_collection_file_path)
         file_name_base = file_opt.name_base
         return file_name_base.split('__')[-1]
+
     @classmethod
     def copy_xgen_collection_files_fnc(cls, file_path_src, file_path_tgt):
         """
@@ -687,8 +717,12 @@ class AbsDotXgenDef(object):
                         )
                     with open(file_path_tgt, 'w') as f_w:
                         f_w.write(d)
+
     @classmethod
-    def _set_xgen_collection_file_repath_(cls, xgen_collection_file_path, xgen_project_directory_path, xgen_collection_directory_path, xgen_collection_name):
+    def _set_xgen_collection_file_repath_(
+            cls, xgen_collection_file_path, xgen_project_directory_path, xgen_collection_directory_path,
+            xgen_collection_name
+            ):
         dot_xgen_file_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
         dot_xgen_file_reader.set_project_directory_repath(xgen_project_directory_path)
         dot_xgen_file_reader.set_collection_directory_repath(
@@ -696,6 +730,7 @@ class AbsDotXgenDef(object):
         )
         #
         dot_xgen_file_reader.set_save()
+
     @classmethod
     def _set_xgen_collection_file_repair_(cls, xgen_collection_file_path):
         i_dot_xgen_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
@@ -710,8 +745,10 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
         location=''
     )
     FNC_DCC_MESH_MATCHER_CLS = None
+
     def __init__(self, option):
         super(AbsUsdGeometryComparer, self).__init__(option)
+
     @classmethod
     def _get_data_(cls, file_path, location):
         import lxusd.dcc.dcc_objects as usd_dcc_objects
@@ -767,7 +804,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
         paths_tgt = [i.path for i in objs_tgt]
         #
         path_addition = list(
-            set(paths_tgt) - set(paths_src)
+            set(paths_tgt)-set(paths_src)
         )
         for i_path_tgt in path_addition:
             self._comparer_results.append(
@@ -809,25 +846,26 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
 
 class AbsFncRenderTextureExportDef(object):
     KEY = 'texture export'
+
     @classmethod
     def copy_and_repath_as_base_link_fnc(
-        cls,
-        directory_path_bsc, directory_path_dst,
-        #
-        dcc_objs,
-        # file name auto replace " " to "_"
-        fix_name_blank,
-        #
-        with_reference=False,
-        ignore_missing_texture=False,
-        remove_expression=False,
-        use_environ_map=False,
-        repath_fnc=None,
-        # copy option
-        #   copy source file, etc. use ".tx", auto copy ".exr"
-        copy_source=False,
-        copy_source_scheme='separate',
-        target_extension='.tx',
+            cls,
+            directory_path_bsc, directory_path_dst,
+            #
+            dcc_objs,
+            # file name auto replace " " to "_"
+            fix_name_blank,
+            #
+            with_reference=False,
+            ignore_missing_texture=False,
+            remove_expression=False,
+            use_environ_map=False,
+            repath_fnc=None,
+            # copy option
+            #   copy source file, etc. use ".tx", auto copy ".exr"
+            copy_source=False,
+            copy_source_scheme='separate',
+            target_extension='.tx',
     ):
         if dcc_objs:
             copy_cache = []
@@ -854,7 +892,7 @@ class AbsFncRenderTextureExportDef(object):
                         else:
                             j_key = j_texture_dpt.name
                             if j_key in index_mapper:
-                                j_index = index_mapper[j_key] + 1
+                                j_index = index_mapper[j_key]+1
                             else:
                                 j_index = 0
                             #
@@ -946,25 +984,26 @@ class AbsFncRenderTextureExportDef(object):
                                     cls.KEY,
                                     u'file="{}" is non-exists'.format(j_texture_path_dst)
                                 )
+
     @classmethod
     def copy_and_repath_fnc(
-        cls,
-        directory_path_dst,
-        #
-        dcc_objs,
-        # file name auto replace " " to "_"
-        fix_name_blank,
-        #
-        with_reference=False,
-        ignore_missing_texture=False,
-        remove_expression=False,
-        use_environ_map=False,
-        repath_fnc=None,
-        # copy option
-        #   copy source file, etc. use ".tx", auto copy ".exr"
-        copy_source=False,
-        copy_source_scheme='separate',
-        target_extension='.tx',
+            cls,
+            directory_path_dst,
+            #
+            dcc_objs,
+            # file name auto replace " " to "_"
+            fix_name_blank,
+            #
+            with_reference=False,
+            ignore_missing_texture=False,
+            remove_expression=False,
+            use_environ_map=False,
+            repath_fnc=None,
+            # copy option
+            #   copy source file, etc. use ".tx", auto copy ".exr"
+            copy_source=False,
+            copy_source_scheme='separate',
+            target_extension='.tx',
     ):
         copy_cache = []
         index_mapper = {}

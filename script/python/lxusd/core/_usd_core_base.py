@@ -20,6 +20,7 @@ class UsdTypeMtd(object):
         #
         unr_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
     }
+
     @classmethod
     def get(cls, key):
         if key in cls.TYPE_MAPPER:
@@ -114,6 +115,7 @@ class UsdMaterialAssignOpt(object):
     def assign(self, *args):
         arg = args[0]
         r = self._usd_prim.CreateRelationship('material:binding')
+        r.BlockTargets()
         if isinstance(arg, six.string_types):
             r.AddTarget(
                 self._usd_prim.GetStage().GetPrimAtPath(arg).GetPath()
@@ -175,16 +177,17 @@ class UsdArnoldGeometryPropertiesOpt(object):
     VISIBILITY_MAPPER = dict(
 
     )
+
     def __init__(self, usd_prim):
         self._usd_prim = usd_prim
         self._usd_fnc = UsdGeom.Imageable(self._usd_prim)
-        self._usd_mesh = UsdGeom.Mesh(self._usd_prim)
+        self._usd_fnc = UsdGeom.Mesh(self._usd_prim)
 
     def set_properties(self, data):
         for k, v in data.items():
             self.set_property(k, v)
 
-        # self._usd_mesh.CreateSubdivisionSchemeAttr(
+        # self._usd_fnc.CreateSubdivisionSchemeAttr(
         #     UsdGeom.Tokens.catmullClark
         # )
 

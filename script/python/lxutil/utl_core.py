@@ -9,7 +9,7 @@ if __name__ == '__main__':
     # with LogProgressRunner.create_as_bar(maximum=10, label='test') as l_p:
     #     for i in range(10):
     #         l_p.set_update()
-    print bsc_objects.Configure(
+    print ctt_objects.Configure(
         value=bsc_core.StgFileOpt(
             bsc_core.CfgFileMtd.get_yaml('storage/path-mapper')
         ).set_read()

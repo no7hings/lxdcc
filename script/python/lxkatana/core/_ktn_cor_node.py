@@ -9,15 +9,18 @@ import sys
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 # katana scene graph operator
-class KtnSGObjOpt(object):
-    def __init__(self, scene_graph_opt, obj_path):
-        self._scene_graph_opt = scene_graph_opt
+class KtnObjOpt(object):
+    def __init__(self, stage_opt, obj_path):
+        self._stage_opt = stage_opt
         self._obj_path = obj_path
-        self._traversal = scene_graph_opt._get_traversal_(obj_path)
+        self._traversal = stage_opt._get_traversal_(obj_path)
+
+    def get_path(self):
+        return self._obj_path
 
     def get_port(self, port_path, use_global=False):
         tvl = self._traversal
@@ -35,7 +38,17 @@ class KtnSGObjOpt(object):
             return port.getValue()
 
     def get(self, key, use_global=False):
-        return self.get_port_raw(key, use_global)
+        p = self.get_port(key, use_global=False)
+        if p is not None:
+            c = p.getNumberOfValues()
+            if c == 1:
+                return p.getValue()
+
+            _ = p.getData()
+            t_c = p.getTupleSize()
+            if t_c == 1:
+                return list(_)
+            return [tuple(_[i:i+t_c]) for i in range(0, c, t_c)]
 
     def get_properties(self, key):
         def rcs_fnc_(k_):
@@ -47,19 +60,31 @@ class KtnSGObjOpt(object):
                     print _i_p
                     print dir(_i_p)
 
-        ps = bsc_objects.Properties(self)
+        ps = ctt_objects.Properties(self)
         tvl = self._traversal
         if tvl.valid():
             attrs = tvl.getLocationData().getAttrs()
             rcs_fnc_(key)
 
 
-class SGStageOpt(object):
+class KtnMeshOpt(KtnObjOpt):
+    def __init__(self, *args, **kwargs):
+        super(KtnMeshOpt, self).__init__(*args, **kwargs)
+
+    def get_points(self):
+        return self.get('geometry.point.P')
+
+    def get_face_vertices(self):
+        pass
+
+
+class KtnStageOpt(object):
     OBJ_PATHSEP = '/'
     PORT_PATHSEP = '.'
     #
     GEOMETRY_ROOT = '/root/world/geo'
-    OBJ_OPT_CLS = KtnSGObjOpt
+    OBJ_OPT_CLS = KtnObjOpt
+
     def __init__(self, ktn_obj=None):
         if ktn_obj is not None:
             if isinstance(ktn_obj, six.string_types):
@@ -91,8 +116,11 @@ class SGStageOpt(object):
     def get_obj(self, obj_path):
         return self._get_traversal_(obj_path)
 
-    def get_obj_opt(self, obj_path):
-        return self.OBJ_OPT_CLS(self, obj_path)
+    def generate_obj_opt(self, obj_path):
+        return KtnObjOpt(self, obj_path)
+
+    def generate_mesh_opt(self, obj_path):
+        return KtnMeshOpt(self, obj_path)
 
     def get_descendant_paths_at(self, location):
         list_ = []
@@ -119,8 +147,7 @@ class SGStageOpt(object):
             c = p.getTupleSize()
             if c == 1:
                 return p.getValue()
-            else:
-                return p.getData()
+            return p.getData()
 
     def get(self, key):
         return self.get_port_raw(key)
@@ -255,6 +282,7 @@ class KtnSGSelectionOpt(object):
         #
         self._scene_graph.addOpenLocations(list_, replace=True)
         self._scene_graph.addSelectedLocations(paths, replace=True)
+
     @classmethod
     def set_clear(cls):
         ScenegraphManager.getActiveScenegraph().clearOpenLocations()
@@ -272,7 +300,10 @@ class NGLayoutOpt(object):
         TopToBottom = 't-b'
         BottomToTop = 'b-t'
 
-    def __init__(self, graph_data, scheme=(Orientation.Horizontal, Direction.RightToLeft, Direction.TopToBottom), size=(320, 80), option=None):
+    def __init__(
+            self, graph_data, scheme=(Orientation.Horizontal, Direction.RightToLeft, Direction.TopToBottom),
+            size=(320, 80), option=None
+            ):
         # branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
         self._branch_leaf_names_dict, self._leaf_branch_names_dict, self._size_dict, self._graph_dict = graph_data
         self._branch_leaf_names_dict = bsc_core.DictMtd.deduplication_value_to(self._branch_leaf_names_dict)
@@ -327,24 +358,24 @@ class NGLayoutOpt(object):
         ort, drt_h, drt_v = self._scheme
         if ort == self.Orientation.Horizontal:
             if drt_h == 'r-l':
-                s_x = x - branch_index * w * 2
+                s_x = x-branch_index*w*2
             elif drt_h == 'l-r':
-                s_x = x + branch_index * w * 2
+                s_x = x+branch_index*w*2
             else:
                 raise ValueError()
             #
             if drt_v == 't-b':
-                s_y = y + ((count - (count % 2)) * h) / 2
+                s_y = y+((count-(count%2))*h)/2
             elif drt_v == 'b-t':
-                s_y = y - ((count - (count % 2)) * h) / 2
+                s_y = y-((count-(count%2))*h)/2
             else:
                 raise ValueError()
             #
             j_x = s_x
             if drt_v == 't-b':
-                j_y = s_y - leaf_index * h
+                j_y = s_y-leaf_index*h
             elif drt_v == 'b-t':
-                j_y = s_y + leaf_index * h
+                j_y = s_y+leaf_index*h
             else:
                 raise ValueError()
             return j_x, j_y
@@ -352,24 +383,24 @@ class NGLayoutOpt(object):
             # _y = branch_index * h
             _y = y_dict[branch_index]
             if drt_v == 't-b':
-                s_y_ = y - _y * 2
+                s_y_ = y-_y*2
             elif drt_v == 'b-t':
-                s_y_ = y + _y * 2
+                s_y_ = y+_y*2
             else:
                 raise ValueError()
             #
             if drt_h == 'r-l':
-                s_x_ = x + ((count - (count % 2)) * w) / 2
+                s_x_ = x+((count-(count%2))*w)/2
             elif drt_h == 'l-r':
-                s_x_ = x - ((count - (count % 2)) * w) / 2
+                s_x_ = x-((count-(count%2))*w)/2
             else:
                 raise ValueError()
             #
             j_y_ = s_y_
             if drt_h == 'r-l':
-                j_x_ = s_x_ - leaf_index * w
+                j_x_ = s_x_-leaf_index*w
             elif drt_h == 'l-r':
-                j_x_ = s_x_ + leaf_index * w
+                j_x_ = s_x_+leaf_index*w
             else:
                 raise ValueError()
             return j_x_, j_y_
@@ -452,12 +483,14 @@ class NGObjsMtd(object):
     class MatchMode(object):
         One = 0
         All = 1
+
     @classmethod
     def find_nodes(cls, type_name, ignore_bypassed=False):
         _ = NodegraphAPI.GetAllNodesByType(type_name) or []
         if ignore_bypassed is False:
             return _
         return [i for i in _ if NGObjOpt(i).get_is_bypassed(ancestors=True) is False]
+
     @classmethod
     def filter_fnc(cls, nodes, filters):
         list_ = []
@@ -493,6 +526,7 @@ class NGObjsMtd(object):
                 if sum(i_results) == i_c:
                     list_.append(i)
         return list_
+
     @classmethod
     def filter_nodes(cls, filters, ignore_bypassed=False):
         return cls.filter_fnc(NodegraphAPI.GetAllNodes(), filters)
@@ -501,6 +535,7 @@ class NGObjsMtd(object):
 class NGObjOpt(object):
     PATHSEP = '/'
     PORT_PATHSEP = '.'
+
     #
     @classmethod
     def _get_path_(cls, name):
@@ -514,11 +549,13 @@ class NGObjOpt(object):
                     _parent_name = _parent.getName()
                     list_.append(_parent_name)
                     _rcs_fnc(_parent_name)
+
         #
         list_ = [name]
         _rcs_fnc(name)
         list_.reverse()
         return cls.PATHSEP.join(list_)
+
     @classmethod
     def _set_create_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -543,9 +580,11 @@ class NGObjOpt(object):
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj
+
     @classmethod
     def _get_is_parent_for_(cls, parent_ktn_obj, child_ktn_obj):
         return child_ktn_obj.getParent().getName() == parent_ktn_obj.getName()
+
     @classmethod
     def _get_node_create_args_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -573,6 +612,7 @@ class NGObjOpt(object):
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj, False
+
     @classmethod
     def _get_group_child_create_args_(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -611,6 +651,7 @@ class NGObjOpt(object):
             else:
                 raise RuntimeError('obj="{}" is non-exists'.format(parent_name))
         return ktn_obj, False
+
     @classmethod
     def _get_material_node_graph_create_args_(cls, path, type_name, shader_type_name=None):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -641,8 +682,9 @@ class NGObjOpt(object):
                 return cls._get_shader_create_args_(path, type_name, shader_type_name)
             return ktn_obj, True
         return ktn_obj, False
+
     @classmethod
-    def _get_shader_create_args_(cls, path, type_name, shader_type_name):
+    def _get_shader_create_args_(cls, path, type_name, shader_type_name=None):
         ktn_obj, is_create = cls._get_node_create_args_(path, type_name)
         if is_create is True:
             type_ktn_port = ktn_obj.getParameter('nodeType')
@@ -650,6 +692,7 @@ class NGObjOpt(object):
                 type_ktn_port.setValue(str(shader_type_name), 0)
                 ktn_obj.checkDynamicParameters()
         return ktn_obj, is_create
+
     @classmethod
     def _get_usd_shader_create_args_(cls, path, shader_type_name):
         ktn_obj, is_create = cls._get_node_create_args_(path, 'UsdShadingNode')
@@ -659,8 +702,11 @@ class NGObjOpt(object):
                 type_ktn_port.setValue(str(shader_type_name), 0)
                 ktn_obj.checkDynamicParameters()
         return ktn_obj, is_create
+
     @classmethod
-    def _create_connections_by_data_(cls, connections_data, extend_kwargs=None, create_source=False, create_target=False):
+    def _create_connections_by_data_(
+            cls, connections_data, extend_kwargs=None, create_source=False, create_target=False
+            ):
         """
         :param connections_data: etc. [
             'node_a.a.b',
@@ -669,8 +715,8 @@ class NGObjOpt(object):
         :return:
         """
         for seq, i in enumerate(connections_data):
-            if not (seq + 1) % 2:
-                i_source_attr_path = connections_data[seq - 1]
+            if not (seq+1)%2:
+                i_source_attr_path = connections_data[seq-1]
                 i_target_attr_path = i
                 if isinstance(extend_kwargs, dict):
                     i_source_attr_path = i_source_attr_path.format(**extend_kwargs)
@@ -733,9 +779,11 @@ class NGObjOpt(object):
                 i_port_src.connect(
                     i_port_tgt
                 )
+
     @classmethod
     def _get_is_exists_(cls, string_arg):
         return cls._get_ktn_obj_(string_arg) is not None
+
     @classmethod
     def _get_ktn_obj_(cls, string_arg):
         if string_arg.startswith(cls.PATHSEP):
@@ -758,26 +806,32 @@ class NGObjOpt(object):
 
     def get_ktn_obj(self):
         return self._ktn_obj
+
     ktn_obj = property(get_ktn_obj)
 
     def get_type(self):
         return self.ktn_obj.getType()
+
     type = property(get_type)
 
     def get_type_name(self):
         return self.get_type()
+
     type_name = property(get_type_name)
 
     def get_shader_type_name(self):
         return self.get('nodeType')
+
     shader_type_name = property(get_shader_type_name)
 
     def get_path(self):
         return self._get_path_(self.get_name())
+
     path = property(get_path)
 
     def get_name(self):
         return self._ktn_obj.getName()
+
     name = property(get_name)
 
     def set_rename(self, new_name):
@@ -790,7 +844,7 @@ class NGObjOpt(object):
         self._ktn_obj.setName(new_name)
 
     def get_stage_opt(self):
-        return SGStageOpt(
+        return KtnStageOpt(
             self._ktn_obj
         )
 
@@ -831,6 +885,7 @@ class NGObjOpt(object):
             if i_ktn_obj not in list_:
                 list_.append(i_ktn_obj)
         return list_
+
     @classmethod
     def _get_sources_inner_(cls, ktn_obj):
         list_ = []
@@ -841,6 +896,7 @@ class NGObjOpt(object):
             if i_ktn_ports_src:
                 list_.extend(i_ktn_ports_src)
         return list_
+
     @classmethod
     def _get_source_objs_inner_(cls, ktn_obj):
         list_ = []
@@ -865,6 +921,7 @@ class NGObjOpt(object):
                     else:
                         list__.append(_i_ktn_obj)
                         rcs_fnc_(list__, _i_ktn_obj)
+
         #
         inner = kwargs.get('inner', False)
         #
@@ -889,6 +946,7 @@ class NGObjOpt(object):
                         inner_fnc_(ktn_obj_, _root_name, root_index_, branch_index_)
             else:
                 outer_fnc_(ktn_obj_, root_name_, root_index_, branch_index_)
+
         #
         def outer_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
             _source_ktn_objs = self.__class__(ktn_obj_).get_source_objs()
@@ -896,6 +954,7 @@ class NGObjOpt(object):
             if _source_ktn_objs:
                 branch_index_ += 1
                 add_fnc_(_source_ktn_objs, root_name_, root_index_, branch_index_)
+
         #
         def inner_fnc_(ktn_obj_, root_name_, root_index_, branch_index_):
             root_index_ += 1
@@ -904,6 +963,7 @@ class NGObjOpt(object):
             if _source_ktn_objs:
                 branch_index_ += 1
                 add_fnc_(_source_ktn_objs, root_name_, root_index_, branch_index_)
+
         #
         def add_fnc_(ktn_objs_, root_name_, root_index_, branch_index_):
             for _i_sub_index, _i_ktn_obj in enumerate(ktn_objs_):
@@ -911,6 +971,7 @@ class NGObjOpt(object):
                 if _i_leaf_name not in index_dict_:
                     index_dict_[_i_leaf_name] = (root_index_, branch_index_, _i_sub_index, len(index_dict_))
                     rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
+
         #
         name = self._ktn_obj.getName()
         exclude_names = [
@@ -951,6 +1012,7 @@ class NGObjOpt(object):
             else:
                 _branch_name = ktn_obj_.getName()
                 outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
+
         #
         def outer_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
             _source_ktn_objs = self.__class__(ktn_obj_).get_source_objs()
@@ -958,6 +1020,7 @@ class NGObjOpt(object):
             if _source_ktn_objs:
                 branch_index_ += 1
                 add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
+
         #
         def inner_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
             root_index_ += 1
@@ -966,6 +1029,7 @@ class NGObjOpt(object):
             if _source_ktn_objs:
                 branch_index_ += 1
                 add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
+
         #
         def add_fnc_(ktn_objs_, root_name_, branch_name_, root_index_, branch_index_):
             _graph_key_cur = (root_index_, branch_index_, root_name_)
@@ -1029,6 +1093,7 @@ class NGObjOpt(object):
                         _graph_data_in_cur.append(_i_leaf_name)
                     #
                     rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
+
         #
         inner = kwargs.get('inner', False)
         skip_base_type_names = kwargs.get('skip_base_type_names', [])
@@ -1061,8 +1126,13 @@ class NGObjOpt(object):
         #
         rcs_fnc_(self._ktn_obj, name, start_depth, start_index)
         return branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
+
     @Modifier.undo_run
-    def gui_layout_shader_graph(self, scheme=(NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
+    def gui_layout_shader_graph(
+            self, scheme=(
+            NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom),
+            size=(320, 80), expanded=False, collapsed=False, shader_view_state=None
+            ):
         graph_dara = self.get_gui_layout_data(
             inner=True,
             size=size
@@ -1079,8 +1149,13 @@ class NGObjOpt(object):
                 # use_one_by_one=True
             )
         ).run()
+
     @Modifier.undo_run
-    def gui_layout_node_graph(self, scheme=(NGLayoutOpt.Orientation.Vertical, NGLayoutOpt.Direction.LeftToRight, NGLayoutOpt.Direction.BottomToTop), size=(320, 40)):
+    def gui_layout_node_graph(
+            self, scheme=(
+            NGLayoutOpt.Orientation.Vertical, NGLayoutOpt.Direction.LeftToRight, NGLayoutOpt.Direction.BottomToTop),
+            size=(320, 40)
+            ):
         graph_dara = self.get_gui_layout_data(
             inner=True,
             size=size,
@@ -1104,9 +1179,9 @@ class NGObjOpt(object):
             return NGPortOpt(port).get()
 
     def set_port_raw(self, port_path, raw, ignore_changed=False):
-        port = self.ktn_obj.getParameter(port_path)
-        if port:
-            NGPortOpt(port).set(raw)
+        p = self.ktn_obj.getParameter(port_path)
+        if p:
+            NGPortOpt(p).set(raw)
 
     def set(self, key, value, ignore_changed=False):
         key = key.replace('/', '.')
@@ -1338,6 +1413,9 @@ class NGObjOpt(object):
             #
             i_hint_dict.update(i_hint_dict_)
             #
+            if 'conditionalVisOps' in i_hint_dict:
+                i_hint_dict['conditionalVisOps'] = dict(i_hint_dict['conditionalVisOps'])
+            #
             i_p.setHintString(str(i_hint_dict))
 
     def set_port_hint(self, port_path, hint_dict):
@@ -1444,6 +1522,7 @@ class NGObjOpt(object):
 
     def get_return_ports(self):
         return [self._ktn_obj.getReturnPort(i.getName()) for i in self._ktn_obj.getOutputPorts()]
+
     # send and return
     def get_send_port(self, port_path):
         return self._ktn_obj.getSendPort(port_path)
@@ -1458,7 +1537,7 @@ class NGObjOpt(object):
 
     def set_port_create(self, port_path, port_type, default_value):
         _ = self.get_port(port_path)
-        port_parent = bsc_core.DccPortPathMtd.get_dag_parent(
+        port_parent = bsc_core.DccPortPathMtd.get_dag_parent_path(
             path=port_path, pathsep=self.PORT_PATHSEP
         )
         port_name = bsc_core.DccPortPathMtd.get_dag_name(
@@ -1689,9 +1768,11 @@ class NGObjOpt(object):
                     tool_tip=data.get('tool_tip'),
                     lock=data.get('lock'),
                     visible_condition_hint=data.get('visible_condition_hint'),
-                    expand=data.get('expand')
+                    expand=data.get('expand'),
+                    range=data.get('range')
                 )
             )
+
     @classmethod
     def _create_port_by_data(cls, group_ktn_obj, data):
         name = data['name']
@@ -1702,8 +1783,9 @@ class NGObjOpt(object):
         expression = data['expression']
         tool_tip = data['tool_tip']
         lock = data['lock']
-        if label != ' ':
+        if label is None:
             label = bsc_core.RawStrUnderlineOpt(name).to_prettify(capitalize=False)
+
         ktn_port = group_ktn_obj.getChild(name)
         if ktn_port is None:
             if widget in {'proxy'}:
@@ -1760,6 +1842,17 @@ class NGObjOpt(object):
                         ktn_port.setHintString(
                             str({'widget': 'boolean'})
                         )
+                    elif widget in {'integer'}:
+                        value_range = data['range']
+                        if value_range is not None:
+                            minimum, maximum = value_range
+                            ktn_port.setHintString(
+                                str({'int': True, 'slider': True, 'slidermin': minimum, 'slidermax': maximum})
+                            )
+                        else:
+                            ktn_port.setHintString(
+                                str({'int': True})
+                            )
                 elif isinstance(value, (list,)):
                     if widget in {'enumerate'}:
                         ktn_port = group_ktn_obj.createChildString(name, value[0])
@@ -1812,7 +1905,9 @@ class NGObjOpt(object):
                                 dict(
                                     widget='capsule',
                                     options=list(value),
-                                    displayText=map(lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(value)),
+                                    displayText=map(
+                                        lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(value)
+                                        ),
                                     exclusive=True,
                                     colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(value)],
                                     equalPartitionWidths=True,
@@ -1830,7 +1925,9 @@ class NGObjOpt(object):
                                 dict(
                                     widget='capsule',
                                     options=list(value),
-                                    displayText=map(lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(value)),
+                                    displayText=map(
+                                        lambda x: bsc_core.RawStrUnderlineOpt(x).to_prettify(), list(value)
+                                        ),
                                     exclusive=False,
                                     colors=[bsc_core.RawTextOpt(i).to_rgb__(s_p=50, v_p=100) for i in list(value)],
                                     equalPartitionWidths=True,
@@ -1845,13 +1942,33 @@ class NGObjOpt(object):
                         ktn_port = group_ktn_obj.createChildString(name, '')
                         hint_dict = dict(
                             widget='scriptToolbar',
-                            buttonData=[dict(text=i.get('name', ''), scriptText=i.get('script', ''), flat=0) for i in value]
+                            buttonData=[dict(text=i.get('name', ''), scriptText=i.get('script', ''), flat=0) for i in
+                                        value]
                         )
                         ktn_port.setHintString(
                             str(
                                 hint_dict
                             )
                         )
+                    elif widget in {'integer_array'}:
+                        c_c = 1
+                        c = c_c*10
+                        ktn_port = group_ktn_obj.createChildNumberArray(name, c)
+                        ktn_port.setTupleSize(c_c)
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(0, 0)
+                        ktn_port.setHintString(
+                            str({'int': True})
+                        )
+                    elif widget in {'vector_array', 'color_array'}:
+                        c_c = 3
+                        c = c_c*2
+                        ktn_port = group_ktn_obj.createChildNumberArray(name, c)
+                        ktn_port.setTupleSize(c_c)
+                        for i in range(c):
+                            i_ktn_port = ktn_port.getChildByIndex(i)
+                            i_ktn_port.setValue(0, 0)
                     else:
                         c = len(value)
                         if isinstance(value[0], six.string_types):
@@ -1940,7 +2057,11 @@ class NGGuiLayout(object):
     def __init__(self, ktn_objs):
         self._ktn_objs = ktn_objs
 
-    def layout_shader_graph(self, scheme=(NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom), size=(320, 80), expanded=False, collapsed=False, shader_view_state=None):
+    def layout_shader_graph(
+            self, scheme=(
+            NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom),
+            size=(320, 80), expanded=False, collapsed=False, shader_view_state=None
+            ):
         graph_dara = self.get_gui_layout_data(inner=False, size=size)
         #
         NGLayoutOpt(
@@ -1972,6 +2093,7 @@ class NGGuiLayout(object):
             else:
                 _branch_name = ktn_obj_.getName()
                 outer_fnc_(ktn_obj_, root_name_, _branch_name, root_index_, branch_index_)
+
         #
         def outer_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
             _source_ktn_objs = NGObjOpt(ktn_obj_).get_source_objs()
@@ -1979,6 +2101,7 @@ class NGGuiLayout(object):
             if _source_ktn_objs:
                 branch_index_ += 1
                 add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
+
         #
         def inner_fnc_(ktn_obj_, root_name_, branch_name_, root_index_, branch_index_):
             root_index_ += 1
@@ -1987,6 +2110,7 @@ class NGGuiLayout(object):
             if _source_ktn_objs:
                 branch_index_ += 1
                 add_fnc_(_source_ktn_objs, root_name_, branch_name_, root_index_, branch_index_)
+
         #
         def add_fnc_(ktn_objs_, root_name_, branch_name_, root_index_, branch_index_):
             _graph_key_cur = (root_index_, branch_index_, root_name_)
@@ -2051,6 +2175,7 @@ class NGGuiLayout(object):
                         _graph_data_in_cur.append(_i_leaf_name)
                     #
                     rcs_fnc_(_i_ktn_obj, root_name_, root_index_, branch_index_)
+
         #
         inner = kwargs.get('inner', False)
         skip_base_type_names = kwargs.get('skip_base_type_names', [])
@@ -2154,47 +2279,49 @@ class NGMaterialGroupOpt(NGObjOpt):
 
 class NGPortOpt(object):
     PATHSEP = '.'
+
     def __init__(self, ktn_port):
-        self._ktn_port = ktn_port
-        self._atr_path = self._get_atr_path_(self._ktn_port)
+        self.__ktn_port = ktn_port
+        self._atr_path = self._to_atr_path_(self.__ktn_port)
+
     @property
     def ktn_port(self):
-        return self._ktn_port
+        return self.__ktn_port
+
     @property
     def ktn_obj(self):
         return self.ktn_port.getNode()
+
     @property
     def type(self):
         return self.ktn_port.getType()
+
     @property
     def path(self):
         return self._atr_path
 
     def get_name(self):
-        return self._ktn_port.getName()
+        return self.__ktn_port.getName()
+
     name = property(get_name)
+
     @classmethod
-    def _get_atr_path_(cls, ktn_port):
-        def rcs_fnc_(ktn_port_):
-            if ktn_port_ is not None:
-                _port_name = ktn_port_.getName()
-                list_.append(_port_name)
-                _parent_ktn_port = ktn_port_.getParent()
-                rcs_fnc_(_parent_ktn_port)
-        #
+    def _to_atr_path_(cls, ktn_port):
+        def rcs_fnc_(p_):
+            if p_ is not None:
+                list_.append(p_.getName())
+                rcs_fnc_(p_.getParent())
+
         list_ = []
-        #
         rcs_fnc_(ktn_port)
-        #
         list_.reverse()
         return cls.PATHSEP.join(list_)
-    #
+
     def get(self, frame=0):
         _children = self.ktn_port.getChildren() or []
         if _children:
             return [i.getValue(frame) for i in _children]
-        else:
-            return self.ktn_port.getValue(frame)
+        return self.ktn_port.getValue(frame)
 
     def set(self, value, frame=0):
         if isinstance(value, (tuple, list)):
@@ -2214,7 +2341,7 @@ class NGPortOpt(object):
             #
             self.ktn_port.setValue(_value, frame)
 
-    def set_help_string(self, value):
+    def set_tool_tip(self, value):
         hint_string = self.ktn_port.getHintString()
         if hint_string:
             hint_dict = eval(hint_string)
@@ -2306,30 +2433,30 @@ class NGPortOpt(object):
             str(hint_dict)
         )
 
-    def set_connect_to(self, input_port):
-        self._ktn_port.connect(
+    def connect_to(self, input_port):
+        self.__ktn_port.connect(
             input_port
         )
 
     def set_target(self, input_port):
-        self._ktn_port.connect(
+        self.__ktn_port.connect(
             input_port
         )
 
     def set_expression(self, raw):
-        self._ktn_port.setExpression(raw)
+        self.__ktn_port.setExpression(raw)
 
     def get_expression(self):
-        return self._ktn_port.getExpression()
+        return self.__ktn_port.getExpression()
 
     def get_is_expression(self):
-        return self._ktn_port.isExpression()
+        return self.__ktn_port.isExpression()
 
     def get_children(self):
-        return self._ktn_port.getChildren()
+        return self.__ktn_port.getChildren()
 
     def clear_children(self):
-        [self._ktn_port.deleteChild(i) for i in self.get_children()]
+        [self.__ktn_port.deleteChild(i) for i in self.get_children()]
 
 
 class NGAndObjTypeOpt(object):
@@ -2365,11 +2492,14 @@ class NGObjTypeOpt(object):
 
 class NGNmeOpt(object):
     STATE_DICT = {}
+
     def __init__(self, ktn_obj):
         self._ktn_obj = ktn_obj
+
     @classmethod
     def _set_status_(cls, key):
         cls.STATE_DICT[key] = True
+
     @classmethod
     def _get_status_(cls, key):
         return cls.STATE_DICT.get(key, False)
@@ -2417,6 +2547,7 @@ class NGNmeOpt(object):
             print('update "NetworkMaterialEdit" "{}" is failed'.format(self._ktn_obj.getName()))
             return False
         return False
+
     @classmethod
     def _set_contents_update_(cls, ktn_obj):
         """
@@ -2439,7 +2570,9 @@ class NGNmeOpt(object):
             elif upstreamMaterial.getHash() != ktn_obj._NetworkMaterialEditNode__lastUpstreamMaterialHash:
                 ktn_obj._NetworkMaterialEditNode__clearContents()
                 if get_is_ui_mode() is True:
-                    populated = ktn_obj._NetworkMaterialEditNode__populateFromInputMaterial(upstreamMaterial, materialAttr)
+                    populated = ktn_obj._NetworkMaterialEditNode__populateFromInputMaterial(
+                        upstreamMaterial, materialAttr
+                        )
                 else:
                     populated = cls._populate_fromInput_material(ktn_obj, upstreamMaterial, materialAttr)
                 if not populated:
@@ -2452,6 +2585,7 @@ class NGNmeOpt(object):
             if get_is_ui_mode() is True:
                 ktn_obj._NetworkMaterialEditNode__notifyUpdated()
             return status
+
     @classmethod
     def _populate_fromInput_material(cls, ktn_obj, incomingMaterial, materialAttr):
         mod = sys.modules[ktn_obj.__class__.__module__]
@@ -2465,7 +2599,7 @@ class NGNmeOpt(object):
             layoutAttr = materialAttr.getChildByName('layout')
             if layoutAttr is None:
                 return False
-            parentAttr = layoutAttr.getChildByName('%s.parent' % nmcNetworkMaterialNodeName)
+            parentAttr = layoutAttr.getChildByName('%s.parent'%nmcNetworkMaterialNodeName)
             if parentAttr is None:
                 return False
             nmcName = parentAttr.getValue()
@@ -2480,7 +2614,9 @@ class NGNmeOpt(object):
                 for i in range(totalNodes):
                     nodeName = orderedNodeNames[i]
                     nodeLayoutAttr = layoutAttr.getChildByName(nodeName)
-                    node = ktn_obj._NetworkMaterialEditNode__createNodeFromLayoutAttr(paramExtractor, nodeName, nodeLayoutAttr)
+                    node = ktn_obj._NetworkMaterialEditNode__createNodeFromLayoutAttr(
+                        paramExtractor, nodeName, nodeLayoutAttr
+                        )
                     if node:
                         ktn_obj._NetworkMaterialEditNode__shadingNetworkNodes[nodeName] = node
                         ktn_obj._NetworkMaterialEditNode__nodeSourceNameLookup[node] = nodeName
@@ -2530,7 +2666,7 @@ class NGObjCustomizePortOpt(object):
             if isinstance(k, six.string_types):
                 i_port_path = k
                 scheme = None
-            elif isinstance(k, (tuple, )):
+            elif isinstance(k, (tuple,)):
                 scheme, i_port_path, = k
             else:
                 raise TypeError()
@@ -2559,15 +2695,17 @@ class NGObjCustomizePortOpt(object):
 
     def add_port(self, key, value):
         pass
+
     @classmethod
     def _set_port_add_as_enable_(cls):
         pass
+
     @classmethod
     def _set_type_port_add_(cls, group_ktn_obj, name, scheme, value, default):
         label = bsc_core.RawStrUnderlineOpt(name).to_prettify(capitalize=False)
         ktn_port = group_ktn_obj.getChild(name)
         if ktn_port is None:
-            if isinstance(default, (bool, )):
+            if isinstance(default, (bool,)):
                 ktn_port = group_ktn_obj.createChildNumber(name, value)
                 ktn_port.setHintString(str({'widget': 'checkBox', 'constant': 'True'}))
             elif isinstance(default, six.string_types):
@@ -2594,7 +2732,7 @@ class NGObjCustomizePortOpt(object):
                     )
             elif isinstance(default, (int, float)):
                 ktn_port = group_ktn_obj.createChildNumber(name, value)
-            elif isinstance(default, (tuple, )):
+            elif isinstance(default, (tuple,)):
                 if scheme in ['enumerate']:
                     ktn_port = group_ktn_obj.createChildString(name, value[0])
                     ktn_port.setHintString(
@@ -2640,11 +2778,12 @@ class NGMacro(object):
         _ = self._ktn_obj.getOutputPort(port_path)
         if _ is None:
             self._ktn_obj.addOutputPort(port_path)
+
     @Modifier.undo_debug_run
     def create_by_configure_file(self, file_path, clear_start=None):
         NGObjOpt(self._ktn_obj).clear_ports(clear_start)
         #
-        configure = bsc_objects.Configure(value=file_path)
+        configure = ctt_objects.Configure(value=file_path)
         input_ports = configure.get('input_ports') or []
         #
         NGObjOpt(self._ktn_obj).set_color(
@@ -2662,6 +2801,7 @@ class NGMacro(object):
         for k, v in parameters.items():
             k = k.replace('/', '.')
             NGObjOpt(self._ktn_obj).create_port_by_data(k, v)
+
     @Modifier.undo_debug_run
     def set_create_to_op_script_by_configure_file(self, file_path, paths=None):
         if paths is not None:
@@ -2669,7 +2809,7 @@ class NGMacro(object):
         else:
             ktn_op_scripts = NGObjOpt(self._ktn_obj).get_children(include_type_names=['OpScript'])
         for i_ktn_op_script in ktn_op_scripts:
-            configure = bsc_objects.Configure(value=file_path)
+            configure = ctt_objects.Configure(value=file_path)
             parameters = configure.get('parameters') or {}
             NGObjOpt(i_ktn_op_script).clear_ports('user')
             for k, v in parameters.items():
@@ -2683,7 +2823,7 @@ class NGMacro(object):
     def set_sub_op_script_create_by_configure_file(self, file_path, key, paths):
         ktn_op_scripts = [NodegraphAPI.GetNode(i) for i in paths]
         for i_ktn_op_script in ktn_op_scripts:
-            configure = bsc_objects.Configure(value=file_path)
+            configure = ctt_objects.Configure(value=file_path)
             parameters = configure.get('op_script.{}.parameters'.format(key)) or {}
             NGObjOpt(i_ktn_op_script).clear_ports('user')
             for k, v in parameters.items():

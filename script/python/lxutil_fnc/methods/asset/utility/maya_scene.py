@@ -8,7 +8,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
 
     def set_check_run(self):
         def yes_fnc_():
-            maya_dcc_objects.Scene.set_file_save()
+            maya_dcc_objects.Scene.save_file()
         #
         from lxutil import utl_core
         #
@@ -72,7 +72,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             if bsc_core.ApplicationMtd.get_is_maya():
                 import lxmaya.fnc.exporters as mya_fnc_exporters
                 #
-                mya_fnc_exporters.SceneExporter(
+                mya_fnc_exporters.FncSceneExporter(
                     option=dict(
                         file=maya_scene_src_file_path,
                         with_xgen_collection=True

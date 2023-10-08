@@ -9,12 +9,13 @@ class Packages(object):
 
 def set_reload(modules=None):
     import lxbasic.objects as bsc_objects
+
     if isinstance(modules, (tuple, list)):
         p = bsc_objects.PyReloader(modules)
     else:
         p = bsc_objects.PyReloader(
             [
-                'lxscheme', 'lxsession', 'lxdatabase', 'lxdeadline', 'lxbasic', 'lxuniverse', 'lxresolver', 'lxarnold',
+                'lxsession', 'lxdatabase', 'lxdeadline', 'lxbasic', 'lxuniverse', 'lxresolver', 'lxarnold',
                 'lxusd',
                 'lxutil', 'lxutil_gui',
                 'lxshotgun', 'lxshotgun_gui',

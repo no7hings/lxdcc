@@ -6,7 +6,7 @@ from lxutil import utl_core
 
 class ScpOslFile(object):
     @classmethod
-    def set_katana_ui_template_create(cls, file_path, output_file_path):
+    def generate_katana_ui_template(cls, file_path, output_file_path):
         output_file_opt = bsc_core.StgFileOpt(output_file_path)
         output_file_opt.create_directory()
         info = bsc_core.OslFileMtd.get_info(file_path)
@@ -17,8 +17,9 @@ class ScpOslFile(object):
             )
             # print(raw)
             output_file_opt.set_write(raw)
+
     @classmethod
-    def set_maya_ui_template_create(cls, file_path, output_file_path):
+    def generate_maya_ui_template(cls, file_path, output_file_path):
         output_file_opt = bsc_core.StgFileOpt(output_file_path)
         output_file_opt.create_directory()
         info = bsc_core.OslFileMtd.get_info(file_path)

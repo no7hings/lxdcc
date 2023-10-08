@@ -29,12 +29,12 @@ class AbsStorageGuiDef(object):
         raise NotImplementedError()
 
     def set_copy_path_to_clipboard(self):
-        from lxutil_gui.qt import utl_gui_qt_core
-        utl_gui_qt_core.set_text_copy_to_clipboard(self.path)
+        from lxutil_gui.qt import gui_qt_core
+        gui_qt_core.set_text_copy_to_clipboard(self.path)
 
     def set_copy_name_to_clipboard(self):
-        from lxutil_gui.qt import utl_gui_qt_core
-        utl_gui_qt_core.set_text_copy_to_clipboard(self.name)
+        from lxutil_gui.qt import gui_qt_core
+        gui_qt_core.set_text_copy_to_clipboard(self.name)
 
 
 class AbsOsDirectory(
@@ -49,7 +49,7 @@ class AbsOsDirectory(
         self.set_gui_attribute(
             'gui_menu',
             [
-                ('open folder', 'file/folder', self.set_open),
+                ('open folder', 'file/open-folder', self.set_open),
                 (),
                 ('copy path', 'copy', self.set_copy_path_to_clipboard),
                 ('copy name', 'copy', self.set_copy_name_to_clipboard),
@@ -147,7 +147,7 @@ class AbsOsFile(
         self.set_gui_attribute(
             'gui_menu',
             [
-                ('open folder', 'file/folder', self.set_directory_open),
+                ('open folder', 'file/open-folder', self.open_directory_in_system),
                 (),
                 ('copy path', None, self.set_copy_path_to_clipboard),
                 ('copy name', None, self.set_copy_name_to_clipboard),
@@ -256,7 +256,7 @@ class AbsOsFile(
     def get_has_elements(self):
         return self._get_has_elements_(self.path)
     @classmethod
-    def _get_exists_file_paths_(cls, file_path, include_exts=None):
+    def _get_exists_file_paths_(cls, file_path, ext_includes=None):
         def get_ext_replace_fnc_(file_path_, ext_):
             return os.path.splitext(file_path_)[0] + ext_
         #
@@ -300,11 +300,11 @@ class AbsOsFile(
                 list_ = []
         #
         add_list_ = []
-        get_add_fnc_(include_exts, ext)
+        get_add_fnc_(ext_includes, ext)
         _ = list_ + add_list_
         return [i for i in _ if os.path.isfile(i)]
     @classmethod
-    def _get_exists_file_paths__(cls, file_path, include_exts=None):
+    def _get_exists_file_paths__(cls, file_path, ext_includes=None):
         def get_ext_replace_fnc_(file_path_, ext_):
             return os.path.splitext(file_path_)[0] + ext_
         #
@@ -338,7 +338,7 @@ class AbsOsFile(
         #
         if name_base != name_base_new:
             glob_pattern = pathsep.join([directory, name_base_new])
-            list_ = bsc_core.StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
+            list_ = bsc_core.StgDirectoryMtd.find_file_paths(glob_pattern)
             if list_:
                 list_.sort()
         else:
@@ -348,7 +348,7 @@ class AbsOsFile(
                 list_ = []
         #
         add_list_ = []
-        get_add_fnc_(include_exts, ext)
+        get_add_fnc_(ext_includes, ext)
         _ = list_ + add_list_
         return _
 
@@ -533,7 +533,7 @@ class AbsOsFile(
                 u'rename file: "{}" > "{}"'.format(self.path, new_path)
             )
 
-    def get_ext_variants(self, include_exts=None):
+    def get_ext_variants(self, ext_includes=None):
         path_base, ext = os.path.splitext(self.path)
         glob_pattern = u'{}.*'.format(path_base)
         _ = glob.glob(glob_pattern)
@@ -542,9 +542,9 @@ class AbsOsFile(
             for i in _:
                 if i == self.path:
                     continue
-                if include_exts is not None:
+                if ext_includes is not None:
                     i_base, i_ext = os.path.splitext(i)
-                    if i_ext not in include_exts:
+                    if i_ext not in ext_includes:
                         continue
                 lis.append(i)
         return [self.__class__(i) for i in lis]

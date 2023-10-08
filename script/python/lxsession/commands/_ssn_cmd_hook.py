@@ -1,21 +1,22 @@
 # coding:utf-8
 import functools
+
 import types
 
 
 def get_hook_args(key, search_paths=None):
     from lxbasic import bsc_core
     #
-    import lxbasic.objects as bsc_objects
-    #
     from lxsession import ssn_core
     #
     import lxsession.objects as ssn_objects
+
+    import lxcontent.objects as ctt_objects
     #
     yaml_file_path = ssn_core.SsnHookFileMtd.get_yaml(key, search_paths)
     if yaml_file_path:
         yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
-        configure = bsc_objects.Configure(value=yaml_file_opt.path)
+        configure = ctt_objects.Configure(value=yaml_file_opt.path)
         type_name = configure.get('option.type')
         if type_name == 'application':
             session = ssn_objects.ApplicationSession(
@@ -90,26 +91,26 @@ def get_option_hook_args(option, search_paths=None):
         session.execute_python_file(
             python_file_path, session=session
         )
-    #
+
     from lxbasic import bsc_core
-    #
-    import lxbasic.objects as bsc_objects
-    #
+
+    import lxcontent.objects as ctt_objects
+
     from lxsession import ssn_core
-    #
+
     import lxsession.objects as ssn_objects
-    #
+
     option_opt = bsc_core.ArgDictStringOpt(option)
-    #
+
     option_hook_key = option_opt.get('option_hook_key')
-    #
+
     yaml_file_path = ssn_core.SsnOptionHookFileMtd.get_yaml(option_hook_key, search_paths)
     if yaml_file_path:
         python_file_path = ssn_core.SsnOptionHookFileMtd.get_python(option_hook_key, search_paths)
         python_file_opt = bsc_core.StgFileOpt(python_file_path)
         yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
         if python_file_opt.get_is_exists() is True and yaml_file_opt.get_is_exists() is True:
-            configure = bsc_objects.Configure(value=yaml_file_opt.path)
+            configure = ctt_objects.Configure(value=yaml_file_opt.path)
             type_name = configure.get('option.type')
             #
             session = None
@@ -194,7 +195,7 @@ def get_option_hook_args(option, search_paths=None):
 def get_option_hook_configure(option):
     from lxbasic import bsc_core
     #
-    import lxbasic.objects as bsc_objects
+    import lxcontent.objects as ctt_objects
     #
     from lxsession import ssn_core
     #
@@ -206,7 +207,7 @@ def get_option_hook_configure(option):
     if yaml_file_path:
         yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
         if yaml_file_opt.get_is_exists() is True:
-            return bsc_objects.Configure(value=yaml_file_opt.path)
+            return ctt_objects.Configure(value=yaml_file_opt.path)
 
 
 def set_option_hook_execute(option):

@@ -53,7 +53,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword_0
             )
             scene_file_path = scene_file_rsv_unit.get_result(version=version)
-            mya_fnc_exporters.SceneExporter(
+            mya_fnc_exporters.FncSceneExporter(
                 option=dict(
                     file=scene_file_path,
                     location=location,
@@ -63,7 +63,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     ext_extras=self._hook_option_opt.get('ext_extras', as_array=True)
                 )
-            ).set_run()
+            ).execute()
             return scene_file_path
         else:
             raise RuntimeError(
@@ -85,7 +85,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_root_dag_opt.get_value()
         )
         if mya_root.get_is_exists() is True:
-            ma_core.CmdObjOpt(mya_root.path).set_customize_attribute_create(
+            ma_core.CmdObjOpt(mya_root.path).create_customize_attribute(
                 'pg_{}_version'.format(task),
                 version
             )
@@ -120,7 +120,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             scene_src_file = utl_dcc_objects.OsFile(scene_src_file_path)
             if scene_src_file.get_is_exists() is True:
-                mya_dcc_objects.Scene.set_file_open(scene_src_file_path)
+                mya_dcc_objects.Scene.open_file(scene_src_file_path)
                 camera_location = '/camera_grp'
                 mya_camera_location = bsc_core.DccPathDagOpt(camera_location).translate_to(pathsep).to_string()
                 mya_camera_group = mya_dcc_objects.Group(mya_camera_location)
@@ -159,7 +159,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             u'obj="{}" is non-exists'.format(mya_camera_location)
                         )
                     )
-                mya_dcc_objects.Scene.set_file_save()
+                mya_dcc_objects.Scene.save_file()
             else:
                 raise RuntimeError()
         else:
@@ -251,7 +251,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 geometry_var_names=['hi'],
             )
         ).set_run()
-        mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+        mya_dcc_objects.Scene.save_file_to(scene_src_file_path)
 
     def execute_asset_scene_src_create(self):
         rsv_scene_properties = self._rsv_scene_properties
@@ -315,7 +315,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             ).execute()
         #
-        mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+        mya_dcc_objects.Scene.save_file_to(scene_src_file_path)
         #
         if self._hook_option_opt.get_as_boolean('with_scene_link') is True:
             scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
@@ -495,7 +495,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             ).set_convert_run()
             #
-            mya_dcc_objects.Scene.set_file_save_to(
+            mya_dcc_objects.Scene.save_file_to(
                 scene_file_path
             )
 
@@ -580,7 +580,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         )
         if asset_shot_scene_file_path is not None:
-            mya_dcc_objects.Scene.set_file_open(
+            mya_dcc_objects.Scene.open_file(
                 asset_shot_scene_file_path
             )
         else:
@@ -660,7 +660,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         )
         if asset_shot_scene_src_file_path:
-            mya_dcc_objects.Scene.set_file_open(asset_shot_scene_src_file_path)
+            mya_dcc_objects.Scene.open_file(asset_shot_scene_src_file_path)
             #
             asset_maya_scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
                 keyword=keyword_2
@@ -682,7 +682,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     asset_shot=asset_shot
                 )
             )
-            mya_dcc_objects.Scene.set_file_save_to(
+            mya_dcc_objects.Scene.save_file_to(
                 asset_shot_scene_file_path
             )
         else:

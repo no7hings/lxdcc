@@ -39,7 +39,7 @@ def set_geometry_export_by_any_scene_file(option):
             )
             #
             mya_scene_file_path = rsv_task_properties.get('any_scene_file')
-            mya_dcc_objects.Scene.set_file_open(mya_scene_file_path)
+            mya_dcc_objects.Scene.open_file(mya_scene_file_path)
             #
             _mya_fnc_scp_utility.set_export_check_run(
                 rsv_task_properties
@@ -114,7 +114,7 @@ def set_geometry_import_by_any_scene_file(option):
     if rsv_task_properties:
         with_scene = option_opt.get('with_scene')
         if with_scene is True:
-            mya_dcc_objects.Scene.set_file_open(scene_file_path)
+            mya_dcc_objects.Scene.open_file(scene_file_path)
         #
         with_geometry_uv_map = option_opt.get('with_geometry_uv_map') or False
         if with_geometry_uv_map is True:
@@ -126,7 +126,7 @@ def set_geometry_import_by_any_scene_file(option):
                 wokspace='publish', version=version
             )
             utl_dcc_objects.OsFile(scene_file_path).set_backup()
-            mya_dcc_objects.Scene.set_file_save_to(scene_file_path)
+            mya_dcc_objects.Scene.save_file_to(scene_file_path)
     else:
         utl_core.Log.set_module_warning_trace(
             key,

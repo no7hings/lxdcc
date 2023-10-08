@@ -15,9 +15,17 @@ class XgenDescriptionOpt(utl_dcc_opt_abs.AbsObjOpt):
     def __init__(self, *args, **kwargs):
         super(XgenDescriptionOpt, self).__init__(*args, **kwargs)
 
+    def get_name(self):
+        # use transform name
+        return ma_core.Utils.get_name_with_namespace_clear(
+            self._obj.get_transform().get_name()
+        )
+
     def get_path(self, lstrip=None):
         # remove namespace, use transform path
-        raw = ma_core._ma_obj_path__get_with_namespace_clear_(self._obj.transform.path)
+        raw = ma_core.Utils.get_path_with_namespace_clear(
+            self._obj.get_transform().get_name()
+        )
         # replace pathsep
         raw = raw.replace(self._obj.PATHSEP, unr_configure.Obj.PATHSEP)
         # strip path
@@ -29,12 +37,6 @@ class XgenDescriptionOpt(utl_dcc_opt_abs.AbsObjOpt):
     def get_path_as_uuid(self, lstrip=None):
         return bsc_core.HashMtd.get_hash_value(self.get_path(lstrip), as_unique_id=True)
 
-    def get_name(self):
-        # use transform name
-        raw = self._obj.transform.name
-        raw = ma_core._ma_obj_name__get_with_namespace_clear_(raw)
-        return raw
-
     def get_name_as_uuid(self):
         return bsc_core.HashMtd.get_hash_value(self.get_name(), as_unique_id=True)
 
@@ -42,16 +44,18 @@ class XgenDescriptionOpt(utl_dcc_opt_abs.AbsObjOpt):
         guides = cmds.ls(
             self._obj.transform.path, type='xgmSplineGuide', dagObjects=1, noIntermediate=1, long=1
         )
-        points = []
+
         counts = []
-        widths = [0.003]
+        points = []
+        # widths = [0.003]
+        widths = []
         for i in guides:
             i_points = ma_core.CmdXgenSplineGuideOpt(
                 i
             ).get_control_points()
-            points.extend(i_points)
             counts.append(len(i_points))
-            # widths.append(0.003)
+            points.extend(i_points)
+            widths.append(0.003)
         return counts, points, widths
 
 

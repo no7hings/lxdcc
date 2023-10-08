@@ -14,8 +14,6 @@ import parse
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
-
 from lxuniverse import unr_configure
 
 from lxutil import utl_core, utl_configure
@@ -92,7 +90,7 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
 
     def get_matrix(self):
         om2_obj = self.om2_obj
-        return ma_core.Om2Method._get_float_array_(
+        return ma_core.Om2Method._to_float_array_(
             om2_obj.transformation().asMatrix()
         )
 
@@ -126,7 +124,7 @@ class MeshOpt(
                 om2_obj = om2.MFnMesh()
                 face_vertex_counts, face_vertex_indices = face_vertices
                 om2_obj.create(
-                    ma_core.Om2Method._get_om2_point_array_(points),
+                    ma_core.Om2Method._to_om2_point_array_(points),
                     face_vertex_counts, face_vertex_indices,
                     parent=ma_core.Om2Method._get_om2_dag_obj_(transform_path)
                 )
@@ -155,11 +153,11 @@ class MeshOpt(
         if reverse is True:
             face_vertex_indices = []
             for i_face_index in xrange(om2_obj.numPolygons):
-                om2_indices = self.om2_obj.getPolygonVertices(i_face_index)
-                indices = list(om2_indices)
+                i_om2_indices = self.om2_obj.getPolygonVertices(i_face_index)
+                i_indices = list(i_om2_indices)
                 if reverse is True:
-                    indices.reverse()
-                face_vertex_indices.extend(indices)
+                    i_indices.reverse()
+                face_vertex_indices.extend(i_indices)
             return face_vertex_indices
         face_vertex_counts, face_vertex_indices = om2_obj.getVertices()
         return list(face_vertex_indices)
@@ -184,13 +182,13 @@ class MeshOpt(
             face_vertex_counts = []
             face_vertex_indices = []
             for i_face_index in xrange(om2_obj.numPolygons):
-                count = om2_obj.polygonVertexCount(i_face_index)
-                face_vertex_counts.append(count)
-                om2_indices = om2_obj.getPolygonVertices(i_face_index)
-                indices = list(om2_indices)
+                i_count = om2_obj.polygonVertexCount(i_face_index)
+                face_vertex_counts.append(i_count)
+                i_om2_indices = om2_obj.getPolygonVertices(i_face_index)
+                i_indices = list(i_om2_indices)
                 if reverse is True:
-                    indices.reverse()
-                face_vertex_indices.extend(indices)
+                    i_indices.reverse()
+                face_vertex_indices.extend(i_indices)
 
             return face_vertex_counts, face_vertex_indices
         face_vertex_counts, face_vertex_indices = om2_obj.getVertices()
@@ -208,13 +206,11 @@ class MeshOpt(
                 ...
             )
         """
-        return ma_core.Om2Method._get_point_array_(
-            self.om2_obj.getPoints()
-        )
+        return ma_core.Om2Method.to_point_array(self.om2_obj.getPoints())
 
     def set_points(self, points):
         om2_obj = ma_core.Om2Method._get_om2_mesh_fnc_(self._obj.transform.path)
-        om2_obj.setPoints(ma_core.Om2Method._get_om2_point_array_(points))
+        om2_obj.setPoints(ma_core.Om2Method._to_om2_point_array_(points))
         om2_obj.updateSurface()
 
     def get_uv_map_names(self):
@@ -282,12 +278,12 @@ class MeshOpt(
         return self._get_map_face_non_uv_comp_names_()
 
     def get_uv_map_face_vertex_counts(self, uv_map_name):
-        uv_map_face_vertex_counts, uv_map_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
-        return list(uv_map_face_vertex_counts)
+        uv_face_vertex_counts, uv_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
+        return list(uv_face_vertex_counts)
 
     def get_uv_map_face_vertex_indices(self, uv_map_name):
-        uv_map_face_vertex_counts, uv_map_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
-        return list(uv_map_face_vertex_indices)
+        uv_face_vertex_counts, uv_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
+        return list(uv_face_vertex_indices)
 
     def get_uv_map_coords(self, uv_map_name):
         """
@@ -304,10 +300,10 @@ class MeshOpt(
 
     def get_uv_map(self, uv_map_name):
         if uv_map_name in self.get_uv_map_names():
-            uv_map_face_vertex_counts, uv_map_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
+            uv_face_vertex_counts, uv_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
             u_coords, v_coords = self.om2_obj.getUVs(uv_map_name)
             coords = zip(u_coords, v_coords)
-            return list(uv_map_face_vertex_counts), list(uv_map_face_vertex_indices), coords
+            return list(uv_face_vertex_counts), list(uv_face_vertex_indices), coords
 
     def get_uv_maps(self):
         """
@@ -325,11 +321,12 @@ class MeshOpt(
             uv_map_names = self.get_uv_map_names()
         if uv_map_names:
             for uv_map_name in uv_map_names:
-                uv_map_face_vertex_counts, uv_map_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
-                coords = self.get_uv_map_coords(uv_map_name)
+                i_uv_face_vertex_counts, i_uv_face_vertex_indices = self.om2_obj.getAssignedUVs(uv_map_name)
+                i_coords = self.get_uv_map_coords(uv_map_name)
                 dic[uv_map_name] = (
-                    ma_core.Om2Method._get_int_array_(uv_map_face_vertex_counts), ma_core.Om2Method._get_int_array_(uv_map_face_vertex_indices),
-                    coords
+                    list(i_uv_face_vertex_counts),
+                    list(i_uv_face_vertex_indices),
+                    i_coords
                 )
         return dic
     @staticmethod
@@ -342,11 +339,11 @@ class MeshOpt(
             )
         :return:
         """
-        uv_map_face_vertex_indices = []
+        uv_face_vertex_indices = []
         new_uv_map_coords = sorted(set(uv_map_coords), key=uv_map_coords.index)
         for i in uv_map_coords:
-            uv_map_face_vertex_indices.append(new_uv_map_coords.index(i))
-        return new_uv_map_coords, uv_map_face_vertex_indices
+            uv_face_vertex_indices.append(new_uv_map_coords.index(i))
+        return new_uv_map_coords, uv_face_vertex_indices
 
     def set_uv_coords(self, uv_map_name, uv_map_coords):
         """
@@ -354,22 +351,22 @@ class MeshOpt(
         :param uv_map_coords: self.get_uv_map_coords(*args)
         :return: None
         """
-        uv_map_face_vertex_counts = self.get_face_vertex_counts()
-        new_uv_map_coords, uv_map_face_vertex_indices = self._get_uv_map_face_vertex_indices_(uv_map_coords)
+        uv_face_vertex_counts = self.get_face_vertex_counts()
+        new_uv_map_coords, uv_face_vertex_indices = self._get_uv_map_face_vertex_indices_(uv_map_coords)
         uv_map_u_coords, uv_map_v_coords = zip(*new_uv_map_coords)
 
         self.om2_obj.setUVs(uv_map_u_coords, uv_map_v_coords, uv_map_name)
-        self.om2_obj.assignUVs(uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_name)
+        self.om2_obj.assignUVs(uv_face_vertex_counts, uv_face_vertex_indices, uv_map_name)
     @classmethod
     def _set_uvs_reduce_(cls):
         pass
     @classmethod
-    def _get_maya_uv_face_vertex_indices_(cls, om2_obj, uv_map_face_vertex_indices, interpolation, unauthored_values_index):
+    def _get_maya_uv_face_vertex_indices_(cls, om2_obj, uv_face_vertex_indices, interpolation, unauthored_values_index):
         valueIds = om2.MIntArray(om2_obj.numFaceVertices, -1)
         #
         itFV = om2.MItMeshFaceVertex(om2_obj.object())
         itFV.reset()
-        size = max(uv_map_face_vertex_indices)
+        size = max(uv_face_vertex_indices)
         fvi = 0
         while not itFV.isDone():
             valueId = 0
@@ -383,7 +380,7 @@ class MeshOpt(
                 valueId = fvi
             #
             if valueId < size:
-                valueId = uv_map_face_vertex_indices[valueId]
+                valueId = uv_face_vertex_indices[valueId]
                 # if valueId == unauthored_values_index:
                 #     continue
             #
@@ -393,7 +390,7 @@ class MeshOpt(
             itFV.next()
         return valueIds
 
-    def set_uv_map(self, uv_map_name, uv_map):
+    def assign_uv_map(self, uv_map_name, uv_map):
         om2_obj = self.get_om2_fnc()
         #
         if uv_map_name == 'st':
@@ -411,12 +408,12 @@ class MeshOpt(
         om2_obj.setCurrentUVSetName(current_uv_map_name)
         # noinspection PyBroadException
         try:
-            uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = uv_map
-            if uv_map_face_vertex_counts:
+            uv_face_vertex_counts, uv_face_vertex_indices, uv_map_coords = uv_map
+            if uv_face_vertex_counts:
                 u_coords, v_coords = zip(*uv_map_coords)
                 #
                 om2_obj.setUVs(u_coords, v_coords, uv_map_name)
-                om2_obj.assignUVs(uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_name)
+                om2_obj.assignUVs(uv_face_vertex_counts, uv_face_vertex_indices, uv_map_name)
                 #
                 utl_core.Log.set_module_result_trace(
                     'mesh uv-map assign',
@@ -429,7 +426,7 @@ class MeshOpt(
                 'obj="{}"'.format(self.obj.path)
             )
 
-    def set_uv_maps(self, uv_maps, clear=False):
+    def assign_uv_maps(self, uv_maps, clear=False):
         """
         :param uv_maps: see self.get_uv_maps()
         :param clear: bool
@@ -440,7 +437,7 @@ class MeshOpt(
             om2_obj.clearUVs()
         #
         for uv_map_name, uv_map in uv_maps.items():
-            self.set_uv_map(uv_map_name, uv_map)
+            self.assign_uv_map(uv_map_name, uv_map)
 
     def get_normals(self):
         """
@@ -500,22 +497,30 @@ class MeshOpt(
         face_vertex_indices = []
         om2_obj = self.om2_obj
         for i_face_index in xrange(om2_obj.numPolygons):
-            count = om2_obj.polygonVertexCount(i_face_index)
-            face_vertex_counts.append(count)
+            i_count = om2_obj.polygonVertexCount(i_face_index)
+            face_vertex_counts.append(i_count)
             color_range = [i / 100.0 for i in range(0, 100)]
             r, g, b = choice(color_range), choice(color_range), choice(color_range)
-            for i in range(count):
+            for i in range(i_count):
                 om2_color = om2.MColor()
                 om2_color.r, om2_color.g, om2_color.b, om2_color.a = (r, g, b, 1)
                 om2_obj.setFaceVertexColor(om2_color, i_face_index, i)
 
     def get_bounding_box(self):
         omt_bounding_box = self.om2_obj.boundingBox
-        return ma_core.Om2Method._get_point_array_([omt_bounding_box.max, omt_bounding_box.min])
+        return ma_core.Om2Method.to_point_array([omt_bounding_box.max, omt_bounding_box.min])
+
+    def get_name(self):
+        # use transform name
+        return ma_core.Utils.get_name_with_namespace_clear(
+            self._obj.get_transform().get_name()
+        )
 
     def get_path(self, lstrip=None):
         # remove namespace, use transform path
-        raw = ma_core._ma_obj_path__get_with_namespace_clear_(self._obj.transform.path)
+        raw = ma_core.Utils.get_path_with_namespace_clear(
+            self._obj.get_transform().get_name()
+        )
         # replace pathsep
         raw = raw.replace(self._obj.PATHSEP, unr_configure.Obj.PATHSEP)
         # strip path
@@ -526,12 +531,6 @@ class MeshOpt(
 
     def get_path_as_uuid(self, lstrip=None):
         return bsc_core.HashMtd.get_hash_value(self.get_path(lstrip), as_unique_id=True)
-
-    def get_name(self):
-        # use transform name
-        raw = self._obj.transform.name
-        raw = ma_core._ma_obj_name__get_with_namespace_clear_(raw)
-        return raw
 
     def get_name_as_uuid(self):
         return bsc_core.HashMtd.get_hash_value(self.get_name(), as_unique_id=True)
@@ -555,10 +554,10 @@ class MeshOpt(
     def get_uv_map_face_vertices_as_uuid(self, uv_map_name='map1'):
         uv_map = self.get_uv_map(uv_map_name)
         if uv_map:
-            uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = uv_map
-            raw = uv_map_face_vertex_counts, uv_map_face_vertex_indices
+            uv_face_vertex_counts, uv_face_vertex_indices, uv_map_coords = uv_map
+            raw = uv_face_vertex_counts, uv_face_vertex_indices
             return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
-        return bsc_core.UuidMtd.get_new()
+        return bsc_core.UuidMtd.generate_new()
 
     def set_uuids_mark(self):
         # use transform
@@ -597,8 +596,8 @@ class MeshOpt(
     def get_override_face_vertices(self):
         dic = {}
         for i_face_index in xrange(self.om2_obj.numPolygons):
-            om2_indices = self.om2_obj.getPolygonVertices(i_face_index)
-            _ = list(om2_indices)
+            i_om2_indices = self.om2_obj.getPolygonVertices(i_face_index)
+            _ = list(i_om2_indices)
             _.sort()
             key = str(_)
             dic.setdefault(key, []).append(i_face_index)
@@ -702,7 +701,7 @@ class NurbsCurveOpt(
     def get_usd_basis_curve_data(self):
         points = self.get_points()
         counts = [len(points)]
-        widths = [0.003]
+        widths = [0.003]*len(counts)
         return counts, points, widths
 
 

@@ -38,6 +38,12 @@ class Group(_mya_dcc_obj_obj.Node):
             return cmds.ls(self.path, noIntermediate=1, dagObjects=1, type=_, long=1) or []
         return cmds.ls(self.path, noIntermediate=1, dagObjects=1, long=1) or []
 
+    def create_child(self, name):
+        child_path = self.PATHSEP.join([self.get_path(), name])
+        if cmds.objExists(child_path) is False:
+            cmds.group(empty=1, name=name, parent=self.get_path())
+        return self.__class__(child_path)
+
 
 class Transform(_mya_dcc_obj_obj.Node):
     DEFAULT_MATRIX = [

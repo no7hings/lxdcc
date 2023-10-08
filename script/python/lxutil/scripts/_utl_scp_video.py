@@ -8,7 +8,7 @@ class ScpVideo(object):
     @classmethod
     def comp_by_image(cls, file_path):
         user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('vedio-converter')
-        file_name = bsc_core.UuidMtd.get_by_string(file_path)
+        file_name = bsc_core.UuidMtd.generate_by_text(file_path)
         movie_file_path = '{}/{}.mov'.format(user_directory_path, file_name)
         utl_etr_methods.EtrRv.convert_to_mov(
             input=file_path,
@@ -35,7 +35,7 @@ class ScpVideo(object):
                 movie_file_paths.append(i_movie_file_path)
             #
             user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('vedio-converter')
-            file_name = bsc_core.UuidMtd.get_by_string(
+            file_name = bsc_core.UuidMtd.generate_by_text(
                 ' '.join(movie_file_paths)
             )
             movie_file_path = '{}/{}.mov'.format(user_directory_path, file_name)

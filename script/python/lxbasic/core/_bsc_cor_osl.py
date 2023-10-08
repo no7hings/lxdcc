@@ -1,7 +1,7 @@
 # coding:utf-8
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_process, _bsc_cor_storage
+from lxbasic.core import _bsc_cor_process, _bsc_cor_storage, _bsc_cor_executes
 
 
 class OslFileMtd(object):
@@ -9,16 +9,18 @@ class OslFileMtd(object):
     PORT_PATTERN = '    "{name}" "{type}"\n'
     DEFAULT_VALUE_PATTERN = '		Default value: {value}\n'
     METADATA_PATTERN = '		metadata: {type} {name} = {value}\n'
+
     @classmethod
-    def set_compile(cls, file_path):
+    def compile(cls, file_path):
         file_opt = _bsc_cor_storage.StgFileOpt(file_path)
         compile_file_path = '{}.oso'.format(file_opt.path_base)
         #
         cmd_args = [
-            Bin.get_oslc(),
+            _bsc_cor_executes.Executes.oslc(),
             '-o "{}" "{}"'.format(compile_file_path, file_opt.path),
         ]
         _bsc_cor_process.SubProcessMtd.execute_with_result(' '.join(cmd_args))
+
     @classmethod
     def get_info(cls, file_path):
         dic = collections.OrderedDict()
@@ -27,7 +29,7 @@ class OslFileMtd(object):
         compile_file_path = '{}.oso'.format(file_opt.path_base)
         #
         cmd_args = [
-            Bin.get_oslinfo(),
+            _bsc_cor_executes.Executes.oslinfo(),
             '-v "{}"'.format(compile_file_path),
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))

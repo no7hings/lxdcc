@@ -6,15 +6,13 @@ import collections
 #
 from lxbasic import bsc_core
 #
-from lxutil import utl_core
+import lxcontent.objects as ctt_objects
 #
 from lxkatana import ktn_configure, ktn_core
 #
 from lxkatana.dcc import ktn_dcc_obj_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
-
-import lxbasic.objects as bsc_objects
 
 
 class Port(ktn_dcc_obj_abs.AbsKtnPort):
@@ -24,6 +22,7 @@ class Port(ktn_dcc_obj_abs.AbsKtnPort):
 
 class Connection(ktn_dcc_obj_abs.AbsKtnObjConnection):
     PORT_PATHSEP = ktn_configure.Util.PORT_PATHSEP
+
     def __init__(self, source, target):
         super(Connection, self).__init__(source, target)
 
@@ -31,6 +30,7 @@ class Connection(ktn_dcc_obj_abs.AbsKtnObjConnection):
 class Node(ktn_dcc_obj_abs.AbsKtnObj):
     PORT_CLS = Port
     CONNECTION_CLS = Connection
+
     def __init__(self, path):
         super(Node, self).__init__(path)
 
@@ -39,6 +39,7 @@ class FileReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
     PORT_CLS = Port
     CONNECTION_CLS = Connection
     OS_FILE_CLS = utl_dcc_objects.OsFile
+
     def __init__(self, path):
         super(FileReference, self).__init__(path)
 
@@ -47,8 +48,10 @@ class TextureReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
     PORT_CLS = Port
     CONNECTION_CLS = Connection
     OS_FILE_CLS = utl_dcc_objects.OsTexture
+
     def __init__(self, path):
         super(TextureReference, self).__init__(path)
+
     # noinspection PyMethodMayBeStatic
     def get_color_space(self):
         return 'auto'
@@ -60,6 +63,7 @@ class TextureReference(ktn_dcc_obj_abs.AbsKtnFileReferenceObj):
 class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
     PORT_CLS = Port
     CONNECTION_CLS = Connection
+
     def __init__(self, path):
         super(AndShader, self).__init__(path)
 
@@ -110,7 +114,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
         #     print source_obj.get_shader_properties()
 
     def get_shader_properties(self):
-        properties = bsc_objects.Properties(self)
+        properties = ctt_objects.Properties(self)
         properties.set(
             'type', self.get_shader_type_name(),
         )
@@ -127,7 +131,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
         return self.get_port('parameters').get_children()
 
     def get_shader_attributes(self):
-        attributes = bsc_objects.Properties(self)
+        attributes = ctt_objects.Properties(self)
         ports = self.get_shader_ports()
         for port in ports:
             port_name = port.port_name
@@ -146,6 +150,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
 class AndStandardSurface(AndShader):
     def __init__(self, path):
         super(AndStandardSurface, self).__init__(path)
+
     @ktn_core.Modifier.undo_debug_run
     def set_port_user_data_create(self, data_type_name, port_name, attribute_name, default_value):
         name = self.name
@@ -188,6 +193,7 @@ class AndStandardSurface(AndShader):
 class AndRamp(AndShader):
     PORT_CLS = Port
     CONNECTION_CLS = Connection
+
     def __init__(self, path):
         super(AndRamp, self).__init__(path)
         self._ramp_dict = {}
@@ -229,6 +235,7 @@ class AndRamp(AndShader):
     def set_ramp_interpolation(self, value):
         self.get_port('parameters.ramp_Interpolation.enable').set(True)
         self.get_port('parameters.ramp_Interpolation.value').set(value)
+
     #
     def get_ramp_colors(self):
         return self.get_port('parameters.ramp_Colors.value').get()
@@ -236,6 +243,7 @@ class AndRamp(AndShader):
     def set_ramp_colors(self, value):
         self.get_port('parameters.ramp_Colors.enable').set(True)
         self.get_port('parameters.ramp_Colors.value').set(value)
+
     #
     def get_ramp_floats(self):
         return self.get_port('parameters.ramp_Floats.value').get()
@@ -244,6 +252,7 @@ class AndRamp(AndShader):
         self.get_port('parameters.ramp_Floats.enable').set(True)
         self.get_port('parameters.ramp_Floats.value').set(value)
         # print self.get_port('parameters.ramp_Floats').ktn_port.getXML()
+
     #
     def get_ramp_value(self):
         return self.get_port('parameters.ramp_Floats.value').get()
@@ -275,10 +284,10 @@ class AndRamp(AndShader):
         positions = value_dict.keys()
         positions.sort()
         #
-        size = len(positions) + 2
+        size = len(positions)+2
         #
         self.set_ramp_size(size)
-        self.set_ramp_positions([positions[0]] + positions + [positions[-1]])
+        self.set_ramp_positions([positions[0]]+positions+[positions[-1]])
         #
         interpolations = [interpolation_dict[i] for i in positions]
         interpolation = interpolations[0]
@@ -290,11 +299,11 @@ class AndRamp(AndShader):
         values = [value_dict[i] for i in positions]
         type_ = self.get_port('nodeType').get()
         if type_ == 'ramp_rgb':
-            values_ = [values[0]] + values + [values[-1]]
+            values_ = [values[0]]+values+[values[-1]]
             colors = [j for i in values_ for j in i]
             self.set_ramp_colors(colors)
         elif type_ == 'ramp_float':
-            values_ = [values[0]] + values + [values[-1]]
+            values_ = [values[0]]+values+[values[-1]]
             floats = values_
             self.set_ramp_floats(floats)
 
@@ -347,7 +356,7 @@ class AndRamp(AndShader):
                 values = [strings.index(self.get_shader_port_value(dcc_port_key))]*int(count)
             elif dcc_port_key in ['ramp_Colors']:
                 _ = self.get_shader_port_value(dcc_port_key)
-                values = bsc_core.RawListMtd.set_grid_to(_, 3)
+                values = bsc_core.RawListMtd.grid_to(_, 3)
             else:
                 values = self.get_shader_port_value(dcc_port_key)
 
@@ -386,6 +395,7 @@ class Material(ktn_dcc_obj_abs.AbsKtnObj):
     CONNECTION_CLS = Connection
     #
     SOURCE_OBJ_CLS = AndShader
+
     def __init__(self, path):
         super(Material, self).__init__(path)
 

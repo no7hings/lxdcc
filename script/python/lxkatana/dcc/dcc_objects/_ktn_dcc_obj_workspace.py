@@ -9,13 +9,13 @@ from Katana import CacheManager, NodegraphAPI
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-from lxkatana import ktn_configure, ktn_core
+from lxkatana import ktn_core
 
 from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node, _ktn_dcc_obj_nodes
 
@@ -63,7 +63,7 @@ class AssetWorkspace(object):
             return configure
 
     def set_configure_create(self, pass_name='default'):
-        configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        configure = ctt_objects.Configure(value=self.CONFIGURE_FILE_PATH)
         configure.set('option.look_pass', pass_name)
         self._look_configure_dict[pass_name] = configure
         return configure
@@ -105,7 +105,7 @@ class AssetWorkspace(object):
         query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_pass_source_obj()
         for i_dcc_obj in dcc_objs:
-            i_material_paths = ktn_core.SGStageOpt(i_dcc_obj.ktn_obj).get_all_paths_at(
+            i_material_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_paths_at(
                 '/root/materials', include_types=['material']
             )
             for j_material_path in i_material_paths:
@@ -130,12 +130,12 @@ class AssetWorkspace(object):
         list_ = []
         _ = self.get_all_pass_args()
         for i_pass_name, i_dcc_obj in _:
-            i_s_opt = ktn_core.SGStageOpt(i_dcc_obj.ktn_obj)
+            i_s_opt = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj)
             i_geometry_paths = i_s_opt.get_all_paths_at(
                 location, include_types=self.GEOMETRY_TYPES
             )
             for j_path in i_geometry_paths:
-                j_obj_opt = ktn_core.KtnSGObjOpt(i_s_opt, j_path)
+                j_obj_opt = ktn_core.KtnObjOpt(i_s_opt, j_path)
                 # print j_path, j_obj_opt.get('materialAssign', use_global=True), 'AAA'
                 if not j_obj_opt.get('materialAssign'):
                     list_.append(
@@ -148,7 +148,7 @@ class AssetWorkspace(object):
         query_dict = _ktn_dcc_obj_nodes.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_pass_source_obj()
         for i_dcc_obj in dcc_objs:
-            i_material_sg_paths = ktn_core.SGStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
+            i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
                 location, 'materialAssign', include_types=self.GEOMETRY_TYPES
             )
             for j_material_sg_path in i_material_sg_paths:
@@ -972,7 +972,7 @@ class AssetWorkspace(object):
     @classmethod
     def _get_geometry_location_(cls, dcc_obj):
         if dcc_obj.get_is_exists() is True:
-            s = ktn_core.SGStageOpt(dcc_obj.ktn_obj)
+            s = ktn_core.KtnStageOpt(dcc_obj.ktn_obj)
             print s.get_obj_exists('/root/world/geo/master')
     @ktn_core.Modifier.undo_debug_run
     def set_light_rig_update(self):
@@ -1048,7 +1048,7 @@ class AssetWorkspace(object):
     def get_geometry_usd_check_raw(self):
         dic = {}
         workspace_configure = self.get_configure()
-        set_usd_configure = bsc_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
+        set_usd_configure = ctt_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
         for element_label in set_usd_configure.get_branch_keys('elements'):
             asset_root = workspace_configure.get('option.asset_root')
             atr_path = '{}.userProperties.geometry__{}'.format(asset_root, element_label)
@@ -1070,7 +1070,7 @@ class AssetWorkspace(object):
         obj_path = configure.get('workspace.{}.main.path'.format(key))
         dcc_obj = _ktn_dcc_obj_node.Node(obj_path)
         if dcc_obj.get_is_exists() is True:
-            scene_graph_opt = ktn_core.SGStageOpt(dcc_obj.ktn_obj)
+            scene_graph_opt = ktn_core.KtnStageOpt(dcc_obj.ktn_obj)
             return scene_graph_opt.get(atr_path)
         else:
             raise RuntimeError(

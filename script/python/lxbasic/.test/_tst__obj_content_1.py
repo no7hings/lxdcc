@@ -3,9 +3,9 @@ import os
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
-c = bsc_objects.Configure(
+c = ctt_objects.Configure(
     value='/data/e/myworkspace/td/lynxi/script/configure/katana/script/macro/workspace.yml'
 )
 c.set_flatten()

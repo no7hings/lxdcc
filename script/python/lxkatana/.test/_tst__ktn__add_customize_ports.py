@@ -13,7 +13,7 @@ n.set_input_port_add('input')
 
 n.set_output_port_add('output')
 
-n.set_customize_attributes_create(
+n.create_customize_attributes(
     collections.OrderedDict(
         [
             ('render_settings.camera_enable', False),

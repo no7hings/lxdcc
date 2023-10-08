@@ -6,6 +6,7 @@ from lxbasic.core import _bsc_cor_raw
 
 class ArgDictStringMtd(object):
     ARGUMENT_SEP = '&'
+
     @classmethod
     def to_string(cls, **kwargs):
         vars_ = []
@@ -42,6 +43,7 @@ class ArgDictStringOpt(object):
     # \=%5C
     # |=%7C
     ARGUMENT_SEP = '&'
+
     def __init__(self, option, default_option=None):
         dic = collections.OrderedDict()
         if isinstance(default_option, six.string_types):
@@ -61,6 +63,7 @@ class ArgDictStringOpt(object):
         self._string_dict = {
             'key': self.to_string()
         }
+
     @classmethod
     def _set_update_by_string_(cls, dic, option_string):
         ks = [i.lstrip().rstrip() for i in option_string.split(cls.ARGUMENT_SEP)]
@@ -70,6 +73,7 @@ class ArgDictStringOpt(object):
             #
             value = cls._set_value_convert_by_string_(value)
             dic[key.lstrip().rstrip()] = value
+
     @classmethod
     def _set_value_convert_by_string_(cls, value_string):
         if isinstance(value_string, six.string_types):
@@ -88,6 +92,7 @@ class ArgDictStringOpt(object):
 
     def get_value(self):
         return self._option_dict
+
     value = property(get_value)
 
     def get(self, key, as_array=False, as_integer=False, as_float=False):
@@ -192,9 +197,11 @@ class ArgDictStringOpt(object):
 
 class ArgListStringOpt(object):
     PATTERN = r'[\[](.*?)[\]]'
+
     def __init__(self, arguments):
         self._arguments = re.findall(re.compile(self.PATTERN, re.S), arguments) or []
 
     def get_value(self):
         return self._arguments
+
     value = property(get_value)

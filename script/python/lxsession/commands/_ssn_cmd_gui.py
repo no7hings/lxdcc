@@ -5,11 +5,11 @@ import six
 def get_menu_content_by_hooks(hooks):
     from lxbasic import bsc_core
 
-    import lxbasic.objects as bsc_objects
+    import lxcontent.objects as ctt_objects
 
     from lxsession.commands import _ssn_cmd_hook
 
-    content = bsc_objects.Dict()
+    d_ = ctt_objects.Dict()
     for i_hook in hooks:
         if isinstance(i_hook, six.string_types):
             i_hook_key = i_hook
@@ -47,38 +47,38 @@ def get_menu_content_by_hooks(hooks):
                     else:
                         i_gui_separator_path = '{}/{}'.format(i_gui_parent_path, i_gui_separator_name)
                     #
-                    content.set(
+                    d_.set(
                         '{}.properties.type'.format(i_gui_separator_path), 'separator'
                     )
-                    content.set(
+                    d_.set(
                         '{}.properties.name'.format(i_gui_separator_path), i_gui_configure.get('group_name')
                     )
                 #
-                content.set(
+                d_.set(
                     '{}.properties.type'.format(i_gui_path), 'action'
                 )
-                content.set(
+                d_.set(
                     '{}.properties.group_name'.format(i_gui_path), i_gui_configure.get('group_name')
                 )
-                content.set(
+                d_.set(
                     '{}.properties.name'.format(i_gui_path), i_gui_configure.get('name')
                 )
-                content.set(
+                d_.set(
                     '{}.properties.icon_name'.format(i_gui_path), i_gui_configure.get('icon_name')
                 )
                 if i_extra_kwargs:
                     if 'gui_icon_name' in i_extra_kwargs:
-                        content.set(
+                        d_.set(
                             '{}.properties.icon_name'.format(i_gui_path), i_extra_kwargs.get('gui_icon_name')
                         )
                 #
-                content.set(
+                d_.set(
                     '{}.properties.executable_fnc'.format(i_gui_path), i_session.get_is_executable
                 )
-                content.set(
+                d_.set(
                     '{}.properties.execute_fnc'.format(i_gui_path), i_execute_fnc
                 )
-    return content
+    return d_
 
 
 def get_menu_content_by_hook_options(hook_options):
@@ -86,9 +86,9 @@ def get_menu_content_by_hook_options(hook_options):
 
     from lxsession.commands import _ssn_cmd_hook
 
-    import lxbasic.objects as bsc_objects
+    import lxcontent.objects as ctt_objects
 
-    content = bsc_objects.Dict()
+    d_ = ctt_objects.Dict()
     for i_hook_option in hook_options:
         i_hook_args = _ssn_cmd_hook.get_option_hook_args(i_hook_option)
         if i_hook_args:
@@ -123,38 +123,38 @@ def get_menu_content_by_hook_options(hook_options):
                     else:
                         i_gui_separator_path = '{}/{}'.format(i_gui_parent_path, i_gui_group_name)
                     #
-                    content.set(
+                    d_.set(
                         '{}.properties.type'.format(i_gui_separator_path), 'separator'
                     )
-                    content.set(
+                    d_.set(
                         '{}.properties.name'.format(i_gui_separator_path), i_gui_configure.get('group_name')
                     )
                 #
-                content.set(
+                d_.set(
                     '{}.properties.type'.format(i_gui_path), 'action'
                 )
-                content.set(
+                d_.set(
                     '{}.properties.group_name'.format(i_gui_path), i_gui_group_name
                 )
-                content.set(
+                d_.set(
                     '{}.properties.name'.format(i_gui_path), i_gui_name
                 )
-                content.set(
+                d_.set(
                     '{}.properties.icon_name'.format(i_gui_path), i_gui_configure.get('icon_name')
                 )
                 if i_hook_option_opt.get_value():
                     if i_hook_option_opt.get_key_is_exists('gui_icon_name'):
-                        content.set(
+                        d_.set(
                             '{}.properties.icon_name'.format(i_gui_path), i_hook_option_opt.get('gui_icon_name')
                         )
                 #
-                content.set(
+                d_.set(
                     '{}.properties.executable_fnc'.format(i_gui_path), i_session.get_is_executable
                 )
-                content.set(
+                d_.set(
                     '{}.properties.execute_fnc'.format(i_gui_path), i_execute_fnc
                 )
-    return content
+    return d_
 
 
 def get_menu_content_by_hook_options_(hook_options):
@@ -162,9 +162,9 @@ def get_menu_content_by_hook_options_(hook_options):
 
     from lxsession.commands import _ssn_cmd_hook
 
-    import lxbasic.objects as bsc_objects
+    import lxcontent.objects as ctt_objects
 
-    content = bsc_objects.Dict()
+    d_ = ctt_objects.Dict()
     for i_key in hook_options:
         if isinstance(i_key, six.string_types):
             i_hook_option = i_key
@@ -209,38 +209,38 @@ def get_menu_content_by_hook_options_(hook_options):
                     else:
                         i_gui_separator_path = '{}/{}'.format(i_gui_parent_path, i_gui_group_name)
                     #
-                    content.set(
+                    d_.set(
                         '{}.properties.type'.format(i_gui_separator_path), 'separator'
                     )
-                    content.set(
+                    d_.set(
                         '{}.properties.name'.format(i_gui_separator_path), i_gui_configure.get('group_name')
                     )
                 #
-                content.set(
+                d_.set(
                     '{}.properties.type'.format(i_gui_path), 'action'
                 )
-                content.set(
+                d_.set(
                     '{}.properties.group_name'.format(i_gui_path), i_gui_group_name
                 )
-                content.set(
+                d_.set(
                     '{}.properties.name'.format(i_gui_path), i_gui_name
                 )
-                content.set(
+                d_.set(
                     '{}.properties.icon_name'.format(i_gui_path), i_gui_configure.get('icon_name')
                 )
                 if i_hook_option_opt.get_value():
                     if i_hook_option_opt.get_key_is_exists('gui_icon_name'):
-                        content.set(
+                        d_.set(
                             '{}.properties.icon_name'.format(i_gui_path), i_hook_option_opt.get('gui_icon_name')
                         )
                 #
-                content.set(
+                d_.set(
                     '{}.properties.executable_fnc'.format(i_gui_path), i_session.get_is_executable
                 )
-                content.set(
+                d_.set(
                     '{}.properties.execute_fnc'.format(i_gui_path), i_execute_fnc
                 )
-    return content
+    return d_
 
 
 if __name__ == '__main__':

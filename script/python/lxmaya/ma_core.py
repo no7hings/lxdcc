@@ -18,130 +18,78 @@ from . import ma_configure
 from lxmaya.core import *
 
 
-def _ma__get_group_paths_():
-    return [
-        i
-        for i in cmds.ls(exactType='transform', long=1) or []
-        if i and cmds.listRelatives(i, children=1, shapes=1, noIntermediate=0) is None
-    ]
-
-
-def _ma__get_shape_paths_():
-    return [
-        i
-        for i in cmds.ls(shapes=1, long=1, noIntermediate=1) or []
-        if i and cmds.listRelatives(i, children=1, shapes=1, noIntermediate=0) is None
-    ]
-
-
-def _ma__get_namespace_paths_():
-    lis = []
-    except_list = ['UI', 'shared']
-    _ = cmds.namespaceInfo(recurse=1, listOnlyNamespaces=1, fullName=1)
-    if _:
-        _.reverse()
-        for namespace in _:
-            if namespace not in except_list:
-                lis.append(namespace)
-    return lis
-
-
-def _ma_node__get_history_paths_(obj_string):
-    except_types = ['shadingEngine', 'groupId', 'set']
-    lis = []
-    for j in cmds.listHistory(obj_string, pruneDagObjects=1) or []:
-        if cmds.nodeType(j) not in except_types:
-            lis.append(j)
-    return lis
-
-
-def _ma_type__get_file_reference_dict_(node_type):
-    dic = {}
-    PORT_PATHSEP = ma_configure.Util.PORT_PATHSEP
-    directory_paths = cmds.filePathEditor(query=True, listDirectories="") or []
-    for directory_path in directory_paths:
-        raw = cmds.filePathEditor(query=True, listFiles=directory_path, withAttribute=True, byType=node_type) or []
-        for i in range(len(raw) / 2):
-            file_name = raw[i * 2]
-            attribute_path = raw[i * 2 + 1]
-            _ = attribute_path.split(PORT_PATHSEP)
-            file_path = '{}/{}'.format(directory_path, file_name)
-            node_path = cmds.ls(_[0], long=1)[0]
-            port_path = PORT_PATHSEP.join(_[1:])
-            dic.setdefault(node_path, []).append((port_path, file_path))
-    return dic
-
-
-def _ma_get_override_node_paths_(reference=True):
-    _ = [x for x in cmds.ls() if '|' in x]
-    if reference is True:
-        return _
-    return [i for i in _ if not cmds.referenceQuery(i, isNodeReferenced=1)]
-
-
-def _ma_obj_name__get_with_namespace_clear_(obj_name):
-    namespace_pathsep = ma_configure.Util.NAMESPACE_PATHSEP
-    return obj_name.split(namespace_pathsep)[-1]
-
-
-def _ma_obj_path__get_with_namespace_clear_(obj_path):
-    obj_pathsep = ma_configure.Util.OBJ_PATHSEP
-    return obj_pathsep.join([_ma_obj_name__get_with_namespace_clear_(i) for i in obj_path.split(obj_pathsep)])
-
-
 def get_is_ui_mode():
     return not cmds.about(batch=1)
 
 
 class Om2Method(object):
     DEFAULT_MAP_NAME = 'map1'
+
     @classmethod
     def _get_om2_dag_path_(cls, path):
         return om2.MGlobal.getSelectionListByName(path).getDagPath(0)
+
     @classmethod
     def _get_om2_dag_obj_(cls, path):
         return om2.MFnDagNode(cls._get_om2_dag_path_(path)).object()
+
     @classmethod
     def _get_om2_transform_(cls, path=None):
         if path:
             return om2.MFnTransform(cls._get_om2_dag_path_(path))
         return om2.MFnTransform()
+
     @classmethod
     def _get_om2_mesh_fnc_(cls, path):
         return om2.MFnMesh(cls._get_om2_dag_path_(path))
+
     @classmethod
     def _get_om2_nurbs_curve_fnc_(cls, path):
         return om2.MFnNurbsCurve(cls._get_om2_dag_path_(path))
+
     @classmethod
     def _get_om2_nurbs_surface_fnc_(cls, path):
         return om2.MFnNurbsSurface(cls._get_om2_dag_path_(path))
+
     @classmethod
     def _get_om2_dag_node_fnc_(cls, path):
         return om2.MFnDagNode(cls._get_om2_dag_path_(path))
+
     @classmethod
     def _get_om2_obj_(cls, name):
         return om2.MFnDependencyNode(
             om2.MGlobal.getSelectionListByName(name).getDependNode(0)
         )
+
     #
     @classmethod
     def _get_om2_point_(cls, point):
         om2_point = om2.MPoint()
         om2_point.x, om2_point.y, om2_point.z = point
         return om2_point
+
     @classmethod
-    def _get_om2_point_array_(cls, point_array):
-        m2PointArray = om2.MPointArray()
-        for point in point_array:
-            om2_point = cls._get_om2_point_(point)
-            m2PointArray.append(om2_point)
-        return m2PointArray
+    def _to_om2_point_array_(cls, point_array):
+        if isinstance(point_array, om2.MPointArray):
+            return point_array
+        om2_point_array = om2.MPointArray()
+        for i_point in point_array:
+            if isinstance(i_point, om2.MPoint):
+                i_om2_point = i_point
+            elif isinstance(i_point, tuple):
+                i_om2_point = cls._get_om2_point_(i_point)
+            else:
+                raise RuntimeError()
+            om2_point_array.append(i_om2_point)
+        return om2_point_array
+
     #
     @classmethod
-    def _get_int_array_(cls, om2_int_array):
-        return [int(i) for i in om2_int_array]
+    def to_integer_array(cls, om2_int_array):
+        return map(int, om2_int_array)
+
     @classmethod
-    def _get_float_array_(cls, om2_float_array):
+    def _to_float_array_(cls, om2_float_array):
         """
         :param om2_float_array: instance(OpenMaya.MFloatArray)
         :return:
@@ -150,15 +98,17 @@ class Om2Method(object):
                 ...
             )
         """
-        return [float(i) for i in om2_float_array]
+        return map(float, om2_float_array)
+
     @classmethod
-    def _get_point_(cls, om2_point, round_count=None):
+    def _to_point_(cls, om2_point, round_count=None):
         x, y, z = om2_point.x, om2_point.y, om2_point.z
         if isinstance(round_count, int):
             return round(x, round_count), round(y, round_count), round(z, round_count)
         return x, y, z
+
     @classmethod
-    def _get_point_array_(cls, om2_point_array, round_count=None):
+    def to_point_array(cls, om2_point_array, round_count=None):
         """
         :param om2_point_array: instance(OpenMaya.MPoint)
         :return:
@@ -167,7 +117,8 @@ class Om2Method(object):
                 ...
             )
         """
-        return [cls._get_point_(i, round_count) for i in om2_point_array]
+        return map(lambda x: cls._to_point_(x, round_count=round_count), om2_point_array)
+
     @classmethod
     def _get_float_vector_(cls, om2_float_vector):
         """
@@ -176,6 +127,7 @@ class Om2Method(object):
             tuple(float(x), float(y), float(z))
         """
         return om2_float_vector.x, om2_float_vector.y, om2_float_vector.z
+
     @classmethod
     def _get_float_vector_array_(cls, om2_float_vector_array):
         """
@@ -187,6 +139,7 @@ class Om2Method(object):
             )
         """
         return [(i.x, i.y, i.z) for i in om2_float_vector_array]
+
     @classmethod
     def _get_rgba_array_(cls, om2_color_array):
         """
@@ -198,22 +151,27 @@ class Om2Method(object):
             )
         """
         return [(i.r, i.g, i.b, i.a) for i in om2_color_array]
+
     @classmethod
     def _get_om2_vector_(cls, vector):
         return om2.MVector(*vector)
+
     @classmethod
     def _get_om2_int_array_(cls, int_array):
         return om2.MIntArray(int_array)
+
     @classmethod
     def _get_om2_matrix_(cls, matrix):
         om2_matrix = om2.MMatrix()
         for seq in range(4):
             for sub_seq in range(4):
-                om2_matrix.setElement(seq, sub_seq, matrix[seq * 4 + sub_seq])
+                om2_matrix.setElement(seq, sub_seq, matrix[seq*4+sub_seq])
         return om2_matrix
+
     @classmethod
     def _get_om2_transformation_matrix_(cls, matrix):
         return om2.MTransformationMatrix(cls._get_om2_matrix_(matrix))
+
     @staticmethod
     def _to_int_array_reduce(array):
         lis = []
@@ -227,37 +185,38 @@ class Om2Method(object):
         array.sort()
         for seq in array:
             if index > 0:
-                pre = array[index - 1]
+                pre = array[index-1]
             else:
                 pre = None
             #
-            if index < (count - 1):
-                nex = array[index + 1]
+            if index < (count-1):
+                nex = array[index+1]
             else:
                 nex = None
             #
             if pre is None and nex is not None:
                 start = minimum
-                if seq - nex != -1:
+                if seq-nex != -1:
                     lis.append(start)
             elif pre is not None and nex is None:
                 end = maximum
-                if seq - pre == 1:
+                if seq-pre == 1:
                     lis.append((start, end))
                 else:
                     lis.append(end)
             elif pre is not None and nex is not None:
-                if seq - pre != 1 and seq - nex != -1:
+                if seq-pre != 1 and seq-nex != -1:
                     lis.append(seq)
-                elif seq - pre == 1 and seq - nex != -1:
+                elif seq-pre == 1 and seq-nex != -1:
                     end = seq
                     lis.append((start, end))
-                elif seq - pre != 1 and seq - nex == -1:
+                elif seq-pre != 1 and seq-nex == -1:
                     start = seq
             #
             index += 1
         #
         return lis
+
     @classmethod
     def _get_mesh_comp_names_(cls, indices, comp_key):
         lis = []
@@ -273,15 +232,19 @@ class Om2Method(object):
                     lis.append('{}[{}:{}]'.format(comp_key, *i))
         #
         return lis
+
     @classmethod
     def _get_mesh_face_comp_names_(cls, indices):
         return cls._get_mesh_comp_names_(indices, 'f')
+
     @classmethod
     def _get_mesh_edge_comp_names_(cls, indices):
         return cls._get_mesh_comp_names_(indices, 'e')
+
     @classmethod
     def _get_mesh_vertex_comp_names_(cls, indices):
         return cls._get_mesh_comp_names_(indices, 'vtx')
+
     @classmethod
     def _get_curve_knots_(cls, count, degree):
         span = count-3
@@ -295,40 +258,45 @@ class Om2Method(object):
         #
         add_count = count-N-1
         for seq in range(add_count):
-            lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+            lis.append(float(seq+1)*knot_maximum/(add_count+1))
         #
         [lis.append(knot_maximum) for i in range(degree)]
         return lis
+
     @classmethod
     def _get_surface_knots_(cls, count, degree):
         lis = []
         minKnots, maxKnots = 0.0, 1.0
         #
-        iPCount = count - 2
+        iPCount = count-2
         [lis.append(minKnots) for _ in range(degree)]
         #
         for seq in range(iPCount):
-            lis.append(float(seq + 1) * maxKnots / (iPCount + 1))
+            lis.append(float(seq+1)*maxKnots/(iPCount+1))
         #
         [lis.append(maxKnots) for _ in range(degree)]
         return lis
+
     @classmethod
     def _set_locator_create_by_points(cls, points):
         for seq, point in enumerate(points):
             cmds.spaceLocator(name='test_{}_loc'.format(seq), position=point)
+
     @classmethod
     def _get_center_point_(cls, point_0, point_1):
-        x, y, z = (point_0.x + point_1.x) / 2, (point_0.y + point_1.y) / 2, (point_0.z + point_1.z) / 2
+        x, y, z = (point_0.x+point_1.x)/2, (point_0.y+point_1.y)/2, (point_0.z+point_1.z)/2
         return om2.MPoint(x, y, z)
+
     @staticmethod
     def _set_value_map_(range1, range2, value1):
         min1, max1 = range1
         min2, max2 = range2
         #
-        percent = float(value1 - min1)/(max1 - min1)
+        percent = float(value1-min1)/(max1-min1)
         #
-        value2 = (max2 - min2) * percent + min2
+        value2 = (max2-min2)*percent+min2
         return value2
+
     @classmethod
     def _set_om2_curve_create_(cls, points, knots, degree, form, parent):
         om2_curve = om2.MFnNurbsCurve()
@@ -347,13 +315,15 @@ class Om2CurveCreator(object):
         #     cmds.createNode('transform', name=path)
         self._obj_path = path
         self._om2_obj_fnc = Om2Method._get_om2_dag_obj_(path)
+
     @classmethod
-    def _get_om2_point_array_(cls, point_array):
-        m2PointArray = om2.MPointArray()
+    def _to_om2_point_array_(cls, point_array):
+        om2_point_array = om2.MPointArray()
         for point in point_array:
             om2_point = Om2Method._get_om2_point_(point)
-            m2PointArray.append(om2_point)
-        return m2PointArray
+            om2_point_array.append(om2_point)
+        return om2_point_array
+
     @classmethod
     def _get_knots__(cls, count, degree, span):
         M = span
@@ -366,10 +336,11 @@ class Om2CurveCreator(object):
         #
         add_count = count-N-1
         for seq in range(add_count):
-            lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+            lis.append(float(seq+1)*knot_maximum/(add_count+1))
         #
         [lis.append(knot_maximum) for i in range(degree)]
         return lis
+
     @classmethod
     def _set_points_reduce_(cls, points):
         lis = [points[0], cls._get_mid_point_(points[0], points[1])]
@@ -379,11 +350,12 @@ class Om2CurveCreator(object):
             [points[-1]]
         )
         return lis
+
     @classmethod
     def _get_mid_point_(cls, point_0, point_1):
         x_0, y_0, z_0 = point_0
         x_1, y_1, z_1 = point_1
-        return (x_1 + x_0) / 2, (y_1 + y_0) / 2, (z_1 + z_0) / 2
+        return (x_1+x_0)/2, (y_1+y_0)/2, (z_1+z_0)/2
 
     def set_create_by_points(self, points, degree=3):
         points_ = points
@@ -392,7 +364,7 @@ class Om2CurveCreator(object):
         knots = Om2Method._get_curve_knots_(count, degree)
         om2_curve = om2.MFnNurbsCurve()
         om2_curve.create(
-            self._get_om2_point_array_(points_),
+            self._to_om2_point_array_(points_),
             knots, degree, form,
             False,
             True,
@@ -403,7 +375,7 @@ class Om2CurveCreator(object):
         points, knots, degree, form = raw
         om2_curve = om2.MFnNurbsCurve()
         om2_curve.create(
-            self._get_om2_point_array_(points),
+            self._to_om2_point_array_(points),
             knots, degree, form,
             False,
             True,
@@ -414,6 +386,7 @@ class Om2CurveCreator(object):
 class Om2CurveOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_nurbs_curve_fnc_(path)
+
     @property
     def path(self):
         return self._om2_obj_fnc.fullPathName()
@@ -425,30 +398,31 @@ class Om2CurveOpt(object):
         return self._om2_obj_fnc.form
 
     def get_knots(self):
-        return Om2Method._get_float_array_(self._om2_obj_fnc.knots())
+        return Om2Method._to_float_array_(self._om2_obj_fnc.knots())
 
     def set_knots(self, knots):
         self._om2_obj_fnc.setKnots(knots, 0, len(knots)-1)
         self._om2_obj_fnc.updateCurve()
 
     def get_points(self):
-        return Om2Method._get_point_array_(self._om2_obj_fnc.cvPositions())
+        return Om2Method.to_point_array(self._om2_obj_fnc.cvPositions())
 
     def get_create_raw(self):
-        points = Om2Method._get_point_array_(self._om2_obj_fnc.cvPositions())
-        knots = Om2Method._get_float_array_(self._om2_obj_fnc.knots())
+        points = Om2Method.to_point_array(self._om2_obj_fnc.cvPositions())
+        knots = Om2Method._to_float_array_(self._om2_obj_fnc.knots())
         degree = self._om2_obj_fnc.degree
         form = self._om2_obj_fnc.form
         return points, knots, degree, form
 
     def _test_(self):
         print self._om2_obj_fnc.cvs()
+
     @staticmethod
     def _get_curve_knots_(count, degree, form):
         if form == 1:
             if count == 2:
                 return [0.0]*degree+[1.0]
-            span = max(count - 3, 1)
+            span = max(count-3, 1)
             M = span
             N = degree
             lis = []
@@ -456,27 +430,28 @@ class Om2CurveOpt(object):
             #
             [lis.append(knot_minimum) for _ in range(degree)]
             #
-            add_count = count - N - 1
+            add_count = count-N-1
             for seq in range(add_count):
-                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+                lis.append(float(seq+1)*knot_maximum/(add_count+1))
             #
             [lis.append(knot_maximum) for _ in range(degree)]
             return lis
         elif form == 3:
-            span = max(count - 3, 1)
+            span = max(count-3, 1)
             M = span
             N = degree
             lis = []
-            knot_minimum, knot_maximum = 0.0, float(M) + 1
+            knot_minimum, knot_maximum = 0.0, float(M)+1
             #
-            [lis.append(knot_minimum + i - degree + 1) for i in range(degree)]
+            [lis.append(knot_minimum+i-degree+1) for i in range(degree)]
             #
-            add_count = count - N - 1
+            add_count = count-N-1
             for seq in range(add_count):
-                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+                lis.append(float(seq+1)*knot_maximum/(add_count+1))
             #
-            [lis.append(knot_maximum + i) for i in range(degree)]
+            [lis.append(knot_maximum+i) for i in range(degree)]
             return lis
+
     @classmethod
     def set_create(cls, name, degree, form, points):
         if form == 3:
@@ -490,7 +465,7 @@ class Om2CurveOpt(object):
         knots = [0.0, 0.2, 0.4, 0.6, 1.0]
         transform = cmds.createNode('transform', name=name)
         Om2Method._set_om2_curve_create_(
-            Om2Method._get_om2_point_array_(points),
+            Om2Method._to_om2_point_array_(points),
             knots, degree, form,
             parent=Om2Method._get_om2_dag_obj_(transform)
         )
@@ -499,21 +474,25 @@ class Om2CurveOpt(object):
 class Om2MeshOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_mesh_fnc_(path)
-    @property
-    def name(self):
+
+    def get_name(self):
         return self._om2_obj_fnc.name()
-    @property
-    def path(self):
+
+    name = property(get_name)
+
+    def get_path(self):
         return self._om2_obj_fnc.fullPathName()
+
+    path = property(get_path)
 
     def get_face_vertices(self):
         face_vertex_counts = []
         face_vertex_indices = []
-        om2_obj = self._om2_obj_fnc
-        for i_face_index in xrange(om2_obj.numPolygons):
-            i_count = om2_obj.polygonVertexCount(i_face_index)
+        om2_fnc = self._om2_obj_fnc
+        for i_face_index in xrange(om2_fnc.numPolygons):
+            i_count = om2_fnc.polygonVertexCount(i_face_index)
             face_vertex_counts.append(i_count)
-            om2_indices = om2_obj.getPolygonVertices(i_face_index)
+            om2_indices = om2_fnc.getPolygonVertices(i_face_index)
             indices = list(om2_indices)
             face_vertex_indices.extend(indices)
         return face_vertex_counts, face_vertex_indices
@@ -535,21 +514,21 @@ class Om2MeshOpt(object):
             cmds.delete(p)
 
     def set_vertex_delete(self, vertex_index):
-        om2_obj = self._om2_obj_fnc
-        om2_obj.deleteVertex(vertex_index)
+        om2_fnc = self._om2_obj_fnc
+        om2_fnc.deleteVertex(vertex_index)
 
     def get_face_count(self):
-        om2_obj = self._om2_obj_fnc
-        return om2_obj.numPolygons
+        om2_fnc = self._om2_obj_fnc
+        return om2_fnc.numPolygons
 
     def get_points(self, round_count=None):
-        return Om2Method._get_point_array_(
+        return Om2Method.to_point_array(
             self._om2_obj_fnc.getPoints(),
             round_count
         )
 
     def get_point_at(self, vertex_index):
-        return Om2Method._get_point_(
+        return Om2Method._to_point_(
             self._om2_obj_fnc.getPoint(vertex_index),
         )
 
@@ -581,8 +560,11 @@ class Om2MeshOpt(object):
         matrix_data = om2.MFnMatrixData(plug_obj)
         world_matrix = matrix_data.matrix()
         return world_matrix
+
     @classmethod
-    def set_create(cls, name, face_vertices, points, uv_map_coords=None, normal_maps=None, color_maps=None):
+    def create_fnc(
+            cls, name, face_vertices, points, uv_coords_maps=None, uv_maps=None, normal_maps=None, color_maps=None
+            ):
         """
         face_vertex_counts = [4]
         face_vertex_indices = [0, 1, 2, 3]
@@ -590,29 +572,45 @@ class Om2MeshOpt(object):
         :param name:
         :param face_vertices:
         :param points:
-        :param uv_map_coords:
+        :param uv_coords_maps:
+        :param uv_maps:
         :param normal_maps:
         :param color_maps:
         :return:
         """
-        transform = cmds.createNode('transform', name=name)
-        om2_obj = om2.MFnMesh()
+        bsc_core.LogMtd.debug('start create transform')
+        transform = cmds.createNode('transform', name=name, skipSelect=1)
+        transform_name = bsc_core.DccPathDagMtd.get_dag_name(transform, '|')
+        bsc_core.LogMtd.debug('start create mesh')
+        om2_fnc = om2.MFnMesh()
         face_vertex_counts, face_vertex_indices = face_vertices
-        om2_obj.create(
-            Om2Method._get_om2_point_array_(points),
+        om2_fnc.create(
+            Om2Method._to_om2_point_array_(points),
             face_vertex_counts, face_vertex_indices,
             parent=Om2Method._get_om2_dag_obj_(transform)
         )
-        if uv_map_coords is not None:
-            uv_map_name = 'map1'
-            map_u_coords, map_v_coords = zip(*uv_map_coords)
-            om2_obj.setUVs(map_u_coords, map_v_coords, uv_map_name)
-            om2_obj.assignUVs(
-                face_vertex_counts, face_vertex_indices,
-                uv_map_name
-            )
+        bsc_core.LogMtd.debug('start assign uv map')
+        if isinstance(uv_coords_maps, dict):
+            if uv_coords_maps:
+                if 'map1' not in uv_coords_maps:
+                    uv_coords_maps['map1'] = uv_coords_maps.values()[0]
+                for i_map_name, i_uv_coords in uv_coords_maps.items():
+                    if i_map_name != 'map1':
+                        om2_fnc.createUVSet(i_map_name)
+                    #
+                    i_u_coords, i_v_coords = zip(*i_uv_coords)
+                    om2_fnc.setUVs(i_u_coords, i_v_coords, i_map_name)
+                    om2_fnc.assignUVs(
+                        face_vertex_counts, face_vertex_indices,
+                        i_map_name
+                    )
         #
-        cmds.sets(om2_obj.fullPathName(), forceElement='initialShadingGroup')
+        if isinstance(uv_maps, dict):
+            cls(om2_fnc.fullPathName()).assign_uv_maps(uv_maps)
+        #
+        cmds.sets(om2_fnc.fullPathName(), forceElement='initialShadingGroup')
+        om2_fnc.setName(transform_name+'Shape')
+        return om2_fnc.fullPathName()
 
     def get_uv_map_names(self):
         """
@@ -624,6 +622,33 @@ class Om2MeshOpt(object):
         """
         return self._om2_obj_fnc.getUVSetNames()
 
+    def get_uv_maps(self):
+        dict_ = {}
+        om2_fnc = self._om2_obj_fnc
+        uv_map_names = self.get_uv_map_names()
+        # check first map name is default
+        if Om2Method.DEFAULT_MAP_NAME not in uv_map_names:
+            om2_fnc.copyUVSet(uv_map_names[0], Om2Method.DEFAULT_MAP_NAME)
+            uv_map_names = self.get_uv_map_names()
+        if uv_map_names:
+            for uv_map_name in uv_map_names:
+                uv_face_vertex_counts, uv_face_vertex_indices = om2_fnc.getAssignedUVs(uv_map_name)
+                coords = self.get_uv_map_coords(uv_map_name)
+                dict_[uv_map_name] = (
+                    Om2Method.to_integer_array(uv_face_vertex_counts),
+                    Om2Method.to_integer_array(uv_face_vertex_indices),
+                    coords
+                )
+        return dict_
+
+    def get_uv_map(self, uv_map_name):
+        om2_fnc = self._om2_obj_fnc
+        if uv_map_name in self.get_uv_map_names():
+            uv_face_vertex_counts, uv_face_vertex_indices = om2_fnc.getAssignedUVs(uv_map_name)
+            us, vs = om2_fnc.getUVs(uv_map_name)
+            coords = zip(us, vs)
+            return list(uv_face_vertex_counts), list(uv_face_vertex_indices), coords
+
     def get_uv_map_coords(self, uv_map_name):
         """
         :param uv_map_name: str(uv_map_name)
@@ -633,23 +658,23 @@ class Om2MeshOpt(object):
                 ...
             )
         """
-        u_coords, v_coords = self._om2_obj_fnc.getUVs(uv_map_name)
-        coords = zip(u_coords, v_coords)
+        us, vs = self._om2_obj_fnc.getUVs(uv_map_name)
+        coords = zip(us, vs)
         return coords
 
     def get_uv_map_range(self, uv_map_name):
-        u_coords, v_coords = self._om2_obj_fnc.getUVs(uv_map_name)
-        return (min(u_coords), max(u_coords)), (min(v_coords), max(v_coords))
+        us, vs = self._om2_obj_fnc.getUVs(uv_map_name)
+        return (min(us), max(us)), (min(vs), max(vs))
 
     def _set_morph_by_uv_map_0_(self, uv_map_name):
-        scale = self.get_height() + self.get_width() + self.get_depth()
+        scale = self.get_height()+self.get_width()+self.get_depth()
         #
         face_vertices = self._om2_obj_fnc.getAssignedUVs(uv_map_name)
         #
         (u_minimum, u_maximum), (v_minimum, v_maximum) = self.get_uv_map_range(uv_map_name)
-        uv_map_coords = self.get_uv_map_coords(uv_map_name)
+        uv_coords = self.get_uv_map_coords(uv_map_name)
         points = []
-        for i in uv_map_coords:
+        for i in uv_coords:
             x, z = i
             x, z = (
                 Om2Method._set_value_map_((u_minimum, u_maximum), (0, 1), x),
@@ -659,12 +684,12 @@ class Om2MeshOpt(object):
             points.append((x*scale, y, -z*scale))
         #
         name = '{}_morph_mesh_0'.format(self.name)
-        self.set_create(
+        Om2MeshOpt.create_fnc(
             name, face_vertices, points
         )
 
     def _set_morph_by_uv_map_1_(self, uv_map_name):
-        scale = self.get_height() + self.get_width() + self.get_depth()
+        scale = self.get_height()+self.get_width()+self.get_depth()
         #
         om2_vertex_itr = om2.MItMeshVertex(self._om2_obj_fnc.object())
         face_vertices = self.get_face_vertices()
@@ -685,7 +710,7 @@ class Om2MeshOpt(object):
         #
         name = '{}_morph_mesh_0'.format(self.name)
         #
-        self.set_create(
+        Om2MeshOpt.create_fnc(
             name, face_vertices, points
         )
 
@@ -743,6 +768,158 @@ class Om2MeshOpt(object):
             counts, indices
         )
 
+    def assign_uv_map(self, uv_map_name, uv_map):
+        om2_fnc = self._om2_obj_fnc
+        #
+        if uv_map_name == 'st':
+            uv_map_name = 'map1'
+        #
+        uv_map_names = self.get_uv_map_names()
+        #
+        if uv_map_name not in uv_map_names:
+            om2_fnc.createUVSet(uv_map_name)
+        #
+        current_uv_map_name = om2_fnc.currentUVSetName()
+        om2_fnc.setCurrentUVSetName(current_uv_map_name)
+        # noinspection PyBroadException
+        try:
+            uv_face_vertex_counts, uv_face_vertex_indices, uv_coords = uv_map
+            us, vs = zip(*uv_coords)
+            #
+            om2_fnc.setUVs(us, vs, uv_map_name)
+            om2_fnc.assignUVs(uv_face_vertex_counts, uv_face_vertex_indices, uv_map_name)
+        except:
+            bsc_core.LogMtd.trace_error(
+                'assign uv expression: path is "{}", uv map name is "{}"'.format(self.get_path(), uv_map_name)
+            )
+            bsc_core.ExceptionMtd.set_print()
+
+    def assign_uv_maps(self, maps):
+        if 'map1' not in maps:
+            maps['map1'] = maps.values()[0]
+        #
+        for uv_map_name, uv_map in maps.items():
+            self.assign_uv_map(uv_map_name, uv_map)
+
+    def duplicate_faces(self, face_indices):
+        """
+# coding:utf-8
+import lxmaya
+
+lxmaya.set_reload()
+
+from lxmaya import ma_core
+
+print ma_core.Om2MeshOpt(
+    'mesh_001Shape'
+).duplicate_faces(
+    range(741326, 741829+1)
+)
+
+        :param face_indices:
+        :return:
+        """
+        bsc_core.LogMtd.debug('start duplicate faces, count is {}'.format(len(face_indices)))
+        om2_fnc = self._om2_obj_fnc
+        om2_itr_face = om2.MItMeshPolygon(om2_fnc.object())
+        # geometry
+        bsc_core.LogMtd.debug('start build geometry data')
+        face_vertex_counts = []
+        face_vertex_indices_ = []
+        points_ = []
+        points_opt = bsc_core.RawElementArrayOpt(points_)
+        om2_itr_face.reset()
+        for i_face_index in face_indices:
+            om2_itr_face.setIndex(i_face_index)
+            i_count = int(om2_itr_face.polygonVertexCount())
+            face_vertex_counts.append(i_count)
+            i_points = om2_itr_face.getPoints()
+            #
+            i_indices = points_opt.extend(Om2Method.to_point_array(i_points))
+            face_vertex_indices_.extend(i_indices)
+        # uv map
+        bsc_core.LogMtd.debug('start build uv map data')
+        uv_map_names = self.get_uv_map_names()
+        uv_maps = {}
+        for i_map_name in uv_map_names:
+            i_uv_face_vertex_counts = face_vertex_counts
+            i_uv_face_vertex_indices = []
+            i_uv_coords = []
+            i_uv_coords_opt = bsc_core.RawElementArrayOpt(i_uv_coords)
+            om2_itr_face.reset()
+            for j_face_index in face_indices:
+                om2_itr_face.setIndex(j_face_index)
+                j_us, j_vs = om2_itr_face.getUVs()
+                j_uv_coords = zip(j_us, j_vs)
+                j_uv_indices = i_uv_coords_opt.extend(j_uv_coords)
+                i_uv_face_vertex_indices.extend(j_uv_indices)
+            #
+            uv_maps[i_map_name] = i_uv_face_vertex_counts, i_uv_face_vertex_indices, i_uv_coords
+        #
+        bsc_core.LogMtd.debug('start create subset')
+        return Om2MeshOpt.create_fnc(
+            'mesh_subset',
+            face_vertices=(face_vertex_counts, face_vertex_indices_),
+            points=points_,
+            uv_maps=uv_maps
+        )
+
+    def duplicate_faces_(self, face_indices):
+        bsc_core.LogMtd.debug('start duplicate faces, count is {}'.format(len(face_indices)))
+        om2_fnc = self._om2_obj_fnc
+        om2_itr_face = om2.MItMeshPolygon(om2_fnc.object())
+        # geometry
+        bsc_core.LogMtd.debug('start build geometry data')
+        face_vertex_counts = []
+        face_vertex_indices_old = []
+        om2_itr_face.reset()
+        for i_face_index in face_indices:
+            om2_itr_face.setIndex(i_face_index)
+            i_count = int(om2_itr_face.polygonVertexCount())
+            face_vertex_counts.append(i_count)
+            #
+            i_om2_indices = om2_itr_face.getVertices()
+            face_vertex_indices_old.extend(list(i_om2_indices))
+        #
+        face_vertex_indices_new = []
+        points_new = om2.MPointArray()
+        face_vertex_indices_stack = list(set(face_vertex_indices_old))
+        face_vertex_indices_stack_opt = bsc_core.RawStackOpt(face_vertex_indices_stack)
+        index_count = len(face_vertex_indices_stack)
+        index_old_dict = {}
+        for i_index_old in face_vertex_indices_old:
+            i_index_new = face_vertex_indices_stack_opt.index(i_index_old)
+            face_vertex_indices_new.append(i_index_new)
+            index_old_dict[i_index_new] = i_index_old
+        #
+        for i_index_new in range(index_count):
+            points_new.append(om2_fnc.getPoint(index_old_dict[i_index_new]))
+        # uv map
+        bsc_core.LogMtd.debug('start build uv map data')
+        uv_map_names = self.get_uv_map_names()
+        uv_maps = {}
+        for i_map_name in uv_map_names:
+            i_uv_face_vertex_indices = []
+            i_uv_coords = []
+            i_uv_coords_opt = bsc_core.RawElementArrayOpt(i_uv_coords)
+            om2_itr_face.reset()
+            for j_face_index in face_indices:
+                om2_itr_face.setIndex(j_face_index)
+                j_us, j_vs = om2_itr_face.getUVs()
+                j_uv_coords = zip(j_us, j_vs)
+                j_uv_indices = i_uv_coords_opt.extend(j_uv_coords)
+                i_uv_face_vertex_indices.extend(j_uv_indices)
+            #
+            uv_maps[i_map_name] = face_vertex_counts, i_uv_face_vertex_indices, i_uv_coords
+        #
+        bsc_core.LogMtd.debug('start create subset')
+        return Om2MeshOpt.create_fnc(
+            'mesh_subset',
+            face_vertices=(face_vertex_counts, face_vertex_indices_new),
+            points=points_new,
+            uv_maps=uv_maps
+        )
+
 
 class Om2MeshChecker(object):
     def __init__(self, path):
@@ -771,10 +948,12 @@ class MeshToSurfaceConverter(object):
         #
         self._corner_index = 0
         self._rotation = 1
+
     @classmethod
     def _get_center_point_(cls, point_0, point_1):
-        x, y, z = (point_0.x + point_1.x) / 2, (point_0.y + point_1.y) / 2, (point_0.z + point_1.z) / 2
+        x, y, z = (point_0.x+point_1.x)/2, (point_0.y+point_1.y)/2, (point_0.z+point_1.z)/2
         return om2.MPoint(x, y, z)
+
     @classmethod
     def _get_next_comp_index_(cls, comp_index, comp_indices, rotation, step):
         def move_fnc_(i_):
@@ -782,25 +961,28 @@ class MeshToSurfaceConverter(object):
                 if i_ == maximum_index:
                     _n_i = 0
                 else:
-                    _n_i = i_ + 1
+                    _n_i = i_+1
             else:
                 if i_ == 0:
                     _n_i = maximum_index
                 else:
-                    _n_i = i_ - 1
+                    _n_i = i_-1
             return _n_i
+
         #
         comp_indices = list(comp_indices)
-        maximum_index = len(comp_indices) - 1
+        maximum_index = len(comp_indices)-1
         i = comp_indices.index(comp_index)
         for _ in range(step):
             i = move_fnc_(i)
         return comp_indices[i]
+
     @classmethod
     def _get_next_edge_vertex_index_(cls, edge_vertex_index, om2_edge_itr):
         edge_vertex_indices = [om2_edge_itr.vertexId(i) for i in range(2)]
         edge_vertex_indices.remove(edge_vertex_index)
         return edge_vertex_indices[0]
+
     @classmethod
     def _get_border_next_vertex_index_(cls, vertex_index, edge_index, om2_vertex_itr, om2_edge_itr, rotation, step):
         om2_vertex_itr.setIndex(vertex_index)
@@ -913,7 +1095,7 @@ class MeshToSurfaceConverter(object):
         for seq, border_v_index in enumerate(border_v_vertex_indices):
             if seq == 0:
                 u_vertex_indices = border_start_u_vertex_indices
-            elif seq == self._surface_v_count - 1:
+            elif seq == self._surface_v_count-1:
                 u_vertex_indices = border_end_u_vertex_indices
             else:
                 u_vertex_indices = self._get_border_vertex_indices_at_(
@@ -950,16 +1132,17 @@ class MeshToSurfaceConverter(object):
             u_vertex_index = u_vertex_indices[u_index]
             u_point = self._mesh_points[u_vertex_index]
             if u_index == 0:
-                next_u_point = self._mesh_points[u_vertex_indices[u_index + 1]]
+                next_u_point = self._mesh_points[u_vertex_indices[u_index+1]]
                 center_u_point = self._get_center_point_(u_point, next_u_point)
                 u_points.extend([u_point, center_u_point])
-            elif u_index == u_count - 1:
-                pre_u_point = self._mesh_points[u_vertex_indices[u_index - 1]]
+            elif u_index == u_count-1:
+                pre_u_point = self._mesh_points[u_vertex_indices[u_index-1]]
                 center_u_point = self._get_center_point_(pre_u_point, u_point)
                 u_points.extend([center_u_point, u_point])
             else:
                 u_points.append(u_point)
         return u_points
+
     #
     def _get_center_u_points_between_(self, v_index_0, v_index_1):
         u_vertex_indices_0 = self._surface_grid_vertex_indices_1[v_index_0]
@@ -1001,12 +1184,13 @@ class MeshToSurfaceConverter(object):
 class Om2SurfaceOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_nurbs_surface_fnc_(path)
+
     @property
     def path(self):
         return self._om2_obj_fnc.fullPathName()
 
     def get_points(self, round_count=None):
-        return Om2Method._get_point_array_(
+        return Om2Method.to_point_array(
             self._om2_obj_fnc.cvPositions(),
             round_count
         )
@@ -1033,12 +1217,12 @@ class Om2SurfaceOpt(object):
                 (0, 1), (u_p_max, u_p_min), u_percent
             )
             for v_index in range(v_division):
-                v_percent = float(v_index) / float(v_division-1)
+                v_percent = float(v_index)/float(v_division-1)
                 v_p = Om2Method._set_value_map_(
                     (0, 1), (v_p_max, v_p_min), v_percent
                 )
                 lis.append(
-                    Om2Method._get_point_(
+                    Om2Method._to_point_(
                         self._om2_obj_fnc.getPointAtParam(u_p, v_p, 4)
                     )
                 )
@@ -1049,19 +1233,20 @@ class Om2SurfaceOpt(object):
 
     def set_convert_to_mesh(self):
         def set_face_vertices_update_fnc_():
-            _v_face_count = mesh_v_face_count - 2
-            _u_face_count = mesh_u_face_count - 2
+            _v_face_count = mesh_v_face_count-2
+            _u_face_count = mesh_u_face_count-2
             #
-            _l = [0, 1, 2 + _u_face_count, 1 + _u_face_count]
+            _l = [0, 1, 2+_u_face_count, 1+_u_face_count]
             for _v_face_index in range(_v_face_count):
                 for _u_face_index in range(_u_face_count):
                     mesh_face_vertex_counts.append(4)
                     if _u_face_index == 0:
-                        __l = [(i + _v_face_index * (_u_face_count + 1)) for i in _l]
+                        __l = [(i+_v_face_index*(_u_face_count+1)) for i in _l]
                     else:
-                        __l = [(i + _v_face_index * (_u_face_count + 1) + _u_face_index) for i in _l]
+                        __l = [(i+_v_face_index*(_u_face_count+1)+_u_face_index) for i in _l]
                     #
                     mesh_face_vertex_indices.extend(__l)
+
         #
         def set_points_update_fnc_():
             # u = 5, v = 4
@@ -1075,18 +1260,19 @@ class Om2SurfaceOpt(object):
                 if _v_point_index in _exclude_v_point_indices:
                     continue
                 #
-                _map_v_coord = float(_v_point_index) / float(_v_point_count - 3)
+                _map_v_coord = float(_v_point_index)/float(_v_point_count-3)
                 for _u_point_index in range(_u_point_count):
                     if _u_point_index in _exclude_u_point_indices:
                         continue
-                    _index = _u_point_index*_v_point_count + _v_point_index
+                    _index = _u_point_index*_v_point_count+_v_point_index
                     #
                     mesh_points.append(surface_points[_index])
                     #
-                    _map_u_coord = float(_u_point_index) / float(_u_point_count-3)
-                    mesh_map_coords.append(
+                    _map_u_coord = float(_u_point_index)/float(_u_point_count-3)
+                    mesh_uv_coords.append(
                         (_map_u_coord, _map_v_coord)
                     )
+
         #
         surface_v_count = self._om2_obj_fnc.numCVsInV
         surface_u_count = self._om2_obj_fnc.numCVsInU
@@ -1097,16 +1283,16 @@ class Om2SurfaceOpt(object):
         #
         mesh_face_vertex_counts, mesh_face_vertex_indices = [], []
         mesh_points = []
-        mesh_map_coords = []
+        mesh_uv_coords = []
         #
         set_face_vertices_update_fnc_()
         set_points_update_fnc_()
         #
-        Om2MeshOpt.set_create(
+        Om2MeshOpt.create_fnc(
             'test',
             (mesh_face_vertex_counts, mesh_face_vertex_indices),
             mesh_points,
-            mesh_map_coords
+            uv_coords_maps={'map1': mesh_uv_coords}
         )
 
     def set_convert_to_mesh_(self, u_division, v_division):
@@ -1114,16 +1300,17 @@ class Om2SurfaceOpt(object):
             _v_face_count = mesh_v_face_count
             _u_face_count = mesh_u_face_count
             #
-            _l = [0, 1, 2 + _u_face_count, 1 + _u_face_count]
+            _l = [0, 1, 2+_u_face_count, 1+_u_face_count]
             for _v_face_index in range(_v_face_count):
                 for _u_face_index in range(_u_face_count):
                     mesh_face_vertex_counts.append(4)
                     if _u_face_index == 0:
-                        __l = [(i + _v_face_index * (_u_face_count + 1)) for i in _l]
+                        __l = [(i+_v_face_index*(_u_face_count+1)) for i in _l]
                     else:
-                        __l = [(i + _v_face_index * (_u_face_count + 1) + _u_face_index) for i in _l]
+                        __l = [(i+_v_face_index*(_u_face_count+1)+_u_face_index) for i in _l]
                     #
                     mesh_face_vertex_indices.extend(__l)
+
         #
         def set_points_update_fnc_():
             # u = 5, v = 4
@@ -1136,15 +1323,16 @@ class Om2SurfaceOpt(object):
             for _v_point_index in range(_v_point_count):
                 _map_v_coord = float(_v_point_index)/float(_v_point_count-1)
                 for _u_point_index in range(_u_point_count):
-                    _index = _u_point_index*_v_point_count + _v_point_index
+                    _index = _u_point_index*_v_point_count+_v_point_index
                     #
                     mesh_points.append(
                         surface_points[_index]
                     )
                     _map_u_coord = float(_u_point_index)/float(_u_point_count-1)
-                    mesh_map_coords.append(
+                    mesh_uv_coords.append(
                         (_map_u_coord, _map_v_coord)
                     )
+
         #
         surface_v_count = u_division
         surface_u_count = v_division
@@ -1158,49 +1346,51 @@ class Om2SurfaceOpt(object):
         #
         mesh_face_vertex_counts, mesh_face_vertex_indices = [], []
         mesh_points = []
-        mesh_map_coords = []
+        mesh_uv_coords = []
         #
         set_face_vertices_update_fnc_()
         set_points_update_fnc_()
         #
-        Om2MeshOpt.set_create(
+        Om2MeshOpt.create_fnc(
             'test',
             (mesh_face_vertex_counts, mesh_face_vertex_indices),
             mesh_points,
-            mesh_map_coords
+            uv_coords_maps={'map1': mesh_uv_coords}
         )
+
     @staticmethod
     def _get_surface_knots_(count, degree, form):
         if form == 1:
             lis = []
-            span = max(count - 3, 1)
+            span = max(count-3, 1)
             M = span
             N = degree
             knot_minimum, knot_maximum = 0.0, 1.0
             #
-            add_count = count - N - 1
+            add_count = count-N-1
             [lis.append(knot_minimum) for _ in range(degree)]
             #
             for seq in range(add_count):
-                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+                lis.append(float(seq+1)*knot_maximum/(add_count+1))
             #
             [lis.append(knot_maximum) for _ in range(degree)]
             return lis
         elif form == 3:
-            span = max(count - 3, 1)
+            span = max(count-3, 1)
             M = span
             N = degree
             lis = []
             knot_minimum, knot_maximum = 0.0, float(M)+1
             #
-            [lis.append(knot_minimum + i - degree + 1) for i in range(degree)]
+            [lis.append(knot_minimum+i-degree+1) for i in range(degree)]
             #
-            add_count = count - N - 1
+            add_count = count-N-1
             for seq in range(add_count):
-                lis.append(float(seq + 1) * knot_maximum / (add_count + 1))
+                lis.append(float(seq+1)*knot_maximum/(add_count+1))
             #
-            [lis.append(knot_maximum + i) for i in range(degree)]
+            [lis.append(knot_maximum+i) for i in range(degree)]
             return lis
+
     @classmethod
     def set_create(cls, name, u_count, v_count, points, u_form=1, v_form=3):
         u_degree, v_degree = 3, 2
@@ -1211,8 +1401,8 @@ class Om2SurfaceOpt(object):
             cls._get_surface_knots_(v_count, v_degree, v_form)
         )
         transform = cmds.createNode('transform', name=name)
-        om2_obj = om2.MFnNurbsSurface()
-        om2_obj.create(
+        om2_fnc = om2.MFnNurbsSurface()
+        om2_fnc.create(
             points,
             u_knots, v_knots,
             u_degree, v_degree,
@@ -1226,6 +1416,7 @@ class CmdXgenSplineGuideOpt(object):
     def __init__(self, path):
         self._om2_obj_fnc = Om2Method._get_om2_dag_node_fnc_(path)
         self._obj_path = self._om2_obj_fnc.fullPathName()
+
     @property
     def path(self):
         return self._obj_path
@@ -1235,8 +1426,8 @@ class CmdXgenSplineGuideOpt(object):
         # xgmGuideGeom [-guide STRING] [-numVertices] [-basePoint | -controlPoints] [-lockBasePt BOOL] [-guideNormal] [-uvLocation] [-isCached]
         _ = cmds.xgmGuideGeom(guide=self._obj_path, controlPoints=1)
         for seq, i in enumerate(_):
-            if not seq % 3:
-                lis.append(tuple([_[seq + j] for j in range(3)]))
+            if not seq%3:
+                lis.append(tuple([_[seq+j] for j in range(3)]))
         return lis
 
     def get_vertex_points(self):
@@ -1260,234 +1451,30 @@ class CmdXgenSplineGuideOpt(object):
         print cmd
 
 
-class ObjOpt(object):
-    def __init__(self, path):
-        self._om2_obj_fnc = Om2Method._get_om2_obj_(path)
-        self._obj_path = self._om2_obj_fnc.name()
-
-    def _test_(self):
-        p = self._om2_obj_fnc.findPlug('inputXgenGuide', 0)
-        s = p.source()
-        if s.isNull is False:
-            obj = om2.MFnDagNode(s.node())
-            print obj.fullPathName()
-
-    def get_port(self, port_path):
-        p = self._om2_obj_fnc.findPlug(port_path, 0)
-        return p
-
-
-class ScriptJobMtd(object):
-    # dbTraceChanged
-    # resourceLimitStateChange
-    # linearUnitChanged
-    # timeUnitChanged
-    # angularUnitChanged
-    # Undo
-    # undoSupressed
-    # Redo
-    # customEvaluatorChanged
-    # serialExecutorFallback
-    # timeChanged
-    # currentContainerChange
-    # quitApplication
-    # idleHigh
-    # idle
-    # idleVeryLow
-    # RecentCommandChanged
-    # ToolChanged
-    # PostToolChanged
-    # ToolDirtyChanged
-    # ToolSettingsChanged
-    # DisplayRGBColorChanged
-    # animLayerRebuild
-    # animLayerRefresh
-    # animLayerAnimationChanged
-    # animLayerLockChanged
-    # animLayerBaseLockChanged
-    # animLayerGhostChanged
-    # cteEventKeyingTargetForClipChanged
-    # cteEventKeyingTargetForLayerChanged
-    # cteEventKeyingTargetForInvalidChanged
-    # teClipAdded
-    # teClipModified
-    # teClipRemoved
-    # teCompositionAdded
-    # teCompositionRemoved
-    # teCompositionActiveChanged
-    # teCompositionNameChanged
-    # teMuteChanged
-    # cameraChange
-    # cameraDisplayAttributesChange
-    # SelectionChanged
-    # PreSelectionChangedTriggered
-    # LiveListChanged
-    # ActiveViewChanged
-    # SelectModeChanged
-    # SelectTypeChanged
-    # SelectPreferenceChanged
-    # DisplayPreferenceChanged
-    # DagObjectCreated
-    # transformLockChange
-    # renderLayerManagerChange
-    # renderLayerChange
-    # displayLayerManagerChange
-    # displayLayerAdded
-    # displayLayerDeleted
-    # displayLayerVisibilityChanged
-    # displayLayerChange
-    # renderPassChange
-    # renderPassSetChange
-    # renderPassSetMembershipChange
-    # passContributionMapChange
-    # DisplayColorChanged
-    # lightLinkingChanged
-    # lightLinkingChangedNonSG
-    # UvTileProxyDirtyChangeTrigger
-    # preferredRendererChanged
-    # polyTopoSymmetryValidChanged
-    # SceneSegmentChanged
-    # PostSceneSegmentChanged
-    # SequencerActiveShotChanged
-    # ColorIndexChanged
-    # deleteAll
-    # NameChanged
-    # symmetricModellingOptionsChanged
-    # softSelectOptionsChanged
-    # SetModified
-    # xformConstraintOptionsChanged
-    # metadataVisualStatusChanged
-    # undoXformCmd
-    # redoXformCmd
-    # freezeOptionsChanged
-    # linearToleranceChanged
-    # angularToleranceChanged
-    # nurbsToPolygonsPrefsChanged
-    # nurbsCurveRebuildPrefsChanged
-    # constructionHistoryChanged
-    # threadCountChanged
-    # SceneSaved
-    # NewSceneOpened
-    # SceneOpened
-    # SceneImported
-    # PreFileNewOrOpened
-    # PreFileNew
-    # PreFileOpened
-    # PostSceneRead
-    # renderSetupAutoSave
-    # workspaceChanged
-    # PolyUVSetChanged
-    # PolyUVSetDeleted
-    # selectionConstraintsChanged
-    # nurbsToSubdivPrefsChanged
-    # startColorPerVertexTool
-    # stopColorPerVertexTool
-    # start3dPaintTool
-    # stop3dPaintTool
-    # DragRelease
-    # ModelPanelSetFocus
-    # modelEditorChanged
-    # MenuModeChanged
-    # gridDisplayChanged
-    # interactionStyleChanged
-    # axisAtOriginChanged
-    # CurveRGBColorChanged
-    # SelectPriorityChanged
-    # snapModeChanged
-    # texWindowEditorImageBaseColorChanged
-    # texWindowEditorCheckerDensityChanged
-    # texWindowEditorCheckerDisplayChanged
-    # texWindowEditorDisplaySolidMapChanged
-    # texWindowEditorShowup
-    # texWindowEditorClose
-    # profilerSelectionChanged
-    # activeHandleChanged
-    # ChannelBoxLabelSelected
-    # colorMgtOCIORulesEnabledChanged
-    # colorMgtUserPrefsChanged
-    # RenderSetupSelectionChanged
-    # colorMgtEnabledChanged
-    # colorMgtConfigFileEnableChanged
-    # colorMgtConfigFilePathChanged
-    # colorMgtConfigChanged
-    # colorMgtWorkingSpaceChanged
-    # colorMgtPrefsViewTransformChanged
-    # colorMgtPrefsReloaded
-    # colorMgtOutputChanged
-    # colorMgtPlayblastOutputChanged
-    # colorMgtRefreshed
-    # selectionPipelineChanged
-    # currentSoundNodeChanged
-    # graphEditorChanged
-    # graphEditorParamCurveSelected
-    # graphEditorOutlinerHighlightChanged
-    # graphEditorOutlinerListChanged
-    # glFrameTrigger
-    # EditModeChanged
-    # playbackRangeAboutToChange
-    # playbackSpeedChanged
-    # playbackModeChanged
-    # playbackRangeSliderChanged
-    # playbackByChanged
-    # playbackRangeChanged
-    # RenderViewCameraChanged
-    # texScaleContextOptionsChanged
-    # texRotateContextOptionsChanged
-    # texMoveContextOptionsChanged
-    # polyCutUVSteadyStrokeChanged
-    # polyCutUVEventTexEditorCheckerDisplayChanged
-    # polyCutUVShowTextureBordersChanged
-    # polyCutUVShowUVShellColoringChanged
-    # shapeEditorTreeviewSelectionChanged
-    # poseEditorTreeviewSelectionChanged
-    # sculptMeshCacheBlendShapeListChanged
-    # sculptMeshCacheCloneSourceChanged
-    # RebuildUIValues
-    # cacheDestroyed
-    # cachingPreferencesChanged
-    # cachingSafeModeChanged
-    # cachingEvaluationModeChanged
-    # teTrackAdded
-    # teTrackRemoved
-    # teTrackNameChanged
-    # teTrackModified
-    # cteEventClipEditModeChanged
-    # teEditorPrefsChanged
-    @classmethod
-    def get_all(cls):
-        return cmds.scriptJob(listJobs=1) or []
-    @classmethod
-    def set_delete(cls, pattern):
-        _ = fnmatch.filter(cls.get_all(), pattern)
-        if _:
-            for i in _:
-                index = i.split(': ')[0]
-                cmds.scriptJob(kill=int(index), force=1)
-                utl_core.Log.set_module_result_trace(
-                    'job-script kill',
-                    'job-script="{}"'.format(i.lstrip().rstrip())
-                )
-
-
 class CmdAtrQueryOpt(object):
     PORT_PATHSEP = ma_configure.Util.PORT_PATHSEP
+
     def __init__(self, atr_path):
         self._atr_path = atr_path
         _ = atr_path.split(self.PORT_PATHSEP)
         self._obj_path, self._port_path = _[0], self._get_port_path_(self.PORT_PATHSEP.join(_[1:]))
+
     @classmethod
     def _get_port_path_(cls, port_path):
         _ = port_path.split('.')[-1]
         if _.endswith(']'):
             return _.split('[')[0]
         return _
+
     #
     @property
     def atr_path(self):
         return self._atr_path
+
     @property
     def obj_path(self):
         return self._obj_path
+
     @property
     def port_path(self):
         return self._port_path
@@ -1498,7 +1485,9 @@ class CmdAtrQueryOpt(object):
             node=self.obj_path,
             attributeType=1
         )
+
     type = property(get_type)
+
     #
     def get_is_exists(self):
         return cmds.attributeQuery(
@@ -1534,9 +1523,9 @@ class CmdAtrQueryOpt(object):
                 else:
                     alpha_port_path = '{}A'.format(self.port_path)
                 if cmds.attributeQuery(
-                    alpha_port_path,
-                    node=self.obj_path,
-                    exists=1
+                        alpha_port_path,
+                        node=self.obj_path,
+                        exists=1
                 ) is True:
                     names.append(alpha_port_path)
             return names
@@ -1604,6 +1593,7 @@ class CmdAtrQueryOpt(object):
 
 class CmdPortQueryOpt(object):
     PATHSEP = '.'
+
     def __init__(self, obj_type_name, port_query_path):
         self._obj_type_name = obj_type_name
         self._port_query_path = port_query_path
@@ -1613,7 +1603,7 @@ class CmdPortQueryOpt(object):
 
     def get_port_query_path(self):
         return self._port_query_path
-    
+
     def __get_query_key_(self):
         _ = self._port_query_path.split(self.PATHSEP)[-1]
         if _.endswith(u']'):
@@ -1664,7 +1654,7 @@ class CmdPortQueryOpt(object):
             self.__get_query_key_(),
             **self.__get_query_kwargs_(obj_path, listParent=True)
         ) is not None
-    
+
     def get_is_array(self, obj_path=None):
         return cmds.attributeQuery(
             self.__get_query_key_(),
@@ -1694,6 +1684,7 @@ class CmdPortQueryOpt(object):
             self.__get_query_key_(),
             **self.__get_query_kwargs_(obj_path, enum=True)
         ) or False
+
     #
     def get_enumerate_strings(self, obj_path=None):
         _ = cmds.attributeQuery(
@@ -1739,9 +1730,11 @@ class CmdCustomizePortQueryOpt(object):
 class CmdObjQueryOpt(object):
     def __init__(self, obj_type_name):
         self._obj_type_name = obj_type_name
+
     #
     def get_type_name(self):
         return self._obj_type_name
+
     @classmethod
     def _set_cleanup_to_(cls, lis):
         lis_ = list(filter(None, set(lis)))
@@ -1771,6 +1764,7 @@ class CmdObjQueryOpt(object):
                     _i_port_query_path = u'{}.{}'.format(port_query_path_, _i)
                     lis.append(_i_port_query_path)
                     rcs_fnc_(_i_port_query_path)
+
         #
         lis = []
         #
@@ -1795,13 +1789,14 @@ class CmdObjQueryOpt(object):
 
 class CmdPortOpt(object):
     PATHSEP = '.'
+
     def __init__(self, obj_path, port_path):
         self._obj_path = obj_path
         self._port_path = port_path
         _ = '.'.join(
             [self._obj_path, port_path]
         )
-        self._atr_path = self._get_atr_path_(
+        self._atr_path = self._to_atr_path_(
             self._obj_path, self._port_path
         )
         if cmds.objExists(self._atr_path) is True:
@@ -1813,6 +1808,7 @@ class CmdPortOpt(object):
             self._atr_query = CmdAtrQueryOpt(self._atr_path)
         else:
             raise RuntimeError()
+
     @classmethod
     def _set_create_(cls, obj_path, port_path, type_name, enumerate_strings=None):
         if cls._get_is_exists_(obj_path, port_path) is False:
@@ -1842,15 +1838,18 @@ class CmdPortOpt(object):
                     longName=port_path,
                     attributeType=type_name
                 )
+
     @classmethod
     def _get_is_exists_(cls, obj_path, port_path):
-        atr_path = cls._get_atr_path_(obj_path, port_path)
+        atr_path = cls._to_atr_path_(obj_path, port_path)
         return cmds.objExists(atr_path)
+
     @classmethod
-    def _get_atr_path_(cls, obj_path, port_path):
+    def _to_atr_path_(cls, obj_path, port_path):
         return cls.PATHSEP.join(
             [obj_path, port_path]
         )
+
     @classmethod
     def _set_connection_create_(cls, atr_path_src, atr_path_tgt):
         if cmds.isConnected(atr_path_src, atr_path_tgt) is False:
@@ -1862,22 +1861,27 @@ class CmdPortOpt(object):
 
     def get_obj_path(self):
         return self._obj_path
+
     obj_path = property(get_obj_path)
 
     def get_type_name(self):
         return self._port_type
+
     type_name = property(get_type_name)
 
     def get_path(self):
         return self._atr_path
+
     path = property(get_path)
 
     def get_atr_path(self):
         return self._atr_path
+
     atr_path = property(get_atr_path)
 
     def get_port_path(self):
         return self._port_path
+
     port_path = property(get_port_path)
 
     def get_array_indices(self):
@@ -1890,10 +1894,9 @@ class CmdPortOpt(object):
         return []
 
     def get(self, as_string=False):
-        if self.get_type_name() == 'message':
+        if self.get_type_name() in {'message', 'TdataCompound'}:
             return None
-        elif self.get_type_name() == 'TdataCompound':
-            return None
+
         if as_string is True:
             return cmds.getAttr(self.path, asString=True) or ''
         #
@@ -1903,7 +1906,7 @@ class CmdPortOpt(object):
         return _
 
     def set(self, value, enumerate_strings=None):
-        if self.get_has_source() is False:
+        if self.has_source() is False:
             # unlock first
             is_lock = cmds.getAttr(self.get_path(), lock=1)
             if is_lock:
@@ -1932,7 +1935,7 @@ class CmdPortOpt(object):
                     else:
                         # Debug ( Clamp Maximum or Minimum Value )
                         cmds.setAttr(self.get_path(), value, clamp=1)
-    
+
     def get_default(self):
         if self.get_type_name() == 'message':
             return None
@@ -1963,7 +1966,7 @@ class CmdPortOpt(object):
             edit=1, enumName=':'.join(strings)
         )
 
-    def get_has_source(self):
+    def has_source(self):
         _ = cmds.connectionInfo(
             self.get_path(), isExactDestination=True
         )
@@ -2032,46 +2035,79 @@ class CmdPortOpt(object):
 
 class CmdAtrOpt(object):
     PATHSEP = '.'
+
     def __init__(self, atr_path):
         pass
 
 
+class ShaderCategory(object):
+    CACHE = {}
+
+    @classmethod
+    def create_cache(cls):
+        if not cls.CACHE:
+            # custom
+            for i_category in ['shader', 'texture', 'light', 'utility']:
+                for j_type in cmds.listNodeTypes(i_category) or []:
+                    cls.CACHE[j_type] = i_category
+            # arnold
+            for i_category in ['shader', 'texture', 'light', 'utility']:
+                for j_type in cmds.listNodeTypes('rendernode/arnold/'+i_category) or []:
+                    cls.CACHE[j_type] = i_category
+
+    @classmethod
+    def get(cls, type_name, default='unknown'):
+        cls.create_cache()
+        return cls.CACHE.get(type_name, default)
+
+    @classmethod
+    def is_shader_type(cls, type_name):
+        cls.create_cache()
+        return type_name in cls.CACHE
+
+    @classmethod
+    def get_(cls, type_name):
+        return cmds.getClassification(type_name)[0]
+
+
 class CmdObjOpt(object):
+    PATHSEP = '|'
     PORT_PATHSEP = '.'
     #
     OBJ_NAME_0 = 'renderPartition'
     OBJ_NAME_1 = 'lightLinker1'
     OBJ_NAME_2 = 'defaultLightSet'
-    #
-    SHADER_CATEGORY_DICT = {}
-    for _category in ['shader', 'texture', 'light', 'utility']:
-        _ = cmds.listNodeTypes(_category) or []
-        for _i in _:
-            SHADER_CATEGORY_DICT[_i] = _category
+
     #
     def __init__(self, obj_path):
         _ = cmds.ls(obj_path, long=1)
         if _:
             self._obj_path = _[0]
+            self._uuid = cmds.ls(self._obj_path, uuid=1)[0]
             self._obj_type = cmds.nodeType(self._obj_path)
             self._obj_query_opt = CmdObjQueryOpt(self._obj_type)
         else:
             raise RuntimeError()
+
     @classmethod
     def _get_is_exists_(cls, obj_path):
         return cmds.objExists(obj_path)
+
     @classmethod
     def _set_create_(cls, obj_path, type_name):
         if type_name == ma_configure.Util.MATERIAL_TYPE:
-            cls._set_material_create_(obj_path, type_name)
-        elif type_name in cls.SHADER_CATEGORY_DICT:
-            cls._ser_shader_create_(obj_path, type_name)
+            cls._create_material_(obj_path, type_name)
+        elif type_name in ShaderCategory.is_shader_type(type_name):
+            cls._create_shader_(obj_path, type_name)
         else:
-            _ = cmds.createNode(type_name, name=obj_path, skipSelect=1)
+            _ = cmds.createNode(
+                type_name, name=obj_path, skipSelect=1
+            )
+
     @classmethod
-    def _ser_shader_create_(cls, obj_name, type_name):
+    def _create_shader_(cls, obj_name, type_name):
         if cls._get_is_exists_(obj_name) is False:
-            category = cls.SHADER_CATEGORY_DICT.get(type_name, 'utility')
+            category = ShaderCategory.get(type_name, 'utility')
             kwargs = dict(
                 name=obj_name,
                 skipSelect=1
@@ -2086,8 +2122,9 @@ class CmdObjOpt(object):
                 kwargs['asUtility'] = 1
             #
             _ = cmds.shadingNode(type_name, **kwargs)
+
     @classmethod
-    def _set_material_create_(cls, obj_name, type_name):
+    def _create_material_(cls, obj_name, type_name):
         if cls._get_is_exists_(obj_name) is False:
             result = cmds.shadingNode(
                 type_name,
@@ -2095,9 +2132,10 @@ class CmdObjOpt(object):
                 asUtility=1,
                 skipSelect=1
             )
-            cls._set_material_light_link_create_(result)
+            cls._create_material_light_link_(result)
+
     @classmethod
-    def _set_material_light_link_create_(cls, shadingEngine):
+    def _create_material_light_link_(cls, shadingEngine):
         def get_connection_index_():
             for i in range(5000):
                 if get_is_partition_connected_at_(i) \
@@ -2117,27 +2155,27 @@ class CmdObjOpt(object):
 
         #
         def get_is_partition_connected_at_(index):
-            connection = cls.OBJ_NAME_0 + '.sets[%s]' % index
+            connection = cls.OBJ_NAME_0+'.sets[%s]'%index
             return get_is_connected_(connection)
 
         #
         def get_is_obj_link_connected_at_(index):
-            connection = cls.OBJ_NAME_1 + '.link[%s].object' % index
+            connection = cls.OBJ_NAME_1+'.link[%s].object'%index
             return get_is_connected_(connection)
 
         #
         def get_is_obj_shadow_link_connected_at_(index):
-            connection = cls.OBJ_NAME_1 + '.shadowLink[%s].shadowObject' % index
+            connection = cls.OBJ_NAME_1+'.shadowLink[%s].shadowObject'%index
             return get_is_connected_(connection)
 
         #
         def get_is_light_link_connected_at_(index):
-            connection = cls.OBJ_NAME_1 + '.link[%s].light' % index
+            connection = cls.OBJ_NAME_1+'.link[%s].light'%index
             return get_is_connected_(connection)
 
         #
         def get_is_light_shadow_link_connected_at_(index):
-            connection = cls.OBJ_NAME_1 + '.shadowLink[%s].shadowLight' % index
+            connection = cls.OBJ_NAME_1+'.shadowLink[%s].shadowLight'%index
             return get_is_connected_(connection)
 
         #
@@ -2145,29 +2183,29 @@ class CmdObjOpt(object):
             index = get_connection_index_()
             if index:
                 # Debug ( Repeat )
-                if not cmds.connectionInfo(shadingEngine + '.partition', isSource=1):
-                    cmds.connectAttr(shadingEngine + '.partition', cls.OBJ_NAME_0 + '.sets[%s]' % index)
+                if not cmds.connectionInfo(shadingEngine+'.partition', isSource=1):
+                    cmds.connectAttr(shadingEngine+'.partition', cls.OBJ_NAME_0+'.sets[%s]'%index)
                     cmds.connectAttr(
-                        shadingEngine + '.message',
-                        cls.OBJ_NAME_1 + '.link[%s].object' % index
+                        shadingEngine+'.message',
+                        cls.OBJ_NAME_1+'.link[%s].object'%index
                     )
                     cmds.connectAttr(
-                        shadingEngine + '.message',
-                        cls.OBJ_NAME_1 + '.shadowLink[%s].shadowObject' % index
+                        shadingEngine+'.message',
+                        cls.OBJ_NAME_1+'.shadowLink[%s].shadowObject'%index
                     )
                     cmds.connectAttr(
-                        cls.OBJ_NAME_2 + '.message',
-                        cls.OBJ_NAME_1 + '.link[%s].light' % index
+                        cls.OBJ_NAME_2+'.message',
+                        cls.OBJ_NAME_1+'.link[%s].light'%index
                     )
                     cmds.connectAttr(
-                        cls.OBJ_NAME_2 + '.message',
-                        cls.OBJ_NAME_1 + '.shadowLink[%s].shadowLight' % index
+                        cls.OBJ_NAME_2+'.message',
+                        cls.OBJ_NAME_1+'.shadowLink[%s].shadowLight'%index
                     )
 
         #
         main_fnc_()
 
-    def set_array_ports_clear(self):
+    def clear_array_ports(self):
         ports = self.get_ports()
         for port in ports:
             if port.get_port_query().get_is_array(self.get_path()) is True:
@@ -2180,11 +2218,32 @@ class CmdObjOpt(object):
 
     def get_type_name(self):
         return self._obj_type
+
     type_name = property(get_type_name)
 
     def get_path(self):
         return self._obj_path
+
     path = property(get_path)
+
+    def update_path(self):
+        _ = cmds.ls(self._uuid, long=1)
+        if _:
+            self._obj_path = _[0]
+
+    def get_parent_path(self):
+        _ = cmds.listRelatives(self.get_path(), parent=1, fullPath=1)
+        if _:
+            return _[0]
+
+    def parent_to_path(self, path):
+        if path == self.PATHSEP:
+            if cmds.listRelatives(self.get_path(), parent=1):
+                cmds.parent(self.get_path(), world=1)
+        else:
+            if cmds.objExists(path) is True:
+                if self.get_parent_path() != path:
+                    cmds.parent(self.get_path(), path)
 
     def __get_port_paths_(self, port_paths):
         def rcs_fnc_(port_path_):
@@ -2214,6 +2273,7 @@ class CmdObjOpt(object):
                     rcs_fnc_(_i_port_path)
             elif _condition == (False, False):
                 pass
+
         #
         lis = []
         obj_path = self.get_path()
@@ -2258,7 +2318,7 @@ class CmdObjOpt(object):
             )
         ]
 
-    def set_customize_attributes_create(self, attributes):
+    def create_customize_attributes(self, attributes):
         # 'message',
         # 'bool',
         # 'byte',
@@ -2312,7 +2372,7 @@ class CmdObjOpt(object):
             if i_value is not None:
                 port.set(i_value)
 
-    def set_customize_attribute_create(self, port_path, value):
+    def create_customize_attribute(self, port_path, value):
         if value is not None:
             obj_path = self.get_path()
             if isinstance(value, six.string_types):
@@ -2341,7 +2401,7 @@ class CmdObjOpt(object):
     def get_port_opt(self, port_path):
         return CmdPortOpt(self._obj_path, port_path)
 
-    def set_file_new(self):
+    def new_file(self):
         for i_port in self.get_ports():
             i_port.set_disconnect()
         #
@@ -2351,15 +2411,16 @@ class CmdObjOpt(object):
                 i_port.set_default()
             except:
                 bsc_core.ExceptionMtd.set_print()
-                utl_core.Log.set_module_error_trace(
-                    'attribute-set',
-                    'obj="{}", port="{}"'.format(
-                        i_port.get_obj_path(), i_port.get_port_path()
-                    )
-                )
 
     def set(self, key, value):
         self.get_port(key).set(value)
+
+    def get(self, key):
+        if CmdPortOpt._get_is_exists_(self.get_path(), key) is True:
+            return self.get_port(key).get()
+
+    def delete(self):
+        cmds.delete(self.get_path())
 
     def __str__(self):
         return '{}(path="{}")'.format(
@@ -2368,6 +2429,101 @@ class CmdObjOpt(object):
 
     def __repr__(self):
         return self.__str__()
+
+
+class CmdCameraOpt(CmdObjOpt):
+    def __init__(self, obj_path):
+        super(CmdCameraOpt, self).__init__(obj_path)
+
+    @classmethod
+    def get_front_frame_args(cls, geometry_args, angle):
+        _, (c_x, c_y, c_z), (w, h, d) = geometry_args
+        z_1 = h/math.tan(math.radians(angle))
+        return (c_x, c_y, z_1-c_z), (0, 0, 0)
+
+
+class CmdShapeOpt(CmdObjOpt):
+    def __int__(self, path):
+        super(CmdShapeOpt, self).__init__(path)
+
+    def get_transform_name(self):
+        return bsc_core.DccPathDagMtd.get_dag_parent_name(
+            self.get_path(), self.PATHSEP
+        )
+
+    def get_transform_path(self):
+        return bsc_core.DccPathDagMtd.get_dag_parent_path(
+            self.get_path(), self.PATHSEP
+        )
+
+    def get_subsets_by_material_assign(self):
+        subset_dict = {}
+        transform_path = self.get_transform_path()
+        shape_path = self.get_path()
+        material_paths = cmds.listConnections(
+            shape_path, destination=1, source=0, type='shadingEngine'
+        ) or []
+        if len(material_paths) > 1:
+            for i_material_path in material_paths:
+                i_elements = cmds.sets(i_material_path, query=1)
+                if i_elements:
+                    i_element_paths = [i for i in cmds.ls(i_elements, leaf=1, noIntermediate=1, long=1)]
+                    for j_element_path in i_element_paths:
+                        if j_element_path.startswith(transform_path):
+                            j_comp = j_element_path.split('.f[')[-1][:-1]
+                            if ':' in j_comp:
+                                j_ = j_comp.split(':')
+                                j_indices = range(int(j_[0]), int(j_[1])+1)
+                            else:
+                                j_indices = [int(j_comp)]
+                            subset_dict.setdefault(i_material_path, []).extend(j_indices)
+        return subset_dict
+
+    def duplicate_by_material_subsets(self):
+        pass
+
+    def rename_transform(self, new_name):
+        cmds.rename(self.get_transform_path(), new_name)
+        self.update_path()
+
+    def parent_transform_to_path(self, path):
+        self.__class__(self.get_transform_path()).parent_to_path(path)
+        self.update_path()
+
+    def assign_material_to_path(self, path):
+        if cmds.objExists(path) is True:
+            _ = cmds.sets(path, query=1) or []
+            _ = [cmds.ls(i, long=1)[0] for i in _]
+            if self.get_path() not in _:
+                # noinspection PyBroadException
+                try:
+                    cmds.sets(self.get_path(), forceElement=path)
+                except:
+                    bsc_core.ExceptionMtd.set_print()
+
+    def get_render_properties(self, renderer='arnold'):
+        properties = {}
+        if renderer == 'arnold':
+            from lxarnold import and_configure
+
+            for i_key in and_configure.GeometryProperties.AllKeys:
+                if i_key in and_configure.GeometryProperties.MayaMapper:
+                    i_port_path = and_configure.GeometryProperties.MayaMapper[i_key]
+                    value = self.get(i_port_path)
+                    properties[i_key] = value
+        return properties
+
+    def assign_render_properties(self, properties, renderer='arnold'):
+        if renderer == 'arnold':
+            from lxarnold import and_configure
+
+            for i_key, i_value in properties.items():
+                if i_key in and_configure.GeometryProperties.MayaMapper:
+                    i_port_path = and_configure.GeometryProperties.MayaMapper[i_key]
+                    self.set(i_port_path, i_value)
+
+    def delete_transform(self):
+        self.__class__(self.get_transform_path()).delete()
 
 
 class CmdMeshesOpt(object):
@@ -2394,6 +2550,7 @@ class CmdMeshesOpt(object):
         'center-y': 0.0,
         'center-z': 0.0,
     }
+
     def __init__(self, root):
         self._root = root
         self._mesh_paths = cmds.ls(
@@ -2486,6 +2643,7 @@ class CmdMeshesOpt(object):
     def set_reduce_by(self, percent):
         for i_mesh_path in self._mesh_paths:
             self._set_mesh_reduce_(i_mesh_path, percent)
+
     @classmethod
     def _set_mesh_reduce_(cls, mesh_path, percent):
         cmds.polyReduce(
@@ -2533,20 +2691,10 @@ class CmdMeshesOpt(object):
         return (x_0, y_0, z_0), (c_x, c_y, c_z), (w, h, d)
 
 
-class CmdCameraOpt(CmdObjOpt):
-    def __init__(self, obj_path):
-        super(CmdCameraOpt, self).__init__(obj_path)
-    @classmethod
-    def get_front_frame_args(cls, geometry_args, angle):
-        _, (c_x, c_y, c_z), (w, h, d) = geometry_args
-        z_1 = h / math.tan(math.radians(angle))
-        return (c_x, c_y, z_1 - c_z), (0, 0, 0)
-
-
 class CmdUndoStack(object):
     def __init__(self, key=None):
         if key is None:
-            key = bsc_core.UuidMtd.get_new()
+            key = bsc_core.UuidMtd.generate_new()
         #
         self._key = key
 
@@ -2609,13 +2757,17 @@ class QtControlOpt(object):
                 initialWidth=width, initialHeight=height,
                 widthProperty='free', heightProperty='free'
             )
+
     @classmethod
     def _to_qt_instance_(cls, ptr, base):
+        # noinspection PyUnresolvedReferences
         from shiboken2 import wrapInstance
+
         return wrapInstance(long(ptr), base)
 
     def to_qt_widget(self):
         from PySide2 import QtWidgets
+
         ptr = OpenMayaUI.MQtUtil.findControl(self._name)
         if ptr is not None:
             return self._to_qt_instance_(

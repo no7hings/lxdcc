@@ -72,7 +72,7 @@ def set_camera_export_by_any_scene_file(option):
         if branch == 'asset':
             scene_src_file = utl_dcc_objects.OsFile(any_scene_file_path)
             if scene_src_file.get_is_exists() is True:
-                mya_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                mya_dcc_objects.Scene.open_file(any_scene_file_path)
                 #
                 with_camera_main_abc = option_opt.get('with_camera_main_abc') or False
                 if with_camera_main_abc is True:

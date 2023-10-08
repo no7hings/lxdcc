@@ -23,6 +23,7 @@ class PackageContextNew(object):
         windows=['{root}/{package_name}/{version}/paper_configure_bundle.py'],
         linux=['{root}/{package_name}/{version}/paper_configure_bundle.py']
     )
+
     @classmethod
     def get_bin_source(cls):
         return bsc_core.StgPathMapMtd.map_to_current(cls.BIN_SOURCE)
@@ -103,6 +104,7 @@ class PackageContextNew(object):
 
     def _get_package_file_patterns(self):
         return self.FILE_PATTERNS.get(self._platform) or []
+
     @classmethod
     def _get_virtual_version(cls, version):
         """
@@ -125,7 +127,6 @@ class PackageContextNew(object):
         if use_beta is True:
             package_roots += pre_release_package_roots
         package_file_patterns = self._get_package_file_patterns()
-        #
         for i_index, i_package_root in enumerate(package_roots):
             if bsc_core.StorageMtd.get_is_exists(i_package_root):
                 i_variants = dict(
@@ -237,6 +238,7 @@ class PackageContextNew(object):
 
     def get_args(self, packages_extend=None, use_beta=False):
         return self._get_packages(packages_extend, use_beta)
+
     @classmethod
     def convert_args_execute(cls, args_execute=None):
         if isinstance(args_execute, (set, tuple, list)):
@@ -261,12 +263,13 @@ class PackageContextNew(object):
         if args:
             if isinstance(args_execute, (set, tuple, list)):
                 args.extend(args_execute)
-            return ' '.join([self._bin_source] + list(args))
+            return ' '.join([self._bin_source]+list(args))
 
 
 if __name__ == '__main__':
+    # print PackageContextNew(
+    #     None
+    # ).get_command(args_execute=['-- lxdcc'], packages_extend=['lxdcc'])
     print PackageContextNew(
-        None
-    ).get_command(args_execute=['-- lxdcc'], packages_extend=['lxdcc'])
-
-
+        'studio katana usd lxdcc katana@4.5v4 ktoa@4.1.5.0'
+    ).get_args()

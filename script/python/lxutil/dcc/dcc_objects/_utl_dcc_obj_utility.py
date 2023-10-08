@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxutil import utl_abstract
 
-from lxutil_gui import utl_gui_core
+from lxutil_gui import gui_core
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -20,9 +20,9 @@ class Obj(
             self._name = self.path
 
         if 'icon_name' in kwargs:
-            self._icon_file_path = utl_gui_core.RscIconFile.get(kwargs.get('icon_name'))
+            self._icon_file_path = gui_core.RscIconFile.get(kwargs.get('icon_name'))
         else:
-            self._icon_file_path = utl_gui_core.RscIconFile.get('obj/object')
+            self._icon_file_path = gui_core.RscIconFile.get('obj/object')
 
         if 'type_name' in kwargs:
             self._type_name = kwargs.get('type_name')
@@ -42,7 +42,7 @@ class Obj(
 
     def create_dag_fnc(self, path):
         _ = self.__class__(path)
-        _._icon_file_path = utl_gui_core.RscIconFile.get('obj/group')
+        _._icon_file_path = gui_core.RscIconFile.get('obj/group')
         return _
 
     def _get_child_paths_(self, path):
@@ -75,7 +75,7 @@ class Component(utl_abstract.AbsObjGuiDef):
         return self._path
     @property
     def icon(self):
-        return utl_gui_core.RscIconFile.get('obj/{}'.format(self.type))
+        return gui_core.RscIconFile.get('obj/{}'.format(self.type))
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(

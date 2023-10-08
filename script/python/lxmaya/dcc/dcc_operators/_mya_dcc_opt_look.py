@@ -12,6 +12,8 @@ from lxarnold import and_configure
 
 from lxmaya import ma_configure, ma_core
 
+from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj
+
 from lxmaya.dcc.dcc_operators import _mya_dcc_opt_geometry
 
 import lxmaya.modifiers as mya_modifiers
@@ -34,7 +36,7 @@ class AbsLookOpt(object):
         ) or []
 
     def get_materials(self):
-        return [self._obj.__class__(i) for i in self.get_material_paths()]
+        return [_mya_dcc_obj_obj.Node(i) for i in self.get_material_paths()]
 
     def set_default_material_assign(self):
         shape_path = self._obj.path
@@ -45,25 +47,25 @@ class AbsLookOpt(object):
             u'assign="{}" >> "{}"'.format(shape_path, value)
         )
 
-    def set_material_assigns(self, material_assigns, force=False):
+    def assign_materials(self, material_assigns, force=False):
         for key, value in material_assigns.items():
             if key == 'all':
-                self.set_material(value)
+                self.assign_material_to_path(value)
             else:
                 self.__set_comp_material_(
                     key, value
                 )
 
-    def set_material(self, material_path):
+    def assign_material_to_path(self, material_path):
         shape_path = self._obj.path
-        self._set_material_(shape_path, material_path)
+        self._assign_material_to_path_(shape_path, material_path)
 
     def __set_comp_material_(self, comp_name, material_path):
         shape_path = self._obj.path
         comp_path = '.'.join([shape_path, comp_name])
-        self._set_material_(comp_path, material_path)
+        self._assign_material_to_path_(comp_path, material_path)
     @classmethod
-    def _set_material_(cls, geometry_path, material_path):
+    def _assign_material_to_path_(cls, geometry_path, material_path):
         if cmds.objExists(material_path) is True:
             _ = cmds.sets(material_path, query=1) or []
             _ = [cmds.ls(i, long=1)[0] for i in _]
@@ -91,7 +93,7 @@ class AbsLookOpt(object):
         for key, value in properties.items():
             self._obj.get_port(key).set(value)
 
-    def set_visibilities(self, visibilities, renderer='arnold'):
+    def assign_render_visibilities(self, visibilities, renderer='arnold'):
         for key, value in visibilities.items():
             self._obj.get_port(key).set(value)
     @mya_modifiers.set_undo_mark_mdf
@@ -148,15 +150,15 @@ class MeshLookOpt(AbsLookOpt):
                 if elements:
                     element_paths = [i for i in cmds.ls(elements, leaf=1, noIntermediate=1, long=1)]
                     for element_path in element_paths:
-                        shot_type = cmds.ls(element_path, showType=1)[1]
+                        show_type = cmds.ls(element_path, showType=1)[1]
                         value = material_path
-                        value = ma_core._ma_obj_path__get_with_namespace_clear_(value)
+                        value = ma_core.Utils.get_path_with_namespace_clear(value)
                         #
                         key = None
-                        if shot_type in [ma_configure.Util.MESH_TYPE]:
+                        if show_type in [ma_configure.Util.MESH_TYPE]:
                             if element_path == shape_path:
                                 key = 'all'
-                        elif shot_type == 'float3':
+                        elif show_type == 'float3':
                             if element_path.startswith(transform_path):
                                 comp_name = element_path.split('.')[-1]
                                 mesh_obj_opt = _mya_dcc_opt_geometry.MeshOpt(self._obj)
@@ -178,12 +180,12 @@ class MeshLookOpt(AbsLookOpt):
                     lis.append(k)
         return lis
 
-    def get_properties(self, renderer='arnold'):
+    def get_render_properties(self, renderer='arnold'):
         properties = collections.OrderedDict()
         if renderer == 'arnold':
-            for key in and_configure.GeometryProperties.ALL:
-                if key in and_configure.GeometryProperties.MAYA_DICT:
-                    dcc_port_path = and_configure.GeometryProperties.MAYA_DICT[key]
+            for key in and_configure.GeometryProperties.AllKeys:
+                if key in and_configure.GeometryProperties.MayaMapper:
+                    dcc_port_path = and_configure.GeometryProperties.MayaMapper[key]
                     port = self._obj.get_port(dcc_port_path)
                     if port.get_is_exists() is True:
                         value = port.get()
@@ -194,14 +196,14 @@ class MeshLookOpt(AbsLookOpt):
                         )
         return properties
 
-    def set_properties(self, properties, renderer='arnold'):
+    def assign_render_properties(self, properties, renderer='arnold'):
         if renderer == 'arnold':
             for key, value in properties.items():
-                if key in and_configure.GeometryProperties.MAYA_DICT:
-                    dcc_port_path = and_configure.GeometryProperties.MAYA_DICT[key]
+                if key in and_configure.GeometryProperties.MayaMapper:
+                    dcc_port_path = and_configure.GeometryProperties.MayaMapper[key]
                     self._obj.get_port(dcc_port_path).set(value)
 
-    def get_visibilities(self, renderer='arnold'):
+    def get_render_visibilities(self, renderer='arnold'):
         visibilities = collections.OrderedDict()
         if renderer == 'arnold':
             kwargs = {key: self._obj.get_port(v).get() for key, v in and_configure.Visibility.MAYA_VISIBILITY_DICT.items()}
@@ -212,7 +214,7 @@ class MeshLookOpt(AbsLookOpt):
             visibilities[and_configure.Visibility.AUTOBUMP_VISIBILITY] = value
         return visibilities
 
-    def set_visibilities(self, visibilities, renderer='arnold'):
+    def assign_render_visibilities(self, visibilities, renderer='arnold'):
         if renderer == 'arnold':
             kwargs = and_configure.Visibility.get_visibility_as_dict(visibilities[and_configure.Visibility.VISIBILITY])
             for key, value in kwargs.items():
@@ -223,6 +225,46 @@ class MeshLookOpt(AbsLookOpt):
             port = self._obj.get_port(and_configure.Visibility.MAYA_AUTOBUMP_VISIBILITY)
             if port.get_is_exists() is True:
                 port.set(visibilities[and_configure.Visibility.AUTOBUMP_VISIBILITY])
+
+    def get_subsets_by_material_assign(self):
+        """
+import lxmaya
+
+lxmaya.set_reload()
+
+import lxmaya.dcc.dcc_objects as mya_dcc_objects
+
+import lxmaya.dcc.dcc_operators as mya_dcc_operators
+
+m = mya_dcc_objects.Mesh('mesh_001')
+
+m_o = mya_dcc_operators.MeshLookOpt(m)
+
+print m_o.get_subsets_by_material_assign()
+        :return:
+        """
+        subset_dict = {}
+        transform_path = self._obj.get_transform().get_name()
+        shape_path = self._obj.path
+        shading_engines = cmds.listConnections(
+            shape_path, destination=1, source=0, type='shadingEngine'
+        ) or []
+        if len(shading_engines) > 1:
+            for i_shading_engine in shading_engines:
+                i_elements = cmds.sets(i_shading_engine, query=1)
+                if i_elements:
+                    i_element_paths = [i for i in cmds.ls(i_elements, leaf=1, noIntermediate=1, long=1)]
+                    for j_element_path in i_element_paths:
+                        if j_element_path.startswith(transform_path):
+                            j_comp = j_element_path.split('.f[')[-1][:-1]
+                            if ':' in j_comp:
+                                j_ = j_comp.split(':')
+                                j_indices = range(int(j_[0]), int(j_[1]))
+                            else:
+                                j_indices = [int(j_comp)]
+
+                            subset_dict.setdefault(i_shading_engine, []).extend(j_indices)
+        return subset_dict
 
 
 class XgenDescriptionLookOpt(AbsLookOpt):
@@ -241,12 +283,12 @@ class XgenDescriptionLookOpt(AbsLookOpt):
                     for element_path in element_paths:
                         if element_path == shape_path:
                             value = material_path
-                            value = ma_core._ma_obj_path__get_with_namespace_clear_(value)
+                            value = ma_core.Utils.get_path_with_namespace_clear(value)
                             key = 'all'
                             material_assigns[key] = value
         return material_assigns
 
-    def get_properties(self, renderer='arnold'):
+    def get_render_properties(self, renderer='arnold'):
         properties = collections.OrderedDict()
         if renderer == 'arnold':
             for key in and_configure.HairProperty.ALL:
@@ -271,7 +313,7 @@ class XgenDescriptionLookOpt(AbsLookOpt):
                     if port.get_is_exists() is True:
                         port.set(value)
 
-    def get_visibilities(self, renderer='arnold'):
+    def get_render_visibilities(self, renderer='arnold'):
         visibilities = collections.OrderedDict()
         if renderer == 'arnold':
             kwargs = {k: self._obj.get_port(v).get() for k, v in and_configure.Visibility.MAYA_VISIBILITY_DICT.items()}
@@ -279,7 +321,7 @@ class XgenDescriptionLookOpt(AbsLookOpt):
             visibilities[and_configure.Visibility.VISIBILITY] = value
         return visibilities
 
-    def set_visibilities(self, visibilities, renderer='arnold'):
+    def assign_render_visibilities(self, visibilities, renderer='arnold'):
         if renderer == 'arnold':
             kwargs = and_configure.Visibility.get_visibility_as_dict(visibilities[and_configure.Visibility.VISIBILITY])
             for key, value in kwargs.items():

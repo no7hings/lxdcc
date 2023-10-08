@@ -36,7 +36,7 @@ def set_geometry_export_by_any_scene_file(option):
         if branch == 'asset':
             scene_src_file_obj = utl_dcc_objects.OsFile(any_scene_file_path)
             if scene_src_file_obj.get_is_exists() is True:
-                ktn_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                ktn_dcc_objects.Scene.open_file(any_scene_file_path)
                 # geometry
                 with_geometry_usd = option_opt.get('with_geometry_usd') or False
                 if with_geometry_usd is True:

@@ -5,7 +5,7 @@ from lxbasic import bsc_core
 
 import lxbasic.extra.methods as bsc_etr_methods
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 import lxresolver.commands as rsv_commands
 
@@ -15,11 +15,13 @@ class AbsHookExecutor(object):
     DEADLINE_PATTERN = '-- lxhook-engine -o "{option}&start_index=<STARTFRAME>&end_index=<ENDFRAME>"'
     #
     SUBMITTER_CLS = None
+
     def __init__(self, session):
         self._session = session
 
     def get_session(self):
         return self._session
+
     session = property(get_session)
 
     def execute_with_deadline(self):
@@ -282,7 +284,7 @@ class AbsRsvProjectMethodHookExecutor(AbsHookExecutor):
             )
             if deadline_configure_file_path:
                 if bsc_core.StgPathMtd.get_is_exists(deadline_configure_file_path):
-                    deadline_configure = bsc_objects.Configure(value=deadline_configure_file_path)
+                    deadline_configure = ctt_objects.Configure(value=deadline_configure_file_path)
             job_name = session.get_ddl_job_name()
             return self._submit_deadline_job_(
                 session, job_name, rsv_properties.value, deadline_configure
@@ -316,7 +318,7 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
             )
             if deadline_configure_file_path:
                 if bsc_core.StgPathMtd.get_is_exists(deadline_configure_file_path):
-                    deadline_configure = bsc_objects.Configure(value=deadline_configure_file_path)
+                    deadline_configure = ctt_objects.Configure(value=deadline_configure_file_path)
             #
             job_name = session._get_rsv_task_version_(rsv_scene_properties)
             return self._submit_deadline_job_(

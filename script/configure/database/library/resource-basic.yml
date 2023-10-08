@@ -199,6 +199,9 @@ patterns:
     texture-acescg-tx-file: '<.texture-acescg-tx-dir>/{resource}.{texture_type_tag}.tx'
     #
     texture-source-dir: '<.texture-dir>/source'
+    #
+    texture-json-dir: '<.texture-dir>/json'
+    texture-json-search-file: '<.texture-json-dir>/{resource}.search.json'
     # geometry
     geometry-dir: '<.version-dir>/geometry'
     geometry-fbx-dir: '<.geometry-dir>/fbx'
@@ -209,7 +212,9 @@ patterns:
     geometry-fbx-var-lod-file: '<.geometry-fbx-dir>/{resource}.var_{var_index.zfill(2)}.lod_{lod_level.zfill(2)}.fbx'
     #
     geometry-abc-dir: '<.geometry-dir>/abc'
+    geometry-abc-file: '<.geometry-abc-dir>/{resource}.abc'
     geometry-usd-dir: '<.geometry-dir>/usd'
+    geometry-usd-file: '<.geometry-usd-dir>/{resource}.usd'
     # scene
     scene-dir: '<.version-dir>/scene'
     scene-maya-dir: '<.scene-dir>/maya'
@@ -219,6 +224,11 @@ patterns:
     # proxy
     proxy-dir: '<.version-dir>/proxy'
     proxy-ass-dir: '<.proxy-dir>/ass'
+    proxy-ass-file: '<.proxy-ass-dir>/{resource}.ass'
+    # look
+    look-dir: '<.version-dir>/look'
+    look-preview-json-file: '<.look-dir>/json/{resource}.preview.json'
+    look-preview-usd-file: '<.look-dir>/usd/{resource}.preview.usda'
 #
 storages:
     # texture

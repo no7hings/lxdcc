@@ -7,8 +7,6 @@ from lxbasic import bsc_core
 
 from lxutil import utl_core
 
-import lxbasic.objects as bsc_objects
-
 import lxdatabase.objects as dtb_objects
 
 
@@ -32,12 +30,12 @@ class ScpResourcesAddForSurface(object):
         )
         #
         dtb_opt.get_type_force(type_dtb_path)
-        include_exts = ['.png', '.jpg', '.tga', '.exr']
+        ext_includes = ['.png', '.jpg', '.tga', '.exr']
         file_name_pattern = '{name} seamless 0{number}-png'
         resource_name_pattern = '{name}_vol3_{number.zfill(3)}'
 
         all_file_path = bsc_core.StgDirectoryOpt(directory_path_src).get_all_file_paths(
-            include_exts=include_exts
+            ext_includes=ext_includes
         )
         with utl_core.LogProgressRunner.create_as_bar(maximum=len(all_file_path), label='add resource') as l_p:
             for i_file_path in all_file_path:

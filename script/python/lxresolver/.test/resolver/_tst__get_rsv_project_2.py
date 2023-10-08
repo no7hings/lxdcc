@@ -1,8 +1,6 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
-
 import lxresolver.commands as rsv_commands
 
 r = rsv_commands.get_resolver()

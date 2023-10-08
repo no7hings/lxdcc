@@ -16,7 +16,7 @@ import platform
 
 from lxbasic import bsc_configure, bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
@@ -26,7 +26,7 @@ from lxuniverse import unr_configure
 
 from lxarnold import and_configure
 
-ACES_COLOR_CONFIGURE = bsc_objects.Properties(
+ACES_COLOR_CONFIGURE = ctt_objects.Properties(
     None, bsc_core.CfgFileMtd.get_yaml('colorspace/aces-color')
 )
 

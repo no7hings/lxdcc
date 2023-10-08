@@ -4,16 +4,17 @@ import hou
 
 import collections
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class LookContent(object):
     GEOMETRY_PATH_NAME = 'path'
     MATERIAL_PATH_NAME = 'shop_materialpath'
     PROPERTY_LABEL = 'ar_'
+
     def __init__(self, root, look='default'):
         self._hou_root = hou.node(root)
-        self._raw_content = bsc_objects.Properties(None, collections.OrderedDict())
+        self._raw_content = ctt_objects.Properties(None, collections.OrderedDict())
         self._look = look
         self._set_run_()
 

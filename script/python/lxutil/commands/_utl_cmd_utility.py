@@ -92,7 +92,7 @@ def get_reference_raws_from_maya_ascii(file_path):
     return lis
 
 
-def get_multiply_file_paths(file_path, include_exts=None):
+def get_multiply_file_paths(file_path, ext_includes=None):
     def get_ext_replace_fnc_(file_path_, ext_):
         return os.path.splitext(file_path_)[0] + ext_
     #
@@ -136,8 +136,8 @@ def get_multiply_file_paths(file_path, include_exts=None):
         list_.sort()
     #
     add_list_ = []
-    if isinstance(include_exts, (tuple, list)):
-        for ext in include_exts:
+    if isinstance(ext_includes, (tuple, list)):
+        for ext in ext_includes:
             for i in list_:
                 add_ = get_ext_replace_fnc_(i, ext)
                 if os.path.isfile(add_) is True:

@@ -7,19 +7,17 @@ from lxbasic import bsc_core
 
 from lxutil import utl_core
 
-import lxbasic.objects as bsc_objects
-
 import lxdatabase.objects as dtb_objects
 
 
 class ScpResourcesAddFor3dPlant(object):
     NAME_REPLACE = [
+        ('YeCao', 'wild_grass'),
+        ('YeHua', 'wild_flower'),
         ('Cao', 'grass'),
         ('GuanMu', 'shrub'),
         ('JueLei', 'fern'),
         ('Shu', 'tree'),
-        ('YeCao', 'wild_grass'),
-        ('YeGya', 'wild_flower')
     ]
     TYPE_DICT = {}
     def __init__(self):

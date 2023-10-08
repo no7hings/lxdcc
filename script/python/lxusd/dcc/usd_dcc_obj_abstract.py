@@ -111,9 +111,9 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         _obj = obj_type.create_obj(obj_path)
         _obj._usd_obj = usd_prim
         if utl_core.get_is_ui_mode() is True:
-            from lxutil_gui.qt import utl_gui_qt_core
+            from lxutil_gui.qt import gui_qt_core
             if obj_type_name == usd_configure.ObjType.Xform:
-                _obj.set_gui_attribute('icon', utl_gui_qt_core.QtUtilMtd.get_qt_icon('obj/group'))
+                _obj.set_gui_attribute('icon', gui_qt_core.QtUtilMtd.get_qt_icon('obj/group'))
             elif obj_type_name == usd_configure.ObjType.Mesh:
-                _obj.set_gui_attribute('icon', utl_gui_qt_core.QtUtilMtd.get_qt_icon('obj/mesh'))
+                _obj.set_gui_attribute('icon', gui_qt_core.QtUtilMtd.get_qt_icon('obj/mesh'))
         return _obj

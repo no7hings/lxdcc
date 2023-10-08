@@ -12,7 +12,7 @@ class ScpTextureResourceData(object):
     def get_data(self):
         dict_ = {}
         directory_opt = bsc_core.StgDirectoryOpt(self._directory_path)
-        texture_paths = directory_opt.get_all_file_paths(include_exts=['.tx'])
+        texture_paths = directory_opt.get_all_file_paths(ext_includes=['.tx'])
 
         name_p_opt = bsc_core.PtnParseOpt(
             '{name}.{key}'

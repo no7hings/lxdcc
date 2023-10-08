@@ -212,7 +212,7 @@ class ScpRenderBuild(object):
     def pre_process(self):
         render_file_path = self._hook_option_opt.get('render_file')
 
-        ktn_dcc_objects.Scene.set_file_open(render_file_path)
+        ktn_dcc_objects.Scene.open_file(render_file_path)
 
         default_render_version = self._hook_option_opt.get('default_render_version')
 
@@ -220,11 +220,11 @@ class ScpRenderBuild(object):
             default_render_version=default_render_version
         )
 
-        ktn_dcc_objects.Scene.set_file_save()
+        ktn_dcc_objects.Scene.save_file()
 
     def build_render_job(self):
         render_file_path = self._hook_option_opt.get('render_file')
-        ktn_dcc_objects.Scene.set_file_open(render_file_path)
+        ktn_dcc_objects.Scene.open_file(render_file_path)
         self._build_render_job_(
             hook_option_opt=self._hook_option_opt
         )
@@ -268,7 +268,7 @@ class ScpRenderBuild(object):
                     else:
                         i_render_frames_string = default_render_frames
                     #
-                    i_render_output_image_file_path = ktn_core.SGStageOpt(
+                    i_render_output_image_file_path = ktn_core.KtnStageOpt(
                         i_render_node_opt._ktn_obj
                     ).get(
                         '/root.renderSettings.outputs.primary.locationSettings.renderLocation'

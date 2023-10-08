@@ -13,7 +13,7 @@ from lxusd import usd_configure, usd_core
 
 from lxutil import utl_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -31,6 +31,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         path_lstrip=None,
     )
+
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
         self._root = root
@@ -47,17 +48,19 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         self._file_path_0 = self.get('file_0')
         if self._file_path_0 is not None:
-            self._geometry_stage_opt_0.set_sublayer_append(self._file_path_0)
+            self._geometry_stage_opt_0.append_sublayer(self._file_path_0)
             self._geometry_stage_0.Flatten()
         #
         self._file_path_1 = self.get('file_1')
         if self._file_path_1 is not None:
-            self._geometry_stage_opt_1.set_sublayer_append(self._file_path_1)
+            self._geometry_stage_opt_1.append_sublayer(self._file_path_1)
             self._geometry_stage_1.Flatten()
 
     def set_uv_map_export(self):
         display_color = self.get('display_color')
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export') as l_p:
+        with utl_core.LogProgressRunner.create_as_bar(
+                maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export'
+                ) as l_p:
             for i_usd_prim in self._geometry_stage_0.TraverseAll():
                 l_p.set_update()
                 i_obj_type_name = i_usd_prim.GetTypeName()
@@ -84,9 +87,9 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     if uv_map_names:
                         for uv_map_name in uv_map_names:
                             uv_map = input_usd_mesh_opt.get_uv_map(uv_map_name)
-                            i_output_usd_mesh_opt.set_uv_map_create(uv_map_name, uv_map)
+                            i_output_usd_mesh_opt.create_uv_map(uv_map_name, uv_map)
                     #
-                    input_usd_mesh_opt.set_display_color_fill(
+                    input_usd_mesh_opt.fill_display_color(
                         display_color
                     )
                     i_output_usd_mesh_opt.set_display_colors(
@@ -97,7 +100,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         # create directory
         # bsc_core.StgFileOpt(self._file_path).create_directory()
         #
-        self._output_stage_opt.set_export_to(self._file_path)
+        self._output_stage_opt.export_to(self._file_path)
         #
         utl_core.Log.set_module_result_trace(
             'fnc-geometry-usd-uv-map-export',
@@ -130,6 +133,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         with_display_color=False,
         display_color=(0.25, 0.75, 0.5)
     )
+
     def __init__(self, *args, **kwargs):
         super(GeometryLookPropertyExporter, self).__init__(*args, **kwargs)
         #
@@ -177,17 +181,17 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     #
                     if self.get('with_object_color') is True:
                         i_object_color = i_obj_path_opt.get_color_from_name(maximum=1.0, seed=self._color_seed)
-                        i_usd_geometry_opt_tgt.set_customize_port_create_(
+                        i_usd_geometry_opt_tgt.create_customize_port_(
                             'object_color', 'color/color3', i_object_color
                         )
                     if self.get('with_group_color') is True:
                         i_group_path_opt = i_obj_path_opt.get_parent().get_parent()
                         i_group_color = i_group_path_opt.get_color_from_name(maximum=1.0, seed=self._color_seed)
-                        i_usd_geometry_opt_tgt.set_customize_port_create_(
+                        i_usd_geometry_opt_tgt.create_customize_port_(
                             'group_color', 'color/color3', i_group_color
                         )
                     if self.get('with_asset_color') is True:
-                        i_usd_geometry_opt_tgt.set_customize_port_create_(
+                        i_usd_geometry_opt_tgt.create_customize_port_(
                             'asset_color', 'color/color3', asset_color
                         )
                     #
@@ -202,19 +206,19 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             if i_uv_map_names:
                                 for j_uv_map_name in i_uv_map_names:
                                     uv_map = i_usd_mesh_opt_src.get_uv_map(j_uv_map_name)
-                                    i_usd_mesh_opt_tgt.set_uv_map_create(j_uv_map_name, uv_map)
+                                    i_usd_mesh_opt_tgt.create_uv_map(j_uv_map_name, uv_map)
                         #
                         if self.get('with_shell_color') is True:
                             i_offset = bsc_core.RawTextOpt(i_obj_path_opt.name).get_index()
-                            face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
+                            colors = i_usd_mesh_opt_src.get_colors_fom_shell(
                                 offset=i_offset, seed=self._color_seed
                             )
-                            i_usd_geometry_opt_tgt.set_customize_port_create_as_face_color(
-                                'shell_color', 'array/color3', face_colors
+                            i_usd_geometry_opt_tgt.create_customize_port_as_face_color(
+                                'shell_color', 'array/color3', colors
                             )
                         #
                         if self.get('with_display_color') is True:
-                            i_usd_mesh_opt_tgt.set_display_color_fill(display_color)
+                            i_usd_mesh_opt_tgt.fill_display_color(display_color)
         #
         component_paths = bsc_core.DccPathDagOpt(self._location_path).get_component_paths()
         if component_paths:
@@ -223,7 +227,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 component_paths[1]
             )
 
-        self._usd_stage_opt_tgt.set_export_to(self._file_path)
+        self._usd_stage_opt_tgt.export_to(self._file_path)
 
 
 class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
@@ -240,6 +244,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         # "object_color", "group_color", "asset_color", "uv_map_color", "shell_color", "enable_color"
         color_scheme='asset_color'
     )
+
     def __init__(self, *args, **kwargs):
         super(GeometryDisplayColorExporter, self).__init__(*args, **kwargs)
         #
@@ -270,8 +275,8 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         count = len([i for i in self._usd_stage_src.TraverseAll()])
         color_scheme = self.get('color_scheme')
         with utl_core.LogProgressRunner.create_as_bar(
-            maximum=count,
-            label='geometry display-color create'
+                maximum=count,
+                label='geometry display-color create'
         ) as l_p:
             asset_color = bsc_core.RawTextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
             for i_index, i_usd_prim_src in enumerate(self._usd_stage_src.TraverseAll()):
@@ -294,29 +299,25 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             i_object_color = i_obj_path_opt.get_color_from_name(
                                 maximum=1.0, seed=self._color_seed
                             )
-                            i_usd_mesh_opt_tgt.set_display_color_fill(i_object_color)
+                            i_usd_mesh_opt_tgt.fill_display_color(i_object_color)
                         elif color_scheme == 'group_color':
                             i_group_path_opt = i_obj_path_opt.get_parent().get_parent()
                             i_group_color = i_group_path_opt.get_color_from_name(
                                 maximum=1.0, seed=self._color_seed
                             )
-                            i_usd_mesh_opt_tgt.set_display_color_fill(i_group_color)
+                            i_usd_mesh_opt_tgt.fill_display_color(i_group_color)
                         elif color_scheme == 'asset_color':
-                            i_usd_mesh_opt_tgt.set_display_color_fill(asset_color)
+                            i_usd_mesh_opt_tgt.fill_display_color(asset_color)
                         # for mesh
                         if i_obj_type_name == usd_configure.ObjType.Mesh:
                             if color_scheme == 'uv_map_color':
-                                i_display_color_map = i_usd_mesh_opt_src.get_display_color_map_from_uv_map('st')
-                                i_usd_mesh_opt_tgt.set_display_color_as_face_vertices(
-                                    i_display_color_map
-                                )
+                                i_color_map = i_usd_mesh_opt_src.compute_vertex_color_map_from_uv_coord('st')
+                                i_usd_mesh_opt_tgt.set_display_colors_as_vertex(i_color_map)
                             elif color_scheme == 'shell_color':
-                                i_face_colors = i_usd_mesh_opt_src.get_face_color_fom_shell(
+                                i_colors = i_usd_mesh_opt_src.get_colors_fom_shell(
                                     offset=i_index, seed=self._color_seed
                                 )
-                                i_usd_mesh_opt_tgt.set_display_color_as_face_color(
-                                    i_face_colors
-                                )
+                                i_usd_mesh_opt_tgt.set_display_colors_as_uniform(i_colors)
                     elif isinstance(color_scheme, dict):
                         pass
                 #
@@ -329,7 +330,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 component_paths[1]
             )
 
-        self._usd_stage_opt_tgt.set_export_to(self._file_path)
+        self._usd_stage_opt_tgt.export_to(self._file_path)
 
 
 class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
@@ -338,6 +339,7 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
         output_file='',
         location=''
     )
+
     def __init__(self, option):
         super(GeometryDebugger, self).__init__(option)
 
@@ -350,8 +352,8 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
         self._output_stage_opt = usd_core.UsdStageOpt()
 
         with utl_core.LogProgressRunner.create_as_bar(
-            maximum=self._input_stage_opt.get_count(),
-            label='face vertex indices reverse create'
+                maximum=self._input_stage_opt.get_count(),
+                label='face vertex indices reverse create'
         ) as l_p:
             for i_input_prim in self._input_stage_opt.usd_instance.TraverseAll():
                 l_p.set_update()
@@ -370,6 +372,7 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
         path_lstrip=None,
         geometry_file=None,
     )
+
     def __init__(self, file_path, root=None, option=None):
         super(GeometryInfoXmlExporter, self).__init__(file_path, root, option)
         #
@@ -378,19 +381,20 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
         #
         geometry_file_path = self._option.get('geometry_file')
         if geometry_file_path is not None:
-            self._usd_stage_opt.set_sublayer_append(geometry_file_path)
+            self._usd_stage_opt.append_sublayer(geometry_file_path)
         #
         self._usd_stage.Flatten()
+
     @classmethod
     def _get_info_raw(cls, stage, root=None, lstrip=None):
-        info_configure = bsc_objects.Content(value=collections.OrderedDict())
+        info_configure = ctt_objects.Content(value=collections.OrderedDict())
         for prim in stage.TraverseAll():
             i_obj_type_name = prim.GetTypeName()
             obj_path = prim.GetPath().pathString
             #
             obj_path_ = bsc_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, lstrip)
             if obj_path_:
-                obj_properties = bsc_objects.Content(value=collections.OrderedDict())
+                obj_properties = ctt_objects.Content(value=collections.OrderedDict())
                 #
                 if i_obj_type_name == 'Mesh':
                     obj_type_name_ = 'mesh'
@@ -438,7 +442,7 @@ class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
         # self._usd_stage.Export(base + '.usda')
 
 
-class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+class FncGeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -448,8 +452,9 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         path_lstrip=None,
     )
+
     def __init__(self, *args, **kwargs):
-        super(GeometryExporter, self).__init__(*args, **kwargs)
+        super(FncGeometryExporter, self).__init__(*args, **kwargs)
         #
         self._file_path = self.get('file')
         self._location_path = self.get('location')
@@ -457,9 +462,10 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._output_stage = Usd.Stage.CreateInMemory()
         self._output_stage_opt = usd_core.UsdStageOpt(self._output_stage)
         #
-        self._set_location_create_(self._output_stage, self._location_path)
+        self._create_location_fnc_(self._output_stage, self._location_path)
+
     @classmethod
-    def _set_location_create_(cls, stage, location):
+    def _create_location_fnc_(cls, stage, location):
         dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(location, pathsep=usd_configure.Obj.PATHSEP)
         if dag_path_comps:
             dag_path_comps.reverse()
@@ -474,7 +480,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         default_prim_path = stage.GetPrimAtPath(dag_path_comps[1])
         stage.SetDefaultPrim(default_prim_path)
 
-    def _set_transform_opt_create_(self, obj_path, use_override=False):
+    def create_transform_opt(self, obj_path, use_override=False):
         if use_override is True:
             prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.Xform)
         else:
@@ -482,7 +488,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         obj_opt = usd_dcc_operators.TransformOpt(prim)
         return obj_opt
 
-    def _set_mesh_opt_create_(self, obj_path, use_override=False):
+    def create_mesh_opt(self, obj_path, use_override=False):
         if use_override is True:
             prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.Mesh)
         else:
@@ -491,7 +497,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         obj_opt = usd_dcc_operators.MeshOpt(prim)
         return obj_opt
 
-    def _set_nurbs_curves_create_(self, obj_path, use_override=False):
+    def create_nurbs_curve_opt(self, obj_path, use_override=False):
         if use_override is True:
             prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.NurbsCurves)
         else:
@@ -500,7 +506,7 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         obj_opt = usd_dcc_operators.NurbsCurveOpt(prim)
         return obj_opt
 
-    def _set_basis_curves_create_(self, obj_path, use_override=False):
+    def create_basis_curves_opt(self, obj_path, use_override=False):
         if use_override is True:
             prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.BasisCurves)
         else:
@@ -521,9 +527,9 @@ class GeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 default_prim_path
             )
         #
-        self._output_stage_opt.set_export_to(self._file_path)
+        self._output_stage_opt.export_to(self._file_path)
 
-    def set_run(self):
+    def execute(self):
         self._set_export_run_()
 
 
@@ -539,4 +545,3 @@ if __name__ == '__main__':
     )
 
     e.set_run()
-

@@ -1,6 +1,6 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom, Gf
+from pxr import Usd, Sdf, Vt, UsdGeom, UsdShade, Gf, Tf
 
 from lxbasic import bsc_core
 
@@ -8,55 +8,32 @@ from lxutil import utl_core
 
 from lxutil.dcc import utl_dcc_opt_abs
 
-from lxusd import usd_core
-
-
-class UsdOptCore(object):
-    @classmethod
-    def _get_int_array_(cls, usd_int_array):
-        return list(usd_int_array)
-    @classmethod
-    def _get_point_array_(cls, usd_point_array):
-        return [tuple(i) for i in usd_point_array]
-    @classmethod
-    def _get_coord_array_(cls, usd_coord_array):
-        return [tuple(i) for i in usd_coord_array]
-    @classmethod
-    def _get_matrix_(cls, usd_matrix):
-        lis = []
-        for row in usd_matrix:
-            for column in row:
-                lis.append(column)
-        return lis
-    @classmethod
-    def _get_usd_matrix_(cls, matrix):
-        lis = []
-        for i in range(4):
-            rows = []
-            for j in range(4):
-                rows.append(matrix[i * 4 + j])
-            lis.append(rows)
-        #
-        return Gf.Matrix4d(lis)
+from lxusd import usd_configure, usd_core
 
 
 class AbsUsdOptDef(object):
     def __init__(self, *args, **kwargs):
-        self._prim = args[0]
+        self._usd_prim = args[0]
+
     @property
     def prim(self):
-        return self._prim
-    @property
-    def stage(self):
+        return self._usd_prim
+
+    def get_stage(self):
         return self.prim.GetStage()
-    @property
-    def path(self):
-        return self._prim.GetPath().pathString
+
+    stage = property(get_stage)
+
+    def get_path(self):
+        return self._usd_prim.GetPath().pathString
+
+    path = property(get_path)
 
 
 class TransformOpt(AbsUsdOptDef):
     def __init__(self, *args, **kwargs):
         super(TransformOpt, self).__init__(*args, **kwargs)
+
     @property
     def xform(self):
         return UsdGeom.Xform(self.prim)
@@ -64,7 +41,7 @@ class TransformOpt(AbsUsdOptDef):
     def set_matrix(self, matrix):
         xform = self.xform
         op = xform.MakeMatrixXform()
-        op.Set(UsdOptCore._get_usd_matrix_(matrix))
+        op.Set(usd_core.UsdBase.to_usd_matrix(matrix))
 
     def get_matrix(self):
         xform = self.xform
@@ -72,7 +49,7 @@ class TransformOpt(AbsUsdOptDef):
         usd_matrix = op.Get()
         if usd_matrix is None:
             usd_matrix = Gf.Matrix4d()
-        return UsdOptCore._get_matrix_(usd_matrix)
+        return usd_core.UsdBase.to_matrix(usd_matrix)
 
     def set_visible(self, boolean):
         usd_core.UsdTransformOpt(
@@ -97,21 +74,26 @@ class MeshOpt(
 
     def get_usd_mesh(self):
         return UsdGeom.Mesh(self.prim)
+
     @property
     def usd_mesh(self):
         return self.get_usd_mesh()
+
     @property
     def mesh(self):
         return self.get_usd_mesh()
 
-    def set_create(self, face_vertices, points, uv_maps=None, normal_maps=None, color_maps=None):
+    def set_create(self, face_vertices, points, uv_maps=None, normal_maps=None, color_maps=None, geometry_subsets=None):
         # prim = self.prim
         # mesh = self.usd_mesh
         face_vertex_counts, face_vertex_indices = face_vertices
         self._set_face_vertex_counts_(face_vertex_counts)
         self._set_face_vertex_indices_(face_vertex_indices)
         self.set_points(points)
-        self.set_uv_maps(uv_maps)
+        if uv_maps:
+            self.assign_uv_maps(uv_maps)
+        if geometry_subsets is not None:
+            self.create_subsets(geometry_subsets)
 
     def _set_face_vertex_counts_(self, raw):
         if raw:
@@ -139,7 +121,7 @@ class MeshOpt(
         else:
             v = a.Get()
         if v:
-            return UsdOptCore._get_int_array_(v)
+            return usd_core.UsdBase.to_integer_array(v)
         return []
 
     def get_face_vertex_indices(self):
@@ -150,17 +132,18 @@ class MeshOpt(
         else:
             v = a.Get()
         if v:
-            return UsdOptCore._get_int_array_(v)
+            return usd_core.UsdBase.to_integer_array(v)
         return []
+
     @classmethod
     def _get_face_vertex_reverse_(cls, face_vertex_counts, face_vertex_indices):
         lis = []
-        index = 0
-        for seq, face_vertex_count in enumerate(face_vertex_counts):
-            indices = face_vertex_indices[index:index + face_vertex_count]
-            indices.reverse()
-            lis.extend(indices)
-            index += face_vertex_count
+        index_cur = 0
+        for i_count in face_vertex_counts:
+            i_indices = face_vertex_indices[index_cur:index_cur+i_count]
+            i_indices.reverse()
+            lis.extend(i_indices)
+            index_cur += i_count
         return lis
 
     def get_face_vertices(self):
@@ -174,7 +157,7 @@ class MeshOpt(
         else:
             v = p.Get()
         if v:
-            return UsdOptCore._get_point_array_(v)
+            return usd_core.UsdBase.to_point_array(v)
         return []
 
     def set_points(self, points):
@@ -200,10 +183,10 @@ class MeshOpt(
     def get_uv_map(self, uv_map_name):
         usd_mesh = self.usd_mesh
         a = usd_mesh.GetPrimvar(uv_map_name)
-        uv_map_face_vertex_counts = self.get_face_vertex_counts()
-        uv_map_face_vertex_indices = a.GetIndices()
+        uv_face_vertex_counts = self.get_face_vertex_counts()
+        uv_face_vertex_indices = a.GetIndices()
         uv_map_coords = a.Get()
-        return uv_map_face_vertex_counts, UsdOptCore._get_int_array_(uv_map_face_vertex_indices), uv_map_coords
+        return uv_face_vertex_counts, usd_core.UsdBase.to_integer_array(uv_face_vertex_indices), uv_map_coords
 
     def get_uv_maps(self, default_uv_map_name='st'):
         dic = {}
@@ -213,7 +196,7 @@ class MeshOpt(
             dic[i_uv_map_name] = uv_map
         return dic
 
-    def set_uv_maps(self, raw):
+    def assign_uv_maps(self, raw):
         if raw:
             usd_mesh = self.usd_mesh
             for i_uv_map_name, v in raw.items():
@@ -254,8 +237,8 @@ class MeshOpt(
         return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
 
     def get_uv_map_face_vertices_as_uuid(self, uv_map_name='st'):
-        uv_map_face_vertex_counts, uv_map_face_vertex_indices, uv_map_coords = self.get_uv_map(uv_map_name)
-        raw = (uv_map_face_vertex_counts, uv_map_face_vertex_indices)
+        uv_face_vertex_counts, uv_face_vertex_indices, uv_map_coords = self.get_uv_map(uv_map_name)
+        raw = (uv_face_vertex_counts, uv_face_vertex_indices)
         return bsc_core.HashMtd.get_hash_value(raw, as_unique_id=True)
 
     def get_points_as_uuid(self, ordered=False, round_count=4):
@@ -272,7 +255,7 @@ class MeshOpt(
 
     def get_vertex_count(self):
         _ = self.get_face_vertex_indices()
-        return max(_) + 1
+        return max(_)+1
 
     def get_face_count(self):
         usd_mesh = self.usd_mesh
@@ -285,10 +268,10 @@ class MeshOpt(
             boolean
         )
 
-    def set_display_color_fill(self, color):
+    def fill_display_color(self, color):
         usd_core.UsdGeometryMeshOpt(
             self.prim
-        ).set_display_color_fill(
+        ).fill_display_color(
             color
         )
 
@@ -296,6 +279,33 @@ class MeshOpt(
         usd_core.UsdPrimOpt._add_customize_attribute_(
             self.mesh, key, value
         )
+
+    def create_subsets(self, geometry_subsets):
+        state = self.get_stage()
+        for k, v in geometry_subsets.items():
+            i_path = '{}/{}'.format(self.get_path(), k)
+            i_prim = state.DefinePrim(i_path, usd_configure.ObjType.GeometrySubset)
+            i_fnc = UsdGeom.Subset(i_prim)
+            i_element_type_atr = i_fnc.CreateElementTypeAttr()
+            i_element_type_atr.Set(UsdGeom.Tokens.face)
+            i_indices_atr = i_fnc.CreateIndicesAttr()
+            i_indices_atr.Set(v)
+            i_family_name_atr = i_fnc.GetFamilyNameAttr()
+            i_family_name_atr.Set(UsdShade.Tokens.materialBind)
+
+    def assign_materials(self, material_assigns, location='/looks'):
+        for key, value in material_assigns.items():
+            if key == 'all':
+                self.assign_material_to_path(value, location)
+
+    def assign_material_to_path(self, path, location='/looks'):
+        r = self._usd_prim.CreateRelationship('material:binding')
+        if path.startswith('/'):
+            path_ = location+path
+        else:
+            path_ = '{}/{}'.format(location, path)
+        r.BlockTargets()
+        r.AddTarget(path_)
 
 
 class NurbsCurveOpt(
@@ -308,6 +318,7 @@ class NurbsCurveOpt(
 
     def get_usd_fnc(self):
         return UsdGeom.NurbsCurves(self.prim)
+
     @property
     def usd_fnc(self):
         return self.get_usd_fnc()
@@ -339,7 +350,7 @@ class NurbsCurveOpt(
         else:
             v = p.Get()
         if v:
-            return UsdOptCore._get_point_array_(v)
+            return usd_core.UsdBase.to_point_array(v)
         return []
 
     def get_point_count(self):
@@ -380,10 +391,10 @@ class NurbsCurveOpt(
             p = usd_fnc.CreateOrderAttr()
         p.Set(order)
 
-    def set_display_color_fill(self, color):
+    def fill_display_color(self, color):
         usd_core.UsdGeometryMeshOpt(
             self.prim
-        ).set_display_color_fill(
+        ).fill_display_color(
             color
         )
 
@@ -398,6 +409,7 @@ class BasisCurveOpt(
 
     def get_usd_fnc(self):
         return UsdGeom.BasisCurves(self.prim)
+
     @property
     def usd_fnc(self):
         return self.get_usd_fnc()
@@ -451,7 +463,7 @@ class BasisCurveOpt(
         else:
             v = p.Get()
         if v:
-            return UsdOptCore._get_point_array_(v)
+            return usd_core.UsdBase.to_point_array(v)
         return []
 
     def set_widths(self, values):
@@ -461,10 +473,10 @@ class BasisCurveOpt(
             p = usd_fnc.CreateWidthsAttr()
         p.Set(values)
 
-    def set_display_color_fill(self, color):
+    def fill_display_color(self, color):
         usd_fnc = self.get_usd_fnc()
-        usd_core.UsdGeometryOpt_(
+        usd_core.UsdGeometryOpt(
             usd_fnc
-        ).set_display_color_fill(
+        ).fill_display_color(
             color
         )

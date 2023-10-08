@@ -5,9 +5,9 @@ import collections
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
-from lxutil import utl_configure, utl_core
+from lxutil import utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -74,8 +74,10 @@ class RsvUsdAssetSetCreator(object):
         'effect_main': -1,
         'surface_main': -1,
     }
+
     def __init__(self, rsv_asset):
         self._rsv_asset = rsv_asset
+
     @classmethod
     def _get_shot_asset_cache_(cls, rsv_asset, rsv_shot):
         file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
@@ -84,14 +86,13 @@ class RsvUsdAssetSetCreator(object):
             file_opt = bsc_core.StgFileOpt(yml_file_path)
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
-            else:
-                if bsc_core.SystemMtd.get_is_linux():
-                    dict_ = cls._get_shot_asset_dict_(rsv_asset, rsv_shot)
-                    file_opt.set_write(dict_)
-                    return dict_
-                return {}
-        else:
-            return bsc_objects.Content(value={})
+            if bsc_core.SystemMtd.get_is_linux():
+                dict_ = cls._get_shot_asset_dict_(rsv_asset, rsv_shot)
+                file_opt.set_write(dict_)
+                return dict_
+            return {}
+        return ctt_objects.Content(value={})
+
     @classmethod
     def _get_shot_asset_dict_(cls, rsv_asset, rsv_shot):
         from lxusd import usd_core
@@ -104,7 +105,7 @@ class RsvUsdAssetSetCreator(object):
         try:
             paths = usd_core.UsdStageOpt(
                 shot_set_dress_usd_file_path
-            ).set_obj_paths_find(
+            ).find_obj_paths(
                 '/assets/*/{}*'.format(
                     rsv_asset.get('asset')
                 )
@@ -122,6 +123,7 @@ class RsvUsdAssetSetCreator(object):
             )
         finally:
             return dict_
+
     @classmethod
     def _get_shot_asset_override_dict_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         dict_ = collections.OrderedDict()
@@ -154,6 +156,7 @@ class RsvUsdAssetSetCreator(object):
             if register_usd_file_path is not None:
                 dict_[shot_asset] = register_usd_file_path
         return dict_
+
     @classmethod
     def _get_rsv_asset_shots_(cls, rsv_asset):
         lis = []
@@ -181,6 +184,7 @@ class RsvUsdAssetSetCreator(object):
                     if shot_assets_dict:
                         lis.append(i_rsv_shot)
         return lis
+
     @classmethod
     def _get_shot_frame_range_(cls, rsv_shot):
         from lxusd import usd_core
@@ -190,6 +194,7 @@ class RsvUsdAssetSetCreator(object):
             return usd_core.UsdStageOpt(
                 shot_set_dress_usd_file_path
             ).get_frame_range()
+
     @classmethod
     def _get_asset_set_dress_file_path_(cls, rsv_asset):
         rsv_asset_set_task = rsv_asset.get_rsv_task(
@@ -202,6 +207,7 @@ class RsvUsdAssetSetCreator(object):
             return asset_set_dress_usd_file_rsv_unit.get_result(
                 version='latest'
             )
+
     @classmethod
     def _get_shot_set_dress_file_path_(cls, rsv_shot):
         rsv_shot_set_task = rsv_shot.get_rsv_task(
@@ -214,6 +220,7 @@ class RsvUsdAssetSetCreator(object):
             return shot_set_dress_usd_file_rsv_unit.get_result(
                 version='latest'
             )
+
     @classmethod
     def _get_asset_usd_file_path_(cls, rsv_asset, rsv_scene_properties):
         if rsv_scene_properties:
@@ -221,7 +228,8 @@ class RsvUsdAssetSetCreator(object):
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
-            if workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
+            if workspace in [rsv_scene_properties.get('workspaces.source'),
+                             rsv_scene_properties.get('workspaces.user')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-asset-set-usd-file'
                 )
@@ -245,6 +253,7 @@ class RsvUsdAssetSetCreator(object):
                 rsv_asset.path
             )
         return usd_file_path
+
     @classmethod
     def _get_asset_usd_latest_file_path_(cls, rsv_asset, rsv_scene_properties):
         if rsv_scene_properties:
@@ -252,7 +261,8 @@ class RsvUsdAssetSetCreator(object):
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
-            if workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
+            if workspace in [rsv_scene_properties.get('workspaces.source'),
+                             rsv_scene_properties.get('workspaces.user')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-asset-set-usd-file'
                 )
@@ -276,6 +286,7 @@ class RsvUsdAssetSetCreator(object):
                 rsv_asset.path
             )
         return usd_file_path
+
     @classmethod
     def _get_asset_shot_usd_file_path_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         usd_file_path = None
@@ -284,7 +295,8 @@ class RsvUsdAssetSetCreator(object):
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
-            if workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
+            if workspace in [rsv_scene_properties.get('workspaces.source'),
+                             rsv_scene_properties.get('workspaces.user')]:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-shot-set-usd-file'
                 )
@@ -320,10 +332,12 @@ class RsvUsdAssetSetCreator(object):
                 rsv_asset.path
             )
         return usd_file_path
+
     @classmethod
     def _get_asset_usd_set_dress_variant_dict_(cls, rsv_asst):
         usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asst)
         return cls._get_usd_file_variant_dict_(usd_file_path)
+
     @classmethod
     def _get_asset_usd_set_dress_variant_cache_(cls, rsv_asset):
         file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
@@ -339,16 +353,18 @@ class RsvUsdAssetSetCreator(object):
                     return dict_
                 return {}
         else:
-            return bsc_objects.Content(value={})
+            return ctt_objects.Content(value={})
+
     @classmethod
     def _get_shot_usd_set_dress_variant_dict_(cls, rsv_shot):
         usd_file_path = cls._get_shot_set_dress_file_path_(rsv_shot)
         return cls._get_usd_file_variant_dict_(usd_file_path)
+
     @classmethod
     def _get_usd_file_variant_dict_(cls, usd_file_path):
         from lxusd import usd_core
 
-        c = bsc_objects.Configure(value=collections.OrderedDict())
+        c = ctt_objects.Configure(value=collections.OrderedDict())
         usd_stage_opt = usd_core.UsdStageOpt(usd_file_path)
         usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
         if usd_file_path:
@@ -378,11 +394,12 @@ class RsvUsdAssetSetCreator(object):
                         'None'
                     )
         return c.value
+
     @classmethod
     def _get_usd_variant_dict_(cls, rsv_asset, rsv_scene_properties, asset_usd_file_path):
         from lxusd import usd_core
 
-        c = bsc_objects.Configure(value=collections.OrderedDict())
+        c = ctt_objects.Configure(value=collections.OrderedDict())
         cur_step = rsv_scene_properties.get('step')
         cur_key = cls.STEP_MAPPER[cur_step]
         usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
@@ -429,7 +446,8 @@ class RsvUsdAssetSetCreator(object):
             else:
                 c.set(
                     '{}.variant_names'.format(
-                        i_variant_set_name),
+                        i_variant_set_name
+                    ),
                     ['None']
                 )
                 c.set(
@@ -437,6 +455,7 @@ class RsvUsdAssetSetCreator(object):
                     'None'
                 )
         return c.value
+
     @classmethod
     def _update_asset_all_registry_comps_(cls, configure, rsv_asset, rsv_scene_properties):
         asset_step_query = rsv_scene_properties.get('asset_steps')
@@ -470,6 +489,7 @@ class RsvUsdAssetSetCreator(object):
                 configure.set(
                     'asset.version_override.{}'.format(i_key), i_version_override_dict
                 )
+
     @classmethod
     def _get_asset_version_main_dict_(cls, cur_rsv_task):
         dict_ = collections.OrderedDict()
@@ -484,13 +504,15 @@ class RsvUsdAssetSetCreator(object):
             i_version = i_properties.get('version')
             dict_[i_version] = i_file_path
         return dict_
+
     @classmethod
     def _get_asset_version_override_dict_(cls, rsv_scene_properties, cur_rsv_task):
         dict_ = collections.OrderedDict()
         #
         cur_workspace = rsv_scene_properties.get('workspace')
         cur_step = cur_rsv_task.get('step')
-        if cur_workspace in [rsv_scene_properties.get('workspaces.source'), rsv_scene_properties.get('workspaces.user')]:
+        if cur_workspace in [rsv_scene_properties.get('workspaces.source'),
+                             rsv_scene_properties.get('workspaces.user')]:
             if cur_step in ['srf']:
                 RsvTaskOverrideUsdCreator(
                     cur_rsv_task
@@ -529,6 +551,7 @@ class RsvUsdAssetSetCreator(object):
                 i_version = i_properties.get('version')
                 dict_[i_version] = i_file_path
         return dict_
+
     @classmethod
     def _set_asset_usd_file_create_(cls, rsv_asset, rsv_scene_properties):
         asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path_(rsv_asset)
@@ -572,6 +595,7 @@ class RsvUsdAssetSetCreator(object):
             new_raw
         )
         return asset_set_usd_file_path
+
     @classmethod
     def _set_asset_shot_usd_file_create_(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         from lxusd import usd_core
@@ -672,7 +696,7 @@ class RsvUsdAssetSet(object):
         if not usd_variant_dict:
             return {}
 
-        c = bsc_objects.Content(value=collections.OrderedDict())
+        c = ctt_objects.Content(value=collections.OrderedDict())
 
         keys = [
             'model',
@@ -700,11 +724,11 @@ class RsvUsdAssetSet(object):
                     i_default_release, i_values_release = i_args_release
                     # main default use "None" when step-key is current step-key and workspace-key is "source"
                     if (
-                        cur_step_key == i_key
-                        # and cur_workspace_key in {
-                        #     resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
-                        # }
-                        and mode == 'override'
+                            cur_step_key == i_key
+                            # and cur_workspace_key in {
+                            #     resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                            # }
+                            and mode == 'override'
                     ):
                         i_default_main = 'None'
                     # main default use register
@@ -732,11 +756,11 @@ class RsvUsdAssetSet(object):
                     'asset_version_override.{}.values'.format(i_key), i_values_override
                 )
                 if (
-                    cur_step_key == i_key
-                    # and cur_workspace_key in {
-                    #     resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
-                    # }
-                    and mode == 'override'
+                        cur_step_key == i_key
+                        # and cur_workspace_key in {
+                        #     resolver.WorkspaceKeys.Source, resolver.WorkspaceKeys.Temporary
+                        # }
+                        and mode == 'override'
                 ):
                     i_default_override = i_values_override[-1]
                     c.set(
@@ -748,13 +772,14 @@ class RsvUsdAssetSet(object):
 class RsvUsdShotSetCreator(object):
     def __init__(self, rsv_shot):
         self._rsv_shot = rsv_shot
+
     @classmethod
     def get_effect_component_paths(cls, usd_file_path):
         from lxusd import usd_core
 
         paths = usd_core.UsdStageOpt(
             usd_file_path
-        ).set_obj_paths_find(
+        ).find_obj_paths(
             '/assets/efx/effects/*'
         )
         if paths:
@@ -768,6 +793,7 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
         root='/master'
     )
     VAR_NAMES = ['hi']
+
     def __init__(self, rsv_task, option=None):
         super(RsvTaskOverrideUsdCreator, self).__init__(option)
         if rsv_task is None:
@@ -789,6 +815,7 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def create_element_geometry_uv_map_over_at(self, directory_path, var_name):
         import lxusd.fnc.exporters as usd_fnc_exporters
+
         #
         root = self.get('root')
         #
@@ -853,6 +880,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         'shell_color',
         'uv_map_color'
     ]
+
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvUsdHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -920,6 +948,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         from lxusd import usd_core
 
         import lxusd.fnc.exporters as usd_fnc_exporters
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -953,7 +982,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 extend_variants=dict(var=i_var_name)
             )
             if i_geometry_usd_var_file_path:
-                s.set_sublayer_append(i_geometry_usd_var_file_path)
+                s.append_sublayer(i_geometry_usd_var_file_path)
             else:
                 bsc_core.LogMtd.trace_method_warning(
                     'look property create',
@@ -990,6 +1019,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         from lxusd import usd_core
 
         import lxusd.fnc.exporters as usd_fnc_exporter
+
         #
         rsv_scene_properties = self._rsv_scene_properties
 
@@ -1023,7 +1053,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 extend_variants=dict(var=i_var_name)
             )
             if i_geometry_usd_var_file_path:
-                s.set_sublayer_append(i_geometry_usd_var_file_path)
+                s.append_sublayer(i_geometry_usd_var_file_path)
             else:
                 bsc_core.LogMtd.trace_method_warning(
                     'geometry display-color create',
@@ -1062,6 +1092,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxutil.scripts as utl_scripts
         #
         import lxutil.extra.methods as utl_etr_methods
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #

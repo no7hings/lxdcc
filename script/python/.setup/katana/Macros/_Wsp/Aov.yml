@@ -133,7 +133,6 @@ node:
         connections:
             - '<..channel_define.output>'
             - '<.input>'
-    #
     #   abc enable
     asset_abc_enable:
         type: Switch

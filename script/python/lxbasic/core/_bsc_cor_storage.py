@@ -1,21 +1,25 @@
 # coding:utf-8
 import os.path
 
+import parse
 import six
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_time, _bsc_cor_log, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
+from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_time, _bsc_cor_log, _bsc_cor_dict, \
+    _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
 
 
 class StgRpcMtd(object):
     RPC_SERVER = '10.10.206.117'
     RPC_PORT = 58888
     PATHSEP = '/'
+
     @classmethod
     def get_client(cls, port_addition=0):
         return xmlrpclib.ServerProxy(
             'http://{0}:{1}'.format(cls.RPC_SERVER, cls.RPC_PORT+port_addition)
         )
+
     @classmethod
     def create_directory(cls, directory_path, mode='775'):
         units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(directory_path)
@@ -28,6 +32,7 @@ class StgRpcMtd(object):
         #
         for i in list_:
             cls._create_directory_fnc_(i, mode)
+
     @classmethod
     def _create_directory_fnc_(cls, directory_path, mode='775'):
         key = 'rpc create directory'
@@ -39,7 +44,7 @@ class StgRpcMtd(object):
             clt.mkdir(directory_path, mode)
             p = os.path.dirname(directory_path)
             while os.path.exists(directory_path) is False:
-                cost_time = int(time.time() - start_time)
+                cost_time = int(time.time()-start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
                         _bsc_cor_log.LogMtd.trace_method_error(
@@ -63,6 +68,7 @@ class StgRpcMtd(object):
                 user='artist', group='artists'
             )
         return True
+
     @classmethod
     def delete(cls, file_path):
         if os.path.exists(file_path) is True:
@@ -92,6 +98,7 @@ class StgRpcMtd(object):
                 'rpc delete',
                 'path="{}" is completed, cost time {}s'.format(file_path, cost_time)
             )
+
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
         key = 'rpc copy to file'
@@ -138,6 +145,7 @@ class StgRpcMtd(object):
                 key,
                 'path="{} >> {}"'.format(file_path_src, file_path_tgt)
             )
+
     @classmethod
     def change_mode(cls, path, mode='775'):
         key = 'rpc change mode'
@@ -153,6 +161,7 @@ class StgRpcMtd(object):
                 key,
                 'path="{}", mode="{}"'.format(path, mode)
             )
+
     @classmethod
     def change_owner(cls, path, user='artist', group='artists'):
         key = 'rpc change owner'
@@ -207,6 +216,7 @@ class StgSshMtd(object):
     #
     HOST = 'isilon.diezhi.local'
     USER = 'root'
+
     # noinspection PyAugmentAssignment
     class MakePassword(object):
         def __init__(self, key, s):
@@ -216,44 +226,47 @@ class StgSshMtd(object):
         def encrypt(self):
             b = bytearray(str(self.s).encode("utf-8"))
             n = len(b)
-            c = bytearray(n * 2)
+            c = bytearray(n*2)
             j = 0
             for i in range(0, n):
                 b1 = b[i]
-                b2 = b1 ^ self.key
-                c1 = b2 % 16
-                c2 = b2 // 16
-                c1 = c1 + 65
-                c2 = c2 + 65
+                b2 = b1^self.key
+                c1 = b2%16
+                c2 = b2//16
+                c1 = c1+65
+                c2 = c2+65
                 c[j] = c1
-                c[j + 1] = c2
-                j = j + 2
+                c[j+1] = c2
+                j = j+2
             return c.decode("utf-8")
 
         def decrypt(self):
             c = bytearray(str(self.s).encode("utf-8"))
             n = len(c)
-            if n % 2 != 0:
+            if n%2 != 0:
                 return ""
-            n = n // 2
+            n = n//2
             b = bytearray(n)
             j = 0
             for i in range(0, n):
                 c1 = c[j]
-                c2 = c[j + 1]
-                j = j + 2
-                c1 = c1 - 65
-                c2 = c2 - 65
-                b2 = c2 * 16 + c1
-                b1 = b2 ^ self.key
+                c2 = c[j+1]
+                j = j+2
+                c1 = c1-65
+                c2 = c2-65
+                b2 = c2*16+c1
+                b1 = b2^self.key
                 b[i] = b1
             try:
                 return b.decode("utf-8")
             except:
                 return "failed"
+
     @classmethod
     def _set_nas_cmd_run_(cls, cmd):
+        # noinspection PyUnresolvedReferences
         import paramiko
+
         #
         _bsc_cor_log.LogMtd.trace_method_result(
             'nas-cmd-run',
@@ -275,6 +288,7 @@ class StgSshMtd(object):
         result = stdout.read()
         ssh.close()
         return result
+
     @classmethod
     def _get_all_group_data_(cls, nas_path):
         kwargs = dict(
@@ -294,6 +308,7 @@ class StgSshMtd(object):
                     if i_dict:
                         dict_[i_dict['group']] = (i_dict['index'], i_dict['context'])
         return dict_
+
     @classmethod
     def _get_all_group_data_1_(cls, nas_path):
         kwargs = dict(
@@ -315,6 +330,7 @@ class StgSshMtd(object):
                             (i_dict['group'], i_dict['index'], i_dict['context'])
                         )
         return list_
+
     @classmethod
     def _get_all_user_data_(cls, nas_path):
         kwargs = dict(
@@ -336,6 +352,7 @@ class StgSshMtd(object):
                             (i_dict['user'], i_dict['index'], i_dict['context'])
                         )
         return list_
+
     @classmethod
     def _get_all_data_(cls, nas_path):
         kwargs = dict(
@@ -435,11 +452,13 @@ class StgUserMtd(object):
             os.environ.get('HOMEDRIVE', 'c:'),
             os.environ.get('HOMEPATH', 'c:/temp')
         ).replace('\\', '/')
+
     @classmethod
     def get_linux_home(cls):
         return '{}'.format(
             os.environ.get('HOME', '/temp')
         )
+
     @classmethod
     def get_home(cls):
         if SystemMtd.get_is_windows():
@@ -448,17 +467,20 @@ class StgUserMtd(object):
             return cls.get_linux_home()
         else:
             raise SystemError()
+
     @classmethod
     def get_windows_user_directory(cls):
         return '{}/{}/.lynxi'.format(
             os.environ.get('HOMEDRIVE', 'c:'),
             os.environ.get('HOMEPATH', 'c:/temp')
         ).replace('\\', '/')
+
     @classmethod
     def get_linux_user_directory(cls):
         return '{}/.lynxi'.format(
             os.environ.get('HOME', '/temp')
         )
+
     @classmethod
     def get_user_directory(cls):
         if SystemMtd.get_is_windows():
@@ -467,6 +489,7 @@ class StgUserMtd(object):
             return cls.get_linux_user_directory()
         else:
             raise SystemError()
+
     @classmethod
     def get_user_temporary_directory(cls, create=False):
         date_tag = TimeMtd.get_date_tag()
@@ -476,6 +499,7 @@ class StgUserMtd(object):
         if create:
             StorageMtd.create_directory(_)
         return _
+
     @classmethod
     def get_user_debug_directory(cls, tag=None, create=False):
         date_tag = TimeMtd.get_date_tag()
@@ -487,17 +511,32 @@ class StgUserMtd(object):
         if create:
             StorageMtd.create_directory(_)
         return _
+
     @classmethod
-    def get_log_directory(cls):
+    def get_user_batch_exception_directory(cls, tag, create=False):
+        date_tag = TimeMtd.get_date_tag()
+        _ = '{}/batch-exception-log/{}'.format(
+            cls.get_user_directory(), date_tag
+        )
+        if tag is not None:
+            _ = '{}/{}'.format(_, tag)
+        if create:
+            StorageMtd.create_directory(_)
+        return _
+
+    @classmethod
+    def get_user_log_directory(cls):
         date_tag = TimeMtd.get_date_tag()
         return '{}/log/{}.log'.format(
             cls.get_user_directory(), date_tag
         )
+
     @classmethod
     def get_user_history_file(cls):
         return '{}/history.yml'.format(
             cls.get_user_directory()
         )
+
     @classmethod
     def get_user_session_directory(cls, create=False):
         date_tag = TimeMtd.get_date_tag()
@@ -507,58 +546,72 @@ class StgUserMtd(object):
         if create:
             StorageMtd.create_directory(_)
         return _
+
     @classmethod
     def get_user_session_file(cls, unique_id=None):
         directory_path = cls.get_user_session_directory()
         if unique_id is None:
-            unique_id = UuidMtd.get_new()
+            unique_id = UuidMtd.generate_new()
         return '{}/{}.yml'.format(directory_path, unique_id)
 
 
-class StgExtraMtd(object):
+class StgSystem(object):
     @classmethod
-    def set_directory_open(cls, path):
+    def open_directory(cls, path):
         path = _bsc_cor_raw.auto_encode(path)
         if SystemMtd.get_is_windows():
             cmd = 'explorer "{}"'.format(path.replace('/', '\\'))
         elif SystemMtd.get_is_linux():
-            cmd = 'nautilus "{}"'.format(path)
+            cmd = 'gio open "{}"'.format(path)
         else:
             raise SystemError()
 
         t_0 = threading.Thread(
             target=functools.partial(
-                _bsc_cor_process.SubProcessMtd.execute_as_block, cmd
+                _bsc_cor_process.SubProcessMtd.execute, cmd
             )
         )
         t_0.setDaemon(True)
         t_0.start()
-        # t_0.join()
+
+    @classmethod
+    def open_file(cls, path):
+        if SystemMtd.get_is_windows():
+            cmd = 'explorer /select,"{}"'.format(path.replace('/', '\\'))
+        elif SystemMtd.get_is_linux():
+            cmd = 'nautilus "{}" --select'.format(path)
+        else:
+            raise SystemError()
+
+        t_0 = threading.Thread(
+            target=functools.partial(
+                _bsc_cor_process.SubProcessMtd.execute, cmd
+            )
+        )
+        t_0.setDaemon(True)
+        t_0.start()
+
+    @classmethod
+    def open(cls, path):
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                cls.open_directory(path)
+            elif os.path.isfile(path):
+                cls.open_file(path)
+        else:
+            component = StgExtraMtd.get_exists_component(path)
+            if component:
+                cls.open_directory(component)
+
+
+class StgExtraMtd(object):
     @classmethod
     def get_exists_component(cls, path):
         units = _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(path)
         for i in units:
             if os.path.exists(i):
                 return i
-    @classmethod
-    def set_file_open(cls, path):
-        if SystemMtd.get_is_windows():
-            cmd = u'explorer /select,"{}"'.format(path.replace('/', '\\'))
-            # subprocess.Popen(cmd, shell=True)
 
-        elif SystemMtd.get_is_linux():
-            cmd = u'nautilus "{}" --select'.format(path)
-            # subprocess.Popen(cmd, shell=True)
-        else:
-            raise SystemError()
-
-        t_0 = threading.Thread(
-            target=functools.partial(
-                _bsc_cor_process.SubProcessMtd.execute_with_result, cmd
-            )
-        )
-        t_0.start()
-        # t_0.join()
     @classmethod
     def get_paths_by_fnmatch_pattern(cls, pattern, sort_by='number'):
         _ = glob.glob(pattern) or []
@@ -571,9 +624,10 @@ class StgExtraMtd(object):
                 if sort_by == 'number':
                     _.sort(key=lambda x: _bsc_cor_raw.RawTextMtd.to_number_embedded_args(x))
         return _
+
     @classmethod
     def create_directory(cls, directory_path):
-        if os.path.isdir(directory_path) is False:
+        if os.path.exists(directory_path) is False:
             os.makedirs(directory_path)
             _bsc_cor_log.LogMtd.trace_method_result(
                 'create-directory',
@@ -588,6 +642,7 @@ class StgPathLinkMtd(object):
             tgt_dir_path = os.path.dirname(path_tgt)
             src_rel_path = os.path.relpath(path_src, tgt_dir_path)
             os.symlink(src_rel_path, path_tgt)
+
     @classmethod
     def get_is_link_source_to(cls, path_src, path_tgt):
         tgt_dir_path = os.path.dirname(path_tgt)
@@ -596,13 +651,16 @@ class StgPathLinkMtd(object):
             orig_src_rel_path = os.readlink(path_tgt)
             return src_rel_path == orig_src_rel_path
         return False
+
     @classmethod
     def get_rel_path(cls, path_src, path_tgt):
         tgt_dir_path = os.path.dirname(path_tgt)
         return os.path.relpath(path_src, tgt_dir_path)
+
     @classmethod
     def get_is_link(cls, path):
         return os.path.islink(path)
+
     @classmethod
     def get_link_source(cls, path_tgt):
         cur_path = path_tgt
@@ -617,6 +675,7 @@ class StgPathLinkMtd(object):
             else:
                 break
         return cur_path
+
     @classmethod
     def link_file_to(cls, path_src, path_tgt):
         if os.path.isfile(path_src):
@@ -631,24 +690,25 @@ class StgPathLinkMtd(object):
 
 class StgDirectoryMtd(object):
     @classmethod
-    def get_file_paths(cls, directory_path, include_exts=None):
+    def get_file_paths(cls, directory_path, ext_includes=None):
         list_ = []
         if os.path.isdir(directory_path):
             results = os.listdir(directory_path) or []
             for i_name in results:
                 i_path = '{}/{}'.format(directory_path, i_name)
                 if os.path.isfile(i_path):
-                    if isinstance(include_exts, (tuple, list)):
+                    if isinstance(ext_includes, (tuple, list)):
                         i_name_base, i_ext = os.path.splitext(i_name)
-                        if i_ext not in include_exts:
+                        if i_ext not in ext_includes:
                             continue
                     #
                     list_.append(i_path)
         if list_:
             list_.sort()
         return list_
+
     @classmethod
-    def _get_file_paths(cls, directory_path, include_exts=None):
+    def _get_file_paths(cls, directory_path, ext_includes=None):
         import scandir
 
         list_ = []
@@ -656,31 +716,33 @@ class StgDirectoryMtd(object):
             for i in scandir.scandir(directory_path):
                 if i.is_file():
                     i_path = i.path
-                    if isinstance(include_exts, (tuple, list)):
+                    if isinstance(ext_includes, (tuple, list)):
                         i_base, i_ext = os.path.splitext(i_path)
-                        if i_ext not in include_exts:
+                        if i_ext not in ext_includes:
                             continue
                     #
                     list_.append(i_path)
         if list_:
             list_.sort()
         return list_
+
     @classmethod
-    def get_file_paths__(cls, directory_path, include_exts=None):
+    def get_file_paths__(cls, directory_path, ext_includes=None):
         if SystemMtd.get_is_linux():
-            return cls._get_file_paths(directory_path, include_exts)
+            return cls._get_file_paths(directory_path, ext_includes)
         else:
-            return cls.get_file_paths(directory_path, include_exts)
+            return cls.get_file_paths(directory_path, ext_includes)
+
     @classmethod
-    def get_all_file_paths(cls, directory_path, include_exts=None):
+    def get_all_file_paths(cls, directory_path, ext_includes=None):
         def rcs_fnc_(path_):
             _results = os.listdir(path_) or []
             for _i_name in _results:
                 _i_path = '{}/{}'.format(path_, _i_name)
                 if os.path.isfile(_i_path):
-                    if isinstance(include_exts, (tuple, list)):
+                    if isinstance(ext_includes, (tuple, list)):
                         _i_name_base, _i_ext = os.path.splitext(_i_name)
-                        if _i_ext not in include_exts:
+                        if _i_ext not in ext_includes:
                             continue
                     #
                     list_.append(_i_path)
@@ -693,15 +755,16 @@ class StgDirectoryMtd(object):
         if list_:
             list_.sort()
         return list_
+
     @classmethod
-    def _get_all_file_paths(cls, directory_path, include_exts=None):
+    def _get_all_file_paths(cls, directory_path, ext_includes=None):
         def rcs_fnc_(path_):
             for _i in scandir.scandir(path_):
                 _i_path = _i.path
                 if _i.is_file():
-                    if isinstance(include_exts, (tuple, list)):
+                    if isinstance(ext_includes, (tuple, list)):
                         _i_base, _i_ext = os.path.splitext(_i_path)
-                        if _i_ext not in include_exts:
+                        if _i_ext not in ext_includes:
                             continue
                     #
                     list_.append(_i_path)
@@ -716,12 +779,14 @@ class StgDirectoryMtd(object):
         if list_:
             list_.sort()
         return list_
+
     @classmethod
-    def get_all_file_paths__(cls, directory_path, include_exts=None):
+    def get_all_file_paths__(cls, directory_path, ext_includes=None):
         if SystemMtd.get_is_linux():
-            return cls._get_all_file_paths(directory_path, include_exts)
+            return cls._get_all_file_paths(directory_path, ext_includes)
         else:
-            return cls.get_all_file_paths(directory_path, include_exts)
+            return cls.get_all_file_paths(directory_path, ext_includes)
+
     @classmethod
     def get_directory_paths(cls, directory_path):
         list_ = []
@@ -733,6 +798,7 @@ class StgDirectoryMtd(object):
                 if os.path.isdir(i_path):
                     list_.append(i_path)
         return list_
+
     @classmethod
     def _get_directory_paths(cls, directory_path):
         import scandir
@@ -743,12 +809,14 @@ class StgDirectoryMtd(object):
                 if i.is_dir():
                     list_.append(i.path)
         return list_
+
     @classmethod
     def get_directory_paths__(cls, directory_path):
         if SystemMtd.get_is_linux():
             return cls._get_directory_paths(directory_path)
         else:
             return cls.get_directory_paths(directory_path)
+
     @classmethod
     def get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(path_):
@@ -765,6 +833,7 @@ class StgDirectoryMtd(object):
         if list_:
             list_.sort()
         return list_
+
     @classmethod
     def _get_all_directory_paths(cls, directory_path):
         def rcs_fnc_(d_):
@@ -773,6 +842,7 @@ class StgDirectoryMtd(object):
                     _i_path = _i.path
                     list_.append(_i_path)
                     rcs_fnc_(_i_path)
+
         # noinspection PyUnresolvedReferences
         import scandir
 
@@ -782,15 +852,18 @@ class StgDirectoryMtd(object):
         if list_:
             list_.sort()
         return list_
+
     @classmethod
     def get_all_directory_paths__(cls, directory_path):
         if SystemMtd.get_is_linux():
             return cls._get_all_directory_paths(directory_path)
         else:
             return cls.get_all_directory_paths(directory_path)
+
     @classmethod
     def get_file_relative_path(cls, directory_path, file_path):
         return os.path.relpath(file_path, directory_path)
+
     @classmethod
     def set_copy_to(cls, src_directory_path, directory_path_tgt, excludes=None):
         def copy_fnc_(src_file_path_, tgt_file_path_):
@@ -799,6 +872,7 @@ class StgDirectoryMtd(object):
                 'file copy',
                 'file="{}" >> "{}"'.format(src_file_path_, tgt_file_path_)
             )
+
         #
         src_directory_path = src_directory_path
         file_paths = cls.get_all_file_paths__(src_directory_path)
@@ -817,7 +891,7 @@ class StgDirectoryMtd(object):
                 if is_match is True:
                     continue
             #
-            i_tgt_file_path = directory_path_tgt + i_local_file_path
+            i_tgt_file_path = directory_path_tgt+i_local_file_path
             if os.path.exists(i_tgt_file_path) is False:
                 i_tgt_dir_path = os.path.dirname(i_tgt_file_path)
                 if os.path.exists(i_tgt_dir_path) is False:
@@ -830,14 +904,16 @@ class StgDirectoryMtd(object):
                 i_thread.start()
         #
         [i.join() for i in threads]
+
     @classmethod
     def get_file_paths_by_pattern__(cls, directory_path, name_pattern):
         path_pattern = '{}/{}'.format(directory_path, name_pattern)
         return fnmatch.filter(
             cls.get_file_paths__(directory_path), path_pattern
         )
+
     @classmethod
-    def get_file_paths_by_glob_pattern__(cls, glob_pattern):
+    def find_file_paths(cls, glob_pattern):
         return fnmatch.filter(
             cls.get_file_paths__(os.path.dirname(glob_pattern)), glob_pattern
         )
@@ -851,6 +927,7 @@ class StgFileMultiplyMtd(object):
     PATHSEP = _bsc_cor_pattern.PtnMultiplyFileMtd.PATHSEP
     P = '[0-9]'
     CACHE = dict()
+
     @classmethod
     def get_match_args(cls, file_name, name_pattern):
         new_file_name = file_name
@@ -868,6 +945,7 @@ class StgFileMultiplyMtd(object):
                     numbers[i], i_key, 1
                 )
             return new_file_name, map(int, numbers)
+
     @classmethod
     def merge_to(cls, file_paths, name_patterns):
         list_ = []
@@ -876,6 +954,7 @@ class StgFileMultiplyMtd(object):
             if i_file_path not in list_:
                 list_.append(i_file_path)
         return list_
+
     @classmethod
     def convert_to(cls, file_path, name_patterns):
         """
@@ -900,6 +979,7 @@ class StgFileMultiplyMtd(object):
                     i_file_path = '{}/{}'.format(file_opt.directory_path, i_file_name)
                     return i_file_path
         return file_path
+
     @classmethod
     def to_glob_pattern(cls, name_base):
         if name_base in cls.CACHE:
@@ -918,6 +998,7 @@ class StgFileMultiplyMtd(object):
                 name_base_new = name_base_new.replace(name_base[j_start:j_end], s, 1)
         cls.CACHE[name_base] = name_base_new
         return name_base_new
+
     @classmethod
     def get_exists_unit_paths(cls, file_path):
         if os.path.isfile(file_path):
@@ -928,9 +1009,10 @@ class StgFileMultiplyMtd(object):
         if name_base != name_base_new:
             directory_path = os.path.dirname(file_path)
             glob_pattern = cls.PATHSEP.join([directory_path, name_base_new])
-            list_ = StgDirectoryMtd.get_file_paths_by_glob_pattern__(glob_pattern)
+            list_ = StgDirectoryMtd.find_file_paths(glob_pattern)
             return list_
         return []
+
     @classmethod
     def get_is_exists(cls, file_path):
         return not not cls.get_exists_unit_paths(file_path)
@@ -964,13 +1046,14 @@ class StgDirectoryMultiplyMtd(object):
 class StgPathMtd(StorageMtd):
     @classmethod
     def get_parent(cls, path):
-        return _bsc_cor_path.DccPathDagMtd.get_dag_parent(
+        return _bsc_cor_path.DccPathDagMtd.get_dag_parent_path(
             path
         )
 
 
 class StgPathOpt(object):
     PATHSEP = '/'
+
     def __init__(self, path, cleanup=True):
         if cleanup is True:
             self._path = StorageMtd.clear_pathsep_to(path)
@@ -988,22 +1071,28 @@ class StgPathOpt(object):
         if self.get_is_file():
             return 'file'
         return 'directory'
+
     type_name = property(get_type_name)
 
     def get_path(self):
         return self._path
+
     path = property(get_path)
 
     def get_name(self):
         return os.path.basename(self.path)
+
     name = property(get_name)
 
     def get_root(self):
         return self._root
+
     root = property(get_root)
+
     @property
     def normcase_root(self):
         return os.path.normcase(self._root)
+
     @property
     def normcase_path(self):
         return os.path.normcase(self._path)
@@ -1024,11 +1113,8 @@ class StgPathOpt(object):
         return os.path.isfile(self.get_path())
 
     def set_open_in_system(self):
-        if self.get_is_exists():
-            if self.get_is_directory():
-                StgExtraMtd.set_directory_open(self.get_path())
-            elif self.get_is_file():
-                StgExtraMtd.set_file_open(self.get_path())
+        if self.get_path():
+            StgSystem.open(self.get_path())
 
     def get_modify_timestamp(self):
         return os.stat(self._path).st_mtime
@@ -1066,8 +1152,13 @@ class StgPathOpt(object):
     def __str__(self):
         return self._path
 
+    def __repr__(self):
+        return self._path
+
 
 class StgFileSearchOpt(object):
+    KEY = 'file search'
+
     def __init__(self, ignore_name_case=False, ignore_ext_case=False, ignore_ext=False):
         self._ignore_name_case = ignore_name_case
         self._ignore_ext_case = ignore_ext_case
@@ -1078,6 +1169,10 @@ class StgFileSearchOpt(object):
         self._search_dict = collections.OrderedDict()
         for i in directory_paths:
             self.append_search_directory(i, below_enable=below_enable)
+            _bsc_cor_log.LogMtd.trace_method_result(
+                self.KEY,
+                'append search directory: "{}"'.format(i)
+            )
         #
         self._set_key_sort_()
 
@@ -1146,14 +1241,14 @@ class StgDirectoryOpt(StgPathOpt):
             self.path
         )
 
-    def get_file_paths(self, include_exts=None):
+    def get_file_paths(self, ext_includes=None):
         return StgDirectoryMtd.get_file_paths__(
-            self.path, include_exts
+            self.path, ext_includes
         )
 
-    def get_all_file_paths(self, include_exts=None):
+    def get_all_file_paths(self, ext_includes=None):
         return StgDirectoryMtd.get_all_file_paths__(
-            self.path, include_exts
+            self.path, ext_includes
         )
 
     def get_all_directory_paths(self):
@@ -1172,7 +1267,7 @@ class StgDirectoryOpt(StgPathOpt):
         #
         for index, i_file_path_src in enumerate(file_paths_src):
             i_relative_file_path = i_file_path_src[len(directory_path_src):]
-            i_file_path_tgt = directory_path_tgt + i_relative_file_path
+            i_file_path_tgt = directory_path_tgt+i_relative_file_path
             #
             i_file_opt_src = StgFileOpt(i_file_path_src)
             i_file_opt_tgt = StgFileOpt(i_file_path_tgt)
@@ -1193,6 +1288,7 @@ class StgDirectoryOpt_(object):
 
     def get_path(self):
         return self._path
+
     path = property(get_path)
 
     def set_open(self):
@@ -1210,9 +1306,9 @@ class StgDirectoryOpt_(object):
     def get_is_exists(self):
         return os.path.exists(self.path)
 
-    def get_all_file_path(self, include_exts=None):
+    def get_all_file_path(self, ext_includes=None):
         return StgDirectoryMtd.get_all_file_paths__(
-            self.path, include_exts
+            self.path, ext_includes
         )
 
     def set_create(self):
@@ -1234,30 +1330,36 @@ class StgFileOpt(StgPathOpt):
 
     def get_directory_path(self):
         return os.path.dirname(self.path)
+
     directory_path = property(get_directory_path)
 
     def get_type(self):
         return self.ext
+
     type = property(get_type)
 
     def get_path_base(self):
         return os.path.splitext(self.path)[0]
+
     @property
     def path_base(self):
         return os.path.splitext(self.path)[0]
 
     def get_name(self):
         return os.path.basename(self.path)
+
     name = property(get_name)
 
     def get_name_base(self):
         return os.path.splitext(os.path.basename(self.path))[0]
+
     name_base = property(get_name_base)
 
     def get_ext(self):
         if self._file_type is not None:
             return self._file_type
         return os.path.splitext(self.path)[-1]
+
     ext = property(get_ext)
 
     def get_format(self):
@@ -1271,14 +1373,14 @@ class StgFileOpt(StgPathOpt):
 
     def set_read(self):
         if os.path.exists(self.path):
-            if self.get_ext() in ['.json']:
+            if self.get_ext() in {'.json'}:
                 with open(self.path) as j:
                     raw = json.load(j, object_pairs_hook=collections.OrderedDict)
                     j.close()
                     return raw
-            elif self.get_ext() in ['.yml']:
+            elif self.get_ext() in {'.yml'}:
                 with open(self.path) as y:
-                    raw = _bsc_cor_dict.OrderedYamlMtd.set_load(y)
+                    raw = _bsc_cor_dict.YamlMtd.load(y)
                     y.close()
                     return raw
             else:
@@ -1295,28 +1397,33 @@ class StgFileOpt(StgPathOpt):
                 os.makedirs(directory)
             except:
                 pass
-        if self.ext in ['.json']:
+        if self.ext in {'.json'}:
             with open(self.path, 'w') as j:
                 json.dump(
                     raw,
                     j,
                     indent=4
                 )
-        elif self.ext in ['.yml']:
+        elif self.ext in {'.yml'}:
             with open(self.path, 'w') as y:
-                _bsc_cor_dict.OrderedYamlMtd.set_dump(
+                _bsc_cor_dict.YamlMtd.dump(
                     raw,
                     y,
                     indent=4,
                     default_flow_style=False,
                 )
+        elif self.ext in {'.png'}:
+            with open(self.path, 'wb') as f:
+                f.write(raw)
         else:
             with open(self.path, 'w') as f:
                 f.write(raw.encode('utf-8'))
 
-    def append(self, raw):
-        with open(self.path, 'w') as f:
-            f.write(raw)
+    def append(self, text):
+        with open(self.path, 'a+') as f:
+            text = _bsc_cor_raw.auto_encode(text)
+            f.write('{}\n'.format(text))
+            f.close()
 
     def create_directory(self):
         StorageMtd.create_directory(
@@ -1332,7 +1439,7 @@ class StgFileOpt(StgPathOpt):
 
     def set_directory_repath_to_join_uuid(self, directory_path_tgt):
         directory_path_src = self.get_directory_path()
-        uuid_key = UuidMtd.get_by_string(directory_path_src)
+        uuid_key = UuidMtd.generate_by_text(directory_path_src)
         return self.__class__(
             u'{}/{}/{}'.format(
                 directory_path_tgt, uuid_key, self.get_name()
@@ -1352,11 +1459,17 @@ class StgFileOpt(StgPathOpt):
                 os.remove(file_path_tgt)
         #
         file_path_src = self.path
+        if file_path_src == file_path_tgt:
+            return
         #
         if os.path.exists(file_path_tgt) is False:
             directory_path_tgt = os.path.dirname(file_path_tgt)
             if os.path.exists(directory_path_tgt) is False:
-                os.makedirs(directory_path_tgt)
+                # noinspection PyBroadException
+                try:
+                    os.makedirs(directory_path_tgt)
+                except:
+                    pass
             # noinspection PyBroadException
             try:
                 shutil.copy2(file_path_src, file_path_tgt)
@@ -1381,6 +1494,18 @@ class StgFileOpt(StgPathOpt):
             )
         )
 
+    def get_size(self):
+        if os.path.isfile(self.path):
+            return os.path.getsize(self.path)
+        return 0
+
+    def get_tag_as_36(self):
+        timestamp = self.get_modify_timestamp()
+        time_tag = _bsc_cor_raw.RawIntegerOpt(int(timestamp*10)).set_encode_to_36()
+        size = self.get_size()
+        size_tag = _bsc_cor_raw.RawIntegerOpt(int(size)).set_encode_to_36()
+        return '{}{}'.format(time_tag, size_tag)
+
 
 # compress
 class StgGzipFileOpt(StgFileOpt):
@@ -1393,8 +1518,8 @@ class StgGzipFileOpt(StgFileOpt):
                     mode='rb',
                     fileobj=open(self.path, 'rb')
             ) as g:
-                if self.get_ext() in ['.yml']:
-                    raw = _bsc_cor_dict.OrderedYamlMtd.set_load(g)
+                if self.get_ext() in {'.yml'}:
+                    raw = _bsc_cor_dict.YamlMtd.load(g)
                     g.close()
                     return raw
 
@@ -1403,13 +1528,13 @@ class StgGzipFileOpt(StgFileOpt):
             os.makedirs(self.directory_path)
         # noinspection PyArgumentEqualDefault
         with gzip.GzipFile(
-            filename=self.name + self.ext,
-            mode='wb',
-            compresslevel=9,
-            fileobj=open(self.path, 'wb')
+                filename=self.name+self.ext,
+                mode='wb',
+                compresslevel=9,
+                fileobj=open(self.path, 'wb')
         ) as g:
             if self.get_ext() in ['.yml']:
-                _bsc_cor_dict.OrderedYamlMtd.set_dump(
+                _bsc_cor_dict.YamlMtd.dump(
                     raw,
                     g,
                     indent=4,
@@ -1445,6 +1570,7 @@ class StgRarFileOpt(StgFileOpt):
 
     def get_element_names(self):
         from unrar import rarfile
+
         file_path = self.get_path()
         if rarfile.is_rarfile(file_path):
             with rarfile.RarFile(file_path) as r:
@@ -1453,6 +1579,7 @@ class StgRarFileOpt(StgFileOpt):
 
     def extract_element_to(self, element_name, element_file_path):
         from unrar import rarfile
+
         file_path = self.get_path()
         if rarfile.is_rarfile(file_path):
             with rarfile.RarFile(file_path) as r:
@@ -1472,6 +1599,7 @@ class StgRarFileOpt(StgFileOpt):
 # temp
 class StgTmpBaseMtd(object):
     ROOT = '/l/temp'
+
     @classmethod
     def get_user_directory(cls, tag):
         return StgPathMapMtd.map_to_current(
@@ -1484,16 +1612,30 @@ class StgTmpBaseMtd(object):
                 )
             )
         )
+
+    @classmethod
+    def get_cache_directory(cls, tag):
+        return StgPathMapMtd.map_to_current(
+            u'{root}/temporary/{tag}/{user}'.format(
+                **dict(
+                    root=cls.ROOT,
+                    user=SystemMtd.get_user_name(),
+                    tag=tag
+                )
+            )
+        )
+
     @classmethod
     def get_save_region(cls, unique_id):
         number = abs(uuid.UUID(unique_id).int)
-        return _bsc_cor_raw.RawIntegerOpt(number % 4096).set_encode_to_36()
+        return _bsc_cor_raw.RawIntegerOpt(number%4096).set_encode_to_36()
 
 
 class StgTmpThumbnailMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.get_by_file(file_path)
+        return UuidMtd.generate_by_file(file_path)
+
     @classmethod
     def get_file_path(cls, file_path, ext='.jpg'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
@@ -1502,6 +1644,7 @@ class StgTmpThumbnailMtd(object):
         return '{}/.thumbnail/{}/{}{}'.format(
             directory_path, region, key, ext
         )
+
     @classmethod
     def get_file_path_(cls, file_path, width=128, ext='.jpg'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
@@ -1510,6 +1653,7 @@ class StgTmpThumbnailMtd(object):
         return '{}/.thumbnail/{}/{}/{}{}'.format(
             directory_path, region, key, width, ext
         )
+
     @classmethod
     def get_qt_file_path_(cls, file_path, width=128, ext='.jpg'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
@@ -1523,7 +1667,8 @@ class StgTmpThumbnailMtd(object):
 class StgTmpYamlMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.get_by_file(file_path)
+        return UuidMtd.generate_by_file(file_path)
+
     @classmethod
     def get_file_path(cls, file_path, tag='untitled'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
@@ -1537,7 +1682,8 @@ class StgTmpYamlMtd(object):
 class StgTmpTextMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.get_by_file(file_path)
+        return UuidMtd.generate_by_file(file_path)
+
     @classmethod
     def get_file_path(cls, file_path, tag='untitled'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
@@ -1551,7 +1697,8 @@ class StgTmpTextMtd(object):
 class StgTmpInfoMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.get_by_file(file_path)
+        return UuidMtd.generate_by_file(file_path)
+
     @classmethod
     def get_file_path(cls, file_path, tag='untitled'):
         directory_path = _bsc_cor_environ.EnvironMtd.get_temporary_root()
@@ -1566,12 +1713,15 @@ class StgPathPermissionDefaultMtd(object):
     @classmethod
     def create_directory(cls, path, mode):
         StgPathMtd.create_directory(path)
+
     @classmethod
     def change_mode(cls, path, mode):
         pass
+
     @classmethod
     def change_owner(cls, path, user='artist', group='artists'):
         pass
+
     @classmethod
     def lock(cls, path):
         StgSshOpt(
@@ -1579,12 +1729,15 @@ class StgPathPermissionDefaultMtd(object):
         ).set_just_read_only_for(
             ['cg_group', 'coop_grp']
         )
+
     @classmethod
     def unlock(cls, path):
         pass
+
     @classmethod
     def delete(cls, path):
         os.remove(path)
+
     @classmethod
     def lock_all_directories(cls, path):
         StgSshOpt(
@@ -1592,15 +1745,19 @@ class StgPathPermissionDefaultMtd(object):
         ).set_just_read_only_for(
             ['cg_group', 'coop_grp']
         )
+
     @classmethod
     def unlock_all_directories(cls, path):
         pass
+
     @classmethod
     def lock_all_files(cls, path):
         pass
+
     @classmethod
     def unlock_all_files(cls, path):
         pass
+
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
         StgFileOpt(file_path_src).set_copy_to_file(
@@ -1612,27 +1769,33 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
     @classmethod
     def create_directory(cls, path, mode):
         StgRpcMtd.create_directory(path)
+
     @classmethod
     def change_mode(cls, path, mode):
         StgRpcMtd.change_mode(path, mode)
+
     @classmethod
     def change_owner(cls, path, user='artist', group='artists'):
         StgRpcMtd.change_owner(path, user, group)
+
     @classmethod
     def lock(cls, path):
         StgRpcMtd.change_mode(
             path, '555'
         )
+
     @classmethod
     def unlock(cls, path):
         StgRpcMtd.change_mode(
             path, '775'
         )
+
     @classmethod
     def delete(cls, path):
         StgRpcMtd.delete(
             path
         )
+
     @classmethod
     def lock_all_directories(cls, path):
         StgRpcMtd.change_mode(
@@ -1645,6 +1808,7 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
             StgRpcMtd.change_mode(
                 i, '555'
             )
+
     @classmethod
     def unlock_all_directories(cls, path):
         StgRpcMtd.change_mode(
@@ -1657,6 +1821,7 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
             StgRpcMtd.change_mode(
                 i, '775'
             )
+
     @classmethod
     def lock_all_files(cls, path):
         fs = StgDirectoryMtd.get_all_file_paths__(
@@ -1666,6 +1831,7 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
             StgRpcMtd.change_mode(
                 i, '555'
             )
+
     @classmethod
     def unlock_all_files(cls, path):
         StgRpcMtd.change_mode(
@@ -1678,11 +1844,17 @@ class StgPathPermissionNewMtd(StgPathPermissionDefaultMtd):
             StgRpcMtd.change_mode(
                 i, '775'
             )
+
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
-        StgRpcMtd.copy_to_file(
-            file_path_src, file_path_tgt, replace=replace
-        )
+        if StgPathPermissionBaseMtd.get_scheme(file_path_src) == 'default':
+            StgPathPermissionDefaultMtd.copy_to_file(file_path_src, file_path_tgt)
+            cls.change_owner(file_path_tgt)
+            cls.change_mode(file_path_tgt, '775')
+        else:
+            StgRpcMtd.copy_to_file(
+                file_path_src, file_path_tgt, replace=replace
+            )
 
 
 class StgPathPermissionBaseMtd(object):
@@ -1703,6 +1875,7 @@ class StgPathPermissionBaseMtd(object):
         default=StgPathPermissionDefaultMtd,
         new=StgPathPermissionNewMtd
     )
+
     @classmethod
     def get_mode(cls, user, group, other):
         query = [
@@ -1716,12 +1889,14 @@ class StgPathPermissionBaseMtd(object):
             'rwx',  # 7
         ]
         return str(query.index(user))+str(query.index(group))+str(query.index(other))
+
     @classmethod
     def get_scheme(cls, path):
         for k, v in cls.MAP_DICT.items():
             if path.startswith(k+'/'):
                 return v
         return 'default'
+
     @classmethod
     def get_method(cls, path):
         """
@@ -1740,58 +1915,150 @@ print StgPathPermissionBaseMtd.get_method(
 class StgPathPermissionMtd(object):
     def __init__(self, path):
         self._path = path
+
     @classmethod
     def create_directory(cls, path, mode='775'):
         StgPathPermissionBaseMtd.get_method(
             path
         ).create_directory(path, mode)
+
     @classmethod
     def change_owner(cls, path, user='artist', group='artists'):
         StgPathPermissionBaseMtd.get_method(
             path
         ).change_owner(path, user, group)
+
     @classmethod
     def change_mode(cls, path, mode):
         StgPathPermissionBaseMtd.get_method(
             path
         ).change_mode(path, mode)
+
     @classmethod
     def lock(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).lock(path)
+
     @classmethod
     def unlock(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).unlock(path)
+
     @classmethod
     def delete(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).delete(path)
+
     @classmethod
     def lock_all_directories(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).lock_all_directories(path)
+
     @classmethod
     def unlock_all_directories(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).unlock_all_directories(path)
+
     @classmethod
     def lock_all_files(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).lock_all_files(path)
+
     @classmethod
     def unlock_all_files(cls, path):
         StgPathPermissionBaseMtd.get_method(
             path
         ).unlock_all_files(path)
+
     @classmethod
     def copy_to_file(cls, file_path_src, file_path_tgt, replace=False):
         StgPathPermissionBaseMtd.get_method(
             file_path_tgt
         ).copy_to_file(file_path_src, file_path_tgt, replace)
+
+
+class StgTextureMtd(object):
+    @classmethod
+    def get_is_udim(cls, path):
+        n = os.path.basename(path)
+        return not not re.finditer(r'<udim>', n, re.IGNORECASE)
+
+    @classmethod
+    def get_udim_region_args(cls, path):
+        """
+        print StgTextureMtd.get_udim_region_args(
+            '/data/e/workspace/lynxi/test/maya/vertex-color/test.1002.jpg'
+        )
+        print StgTextureMtd.get_udim_region_args(
+            '/data/e/workspace/lynxi/test/maya/vertex-color/test.<udim>.jpg'
+        )
+        """
+        d = os.path.dirname(path)
+        n = os.path.basename(path)
+        if os.path.isfile(path):
+            return [(path, '1001')]
+        r = re.finditer(r'<udim>', n, re.IGNORECASE) or []
+        if r:
+            list_ = []
+            g_n = p_n = n
+            for i_result in r:
+                i_start, i_end = i_result.span()
+                g_n = g_n.replace(n[i_start:i_end], '[0-9][0-9][0-9][0-9]', 1)
+                p_n = p_n.replace(n[i_start:i_end], '{region}', 1)
+            g_p = '/'.join([d, g_n])
+            p_p = '/'.join([d, p_n])
+            results = StgDirectoryMtd.find_file_paths(g_p)
+            for i_result in results:
+                i_p = parse.parse(
+                    p_p, i_result
+                )
+                i_region = i_p['region']
+                list_.append((i_result, i_region))
+            return list_
+        return []
+
+    @classmethod
+    def get_unit_paths(cls, path):
+        """
+        print StgTextureMtd.get_unit_paths(
+            '/data/e/workspace/lynxi/test/maya/vertex-color/test.1001.jpg'
+        )
+        print StgTextureMtd.get_unit_paths(
+            '/data/e/workspace/lynxi/test/maya/vertex-color/test.<udim>.jpg'
+        )
+        """
+        if os.path.isfile(path):
+            return [path]
+        d = os.path.dirname(path)
+        n = os.path.basename(path)
+        r = re.finditer(r'<udim>', n, re.IGNORECASE) or []
+        if r:
+            g_n = n
+            for i_result in r:
+                i_start, i_end = i_result.span()
+                g_n = g_n.replace(n[i_start:i_end], '[0-9][0-9][0-9][0-9]', 1)
+            g_p = '/'.join([d, g_n])
+            return StgDirectoryMtd.find_file_paths(g_p)
+        return []
+
+
+class StgTextureOpt(StgFileOpt):
+    def __init__(self, *args, **kwargs):
+        super(StgTextureOpt, self).__init__(*args, **kwargs)
+
+    def get_units(self):
+        return map(
+            lambda x: self.__class__(x), StgTextureMtd.get_unit_paths(self.get_path())
+        )
+
+    def get_unit_paths(self):
+        return StgTextureMtd.get_unit_paths(self.get_path())
+
+    def get_udim_region_args(self):
+        return StgTextureMtd.get_udim_region_args(self.get_path())

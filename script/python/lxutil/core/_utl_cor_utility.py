@@ -31,13 +31,11 @@ import functools
 
 import copy
 
-from lxscheme.scm_objects import _scm_obj_utility
-
 from lxutil import utl_configure
 
 from lxbasic import bsc_configure, bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 QT_LOG_RESULT_TRACE_METHOD = None
 QT_LOG_WARNING_TRACE_METHOD = None
@@ -59,8 +57,10 @@ class Log(object):
     TRACE_RESULT_ENABLE = True
     TRACE_WARNING_ENABLE = True
     TRACE_ERROR_ENABLE = True
+
     def __init__(self, file_path):
         self._file_path = file_path
+
     @classmethod
     def _trace_fnc_(cls, *args, **kwargs):
         text = args[0]
@@ -80,6 +80,7 @@ class Log(object):
                 # noinspection PyCallingNonCallable
                 LOG_WRITE_METHOD(text)
             return text
+
     @classmethod
     def set_trace(cls, *args, **kwargs):
         text = args[0]
@@ -89,6 +90,7 @@ class Log(object):
             print_method=QT_LOG_RESULT_TRACE_METHOD,
             write_method=LOG_WRITE_METHOD
         )
+
     @classmethod
     def set_result_trace(cls, *args):
         if cls.TRACE_RESULT_ENABLE is True:
@@ -99,6 +101,7 @@ class Log(object):
                 print_method=QT_LOG_RESULT_TRACE_METHOD,
                 write_method=LOG_WRITE_METHOD
             )
+
     @classmethod
     def set_module_result_trace(cls, *args):
         if cls.TRACE_RESULT_ENABLE is True:
@@ -111,6 +114,7 @@ class Log(object):
                 print_method=QT_LOG_RESULT_TRACE_METHOD,
                 write_method=LOG_WRITE_METHOD
             )
+
     @classmethod
     def set_warning_trace(cls, *args):
         if cls.TRACE_WARNING_ENABLE is True:
@@ -121,6 +125,7 @@ class Log(object):
                 print_method=QT_LOG_RESULT_TRACE_METHOD,
                 write_method=LOG_WRITE_METHOD
             )
+
     @classmethod
     def set_module_warning_trace(cls, *args):
         if cls.TRACE_WARNING_ENABLE is True:
@@ -133,6 +138,7 @@ class Log(object):
                 print_method=QT_LOG_RESULT_TRACE_METHOD,
                 write_method=LOG_WRITE_METHOD
             )
+
     @classmethod
     def set_error_trace(cls, *args):
         if cls.TRACE_ERROR_ENABLE is True:
@@ -143,6 +149,7 @@ class Log(object):
                 print_method=QT_LOG_RESULT_TRACE_METHOD,
                 write_method=LOG_WRITE_METHOD
             )
+
     @classmethod
     def set_module_error_trace(cls, *args):
         if cls.TRACE_ERROR_ENABLE is True:
@@ -155,6 +162,7 @@ class Log(object):
                 print_method=QT_LOG_RESULT_TRACE_METHOD,
                 write_method=LOG_WRITE_METHOD
             )
+
     @classmethod
     def set_log_write(cls, file_path, text):
         if file_path is not None:
@@ -186,6 +194,7 @@ class MethodLogging(object):
 
 class Progress(object):
     PROGRESSES = []
+
     @classmethod
     def set_create(cls, maximum, label=None):
         if QT_PROGRESS_CREATE_METHOD is not None:
@@ -194,10 +203,12 @@ class Progress(object):
             [cls.PROGRESSES.append(i) for i in ps]
             return ps
         return []
+
     @classmethod
     def set_update(cls, ps):
         for p in ps:
             p.set_update()
+
     @classmethod
     def set_stop(cls, ps):
         for p in ps:
@@ -249,6 +260,7 @@ class LogProgressRunner(object):
     @classmethod
     def create(cls, *args, **kwargs):
         return cls(*args, **kwargs)
+
     @classmethod
     def create_as_bar(cls, *args, **kwargs):
         kwargs['use_as_progress_bar'] = True
@@ -273,12 +285,12 @@ class LogProgressRunner(object):
     def set_update(self, sub_label=None):
         self._value += 1
         cur_timestamp = bsc_core.TimeMtd.get_timestamp()
-        cost_timestamp = cur_timestamp - self._pre_timestamp
+        cost_timestamp = cur_timestamp-self._pre_timestamp
         self._pre_timestamp = cur_timestamp
         #
-        percent = float(self._value) / float(self._maximum)
+        percent = float(self._value)/float(self._maximum)
         # trace when value is integer
-        p = '%3d' % (int(percent*100))
+        p = '%3d'%(int(percent*100))
         if self._p != p:
             self._p = p
             if self._use_as_progress_bar is True:
@@ -299,6 +311,7 @@ class LogProgressRunner(object):
                         bsc_core.RawIntegerMtd.second_to_time_prettify(cost_timestamp),
                     )
                 )
+
     @classmethod
     def _get_progress_bar_string_(cls, percent):
         c = 20
@@ -312,7 +325,7 @@ class LogProgressRunner(object):
         self._value = 0
         self._maximum = 0
         #
-        cost_timestamp = bsc_core.TimeMtd.get_timestamp() - self._start_timestamp
+        cost_timestamp = bsc_core.TimeMtd.get_timestamp()-self._start_timestamp
         bsc_core.LogMtd.trace_method_result(
             self._label,
             'is completed, cost time {}'.format(
@@ -329,41 +342,43 @@ class LogProgressRunner(object):
 
 class DialogWindow(object):
     ValidatorStatus = bsc_configure.ValidatorStatus
+
     @classmethod
     def set_create(
-        cls,
-        label,
-        sub_label=None,
-        content=None,
-        content_text_size=10,
-        window_size=(480, 160),
-        yes_method=None,
-        yes_label=None,
-        yes_visible=True,
-        #
-        no_method=None,
-        no_label=None,
-        no_visible=True,
-        #
-        cancel_fnc=None,
-        cancel_label=None,
-        cancel_visible=True,
-        #
-        tip_visible=True,
-        #
-        button_size=160,
-        status=None,
-        use_as_error=False,
-        use_as_warning=False,
-        show=True,
-        use_exec=True,
-        options_configure=None,
-        use_thread=True,
-        parent=None,
-        #
-        use_window_modality=True
+            cls,
+            label,
+            sub_label=None,
+            content=None,
+            content_text_size=10,
+            window_size=(480, 160),
+            yes_method=None,
+            yes_label=None,
+            yes_visible=True,
+            #
+            no_method=None,
+            no_label=None,
+            no_visible=True,
+            #
+            cancel_fnc=None,
+            cancel_label=None,
+            cancel_visible=True,
+            #
+            tip_visible=True,
+            #
+            button_size=160,
+            status=None,
+            use_as_error=False,
+            use_as_warning=False,
+            show=True,
+            use_exec=True,
+            options_configure=None,
+            use_thread=True,
+            parent=None,
+            #
+            use_window_modality=True
     ):
         import lxutil_gui.proxy.widgets as prx_widgets
+
         #
         if use_exec is True:
             w = prx_widgets.PrxDialogWindow1(parent=parent)
@@ -386,19 +401,19 @@ class DialogWindow(object):
         if yes_label is not None:
             w.set_yes_label(yes_label)
         if yes_method is not None:
-            w.set_yes_method_add(yes_method)
+            w.connect_yes_to(yes_method)
         w.set_yes_visible(yes_visible)
         #
         if no_label is not None:
             w.set_no_label(no_label)
         if no_method is not None:
-            w.set_no_method_add(no_method)
+            w.connect_no_to(no_method)
         w.set_no_visible(no_visible)
         #
         if cancel_label is not None:
             w.set_cancel_label(cancel_label)
         if cancel_fnc is not None:
-            w.set_cancel_method_add(cancel_fnc)
+            w.connect_cancel_method(cancel_fnc)
         w.set_cancel_visible(cancel_visible)
         #
         if status is not None:
@@ -420,13 +435,20 @@ class WaitWindow(object):
     pass
 
 
+class ProcessingWindow(object):
+    def create(self):
+        pass
+
+
 class ExceptionCatcher(object):
     ValidatorStatus = bsc_configure.ValidatorStatus
+
     @classmethod
     def _get_window_(cls):
         from lxutil_gui.proxy import utl_gui_prx_core
         #
         import lxutil_gui.proxy.widgets as prx_widgets
+
         #
         _0 = utl_gui_prx_core.get_gui_proxy_by_class(prx_widgets.PrxTipWindow)
         if _0:
@@ -438,17 +460,19 @@ class ExceptionCatcher(object):
         _1.set_definition_window_size((640, 320))
         _1.set_window_show()
         return _1
+
     @classmethod
     def set_create(cls, use_window=True):
         import sys
         #
         import traceback
+
         #
         exc_texts = []
         value = ''
         exc_type, exc_value, exc_stack = sys.exc_info()
         if exc_type:
-            value = '{}: "{}"'.format(exc_type.__name__, exc_value.message)
+            value = '{}: "{}"'.format(exc_type.__name__, repr(exc_value))
             for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
                 i_file_path, i_line, i_fnc, i_fnc_line = stk
                 exc_texts.append(
@@ -485,9 +509,11 @@ class SubProcessRunner(object):
         NO_WINDOW.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     else:
         NO_WINDOW = None
+
     #
     def __init__(self):
         pass
+
     @classmethod
     def execute_with_result(cls, cmd, **sub_progress_kwargs):
         bsc_core.LogMtd.trace_method_result(
@@ -501,6 +527,7 @@ class SubProcessRunner(object):
             'sub-process',
             'complete for: `{}`'.format(cmd)
         )
+
     @classmethod
     def set_run(cls, cmd):
         bsc_core.LogMtd.trace_method_result(
@@ -510,16 +537,7 @@ class SubProcessRunner(object):
         return bsc_core.SubProcessMtd.set_run(
             cmd
         )
-    @classmethod
-    def set_run_with_log(cls, name, cmd):
-        import lxutil_gui.proxy.widgets as prx_widgets
-        #
-        w = prx_widgets.PrxProcessWindow()
-        w.set_window_show()
-        #
-        w.set_process_name(name)
-        w.set_process_cmd(cmd)
-        w.set_process_start()
+
     @classmethod
     def set_run_with_result_use_thread(cls, cmd, **sub_progress_kwargs):
         t_0 = threading.Thread(
@@ -531,6 +549,7 @@ class SubProcessRunner(object):
         )
         t_0.start()
         # t_0.join()
+
     @classmethod
     def set_run_with_result_use_log(cls):
         pass
@@ -553,12 +572,12 @@ class DDlMonitor(object):
         j_m = ddl_objects.DdlJobMonitor(job_id)
         button.set_statuses(j_m.get_task_statuses())
         button.set_initialization(j_m.get_task_count())
-        j_m.logging.set_connect_to(w.set_logging)
-        j_m.task_status_changed_at.set_connect_to(w.set_status_at)
-        j_m.task_finished_at.set_connect_to(w.set_finished_at)
+        j_m.logging.connect_to(w.set_logging)
+        j_m.task_status_changed_at.connect_to(w.set_status_at)
+        j_m.task_finished_at.connect_to(w.set_finished_at)
         j_m.set_start()
 
-        w.set_window_close_connect_to(j_m.set_stop)
+        w.connect_window_close_to(j_m.set_stop)
 
         w.set_window_show(size=(480, 240))
 
@@ -568,7 +587,7 @@ class CommandMonitor(object):
     def set_create(cls, label, command, parent=None):
         def completed_fnc_(*args):
             w.set_status(w.ValidatorStatus.Correct)
-            w.set_window_close_later()
+            w.close_window_later()
 
         def failed_fnc_(*args):
             w.set_status(w.ValidatorStatus.Error)
@@ -576,7 +595,7 @@ class CommandMonitor(object):
         def finished_fnc_(*args):
             pass
 
-        from lxutil_gui.qt import utl_gui_qt_core
+        from lxutil_gui.qt import gui_qt_core
 
         import lxutil_gui.proxy.widgets as prx_widgets
 
@@ -584,19 +603,19 @@ class CommandMonitor(object):
         w.set_window_title(label)
         #
         status_button = w.get_status_button()
-        c_t = bsc_core.TrdCmdProcess_(command)
+        c_t = bsc_core.TrdCommand(command)
         status_button.set_statuses([c_t.get_status()])
         status_button.set_initialization(1)
-        c_t.status_changed.set_connect_to(lambda x: w.set_status_at(0, x))
-        # c_t.finished.set_connect_to(lambda x: w.set_finished_at(0, x))
-        c_t.logging.set_connect_to(w.set_logging)
-        w.set_window_close_connect_to(c_t.set_stopped)
+        c_t.status_changed.connect_to(lambda x: w.set_status_at(0, x))
+        # c_t.finished.connect_to(lambda x: w.set_finished_at(0, x))
+        c_t.logging.connect_to(w.set_logging)
+        w.connect_window_close_to(c_t.set_stopped)
         #
-        q_c_s = utl_gui_qt_core.QtCommandSignals(w.widget)
+        q_c_s = gui_qt_core.QtCommandSignals(w.widget)
         #
-        c_t.completed.set_connect_to(q_c_s.completed.emit)
-        c_t.finished.set_connect_to(q_c_s.finished.emit)
-        c_t.failed.set_connect_to(q_c_s.failed.emit)
+        c_t.completed.connect_to(q_c_s.completed.emit)
+        c_t.finished.connect_to(q_c_s.finished.emit)
+        c_t.failed.connect_to(q_c_s.failed.emit)
         #
         q_c_s.completed.connect(completed_fnc_)
         q_c_s.failed.connect(failed_fnc_)
@@ -611,18 +630,22 @@ class CommandMonitor(object):
 class Icon(object):
     ROOT_PATH = utl_configure.Root.icon
     ICON_KEY_PATTERN = r'[@](.*?)[@]'
+
     @classmethod
     def get(cls, icon_name, ext='.svg'):
         glob_pattern = '{}/{}.*'.format(cls.ROOT_PATH, icon_name)
         results = glob.glob(glob_pattern) or []
         if results:
             return bsc_core.StgPathOpt(results[-1]).get_path()
+
     @classmethod
     def get_katana_obj(cls):
         return cls.get('application/katana', ext='.png')
+
     @classmethod
     def get_port(cls):
         return cls.get('attribute')
+
     @classmethod
     def _get_file_path_(cls, icon_key):
         _ = re.findall(re.compile(cls.ICON_KEY_PATTERN, re.S), icon_key)
@@ -640,6 +663,7 @@ class IconFile(object):
 
 class FileIcon(object):
     ROOT_PATH = utl_configure.Root.icon
+
     @classmethod
     def get(cls, icon_name):
         """
@@ -651,79 +675,42 @@ class FileIcon(object):
         glob_results = glob.glob(glob_pattern)
         if glob_results:
             return glob_results[0]
+
     @classmethod
     def get_default(cls):
         dir_path = '{}/file'.format(cls.ROOT_PATH)
         return '{}/file.svg'.format(dir_path)
+
     @classmethod
     def get_root(cls):
         return Icon.get('file/root')
+
     @classmethod
     def get_folder(cls):
         return Icon.get('file/folder')
+
     @classmethod
     def get_image(cls):
         return Icon.get('file/image')
+
     @classmethod
     def get_houdini(cls):
         return Icon.get('file/houdini')
+
     @classmethod
     def get_by_file_ext(cls, ext):
         return Icon.get('file/{}'.format(ext[1:]))
-
-
-class Scheme(object):
-    UTILITY_TOOL_TD = _scm_obj_utility.FileScheme(
-        '{}/utility/tool/td_configures.yml'.format(utl_configure.Root.DATA)
-    )
-    # maya tool
-    MAYA_TOOL_TD = _scm_obj_utility.FileScheme(
-        '{}/maya/tool/td_configures.yml'.format(utl_configure.Root.DATA)
-    )
-    # houdini tool
-    HOUDINI_TOOL_TD = _scm_obj_utility.FileScheme(
-        '{}/houdini/tool/td_configures.yml'.format(utl_configure.Root.DATA)
-    )
-    # katana tool
-    KATANA_TOOL_TD = _scm_obj_utility.FileScheme(
-        '{}/katana/tool/td_configures.yml'.format(utl_configure.Root.DATA)
-    )
-
-
-class OrderedYamlMtd(object):
-    @classmethod
-    def set_dump(cls, raw, stream=None, Dumper=yaml.SafeDumper, object_pairs_hook=collections.OrderedDict, **kwargs):
-        class _Cls(Dumper):
-            pass
-        # noinspection PyUnresolvedReferences
-        def _fnc(dumper_, data_):
-            return dumper_.represent_mapping(
-                yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-                data_.items(),
-            )
-
-        _Cls.add_representer(object_pairs_hook, _fnc)
-        return yaml.dump(raw, stream, _Cls, **kwargs)
-    @classmethod
-    def set_load(cls, stream, Loader=yaml.SafeLoader, object_pairs_hook=collections.OrderedDict):
-        class _Cls(Loader):
-            pass
-        # noinspection PyArgumentList
-        def _fnc(loader_, node_):
-            loader_.flatten_mapping(node_)
-            return object_pairs_hook(loader_.construct_pairs(node_))
-        # noinspection PyUnresolvedReferences
-        _Cls.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _fnc)
-        return yaml.load(stream, _Cls)
 
 
 class System(object):
     @classmethod
     def get_user_name(cls):
         return bsc_core.SystemMtd.get_user_name()
+
     @classmethod
     def get_time(cls):
         return bsc_core.SystemMtd.get_time()
+
     @classmethod
     def get_time_tag(cls):
         return bsc_core.TimeMtd.get_time_tag()
@@ -734,27 +721,33 @@ class Environ(object):
     #
     TRUE = 'true'
     FALSE = 'false'
+
     def __init__(self):
         pass
+
     @classmethod
     def get_is_td_enable(cls):
         _ = cls.get(cls.TD_ENABLE_KEY)
         if _ == cls.TRUE:
             return True
         return False
+
     @classmethod
     def set_td_enable(cls, boolean):
         if boolean is True:
             cls.set(cls.TD_ENABLE_KEY, cls.TRUE)
         else:
             cls.set(cls.TD_ENABLE_KEY, cls.FALSE)
+
     @classmethod
     def get(cls, key):
         return os.environ.get(key)
+
     @classmethod
     def get_as_array(cls, key):
         _ = os.environ.get(key) or ''
         return _.split(os.pathsep)
+
     @classmethod
     def set(cls, key, value):
         os.environ[key] = value
@@ -762,12 +755,13 @@ class Environ(object):
             'environ set',
             u'key="{}", value="{}"'.format(key, value)
         )
+
     @classmethod
-    def set_add(cls, key, value):
+    def append(cls, key, value):
         if key in os.environ:
             v = os.environ[key]
             if value not in v:
-                os.environ[key] += os.pathsep + value
+                os.environ[key] += os.pathsep+value
                 bsc_core.LogMtd.trace_method_result(
                     'environ add',
                     u'key="{}", value="{}"'.format(key, value)
@@ -787,6 +781,7 @@ class File(object):
             bsc_core.StgFileOpt(
                 file_path
             ).set_write(raw)
+
     @classmethod
     def set_read(cls, file_path):
         with MethodLogging.create('file read', u'file="{}"'.format(file_path)):
@@ -803,6 +798,7 @@ class Path(object):
             bsc_core.CfgFileMtd.get_yaml('storage/path-mapper')
         ).set_read()
     )
+
     @classmethod
     def map_to_current(cls, path):
         if path is not None:
@@ -812,6 +808,7 @@ class Path(object):
                 return cls.map_to_linux(path)
             return bsc_core.StgPathOpt(path).__str__()
         return path
+
     @classmethod
     def map_to_windows(cls, path):
         # clear first
@@ -822,9 +819,10 @@ class Path(object):
                 if path == i_root_src:
                     return i_root_tgt
                 elif path.startswith(i_root_src+cls.PATHSEP):
-                    return i_root_tgt + path[len(i_root_src):]
+                    return i_root_tgt+path[len(i_root_src):]
             return path
         return path
+
     @classmethod
     def map_to_linux(cls, path):
         """
@@ -842,7 +840,7 @@ print Path.map_to_linux(
                 if path == i_root_src:
                     return i_root_tgt
                 elif path.startswith(i_root_src+cls.PATHSEP):
-                    return i_root_tgt + path[len(i_root_src):]
+                    return i_root_tgt+path[len(i_root_src):]
             return path
         return path
 
@@ -853,6 +851,7 @@ class PathEnv(object):
             bsc_core.CfgFileMtd.get_yaml('storage/path-environment-mapper')
         ).set_read()
     )
+
     @classmethod
     def map_to_path(cls, path, pattern='[KEY]'):
         """
@@ -879,8 +878,9 @@ class PathEnv(object):
             if path == i_string:
                 return i_root
             elif path.startswith(i_string+'/'):
-                return i_root + path[len(i_string):]
+                return i_root+path[len(i_string):]
         return path
+
     @classmethod
     def map_to_env(cls, path, pattern='[KEY]'):
         """
@@ -907,7 +907,7 @@ class PathEnv(object):
             if path == i_root:
                 return i_string
             elif path.startswith(i_root+'/'):
-                return i_string + path[len(i_root):]
+                return i_string+path[len(i_root):]
         return path
 
 
@@ -926,6 +926,7 @@ class AppLauncher(object):
     APP_CONFIGURE_MAP_DICT = {
         'usdview': 'usd_view'
     }
+
     def __init__(self, **kwargs):
         """
         :param kwargs:
@@ -942,9 +943,11 @@ class AppLauncher(object):
             project=kwargs['project'],
             application=kwargs['application']
         )
+
     @classmethod
     def get_server_root(cls):
         pass
+
     @classmethod
     def _get_application_configure_file_path_(cls, **kwargs):
         kwargs_ = copy.copy(kwargs)
@@ -958,14 +961,16 @@ class AppLauncher(object):
             )
             if os.path.exists(i_file_path) is True:
                 return i_file_path
+
     @classmethod
     def _set_cmd_run_(cls, *args):
         SubProcessRunner.set_run(
-            ' '.join(['rez-env'] + list(args))
+            ' '.join(['rez-env']+list(args))
         )
+
     @classmethod
     def _get_run_cmd_(cls, *args):
-        return ' '.join(['rez-env'] + list(args))
+        return ' '.join(['rez-env']+list(args))
 
     def get_rez_packages(self):
         lis = []
@@ -994,7 +999,7 @@ class AppLauncher(object):
                     **kwargs
                 )
             )
-            configure = bsc_objects.Configure(value=configure_file_path)
+            configure = ctt_objects.Configure(value=configure_file_path)
             keys = configure.get_leaf_keys()
             for key in keys:
                 i_run_args = configure.get(key)
@@ -1023,19 +1028,22 @@ class AppLauncher(object):
         #
         run_args.append(' '.join(args))
         return self._get_run_cmd_(*run_args)
+
     # run methods
     @classmethod
     def _set_run_with_result_as_rez_(cls, *run_args, **sub_progress_kwargs):
         SubProcessRunner.execute_with_result(
-            ' '.join(['rez-env'] + list(run_args)),
+            ' '.join(['rez-env']+list(run_args)),
             **sub_progress_kwargs
         )
+
     @classmethod
     def _set_run_with_result_use_thread_as_rez_(cls, *run_args, **sub_progress_kwargs):
         SubProcessRunner.set_run_with_result_use_thread(
-            ' '.join(['rez-env'] + list(run_args)),
+            ' '.join(['rez-env']+list(run_args)),
             **sub_progress_kwargs
         )
+
     #
     def set_cmd_run_with_result_as_rez(self, extend_cmd, **sub_progress_kwargs):
         run_args = self.get_rez_packages()
@@ -1093,7 +1101,7 @@ class MayaLauncher(object):
         self._kwargs = kwargs
         self._kwargs['application'] = 'maya'
 
-    def set_file_open(self, file_path):
+    def open_file(self, file_path):
         args = [
             '-- maya',
             r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open_as_project(\\\"{}\\\")\")"'.format(
@@ -1105,7 +1113,7 @@ class MayaLauncher(object):
             cmd
         )
 
-    def set_file_new(self, file_path):
+    def new_file(self, file_path):
         args = [
             '-- maya',
             r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_path_as_project(\\\"{}\\\", with_create_directory=True)\")"'.format(
@@ -1125,7 +1133,7 @@ class MayaLauncher(object):
             '-- maya',
             '-file',
             '"{}"'.format(file_path),
-            # r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open(\\\"{}\\\")\")"'.format(
+            # r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.open_file(\\\"{}\\\")\")"'.format(
             #     file_path
             # )
         ]
@@ -1354,6 +1362,7 @@ Any boolean flag will take the following values as FALSE: off, no, false, or 0.
 
     e.g. -s 1 -e 10 -x 512 -y 512 -cam persp -as 4 -hs 2 -dif 2 file.
     """
+
     def __init__(self, option):
         self._option = option
 
@@ -1374,7 +1383,7 @@ class HoudiniLauncher(object):
         self._kwargs = kwargs
         self._kwargs['application'] = 'houdini'
 
-    def set_file_open(self, file_path):
+    def open_file(self, file_path):
         pass
 
     def set_command_run(self, command):
@@ -1512,6 +1521,7 @@ class KatanaLauncher(object):
         -c, --crash         Load the crash file.
 
     """
+
     def __init__(self, **kwargs):
         """
         :param kwargs:
@@ -1520,7 +1530,7 @@ class KatanaLauncher(object):
         self._kwargs = kwargs
         self._kwargs['application'] = 'katana'
 
-    def set_file_open(self, file_path):
+    def open_file(self, file_path):
         args = [
             '-- katana',
             '"{}"'.format(file_path)
@@ -1531,8 +1541,9 @@ class KatanaLauncher(object):
             cmd
         )
 
-    def set_file_new(self, file_path):
+    def new_file(self, file_path):
         from lxkatana import ktn_configure
+
         create_args = [
             '-c'
             '"katana --script={} \"set_scene_new\" \"{}\""'.format(
@@ -1543,7 +1554,7 @@ class KatanaLauncher(object):
         AppLauncher(**self._kwargs).set_cmd_run_with_result_as_rez(
             cmd
         )
-        self.set_file_open(file_path)
+        self.open_file(file_path)
 
     def set_run(self):
         args = [
@@ -1570,7 +1581,7 @@ class UsdViewLauncher(object):
         self._kwargs = kwargs
         self._kwargs['application'] = 'usdview'
 
-    def set_file_open(self, file_path):
+    def open_file(self, file_path):
         # rez-env arnold_usd-6.1.0.1 arnold-6.1.0.1 aces pyside2 pgusd usd-20.11
         args = [
             # 'pgtk',
@@ -1591,6 +1602,7 @@ class History(object):
     MAXIMUM = 20
     FILE_PATH = bsc_core.StgUserMtd.get_user_history_file()
     CACHE = None
+
     @classmethod
     def pre_run(cls):
         f_o = cls.get_file_opt()
@@ -1598,17 +1610,20 @@ class History(object):
             bsc_core.StgFileOpt(cls.FILE_PATH).set_write(
                 {}
             )
+
     @classmethod
     def get_file_opt(cls):
         return bsc_core.StgPathOpt(cls.FILE_PATH)
+
     @classmethod
     def get_content(cls):
         if cls.CACHE is not None:
             return cls.CACHE
-        cls.CACHE = bsc_objects.Content(
+        cls.CACHE = ctt_objects.Content(
             value=cls.FILE_PATH
         )
         return cls.CACHE
+
     @classmethod
     def set_one(cls, key, value):
         cls.pre_run()
@@ -1616,7 +1631,8 @@ class History(object):
         if f_o.get_is_exists() is True:
             c = cls.get_content()
             c.set(key, value)
-            c.set_save_to(cls.FILE_PATH)
+            c.save_to(cls.FILE_PATH)
+
     @classmethod
     def get_one(cls, key):
         cls.pre_run()
@@ -1624,6 +1640,7 @@ class History(object):
         if f_o.get_is_exists() is True:
             c = cls.get_content()
             return c.get(key)
+
     @classmethod
     def append(cls, key, value):
         cls.pre_run()
@@ -1638,9 +1655,10 @@ class History(object):
             #
             values_exists = values_exists[-cls.MAXIMUM:]
             c.set(key, values_exists)
-            c.set_save_to(cls.FILE_PATH)
+            c.save_to(cls.FILE_PATH)
             return True
         return False
+
     @classmethod
     def extend(cls, key, values):
         cls.pre_run()
@@ -1655,13 +1673,15 @@ class History(object):
             #
             values_exists = values_exists[-cls.MAXIMUM:]
             c.set(key, values_exists)
-            c.set_save_to(cls.FILE_PATH)
+            c.save_to(cls.FILE_PATH)
             return True
         return False
+
     @classmethod
     def get_all(cls, key):
         c = cls.get_content()
-        return c.get(key) or []
+        return copy.copy(c.get(key)) or []
+
     @classmethod
     def get_latest(cls, key):
         f_o = cls.get_file_opt()
@@ -1681,7 +1701,9 @@ class Modifier(object):
                 return fnc(*args, **kw)
             except Exception:
                 bsc_core.ExceptionMtd.set_print()
+
         return fnc_
+
     @staticmethod
     def time_trace(fnc):
         def fnc_(*args, **kwargs):
@@ -1707,11 +1729,13 @@ class Modifier(object):
                     bsc_core.TimeMtd.TIME_FORMAT,
                     time.localtime(end_timestamp)
                 ),
-                (end_timestamp - start_timestamp)
+                (end_timestamp-start_timestamp)
             )
             bsc_core.SystemMtd.trace(message)
             return _fnc
+
         return fnc_
+
     @staticmethod
     def ignore_run(fnc):
         def fnc_(*args, **kwargs):
@@ -1750,7 +1774,9 @@ class Modifier(object):
                     )
                 )
                 bsc_core.ExceptionMtd.set_print()
+
         return fnc_
+
     @staticmethod
     def completion_trace(fnc):
         def fnc_(*args, **kwargs):
@@ -1797,7 +1823,9 @@ class Modifier(object):
                     )
                 )
                 bsc_core.ExceptionMtd.set_print()
+
         return fnc_
+
     @staticmethod
     def exception_catch(fnc):
         def fnc_(*args, **kwargs):
@@ -1808,6 +1836,7 @@ class Modifier(object):
             except:
                 ExceptionCatcher.set_create()
                 raise
+
         return fnc_
 
 
@@ -1825,15 +1854,17 @@ print(
     )
 )
     """
+
     @classmethod
     def get_configure(cls, key):
         f = bsc_core.CfgFileMtd.get_yaml(
             'jinja/{}'.format(key)
         )
         if f:
-            return bsc_objects.Configure(
+            return ctt_objects.Configure(
                 value=f
             )
+
     @classmethod
     def get_template(cls, key):
         import jinja2
@@ -1845,6 +1876,7 @@ print(
             return jinja2.Template(
                 bsc_core.StgFileOpt(f).set_read()
             )
+
     @classmethod
     def get_result(cls, key, variants):
         t = Jinja.get_template(key)
@@ -1856,9 +1888,11 @@ print(
 def get_is_ui_mode():
     if bsc_core.ApplicationMtd.get_is_maya():
         from lxmaya import ma_core
+
         return ma_core.get_is_ui_mode()
     elif bsc_core.ApplicationMtd.get_is_katana():
         from lxkatana import ktn_core
+
         return ktn_core.get_is_ui_mode()
     return False
 
@@ -1869,8 +1903,14 @@ if __name__ == '__main__':
             'katana/images',
             dict(
                 images=[
-                    dict(name='diffuse', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=0),
-                    dict(name='roughness', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0, position_y=240)
+                    dict(
+                        name='diffuse', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0,
+                        position_y=0
+                    ),
+                    dict(
+                        name='roughness', file='test', color_r=0.0625, color_g=0.25, color_b=0.125, position_x=0,
+                        position_y=240
+                    )
                 ]
             )
         )

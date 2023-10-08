@@ -17,11 +17,14 @@ from lxresolver import rsv_configure
 
 import lxbasic.objects as bsc_objects
 
+import lxcontent.objects as ctt_objects
+
 
 class AbsRsvAppDef(object):
     Applications = rsv_configure.Applications
     CACHE = dict()
     BIN = None
+
     def __init__(self, rsv_project, application, configure):
         self._rsv_project = rsv_project
         #
@@ -60,14 +63,17 @@ class AbsRsvAppDef(object):
 
     def get_project(self):
         return self._project
+
     project = property(get_project)
 
     def get_application(self):
         return self._application
+
     application = property(get_application)
 
     def get_configure(self):
         return self._configure
+
     configure = property(get_configure)
 
     def get_user_package_roots(self):
@@ -171,6 +177,7 @@ class AbsRsvAppDef(object):
                 cmd,
                 **sub_progress_kwargs
             )
+
     @classmethod
     def execute_with_result(cls, command, **sub_progress_kwargs):
         bsc_core.LogMtd.trace_method_result(
@@ -181,6 +188,7 @@ class AbsRsvAppDef(object):
             command,
             **sub_progress_kwargs
         )
+
     @classmethod
     def execute_with_result_use_thread(cls, command, **sub_progress_kwargs):
         t_0 = threading.Thread(
@@ -202,9 +210,10 @@ class AbsRsvAppDef(object):
 
 class AbsRsvAppDefault(AbsRsvAppDef):
     BIN = 'rez-env'
+
     def __init__(self, *args, **kwargs):
         super(AbsRsvAppDefault, self).__init__(*args, **kwargs)
-    
+
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:
             return ['lxdcc']
@@ -222,7 +231,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
                     **dict(project=self._project, application=self._application)
                 )
             )
-            configure = bsc_objects.Configure(value=configure_file_path)
+            configure = ctt_objects.Configure(value=configure_file_path)
             keys = configure.get_leaf_keys()
             for i_key in keys:
                 i_args = configure.get(i_key)
@@ -243,7 +252,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
                 args.extend(args_execute)
             if isinstance(args_extend, (set, tuple, list)):
                 args.extend(args_extend)
-            return ' '.join([self.BIN] + list(args))
+            return ' '.join([self.BIN]+list(args))
 
     def _test_(self):
         pass
@@ -252,6 +261,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
 class AbsRsvAppNew(AbsRsvAppDef):
     BIN_SOURCE = '/job/PLE/support/wrappers/paper-bin'
     BIN = '/job/PLE/support/wrappers/paper-bin'
+
     def __init__(self, *args, **kwargs):
         super(AbsRsvAppNew, self).__init__(*args, **kwargs)
         self._bin_source = bsc_core.StgPathMapMtd.map_to_current(self.BIN_SOURCE)
@@ -305,7 +315,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
                 args.extend(args_execute)
             if isinstance(args_extend, (set, tuple, list)):
                 args.extend(args_extend)
-            return ' '.join([self._bin_source] + list(args))
+            return ' '.join([self._bin_source]+list(args))
 
     def _test_(self):
         pass

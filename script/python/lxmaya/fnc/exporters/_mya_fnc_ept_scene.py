@@ -14,7 +14,7 @@ from lxbasic import bsc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
@@ -29,7 +29,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 import lxutil.fnc.exporters as utl_fnc_exporters
 
 
-class SceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+class FncSceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     WITH_XGEN = 'with_xgen_collection'
     OPTION = dict(
         file='',
@@ -38,10 +38,11 @@ class SceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         with_set=False,
         ext_extras=[]
     )
-    def __init__(self, option=None):
-        super(SceneExporter, self).__init__(option)
 
-    def set_run(self):
+    def __init__(self, option=None):
+        super(FncSceneExporter, self).__init__(option)
+
+    def execute(self):
         file_path = self.get('file')
         location = self.get('location')
         with_xgen_collection = self.get('with_xgen_collection')
@@ -126,10 +127,15 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         frame=(0, 0),
         color_space='Linear'
     )
+
     def __init__(self, file_path, root=None, option=None):
         super(PreviewExporter, self).__init__(file_path, root, option)
+
     @classmethod
-    def _set_playblast_(cls, file_path, root, use_default_material=False, frame=(0, 0), size=(1024, 1024), persp_view=True, default_material_color=None):
+    def _set_playblast_(
+            cls, file_path, root, use_default_material=False, frame=(0, 0), size=(1024, 1024), persp_view=True,
+            default_material_color=None
+            ):
         output_file = utl_dcc_objects.OsFile(file_path)
         output_file_path_base = output_file.path_base
         ext = output_file.ext
@@ -222,6 +228,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         #
         cmds.setAttr('lambert1.color', .5, .5, .5)
         cmds.delete(camera)
+
     @classmethod
     def _set_render_(cls, file_path, root, persp_view=True, size=(1024, 1024), frame=(0, 0)):
         output_file = utl_dcc_objects.OsFile(file_path)
@@ -244,6 +251,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         cls._set_arnold_render_run_(camera, image_width, image_height)
         cmds.delete(light)
         cmds.delete(camera)
+
     @classmethod
     def create_arnold_lights_fnc(cls):
         light = mya_dcc_objects.Shape('light')
@@ -257,20 +265,25 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         )
         [light.get_port(k).set(v) for k, v in atr_raw.items()]
         return light.transform.path
+
     @classmethod
     def create_arnold_options_fnc(cls):
         # noinspection PyBroadException
         try:
+            cmds.loadPlugin('mtoa', quiet=1)
             # noinspection PyUnresolvedReferences
             import mtoa.core as core
+
             core.createOptions()
         except:
             pass
+
     @classmethod
     def _set_arnold_options_update_(cls):
         arnold_render_option = mya_dcc_objects.AndRenderOption()
         arnold_render_option.set_image_format('exr')
         arnold_render_option.set_aa_sample(6)
+
     @classmethod
     def _set_arnold_render_run_(cls, camera, image_width, image_height, frame=None):
         cls.create_arnold_options_fnc()
@@ -308,6 +321,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
 
     def _set_snapshot_run_(self):
         import lxshotgun.operators as stg_operators
+
         #
         self._file_obj = utl_dcc_objects.OsFile(self._file_path)
         file_path_base = self._file_obj.path_base
@@ -374,12 +388,14 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         file='',
         root=''
     )
+
     def __init__(self, option):
         super(CameraYamlExporter, self).__init__(option)
         #
-        self._raw = bsc_objects.Content(
+        self._raw = ctt_objects.Content(
             value=collections.OrderedDict()
         )
+
     @classmethod
     def _set_camera_create_(cls, root, persp_view):
         dcc_root_dag_path = bsc_core.DccPathDagOpt(root)
@@ -415,8 +431,8 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 rotation=(-27.9383527296, 45, 0)
             )
         #
-        cmds.setAttr(camera_shape + '.displayGateMaskOpacity', 1)
-        cmds.setAttr(camera_shape + '.displayGateMaskColor', 0, 0, 0, type='double3')
+        cmds.setAttr(camera_shape+'.displayGateMaskOpacity', 1)
+        cmds.setAttr(camera_shape+'.displayGateMaskColor', 0, 0, 0, type='double3')
         #
         cmds.viewFit(
             camera_shape,
@@ -430,6 +446,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             focalLength=67.177,
         )
         return camera_transform, camera_shape
+
     @mya_modifiers.set_undo_mark_mdf
     def set_run(self):
         file_path = self._option['file']
@@ -446,7 +463,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 'persp.shape.{}'.format(p.get_port_path()), p.get()
             )
         #
-        self._raw.set_save_to(file_path)
+        self._raw.save_to(file_path)
         utl_core.Log.set_module_result_trace(
             'camera-yml-export',
             'file="{}"'.format(file_path)

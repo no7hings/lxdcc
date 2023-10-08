@@ -199,6 +199,7 @@ class ScpGeneralPublish(object):
         ssn_commands.set_option_hook_execute_by_deadline(
             option=option_opt.to_string()
         )
+
     @utl_core.Modifier.exception_catch
     def execute(self):
         fncs = [

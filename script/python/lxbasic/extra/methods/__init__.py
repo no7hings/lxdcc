@@ -1,6 +1,6 @@
 # coding:utf-8
 from lxbasic import bsc_core
-# noinspection PyUnresolvedReferences
+
 import lxbasic.objects as bsc_objects
 
 

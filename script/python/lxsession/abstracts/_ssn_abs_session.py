@@ -1,5 +1,6 @@
 # coding:utf-8
 import fnmatch
+
 import functools
 
 import os
@@ -8,7 +9,7 @@ import subprocess
 
 from lxbasic import bsc_configure, bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 import lxbasic.extra.methods as bsc_etr_methods
 
@@ -36,10 +37,12 @@ class AbsSsnConfigureBaseDef(object):
 
     def get_basic_configure(self):
         return self._basic_configure
+
     basic_configure = property(get_basic_configure)
 
     def get_gui_configure(self):
         return self._gui_configure
+
     gui_configure = property(get_gui_configure)
 
     @property
@@ -52,6 +55,7 @@ class AbsSsnConfigureBaseDef(object):
         return self._gui_configure.get(
             'name'
         )
+
     gui_name = property(get_gui_name)
 
     @property
@@ -68,9 +72,11 @@ class AbsSsnRezDef(object):
     def _set_rez_def_init_(self):
         # self._rez_beta = bsc_core.EnvironMtd.get('REZ_BETA')
         pass
+
     @classmethod
     def get_is_td_enable(cls):
         return bsc_core.EnvExtraMtd.get_is_td_enable()
+
     @classmethod
     def get_is_beta_enable(cls):
         return bsc_core.EnvExtraMtd.get_is_beta_enable()
@@ -82,21 +88,22 @@ class AbsSsnObj(
 ):
     Platform = bsc_configure.Platform
     Application = bsc_configure.Application
+
     def __init__(self, *args, **kwargs):
         if 'type' in kwargs:
             self._type = kwargs['type']
         else:
             self._type = None
         #
-        if 'name' in kwargs:
-            self._name = kwargs['name']
-        else:
-            self._name = None
-        #
         if 'hook' in kwargs:
             self._hook = kwargs['hook']
         else:
             self._hook = None
+        #
+        if 'name' in kwargs:
+            self._name = kwargs['name']
+        else:
+            self._name = str(self._hook).split('/')[-1]
         #
         if 'configure' in kwargs:
             self._configure = kwargs['configure']
@@ -139,46 +146,58 @@ class AbsSsnObj(
 
     def get_type(self):
         return self._type
+
     type = property(get_type)
 
     def get_name(self):
         if self._name:
             return self._name
         return self._hook
+
     name = property(get_name)
 
     def get_hook(self):
         return self._hook
+
     hook = property(get_hook)
 
     def get_group(self):
         return self.get_type()
+
     group = property(get_group)
 
     def get_configure(self):
         return self._configure
+
     configure = property(get_configure)
 
     def reload_configure(self):
         self._configure.set_reload()
+
     #
     def get_platform(self):
         return self._platform
+
     platform = property(get_platform)
 
     def get_application(self):
         return self._application
+
     application = property(get_application)
 
     def get_user(self):
         return self._user
+
     user = property(get_user)
+
     @property
     def system(self):
         return self._system
+
     @property
     def system_includes(self):
         return self._system_includes
+
     @property
     def variants(self):
         return self._variants
@@ -213,8 +232,10 @@ class AbsSsnObj(
             self.set_run()
         except Exception:
             from lxutil import utl_core
+
             utl_core.ExceptionCatcher.set_create()
             raise
+
     @staticmethod
     def execute_python_file(file_path, **kwargs):
         # use for python 3
@@ -233,11 +254,13 @@ class AbsSsnObj(
                 file_path
             )
         )
+
     @staticmethod
     def execute_python_script(cmd, **kwargs):
         # noinspection PyUnusedLocal
         session = kwargs['session']
         exec cmd
+
     @staticmethod
     def execute_shell_file_use_terminal(file_path, **kwargs):
         bsc_core.LogMtd.trace_method_result(
@@ -256,7 +279,7 @@ class AbsSsnObj(
                 ' '.join(cmds)
             )
         elif bsc_core.PlatformMtd.get_is_windows():
-            cmds = ['start', 'cmd',  '/k', file_path]
+            cmds = ['start', 'cmd', '/k', file_path]
             subprocess.Popen(
                 cmds,
                 shell=True,
@@ -267,6 +290,7 @@ class AbsSsnObj(
                 file_path
             )
         )
+
     @classmethod
     def execute_shell_script_use_terminal(cls, cmd, **kwargs):
         session = kwargs['session']
@@ -281,6 +305,7 @@ class AbsSsnObj(
             bsc_core.SubProcessMtd.execute(
                 ' '.join(cmds)
             )
+
     @classmethod
     def execute_shell_script(cls, cmd, use_thread=True):
         if use_thread is True:
@@ -303,11 +328,12 @@ class AbsSsnObj(
 
     def get_is_system_matched(self, system_key):
         return self.system in bsc_core.SystemMtd.get_system_includes([system_key])
+
     @classmethod
     def _get_choice_scheme_matched_(cls, choice_scheme, choice_scheme_includes):
         for i_choice_scheme in choice_scheme_includes:
             if fnmatch.filter(
-                [choice_scheme], i_choice_scheme
+                    [choice_scheme], i_choice_scheme
             ):
                 return True
         return False
@@ -362,6 +388,7 @@ class AbsSsnObj(
     def set_reload(self):
         self._configure.set_reload()
         self._configure.set_flatten()
+
     @classmethod
     def set_cmd_run(cls, cmd):
         ssn_core.SsnHookMtd.set_cmd_run(
@@ -390,6 +417,7 @@ class AbsSsnObj(
         if condition_string:
             return self._match_fnc_(condition_string, match_dict)
         return True
+
     @classmethod
     def _match_fnc_(cls, condition_string, match_dict):
         if condition_string:
@@ -411,6 +439,7 @@ class AbsSsnObj(
                     if i_condition != i_input:
                         return False
         return True
+
     @classmethod
     def open_url(cls, url):
         bsc_core.UrlMtd.open_in_chrome(url)
@@ -434,9 +463,11 @@ class AbsSsnRsvObj(AbsSsnObj):
         super(AbsSsnRsvObj, self).__init__(
             *args, **kwargs
         )
+
     @property
     def rsv_obj(self):
         return self._rsv_obj
+
     @property
     def rsv_properties(self):
         return self._rsv_properties
@@ -451,6 +482,7 @@ class AbsSsnShotgunDef(object):
 
     def get_shotgun_connector(self):
         return stg_objects.StgConnector()
+
     shotgun_connector = property(get_shotgun_connector)
 
 
@@ -468,24 +500,31 @@ class AbsSsnRsvUnitDef(object):
                 keyword=self._rsv_keyword
             )
             self._rsv_unit_extend_variants['artist'] = bsc_core.SystemMtd.get_user_name()
+
     @property
     def rsv_task(self):
         return self._rsv_unit.get_rsv_task()
+
     @property
     def rsv_step(self):
         return self._rsv_unit.get_rsv_setp()
+
     @property
     def rsv_entity(self):
         return self._rsv_unit.get_rsv_resource()
+
     @property
     def rsv_unit(self):
         return self._rsv_unit
+
     @property
     def rsv_keyword(self):
         return self._rsv_keyword
+
     @property
     def rsv_unit_version(self):
         return self._rsv_unit_version
+
     @property
     def rsv_unit_extend_variants(self):
         return self._rsv_unit_extend_variants
@@ -554,6 +593,7 @@ class AbsSsnRsvUnitAction(
 
 class AbsSsnOptionExecuteDef(object):
     EXECUTOR = None
+
     @classmethod
     def _get_rsv_task_version_(cls, rsv_scene_properties):
         if rsv_scene_properties.get('shot'):
@@ -562,6 +602,7 @@ class AbsSsnOptionExecuteDef(object):
             return '{project}.{asset}.{step}.{task}.{version}'.format(**rsv_scene_properties.value)
         else:
             raise TypeError()
+
     #
     def _set_option_execute_def_init_(self, ddl_configure):
         self._ddl_configure = ddl_configure
@@ -630,10 +671,12 @@ class AbsSsnOptionGui(
 
     def get_option_opt(self):
         return self._option_opt
+
     option_opt = property(get_option_opt)
 
     def get_option(self):
         return self._option_opt.to_string()
+
     option = property(get_option)
 
 
@@ -680,10 +723,12 @@ class AbsSsnOptionObj(AbsSsnObj):
 
     def get_option_opt(self):
         return self._option_opt
+
     option_opt = property(get_option_opt)
 
     def get_option(self):
         return self._option_opt.to_string()
+
     option = property(get_option)
 
     def get_extra_hook_options(self):
@@ -727,16 +772,19 @@ class AbsSsnDatabaseOptionAction(
     def __init__(self, *args, **kwargs):
         super(AbsSsnDatabaseOptionAction, self).__init__(*args, **kwargs)
 
-    def get_database_opt(self):
+    def get_database_opt(self, disable_new_connection=False):
         return dtb_objects.DtbResourceLibraryOpt(
             self.option_opt.get('database_configure'),
-            self.option_opt.get('database_configure_extend')
+            self.option_opt.get('database_configure_extend'),
+            disable_new_connection=disable_new_connection
         )
+
     database_opt = property(get_database_opt)
 
     def get_window(self):
-        from lxutil_gui.qt import utl_gui_qt_core
-        return utl_gui_qt_core.get_lx_window_by_unique_id(
+        from lxutil_gui.qt import gui_qt_core
+
+        return gui_qt_core.get_lx_window_by_unique_id(
             self.option_opt.get('window_unique_id')
         )
 
@@ -750,9 +798,11 @@ class AbsSsnOptionLauncher(
 
 class AbsSsnShellExecuteDef(object):
     EXECUTOR = None
+
     @property
     def configure(self):
         raise NotImplementedError()
+
     @property
     def option_opt(self):
         raise NotImplementedError()
@@ -812,6 +862,7 @@ class AbsSsnOptionMethod(
         'host',
         'time_tag',
     ]
+
     def __init__(self, *args, **kwargs):
         super(AbsSsnOptionMethod, self).__init__(*args, **kwargs)
         self._set_system_option_completion_()
@@ -863,7 +914,7 @@ class AbsSsnOptionMethod(
         )
         main_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = bsc_objects.Configure(value=f)
+        c = ctt_objects.Configure(value=f)
         #
         dependent_option_hook_keys = hook_option_opt.get(
             'dependencies', as_array=True
@@ -885,7 +936,7 @@ class AbsSsnOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = bsc_objects.Configure(value=f)
+        c = ctt_objects.Configure(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -904,7 +955,7 @@ class AbsSsnOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = bsc_objects.Configure(value=f)
+        c = ctt_objects.Configure(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -918,7 +969,7 @@ class AbsSsnOptionMethod(
         c.set(
             'deadline.{}.option'.format(key), hook_option
         )
-        c.set_save_to(
+        c.save_to(
             f
         )
 
@@ -932,6 +983,7 @@ class AbsSsnRsvDef(object):
 
     def get_resolver(self):
         return self._resolver
+
     resolver = property(get_resolver)
 
 
@@ -1047,6 +1099,7 @@ class ValidationChecker(object):
         return self._get_info_by_results_(
             self.get_summary(), self._check_options, self._check_results
         )
+
     @classmethod
     def _get_info_by_results_(cls, summary, check_options, check_results):
         list_ = []
@@ -1059,7 +1112,7 @@ class ValidationChecker(object):
                 list_.append(
                     (
                         '    {}: {}\n'
-                     ).format(k, ['off', 'on'][v])
+                    ).format(k, ['off', 'on'][v])
                 )
         #
         error_count = 0
@@ -1261,7 +1314,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = bsc_objects.Configure(value=f)
+        c = ctt_objects.Configure(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -1275,7 +1328,7 @@ class AbsSsnRsvTaskOptionMethod(
         c.set(
             'deadline.{}.option'.format(key), hook_option
         )
-        c.set_save_to(
+        c.save_to(
             f
         )
 
@@ -1285,7 +1338,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = bsc_objects.Configure(value=f)
+        c = ctt_objects.Configure(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -1297,6 +1350,7 @@ class AbsSsnRsvTaskOptionMethod(
         return c.get(
             'deadline.{}.job_id'.format(key)
         )
+
     @classmethod
     def get_dependencies(cls, hook_option):
         lis = []
@@ -1322,7 +1376,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
         main_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = bsc_objects.Configure(value=f)
+        c = ctt_objects.Configure(value=f)
         #
         dependent_option_hook_keys = hook_option_opt.get(
             'dependencies', as_array=True

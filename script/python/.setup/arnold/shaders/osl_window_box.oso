@@ -276,16 +276,16 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:20
 #     float room_depthMult = clamp(room_depth,0.1,100);
 	functioncall	$const4 3 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl"} %line{20} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp1 room_depth $const3 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp1 room_depth $const3 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		room_depthMult $tmp1 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:21
 #     float height_overscanMult = 1 - clamp(height_overscan,0,0.9);
 	functioncall	$const4 6 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl"} %line{21} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp3 height_overscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp3 height_overscan $const8 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp2 $tmp3 $const7 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:21
 #     float height_overscanMult = 1 - clamp(height_overscan,0,0.9);
@@ -293,9 +293,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:22
 #     float width_overscanMult = 1 - clamp(width_overscan,0,0.9); 
 	functioncall	$const4 10 	%line{22} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp5 width_overscan $const8 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp5 width_overscan $const8 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp4 $tmp5 $const7 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:22
 #     float width_overscanMult = 1 - clamp(width_overscan,0,0.9); 
@@ -304,9 +304,9 @@ code ___main___
 #     float midground_depthMult = clamp(midground_depth,0.05,room_depthMult-0.01); 
 	sub		$tmp6 room_depthMult $const11 	%line{23} %argrw{"wrr"}
 	functioncall	$const4 15 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp7 midground_depth $tmp6 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp7 midground_depth $tmp6 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		midground_depthMult $tmp7 $const10 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:24
 #     float midgroundOffY = midground_offset_y * (texture_flip*2-1) * 0.1;
@@ -326,9 +326,9 @@ code ___main___
 #     vector objI = transform("object", -I);
 	neg		$tmp16 I 	%line{29} %argrw{"wr"}
 	functioncall	$const14 28 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:262
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:262
 # vector transform (string to, vector p) { return transform("common",to,p); }
-	transformv	objI $const15 $const13 $tmp16 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
+	transformv	objI $const15 $const13 $tmp16 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl:30
 #     if (up_use_z_axis > 0){
 	gt		$tmp17 up_use_z_axis $const6 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box.osl"} %line{30} %argrw{"wrr"}

@@ -12,14 +12,17 @@ class LookAssignsReplace(object):
         'MaterialAssign',
         'ArnoldObjectSettings',
     ]
+
     def __init__(self, string_src, string_tgt):
         self._string_src = string_src
         self._string_tgt = string_tgt
 
         ktn_objs = None
+
     @classmethod
     def _get_ktn_objs_(cls, obj_type_names):
         return [j for i in obj_type_names for j in NodegraphAPI.GetAllNodesByType(i) or []]
+
     @classmethod
     def _get_values_(cls, p):
         ptn = '[(](.*?)[)]'
@@ -31,6 +34,7 @@ class LookAssignsReplace(object):
                 return _[0].split(' ')
             else:
                 return [value]
+
     @classmethod
     def _set_values_(cls, p, values):
         if values:
@@ -40,6 +44,7 @@ class LookAssignsReplace(object):
                 value = '({})'.format(' '.join(values))
             print value
             # p.setValue(value, 0)
+
     @ktn_core.Modifier.undo_debug_run
     def set_run(self):
         for i in self._get_ktn_objs_(self.INCLUDE_DCC_TYPES):
@@ -50,4 +55,3 @@ class LookAssignsReplace(object):
                     self._string_src, self._string_tgt
                 )
                 i_p.setValue(i_value_tgt, 0)
-

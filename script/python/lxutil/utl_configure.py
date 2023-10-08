@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class Root(object):
@@ -21,27 +21,33 @@ class Root(object):
 
 class _AbsData(object):
     ROOT = None
+
     @classmethod
     def get(cls, key):
         return '{}/{}.yml'.format(cls.ROOT, key)
+
     @classmethod
     def get_as_configure(cls, key):
-        return bsc_objects.Configure(
+        return ctt_objects.Configure(
             value=cls.get(key)
         )
 
 
 class MainData(_AbsData):
     ROOT = Root.DATA
+
     @classmethod
     def get_directory(cls, key):
         return '{}/{}'.format(cls.ROOT, key)
+
     @classmethod
     def get_file(cls, file_name):
         return '{}/{}'.format(cls.ROOT, file_name)
+
     @classmethod
     def get_configure_file(cls, key):
         return '{}/{}.yml'.format(cls.ROOT, key)
+
     @classmethod
     def get_help_file(cls, key):
         return '{}/{}.md'.format(cls.ROOT, key)
@@ -132,6 +138,7 @@ class TextureTypes(object):
         'cavity',
         'mask'
     ]
+
     class Arnold(object):
         All = [
             'diffuse_color',

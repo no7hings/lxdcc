@@ -72,7 +72,18 @@ class GeometryAbcExporter(object):
         HDF
     ]
     PLUG_NAME = 'AbcExport'
-    def __init__(self, file_path, root=None, frame=None, step=None, attribute=None, attribute_prefix=None, option=None, data_format=None):
+
+    def __init__(
+            self,
+            file_path,
+            root=None,
+            frame=None,
+            step=None,
+            attribute=None,
+            attribute_prefix=None,
+            option=None,
+            data_format=None
+        ):
         self._file_path = file_path
         #
         self._root = self._get_location_(root)
@@ -90,6 +101,7 @@ class GeometryAbcExporter(object):
         self._data_format = data_format
         #
         self._results = []
+
     @classmethod
     def _get_location_(cls, raw):
         if raw is not None:
@@ -101,15 +113,18 @@ class GeometryAbcExporter(object):
                 raise TypeError()
             return map(lambda x: bsc_core.DccPathDagOpt(x).translate_to('|').to_string(), _)
         return []
+
     @classmethod
     def _get_file_(cls, file_path):
         return '-{0} {1}'.format(cls.FILE, file_path.replace('\\', '/'))
+
     @classmethod
     def _get_option_(cls, option):
         if isinstance(option, dict):
             lis = ['-{0}'.format(k) for k, v in option.items() if v is True]
             if lis:
                 return ' '.join(lis)
+
     @classmethod
     def _get_data_format_(cls, data_format):
         if isinstance(data_format, six.string_types):
@@ -117,18 +132,22 @@ class GeometryAbcExporter(object):
                 return '-{0} {1}'.format(cls.DATA_FORMAT, data_format)
             return '-{0} {1}'.format(cls.DATA_FORMAT, cls.OGAWA)
         return '-{0} {1}'.format(cls.DATA_FORMAT, cls.OGAWA)
+
     @classmethod
     def _get_frame_(cls, star_frame, end_frame):
         return '-{0} {1} {2}'.format(cls.FRAME_RANGE, star_frame, end_frame)
+
     @classmethod
     def _get_step_(cls, step):
         if isinstance(step, (int, float)):
             return '-{0} {1}'.format(cls.STEP, step)
+
     @classmethod
     def _get_root_(cls, root):
         lis = cls._get_exists_dcc_paths_(root)
         if lis:
             return ' '.join(['-{0} {1}'.format(cls.ROOT, i) for i in lis])
+
     @classmethod
     def _get_exists_dcc_paths_(cls, obj_path_args):
         if isinstance(obj_path_args, six.string_types):
@@ -136,6 +155,7 @@ class GeometryAbcExporter(object):
                 return [cmds.ls(obj_path_args, long=1)[0]]
         elif isinstance(obj_path_args, (tuple, list)):
             return [cmds.ls(i, long=1)[0] for i in obj_path_args if cmds.objExists(i)]
+
     @classmethod
     def _get_strs_(cls, string, includes=None):
         lis = []
@@ -153,6 +173,7 @@ class GeometryAbcExporter(object):
                 else:
                     lis.append(i)
         return lis
+
     @classmethod
     def _get_attribute_(cls, attr_name):
         lis = cls._get_strs_(attr_name)
@@ -162,6 +183,7 @@ class GeometryAbcExporter(object):
         else:
             _ = None
         return _
+
     @classmethod
     def _get_attribute_prefix_(cls, attr_name):
         lis = cls._get_strs_(attr_name)
@@ -171,11 +193,13 @@ class GeometryAbcExporter(object):
         else:
             _ = None
         return _
+
     @staticmethod
     def _get_j_(js):
         _ = [i for i in js if i is not None]
         if _:
             return ' '.join(_)
+
     @classmethod
     def _set_cmd_run_(cls, j):
         """
@@ -184,6 +208,7 @@ class GeometryAbcExporter(object):
         """
         cmds.loadPlugin(cls.PLUG_NAME, quiet=1)
         return cmds.AbcExport(j=j)
+
     #
     def set_run(self):
         js = [
@@ -243,6 +268,7 @@ class GeometryUsdExporter(object):
         stripNamespaces=1
     )
     PLUG_NAME = 'mayaUsdPlugin'
+
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
         self._root = root
@@ -254,6 +280,7 @@ class GeometryUsdExporter(object):
                 self._option[k] = v
 
         self._results = []
+
     @classmethod
     def _get_usd_format_(cls, file_path):
         ext = os.path.splitext(file_path)[-1]
@@ -262,6 +289,7 @@ class GeometryUsdExporter(object):
         elif ext == '.usda':
             return 'usda'
         raise TypeError()
+
     @classmethod
     def _get_usd_option_(cls, option):
         lis = []
@@ -270,6 +298,7 @@ class GeometryUsdExporter(object):
                 v = int(v)
             lis.append(';{}={}'.format(k, v))
         return ''.join(lis)
+
     @classmethod
     def _set_cmd_run_(cls, file_path, **kwargs):
         cmds.loadPlugin(cls.PLUG_NAME, quiet=1)
@@ -319,6 +348,7 @@ class GeometryUsdExporter(object):
 
 class GeometryUsdExporter1(object):
     OPTION = {}
+
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
         self._root = root
@@ -333,6 +363,7 @@ class GeometryUsdExporter1(object):
     def set_run(self):
         # noinspection PyUnresolvedReferences
         from papyUsd.maya import MayaUsdExport
+
         root = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(self._root, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP)
         s_r = root
         r = '|'.join(s_r.split('|')[:-1])
@@ -351,6 +382,7 @@ class DatabaseGeometryExport(object):
     OPTION = dict(
         force=False
     )
+
     def __init__(self, option=None):
         self._results = []
         self._errors = []
@@ -374,9 +406,9 @@ class DatabaseGeometryExport(object):
                     uv_maps = mesh_opt.get_uv_maps()
                     key = mesh_opt.get_face_vertices_as_uuid()
                     if bsc_core.DtbGeometryUvMapFileMtd.set_value(
-                        key=key,
-                        value=uv_maps,
-                        force=self._option['force']
+                            key=key,
+                            value=uv_maps,
+                            force=self._option['force']
                     ) is True:
                         utl_core.Log.set_module_result_trace(
                             '{}'.format(self.__class__.__name__),
@@ -399,6 +431,7 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionBase):
         location='',
         frame=(1, 1),
     )
+
     def __init__(self, option):
         super(CameraAbcExport, self).__init__(option)
         option = self.get_option()
@@ -450,10 +483,19 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         namespace_clear=True,
         #
         with_visible=True,
+        #
         with_display_color=True,
+        display_color=(0.25, 0.75, 0.5),
+        #
+        auto_display_color=False,
+        auto_plant_display_color=False,
+        #
+        with_mesh_subset=False,
+        with_material_assign=False,
         #
         port_match_patterns=[]
     )
+
     def __init__(self, option=None):
         super(FncGeometryUsdExporter, self).__init__(option)
 
@@ -466,6 +508,11 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         usd_root_lstrip = self.get('path_lstrip')
         with_visible = self.get('with_visible')
         with_display_color = self.get('with_display_color')
+        display_color = self.get('display_color')
+        auto_display_color = self.get('auto_display_color')
+        auto_plant_display_color = self.get('auto_plant_display_color')
+        with_mesh_subset = self.get('with_mesh_subset')
+        with_material_assign = self.get('with_material_assign')
         port_match_patterns = self.get('port_match_patterns')
         #
         if location.startswith('|'):
@@ -481,7 +528,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         if root_mya_obj.get_is_exists() is True:
             mya_objs = root_mya_obj.get_descendants()
             if mya_objs:
-                usd_geometry_exporter = usd_fnc_exporters.GeometryExporter(
+                usd_geometry_exporter = usd_fnc_exporters.FncGeometryExporter(
                     option=dict(
                         file=file_path,
                         location=location,
@@ -492,8 +539,6 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 c = len(mya_objs)
                 with utl_core.GuiProgressesRunner.create(maximum=c, label='geometry-usd export') as g_p:
                     for i_mya_obj in mya_objs:
-                        g_p.set_update()
-                        #
                         i_mya_type_name = i_mya_obj.get_type_name()
                         i_mya_api_type_name = i_mya_obj.get_api_type_name()
                         i_mya_obj_path = i_mya_obj.get_path()
@@ -502,6 +547,14 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             i_mya_obj_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
                         )
                         i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
+
+                        i_rgb = None
+                        if auto_plant_display_color is True:
+                            i_rgb = bsc_core.DccPathDagOpt(i_usd_obj_path).get_plant_rgb(maximum=1.0)
+                        elif auto_display_color is True:
+                            i_rgb = bsc_core.DccPathDagOpt(i_usd_obj_path).get_rgb(maximum=1.0)
+                        elif with_display_color is True:
+                            i_rgb = display_color
                         # clean namespace
                         if ':' in i_usd_obj_path:
                             utl_core.Log.set_module_warning_trace(
@@ -518,7 +571,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         if i_mya_api_type_name in ma_configure.ApiTypes.Transforms:
                             transform_mya_obj = mya_dcc_objects.Transform(i_mya_obj_path)
                             transform_mya_obj_opt = mya_dcc_operators.TransformOpt(transform_mya_obj)
-                            transform_usd_obj_opt = usd_geometry_exporter._set_transform_opt_create_(
+                            transform_usd_obj_opt = usd_geometry_exporter.create_transform_opt(
                                 i_usd_obj_path, use_override=use_override
                             )
                             matrix = transform_mya_obj_opt.get_matrix()
@@ -533,8 +586,9 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             i_mya_mesh = mya_dcc_objects.Mesh(i_mya_obj_path)
                             if i_mya_mesh.get_port('intermediateObject').get() is False:
                                 i_mya_mesh_opt = mya_dcc_operators.MeshOpt(i_mya_mesh)
+                                i_mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(i_mya_mesh)
                                 if i_mya_mesh_opt.get_is_invalid() is False:
-                                    i_usd_mesh_opt = usd_geometry_exporter._set_mesh_opt_create_(
+                                    i_usd_mesh_opt = usd_geometry_exporter.create_mesh_opt(
                                         i_usd_obj_path, use_override=use_override
                                     )
                                     i_usd_mesh_opt.set_create(
@@ -542,19 +596,25 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                         points=i_mya_mesh_opt.get_points(),
                                         uv_maps=i_mya_mesh_opt.get_uv_maps()
                                     )
+                                    if with_mesh_subset is True:
+                                        subsets = i_mya_mesh_look_opt.get_subsets_by_material_assign()
+                                        if subsets:
+                                            i_usd_mesh_opt.create_subsets(
+                                                subsets
+                                            )
+                                    if with_material_assign is True:
+                                        material_assigns = i_mya_mesh_look_opt.get_material_assigns()
+                                        i_usd_mesh_opt.assign_materials(
+                                            material_assigns
+                                        )
                                     # export visibility
                                     if with_visible is True:
                                         i_usd_mesh_opt.set_visible(
                                             i_mya_mesh.get_visible()
                                         )
                                     # export color use name
-                                    if with_display_color is True:
-                                        color = bsc_core.RawTextOpt(i_mya_mesh.name).to_rgb__(
-                                            maximum=1, s_p=50, v_p=100
-                                        )
-                                        i_usd_mesh_opt.set_display_color_fill(
-                                            color
-                                        )
+                                    if i_rgb is not None:
+                                        i_usd_mesh_opt.fill_display_color(i_rgb)
                                 else:
                                     utl_core.Log.set_module_error_trace(
                                         'usd-mesh export',
@@ -566,20 +626,15 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             if i_mya_curve.get_port('intermediateObject').get() is False:
                                 i_mya_curve_opt = mya_dcc_operators.NurbsCurveOpt(i_mya_curve)
                                 if i_mya_curve_opt.get_is_invalid() is False:
-                                    i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
+                                    i_usd_curve_opt = usd_geometry_exporter.create_basis_curves_opt(
                                         i_usd_obj_path, use_override=use_override
                                     )
                                     counts, points, widths = i_mya_curve_opt.get_usd_basis_curve_data()
                                     i_usd_curve_opt.set_create(
                                         counts, points, widths
                                     )
-                                    if with_display_color is True:
-                                        color = bsc_core.RawTextOpt(i_mya_curve.name).to_rgb__(
-                                            maximum=1, s_p=50, v_p=100
-                                        )
-                                        i_usd_curve_opt.set_display_color_fill(
-                                            color
-                                        )
+                                    if i_rgb is not None:
+                                        i_usd_curve_opt.fill_display_color(i_rgb)
                         # xgen description
                         elif i_mya_type_name == ma_configure.Util.XGEN_DESCRIPTION:
                             i_mya_xgen_description = mya_dcc_objects.Shape(i_mya_obj_path)
@@ -587,21 +642,16 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                 i_mya_xgen_description
                             )
                             if i_mya_xgen_description_guide_opt.get_is_exists() is True:
-                                i_usd_curve_opt = usd_geometry_exporter._set_basis_curves_create_(
+                                i_usd_curve_opt = usd_geometry_exporter.create_basis_curves_opt(
                                     i_usd_obj_path, use_override=use_override
                                 )
                                 counts, points, widths = i_mya_xgen_description_guide_opt.get_usd_basis_curve_data()
                                 i_usd_curve_opt.set_create(
                                     counts, points, widths
                                 )
-                                if with_display_color is True:
-                                    color = bsc_core.RawTextOpt(i_mya_xgen_description.name).to_rgb__(
-                                            maximum=1, s_p=50, v_p=100
-                                        )
-                                    i_usd_curve_opt.set_display_color_fill(
-                                        color
-                                    )
-
+                                if i_rgb is not None:
+                                    i_usd_curve_opt.fill_display_color(i_rgb)
+                        #
                         if port_match_patterns:
                             i_geometry_usd_fnc = usd_geometry_exporter._get_geometry_fnc_(i_usd_obj_path)
                             if i_geometry_usd_fnc is not None:
@@ -616,8 +666,10 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                         usd_core.UsdPrimOpt._add_customize_attribute_(
                                             i_geometry_usd_fnc, j_key, j_value
                                         )
+                        #
+                        g_p.set_update()
                 #
-                usd_geometry_exporter.set_run()
+                usd_geometry_exporter.execute()
         else:
             utl_core.Log.set_module_warning_trace(
                 'maya-usd-export',
@@ -634,8 +686,10 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         display_color=(0.75, .75, 0.5),
         subdiv_dict={}
     )
+
     def __init__(self, option):
         super(GeometryUvMapUsdExporter, self).__init__(option)
+
     @classmethod
     def _set_subdiv_(cls, obj_path, subdiv_count):
         _ = cmds.listConnections(obj_path, destination=0, source=1, type='polySmoothFace')
@@ -668,6 +722,7 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             ro=1,
             ch=1
         )
+
     @classmethod
     def _get_tmp_usd_file_(cls):
         user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('usd-export')
@@ -677,6 +732,7 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 bsc_core.TimeMtd.get_timestamp()
             ).get_as_tag_36()
         )
+
     @classmethod
     def _set_tmp_usd_export_(cls, file_path, location, root):
         FncGeometryUsdExporter(
@@ -755,6 +811,7 @@ class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
             # 'pg_*'
         ]
     )
+
     def __init__(self, option):
         super(FncGeometryUsdExporterNew, self).__init__(option)
 
@@ -850,5 +907,3 @@ class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 self.KEY,
                 'nothing to export'
             )
-
-

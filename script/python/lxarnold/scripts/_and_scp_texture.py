@@ -34,7 +34,7 @@ class ScpTextureCreate(object):
         directory_opt_tgt.set_create()
         #
         file_paths_src = directory_opt_src.get_all_file_paths(
-            include_exts=map(lambda x: '.{}'.format(x), formats)
+            ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
         file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
             file_paths_src, formats
@@ -44,8 +44,8 @@ class ScpTextureCreate(object):
             i_file_opt_src = bsc_core.StgFileOpt(i_file_path_src)
             i_file_path_tgt = '{}/{}.exr'.format(directory_path_tgt, i_file_opt_src.name_base)
 
-            bsc_core.TrdFncProcess.set_wait()
-            bsc_core.TrdFncProcess.set_start(
+            bsc_core.TrdFunction.set_wait()
+            bsc_core.TrdFunction.set_start(
                 cls.to_exr_as_acescg, i_index,
                 # args
                 i_file_path_src, i_file_path_tgt,
@@ -67,7 +67,7 @@ class ScpTextureCreate(object):
         directory_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
         #
         file_paths_src = directory_opt_src.get_all_file_paths(
-            include_exts=map(lambda x: '.{}'.format(x), formats)
+            ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
         file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
             file_paths_src, formats
@@ -86,7 +86,7 @@ class ScpTextureCreate(object):
         directory_opt_tgt.set_create()
         #
         file_paths_src = directory_opt_src.get_all_file_paths(
-            include_exts=map(lambda x: '.{}'.format(x), formats)
+            ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
         file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
             file_paths_src, formats
@@ -115,7 +115,7 @@ class ScpTextureCreate(object):
         directory_opt_tgt.set_create()
         #
         file_paths_src = directory_opt_src.get_all_file_paths(
-            include_exts=map(lambda x: '.{}'.format(x), formats)
+            ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
         file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
             file_paths_src, formats
@@ -125,8 +125,8 @@ class ScpTextureCreate(object):
             i_file_opt_src = bsc_core.StgFileOpt(i_file_path_src)
             i_file_path_tgt = '{}/{}.tx'.format(directory_path_tgt, i_file_opt_src.name_base)
 
-            bsc_core.TrdFncProcess.set_wait()
-            bsc_core.TrdFncProcess.set_start(
+            bsc_core.TrdFunction.set_wait()
+            bsc_core.TrdFunction.set_start(
                 cls.to_tx_as_acescg, i_index,
                 # args
                 i_file_path_src, i_file_path_tgt,
@@ -150,7 +150,7 @@ class ScpTextureCreate(object):
         directory_opt_tgt.set_create()
         #
         file_paths_src = directory_opt_src.get_all_file_paths(
-            include_exts=map(lambda x: '.{}'.format(x), formats)
+            ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
         file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
             file_paths_src, formats

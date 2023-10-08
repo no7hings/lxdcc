@@ -53,7 +53,7 @@ def set_look_export_by_any_scene_file(option):
                     'start'
                 )
                 #
-                ktn_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                ktn_dcc_objects.Scene.open_file(any_scene_file_path)
                 # texture
                 with_texture = option_opt.get('with_texture') or False
                 if with_texture is True:
@@ -291,11 +291,11 @@ def set_cfx_look_export_by_any_scene_file(option):
                     scene_src_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_katana_src_file(
                         version=version
                     )
-                    ktn_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+                    ktn_dcc_objects.Scene.save_file_to(scene_src_file_path)
             #
             any_scene_file = utl_dcc_objects.OsFile(any_scene_file_path)
             if any_scene_file.get_is_exists() is True:
-                ktn_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                ktn_dcc_objects.Scene.open_file(any_scene_file_path)
                 #
                 with_texture = option_opt.get('with_texture') or False
                 if with_texture is True:
@@ -308,7 +308,7 @@ def set_cfx_look_export_by_any_scene_file(option):
                     scene_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_katana_file(
                         version=version
                     )
-                    ktn_dcc_objects.Scene.set_file_save_to(scene_file_path)
+                    ktn_dcc_objects.Scene.save_file_to(scene_file_path)
                 # geometry uv-map
                 rsv_asset_geometry_query = rsv_operators.RsvAssetGeometryQuery(rsv_task_properties)
                 surface_anm_geometry_uv_map_file_path = rsv_asset_geometry_query.get_usd_surface_anm_hi_file(version=version)

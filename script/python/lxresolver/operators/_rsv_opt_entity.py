@@ -1,5 +1,5 @@
 # coding:utf-8
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxresolver import rsv_configure
 
@@ -15,7 +15,7 @@ class AbsAssetQuery(object):
         self._task_properties = task_properties
         application = task_properties.get('application')
         #
-        self._file_configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        self._file_configure = ctt_objects.Configure(value=self.CONFIGURE_FILE_PATH)
         self._file_configure.set('option.application', application)
         self._file_configure.set_flatten()
         self._resolver = rsv_commands.get_resolver()

@@ -5,7 +5,7 @@ from Katana import CacheManager, NodegraphAPI, KatanaFile
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
@@ -149,7 +149,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._pass_name = self.get('look_pass')
         self._material_root = self.get('material_root')
         #
-        self._convert_configure = bsc_objects.Configure(
+        self._convert_configure = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
@@ -485,7 +485,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             material_assign_dcc_opt.set_geometry_path_append(shape_path)
             if is_create is True:
                 # value
-                material_assign_dcc_opt.set_material(dcc_material)
+                material_assign_dcc_opt.assign_material(dcc_material)
                 #
                 self.__set_tags_add_(dcc_material_assign, and_geometry.path)
     #

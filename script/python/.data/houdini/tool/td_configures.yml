@@ -11,7 +11,7 @@ tool:
             "import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects);
             p = utl_dcc_objects.PyReloader(
                 [
-                    'lxscheme', 'lxuniverse', 'lxresolver',
+                    'lxuniverse', 'lxresolver',
                     'lxarnold', 'lxar2mtx',
                     'lxutil', 'lxutil_fnc', 'lxutil_gui',
                     'lxshotgun', 'lxshotgun_fnc', 'lxshotgun_gui',
@@ -25,7 +25,7 @@ tool:
             - 560
     scene_packager:
         chn_label: None
-        command: from lxhoudini_gui.panel import hou_pnl_widgets; hou_pnl_widgets.ScenePackagerToolPanel().set_window_show()
+        command: ''
         icon: None
         label: Scene-packager
         size:

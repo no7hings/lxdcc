@@ -14,9 +14,10 @@ class RenderOption(object):
         #
         'start_frame': 'defaultRenderGlobals.startFrame',
         'end_frame': 'defaultRenderGlobals.endFrame',
+        'frame_step': 'defaultRenderGlobals.byFrameStep',
         #
         'animation': 'defaultRenderGlobals.animation',
-        'imageFormat': 'defaultRenderGlobals.imfPluginKey',
+        'image_format': 'defaultRenderGlobals.imfPluginKey',
         'periodInExt': 'defaultRenderGlobals.periodInExt',
         'putFrameBeforeExt': 'defaultRenderGlobals.putFrameBeforeExt',
         'extensionPadding': 'defaultRenderGlobals.extensionPadding',
@@ -28,49 +29,62 @@ class RenderOption(object):
         'preMel': 'defaultRenderGlobals.preMel'
     }
     RENDER_GLOBALS = 'defaultRenderGlobals'
+
     def __init__(self):
-        self.render_globals = _mya_dcc_obj_obj.Node(self.RENDER_GLOBALS)
+        self._render_globals = _mya_dcc_obj_obj.Node(self.RENDER_GLOBALS)
+
     @classmethod
     def set_animation_enable(cls, boolean):
         cmds.setAttr('defaultRenderGlobals.animation', boolean)
         cmds.setAttr('defaultRenderGlobals.putFrameBeforeExt', True)
         cmds.setAttr('defaultRenderGlobals.periodInExt', True)
         cmds.setAttr('defaultRenderGlobals.outFormatControl', False)
+
     @classmethod
     def get_animation_enable(cls):
         return cmds.getAttr(cls.PORT_DICT['animation'])
+
     @classmethod
     def get_frame_rage(cls):
         start_frame = cmds.getAttr(cls.PORT_DICT['start_frame'])
         end_frame = cmds.getAttr(cls.PORT_DICT['end_frame'])
         return start_frame, end_frame
 
-    def set_frame_range(self, start_frame, end_frame):
+    @classmethod
+    def set_frame_range(cls, start_frame, end_frame):
         if start_frame is None:
             start_frame = int(cmds.playbackOptions(query=1, minTime=1))
+
         if end_frame is None:
             end_frame = int(cmds.playbackOptions(query=1, maxTime=1))
         #
-        cmds.setAttr(self.PORT_DICT['start_frame'], start_frame)
-        cmds.setAttr(self.PORT_DICT['end_frame'], end_frame)
-        #
-        self.render_globals.get_port('extensionPadding').set(4)
+        cmds.setAttr(cls.PORT_DICT['start_frame'], start_frame)
+        cmds.setAttr(cls.PORT_DICT['end_frame'], end_frame)
+        cmds.setAttr(cls.PORT_DICT['extensionPadding'], 4)
+
     @classmethod
     def get_image_size(cls):
         image_width = cmds.getAttr(cls.PORT_DICT['image_width'])
         image_height = cmds.getAttr(cls.PORT_DICT['image_height'])
         return image_width, image_height
+
     @classmethod
     def set_image_size(cls, image_width, image_height, dpi=72):
         cmds.setAttr(cls.PORT_DICT['image_width'], image_width)
         cmds.setAttr(cls.PORT_DICT['image_height'], image_height)
         #
         cmds.setAttr('defaultResolution.pixelAspect', 1)
-        cmds.setAttr('defaultResolution.deviceAspectRatio', float(image_width / image_height))
+        cmds.setAttr('defaultResolution.deviceAspectRatio', float(image_width/image_height))
         cmds.setAttr('defaultResolution.dpi', dpi)
+
     @classmethod
     def set_output_file_path(cls, file_path):
         cmds.setAttr(cls.PORT_DICT['output_file_path'], file_path, type='string')
+
+
+class SoftwareRenderOption(object):
+    def __init__(self):
+        pass
 
 
 class AndRenderOption(object):
@@ -88,14 +102,18 @@ class AndRenderOption(object):
         AND_AOV_FILTER,
         AND_AOV_DRIVER
     ]
+
     def __init__(self):
         self._options_obj = _mya_dcc_obj_obj.Node(self.AND_OPTIONS)
+
     @classmethod
     def set_image_format(cls, image_format):
         cmds.setAttr(cls.PORT_DICT['image_format'], image_format, type='string')
+
     @classmethod
     def set_color_space(cls, color_space):
         cmds.setAttr(cls.PORT_DICT['color_space'], color_space)
+
     @classmethod
     def get(cls):
         for i in [cls.AND_OPTIONS]:

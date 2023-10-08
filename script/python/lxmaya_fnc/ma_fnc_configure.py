@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-from lxscheme.scm_objects import _scm_obj_utility
+import lxcontent.objects as ctt_objects
 
 
 class Root(object):
@@ -18,15 +18,15 @@ class Data(object):
 
 
 class Scheme(object):
-    STEPS = _scm_obj_utility.FileScheme(
-        '{}/step_configures.yml'.format(Root.data)
+    STEPS = ctt_objects.Configure(
+        value='{}/step_configures.yml'.format(Root.data)
     )
-    CHECKER_CONFIGURES = _scm_obj_utility.FileScheme(
-        '{}/checker_configures.yml'.format(Root.data)
+    CHECKER_CONFIGURES = ctt_objects.Configure(
+        value='{}/checker_configures.yml'.format(Root.data)
     )
     EXPORTERS_CONFIGURE_PATH = '{}/exporters_configure.yml'.format(Root.data)
-    EXPORTER_CONFIGURES = _scm_obj_utility.FileScheme(
-        '{}/exporters_configure.yml'.format(Root.data)
+    EXPORTER_CONFIGURES = ctt_objects.Configure(
+        value='{}/exporters_configure.yml'.format(Root.data)
     )
 
 

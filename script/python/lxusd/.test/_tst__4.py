@@ -15,7 +15,7 @@ f_src = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modelin
 
 f_tgt = '/l/prod/cgm/publish/assets/chr/td_test/mod/modeling/td_test.mod.modeling.v056/cache/usd/geo_extra/user_property.usd'
 
-s = usd_core.UsdStageOpt._set_file_open_(f_src)
+s = usd_core.UsdStageOpt._open_file_(f_src)
 
 usd_fnc_exporter.GeometryLookPropertyExporter(
     option=dict(

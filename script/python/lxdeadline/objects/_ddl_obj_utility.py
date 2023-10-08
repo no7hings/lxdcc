@@ -3,7 +3,7 @@ from Deadline import DeadlineConnect
 
 from lxbasic import bsc_configure, bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_configure, utl_core
 
@@ -27,9 +27,11 @@ class DdlContent(object):
         self._obj = obj
         self._index = index
         self._raw = raw
+
     @property
     def index(self):
         return self._index
+
     @property
     def raw(self):
         return self._raw
@@ -49,8 +51,10 @@ class AbsDdlObj(object):
     DDL_PROPERTY_CLS = None
     #
     DDL_CONTENT_CLS = None
+
     def __init__(self, raw):
         self._ddl_properties = self.DDL_PROPERTIES_CLS(self, raw)
+
     @property
     def properties(self):
         return self._ddl_properties
@@ -61,12 +65,14 @@ class AbsDdlObj(object):
 
 
 class DdlLogQuery(AbsDdlObj):
-    DDL_PROPERTIES_CLS = bsc_objects.Properties
-    DDL_PROPERTY_CLS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = ctt_objects.Properties
+    DDL_PROPERTY_CLS = ctt_objects.Property
+
     def __init__(self, obj, index, raw):
         self._obj = obj
         self._index = index
         super(DdlLogQuery, self).__init__(raw)
+
     @property
     def index(self):
         return self._index
@@ -79,23 +85,27 @@ class DdlLogQuery(AbsDdlObj):
 
 
 class DdlTaskQuery(AbsDdlObj):
-    DDL_PROPERTIES_CLS = bsc_objects.Properties
-    DDL_PROPERTY_CLS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = ctt_objects.Properties
+    DDL_PROPERTY_CLS = ctt_objects.Property
     #
     DDL_CONTENT_CLS = DdlContent
     DDL_LOG_CLS = DdlLogQuery
+
     def __init__(self, job, index, raw):
         self._job = job
         self._job_id = job.id
         self._task_index = index
         self._task_id = '{}_{}'.format(self._job.id, self._task_index)
         super(DdlTaskQuery, self).__init__(raw)
+
     @property
     def index(self):
         return self._task_index
+
     @property
     def job(self):
         return self._job
+
     @property
     def id(self):
         return self._task_id
@@ -115,7 +125,8 @@ class DdlTaskQuery(AbsDdlObj):
     def get_logs(self):
         lis = []
         _ = CON.Tasks.connectionProperties.__get__(
-            "/api/taskreports?JobID={}&TaskID={}&Data=log".format(self._job.id, self._task_index))
+            "/api/taskreports?JobID={}&TaskID={}&Data=log".format(self._job.id, self._task_index)
+        )
         raws = _
         if raws:
             for id_, raw in enumerate(raws):
@@ -153,13 +164,14 @@ class DdlTaskQuery(AbsDdlObj):
 
 
 class DdlJobQuery(AbsDdlObj):
-    DDL_PROPERTIES_CLS = bsc_objects.Properties
-    DDL_PROPERTY_CLS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = ctt_objects.Properties
+    DDL_PROPERTY_CLS = ctt_objects.Property
     #
     DDL_CONTENT_CLS = DdlContent
     DDL_LOG_CLS = DdlLogQuery
     #
     TASK_CLS = DdlTaskQuery
+
     def __init__(self, job_id):
         self._job_id = job_id
         _ = CON.Tasks.connectionProperties.__get__(
@@ -172,6 +184,7 @@ class DdlJobQuery(AbsDdlObj):
 
     def get_id(self):
         return self._job_id
+
     id = property(get_id)
 
     def get_tasks(self, task_indices=None):
@@ -241,14 +254,15 @@ class DdlJobQuery(AbsDdlObj):
 
 
 class DdlJobSender(AbsDdlObj):
-    DDL_PROPERTIES_CLS = bsc_objects.Properties
-    DDL_PROPERTY_CLS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = ctt_objects.Properties
+    DDL_PROPERTY_CLS = ctt_objects.Property
     #
     DDL_CONTENT_CLS = DdlContent
     #
     CONFIGURE_FILE_PATH = ddl_configure.Data.JOB_CONFIGURE_FILE
+
     def __init__(self):
-        self._configure = bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        self._configure = ctt_objects.Configure(value=self.CONFIGURE_FILE_PATH)
         super(DdlJobSender, self).__init__(self._configure.value)
         #
         self._option = self.properties.get_content('option')
@@ -257,22 +271,26 @@ class DdlJobSender(AbsDdlObj):
         self._plug = self.properties.get_content('job.plug')
         #
         self._result = None
+
     @property
     def configure(self):
         return self._configure
+
     @property
     def option(self):
         return self._option
+
     @property
     def info(self):
         return self._info
+
     @property
     def plug(self):
         return self._plug
 
     def set_info_extra(self, raw):
         if isinstance(raw, dict):
-            content = bsc_objects.Content(value=raw)
+            content = ctt_objects.Content(value=raw)
             for seq, k in enumerate(content._get_leaf_keys_()):
                 self.info.set(
                     'ExtraInfoKeyValue{}'.format(seq),
@@ -313,15 +331,16 @@ class DdlJobSender(AbsDdlObj):
 
 
 class AbsDdlJobSender(AbsDdlObj):
-    DDL_PROPERTIES_CLS = bsc_objects.Properties
-    DDL_PROPERTY_CLS = bsc_objects.Property
+    DDL_PROPERTIES_CLS = ctt_objects.Properties
+    DDL_PROPERTY_CLS = ctt_objects.Property
     #
     DDL_CONTENT_CLS = DdlContent
     #
     CONFIGURE_FILE_PATH = None
+
     def __init__(self):
         super(AbsDdlJobSender, self).__init__(
-            bsc_objects.Configure(value=self.CONFIGURE_FILE_PATH).value
+            ctt_objects.Configure(value=self.CONFIGURE_FILE_PATH).value
         )
         #
         self._method = self.properties.get_content('method')
@@ -333,6 +352,7 @@ class AbsDdlJobSender(AbsDdlObj):
 
     def get_method(self):
         return self._method
+
     method = property(get_method)
 
     def set_method(self, **kwargs):
@@ -353,25 +373,29 @@ class AbsDdlJobSender(AbsDdlObj):
 
     def get_job_info(self):
         return self._job_info
+
     job_info = property(get_job_info)
+
     @property
     def job_plug(self):
         return self._job_plug
 
     def set_job_info_extra(self, raw):
         if isinstance(raw, dict):
-            content = bsc_objects.Content(value=raw)
+            content = ctt_objects.Content(value=raw)
             for seq, k in enumerate(content._get_leaf_keys_()):
                 self.job_info.set(
                     'ExtraInfoKeyValue{}'.format(seq),
                     '{}={}'.format(k, content.get(k))
                 )
+
     @utl_core.Modifier.time_trace
     def set_job_submit(self):
         self.properties.set_flatten()
         info = self.job_info.value
         plug = self.job_plug.value
         return self._set_job_submit_(info, plug)
+
     @utl_core.Modifier.time_trace
     def _set_job_submit_(self, info, plug):
         self._result = CON.Jobs.SubmitJob(info, plug)
@@ -399,6 +423,7 @@ class AbsDdlJobSender(AbsDdlObj):
 # use for method
 class DdlMethodJobSender(AbsDdlJobSender):
     CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file('deadline/method')
+
     def __init__(self, **kwargs):
         super(DdlMethodJobSender, self).__init__()
         self._ddl_method_cache_opt = ddl_core.DdlMethodCacheOpt(**kwargs)
@@ -410,12 +435,14 @@ class DdlMethodJobSender(AbsDdlJobSender):
 # use for rsv-task-method
 class DdlRsvTaskMethodJobSender(DdlMethodJobSender):
     CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file('deadline/rsv-task-method')
+
     def __init__(self, **kwargs):
         super(DdlRsvTaskMethodJobSender, self).__init__(**kwargs)
 
 
 class DdlRsvTaskRenderJobSender(DdlMethodJobSender):
     CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file('deadline/rsv-task-render')
+
     def __init__(self, **kwargs):
         super(DdlRsvTaskRenderJobSender, self).__init__(**kwargs)
 
@@ -431,6 +458,7 @@ class SignalThread(threading.Thread):
         self._fnc = target
         self._args = args
         self._kwargs = kwargs
+
     #
     def run(self):
         THREAD_MAXIMUM.acquire()
@@ -446,10 +474,10 @@ class SignalInstance(object):
     def set_cancel(self):
         self.__is_active = False
 
-    def set_connect_to(self, method):
+    def connect_to(self, method):
         self._fncs.append(method)
 
-    def set_emit_send(self, *args, **kwargs):
+    def send_emit(self, *args, **kwargs):
         if self.__is_active is True:
             if self._fncs:
                 ts = [SignalThread(target=i_method, args=args, kwargs=kwargs) for i_method in self._fncs]
@@ -473,6 +501,7 @@ class DdlJobProcess(object):
         Status.Unknown,
         Status.Waiting
     ]
+
     #
     def __init__(self, job_id):
         self._job_query = DdlJobQuery(job_id)
@@ -523,9 +552,11 @@ class DdlJobProcess(object):
             # Pending = 6
             self.__set_waiting_
         ]
+
     #
     def __set_status_update_method_run_(self):
         return self._status_update_methods[self._job_query.get_status()]()
+
     #
     def __set_started_(self):
         self._is_disable = False
@@ -541,15 +572,17 @@ class DdlJobProcess(object):
                 self._job_id, self._job_name
             )
         )
+
     #
     def __set_emit_send_(self, signal, *args, **kwargs):
         # noinspection PyBroadException
-        # signal.set_emit_send(*args, **kwargs)
+        # signal.send_emit(*args, **kwargs)
         try:
-            signal.set_emit_send(*args, **kwargs)
+            signal.send_emit(*args, **kwargs)
         except:
             self.__set_error_occurred_()
             raise
+
     # waiting
     def __set_waiting_(self):
         self._status = self.Status.Waiting
@@ -559,6 +592,7 @@ class DdlJobProcess(object):
         #
         self.__set_processing_time_update_()
         self.__set_waiting_time_update_()
+
     # running
     def __set_running_(self):
         self._status = self.Status.Running
@@ -568,6 +602,7 @@ class DdlJobProcess(object):
         #
         self.__set_processing_time_update_()
         self.__set_running_time_update_()
+
     #
     def __set_elements_running_(self):
         pre_element_status = str(self._sub_process_statuses)
@@ -578,10 +613,12 @@ class DdlJobProcess(object):
             self._sub_process_statuses[index] = i_task_status
         if pre_element_status != str(self._sub_process_statuses):
             self.__set_element_statuses_changed_()
+
     #
     def __set_logging_(self, text):
         print text
         self.__set_emit_send_(self.logging, text)
+
     # status changed
     def __set_status_changed_(self):
         self.__set_emit_send_(self.status_changed, self._status)
@@ -637,6 +674,7 @@ class DdlJobProcess(object):
                 self._job_id, self._job_name
             )
         )
+
     #
     def __set_error_occurred_(self):
         self._is_disable = True
@@ -648,6 +686,7 @@ class DdlJobProcess(object):
                 self._job_id, self._job_name
             )
         )
+
     #
     def __set_run_(self):
         if self._is_disable is False:
@@ -770,6 +809,7 @@ class DdlJobMonitor(object):
         Status.Unknown,
         Status.Waiting
     ]
+
     #
     def __init__(self, job_id):
         self._job_query = DdlJobQuery(job_id)
@@ -839,34 +879,34 @@ class DdlJobMonitor(object):
 
     def __set_logging_(self, text):
         result = bsc_core.LogMtd.get_result(text)
-        self.logging.set_emit_send(
+        self.logging.send_emit(
             result
         )
         print result
 
     def __set_job_status_changed_(self, status):
         if self.__is_active is True:
-            self.job_status_changed.set_emit_send(status)
+            self.job_status_changed.send_emit(status)
             self.__set_logging_(u'job status is change to "{}"'.format(str(status)))
 
     def __set_task_status_changed_at_(self, index, status):
         if self.__is_active is True:
-            self.task_status_changed_at.set_emit_send(index, status)
+            self.task_status_changed_at.send_emit(index, status)
             self.__set_logging_(u'task {} status is change to "{}"'.format(index, str(status)))
 
     def __set_task_progress_at_(self, index, progress):
         if self.__is_active is True:
-            self.task_progress_changed_at.set_emit_send(index, progress)
+            self.task_progress_changed_at.send_emit(index, progress)
             self.__set_logging_(u'task {} progress is changed to "{}"'.format(index, str(progress)))
 
     def __set_job_finished_(self, status):
         self.__is_active = False
-        self.job_finished.set_emit_send(status)
+        self.job_finished.send_emit(status)
         self.__set_logging_(u'job is finished')
 
     def __set_task_finished_at_(self, index, status):
         if self.__is_active is True:
-            self.task_finished_at.set_emit_send(index, status)
+            self.task_finished_at.send_emit(index, status)
             self.__set_logging_(u'task {} is finished'.format(index))
 
     def get_task_count(self):
@@ -915,22 +955,24 @@ class DdlRsvTaskQuery(ddl_obj_abs.AbsDdlRsvTaskQuery):
     CONFIGURE_FILE_PATH = utl_configure.MainData.get_configure_file(
         'deadline/query/rsv-task'
     )
+
     def __init__(self, *args, **kwargs):
         super(DdlRsvTaskQuery, self).__init__(*args, **kwargs)
 
 
 if __name__ == '__main__':
-
     def test_0(*args):
         pass
 
+
     def test_1(*args):
         pass
+
 
     m = DdlJobMonitor('62cea962e127c60c888791c0')
 
     m.set_start()
 
-    m.running.set_connect_to(test_0)
+    m.running.connect_to(test_0)
 
-    m.job_status_changed.set_connect_to(test_1)
+    m.job_status_changed.connect_to(test_1)

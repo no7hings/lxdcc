@@ -1,12 +1,13 @@
 # coding:utf-8
 import collections
+
 import copy
 
 import fnmatch
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 # arnold
@@ -100,7 +101,7 @@ ktn_scripts.ScpLookOutput(
         query_dict = ktn_dcc_objects.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_look_pass_source_nodes()
         for i_dcc_obj in dcc_objs:
-            i_material_sg_paths = ktn_core.SGStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
+            i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
                 location, 'materialAssign', include_types=self.GEOMETRY_TYPES
             )
             for j_material_sg_path in i_material_sg_paths:
@@ -137,12 +138,12 @@ ktn_scripts.ScpLookOutput(
         list_ = []
         _ = self.get_all_look_pass_args()
         for i_pass_name, i_dcc_obj in _:
-            i_s_opt = ktn_core.SGStageOpt(i_dcc_obj.get_name())
+            i_s_opt = ktn_core.KtnStageOpt(i_dcc_obj.get_name())
             i_geometry_paths = i_s_opt.get_all_paths_at(
                 location, include_types=self.GEOMETRY_TYPES
             )
             for j_path in i_geometry_paths:
-                j_obj_opt = ktn_core.KtnSGObjOpt(i_s_opt, j_path)
+                j_obj_opt = ktn_core.KtnObjOpt(i_s_opt, j_path)
                 if not j_obj_opt.get('materialAssign'):
                     list_.append(
                         (i_pass_name, j_path)
@@ -150,11 +151,11 @@ ktn_scripts.ScpLookOutput(
         return list_
 
     def get_geometry_uv_map_usd_source_file(self):
-        s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
+        s = ktn_core.KtnStageOpt(self._obj_opt._ktn_obj)
         geometry_scheme = self.get_geometry_scheme()
         if geometry_scheme == 'asset':
             location = '/root/world/geo/master'
-            _ = s.get_obj_opt(location).get('userProperties.usd.variants.asset.surface.override.file')
+            _ = s.generate_obj_opt(location).get('userProperties.usd.variants.asset.surface.override.file')
             if _:
                 f_opt = bsc_core.StgFileOpt(_)
                 # TODO fix this bug
@@ -165,15 +166,15 @@ ktn_scripts.ScpLookOutput(
                 return _
 
     def get_geometry_uv_map_usd_file(self):
-        s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
+        s = ktn_core.KtnStageOpt(self._obj_opt._ktn_obj)
         geometry_scheme = self.get_geometry_scheme()
         if geometry_scheme == 'asset':
             location = '/root/world/geo/master'
-            _ = s.get_obj_opt(location).get('userProperties.usd.variants.asset.surface.override.file')
+            _ = s.generate_obj_opt(location).get('userProperties.usd.variants.asset.surface.override.file')
             return _
 
     def get_geometry_scheme(self):
-        s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
+        s = ktn_core.KtnStageOpt(self._obj_opt._ktn_obj)
         if s.get_obj_exists('/root/world/geo/master') is True:
             return 'asset'
         elif s.get_obj_exists('/root/world/geo/assets') is True:
@@ -181,7 +182,7 @@ ktn_scripts.ScpLookOutput(
         return 'asset'
 
     def get_geometry_root(self):
-        s = ktn_core.SGStageOpt(self._obj_opt._ktn_obj)
+        s = ktn_core.KtnStageOpt(self._obj_opt._ktn_obj)
         if s.get_obj_exists('/root/world/geo/master') is True:
             return '/root/world/geo/master'
         elif s.get_obj_exists('/root/world/geo/assets') is True:
@@ -334,7 +335,7 @@ class ScpLookAssImport(object):
 
         self._time_tag = bsc_core.TimestampOpt(bsc_core.StgFileOpt(self._file_path).get_modify_timestamp()).get_as_tag_36()
 
-        self._convert_configure = bsc_objects.Configure(
+        self._convert_configure = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()

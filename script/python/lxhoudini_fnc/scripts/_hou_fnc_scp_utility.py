@@ -21,7 +21,7 @@ def set_geometry_unify_by_usd_file(option):
     output_file_path = '{}.output{}'.format(base, ext)
     temp_hda.get_port('usdfile').set(input_file_path)
     temp_hda.get_port('outUsdFile').set(output_file_path)
-    hou_dcc_objects.Scene.set_file_save_to(
+    hou_dcc_objects.Scene.save_file_to(
         output_scene_file_path
     )
     temp_hda.get_port('execute').hou_port.pressButton()
@@ -51,7 +51,7 @@ def set_geometry_uv_map_assign_by_usd_file(option):
     output_file_path = '{}.output{}'.format(base, ext)
     temp_hda.get_port('filepath1').set(input_file_path)
     temp_hda.get_port('lopoutput').set(output_file_path)
-    hou_dcc_objects.Scene.set_file_save_to(
+    hou_dcc_objects.Scene.save_file_to(
         output_scene_file_path
     )
     temp_hda.get_port('execute').hou_port.pressButton()

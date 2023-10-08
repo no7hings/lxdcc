@@ -41,6 +41,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     )
     PLUG_NAME = None
     OBJ_PATHSEP = ma_configure.Util.OBJ_PATHSEP
+
     def __init__(self, option=None):
         super(FncGeometryUsdImporter, self).__init__(option)
         #
@@ -50,7 +51,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._usd_stage = self._usd_stage_opt.usd_instance
         #
         if bsc_core.StgPathOpt(file_path).get_is_file() is True:
-            self._usd_stage_opt.set_sublayer_append(file_path)
+            self._usd_stage_opt.append_sublayer(file_path)
             uv_map_file_path = self.get('uv_map_file')
             if uv_map_file_path is not None:
                 self._usd_stage_opt.set_sublayer_prepend(uv_map_file_path)
@@ -78,9 +79,12 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     elif i_usd_prim_type_name == usd_configure.ObjType.Mesh:
                         mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
                     #
-                    mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(port_match_patterns)
+                    mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
+                        port_match_patterns
+                        )
                     #
                     l_p.set_update()
+
     @classmethod
     def import_fnc(cls, usd_stage, root_override, port_match_patterns):
         c = len([i for i in usd_stage.TraverseAll()])
@@ -96,9 +100,12 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     elif i_usd_prim_type_name == usd_configure.ObjType.Mesh:
                         mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
                     #
-                    mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(port_match_patterns)
+                    mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
+                        port_match_patterns
+                        )
                     #
                     g_p.set_update()
+
     @classmethod
     def create_root_fnc(cls, path, type_name):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -108,6 +115,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             mya_obj.get_dcc_instance(
                 type_name
             )
+
     @classmethod
     def create_path_fnc(cls, path):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -117,6 +125,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             for i_path in paths:
                 if i_path != '/':
                     cls.create_transform_fnc(i_path)
+
     @classmethod
     def create_transform_fnc(cls, path, matrix=None):
         path_opt = bsc_core.DccPathDagOpt(path)
@@ -127,6 +136,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             if mya_obj_opt.set_create() is True:
                 if matrix is not None:
                     mya_obj_opt.set_matrix(matrix)
+
     @classmethod
     def create_mesh_uv_map_fnc(cls, prim, uv_map_face_vertices_contrast=True):
         obj_path = prim.GetPath().pathString
@@ -150,7 +160,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             uv_map_face_vertices_uuid_tgt = mesh_mya_obj_opt.get_uv_map_face_vertices_as_uuid()
                             if uv_map_face_vertices_uuid_src == uv_map_face_vertices_uuid_tgt:
                                 # noinspection PyArgumentEqualDefault
-                                mesh_mya_obj_opt.set_uv_maps(uv_maps, clear=False)
+                                mesh_mya_obj_opt.assign_uv_maps(uv_maps, clear=False)
                             else:
                                 utl_core.Log.set_module_warning_trace(
                                     'uv-map(s)-import',
@@ -160,7 +170,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             uv_map_face_vertices_uuid_src = mesh_usd_obj_opt.get_uv_map_face_vertices_as_uuid()
                             uv_map_face_vertices_uuid_tgt = mesh_mya_obj_opt.get_uv_map_face_vertices_as_uuid()
                             clear = uv_map_face_vertices_uuid_src != uv_map_face_vertices_uuid_tgt
-                            mesh_mya_obj_opt.set_uv_maps(uv_maps, clear=clear)
+                            mesh_mya_obj_opt.assign_uv_maps(uv_maps, clear=clear)
                     else:
                         utl_core.Log.set_module_warning_trace(
                             'uv-map(s)-import',
@@ -181,6 +191,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self.import_uv_map_fnc(
             self._usd_stage, uv_map_face_vertices_contrast
         )
+
     @classmethod
     def import_uv_map_fnc(cls, usd_state, uv_map_face_vertices_contrast):
         c = len([i for i in usd_state.TraverseAll()])
@@ -202,6 +213,7 @@ class FncGeometryFbxImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         file=''
     )
     PLUG_NAME = 'fbxmaya'
+
     def __init__(self, option=None):
         super(FncGeometryFbxImporter, self).__init__(option)
 
@@ -244,6 +256,7 @@ class GeometryUsdImporter0(object):
     OPTION = dict()
     PLUG_NAME = 'mayaUsdPlugin'
     OBJ_PATHSEP = ma_configure.Util.OBJ_PATHSEP
+
     def __init__(self, file_path, root=None, option=None):
         self._file_path = file_path
         self._root = root
@@ -255,6 +268,7 @@ class GeometryUsdImporter0(object):
                 self._option[k] = v
 
         self._results = []
+
     @classmethod
     def _get_usd_format_(cls, file_path):
         ext = os.path.splitext(file_path)[-1]
@@ -263,6 +277,7 @@ class GeometryUsdImporter0(object):
         elif ext == '.usda':
             return 'usda'
         raise TypeError()
+
     @classmethod
     def _set_cmd_run_(cls, file_path, **kwargs):
         cmds.loadPlugin(cls.PLUG_NAME, quiet=1)
@@ -285,6 +300,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     )
     PLUG_NAME = 'AbcImport'
     OBJ_PATHSEP = ma_configure.Util.OBJ_PATHSEP
+
     def __init__(self, file_path, root=None, option=None):
         super(FncGeometryAbcImporter, self).__init__(option)
 
@@ -330,10 +346,10 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     obj.set_visible(False)
                 #
                 target_obj_path = '{}|{}'.format(
-                    root,  bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(obj.name)
+                    root, bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(obj.name)
                 )
                 if cmds.objExists(target_obj_path) is False:
-                    obj.set_parent_path(root)
+                    obj.parent_to_path(root)
                 else:
                     obj.set_delete()
 
@@ -357,8 +373,10 @@ class FncGeometryXgenImporter(
         namespace=':',
     )
     PLUG_NAME = 'xgenToolkit'
+
     def __init__(self, option=None):
         super(FncGeometryXgenImporter, self).__init__(option)
+
     @classmethod
     def import_grow_fnc(cls, grow_file, grow_location):
         if isinstance(grow_file, six.string_types):
@@ -375,12 +393,14 @@ class FncGeometryXgenImporter(
                     hidden=True
                 )
             ).execute()
+
     @classmethod
     def import_xgen_fnc(cls, xgen_collection_file, xgen_collection_directory, xgen_location):
         # noinspection PyUnresolvedReferences
         import xgenm as xg
         # noinspection PyUnresolvedReferences,PyPep8Naming
         import xgenm.xgGlobal as xgg
+
         #
         group = mya_dcc_objects.Group(
             bsc_core.DccPathDagOpt(xgen_location).translate_to('|').get_value()
@@ -409,7 +429,7 @@ class FncGeometryXgenImporter(
                 value=i_xgen_collection_data_directory,
             )
             for i_xgen_guide in mya_dcc_objects.Group(
-                bsc_core.DccPathDagOpt(xgen_location).translate_to('|').value
+                    bsc_core.DccPathDagOpt(xgen_location).translate_to('|').value
             ).get_all_paths(include_obj_type=['xgmSplineGuide']):
                 mya_dcc_objects.Node(i_xgen_guide).set('width', .01)
             #
@@ -456,7 +476,7 @@ class DatabaseGeometryImporter(object):
                 if mesh_opt.get_shell_count() == 1:
                     key = mesh_opt.get_face_vertices_as_uuid()
                     uv_maps = bsc_core.DtbGeometryUvMapFileMtd.get_value(key)
-                    mesh_opt.set_uv_maps(uv_maps, clear=True)
+                    mesh_opt.assign_uv_maps(uv_maps, clear=True)
             #
             g_p.set_stop()
 
@@ -524,6 +544,7 @@ mya_fnc_importers.FncGeometryImporterNew(
         uv_map_only=False,
         uv_map_face_vertices_contrast=True,
     )
+
     def __init__(self, option):
         super(FncGeometryImporterNew, self).__init__(option)
 
@@ -541,6 +562,7 @@ mya_fnc_importers.FncGeometryImporterNew(
             else:
                 list_.append(i_src)
         return list_
+
     @ma_core.Modifier.undo_run
     def execute(self):
         file_path = self.get('file')
@@ -548,7 +570,7 @@ mya_fnc_importers.FncGeometryImporterNew(
         root_type_name = self.get('root_type')
         #
         locations = self.get_locations_fnc(
-            self.get('renderable_locations') + self.get('auxiliary_locations')
+            self.get('renderable_locations')+self.get('auxiliary_locations')
         )
         s_opt = usd_core.UsdStageOpt()
 

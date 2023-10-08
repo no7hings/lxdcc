@@ -4,11 +4,11 @@ from pxr import Usd, Sdf, Vt, UsdGeom, Gf
 
 from lxbasic import bsc_core
 
+import lxcontent.objects as ctt_objects
+
 from lxutil import utl_core
 
 from lxutil.dcc import utl_dcc_opt_abs
-
-import lxbasic.objects as bsc_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -33,7 +33,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
             )
             return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
         else:
-            return bsc_objects.Content(value={})
+            return ctt_objects.Content(value={})
     @classmethod
     def _get_mesh_data_content_(cls, stage, file_path, yml_file_path):
         yml_file = utl_dcc_objects.OsYamlFile(yml_file_path)
@@ -43,9 +43,9 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                     'geometry-comparer data read',
                     'cache="{}", source="{}"'.format(yml_file_path, file_path)
                 )
-                return bsc_objects.Content(value=yml_file_path)
+                return ctt_objects.Content(value=yml_file_path)
         #
-        content_0 = bsc_objects.Content(value={})
+        content_0 = ctt_objects.Content(value={})
         c = len([i for i in stage.TraverseAll()])
         if c:
             with utl_core.GuiProgressesRunner.create(maximum=c, label='gain geometry-comparer data') as g_p:

@@ -10,4 +10,4 @@ import hou
 cmd = "set -g {0}={1}".format('$HIP', '/l/prod/cjd/work/shots/z10/z10090/efx/effects/houdini')
 hou.hscript(cmd)
 
-hou_dcc_objects.Scene.set_file_new_with_dialog(f)
+hou_dcc_objects.Scene.new_file_with_dialog(f)

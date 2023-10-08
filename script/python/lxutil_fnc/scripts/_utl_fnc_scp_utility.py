@@ -280,7 +280,7 @@ def set_work_file_repair(option):
     if rsv_task_properties:
         utl_dcc_objects.OsFile(work_katana_scene_src_file_path).set_backup()
         #
-        ktn_dcc_objects.Scene.set_file_open(work_katana_scene_src_file_path)
+        ktn_dcc_objects.Scene.open_file(work_katana_scene_src_file_path)
         #
         work_texture_dir_Path = rsv_operators.RsvAssetTextureQuery(rsv_task_properties).get_work_directory(version='new')
         #
@@ -292,4 +292,4 @@ def set_work_file_repair(option):
             )
         ).set_copy_and_repath_to(work_texture_dir_Path)
         #
-        ktn_dcc_objects.Scene.set_file_save()
+        ktn_dcc_objects.Scene.save_file()

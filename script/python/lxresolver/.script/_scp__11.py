@@ -1,9 +1,9 @@
 # coding:utf-8
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 f = '/data/f'
 
-c = bsc_objects.Configure(value='/l/prod/cjd/publish/assets/chr/didi/srf/srf_anishading/didi.srf.srf_anishading.v001/look/yml/didi.yml')
+c = ctt_objects.Configure(value='/l/prod/cjd/publish/assets/chr/didi/srf/srf_anishading/didi.srf.srf_anishading.v001/look/yml/didi.yml')
 
 # print c
 

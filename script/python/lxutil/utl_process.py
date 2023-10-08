@@ -6,7 +6,9 @@ class MayaProcess(object):
     def get_command(cls, option):
         import lxbasic.objects as bsc_objects
 
-        c = bsc_objects.PackageContextNew(' '.join(['lxdcc', 'maya', 'maya@2019.2', 'usd', 'mtoa@4.2.1.1'])).get_command(
+        c = bsc_objects.PackageContextNew(
+            ' '.join(['lxdcc', 'maya', 'maya@2019.2', 'usd', 'mtoa@4.2.1.1'])
+        ).get_command(
             args_execute=[
                 (
                     r'-- maya -batch -command '
@@ -22,61 +24,26 @@ class MayaProcess(object):
         return c
 
 
-if __name__ == '__main__':
-    from lxbasic import bsc_core
+class PythonProcess(object):
+    @classmethod
+    def generate_command(cls, option):
+        from lxbasic import bsc_core
 
-    # cmd = MayaProcess.get_command(
-    #     'method=fbx-to-usd&fbx={}&usd={}'.format(
-    #         '/production/library/resource/all/3d_asset/cement_bollard_with_base_sdfx4/v0001/geometry/fbx/cement_bollard_with_base_sdfx4.fbx',
-    #         '/production/library/resource/all/3d_asset/cement_bollard_with_base_sdfx4/v0001/geometry/usd/cement_bollard_with_base_sdfx4.usd'
-    #     )
-    # )
-    #
-    # bsc_core.SubProcessMtd.execute_with_result_in_linux(
-    #     cmd, clear_environ='auto'
-    # )
-    # /production/shows/nsa_dev/assets/oth/genariceyes/user/work.wengmengdi/maya/scenes/srf_anishading/genariceyes.srf.srf_anishading.v001_002.ma
-    # cmd = MayaProcess.get_command(
-    #     'method=collection-and-repath-texture&file={}&scene_directory={}&texture_directory={}'.format(
-    #         '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/source/nikki.ma',
-    #         '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/maya',
-    #         '/production/shows/nsa_dev/assets/chr/nikki/shared/srf/srf_anishading/nikki.srf.srf_anishading.v003/texture'
-    #     )
-    # )
-    #
-    # bsc_core.SubProcessMtd.execute_with_result_in_linux(
-    #     cmd, clear_environ='auto'
-    # )
+        import lxbasic.objects as bsc_objects
 
-    # cmd = MayaProcess.get_command(
-    #     'method=scene-to-usd&scene={}&usd={}&auto_rename=True'.format(
-    #         '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
-    #         '/production/library/resource/all/test/grass_g010/v0001/geometry/usd/grass_g010.usd'
-    #     )
-    # )
-    #
-    # bsc_core.SubProcessMtd.execute_with_result_in_linux(
-    #     cmd, clear_environ='auto'
-    # )
-
-    # print bsc_core.ArgDictStringOpt(
-    #     'method=scene-to-ass&scene={}&ass={}&auto_rename=True&texture_directory={}&texture_search_directory={}&scale=0.1'.format(
-    #         '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
-    #         '/production/library/resource/all/test/grass_g010/v0001/proxy/grass_g010.ass',
-    #         '/production/library/resource/all/test/grass_g010/v0001/texture/source',
-    #         '/production/library/resource/share/texture/plant-unorganized/tx',
-    #     )
-    # ).get_as_float('scale')
-
-    cmd = MayaProcess.get_command(
-        'method=scene-to-ass&scene={}&ass={}&auto_rename=True&texture_directory={}&texture_search_directory={}&scale=0.1'.format(
-            '/production/library/resource/all/test/grass_g010/v0001/scene/maya/source/grass_g010.ma',
-            '/production/library/resource/all/test/grass_g010/v0001/proxy/grass_g010.ass',
-            '/production/library/resource/all/test/grass_g010/v0001/texture/source',
-            '/production/library/resource/share/texture/plant-unorganized/tx',
+        c = bsc_objects.PackageContextNew(
+            ' '.join(['lxdcc', 'usd'])
+        ).get_command(
+            args_execute=[
+                r'-- lxdcc-python {process_file} "{option}"'.format(
+                    process_file=bsc_core.RscFileMtd.get('python-process/usd-script.py'), option=option
+                )
+            ],
         )
-    )
+        return c
 
-    bsc_core.SubProcessMtd.execute_with_result_in_linux(
-        cmd, clear_environ='auto'
+
+if __name__ == '__main__':
+    print PythonProcess.generate_command(
+        'method=test'
     )

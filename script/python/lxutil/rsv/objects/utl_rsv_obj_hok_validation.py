@@ -257,7 +257,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     # maya
     def execute_maya_scene_check(self, validation_checker):
         def yes_fnc_():
-            mya_dcc_objects.Scene.set_file_save()
+            mya_dcc_objects.Scene.save_file()
 
         from lxbasic import bsc_core
         #
@@ -267,7 +267,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
-        from lxutil_gui.qt import utl_gui_qt_core
+        from lxutil_gui.qt import gui_qt_core
         #
         check_group = 'Scene Check'
         #
@@ -295,7 +295,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
-                    parent=utl_gui_qt_core.QtDccMtd.get_active_window()
+                    parent=gui_qt_core.QtDccMtd.get_active_window()
                 )
                 #
                 if not w.get_result():
@@ -603,7 +603,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     # katana
     def execute_katana_scene_check(self, validation_checker):
         def yes_fnc_():
-            ktn_dcc_objects.Scene.set_file_save()
+            ktn_dcc_objects.Scene.save_file()
         #
         from lxutil import utl_core
 
@@ -613,7 +613,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxkatana.scripts as ktn_scripts
 
-        from lxutil_gui.qt import utl_gui_qt_core
+        from lxutil_gui.qt import gui_qt_core
         #
         check_group = 'Scene Check'
         w_s = ktn_core.WorkspaceSetting()
@@ -654,7 +654,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     status=utl_core.DialogWindow.ValidatorStatus.Warning,
                     #
-                    parent=utl_gui_qt_core.QtDccMtd.get_active_window()
+                    parent=gui_qt_core.QtDccMtd.get_active_window()
                 )
                 #
                 if not w.get_result():
@@ -766,7 +766,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if geometry_scheme == 'asset':
             root_location = self._rsv_scene_properties.get('dcc.root')
             location = '{}{}'.format(geometry_location, root_location)
-            stage_opt = ktn_core.SGStageOpt(opt.ktn_obj)
+            stage_opt = ktn_core.KtnStageOpt(opt.ktn_obj)
 
             if stage_opt.get_obj_exists(location) is False:
                 validation_checker.register_node_result(

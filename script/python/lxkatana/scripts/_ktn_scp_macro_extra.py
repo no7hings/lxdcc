@@ -5,14 +5,12 @@ import collections
 
 import six
 
-# noinspection PyUnresolvedReferences
-from Katana import Utils, NodegraphAPI, CacheManager, RenderManager
-# noinspection PyUnresolvedReferences
-from UI4 import Manifest
-
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+# noinspection PyUnresolvedReferences
+from Katana import Utils, NodegraphAPI, CacheManager, RenderManager
+
+import lxcontent.objects as ctt_objects
 
 from lxkatana import ktn_core
 
@@ -20,7 +18,7 @@ from lxkatana import ktn_core
 class ScpMacro(object):
     def __init__(self, file_path):
         self._file_path = file_path
-        self._cfg = bsc_objects.Configure(value=self._file_path)
+        self._cfg = ctt_objects.Configure(value=self._file_path)
         self._cfg.set('option.unique_name', bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100).lower())
         #
         color_hsv = self._cfg.get('option.color_hsv')
@@ -80,8 +78,8 @@ class ScpMacro(object):
             )
         #
         self._cfg.set_flatten()
-    #
-    @ktn_core.Modifier.undo_debug_run
+
+    # @ktn_core.Modifier.undo_debug_run
     def build(self):
         self.build_main()
         self.build_nodes()
@@ -131,6 +129,7 @@ class ScpMacro(object):
         for i_key in c.get_top_keys():
             i_data = c.get_content(i_key)
             self._build_node_(i_data)
+
     @classmethod
     def _build_node_(cls, data, extend_kwargs=None):
         type_name = data['type']
@@ -238,6 +237,7 @@ class ScpMacro(object):
             data.get('attributes') or {}
         )
         return ktn_obj, is_create
+
     @classmethod
     def _build_node_child_(cls, data, extend_kwargs=None):
         type_name = data['type']
@@ -267,6 +267,7 @@ class ScpMacro(object):
                 data.get('proxy_ports') or {},
                 extend_kwargs=extend_kwargs
             )
+
     @classmethod
     def _build_node_node_graph_(cls, data, extend_kwargs=None):
         type_name = data['type']
@@ -363,6 +364,7 @@ class ScpMacro(object):
 
     def save(self):
         import os
+
         yaml_file_opt = bsc_core.StgFileOpt(self._file_path)
         macro_file_path = '{}.macro'.format(yaml_file_opt.path_base)
         macro_file_opt = bsc_core.StgFileOpt(macro_file_path)
@@ -381,11 +383,13 @@ class ScpMacro(object):
             macro_file_path
         )
         os.utime(macro_file_path, (yaml_file_opt.get_modify_timestamp(), yaml_file_opt.get_modify_timestamp()))
+
     @classmethod
     def set_warning_show(cls, label, contents):
         from lxutil import utl_core
         #
         from lxkatana import ktn_core
+
         #
         if contents:
             if ktn_core.get_is_ui_mode():
@@ -407,6 +411,7 @@ class ScpMacro(object):
 
 class AbsWsp(object):
     PRESET_DICT = {}
+
     def __init__(self, ktn_obj):
         if isinstance(ktn_obj, six.string_types):
             self._ktn_obj = ktn_core.NodegraphAPI.GetNode(
@@ -415,14 +420,17 @@ class AbsWsp(object):
         else:
             self._ktn_obj = ktn_obj
         self._obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
     @classmethod
     def get_rsv_project(cls):
         pass
+
     @classmethod
     def get_rsv_asset(cls):
         import lxresolver.commands as rsv_commands
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         #
@@ -432,9 +440,11 @@ class AbsWsp(object):
             if rsv_task is not None:
                 rsv_asset = rsv_task.get_rsv_resource()
                 return rsv_asset
+
     @classmethod
     def _get_rsv_resource_(cls, branch, rsv_asset_path):
         import lxresolver.commands as rsv_commands
+
         #
         _ = rsv_asset_path.split('/')
         project, _, resource = _[1:]
@@ -450,7 +460,7 @@ class AbsWsp(object):
 
     def load_preset(self):
         key = self._obj_opt.get('preset.name')
-        c = bsc_objects.Content(value=self.PRESET_DICT)
+        c = ctt_objects.Content(value=self.PRESET_DICT)
         self._obj_opt.set_parameters_by_data(
             c.get('{}.parameters'.format(key)) or {}
         )
@@ -459,10 +469,10 @@ class AbsWsp(object):
         )
 
     def get_record(self, key):
-        s = ktn_core.SGStageOpt(
+        s = ktn_core.KtnStageOpt(
             self._ktn_obj
         )
-        r = s.get_obj_opt('/root')
+        r = s.generate_obj_opt('/root')
         return r.get('lynxi.variants.{}'.format(key))
 
     def get(self, key):
@@ -478,6 +488,7 @@ class ScpWspVariantRegister(AbsWsp):
 
     def _get_key_(self):
         return self._obj_opt.get('variableName')
+
     @classmethod
     def _get_variant_values_(cls, obj_opt):
         list_ = []
@@ -520,6 +531,7 @@ class ScpWspVariantSet(AbsWsp):
             p, ['None']
         )
         return key_pre
+
     @ktn_core.Modifier.undo_run
     def load_variant_keys(self):
         self._obj_opt.set_capsule_strings(
@@ -540,6 +552,7 @@ class ScpWspVariantSet(AbsWsp):
             self._obj_opt.set_capsule_strings(
                 'parameters.key', list__
             )
+
     @ktn_core.Modifier.undo_run
     def load_variant_values(self):
         key = self._get_key_()
@@ -598,6 +611,7 @@ class ScpWspVariantResolve(AbsWsp):
                 i_variant_value_p, 'None'
             )
         return variant_dict_pre
+
     @ktn_core.Modifier.undo_run
     def resolve_all_variants(self):
         variant_dict_pre = self.clear_all_variants()
@@ -701,6 +715,7 @@ class ScpWspShaderChecker(AbsWsp):
 class ScpWspAssetGeometry(AbsWsp):
     def __init__(self, *args, **kwargs):
         super(ScpWspAssetGeometry, self).__init__(*args, **kwargs)
+
     @ktn_core.Modifier.undo_run
     def load_latest_usd(self):
         from lxkatana import ktn_core
@@ -752,6 +767,7 @@ class ScpWspAssetGeometry(AbsWsp):
         ScpMacro.set_warning_show(
             'camera load', contents
         )
+
     @ktn_core.Modifier.undo_run
     def create_new_usd(self):
         from lxkatana import ktn_core
@@ -850,6 +866,7 @@ class ScpWspAssetGeometry(AbsWsp):
         ScpMacro.set_warning_show(
             'camera load', contents
         )
+
     @ktn_core.Modifier.undo_run
     def load_usd_variant(self):
         mode = self._obj_opt.get('parameters.usd_variant.mode')
@@ -862,6 +879,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
     def translate_to_center(self, above_axis_y=False):
         from lxusd import usd_core
+
         #
         file_path = self._obj_opt.get('usd.file')
         if file_path:
@@ -890,21 +908,24 @@ class ScpWspGeometry(AbsWsp):
     CFG_YAML = bsc_core.CfgFileMtd.get_yaml(
         'katana/script/macro/geometry'
     )
+
     def __init__(self, *args, **kwargs):
         super(ScpWspGeometry, self).__init__(*args, **kwargs)
-        self._cfg = bsc_objects.Configure(value=self.CFG_YAML)
+        self._cfg = ctt_objects.Configure(value=self.CFG_YAML)
         self.PRESET_DICT = self._cfg.get('preset')
 
 
 class ScpWspGeometrySpace(AbsWsp):
     class Records(object):
         variant_register = 'record.variant_register'
+
     #
     class Keys(object):
         node_name = 'record.variant_register'
         #
         default_name = 'extra.default_name'
         customize_name = 'extra.customize_name'
+
     #
     def __init__(self, *args, **kwargs):
         super(ScpWspGeometrySpace, self).__init__(*args, **kwargs)
@@ -937,6 +958,7 @@ class ScpWspAssetCamera(AbsWsp):
         import lxresolver.commands as rsv_commands
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
         #
         self._obj_opt.set(
             'parameters.abc.enable',
@@ -1000,6 +1022,7 @@ class ScpWspCamera(AbsWsp):
             'cache/asset_abc/copy_from': '/root/world/cam/cam_fullbody/cam_fullbodyShape'
         }
     }
+
     def __init__(self, *args, **kwargs):
         super(ScpWspCamera, self).__init__(*args, **kwargs)
 
@@ -1007,6 +1030,7 @@ class ScpWspCamera(AbsWsp):
 class ScpWspSpace(AbsWsp):
     class Records(object):
         variant_register = 'record.variant_register'
+
     #
     def __init__(self, *args, **kwargs):
         super(ScpWspSpace, self).__init__(*args, **kwargs)
@@ -1037,10 +1061,10 @@ class ScpWspCameraSpace(AbsWsp):
         variant_register = 'record.variant_register'
 
     class Keys(object):
-
         #
         default_name = 'extra.default_name'
         customize_name = 'extra.customize_name'
+
     #
     def __init__(self, *args, **kwargs):
         super(ScpWspCameraSpace, self).__init__(*args, **kwargs)
@@ -1065,6 +1089,7 @@ class ScpWspCameraSpace(AbsWsp):
 class AbsSpcWspLookGroup(AbsWsp):
     def __init__(self, *args, **kwargs):
         super(AbsSpcWspLookGroup, self).__init__(*args, **kwargs)
+
     @ktn_core.Modifier.undo_run
     def load_latest_ass_file(self):
         import lxresolver.commands as rsv_commands
@@ -1109,6 +1134,7 @@ class SpcWspMaterialGroup(AbsSpcWspLookGroup):
 
     def build_from_ass_file(self):
         from lxkatana.scripts import _ktn_scp_look
+
         f = self._obj_opt.get('user.parameters.ass.file')
         if f:
             _ktn_scp_look.ScpLookMaterialImport(
@@ -1124,6 +1150,7 @@ class SpcWspMaterialAssignGroup(AbsSpcWspLookGroup):
 
     def build_from_ass_file(self):
         from lxkatana.scripts import _ktn_scp_look
+
         f = self._obj_opt.get('user.parameters.ass.file')
         if f:
             _ktn_scp_look.ScpLookMaterialAssignImport(
@@ -1139,6 +1166,7 @@ class SpcWspGeometryPropertiesAssignGroup(AbsSpcWspLookGroup):
 
     def build_from_ass_file(self):
         from lxkatana.scripts import _ktn_scp_look
+
         f = self._obj_opt.get('user.parameters.ass.file')
         if f:
             _ktn_scp_look.ScpLookGeometryPropertiesAssignImport(
@@ -1155,6 +1183,7 @@ class ScpWspLookSpace(AbsWsp):
         #
         default_name = 'extra.default_name'
         customize_name = 'extra.customize_name'
+
     #
     def __init__(self, *args, **kwargs):
         super(ScpWspLookSpace, self).__init__(*args, **kwargs)
@@ -1179,6 +1208,7 @@ class ScpWspLookSpace(AbsWsp):
 class ScpWspAssetLightRig(AbsWsp):
     def __init__(self, *args, **kwargs):
         super(ScpWspAssetLightRig, self).__init__(*args, **kwargs)
+
     @classmethod
     def _get_light_args_(cls, project):
         import lxbasic.extra.methods as bsc_etr_methods
@@ -1292,9 +1322,10 @@ class ScpWspWorkspace(AbsWsp):
     CFG_YAML = bsc_core.CfgFileMtd.get_yaml(
         'katana/script/macro/workspace'
     )
+
     def __init__(self, *args, **kwargs):
         super(ScpWspWorkspace, self).__init__(*args, **kwargs)
-        self._cfg = bsc_objects.Configure(value=self.CFG_YAML)
+        self._cfg = ctt_objects.Configure(value=self.CFG_YAML)
 
         self._cfg.set(
             'option.path', self._obj_opt.get_path(),
@@ -1333,6 +1364,7 @@ class ScpWspWorkspace(AbsWsp):
             )
             if i_record is not None:
                 ktn_core.NGObjOpt(i_record).execute_port('variant.register')
+
     @ktn_core.Modifier.undo_run
     def build(self):
         keys = self._obj_opt.get('workspace.keys')
@@ -1406,7 +1438,6 @@ class ScpWspWorkspace(AbsWsp):
         ktn_obj, is_create = ScpMacro._build_node_(data)
         obj_opt = ktn_core.NGObjOpt(ktn_obj)
         if is_create is True:
-
             self._obj_opt.set_expression(
                 'record.{}'.format(key),
                 'getNode(\'{}\').getNodeName()'.format(
@@ -1466,8 +1497,10 @@ class ScpWspRenderLayer(AbsWsp):
 
 class ScpAssetAssExport(AbsWsp):
     RENDER_MODE = 'previewRender'
+
     def __init__(self, *args, **kwargs):
         super(ScpAssetAssExport, self).__init__(*args, **kwargs)
+
     @classmethod
     def _get_input_dynamic_usd_file_(cls, rsv_asset):
         rsv_task = rsv_asset.get_rsv_task(
@@ -1481,6 +1514,7 @@ class ScpAssetAssExport(AbsWsp):
             return usd_file_rsv_unit.get_exists_result(
                 version='latest', extend_variants=dict(var='hi')
             )
+
     @classmethod
     def _get_output_ass_file_(cls, rsv_scene_properties, rsv_task, look_pass_name):
         workspace = rsv_scene_properties.get('workspace')
@@ -1514,6 +1548,7 @@ class ScpAssetAssExport(AbsWsp):
                 extend_variants=dict(look_pass=look_pass_name)
             )
         return look_ass_file_path
+
     @ktn_core.Modifier.undo_run
     def set_guess(self):
         from lxbasic import bsc_core
@@ -1585,6 +1620,9 @@ class ScpAssetAssExport(AbsWsp):
             )
 
     def set_ass_export(self):
+        # noinspection PyUnresolvedReferences
+        from UI4 import Manifest
+
         from lxutil import utl_core
 
         from lxkatana import ktn_core
@@ -1640,3 +1678,117 @@ class ScpAssetAssExport(AbsWsp):
                             'ass sequence export',
                             'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
                         )
+
+
+class ScpInstanceColorMap(object):
+    def __init__(self, ktn_obj):
+        if isinstance(ktn_obj, six.string_types):
+            self._ktn_obj = ktn_core.NodegraphAPI.GetNode(
+                ktn_obj
+            )
+        else:
+            self._ktn_obj = ktn_obj
+        self._obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
+
+    def get_location(self):
+        return self._obj_opt.get('parameters.setting.location')
+
+    def get_grow_usd_file_path(self):
+        return self._obj_opt.get('parameters.grow.usd')
+
+    def get_instance_usd_file_path(self):
+        return self._obj_opt.get('parameters.instance.usd')
+
+    def get_grow_image_file_path(self):
+        return self._obj_opt.get('parameters.grow.image')
+
+    def get_grow_map_name(self):
+        return self._obj_opt.get('parameters.grow.uv_map_name')
+
+    def get_grow_op(self):
+        return self._obj_opt.get('parameters.op.grow')
+
+    def generate_grow_cache(self):
+        """
+import lxkatana.scripts as ktn_scripts
+
+ktn_scripts.ScpInstanceColorMap(
+    NodegraphAPI.GetNode('instance_color_map')
+).generate_grow_cache()
+        """
+        self._obj_opt.set('parameters.grow.preview', False)
+        force = bool(self._obj_opt.get('parameters.grow.force'))
+        print force
+
+        grow_usd_file_path = self.get_grow_usd_file_path()
+        image_file_path = self.get_grow_image_file_path()
+        uv_map_name = self.get_grow_map_name()
+        cache_file_name = bsc_core.UuidMtd.generate_by_files(
+            [grow_usd_file_path]+bsc_core.StgTextureMtd.get_unit_paths(image_file_path),
+            [uv_map_name]
+        )
+        cache_usd_directory_path = bsc_core.StgTmpBaseMtd.get_cache_directory('usd-cache')
+        cache_usd_file_path = '{}/{}.usd'.format(cache_usd_directory_path, cache_file_name)
+        self._obj_opt.set('parameters.grow.cache.usd', cache_usd_file_path)
+        if bsc_core.StgPathMtd.get_is_exists(cache_usd_file_path) is False or force is True:
+            import lxutil_gui.proxy.widgets as prx_widgets
+
+            from lxutil import utl_process
+
+            w = prx_widgets.PrxProcessingWindow()
+            w.set_window_title('Generator Grow Cache')
+            w.set_window_show(exclusive=False)
+
+            w.start(
+                utl_process.PythonProcess.generate_command(
+                    'method=generator-grow-cache&grow_usd={}&image={}&uv_map_name={}&cache_usd={}'.format(
+                        grow_usd_file_path, image_file_path, uv_map_name, cache_usd_file_path
+                    )
+                )
+            )
+
+    def generate_instance_cache(self):
+        """
+import lxkatana.scripts as ktn_scripts
+
+ktn_scripts.ScpInstanceColorMap(
+    NodegraphAPI.GetNode('instance_color_map')
+).generate_instance_cache()
+        """
+        self._obj_opt.set('parameters.instance.preview', False)
+        force = bool(self._obj_opt.get('parameters.instance.force'))
+
+        grow_usd_file_path = self.get_grow_usd_file_path()
+        instance_usd_file_path = self.get_instance_usd_file_path()
+        image_file_path = self.get_grow_image_file_path()
+        uv_map_name = self.get_grow_map_name()
+        cache_file_name = bsc_core.UuidMtd.generate_by_files(
+            [grow_usd_file_path, instance_usd_file_path]+bsc_core.StgTextureMtd.get_unit_paths(image_file_path),
+            [uv_map_name]
+        )
+        cache_usd_directory_path = bsc_core.StgTmpBaseMtd.get_cache_directory('usd-cache')
+        cache_usd_file_path = '{}/{}.usd'.format(cache_usd_directory_path, cache_file_name)
+        self._obj_opt.set('parameters.instance.cache.usd', cache_usd_file_path)
+        cache_json_directory_path = bsc_core.StgTmpBaseMtd.get_cache_directory('json-cache')
+        cache_json_file_path = '{}/{}.json'.format(cache_json_directory_path, cache_file_name)
+        self._obj_opt.set('parameters.instance.cache.json', cache_json_file_path)
+        if bsc_core.StgPathMtd.get_is_exists(cache_usd_file_path) is False or force is True:
+            import lxutil_gui.proxy.widgets as prx_widgets
+
+            from lxutil import utl_process
+
+            w = prx_widgets.PrxProcessingWindow()
+            w.set_window_title('Generator Instance Cache')
+            w.set_window_show(exclusive=False)
+
+            w.start(
+                utl_process.PythonProcess.generate_command(
+                    (
+                        'method=generator-instance-cache'
+                        '&grow_usd={}&instance_usd={}&image={}&uv_map_name={}&cache_usd={}&cache_json={}'
+                    ).format(
+                        grow_usd_file_path, instance_usd_file_path, image_file_path, uv_map_name,
+                        cache_usd_file_path, cache_json_file_path
+                    )
+                )
+            )

@@ -4,17 +4,13 @@ if __name__ == '__main__':
 
     from lxbasic import bsc_core
 
-    from lxutil import utl_core
+    import lxcontent.objects as ctt_objects
 
     import lxresolver.commands as rsv_commands
 
     import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-    import lxutil.scripts as utl_scripts
-
-    import lxbasic.objects as bsc_objects
-
-    info = bsc_objects.Configure(value=collections.OrderedDict())
+    info = ctt_objects.Configure(value=collections.OrderedDict())
 
     resolver = rsv_commands.get_resolver()
 
@@ -50,7 +46,7 @@ if __name__ == '__main__':
                         #
                         sub_key_path = '{asset}.{step}.{task}.{version}'.format(
                             **rsv_scene_info_file_unit_properties.value)
-                        scene_info = bsc_objects.Configure(value=scene_info_file_path)
+                        scene_info = ctt_objects.Configure(value=scene_info_file_path)
                         #
                         info.set(
                             '{}.file'.format(sub_key_path), scene_info_file_path

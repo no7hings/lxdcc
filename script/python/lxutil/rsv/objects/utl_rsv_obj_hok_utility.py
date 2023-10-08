@@ -97,9 +97,9 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 # repath texture first
                 repath_maya_texture_enable = self._hook_option_opt.get_as_boolean('repath_maya_texture_enable')
                 if repath_maya_texture_enable is True:
-                    mya_dcc_objects.Scene.set_file_open(file_path_tgt)
+                    mya_dcc_objects.Scene.open_file(file_path_tgt)
                     self.set_maya_texture_repath()
-                    mya_dcc_objects.Scene.set_file_save()
+                    mya_dcc_objects.Scene.save_file()
                 # repath xgen last
                 repath_maya_xgen_enable = self._hook_option_opt.get_as_boolean('repath_maya_xgen_enable')
                 if repath_maya_xgen_enable is True:
@@ -400,13 +400,13 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version='{}__outsource'.format(version)
         )
         # save first
-        ktn_dcc_objects.Scene.set_file_save_to(katana_scene_src_file_path)
+        ktn_dcc_objects.Scene.save_file_to(katana_scene_src_file_path)
 
         self.set_katana_load_workspace()
 
         self.set_katana_import_ass()
 
-        ktn_dcc_objects.Scene.set_file_save_to(katana_scene_src_file_path)
+        ktn_dcc_objects.Scene.save_file_to(katana_scene_src_file_path)
 
     def set_katana_load_workspace(self):
         from lxutil import utl_core
@@ -433,7 +433,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
 
             ms = [
-                (ktn_dcc_objects.Scene.set_file_import, (file_path,)),
+                (ktn_dcc_objects.Scene.import_file_from, (file_path,)),
                 (ktn_dcc_objects.AssetWorkspace().set_all_executes_run, ()),
                 (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
             ]

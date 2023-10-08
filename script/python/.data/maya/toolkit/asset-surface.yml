@@ -174,7 +174,7 @@ central:
                     #
                     type: PrxPressItem
                     path: <...path>/<..key>
-                    click_command: 'import lxmaya.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_reference("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma")'
+                    click_command: 'import lxmaya.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.reference_file_from("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma")'
         #
         TD(s):
             name: <..key>

@@ -22,7 +22,7 @@ class FncUsdObj(object):
         if location is not None:
             location_path_dag_opt = bsc_core.DccPathDagOpt(location)
             mya_root = location_path_dag_opt.translate_to(self.OBJ_PATHSEP)
-            self._mya_path_dag_opt.set_parent_path(mya_root.path)
+            self._mya_path_dag_opt.parent_to_path(mya_root.path)
 
     def __str__(self):
         return '{}(path="{}")'.format(
@@ -108,7 +108,7 @@ class FncUsdMesh(FncUsdObj):
             )
             if is_create is True:
                 uv_maps = usd_mesh_opt.get_uv_maps()
-                mya_mesh_opt.set_uv_maps(uv_maps)
+                mya_mesh_opt.assign_uv_maps(uv_maps)
                 #
                 mya_mesh_look_opt = mya_dcc_operators.MeshLookOpt(mya_mesh)
                 mya_mesh_look_opt.set_default_material_assign()
@@ -124,7 +124,7 @@ class FncUsdMesh(FncUsdObj):
             #
             old_mya_transform = old_mya_mesh.transform
             old_mya_transform.set_visible(False)
-            old_mya_transform.set_parent_path(self.OBJ_PATHSEP)
+            old_mya_transform.parent_to_path(self.OBJ_PATHSEP)
             # instance after
             mya_mesh = mya_dcc_objects.Mesh(self._mya_path_dag_opt.get_value())
             if mya_mesh.get_is_exists() is False:
@@ -144,7 +144,7 @@ class FncUsdMesh(FncUsdObj):
                 if is_create is True:
                     if face_vertices_uuid == old_face_vertices_uuid:
                         uv_maps = geometry['uv_maps']
-                        mya_mesh_opt.set_uv_maps(uv_maps)
+                        mya_mesh_opt.assign_uv_maps(uv_maps)
                     else:
                         old_mya_mesh._update_path_()
                         old_mya_mesh.set_uv_maps_transfer_to(mya_mesh.path, clear_history=True)
@@ -153,9 +153,9 @@ class FncUsdMesh(FncUsdObj):
                     properties = look['properties']
                     visibilities = look['visibilities']
                     #
-                    mya_mesh_look_opt.set_material_assigns(material_assigns)
-                    mya_mesh_look_opt.set_properties(properties)
-                    mya_mesh_look_opt.set_visibilities(visibilities)
+                    mya_mesh_look_opt.assign_materials(material_assigns)
+                    mya_mesh_look_opt.assign_render_properties(properties)
+                    mya_mesh_look_opt.assign_render_visibilities(visibilities)
             #
             old_mya_transform._update_path_()
             old_mya_transform.set_delete()
@@ -168,7 +168,7 @@ class FncUsdMesh(FncUsdObj):
             #
             old_mya_transform = old_mya_mesh.transform
             old_mya_transform.set_visible(False)
-            old_mya_transform.set_parent_path(self.OBJ_PATHSEP)
+            old_mya_transform.parent_to_path(self.OBJ_PATHSEP)
             #
             mya_mesh = mya_dcc_objects.Mesh(self._mya_path_dag_opt.get_value())
             if mya_mesh.get_is_exists() is False:
@@ -188,7 +188,7 @@ class FncUsdMesh(FncUsdObj):
                     old_face_vertices_uuid = geometry['face_vertices_uuid']
                     if face_vertices_uuid == old_face_vertices_uuid:
                         uv_maps = geometry['uv_maps']
-                        mya_mesh_opt.set_uv_maps(uv_maps)
+                        mya_mesh_opt.assign_uv_maps(uv_maps)
                     else:
                         old_mya_mesh._update_path_()
                         old_mya_mesh.set_uv_maps_transfer_to(mya_mesh.path, clear_history=True)
@@ -199,9 +199,9 @@ class FncUsdMesh(FncUsdObj):
                     properties = look['properties']
                     visibilities = look['visibilities']
                     #
-                    mya_mesh_look_opt.set_material_assigns(material_assigns)
-                    mya_mesh_look_opt.set_properties(properties)
-                    mya_mesh_look_opt.set_visibilities(visibilities)
+                    mya_mesh_look_opt.assign_materials(material_assigns)
+                    mya_mesh_look_opt.assign_render_properties(properties)
+                    mya_mesh_look_opt.assign_render_visibilities(visibilities)
                 #
                 old_mya_transform._update_path_()
                 old_mya_transform.set_delete()
@@ -215,14 +215,14 @@ class FncUsdMesh(FncUsdObj):
             points = usd_mesh_opt.get_points()
             mya_mesh_opt.set_points(points)
 
-    def set_uv_maps(self):
+    def assign_uv_maps(self):
         mya_mesh = mya_dcc_objects.Mesh(self._mya_path_dag_opt.get_value())
         if mya_mesh.get_is_exists() is True:
             usd_mesh_opt = usd_dcc_operators.MeshOpt(self._usd_prim)
             #
             mya_mesh_opt = mya_dcc_operators.MeshOpt(mya_mesh)
             uv_maps = usd_mesh_opt.get_uv_maps()
-            mya_mesh_opt.set_uv_maps(uv_maps)
+            mya_mesh_opt.assign_uv_maps(uv_maps)
     @classmethod
     def set_delete(cls, tgt_path):
         mesh_dcc_path_dag_opt = bsc_core.DccPathDagOpt(tgt_path)
@@ -262,7 +262,7 @@ class FncDccMesh(object):
         if self._maya_mesh.get_is_exists() is True:
             return dict(
                 material_assigns=self._mya_mesh_look_opt.get_material_assigns(),
-                properties=self._mya_mesh_look_opt.get_properties(),
-                visibilities=self._mya_mesh_look_opt.get_visibilities()
+                properties=self._mya_mesh_look_opt.get_render_properties(),
+                visibilities=self._mya_mesh_look_opt.get_render_visibilities()
             )
         return {}

@@ -47,7 +47,7 @@ class AbsObjScene(unr_abstracts.AbsObjScene):
         obj_category_name = unr_configure.ObjCategory.LYNXI
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)
-        obj = obj_type.set_obj_create(obj_path)
+        obj = obj_type.create_obj(obj_path)
         #
         if isinstance(obj_properties, dict):
             obj.properties = obj_properties

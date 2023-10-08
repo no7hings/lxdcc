@@ -46,7 +46,7 @@ def set_proxy_export_by_any_scene_file(option):
                             'start'
                         )
                         #
-                        mya_dcc_objects.Scene.set_file_open(scene_src_file_path)
+                        mya_dcc_objects.Scene.open_file(scene_src_file_path)
                         #
                         with_proxy_xarc = option_opt.get('with_proxy_xarc')
                         if with_proxy_xarc is True:

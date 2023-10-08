@@ -3,7 +3,7 @@ import fnmatch
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxsession import ssn_configure
 
@@ -15,7 +15,7 @@ class SsnHookMtd(object):
         #
         from lxbasic import bsc_core
         #
-        unique_id = bsc_core.UuidMtd.get_new()
+        unique_id = bsc_core.UuidMtd.generate_new()
         #
         hook_yml_file_path = bsc_core.StgUserMtd.get_user_session_file(unique_id=unique_id)
         #
@@ -39,7 +39,7 @@ class SsnHookMtd(object):
 
 
 class SsnHookEngineMtd(object):
-    CONFIGURE = bsc_objects.Configure(
+    CONFIGURE = ctt_objects.Configure(
         value=bsc_core.CfgFileMtd.get_yaml('session/hook-engine')
     )
     CONFIGURE.set_flatten()
@@ -124,7 +124,7 @@ class SsnHookFileMtd(object):
         )
     @classmethod
     def set_extra_data_save(cls, raw):
-        key = bsc_core.UuidMtd.get_new()
+        key = bsc_core.UuidMtd.generate_new()
         file_path = cls.get_extra_file(key)
         bsc_core.StgFileOpt(file_path).set_write(raw)
         return key
@@ -141,7 +141,7 @@ class SsnOptionHookFileMtd(SsnHookFileMtd):
 class SsnHookServerMtd(object):
     @classmethod
     def get_key(cls, **kwargs):
-        return bsc_core.UuidMtd.get_by_string(
+        return bsc_core.UuidMtd.generate_by_text(
             bsc_core.ArgDictStringMtd.to_string(**kwargs)
         )
     @classmethod

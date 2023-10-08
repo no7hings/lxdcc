@@ -16,41 +16,14 @@ from lxbasic import bsc_configure, bsc_core
 THREAD_MAXIMUM = threading.Semaphore(1024)
 
 
-class StrCamelcase(object):
-    def __init__(self, string):
-        self._string = string
-
-    def to_prettify(self):
-        return ' '.join([i.capitalize() for i in re.findall(r'[a-zA-Z][a-z]*[0-9]*', self._string)])
-
-    def to_underline(self):
-        return re.sub(re.compile(r'([a-z]|\d)([A-Z])'), r'\1_\2', self._string).lower()
-
-
-class StrUnderline(object):
-    def __init__(self, string):
-        self._string = string
-
-    def to_prettify(self):
-        return ' '.join([i.capitalize() for i in self._string.split('_')])
-
-    def to_camelcase(self):
-        return re.sub(r'_(\w)', lambda x: x.group(1).upper(), self._string)
-
-
-class String(object):
-    def __init__(self, string):
-        self._string = string
-
-
 class SignalInstance(object):
     def __init__(self, *args, **kwargs):
         self._methods = []
 
-    def set_connect_to(self, method):
+    def connect_to(self, method):
         self._methods.append(method)
 
-    def set_emit_send(self, *args, **kwargs):
+    def send_emit(self, *args, **kwargs):
         if self._methods:
             for i in self._methods:
                 i(*args, **kwargs)
@@ -70,6 +43,7 @@ class SignalInstance(object):
 
 class ProcessMonitor(object):
     Status = bsc_configure.Status
+
     def __init__(self, process):
         self._process = process
         self._name = process.get_name()
@@ -122,9 +96,11 @@ class ProcessMonitor(object):
             # Error = 8
             self.__set_error_occurred_
         ]
+
     #
     def __set_status_update_method_run_(self):
         return self._status_update_methods[self._process.get_status()]()
+
     #
     def __set_started_(self):
         self._is_disable = False
@@ -140,15 +116,17 @@ class ProcessMonitor(object):
                 self._name
             )
         )
+
     #
     def __set_emit_send_(self, signal, *args, **kwargs):
         # noinspection PyBroadException
-        # signal.set_emit_send(*args, **kwargs)
+        # signal.send_emit(*args, **kwargs)
         try:
-            signal.set_emit_send(*args, **kwargs)
+            signal.send_emit(*args, **kwargs)
         except:
             self.__set_error_occurred_()
             raise
+
     # waiting
     def __set_waiting_(self):
         self._status = self.Status.Waiting
@@ -158,6 +136,7 @@ class ProcessMonitor(object):
         #
         self.__set_processing_time_update_()
         self.__set_waiting_time_update_()
+
     # running
     def __set_running_(self):
         self._status = self.Status.Running
@@ -167,6 +146,7 @@ class ProcessMonitor(object):
         #
         self.__set_processing_time_update_()
         self.__set_running_time_update_()
+
     #
     def __set_elements_running_(self):
         pre_element_status = str(self._sub_process_statuses)
@@ -177,10 +157,12 @@ class ProcessMonitor(object):
             self._sub_process_statuses[index] = i_element_status
         if pre_element_status != str(self._sub_process_statuses):
             self.__set_element_statuses_changed_()
+
     #
     def __set_logging_(self, text):
         sys.stdout.write(text+'\n')
         self.__set_emit_send_(self.logging, text)
+
     # status changed
     def __set_status_changed_(self):
         self.__set_emit_send_(self.status_changed, self._status)
@@ -236,6 +218,7 @@ class ProcessMonitor(object):
                 self._name
             )
         )
+
     #
     def __set_error_occurred_(self):
         self._is_disable = True
@@ -247,6 +230,7 @@ class ProcessMonitor(object):
                 self._name
             )
         )
+
     #
     def __set_run_(self):
         if self._is_disable is False:
@@ -336,6 +320,7 @@ class ProcessMonitor(object):
 class SubProcess(object):
     Status = bsc_configure.Status
     SubProcessStatus = bsc_configure.SubProcessStatus
+
     def __init__(self, cmds):
         self._cmds = cmds
         self._sp = None
@@ -398,10 +383,10 @@ class GainSignal(object):
     def __init__(self, *args, **kwargs):
         self._methods = []
 
-    def set_connect_to(self, method):
+    def connect_to(self, method):
         self._methods.append(method)
 
-    def set_emit_send(self, *args, **kwargs):
+    def send_emit(self, *args, **kwargs):
         if self._methods:
             THREAD_MAXIMUM.acquire()
             #
@@ -427,20 +412,24 @@ class GainThread(threading.Thread):
         self._fnc = None
         #
         self._data = None
+
     #
     def set_fnc_(self, fnc):
         self._fnc = fnc
+
     #
     def set_data(self, data):
         self._data = data
-        self.run_finished.set_emit_send()
+        self.run_finished.send_emit()
+
     #
     def get_data(self):
         return self._data
+
     #
     def run(self):
         THREAD_MAXIMUM.acquire()
-        self.run_started.set_emit_send()
+        self.run_started.send_emit()
         #
         self.set_data(
             self._fnc()
@@ -471,93 +460,19 @@ class GainThreadsRunner(object):
             thread.get_data()
         )
         if sum(self._results) == len(self._results):
-            self.run_finished.set_emit_send()
+            self.run_finished.send_emit()
 
     def set_start(self):
         c = len(self._fncs)
-        self.run_started.set_emit_send()
+        self.run_started.send_emit()
         for i in range(c):
             i_fnc = self._fncs[i]
             #
             i_t = GainThread()
             i_t.set_fnc_(i_fnc)
-            i_t.run_finished.set_connect_to(
+            i_t.run_finished.connect_to(
                 functools.partial(self.set_result_at, i_t, i, 1)
             )
             #
             i_t.start()
             i_t.join()
-
-
-class UndoFnc(object):
-    def __init__(self, obj):
-        self._obj = obj
-
-    def set_redo(self):
-        pass
-
-    def set_undo(self):
-        pass
-
-
-class UndoGroup(object):
-    def __init__(self, key):
-        self._key = key
-
-        self._keys = []
-        self._fnc_dict = collections.OrderedDict()
-
-    def register(self, key, fnc):
-        self._keys.append(key)
-        self._fnc_dict[key] = fnc
-
-    def set_run(self):
-        for k, v in self._fnc_dict.items():
-            print 'undo >> "{}"'.format(k)
-            v()
-
-
-class UndoStack(object):
-    def __init__(self, obj):
-        self._obj = obj
-        #
-        self._keys = []
-        self._fncs = []
-        self._undo_index = None
-
-        self._cur_group = None
-
-    def set_group_open(self, key):
-        print 'undo group open: "{}"'.format(key)
-        self._cur_group = UndoGroup(key)
-        self._keys.append(key)
-        self._fncs.append(self._cur_group)
-        self._undo_index = len(self._fncs) - 1
-
-    def set_group_close(self):
-        print 'undo group close: "{}"'.format(self._cur_group._key)
-        self._cur_group = None
-
-    def register(self, key, fnc):
-        if self._cur_group is not None:
-            self._cur_group.register(key, fnc)
-        else:
-            self._keys.append(key)
-            self._fncs.append(fnc)
-            self._undo_index = len(self._fncs)-1
-
-    def set_redo(self):
-        pass
-
-    def set_undo(self):
-        if self._fncs and self._undo_index is not None:
-            if self._undo_index > 0:
-                self._undo_index -= 1
-                key = self._keys[self._undo_index]
-                fnc = self._fncs[self._undo_index]
-                if isinstance(fnc, UndoGroup):
-                    print 'undo group >> "{}"'.format(key)
-                    fnc.set_run()
-                else:
-                    print 'undo >> "{}"'.format(key)
-                    fnc()

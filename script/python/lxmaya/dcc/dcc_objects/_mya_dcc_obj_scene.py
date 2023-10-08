@@ -30,20 +30,26 @@ class Namespace(
 ):
     PATHSEP = ':'
     Obj_CLS = _mya_dcc_obj_obj.Node
+
+    # noinspection PyMissingConstructor
     def __init__(self, path):
         self._set_obj_gui_def_init_()
 
         self._path = path
         self._name = self._path.split(self.PATHSEP)[-1]
+
     @property
     def type(self):
         return 'namespace'
+
     @property
     def icon(self):
         return utl_core.Icon.get('name')
+
     @property
     def name(self):
         return self._name
+
     @property
     def path(self):
         return self._path
@@ -172,26 +178,33 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         'animImport': 'data',
         'animExport': 'data'
     }
+
     def __init__(self, *args, **kwargs):
         super(Scene, self).__init__(*args, **kwargs)
+
     @classmethod
     def get_namespace_paths(cls):
-        return ma_core._ma__get_namespace_paths_()
+        return ma_core.Utils.get_all_namespace_paths()
+
     @classmethod
     def get_namespaces(cls):
         return [cls.NAMESPACE_CLS(i) for i in cls.get_namespace_paths()]
+
     @classmethod
     def set_current_frame(cls, frame):
         cmds.currentTime(frame)
+
     @classmethod
     def get_current_frame(cls):
         return cmds.currentTime(query=1)
+
     @classmethod
     def set_frame_range(cls, star_frame, end_frame):
-        cmds.playbackOptions(minTime=star_frame), cmds.playbackOptions(animationStartTime=int(star_frame) - 5)
-        cmds.playbackOptions(maxTime=end_frame), cmds.playbackOptions(animationEndTime=int(end_frame) + 5)
+        cmds.playbackOptions(minTime=star_frame), cmds.playbackOptions(animationStartTime=int(star_frame)-5)
+        cmds.playbackOptions(maxTime=end_frame), cmds.playbackOptions(animationEndTime=int(end_frame)+5)
         #
         cls.set_current_frame(star_frame)
+
     @classmethod
     def get_frame_range(cls, frame=None):
         if isinstance(frame, (tuple, list)):
@@ -201,12 +214,14 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         else:
             star_frame = end_frame = cls.get_current_frame()
         return float(star_frame), float(end_frame)
+
     @classmethod
     def _get_file_type_name_(cls, file_path):
         ext = os.path.splitext(file_path)[-1]
         return cls.FILE_TYPE_DICT.get(ext, cls.FILE_TYPE_ASCII)
+
     @classmethod
-    def set_file_import(cls, file_path, namespace=':'):
+    def import_file_from(cls, file_path, namespace=':'):
         return cmds.file(
             file_path,
             i=True,
@@ -216,8 +231,9 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             mergeNamespacesOnClash=True,
             namespace=namespace,
         )
+
     @classmethod
-    def set_file_export(cls, file_path, root=None):
+    def export_file_to(cls, file_path, root=None):
         option = dict(
             type=cls._get_file_type_name_(file_path),
             options='v=0;',
@@ -239,19 +255,23 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             else:
                 cmds.select(clear=1)
         return results
+
     @classmethod
     def get_current_file_path(cls):
         """
         :return: str(path)
         """
         return cmds.file(query=1, expandName=1)
+
     @classmethod
     def get_current_directory_path(cls):
         file_path = cls.get_current_file_path()
         return os.path.dirname(file_path)
+
     @classmethod
-    def set_file_new(cls):
+    def new_file(cls):
         cmds.file(new=1, force=1)
+
     @classmethod
     def set_file_path(cls, file_path, with_create_directory=False):
         if with_create_directory is True:
@@ -259,21 +279,24 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             f.create_directory()
         #
         cmds.file(rename=file_path)
+
     @classmethod
     def set_file_path_as_project(cls, file_path, with_create_directory=False):
         cls.set_file_path(file_path, with_create_directory)
         workspace_directory = utl_dcc_objects.OsFile(file_path).directory.get_parent()
         cls.set_workspace_create(workspace_directory.path)
+
     @classmethod
-    def set_file_new_with_dialog(cls, file_path, post_method):
+    def new_file_with_dialog(cls, file_path, post_method):
         def pos_method_run_fnc_():
             if isinstance(post_method, (types.FunctionType, types.MethodType)):
                 post_method(file_path)
+
         #
         def yes_fnc_():
-            cls.set_file_save()
+            cls.save_file()
             #
-            cls.set_file_new()
+            cls.new_file()
             #
             f = utl_dcc_objects.OsFile(file_path)
             f.create_directory()
@@ -281,9 +304,10 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             pos_method_run_fnc_()
             #
             cls.set_file_path(file_path)
+
         #
         def no_fnc_():
-            cls.set_file_new()
+            cls.new_file()
             #
             f = utl_dcc_objects.OsFile(file_path)
             f.create_directory()
@@ -291,6 +315,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             pos_method_run_fnc_()
             #
             cls.set_file_path(file_path)
+
         #
         if cls.get_scene_is_dirty() is True:
             w = utl_core.DialogWindow.set_create(
@@ -308,8 +333,9 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             )
         else:
             no_fnc_()
+
     @classmethod
-    def set_file_open(cls, file_path, ignore_format=True):
+    def open_file(cls, file_path, ignore_format=True):
         """
         :param file_path: str,
         :param ignore_format: bool, etc. for save ".mb" but rename to ".ma"
@@ -338,13 +364,15 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             'scene open',
             u'file="{}" is completed'.format(file_path)
         )
+
     @classmethod
     def set_file_open_as_project(cls, file_path):
-        cls.set_file_open(file_path)
+        cls.open_file(file_path)
         workspace_directory = utl_dcc_objects.OsFile(file_path).directory.get_parent()
         cls.set_workspace_create(workspace_directory.path)
+
     @classmethod
-    def set_file_save_to(cls, file_path):
+    def save_file_to(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         file_obj.create_directory()
         #
@@ -359,8 +387,9 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             'scene save',
             u'file="{}"'.format(file_path)
         )
+
     @classmethod
-    def set_file_save(cls):
+    def save_file(cls):
         file_path = cls.get_current_file_path()
         cmds.file(
             save=1,
@@ -372,11 +401,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             'scene save',
             u'file="{}"'.format(file_path)
         )
+
     @classmethod
     def get_scene_is_dirty(cls):
         return cmds.file(query=1, modified=1)
+
     @classmethod
-    def set_file_reference(cls, file_path, namespace=None):
+    def reference_file_from(cls, file_path, namespace=None):
         f = utl_dcc_objects.OsFile(file_path)
         if f.get_is_exists() is True:
             if namespace is None:
@@ -420,12 +451,15 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             #             'file="{}"'.format(file_path)
             #         )
             #         cmds.file(loadReference=reference_node)
+
     @classmethod
     def get_file_reference_node(cls, file_path):
         return cmds.referenceQuery(file_path, referenceNode=True, topReference=True) or None
+
     @classmethod
     def get_file_is_reference_exists(cls, file_path):
         return cls.get_file_reference_node(file_path) is not None
+
     @classmethod
     def _set_viewport_shader_display_mode_(cls, panel):
         cmds.modelEditor(
@@ -443,6 +477,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 'shader'
             )
         )
+
     @classmethod
     def _set_viewport_texture_display_mode_(cls, panel):
         cmds.modelEditor(
@@ -460,6 +495,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 'texture'
             )
         )
+
     @classmethod
     def _set_viewport_light_display_mode_(cls, panel):
         cmds.modelEditor(
@@ -477,6 +513,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 'light'
             )
         )
+
     @classmethod
     def set_display_mode(cls, display_mode):
         viewports = cmds.getPanel(type='modelPanel') or []
@@ -487,14 +524,17 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 cls._set_viewport_texture_display_mode_(viewport)
             elif display_mode == 7:
                 cls._set_viewport_light_display_mode_(viewport)
+
     @classmethod
     def set_window_delete(cls, window):
         if isinstance(window, six.string_types):
             if cmds.window(window, query=1, exists=1):
                 cmds.deleteUI(window, window=1)
+
     @classmethod
     def set_viewport(cls):
         pass
+
     @classmethod
     def _set_preview_viewport_setup_(cls, viewport, mode=0):
         # Render Name [<vp2Renderer>, ]
@@ -510,6 +550,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 cmds.setAttr('hardwareRenderingGlobals.lineAAEnable', 1)
                 cmds.setAttr('hardwareRenderingGlobals.multiSampleEnable', 1)
                 cmds.setAttr('hardwareRenderingGlobals.ssaoEnable', 1)
+
     #
     def load_from_location_fnc(self, root, include_obj_type):
         self.restore_all()
@@ -536,13 +577,15 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)
-        obj = obj_type.set_obj_create(dcc_obj_path)
+        obj = obj_type.create_obj(dcc_obj_path)
         if ma_core.get_is_ui_mode():
-            from lxutil_gui.qt import utl_gui_qt_core
+            from lxutil_gui.qt import gui_qt_core
+
             obj.set_gui_attribute(
-                'icon', utl_gui_qt_core.QtMayaMtd.get_qt_icon(obj_type_name)
+                'icon', gui_qt_core.QtMayaMtd.get_qt_icon(obj_type_name)
             )
         return obj
+
     # clear
     @classmethod
     @utl_core.Modifier.ignore_run
@@ -562,22 +605,25 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                     'unused-script-remove: "{}"'.format(i)
                 )
                 cmds.delete(i)
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unused_shaders_clear(cls):
         mel.eval('MLdeleteUnused;')
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unused_windows_clear(cls, exclude_window_names=None):
         for panel in cmds.getPanel(visiblePanels=1) or []:
             if cmds.panel(panel, query=1, exists=1):
-                window = panel + 'Window'
+                window = panel+'Window'
                 if cmds.window(window, query=1, exists=1):
                     cmds.deleteUI(window, window=1)
                     utl_core.Log.set_module_result_trace(
                         'unused-window-clear',
                         u'window="{}"'.format(window)
                     )
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unknown_plug_ins_clear(cls):
@@ -591,6 +637,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                         'unknown-plug-in-clear',
                         u'plug-in="{}"'.format(i)
                     )
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unused_namespaces_clear(cls):
@@ -598,6 +645,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             parent = cmds.listRelatives(path_, parent=1, fullPath=1)
             if parent:
                 return parent[0]
+
         #
         def get_namespaces_fnc_():
             lis = []
@@ -620,6 +668,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                         if _is_assembly_reference is False:
                             lis.append(_namespace)
             return lis
+
         #
         def set_remove_fnc(namespace_):
             cmds.namespace(removeNamespace=namespace_)
@@ -627,6 +676,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 'scene-clear',
                 u'unused-namespace: "{}"'.format(namespace_)
             )
+
         #
         def fnc_1_():
             _namespaces = get_namespaces_fnc_()
@@ -652,8 +702,10 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                             if _is_reference is False:
                                 cmds.namespace(force=1, moveNamespace=(_namespace, _namespace_parent))
                                 set_remove_fnc(_namespace)
+
         #
         fnc_1_()
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unknown_nodes_clear(cls):
@@ -670,6 +722,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                                 'scene-clear',
                                 u'unknown-node: "{}"'.format(i)
                             )
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unload_references_clear(cls):
@@ -687,6 +740,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                     'scene-clear',
                     u'unload-reference-node: "{}"'.format(reference_node)
                 )
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unused_names_clear(cls):
@@ -702,6 +756,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                             cmds.rename(
                                 i, new_name
                             )
+
     @classmethod
     @utl_core.Modifier.ignore_run
     def set_unused_display_layers_clear(cls):
@@ -722,13 +777,16 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                                 'scene-clear',
                                 u'display-layer: "{}"'.format(i)
                             )
+
     #
     @classmethod
     def set_workspace(cls, directory_path):
         pass
+
     @classmethod
     def get_workspace_rule(cls, key):
         return cmds.workspace(fileRuleEntry=key)
+
     @classmethod
     def set_workspace_create(cls, directory_path):
         # create directory
@@ -746,12 +804,14 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             )
         except:
             bsc_core.ExceptionMtd.set_print()
+
     @classmethod
     def get_workspace_directory_path(cls):
         _ = cmds.workspace(query=1, rootDirectory=1)
         if _:
             if _.endswith('/'):
                 return _[:-1]
+
     @classmethod
     def set_file_open_with_dialog(cls, file_path):
         file_type_name = cls._get_file_type_name_(file_path)
@@ -762,6 +822,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         mel.eval(mel_cmd)
         workspace_directory = utl_dcc_objects.OsFile(file_path).directory.get_parent()
         cls.set_workspace_create(workspace_directory.path)
+
     # render
     @classmethod
     def get_render_cameras(cls):
@@ -772,6 +833,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             if camera.get_is_renderable():
                 lis.append(camera)
         return lis
+
     @classmethod
     def get_current_render_camera_path(cls, camera_path=None):
         if camera_path is None:
@@ -780,6 +842,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 return _[0].path
             return '|persp|perspShape'
         return camera_path
+
     @classmethod
     def set_render_resolution(cls, width, height):
         cmds.setAttr(cls.RENDER_ATTR_DICT['width'], width)
@@ -787,11 +850,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         if width == height:
             cmds.setAttr('defaultResolution.deviceAspectRatio', 1)
         cmds.setAttr('defaultResolution.pixelAspect', 1)
+
     @classmethod
     def get_render_resolution(cls):
         width = cmds.getAttr(cls.RENDER_ATTR_DICT['width'])
         height = cmds.getAttr(cls.RENDER_ATTR_DICT['height'])
         return int(width), int(height)
+
     @classmethod
     def set_render_frame_range(cls, star_frame=None, end_frame=None):
         if not star_frame:
@@ -801,17 +866,19 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         cmds.setAttr(cls.RENDER_ATTR_DICT['start_frame'], star_frame)
         cmds.setAttr(cls.RENDER_ATTR_DICT['end_frame'], end_frame)
+
     @classmethod
     def get_render_frame_range(cls):
         start_frame = cmds.getAttr(cls.RENDER_ATTR_DICT['start_frame'])
         end_frame = cmds.getAttr(cls.RENDER_ATTR_DICT['end_frame'])
         return int(start_frame), int(end_frame)
+
     @classmethod
     def set_message_show(cls, message, keyword, position='topCenter', fade=1, dragKill=0, alpha=.5):
         # topLeft topCenter topRight
         # midLeft midCenter midCenterTop midCenterBot midRight
         # botLeft botCenter botRight
-        assistMessage = '%s <hl>%s</hl>' % (message, keyword)
+        assistMessage = '%s <hl>%s</hl>'%(message, keyword)
         cmds.inViewMessage(
             assistMessage=assistMessage,
             fontSize=12,
@@ -820,3 +887,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             dragKill=dragKill,
             alpha=alpha
         )
+
+    @classmethod
+    def get_tag_as_36(cls):
+        file_path = cls.get_current_file_path()
+        file_opt = bsc_core.StgFileOpt(file_path)
+        timestamp = file_opt.get_modify_timestamp()
+        time_tag = bsc_core.RawIntegerOpt(int(timestamp*10)).set_encode_to_36()
+        size = file_opt.get_size()
+        size_tag = bsc_core.RawIntegerOpt(int(size)).set_encode_to_36()
+        return '{}{}'.format(time_tag, size_tag)

@@ -18,6 +18,7 @@ class AbsObjGuiDef(object):
     def _set_obj_gui_def_init_(self):
         self._gui_menu_raw = None
         self._obj_gui = None
+
     @property
     def icon(self):
         raise NotImplementedError()
@@ -38,6 +39,7 @@ class AbsObjGuiDef(object):
 class AbsDccObjDef(object):
     # path
     PATHSEP = None
+
     def __init__(self, path):
         self._path = path
         self._name = path.split(self.PATHSEP)[-1]
@@ -48,6 +50,7 @@ class AbsDccObjDef(object):
 
     def get_type_name(self):
         return self.type
+
     type_name = property(get_type_name)
 
     @property
@@ -56,15 +59,18 @@ class AbsDccObjDef(object):
 
     def get_name(self):
         return self._name
+
     name = property(get_name)
 
     def get_path(self):
         return self._path
+
     path = property(get_path)
 
     @property
     def icon(self):
         raise NotImplementedError()
+
     @property
     def icon_file(self):
         return self.icon
@@ -97,20 +103,26 @@ class AbsDccObjDef(object):
     def __ne__(self, other):
         return self.path != self.path
 
+    def __hash__(self):
+        return hash(self._path)
+
 
 class AbsDccMtd(object):
     @classmethod
     def get_is_maya(cls):
         return bsc_core.ApplicationMtd.get_is_maya()
+
     @classmethod
     def get_is_houdini(cls):
         return bsc_core.ApplicationMtd.get_is_houdini()
+
     @classmethod
     def get_is_katana(cls):
         _ = os.environ.get('KATANA_ROOT')
         if _:
             return True
         return bsc_core.ApplicationMtd.get_is_katana()
+
     @classmethod
     def get_is_clarisse(cls):
         return bsc_core.ApplicationMtd.get_is_clarisse()
@@ -119,9 +131,11 @@ class AbsDccMtd(object):
 class AbsDccDagDef(object):
     OBJ_PATHSEP = None
     PORT_PATHSEP = None
+
     @classmethod
     def _get_obj_path_args_(cls, obj_path):
         return obj_path.split(cls.OBJ_PATHSEP)
+
     @classmethod
     def _get_attr_path_args_(cls, atr_path):
         _ = atr_path.split(cls.PORT_PATHSEP)
@@ -137,32 +151,40 @@ class AbsDccPort(AbsDccObjDef):
         self._obj = obj
         self._port_path = name
         self._port_assign = port_assign
+
     @property
     def type(self):
         raise NotImplementedError()
+
     @property
     def path(self):
         return self.PATHSEP.join([self.obj.path, self.name])
+
     @property
     def port_path(self):
         return self._port_path
+
     @property
     def port_name(self):
         return self._port_path.split(self.PATHSEP)[-1]
 
     def get_name(self):
         return self._port_path
+
     name = property(get_name)
 
     @property
     def icon(self):
         return utl_core.Icon.get_port()
+
     @property
     def node(self):
         return self._obj
+
     @property
     def obj(self):
         return self._obj
+
     @property
     def port_assign(self):
         return self._port_assign
@@ -178,6 +200,7 @@ class AbsDccPort(AbsDccObjDef):
 
     def get(self, *args):
         raise NotImplementedError()
+
     # connection
     def set_source(self, *args):
         pass
@@ -185,7 +208,7 @@ class AbsDccPort(AbsDccObjDef):
     def set_source_disconnect(self):
         pass
 
-    def get_has_source(self):
+    def has_source(self):
         pass
 
     def get_source(self):
@@ -213,6 +236,7 @@ class AbsDccPort(AbsDccObjDef):
 
     def set_disconnect(self):
         pass
+
     @classmethod
     def _set_atr_path_split_(cls, atr_path):
         _ = atr_path.split(cls.PATHSEP)
@@ -246,11 +270,14 @@ class AbsDccPort(AbsDccObjDef):
 
 class AbsDccObjConnection(object):
     PORT_PATHSEP = None
+
     def __init__(self, source, target):
         self._source, self._target = source, target
+
     @property
     def source(self):
         return self._source
+
     @property
     def target(self):
         return self._target
@@ -268,6 +295,7 @@ class AbsDccObjConnection(object):
 class AbsDccObjSourceDef(object):
     CONNECTION_CLS = None
     SOURCE_OBJ_CLS = None
+
     def __init__(self, *args):
         pass
 
@@ -313,16 +341,17 @@ class AbsDccObjSourceDef(object):
         :param kwargs:
         :return: list(instance(<obj-connection>), ...)
         """
+
         def _rcs_fnc(obj_):
             _connections = obj_.get_source_connections(*args, **kwargs)
             for _connection in _connections:
                 _key = _connection.__str__()
                 if _key not in keys:
-                    keys.append(_key)
+                    keys.add(_key)
                     lis.append(_connection)
                     _rcs_fnc(_connection.source.obj)
 
-        keys = []
+        keys = set()
         lis = []
         _rcs_fnc(self)
         return lis
@@ -367,9 +396,16 @@ class AbsDccObjSourceDef(object):
         """
         return [i.source.obj for i in self.get_all_source_connections(*args, **kwargs)]
 
+    def get_all_source_objs_at(self, key):
+        p = self.get_port(key)
+        source_obj = p.get_source_obj()
+        if source_obj:
+            return [source_obj]+source_obj.get_all_source_objs()
+
 
 class AbsDccObjTargetDef(object):
     CONNECTION_CLS = None
+
     def __init__(self, *args):
         pass
 
@@ -408,16 +444,18 @@ class AbsDccObjTargetDef(object):
         :param kwargs:
         :return: list(instance(<obj-connection>), ...)
         """
+
         def _rcs_fnc(obj_):
             _connections = obj_.get_target_connections(*args, **kwargs)
             for _connection in _connections:
                 _key = _connection.__str__()
                 if _key not in keys:
-                    keys.append(_key)
+                    keys.add(_key)
                     lis.append(_connection)
                     _rcs_fnc(_connection.target.obj)
+
         #
-        keys = []
+        keys = set()
         lis = []
         _rcs_fnc(self)
         return lis
@@ -464,6 +502,7 @@ class AbsDccObj(
     # attribute
     PORT_CLS = None
     CONNECTION_CLS = None
+
     def __init__(self, path):
         self._set_obj_dag_def_init_(path)
         if self.path.startswith(self.PATHSEP):
@@ -472,6 +511,7 @@ class AbsDccObj(
             self._name = self.path
 
         self._set_obj_gui_def_init_()
+
     # property ******************************************************************************************************* #
     @property
     def type(self):
@@ -479,17 +519,21 @@ class AbsDccObj(
 
     def get_type_name(self):
         return self.type
+
     @property
     def type_name(self):
         return self.type
 
     def get_name(self):
         return self._name
+
     name = property(get_name)
+
     # gui property *************************************************************************************************** #
     @property
     def icon(self):
         raise NotImplementedError()
+
     # attribute ****************************************************************************************************** #
     def get_port(self, port_path, port_assign=unr_configure.PortAssign.VARIANTS):
         if self.PORT_CLS is not None:
@@ -525,6 +569,7 @@ class AbsDccObj(
 
     def get_is_file_reference(self):
         raise NotImplementedError()
+
     #
     def get_naming_overlapped_paths(self):
         pass
@@ -572,17 +617,22 @@ class AbsDccObj(
 # dcc scene ********************************************************************************************************** #
 class AbsDccScene(AbsDccObjDef):
     REFERENCE_FILE_CLS = None
+
     def __init__(self):
         self._reference_files = []
+
     @property
     def type(self):
         raise NotImplementedError()
+
     @property
     def path(self):
         raise NotImplementedError()
+
     @property
     def name(self):
         raise NotImplementedError()
+
     @property
     def icon(self):
         raise NotImplementedError()
@@ -599,13 +649,14 @@ class AbsDccScene(AbsDccObjDef):
     def get_current_file_path(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def set_file_save_to(self, *args, **kwargs):
+    def save_file_to(self, *args, **kwargs):
         raise NotImplementedError()
 
 
 class AbsFileReferenceDef(object):
     PORT_CLS = None
     OS_FILE_CLS = None
+
     def _set_file_reference_def_init_(self, file_path):
         self.set_file_path(file_path)
         self._file_attribute_name = None
@@ -613,6 +664,7 @@ class AbsFileReferenceDef(object):
         self._reference_raw = {}
         self._file_paths = []
         self._files = []
+
     @property
     def reference_raw(self):
         return self._reference_raw
@@ -700,20 +752,26 @@ class AbsDccObjs(object):
     EXCLUDE_DCC_PATHS = []
     #
     DCC_NODE_CLS = None
+
     def __init__(self, *args):
         pass
+
     @classmethod
     def _set_obj_create_(cls, path_):
         return cls.DCC_NODE_CLS(path_)
+
     @classmethod
     def get_paths(cls, **kwargs):
         raise NotImplementedError()
+
     @classmethod
     def get_objs(cls, **kwargs):
         return [cls._set_obj_create_(i) for i in cls.get_paths(**kwargs)]
+
     @classmethod
     def get_custom_paths(cls, **kwargs):
         return [i for i in cls.get_paths(**kwargs) if i not in cls.EXCLUDE_DCC_PATHS]
+
     @classmethod
     def get_custom_nodes(cls, **kwargs):
         return [cls._set_obj_create_(i) for i in cls.get_custom_paths(**kwargs)]
@@ -722,47 +780,62 @@ class AbsDccObjs(object):
 class AbsSetup(object):
     def __init__(self, root):
         self._root = root
+        self.__variants = dict(
+            root=self._root
+        )
+
+    def _path_process_(self, path):
+        _ = path.format(**self.__variants)
+        if os.path.exists(_):
+            return _
+
     @classmethod
     def set_environ_fnc(cls, key, value):
-        os.environ[key] = value
-        utl_core.Log.set_module_result_trace(
-            'environ set',
-            u'key="{}", value="{}"'.format(key, value)
-        )
-    @classmethod
-    def add_environ_fnc(cls, key, value):
-        if key in os.environ:
-            v = os.environ[key]
-            if value not in v:
-                os.environ[key] += os.pathsep + value
-                utl_core.Log.set_module_result_trace(
-                    'environ add',
-                    u'key="{}", value="{}"'.format(key, value)
-                )
-        else:
+        if value is not None:
             os.environ[key] = value
             utl_core.Log.set_module_result_trace(
                 'environ set',
                 u'key="{}", value="{}"'.format(key, value)
             )
+
     @classmethod
-    def add_python_env_fnc(cls, path):
-        python_paths = sys.path
-        if path not in python_paths:
-            sys.path.insert(0, path)
-            utl_core.Log.set_module_result_trace(
-                'python-path add',
-                u'value="{}"'.format(path)
-            )
-    @classmethod
-    def add_library_env_fnc(cls, *args):
+    def add_environ_fnc(cls, key, value):
+        if value is not None:
+            if key in os.environ:
+                v = os.environ[key]
+                if value not in v:
+                    os.environ[key] += os.pathsep+value
+                    utl_core.Log.set_module_result_trace(
+                        'environ add',
+                        u'key="{}", value="{}"'.format(key, value)
+                    )
+            else:
+                os.environ[key] = value
+                utl_core.Log.set_module_result_trace(
+                    'environ set',
+                    u'key="{}", value="{}"'.format(key, value)
+                )
+
+    def add_pythons(self, *args):
+        paths_exists = sys.path
+        for i_path in args:
+            i_path = self._path_process_(i_path)
+            if i_path is not None:
+                if i_path not in paths_exists:
+                    sys.path.insert(0, i_path)
+                    utl_core.Log.set_module_result_trace(
+                        'python-path add',
+                        'value="{}"'.format(i_path)
+                    )
+
+    def add_libraries(self, *args):
         if bsc_core.PlatformMtd.get_is_windows():
-            [cls.add_environ_fnc('PATH', i) for i in args]
+            [self.add_environ_fnc('PATH', i) for i in map(self._path_process_, args)]
         elif bsc_core.PlatformMtd.get_is_linux():
-            [cls.add_environ_fnc('LD_LIBRARY_PATH', i) for i in args]
-    @classmethod
-    def add_bin_fnc(cls, *args):
-        [cls.add_environ_fnc('PATH', i) for i in args]
+            [self.add_environ_fnc('LD_LIBRARY_PATH', i) for i in map(self._path_process_, args)]
+
+    def add_bin_fnc(self, *args):
+        [self.add_environ_fnc('PATH', i) for i in map(self._path_process_, args)]
 
     def set_run(self):
         raise NotImplementedError()

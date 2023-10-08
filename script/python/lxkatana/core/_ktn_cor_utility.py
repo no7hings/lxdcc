@@ -13,13 +13,8 @@ import threading
 #
 import time
 # noinspection PyUnresolvedReferences
-from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, Configuration, CacheManager, KatanaFile
-
-from lxbasic import bsc_core
-
-import lxbasic.objects as bsc_objects
-
-from lxutil import utl_core
+from Katana import NodegraphAPI, ResolutionTable, Nodes3DAPI, FnGeolib, ScenegraphManager, Utils, Callbacks, \
+    Configuration, CacheManager, KatanaFile
 
 
 def get_is_ui_mode():
@@ -28,7 +23,7 @@ def get_is_ui_mode():
 
 if get_is_ui_mode():
     # noinspection PyUnresolvedReferences
-    from UI4 import App
+    from UI4 import App, Widgets, Manifest
     # noinspection PyUnresolvedReferences
     from Katana import UserNodes
 
@@ -41,9 +36,11 @@ class ResolutionOpt(object):
     def __init__(self, string):
         r = ResolutionTable.GetResolutionTable().getResolution(string)
         self._x, self._y = r.xres(), r.yres()
+
     @property
     def x(self):
         return self._x
+
     @property
     def y(self):
         return self._y
@@ -60,6 +57,7 @@ class GuiNodeGraphBase(object):
                 NodegraphAPI.GetNode(ktn_obj)
             )
         return NodegraphAPI.GetNodePosition(ktn_obj)
+
     @classmethod
     def set_node_position(cls, ktn_obj, position):
         if isinstance(ktn_obj, six.string_types):
@@ -83,6 +81,7 @@ class GuiNodeGraphOpt(GuiNodeGraphBase):
     def move_node_to_view_center(self, ktn_obj):
         x, y = self.get_track_position()
         self.set_node_position(ktn_obj, (x, y))
+
     @classmethod
     def import_nodes_from_file(cls, file_path):
         nodes = KatanaFile.Import(file_path, True)
@@ -94,6 +93,7 @@ class GuiNodeGraphOpt(GuiNodeGraphBase):
 
 class GuiNodeGraphTabOpt(GuiNodeGraphBase):
     LAYOUT_NODE_KEY = 'F4331532-D52B-11ED-8C7C-2CFDA1C062BB'
+
     def __init__(self, ktn_gui=None):
         if ktn_gui is None:
             self._ktn_gui = App.Tabs.FindTopTab('Node Graph')
@@ -134,12 +134,14 @@ class Modifier(object):
                 return _fnc
             except Exception:
                 from lxbasic import bsc_core
+
                 bsc_core.ExceptionMtd.set_print()
             #
             finally:
                 Utils.UndoStack.CloseGroup()
 
         return sub_fnc_
+
     @staticmethod
     def undo_debug_run(fnc):
         def sub_fnc_(*args, **kwargs):
@@ -151,13 +153,28 @@ class Modifier(object):
             except Exception:
                 if get_is_ui_mode() is True:
                     from lxutil import utl_core
+
                     utl_core.ExceptionCatcher.set_create()
                 else:
                     from lxbasic import bsc_core
+
                     bsc_core.ExceptionMtd.set_print()
                 raise
             #
             finally:
                 Utils.UndoStack.CloseGroup()
+
         return sub_fnc_
 
+
+class CEL(object):
+    def __init__(self, ktn_obj, cel):
+        self._ktn_obj = ktn_obj
+        self._cel = cel
+
+    def parse(self):
+        return Widgets.CollectAndSelectInScenegraph(
+            self._cel, ''
+        ).collectAndSelect(
+            False, self._ktn_obj
+        )

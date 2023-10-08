@@ -20,6 +20,7 @@ class ObjPortsOpt(object):
         return cmds.listAttr(
             self._obj_path, read=1, write=1, inUse=1, multi=1
         ) or []
+
     @classmethod
     def _get_ports_raw_(cls, obj_path, port_names):
         lis = []
@@ -36,20 +37,25 @@ class ObjAtrSetter(object):
 
 class AbsMyaPort(utl_abstract.AbsDccPort):
     PATHSEP = ma_configure.Util.PORT_PATHSEP
+    KEY = 'port'
+
     def __init__(self, obj, path, port_assign=None):
         super(AbsMyaPort, self).__init__(obj, path, port_assign=port_assign)
         self._obj_atr_query = ma_core.CmdAtrQueryOpt(self.path)
+
     @property
     def type(self):
         if self.get_is_exists() is True:
             return cmds.getAttr(self.path, type=True)
         elif self.get_query_is_exists() is True:
             return self._obj_atr_query.type
+
     @property
     def data_type(self):
         if self._obj_atr_query.get_is_exists() is True:
             return self._obj_atr_query.type
         return ''
+
     @property
     def port_query(self):
         return self._obj_atr_query
@@ -105,7 +111,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
 
     def set(self, value):
         if self.get_is_exists() is True:
-            if self.get_has_source() is False:
+            if self.has_source() is False:
                 if self.type == 'string':
                     if isinstance(value, six.string_types):
                         cmds.setAttr(self.path, value, type=self.type)
@@ -135,10 +141,6 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         # Debug ( Clamp Maximum or Minimum Value )
                         cmds.setAttr(self.path, value, clamp=1)
                 #
-                # utl_core.Log.set_module_result_trace(
-                #     'port set',
-                #     u'atr-path="{}" value="{}"'.format(self.path, value)
-                # )
             else:
                 utl_core.Log.set_module_warning_trace(
                     'port set',
@@ -150,7 +152,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
         for seq, value in enumerate(values):
             parent_path_ = '{}[{}]'.format(parent_path, seq)
             atr_path = self.PATHSEP.join(
-               [self.obj.path, parent_path_, self.port_name]
+                [self.obj.path, parent_path_, self.port_name]
             )
             if self.type == 'string':
                 cmds.setAttr(atr_path, value, type=self.type)
@@ -187,12 +189,12 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
             port_path = a.port_path
             return self.obj.__class__(obj_path).get_port(port_path)
 
-    def get_has_source(self):
+    def has_source(self):
         _ = cmds.connectionInfo(self.path, isExactDestination=1)
         if self.get_has_channels():
             if _ is True:
                 return _
-            return True in [i.get_has_source() for i in self.get_channels()]
+            return True in [i.has_source() for i in self.get_channels()]
         return _
 
     def set_target(self, input_port, validation=False):
@@ -200,6 +202,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
 
     def get_has_targets(self):
         return cmds.connectionInfo(self.path, isExactSource=1)
+
     #
     def get_targets(self):
         lis = []
@@ -215,9 +218,11 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                 self.obj.__class__(i_obj_path).get_port(i_port_path)
             )
         return lis
+
     # array
     def get_element_indices(self):
         return ma_core.CmdAtrQueryOpt(self.path).get_element_indices()
+
     # channel
     def get_channel_names(self, alpha=False):
         return ma_core.CmdAtrQueryOpt(self.path).get_channel_names(alpha=alpha)
@@ -267,6 +272,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
             return self.__class__(
                 self.obj, _
             )
+
     @classmethod
     def _set_connect_(cls, source, target, validation=False):
         source_path, target_path = source.path, target.path
@@ -402,20 +408,25 @@ class AbsMyaObjConnection(utl_abstract.AbsDccObjConnection):
 class AbsMaShapeDef(object):
     PATHSEP = None
     TRANSFORM_CLS = None
+
     def _set_ma_shape_def_init_(self, shape_path):
         transform_path = self.PATHSEP.join(shape_path.split(self.PATHSEP)[:-1])
         self._transform = self.TRANSFORM_CLS(transform_path)
-    @property
-    def transform(self):
+
+    def get_transform(self):
         return self._transform
+
+    transform = property(get_transform)
 
 
 class AbsMaUuidDef(object):
     def _set_ma_uuid_def_(self, uuid):
         self._uuid = uuid
+
     @property
     def unique_id(self):
         return self._uuid
+
     @property
     def path(self):
         raise NotImplementedError()
@@ -433,7 +444,9 @@ class AbsMyaObj(
     utl_abstract.AbsDccObj,
     AbsMaUuidDef
 ):
+    KEY = 'maya node'
     PATHSEP = ma_configure.Util.OBJ_PATHSEP
+
     def __init__(self, path):
         _ = path
         if cmds.objExists(_):
@@ -445,6 +458,7 @@ class AbsMyaObj(
         #
         self._set_ma_uuid_def_(uuid)
         super(AbsMyaObj, self).__init__(path_arg)
+
     @property
     def type(self):
         if cmds.objExists(self.path) is True:
@@ -453,11 +467,14 @@ class AbsMyaObj(
 
     def get_api_type_name(self):
         return cmds.nodeType(self.get_path(), apiType=1)
+
     @property
     def icon(self):
         if ma_core.get_is_ui_mode():
-            from lxutil_gui.qt import utl_gui_qt_core
-            return utl_gui_qt_core.QtMayaMtd.get_qt_icon(self.type)
+            from lxutil_gui.qt import gui_qt_core
+
+            return gui_qt_core.QtMayaMtd.get_qt_icon(self.type)
+
     @classmethod
     def _get_full_path_(cls, path):
         if cmds.objExists(path) is True:
@@ -484,13 +501,19 @@ class AbsMyaObj(
     def set_unlock(self):
         cmds.lockNode(self.path, lock=0)
         cmds.warning('unlock node: {}'.format(self.path))
-        utl_core.Log.set_result_trace(
+        bsc_core.LogMtd.trace_method_result(
+            self.KEY,
             'unlock node: {}'.format(self.path)
         )
 
     def set_lock(self):
         cmds.lockNode(self.path, lock=1)
         cmds.warning('lock node: {}'.format(self.path))
+        bsc_core.LogMtd.trace_method_result(
+            self.KEY,
+            'lock node: {}'.format(self.path)
+        )
+
     # noinspection PyUnusedLocal
     def set_delete(self, force=False):
         if self.get_is_exists() is True:
@@ -498,21 +521,22 @@ class AbsMyaObj(
                 self.set_unlock()
             #
             cmds.delete(self.path)
-            utl_core.Log.set_module_result_trace(
-                'obj-delete',
-                u'obj="{}"'.format(self.path)
+            bsc_core.LogMtd.trace_method_result(
+                self.KEY,
+                'delete: "{}"'.format(self.path)
             )
 
     def set_to_world(self):
         if self.get_is_exists() is True:
             cmds.parent(self.path, world=1)
+
     # noinspection PyUnusedLocal
     def set_rename(self, new_name, force=False):
         if self.get_is_exists() is True:
             cmds.rename(self.path, new_name)
-            utl_core.Log.set_module_result_trace(
-                'obj-rename',
-                u'obj="{}" >> "{}"'.format(self.path, new_name)
+            bsc_core.LogMtd.trace_method_result(
+                self.KEY,
+                'rename: "{}" >> "{}"'.format(self.path, new_name)
             )
 
     def set_repath(self, new_obj_path):
@@ -533,19 +557,22 @@ class AbsMyaObj(
         attribute = self.get_port(port_path)
         attribute.set_create(raw_type='bool')
         attribute.set(value)
+
     # naming overlapped
     def get_is_naming_overlapped(self):
         return len(self.get_naming_overlapped_paths()) > 1
 
     def get_naming_overlapped_paths(self):
         return cmds.ls(self.name) or []
+
     # instance
     def get_is_instanced(self):
         dag_node = om2.MFnDagNode(om2.MGlobal.getSelectionListByName(self.path).getDagPath(0))
         return dag_node.isInstanced()
+
     # history
     def get_history_paths(self):
-        return ma_core._ma_node__get_history_paths_(self.path)
+        return ma_core.UtlNode.get_all_history_paths(self.path)
 
     def set_history_clear(self):
         cmds.delete(self.path, constructionHistory=1)
@@ -586,9 +613,9 @@ class AbsMyaObj(
                             else:
                                 parent_string = cmds.group(empty=1, name=name)
                             #
-                            utl_core.Log.set_module_result_trace(
-                                'transform-obj-create',
-                                u'obj-name="{}", parent-path="{}"'.format(name, parent_string)
+                            bsc_core.LogMtd.trace_method_result(
+                                self.KEY,
+                                u'create transform: "{}", parent is "{}"'.format(name, parent_string)
                             )
                         else:
                             parent_string = i
@@ -616,7 +643,7 @@ class AbsMyaObj(
                         else:
                             parent_string = i
 
-    def set_parent_path(self, parent_path, create_parent=False):
+    def parent_to_path(self, parent_path, create_parent=False):
         if parent_path == self.PATHSEP:
             if cmds.listRelatives(self.path, parent=1):
                 cmds.parent(self.path, world=1)
@@ -722,6 +749,7 @@ class AbsMyaObj(
                 return False
             return False
         return False
+
     # node is transform + shape
     def get_is_compose(self):
         return self.get_is_transform() or self.get_is_shape()
@@ -745,9 +773,9 @@ class AbsMyaObj(
         _ = cmds.listConnections(self.path, destination=0, source=1, connections=1, plugs=1) or []
         # ["source-atr-path", "target-atr-path", ...]
         for seq, i in enumerate(_):
-            if seq % 2:
+            if seq%2:
                 source_atr_path = i
-                target_atr_path = _[seq - 1]
+                target_atr_path = _[seq-1]
                 #
                 lis.append((source_atr_path, target_atr_path))
         return lis
@@ -757,8 +785,8 @@ class AbsMyaObj(
         _ = cmds.listConnections(self.path, destination=1, source=0, connections=1, plugs=1) or []
         # ["source-atr-path", "target-atr-path", ...]
         for seq, i in enumerate(_):
-            if seq % 2:
-                source_atr_path = _[seq - 1]
+            if seq%2:
+                source_atr_path = _[seq-1]
                 target_atr_path = i
                 #
                 lis.append((source_atr_path, target_atr_path))
@@ -792,12 +820,14 @@ class AbsMyaFileReferenceObj(
 class AbsMyaObjs(utl_abstract.AbsDccObjs):
     def __init__(self, *args):
         super(AbsMyaObjs, self).__init__(*args)
+
     @classmethod
     def get_paths(cls, reference=True, exclude_paths=None):
         def set_exclude_filter_fnc_(paths):
             if exclude_paths is not None:
                 [paths.remove(_i) for _i in exclude_paths if _i in paths]
             return paths
+
         _ = cmds.ls(type=cls.INCLUDE_DCC_TYPES, long=1) or []
         if exclude_paths is not None:
             return set_exclude_filter_fnc_(_)

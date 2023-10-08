@@ -3,7 +3,7 @@ from lxutil_fnc import utl_fnc_abstract
 
 from lxmaya_fnc import ma_fnc_configure
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class CheckerCreator(utl_fnc_abstract.AbsTaskMethodCreator):
@@ -11,28 +11,32 @@ class CheckerCreator(utl_fnc_abstract.AbsTaskMethodCreator):
     #
     APPLICATION_NAME = 'maya'
     METHOD_MODULE_PATH = 'lxmaya_fnc.checker'
+
     def __init__(self, fnc_scn_isp_paths):
         super(CheckerCreator, self).__init__(fnc_scn_isp_paths)
 
 
 class CheckerLoader(utl_fnc_abstract.AbsCheckerLoader):
     METHODS_CONFIGURE = ma_fnc_configure.Scheme.CHECKER_CONFIGURES
+
     def __init__(self, *args):
         super(CheckerLoader, self).__init__(*args)
 
 
 class ExporterConfigure(utl_fnc_abstract.AbsExporterConfigure):
-    CONFIGURE_CLS = bsc_objects.Configure
+    CONFIGURE_CLS = ctt_objects.Configure
     #
-    PROPERTIES_CLS = bsc_objects.Properties
+    PROPERTIES_CLS = ctt_objects.Properties
     #
     METHODS_CONFIGURE_PATH = ma_fnc_configure.Scheme.EXPORTERS_CONFIGURE_PATH
+
     def __init__(self, *args):
         super(ExporterConfigure, self).__init__(*args)
 
 
 class StpLoader(utl_fnc_abstract.AbsStpLoader):
     STEPS_SCHEME = ma_fnc_configure.Scheme.STEPS
+
     def __init__(self, *args):
         super(StpLoader, self).__init__(*args)
 
@@ -40,8 +44,10 @@ class StpLoader(utl_fnc_abstract.AbsStpLoader):
 class LookContent(object):
     KEYS_FORMAT = '{}.{}.keys.{}.{}'
     VALUES_FORMAT = '{}.{}.values.{}.{}'
+
     def __init__(self, raw):
-        self._raw_content = bsc_objects.Properties(None, raw)
+        self._raw_content = ctt_objects.Properties(None, raw)
+
     # key
     def set_name_key(self, look, var, seq, key):
         content_key_path = self.KEYS_FORMAT.format(look, var, ma_fnc_configure.Look.NAME, key)
@@ -54,6 +60,7 @@ class LookContent(object):
     def set_face_vertices_uuid_key(self, look, var, seq, key):
         content_key_path = self.KEYS_FORMAT.format(look, var, ma_fnc_configure.Look.FACE_VERTICES_UUID, key)
         self._raw_content.set(content_key_path, seq)
+
     # value
     def set_type_value(self, look, var, seq, value):
         content_key_path = self.VALUES_FORMAT.format(look, var, seq, ma_fnc_configure.Look.TYPE)
@@ -78,6 +85,7 @@ class LookContent(object):
     def set_uv_maps_value(self, look, var, seq, value):
         content_key_path = self.VALUES_FORMAT.format(look, var, seq, ma_fnc_configure.Look.UV_MAPS)
         self._raw_content.set(content_key_path, value)
+
     # get
     def get_material_assigns(self, look, var, key_dict):
         for key_type in ma_fnc_configure.Look.SEARCH_ORDER:
@@ -111,6 +119,7 @@ class LookContent(object):
                     return self._raw_content.get(
                         self.VALUES_FORMAT.format(look, var, seq, ma_fnc_configure.Look.VISIBILITIES)
                     )
+
     #
     def get_raw(self):
         return self._raw_content.value

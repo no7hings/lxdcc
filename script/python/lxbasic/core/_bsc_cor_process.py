@@ -13,6 +13,7 @@ class SubProcessMtd(object):
         NO_WINDOW = None
     #
     ENVIRON_MARK = copy.copy(os.environ)
+
     #
     @classmethod
     def get_environs(cls, **kwargs):
@@ -57,19 +58,22 @@ class SubProcessMtd(object):
                             'environ prepend: "{}"="{}"'.format(k, i_v)
                         )
             return environs
+
     @classmethod
     def get_clear_environs(cls, keys_exclude):
         environs_old = dict(os.environ)
         environs = {k: v for k, v in environs_old.items() if k not in keys_exclude}
         return environs
+
     @classmethod
     def check_command_clear_environ(cls, cmd):
         # todo, read form configure?
         if fnmatch.filter(
-            [cmd], '*/paper-bin*'
+                [cmd], '*/paper-bin*'
         ):
             return True
         return False
+
     @classmethod
     def execute_with_result_in_windows(cls, cmd, **kwargs):
         cmd = cmd.replace("&", "^&")
@@ -133,6 +137,7 @@ class SubProcessMtd(object):
             raise subprocess.CalledProcessError(retcode, cmd)
         #
         s_p.stdout.close()
+
     @classmethod
     def execute_with_result_in_linux(cls, cmd, **kwargs):
         clear_environ = kwargs.get('clear_environ', False)
@@ -195,12 +200,14 @@ class SubProcessMtd(object):
             raise subprocess.CalledProcessError(retcode, cmd)
         #
         s_p.stdout.close()
+
     @classmethod
     def execute_with_result(cls, cmd, **kwargs):
         if SystemMtd.get_is_windows():
             cls.execute_with_result_in_windows(cmd, **kwargs)
         elif SystemMtd.get_is_linux():
             cls.execute_with_result_in_linux(cmd, **kwargs)
+
     @classmethod
     def set_run(cls, cmd):
         _sp = subprocess.Popen(
@@ -212,6 +219,7 @@ class SubProcessMtd(object):
             startupinfo=cls.NO_WINDOW,
         )
         return _sp
+
     @classmethod
     def set_run_with_result_use_thread(cls, cmd):
         t_0 = threading.Thread(
@@ -222,12 +230,14 @@ class SubProcessMtd(object):
         )
         t_0.start()
         # t_0.join()
+
     @classmethod
     def execute_as_block(cls, cmd, **kwargs):
         clear_environ = kwargs.get('clear_environ', False)
         if clear_environ == 'auto':
             clear_environ = cls.check_command_clear_environ(cmd)
         #
+        return_dict = kwargs.get('return_dict', {})
         if clear_environ is True:
             s_p = subprocess.Popen(
                 cmd,
@@ -255,9 +265,56 @@ class SubProcessMtd(object):
         if s_p.returncode != 0:
             for i in output.decode('utf-8').splitlines():
                 sys.stderr.write(i+'\n')
+            return_dict['results'] = output.decode('utf-8').splitlines()
             raise subprocess.CalledProcessError(s_p.returncode, cmd)
+        #
         s_p.wait()
+        return_dict['results'] = output.decode('utf-8').splitlines()
         return output.decode('utf-8').splitlines()
+
+    @classmethod
+    def generator(cls, cmd, **kwargs):
+        clear_environ = kwargs.get('clear_environ', False)
+        if clear_environ == 'auto':
+            clear_environ = cls.check_command_clear_environ(cmd)
+
+        if clear_environ is True:
+            s_p = subprocess.Popen(
+                cmd,
+                shell=True,
+                # close_fds=True,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                startupinfo=cls.NO_WINDOW,
+                env=dict()
+            )
+        else:
+            environs_extend = kwargs.get('environs_extend', {})
+            if environs_extend:
+                environs = cls.get_environs(**kwargs)
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                    env=environs
+                )
+            else:
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                )
+        return s_p
+
     @classmethod
     def execute(cls, cmd):
         s_p = subprocess.Popen(
@@ -278,6 +335,7 @@ class SubProcessMtd(object):
             raise subprocess.CalledProcessError(s_p.returncode, cmd)
         s_p.wait()
         return output.decode('utf-8').splitlines()
+
     @classmethod
     def execute_use_thread(cls, cmd):
         t_0 = threading.Thread(

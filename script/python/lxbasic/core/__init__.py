@@ -17,6 +17,8 @@ from ._bsc_cor_environ import *
 
 from ._bsc_cor_process import *
 
+from ._bsc_cor_executes import *
+
 from ._bsc_cor_dict import *
 
 from ._bsc_cor_thread import *

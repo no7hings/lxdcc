@@ -13,13 +13,14 @@ from Deadline import DeadlineConnect
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class _Pattern(object):
     def __init__(self, pattern):
         self._pattern = pattern
         self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
+
     @classmethod
     def _get_fnmatch_pattern_(cls, variant):
         if variant is not None:
@@ -32,9 +33,11 @@ class _Pattern(object):
                     s = s.replace('{{{}}}'.format(key), '*')
             return s
         return variant
+
     @property
     def format(self):
         return self._pattern
+
     @property
     def pattern(self):
         return self._fnmatch_pattern
@@ -42,12 +45,15 @@ class _Pattern(object):
 
 class AbsContentRaw(object):
     SEP = '\n'
+
     def __init__(self, raw):
         self._raw = raw
         self._set_line_raw_update_()
+
     @classmethod
     def _get_lines_(cls, raw, sep):
         return [u'{}{}'.format(i, sep) for i in raw.split(sep)]
+
     @property
     def lines(self):
         return self._lines
@@ -62,6 +68,7 @@ class AbsContentRaw(object):
 
 class DdlContentRaw(AbsContentRaw):
     SEP = '\n'
+
     def __init__(self, raw):
         super(DdlContentRaw, self).__init__(raw)
 
@@ -126,7 +133,7 @@ class DdlContentRaw(AbsContentRaw):
             )
             if p:
                 if content is True:
-                    lis.append(p['content'] + self.SEP)
+                    lis.append(p['content']+self.SEP)
                 else:
                     lis.append(line)
         return lis
@@ -148,7 +155,7 @@ class DdlContentRaw(AbsContentRaw):
             )
             if p:
                 if content is True:
-                    lis.append(p['content'] + self.SEP)
+                    lis.append(p['content']+self.SEP)
                 else:
                     lis.append(line)
         return lis
@@ -161,6 +168,7 @@ class DdlContentRaw(AbsContentRaw):
 
 class ArnoldStoutRaw(AbsContentRaw):
     SEP = '\n'
+
     def __init__(self, raw):
         super(ArnoldStoutRaw, self).__init__(raw)
 
@@ -186,7 +194,7 @@ class ArnoldStoutRaw(AbsContentRaw):
                         continue
                 #
                 if content is True:
-                    lis.append(p['content'] + self.SEP)
+                    lis.append(p['content']+self.SEP)
                 else:
                     lis.append(line)
         return lis
@@ -207,34 +215,39 @@ class DdlConnectOpt(object):
         self._ddl_instance = DeadlineConnect.DeadlineCon(
             ddl_configure.Util.HOST, ddl_configure.Util.PORT
         )
+
     @property
     def ddl_instance(self):
         return self._ddl_instance
 
 
 class DdlCacheMtd(object):
-    CONTENT = bsc_objects.Content(
+    CONTENT = ctt_objects.Content(
         value=collections.OrderedDict()
     )
     #
     METHOD_PATH_PATTERN = '{type}.{name}.{engine}.{script}'
+
     @classmethod
     def set_ddl_job_id_add(cls, method_key, ddl_group_key, ddl_job_key, ddl_job_id):
         cls.CONTENT.add_element(
             '{}.{}.{}.job-ids'.format(method_key, ddl_group_key, ddl_job_key),
             ddl_job_id
         )
+
     @classmethod
     def set_ddl_method_update(cls, ddl_method_path, ddl_method):
         cls.CONTENT.add_element(
             '{}.job-ids'.format(ddl_method_path),
             ddl_method.get_ddl_job_id()
         )
+
     @classmethod
     def get_ddl_method_job_ids(cls, ddl_method_path):
         return cls.CONTENT.get(
             '{}.job-ids'.format(ddl_method_path)
         )
+
     @classmethod
     def set_ddl_rsv_task_method_update(cls, method_key, rsv_task_version, ddl_rsv_task_method):
         cls.set_ddl_job_id_add(
@@ -243,6 +256,7 @@ class DdlCacheMtd(object):
             cls.get_ddl_rsv_task_method_job_name(ddl_rsv_task_method),
             ddl_rsv_task_method.get_ddl_job_id()
         )
+
     @classmethod
     def get_ddl_rsv_task_method_job_ids(cls, method_key, rsv_task_version, ddl_job_key):
         return cls.CONTENT.get(
@@ -252,18 +266,22 @@ class DdlCacheMtd(object):
                 ddl_job_key
             )
         )
+
     @classmethod
     def set_ddl_rsv_task_method_reset(cls, method_key, rsv_task_version):
         cls.CONTENT.set(
             '{}.{}'.format(method_key, rsv_task_version),
             collections.OrderedDict()
         )
+
     @classmethod
     def get_ddl_rsv_task_method_job_name(cls, ddl_rsv_task_method):
         return '[{}][{}]'.format(ddl_rsv_task_method.ENGINE, ddl_rsv_task_method.SCRIPT)
+
     @classmethod
     def get_ddl_method_option(cls):
         pass
+
     @classmethod
     def get_ddl_job_ids(cls, method_options):
         lis = []
@@ -271,6 +289,7 @@ class DdlCacheMtd(object):
             job_ids = cls.get_ddl_method_job_ids(cls.get_ddl_method_path(method_option)) or []
             lis.extend(job_ids)
         return lis
+
     @classmethod
     def get_ddl_method_path(cls, method_option):
         return cls.METHOD_PATH_PATTERN.format(
@@ -281,6 +300,7 @@ class DdlCacheMtd(object):
 class DdlMethodCacheOpt(object):
     METHOD_TYPE = 'method'
     METHOD_PATH_PATTERN = '{type}.{name}.{engine}.{script}'
+
     def __init__(self, **kwargs):
         self._path = DdlCacheMtd.get_ddl_method_path(
             kwargs['option']
@@ -305,6 +325,7 @@ class DdlMethodOption(object):
         return 'type={type}&name={name}&configure={configure}&engine={engine}&script={script}&group={group}&pool={pool}'.format(
             **kwargs
         )
+
     @classmethod
     def get_geometry_unify(cls, configure='cjd'):
         return cls.get(
@@ -318,6 +339,7 @@ class DdlMethodOption(object):
             pool='emergency',
             group='all',
         )
+
     @classmethod
     def get_geometry_uv_assign(cls, configure='cjd'):
         return cls.get(
@@ -350,6 +372,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
         maya_camera_export='file={file}&with_camera_persp_abc={with_camera_persp_abc}',
         katana_render_export='file={file}&create_scene={create_scene}'
     )
+
     # python
     @classmethod
     def get_python_look_preview_export(cls, rsv_task_properties):
@@ -366,15 +389,19 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_method_option(cls, key):
         return
+
     @classmethod
     def get_script_option_pattern(cls, key):
         return cls.SCRIPT_OPTION_PATTERN_DICT[key]
+
     @classmethod
     def get_script_option(cls, key, **kwargs):
         return cls.SCRIPT_OPTION_PATTERN_DICT[key].format(**kwargs)
+
     # maya
     @classmethod
     def get_maya_scene_export(cls, rsv_task_properties):
@@ -391,6 +418,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_maya_geometry_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -406,6 +434,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_maya_look_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -421,6 +450,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_maya_cfx_look_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -436,6 +466,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_maya_camera_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -451,6 +482,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_maya_geometry_import(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -466,6 +498,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_maya_look_import(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -481,6 +514,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     # houdini
     @classmethod
     def get_houdini_scene_export(cls, rsv_task_properties):
@@ -497,6 +531,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_houdini_geometry_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -512,6 +547,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_houdini_look_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -527,6 +563,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     # katana
     @classmethod
     def get_katana_scene_export(cls, rsv_task_properties):
@@ -543,6 +580,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_katana_geometry_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -558,6 +596,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_katana_look_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -573,6 +612,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_katana_cfx_look_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -588,6 +628,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_katana_render_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -603,6 +644,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     # usd
     @classmethod
     def get_usd_export(cls, rsv_task_properties):
@@ -619,6 +661,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     # shotgun
     @classmethod
     def get_shotgun_export(cls, rsv_task_properties):
@@ -635,6 +678,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     @classmethod
     def get_shotgun_render_export(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')
@@ -650,6 +694,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
             pool='subprogress',
             group='subprogress',
         )
+
     #
     SCRIPT_METHOD_DICT = dict(
         maya_camera_expor=get_maya_camera_export
@@ -658,6 +703,7 @@ class DdlRsvTaskMethodOption(AbsDdlRsvTaskOption):
 
 class DdlRsvTaskRenderOption(AbsDdlRsvTaskOption):
     TYPE = 'rsv-task-render'
+
     @classmethod
     def get_katana_scene_render(cls, rsv_task_properties):
         project = rsv_task_properties.get('project')

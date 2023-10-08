@@ -3,7 +3,7 @@ import threading
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxkatana import ktn_core
 
@@ -57,7 +57,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
 
     def __init__(self, root, resource, texture_data):
         self._root_opt = ktn_core.NGObjOpt(root)
-        self._cfg = bsc_objects.Configure(
+        self._cfg = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
         )
         self._cfg.set(
@@ -71,6 +71,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
         )
 
         self._texture_data = texture_data
+
     @ktn_core.Modifier.undo_debug_run
     def create_auto(self):
         def post_fnc_():
@@ -142,6 +143,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
             if mtl_ktn_objs:
                 mtl_obj_opt = ktn_core.NGObjOpt(mtl_ktn_objs[-1])
                 mtl_obj_opt.set_rename(bsc_core.DccPathDagOpt(mtl_path).get_name())
+
     @classmethod
     def _set_material_collapsed_update_(cls, mtl_grp_obj_opt, mtl_name):
         attributes_ = mtl_grp_obj_opt.get_attributes()
@@ -229,12 +231,14 @@ ktn_scripts.ScpTextureImportFromDatabase(
             #
             ktn_core.NGObjOpt._create_connections_by_data_(self._cfg.get('node.{}.connections'.format(key)) or [])
         return ktn_obj
+
     #
     def create_outer_nodes(self, to_view_center=False):
         for i_key in [
             'arnold_surface_shader',
         ]:
             self.create_shader(i_key, to_view_center=to_view_center)
+
     #
     def create_inner_nodes(self):
         for i_key in [
@@ -252,12 +256,15 @@ ktn_scripts.ScpTextureImportFromDatabase(
             'arnold_texture_triplanar_scale',
             #
             'usd_shader',
+            'usd_uv_transform',
+            'usd_uv',
         ]:
             self.create_shader(i_key)
 
     def create_shader(self, key, extend_kwargs=None, to_view_center=False):
         data = self._cfg.get('node.{}'.format(key))
         return self._create_shader_(data, extend_kwargs=extend_kwargs, to_view_center=to_view_center)
+
     @classmethod
     def _create_shader_(cls, data, extend_kwargs=None, to_view_center=False):
         type_name = data['type']
@@ -293,6 +300,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
                 extend_kwargs=extend_kwargs
             )
         return ktn_obj
+
     @classmethod
     def _create_node_(cls, data, extend_kwargs=None, to_view_center=False):
         type_name = data['type']
@@ -327,6 +335,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
                 extend_kwargs=extend_kwargs
             )
         return ktn_obj
+
     @classmethod
     def _create_shader_node_graph_node_connections_(cls, data, extend_kwargs=None):
         ktn_core.NGObjOpt._create_connections_by_data_(

@@ -9,9 +9,9 @@ from lxbasic import bsc_core
 
 import lxbasic.abstracts as bsc_abstracts
 
-import lxbasic.objects as bsc_objects
+from lxutil import utl_core
 
-from lxutil import utl_configure, utl_core
+import lxcontent.objects as ctt_objects
 
 import copy
 
@@ -22,6 +22,7 @@ class _Pattern(object):
     def __init__(self, pattern):
         self._pattern = pattern
         self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
+
     @classmethod
     def _get_fnmatch_pattern_(cls, variant):
         if variant is not None:
@@ -34,9 +35,11 @@ class _Pattern(object):
                     s = s.replace('{{{}}}'.format(key), '*')
             return s
         return variant
+
     @property
     def format(self):
         return self._pattern
+
     @property
     def pattern(self):
         return self._fnmatch_pattern
@@ -80,9 +83,11 @@ class DotAssReader(bsc_abstracts.AbsFileReader):
                     if p:
                         self._texture_paths.append(p['texture_path'])
         return self._texture_paths
+
     @property
     def geometry_paths(self):
         return self._geometry_paths
+
     @property
     def texture_paths(self):
         return self._texture_paths
@@ -97,6 +102,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
         'Palette': ['xgDataPath', 'xgProjectPath'],
         'Description': ['xgDataPath', 'xgProjectPath']
     }
+
     def __init__(self, file_path):
         super(DotXgenFileReader, self).__init__(file_path)
 
@@ -124,6 +130,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
             )
         )
         return lis
+
     @classmethod
     def _get_obj_port_raws_(cls, raw):
         dic = {}
@@ -312,7 +319,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
         )
 
     def get_description_properties(self):
-        d = bsc_objects.Dict()
+        d = ctt_objects.Dict()
         utl_core.Log.set_module_result_trace(
             'file parse is started', 'file="{}"'.format(
                 self._file_path
@@ -376,6 +383,7 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
         'aiVolume': 'filename',
         'aiStandIn': 'dso',
     }
+
     def __init__(self, file_path):
         super(DotMaFileReader, self).__init__(file_path)
 
@@ -428,7 +436,8 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
                     port_raw = self._get_obj_port_raw_(p_line)
                     if port_raw is not None:
                         port_variant = port_raw
-                        port_name, port_type, port_raw = port_variant['port_name'], port_variant['port_type'], port_variant['port_raw']
+                        port_name, port_type, port_raw = port_variant['port_name'], port_variant['port_type'], \
+                        port_variant['port_raw']
                         dic[port_name] = port_type, port_raw
                 else:
                     print 'error: line [{}...] is to large({})'.format(p_line[:50], p_line_size)
@@ -439,6 +448,7 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
             p_index += 1
             c += 1
         return dic
+
     @classmethod
     def _get_is_port_(cls, line):
         pattern_0 = _Pattern(u'{l}setAttr{r}')
@@ -455,6 +465,7 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
         if results:
             return True
         return False
+
     @classmethod
     def _get_obj_port_raw_(cls, line):
         pattern_0 = _Pattern(u'{l}setAttr ".{port_name}" -type "{port_type}"{m}"{port_raw}";{r}')
@@ -492,6 +503,7 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
                 variant = p.named
                 variant['port_raw'] = None
                 return variant
+
     @classmethod
     def _get_obj_uuid_raw_(cls, line):
         pattern = _Pattern(u'{l}rename -uuid "{raw}"{r}')
@@ -562,7 +574,8 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
 class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLS = bsc_objects.Properties
+    PROPERTIES_CLS = ctt_objects.Properties
+
     def __init__(self, file_path):
         super(DotMtlxFileReader, self).__init__(file_path)
 
@@ -583,7 +596,7 @@ class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
             pass
 
         matches = self._get_matches_(
-            pattern=u'{l}<propertyset name="%s">{r}' % property_set_name,
+            pattern=u'{l}<propertyset name="%s">{r}'%property_set_name,
             lines=self._lines
         )
         if matches:
@@ -620,7 +633,8 @@ class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
 class DotOslFileReader(bsc_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLS = bsc_objects.Properties
+    PROPERTIES_CLS = ctt_objects.Properties
+
     def __init__(self, file_path):
         super(DotOslFileReader, self).__init__(file_path)
 
@@ -633,7 +647,7 @@ class DotOslFileReader(bsc_abstracts.AbsFileReader):
 
     def _get_shader_lines_(self):
         index = 0
-        p_index = index + 2
+        p_index = index+2
         is_end = False
         p_maximum = 10000
         c = 0
@@ -659,8 +673,10 @@ class DotUsdaFile(object):
             linesep="\n"
         )
     )
+
     def __init__(self, file_path):
         self._file_path = file_path
+
     @classmethod
     def _set_option_update_(cls, option, directory_path):
         def rcs_fnc_(v_):
@@ -678,7 +694,9 @@ class DotUsdaFile(object):
             else:
                 pass
             #
+
         rcs_fnc_(option)
+
     @classmethod
     def _set_write_(cls, key, file_path, option):
         directory_path = os.path.dirname(file_path)
@@ -698,7 +716,9 @@ class DotUsdaFile(object):
             u'file="{}"'.format(file_path)
         )
 
-    def set_surface_look_write(self, look_root_name, look_pass_name, look_pass_names, look_file_path, look_properties_file_dict):
+    def set_surface_look_write(
+            self, look_root_name, look_pass_name, look_pass_names, look_file_path, look_properties_file_dict
+            ):
         self._set_write_(
             key='surface-look',
             file_path=self._file_path,

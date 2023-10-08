@@ -310,18 +310,6 @@ node:
         connections:
             - '<.path>.out'
             - '<..material.path>.arnoldSurface'
-    # usd shader
-    usd_shader:
-        tag: 'preview'
-        type: 'UsdShadingNode'
-        shader_type: 'UsdPreviewSurface'
-        path: '<..node_group.path>/<.tag>__<option.time_tag>_USD_SDR'
-        #
-        connections:
-            - '<.path>.surface'
-            - '<..node_group.path>.outputs.usd_shader.usd_surface'
-            - '<.path>.displacement'
-            - '<..node_group.path>.outputs.usd_shader.usd_displacement'
     # texture
     #   basic
     arnold_texture_basic_mode:
@@ -478,14 +466,37 @@ node:
         #
         shader_expressions:
             default: 'getNode("<...arnold_texture_triplanar_proxy.name>").parameters.scale.value'
-    #
-    usd_texture:
+    # usd
+    usd_shader:
+        tag: 'preview'
         type: 'UsdShadingNode'
-        shader_type: 'UsdUVTexture'
-        path: '<..node_group.path>/{tag}__<option.time_tag>_USD_IMG'
+        shader_type: 'UsdPreviewSurface'
+        path: '<..node_group.path>/<.tag>__<option.time_tag>_USD_SDR'
+        #
+        connections:
+            - '<.path>.surface'
+            - '<..node_group.path>.outputs.usd_shader.usd_surface'
+            - '<.path>.displacement'
+            - '<..node_group.path>.outputs.usd_shader.usd_displacement'
+    #
+    usd_uv_transform:
+        tag: 'usd_uv_transform'
+        type: 'UsdShadingNode'
+        shader_type: 'UsdTransform2d'
+        path: '<..node_group.path>/<.tag>__<option.time_tag>_USD_IMG'
+    #
+    usd_uv:
+        tag: 'usd_uv'
+        type: 'UsdShadingNode'
+        shader_type: 'UsdPrimvarReader_float2'
+        path: '<..node_group.path>/<.tag>__<option.time_tag>_USD_IMG'
         #
         shader_parameters:
-            file: '{texture}'
+            varname: 'st'
+
+        connections:
+            - '<.path>.result'
+            - '<..usd_uv_transform.path>.in'
 # arnold
 #  texture
 arnold_texture:
@@ -870,11 +881,15 @@ usd_texture:
                 type: 'UsdShadingNode'
                 shader_type: 'UsdUVTexture'
                 path: '<node.node_group.path>/<...tag>__<..key>__<option.time_tag>_USD_NOD'
-                #
+
                 shader_parameters:
                     file: '{texture}'
         #
         connections:
+            # connect uv transform
+            - '<node.usd_uv_transform.path>.result'
+            - '<.node_graph.image.path>.st'
+            #
             - '<.node_graph.image.path>.rgb'
             - '<node.usd_shader.path>.diffuseColor'
     #
@@ -884,5 +899,9 @@ usd_texture:
             image: '$...diffuse_color.node_graph.image'
         #
         connections:
+            # connect uv transform
+            - '<node.usd_uv_transform.path>.result'
+            - '<.node_graph.image.path>.st'
+            #
             - '<.node_graph.image.path>.rgb'
             - '<node.usd_shader.path>.roughness'

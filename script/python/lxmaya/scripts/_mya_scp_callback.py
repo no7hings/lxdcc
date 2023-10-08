@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxmaya import ma_core
 
@@ -10,16 +10,19 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 class ScpCbkEnvironment(object):
     KEY = 'workspace environment build'
+
     def __init__(self):
-        self._cfg = bsc_objects.Configure(
+        self._cfg = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml(
                 'katana/script/scene'
             )
         )
         self._cfg.set_flatten()
+
     @classmethod
     def save(cls, data):
         pass
+
     @classmethod
     def register(cls, data):
         for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
@@ -38,10 +41,12 @@ class ScpCbkEnvironment(object):
             f = mya_dcc_objects.Scene.get_current_file_path()
         #
         import lxresolver.scripts as rsv_scripts
+
         return rsv_scripts.ScpEnvironment.get_data(f)
 
     def add_from_work_environment(self, *args, **kwargs):
         import lxshotgun.scripts as stg_objects
+
         task_id = bsc_core.EnvironMtd.get(
             'PAPER_TASK_ID'
         )
@@ -49,6 +54,7 @@ class ScpCbkEnvironment(object):
 
     def add_from_scene(self, *args, **kwargs):
         return False, None
+
     @ma_core.Modifier.undo_run
     def execute(self, *args, **kwargs):
         if ma_core.get_is_ui_mode():

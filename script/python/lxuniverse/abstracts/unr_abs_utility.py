@@ -19,6 +19,8 @@ from lxbasic import bsc_core
 
 import lxbasic.objects as bsc_objects
 
+import lxcontent.objects as ctt_objects
+
 from lxuniverse import unr_configure
 
 
@@ -1126,11 +1128,11 @@ class AbsObjDagPath(object):
         return self.path == self.pathsep
 
     def get_parent_path(self):
-        return bsc_core.DccPathDagMtd.get_dag_parent(
+        return bsc_core.DccPathDagMtd.get_dag_parent_path(
             path=self._path, pathsep=self._pathsep
         )
 
-    def set_parent_path(self, path):
+    def parent_to_path(self, path):
         # noinspection PyAugmentAssignment
         self._path = path + self._path
 
@@ -1199,7 +1201,7 @@ class AbsPortDagPath(object):
         return self._path
 
     def get_parent_path(self):
-        return bsc_core.DccPathDagMtd.get_dag_parent(
+        return bsc_core.DccPathDagMtd.get_dag_parent_path(
             path=self._path, pathsep=self._pathsep
         )
 
@@ -1735,7 +1737,7 @@ class AbsPortTargetDef(object):
         target_connections = self.get_target_connections()
         return [i.target for i in target_connections]
 
-    def set_connect_to(self, input_port):
+    def connect_to(self, input_port):
         source_obj_args = self.obj_path
         source_port_args = self.port_path
         target_obj_args = input_port.obj_path
@@ -1747,7 +1749,7 @@ class AbsPortTargetDef(object):
         )
 
     def set_target(self, input_port):
-        self.set_connect_to(input_port)
+        self.connect_to(input_port)
 
     def _format_dict_(self):
         raise NotImplementedError()
@@ -2125,7 +2127,7 @@ class AbsPort(
         return False
 
     def to_properties(self):
-        p = bsc_objects.Properties(self)
+        p = ctt_objects.Properties(self)
         p.set(
             'type', self.type_path
         )
@@ -2172,7 +2174,7 @@ class AbsObjTypeObjDef(object):
     def _set_obj_branches_create_(self):
         pass
 
-    def set_obj_create(self, obj_path_args, **kwargs):
+    def create_obj(self, obj_path_args, **kwargs):
         # etc: /a/b/c
         if isinstance(obj_path_args, six.string_types):
             obj_path = obj_path_args
@@ -2897,7 +2899,7 @@ class AbsObjPropertiesDef(object):
     PROPERTIES_CLS = None
 
     def _set_obj_properties_def_init_(self):
-        self._obj_properties = bsc_objects.Properties(
+        self._obj_properties = ctt_objects.Properties(
             self
         )
 
@@ -3024,7 +3026,7 @@ class AbsObj(
         )
 
     def to_properties(self):
-        p = bsc_objects.Properties(self)
+        p = ctt_objects.Properties(self)
         p.set(
             'type', self.type_path
         )
@@ -3182,7 +3184,7 @@ class AbsObjUniverseDef(object):
             obj_type._set_port_queries_build_(unr_configure.ObjType.PORT_QUERY_RAW)
         #
         root_type = self.get_obj_type(unr_configure.ObjType.ROOT)
-        root_type.set_obj_create(root_type.obj_pathsep)
+        root_type.create_obj(root_type.obj_pathsep)
 
     def set_gui_attribute(self, key, value):
         self._custom_raw[key] = value
@@ -3303,7 +3305,7 @@ class AbsObjUniverseDef(object):
         :return: None
         """
         obj_type = source_obj.type
-        new_obj = obj_type.set_obj_create(target_path)
+        new_obj = obj_type.create_obj(target_path)
         port_dict = {}
         for port in source_obj.get_ports():
             key = port.port_path
@@ -3406,7 +3408,7 @@ class AbsObjUniverseDef(object):
         pass
 
     def get_as_dict(self):
-        content = bsc_objects.Content()
+        content = ctt_objects.Content()
         for obj in self.get_objs():
             key = obj.path
             #
@@ -3436,7 +3438,7 @@ class AbsObjUniverseDef(object):
             return [i for i in self.get_objs() if not i.get_target_connections()]
 
     def to_properties(self):
-        p = bsc_objects.Properties(self)
+        p = ctt_objects.Properties(self)
         for i_obj in self.get_objs():
             p.set(
                 i_obj.path, i_obj.to_properties().get_value()
@@ -3520,7 +3522,7 @@ class AbsOsDirectory(
 
     def get_is_root(self):
         return self._path == self._root
-    #
+
     def get_root(self):
         return self.create_dag_fnc(self._root)
 
@@ -3550,17 +3552,17 @@ class AbsOsDirectory(
                 self.path, directory_path_tgt
             )
 
-    def get_file_paths(self, include_exts=None):
+    def get_file_paths(self, ext_includes=None):
         return bsc_core.StgDirectoryMtd.get_file_paths__(
-            self.path, include_exts
+            self.path, ext_includes
         )
 
-    def get_files(self, include_exts=None):
-        return [self.OS_FILE_CLS(i) for i in self.get_file_paths(include_exts)]
+    def get_files(self, ext_includes=None):
+        return [self.OS_FILE_CLS(i) for i in self.get_file_paths(ext_includes)]
 
-    def get_all_file_paths(self, include_exts=None):
+    def get_all_file_paths(self, ext_includes=None):
         return bsc_core.StgDirectoryMtd.get_all_file_paths__(
-            self.path, include_exts
+            self.path, ext_includes
         )
 
     def set_copy_to_directory(self, directory_path_tgt):
@@ -3598,8 +3600,8 @@ class AbsOsDirectory(
         [i.join() for i in threads]
 
     def set_open(self):
-        if os.path.exists(self.path):
-            bsc_core.StgExtraMtd.set_directory_open(self.path)
+        if self.get_path():
+            bsc_core.StgSystem.open_directory(self.get_path())
 
     def __str__(self):
         return u'{}(path="{}")'.format(
@@ -3689,13 +3691,12 @@ class AbsOsFile(
     def base(self):
         return os.path.splitext(self.name)[0]
 
-    @property
-    def name_base(self):
+    def get_name_base(self):
         return os.path.splitext(self.name)[0]
+    name_base = property(get_name_base)
 
     def get_path_base(self):
         return os.path.splitext(self.path)[0]
-
     @property
     def path_base(self):
         return os.path.splitext(self.path)[0]
@@ -3712,7 +3713,7 @@ class AbsOsFile(
     def directory(self):
         return self.get_parent()
 
-    def set_directory_open(self):
+    def open_directory_in_system(self):
         if self.get_is_exists_file() is True:
             if self.get_is_windows():
                 cmd = u'explorer /select,"{}"'.format(self.path.replace('/', '\\'))
@@ -3722,10 +3723,10 @@ class AbsOsFile(
                 subprocess.Popen(cmd, shell=True)
         elif self.directory.get_is_exists() is True:
             if self.get_is_windows():
-                cmd = u'explorer "{}"'.format(self.directory.path.replace('/', '\\'))
+                cmd = 'explorer "{}"'.format(self.directory.path.replace('/', '\\'))
                 subprocess.Popen(cmd, shell=True)
             elif self.get_is_linux():
-                cmd = u'nautilus "{}"'.format(self.directory.path)
+                cmd = 'gio open "{}"'.format(self.directory.path)
                 subprocess.Popen(cmd, shell=True)
 
     def set_copy_to(self, target_dir_path, ignore_structure=True):
@@ -3843,7 +3844,7 @@ class AbsOsFile(
         if self.ext == ext:
             base, ext = os.path.splitext(self.path)
             glob_pattern = u'{}.*'.format(base)
-            _ = bsc_core.StgDirectoryMtd.get_file_paths_by_glob_pattern__(
+            _ = bsc_core.StgDirectoryMtd.find_file_paths(
                 glob_pattern
             )
             lis = []
@@ -3986,7 +3987,7 @@ class AbsValue(object):
         }
 
     def to_properties(self):
-        p = bsc_objects.Properties(self)
+        p = ctt_objects.Properties(self)
         p.set(
             'category', self.category_name
         )

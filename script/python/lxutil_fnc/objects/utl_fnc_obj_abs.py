@@ -5,9 +5,9 @@ import collections
 
 import lxbasic.objects as bsc_objects
 
-import lxutil.dcc.dcc_objects as utl_dcc_objects
+import lxcontent.objects as ctt_objects
 
-import lxutil.objects as utl_objects
+import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxutil import utl_core
 
@@ -17,6 +17,7 @@ import lxutil_fnc.dcc.dcc_objects as utl_fnc_dcc_objects
 class AbsTaskMethodsLoader(object):
     CONFIGURE_CLS = None
     METHODS_CONFIGURE_PATH = None
+
     def __init__(self, task_properties, options=None):
         self._task_properties = task_properties
         self._configure = self.CONFIGURE_CLS(None, self.METHODS_CONFIGURE_PATH)
@@ -32,12 +33,15 @@ class AbsTaskMethodsLoader(object):
         self._obj_universe = self._obj_scene.universe
         #
         self._set_step_mapper_build_()
+
     @property
     def task_properties(self):
         return self._task_properties
+
     @property
     def obj_scene(self):
         return self._obj_scene
+
     @property
     def obj_universe(self):
         return self._obj_universe
@@ -66,15 +70,15 @@ class AbsTaskMethodsLoader(object):
         task = task_properties.get('task')
         _ = 'entities.project.{}.{}.{}'.format(branch, step, task)
         if self._configure.get(_) is not None:
-            return '/' + '/'.join(_.split('.')[1:])
+            return '/'+'/'.join(_.split('.')[1:])
         _ = 'entities.project.{}.{}'.format(branch, step)
         if self._configure.get(_) is not None:
-            return '/' + '/'.join(_.split('.')[1:])
+            return '/'+'/'.join(_.split('.')[1:])
         _ = 'entities.project.{}'.format(branch)
         if self._configure.get(_) is not None:
-            return '/' + '/'.join(_.split('.')[1:])
+            return '/'+'/'.join(_.split('.')[1:])
         _ = 'entities.project'
-        return '/' + '/'.join(_.split('.')[1:])
+        return '/'+'/'.join(_.split('.')[1:])
 
     def get_root_obj(self):
         return self.obj_universe.get_root()
@@ -108,6 +112,7 @@ class AbsTaskMethodsLoader(object):
 
     def get_sorted_objs(self, method_paths):
         import copy
+
         lis = copy.deepcopy(method_paths)
         application = self.task_properties.get('application')
         for method_path in method_paths:
@@ -134,12 +139,15 @@ class AbsMethodDef(object):
     def _set_method_def_init_(self):
         self._obj = None
         self._obj_attribute = None
+
     @property
     def obj(self):
         return self._obj
+
     @obj.setter
     def obj(self, obj):
         self._obj = obj
+
     @property
     def obj_attributes(self):
         return self._obj.attributes
@@ -155,7 +163,8 @@ class AbsMethodCheckDef(object):
     FNC_ISP_IGNORE_CLS = None
     #
     DCC_NODE_CLS = utl_dcc_objects.Obj
-    CONTENT_CLS = bsc_objects.Content
+    CONTENT_CLS = ctt_objects.Content
+
     def _set_method_check_def_init_(self):
         self._error_obj_content = self.CONTENT_CLS(
             value=collections.OrderedDict()
@@ -164,12 +173,15 @@ class AbsMethodCheckDef(object):
         self._check_tags = []
         self._is_check_passed = False
         self._is_check_ignored = False
+
     @property
     def obj(self):
         raise NotImplementedError()
+
     @property
     def obj_attributes(self):
         raise NotImplementedError()
+
     @property
     def check_results(self):
         return self._error_obj_content
@@ -288,6 +300,7 @@ class AbsMethodCheckDef(object):
             description = self.get_obj_check_description(obj_path)
             lis.append(u'obj="{}"\ndescription="{}"'.format(obj_path, description))
         return '\n'.join(lis)
+
     #
     def get_object_check_method(self, index):
         check_method_key = u'_check_method_{}'.format(index)
@@ -308,6 +321,7 @@ class AbsMethodCheckDef(object):
             self.set_check_run()
         except Exception:
             from lxutil import utl_core
+
             utl_core.ExceptionCatcher.set_create()
             raise
 
@@ -369,6 +383,7 @@ class AbsMethodRepairDef(object):
             self.set_repair_run()
         except Exception:
             from lxutil import utl_core
+
             utl_core.ExceptionCatcher.set_create()
             raise
 
@@ -400,6 +415,7 @@ class AbsMethodExportDef(object):
         #
         except Exception:
             from lxutil import utl_core
+
             utl_core.ExceptionCatcher.set_create(use_window)
             raise
 
@@ -420,9 +436,11 @@ class AbsTaskMethod(
         self._set_method_export_def_init_()
         #
         self._task_properties = task_properties
+
     @property
     def task_properties(self):
         return self._task_properties
+
     @task_properties.setter
     def task_properties(self, raw):
         self._task_properties = raw

@@ -8,7 +8,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
 
     def set_check_run(self):
         def yes_fnc_():
-            ktn_dcc_objects.Scene.set_file_save()
+            ktn_dcc_objects.Scene.save_file()
         #
         from lxutil import utl_core
         #
@@ -73,9 +73,11 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             if bsc_core.ApplicationMtd.get_is_katana():
                 import lxkatana.fnc.exporters as ktn_fnc_exporters
                 #
-                ktn_fnc_exporters.SceneExporter(
-                    file_path=katana_scene_src_file_path
-                ).set_run()
+                ktn_fnc_exporters.FncSceneExporter(
+                    option=dict(
+                        file=katana_scene_src_file_path
+                    )
+                ).execute()
             else:
                 pass
             #

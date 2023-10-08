@@ -825,7 +825,7 @@ class LxGeometrySettings(object):
         contents = []
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        stage_opt = ktn_core.SGStageOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
         location = None
         scheme = obj_opt.get('options.scheme')
@@ -877,7 +877,7 @@ class LxGeometrySettings(object):
     def _get_usd_file_path_(self):
         from lxkatana import ktn_core
 
-        stage_opt = ktn_core.SGStageOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
         return stage_opt.get('/root/world/geo.info.usdOpArgs.fileName')
 
@@ -885,7 +885,7 @@ class LxGeometrySettings(object):
         from lxkatana import ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        stage_opt = ktn_core.SGStageOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
         contents = []
 
@@ -1044,7 +1044,7 @@ class LxCamera(object):
         from lxkatana import ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        stage_opt = ktn_core.SGStageOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
         location = '/root/world/geo'
 
@@ -1101,7 +1101,7 @@ class LxCamera(object):
         from lxkatana import ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
-        stage_opt = ktn_core.SGStageOpt(self._ktn_obj)
+        stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
         location = '/root/world/geo'
 

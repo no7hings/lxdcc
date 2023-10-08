@@ -7,7 +7,7 @@ from lxbasic import bsc_core
 
 from lxutil import utl_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 import lxdatabase.objects as dtb_objects
 
@@ -61,7 +61,7 @@ class ScpResourcesAddByQuixel(object):
         json_files = bsc_core.StgDirectoryOpt(
             directory_path_src
         ).get_all_file_paths(
-            include_exts=['.json']
+            ext_includes=['.json']
         )
 
         self._resource_dict = dict()
@@ -78,7 +78,7 @@ class ScpResourcesAddByQuixel(object):
             'json="{}"'.format(file_path)
         )
         quixel_json_file_opt = bsc_core.StgFileOpt(file_path)
-        json_content = bsc_objects.Configure(
+        json_content = ctt_objects.Configure(
             value=file_path
         )
         directory_path_src = quixel_json_file_opt.directory_path
@@ -263,8 +263,7 @@ class ScpResourcesAddByQuixel(object):
             entity_type=dtb_opt.EntityTypes.TagGroup,
             filters=[
                 ('kind', 'is', dtb_opt.Kinds.ResourceSemanticTagGroup)
-            ],
-            new_connection=False
+            ]
         )
         for i in semantic_tag_groups:
             j_tag_group_name = i.name
@@ -343,7 +342,7 @@ class ScpResourcesAddByQuixel(object):
         #
         quixel_directory_path_tgt = quixel_directory_p_opt_tgt.set_update_to(**pattern_kwargs).get_value()
         #
-        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(include_exts=['.jpg', '.png', '.tga', '.exr'])
+        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(ext_includes=['.jpg', '.png', '.tga', '.exr'])
         for i_file_path_src in file_paths:
             # copy to quixel
             bsc_core.StgFileOpt(i_file_path_src).set_copy_to_directory(
@@ -565,7 +564,7 @@ class ScpResourcesAddByQuixel(object):
         #
         quixel_directory_path_tgt = quixel_directory_p_opt_tgt.set_update_to(**pattern_kwargs).get_value()
         #
-        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(include_exts=['.fbx', '.abc', '.obj', '.usd'])
+        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(ext_includes=['.fbx', '.abc', '.obj', '.usd'])
         for i_file_path_src in file_paths:
             # copy to quixel
             bsc_core.StgFileOpt(i_file_path_src).set_copy_to_directory(

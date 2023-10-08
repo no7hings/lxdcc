@@ -26,7 +26,7 @@ d = utl_dcc_objects.OsDirectory_('/l/temp/td/dongchangbao/tx_convert_test/exr_1'
 
 output_directory_path = '/l/temp/td/dongchangbao/tx_convert_test/tx_17'
 
-file_paths = d.get_all_file_paths(include_exts=['.exr'])
+file_paths = d.get_all_file_paths(ext_includes=['.exr'])
 
 if output_directory_path:
     utl_dcc_objects.OsDirectory_(
@@ -50,11 +50,11 @@ with utl_core.LogProgressRunner.create_as_bar(maximum=len(file_paths), label='te
             search_directory_path=output_directory_path,
         )
         if i_cmd:
-            bsc_core.TrdCmdProcess.set_wait()
-            i_t = bsc_core.TrdCmdProcess.set_start(i_cmd, index=i_index)
-            i_t.finished.set_connect_to(
+            bsc_core.TrdCommandPool.set_wait()
+            i_t = bsc_core.TrdCommandPool.set_start(i_cmd, index=i_index)
+            i_t.finished.connect_to(
                 finished_fnc_
             )
-            i_t.status_changed.set_connect_to(
+            i_t.status_changed.connect_to(
                 status_changed_fnc_
             )

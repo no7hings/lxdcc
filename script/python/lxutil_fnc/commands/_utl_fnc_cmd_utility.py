@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
@@ -62,7 +62,7 @@ def set_surface_system_workspace_create(task_properties):
         if task_dir:
             task_dir_path = task_dir.get_result(version='latest')
             if task_dir_path:
-                configure = bsc_objects.Configure(
+                configure = ctt_objects.Configure(
                     value=bsc_core.CfgFileMtd.get_yaml('storage/asset-system-workspace')
                 )
                 configure.set('option.root', task_dir_path)

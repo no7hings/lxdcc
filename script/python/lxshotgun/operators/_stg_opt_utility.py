@@ -13,6 +13,7 @@ class ImgFileOpt(object):
         'ACEScg_sRGB': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/sRGB_for_ACEScg_Maya.csp',
         'ACEScg_Rec709': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/Rec.709_for_ACEScg_Maya.csp'
     }
+
     def __init__(self, obj):
         self._obj = obj
         #
@@ -82,6 +83,7 @@ class StgImageOpt(object):
         'ACEScg_sRGB': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/sRGB_for_ACEScg_Maya.csp',
         'ACEScg_Rec709': '/l/packages/pg/third_party/ocio/aces/1.2/baked/maya/Rec.709_for_ACEScg_Maya.csp'
     }
+
     def __init__(self, obj):
         self._obj = obj
         #
@@ -105,11 +107,13 @@ class AbsStgObjOpt(object):
 
     def get_stg_connector(self):
         return self._stg_obj_query._stg_connector
+
     #
     connector = property(get_stg_connector)
 
     def get_shogun(self):
         return self._stg_obj_query.shotgun
+
     shotgun = property(get_shogun)
 
     @property
@@ -383,7 +387,7 @@ class StgVersionOpt(AbsStgObjOpt):
         key = 'sg_td_batch_log'
         _ = self._stg_obj_query.get(key) or u''
         if _:
-            _ += '\n' + text
+            _ += '\n'+text
         else:
             _ += text
 

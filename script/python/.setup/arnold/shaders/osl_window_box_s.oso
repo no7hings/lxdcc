@@ -940,9 +940,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:17
 #             string i_string_0 = substr(in_string, i_start);
 	functioncall	$const7 19 	%line{17} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:427
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:427
 # string substr (string s, int start) { return substr (s, start, strlen(s)); }
-	strlen		$tmp4 filename 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{427} %argrw{"wr"}
+	strlen		$tmp4 filename 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{427} %argrw{"wr"}
 	substr		___340_i_string_0 filename ___340_i_start $tmp4 	%argrw{"wrrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:18
 #             string i_out_string = concat(i_value, i_string_0);
@@ -1002,9 +1002,9 @@ code ___main___
 	aref		$tmp15 ___355_i_args $const6 	%line{250} %argrw{"wrr"}
 	aref		$tmp16 ___355_i_args $const9 	%argrw{"wrr"}
 	functioncall	$const15 49 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:433
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:433
 #     return concat(concat(a,b), c);
-	concat		$tmp17 $tmp15 ___355_i_udim_str 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{433} %argrw{"wrr"}
+	concat		$tmp17 $tmp15 ___355_i_udim_str 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{433} %argrw{"wrr"}
 	concat		___355_i_file $tmp17 $tmp16 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:253
 #             gettextureinfo(i_file, "exists", i_e);
@@ -1048,16 +1048,16 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:53
 #     float depth_0 = clamp(depth, 0.01, 100.0);
 	functioncall	$const21 79 	%line{53} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp34 depth $const20 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp34 depth $const20 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		___341_depth_0 $tmp34 $const19 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:55
 #     float overscan_left_0 = 1-clamp(overscan_left, 0, 0.9);
 	functioncall	$const21 82 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{55} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp36 overscan_left $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp36 overscan_left $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp35 $tmp36 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:55
 #     float overscan_left_0 = 1-clamp(overscan_left, 0, 0.9);
@@ -1065,9 +1065,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:56
 #     float overscan_right_0 = 1-clamp(overscan_right, 0, 0.9);
 	functioncall	$const21 86 	%line{56} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp38 overscan_right $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp38 overscan_right $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp37 $tmp38 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:56
 #     float overscan_right_0 = 1-clamp(overscan_right, 0, 0.9);
@@ -1075,9 +1075,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:57
 #     float overscan_top_0 = 1-clamp(overscan_top, 0, 0.9);
 	functioncall	$const21 90 	%line{57} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp40 overscan_top $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp40 overscan_top $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp39 $tmp40 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:57
 #     float overscan_top_0 = 1-clamp(overscan_top, 0, 0.9);
@@ -1085,9 +1085,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:58
 #     float overscan_bottom_0 = 1-clamp(overscan_bottom, 0, 0.9);
 	functioncall	$const21 94 	%line{58} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp42 overscan_bottom $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp42 overscan_bottom $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp41 $tmp42 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:58
 #     float overscan_bottom_0 = 1-clamp(overscan_bottom, 0, 0.9);
@@ -1095,9 +1095,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:60
 #     float contract_back_0 = 1-clamp(contract_back, 0, 0.9);
 	functioncall	$const21 98 	%line{60} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp44 contract_back $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp44 contract_back $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp43 $tmp44 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:60
 #     float contract_back_0 = 1-clamp(contract_back, 0, 0.9);
@@ -1106,9 +1106,9 @@ code ___main___
 #     float middle_depth_0 = clamp(middle_depth, 0.01, depth_0-0.01);
 	sub		$tmp45 ___341_depth_0 $const19 	%line{62} %argrw{"wrr"}
 	functioncall	$const21 103 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp46 middle_depth $tmp45 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp46 middle_depth $tmp45 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		___341_middle_depth_0 $tmp46 $const19 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:63
 #     float middle_offset_x_0 = middle_offset_x*-(texture_flop*2-1)*0.1;
@@ -1129,9 +1129,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:67
 #     vector obj_I = transform("object", I);
 	functioncall	$const26 117 	%line{67} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:262
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:262
 # vector transform (string to, vector p) { return transform("common",to,p); }
-	transformv	___341_obj_I $const27 $const25 I 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
+	transformv	___341_obj_I $const27 $const25 I 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:69
 #     vector axis_x = vector(1, 0, 0);
 	assign		___341_axis_x $const28 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{69} %argrw{"wr"}
@@ -1238,92 +1238,92 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:111
 #     obj_I = rotate(obj_I, radians(rotation_x), axis_x);
 	functioncall	$const34 181 	%line{111} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:65
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:65
 # float  radians (float x)  { return x*(M_PI/180.0); }
-	div		$tmp98 $const35 $const36 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
+	div		$tmp98 $const35 $const36 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
 	mul		$tmp97 rotation_x $tmp98 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:111
 #     obj_I = rotate(obj_I, radians(rotation_x), axis_x);
 	functioncall	$const37 233 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{111} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:293
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:293
 #     return rotate (p, angle, point(0), axis);
-	functioncall	$const37 233 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{293} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:270
+	functioncall	$const37 233 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{293} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:270
 #     vector axis = normalize (b - a);
 	sub		$tmp100 ___341_axis_x $const38 	%line{270} %argrw{"wrr"}
 	normalize	___257_axis $tmp100 	%argrw{"wr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:272
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:272
 #     sincos (angle, sinang, cosang);
 	sincos		$tmp97 ___257_sinang ___257_cosang 	%line{272} %argrw{"rww"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:273
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:273
 #     float cosang1 = 1.0 - cosang;
 	sub		___257_cosang1 $const17 ___257_cosang 	%line{273} %argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:274
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:274
 #     float x = axis[0], y = axis[1], z = axis[2];
 	compref		___257_x ___257_axis $const6 	%line{274} %argrw{"wrr"}
 	compref		___257_y ___257_axis $const9 	%argrw{"wrr"}
 	compref		___257_z ___257_axis $const23 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	mul		$tmp101 ___257_x ___257_x 	%line{275} %argrw{"wrr"}
 	mul		$tmp102 ___257_x ___257_x 	%argrw{"wrr"}
 	sub		$tmp103 $const17 $tmp102 	%argrw{"wrr"}
 	mul		$tmp104 $tmp103 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp105 $tmp101 $tmp104 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:276
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:276
 #                        x * y * cosang1 + z * sinang,
 	mul		$tmp106 ___257_x ___257_y 	%line{276} %argrw{"wrr"}
 	mul		$tmp107 $tmp106 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp108 ___257_z ___257_sinang 	%argrw{"wrr"}
 	add		$tmp109 $tmp107 $tmp108 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:277
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:277
 #                        x * z * cosang1 - y * sinang,
 	mul		$tmp110 ___257_x ___257_z 	%line{277} %argrw{"wrr"}
 	mul		$tmp111 $tmp110 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp112 ___257_y ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp113 $tmp111 $tmp112 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:279
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:279
 #                        x * y * cosang1 - z * sinang,
 	mul		$tmp114 ___257_x ___257_y 	%line{279} %argrw{"wrr"}
 	mul		$tmp115 $tmp114 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp116 ___257_z ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp117 $tmp115 $tmp116 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:280
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:280
 #                        y * y + (1.0 - y * y) * cosang,
 	mul		$tmp118 ___257_y ___257_y 	%line{280} %argrw{"wrr"}
 	mul		$tmp119 ___257_y ___257_y 	%argrw{"wrr"}
 	sub		$tmp120 $const17 $tmp119 	%argrw{"wrr"}
 	mul		$tmp121 $tmp120 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp122 $tmp118 $tmp121 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:281
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:281
 #                        y * z * cosang1 + x * sinang,
 	mul		$tmp123 ___257_y ___257_z 	%line{281} %argrw{"wrr"}
 	mul		$tmp124 $tmp123 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp125 ___257_x ___257_sinang 	%argrw{"wrr"}
 	add		$tmp126 $tmp124 $tmp125 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:283
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:283
 #                        x * z * cosang1 + y * sinang,
 	mul		$tmp127 ___257_x ___257_z 	%line{283} %argrw{"wrr"}
 	mul		$tmp128 $tmp127 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp129 ___257_y ___257_sinang 	%argrw{"wrr"}
 	add		$tmp130 $tmp128 $tmp129 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:284
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:284
 #                        y * z * cosang1 - x * sinang,
 	mul		$tmp131 ___257_y ___257_z 	%line{284} %argrw{"wrr"}
 	mul		$tmp132 $tmp131 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp133 ___257_x ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp134 $tmp132 $tmp133 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:285
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:285
 #                        z * z + (1.0 - z * z) * cosang,
 	mul		$tmp135 ___257_z ___257_z 	%line{285} %argrw{"wrr"}
 	mul		$tmp136 ___257_z ___257_z 	%argrw{"wrr"}
 	sub		$tmp137 $const17 $tmp136 	%argrw{"wrr"}
 	mul		$tmp138 $tmp137 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp139 $tmp135 $tmp138 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	matrix		___257_M $tmp105 $tmp109 $tmp113 $const1 $tmp117 $tmp122 $tmp126 $const1 $tmp130 $tmp134 $tmp139 $const1 $const1 $const1 $const1 $const17 	%line{275} %argrw{"wrrrrrrrrrrrrrrrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:288
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:288
 #     return transform (M, p-a) + a;
 	sub		$tmp141 ___341_obj_I $const38 	%line{288} %argrw{"wrr"}
 	transformv	$tmp140 ___257_M $tmp141 	%argrw{"wrr"}
@@ -1331,92 +1331,92 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:112
 #     obj_I = rotate(obj_I, radians(rotation_y), axis_y);
 	functioncall	$const34 236 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{112} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:65
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:65
 # float  radians (float x)  { return x*(M_PI/180.0); }
-	div		$tmp143 $const35 $const36 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
+	div		$tmp143 $const35 $const36 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
 	mul		$tmp142 rotation_y $tmp143 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:112
 #     obj_I = rotate(obj_I, radians(rotation_y), axis_y);
 	functioncall	$const37 288 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{112} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:293
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:293
 #     return rotate (p, angle, point(0), axis);
-	functioncall	$const37 288 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{293} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:270
+	functioncall	$const37 288 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{293} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:270
 #     vector axis = normalize (b - a);
 	sub		$tmp145 ___341_axis_y $const38 	%line{270} %argrw{"wrr"}
 	normalize	___257_axis $tmp145 	%argrw{"wr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:272
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:272
 #     sincos (angle, sinang, cosang);
 	sincos		$tmp142 ___257_sinang ___257_cosang 	%line{272} %argrw{"rww"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:273
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:273
 #     float cosang1 = 1.0 - cosang;
 	sub		___257_cosang1 $const17 ___257_cosang 	%line{273} %argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:274
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:274
 #     float x = axis[0], y = axis[1], z = axis[2];
 	compref		___257_x ___257_axis $const6 	%line{274} %argrw{"wrr"}
 	compref		___257_y ___257_axis $const9 	%argrw{"wrr"}
 	compref		___257_z ___257_axis $const23 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	mul		$tmp146 ___257_x ___257_x 	%line{275} %argrw{"wrr"}
 	mul		$tmp147 ___257_x ___257_x 	%argrw{"wrr"}
 	sub		$tmp148 $const17 $tmp147 	%argrw{"wrr"}
 	mul		$tmp149 $tmp148 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp150 $tmp146 $tmp149 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:276
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:276
 #                        x * y * cosang1 + z * sinang,
 	mul		$tmp151 ___257_x ___257_y 	%line{276} %argrw{"wrr"}
 	mul		$tmp152 $tmp151 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp153 ___257_z ___257_sinang 	%argrw{"wrr"}
 	add		$tmp154 $tmp152 $tmp153 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:277
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:277
 #                        x * z * cosang1 - y * sinang,
 	mul		$tmp155 ___257_x ___257_z 	%line{277} %argrw{"wrr"}
 	mul		$tmp156 $tmp155 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp157 ___257_y ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp158 $tmp156 $tmp157 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:279
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:279
 #                        x * y * cosang1 - z * sinang,
 	mul		$tmp159 ___257_x ___257_y 	%line{279} %argrw{"wrr"}
 	mul		$tmp160 $tmp159 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp161 ___257_z ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp162 $tmp160 $tmp161 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:280
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:280
 #                        y * y + (1.0 - y * y) * cosang,
 	mul		$tmp163 ___257_y ___257_y 	%line{280} %argrw{"wrr"}
 	mul		$tmp164 ___257_y ___257_y 	%argrw{"wrr"}
 	sub		$tmp165 $const17 $tmp164 	%argrw{"wrr"}
 	mul		$tmp166 $tmp165 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp167 $tmp163 $tmp166 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:281
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:281
 #                        y * z * cosang1 + x * sinang,
 	mul		$tmp168 ___257_y ___257_z 	%line{281} %argrw{"wrr"}
 	mul		$tmp169 $tmp168 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp170 ___257_x ___257_sinang 	%argrw{"wrr"}
 	add		$tmp171 $tmp169 $tmp170 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:283
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:283
 #                        x * z * cosang1 + y * sinang,
 	mul		$tmp172 ___257_x ___257_z 	%line{283} %argrw{"wrr"}
 	mul		$tmp173 $tmp172 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp174 ___257_y ___257_sinang 	%argrw{"wrr"}
 	add		$tmp175 $tmp173 $tmp174 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:284
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:284
 #                        y * z * cosang1 - x * sinang,
 	mul		$tmp176 ___257_y ___257_z 	%line{284} %argrw{"wrr"}
 	mul		$tmp177 $tmp176 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp178 ___257_x ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp179 $tmp177 $tmp178 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:285
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:285
 #                        z * z + (1.0 - z * z) * cosang,
 	mul		$tmp180 ___257_z ___257_z 	%line{285} %argrw{"wrr"}
 	mul		$tmp181 ___257_z ___257_z 	%argrw{"wrr"}
 	sub		$tmp182 $const17 $tmp181 	%argrw{"wrr"}
 	mul		$tmp183 $tmp182 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp184 $tmp180 $tmp183 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	matrix		___257_M $tmp150 $tmp154 $tmp158 $const1 $tmp162 $tmp167 $tmp171 $const1 $tmp175 $tmp179 $tmp184 $const1 $const1 $const1 $const1 $const17 	%line{275} %argrw{"wrrrrrrrrrrrrrrrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:288
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:288
 #     return transform (M, p-a) + a;
 	sub		$tmp186 ___341_obj_I $const38 	%line{288} %argrw{"wrr"}
 	transformv	$tmp185 ___257_M $tmp186 	%argrw{"wrr"}
@@ -1424,92 +1424,92 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:113
 #     obj_I = rotate(obj_I, radians(rotation_z), axis_z);
 	functioncall	$const34 291 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{113} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:65
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:65
 # float  radians (float x)  { return x*(M_PI/180.0); }
-	div		$tmp188 $const35 $const36 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
+	div		$tmp188 $const35 $const36 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
 	mul		$tmp187 rotation_z $tmp188 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:113
 #     obj_I = rotate(obj_I, radians(rotation_z), axis_z);
 	functioncall	$const37 343 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{113} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:293
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:293
 #     return rotate (p, angle, point(0), axis);
-	functioncall	$const37 343 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{293} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:270
+	functioncall	$const37 343 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{293} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:270
 #     vector axis = normalize (b - a);
 	sub		$tmp190 ___341_axis_z $const38 	%line{270} %argrw{"wrr"}
 	normalize	___257_axis $tmp190 	%argrw{"wr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:272
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:272
 #     sincos (angle, sinang, cosang);
 	sincos		$tmp187 ___257_sinang ___257_cosang 	%line{272} %argrw{"rww"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:273
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:273
 #     float cosang1 = 1.0 - cosang;
 	sub		___257_cosang1 $const17 ___257_cosang 	%line{273} %argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:274
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:274
 #     float x = axis[0], y = axis[1], z = axis[2];
 	compref		___257_x ___257_axis $const6 	%line{274} %argrw{"wrr"}
 	compref		___257_y ___257_axis $const9 	%argrw{"wrr"}
 	compref		___257_z ___257_axis $const23 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	mul		$tmp191 ___257_x ___257_x 	%line{275} %argrw{"wrr"}
 	mul		$tmp192 ___257_x ___257_x 	%argrw{"wrr"}
 	sub		$tmp193 $const17 $tmp192 	%argrw{"wrr"}
 	mul		$tmp194 $tmp193 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp195 $tmp191 $tmp194 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:276
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:276
 #                        x * y * cosang1 + z * sinang,
 	mul		$tmp196 ___257_x ___257_y 	%line{276} %argrw{"wrr"}
 	mul		$tmp197 $tmp196 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp198 ___257_z ___257_sinang 	%argrw{"wrr"}
 	add		$tmp199 $tmp197 $tmp198 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:277
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:277
 #                        x * z * cosang1 - y * sinang,
 	mul		$tmp200 ___257_x ___257_z 	%line{277} %argrw{"wrr"}
 	mul		$tmp201 $tmp200 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp202 ___257_y ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp203 $tmp201 $tmp202 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:279
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:279
 #                        x * y * cosang1 - z * sinang,
 	mul		$tmp204 ___257_x ___257_y 	%line{279} %argrw{"wrr"}
 	mul		$tmp205 $tmp204 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp206 ___257_z ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp207 $tmp205 $tmp206 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:280
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:280
 #                        y * y + (1.0 - y * y) * cosang,
 	mul		$tmp208 ___257_y ___257_y 	%line{280} %argrw{"wrr"}
 	mul		$tmp209 ___257_y ___257_y 	%argrw{"wrr"}
 	sub		$tmp210 $const17 $tmp209 	%argrw{"wrr"}
 	mul		$tmp211 $tmp210 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp212 $tmp208 $tmp211 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:281
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:281
 #                        y * z * cosang1 + x * sinang,
 	mul		$tmp213 ___257_y ___257_z 	%line{281} %argrw{"wrr"}
 	mul		$tmp214 $tmp213 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp215 ___257_x ___257_sinang 	%argrw{"wrr"}
 	add		$tmp216 $tmp214 $tmp215 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:283
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:283
 #                        x * z * cosang1 + y * sinang,
 	mul		$tmp217 ___257_x ___257_z 	%line{283} %argrw{"wrr"}
 	mul		$tmp218 $tmp217 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp219 ___257_y ___257_sinang 	%argrw{"wrr"}
 	add		$tmp220 $tmp218 $tmp219 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:284
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:284
 #                        y * z * cosang1 - x * sinang,
 	mul		$tmp221 ___257_y ___257_z 	%line{284} %argrw{"wrr"}
 	mul		$tmp222 $tmp221 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp223 ___257_x ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp224 $tmp222 $tmp223 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:285
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:285
 #                        z * z + (1.0 - z * z) * cosang,
 	mul		$tmp225 ___257_z ___257_z 	%line{285} %argrw{"wrr"}
 	mul		$tmp226 ___257_z ___257_z 	%argrw{"wrr"}
 	sub		$tmp227 $const17 $tmp226 	%argrw{"wrr"}
 	mul		$tmp228 $tmp227 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp229 $tmp225 $tmp228 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	matrix		___257_M $tmp195 $tmp199 $tmp203 $const1 $tmp207 $tmp212 $tmp216 $const1 $tmp220 $tmp224 $tmp229 $const1 $const1 $const1 $const1 $const17 	%line{275} %argrw{"wrrrrrrrrrrrrrrrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:288
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:288
 #     return transform (M, p-a) + a;
 	sub		$tmp231 ___341_obj_I $const38 	%line{288} %argrw{"wrr"}
 	transformv	$tmp230 ___257_M $tmp231 	%argrw{"wrr"}
@@ -1877,16 +1877,16 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:53
 #     float depth_0 = clamp(depth, 0.01, 100.0);
 	functioncall	$const21 570 	%line{53} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp389 depth $const20 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp389 depth $const20 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		___341_depth_0 $tmp389 $const19 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:55
 #     float overscan_left_0 = 1-clamp(overscan_left, 0, 0.9);
 	functioncall	$const21 573 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{55} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp391 overscan_left $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp391 overscan_left $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp390 $tmp391 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:55
 #     float overscan_left_0 = 1-clamp(overscan_left, 0, 0.9);
@@ -1894,9 +1894,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:56
 #     float overscan_right_0 = 1-clamp(overscan_right, 0, 0.9);
 	functioncall	$const21 577 	%line{56} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp393 overscan_right $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp393 overscan_right $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp392 $tmp393 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:56
 #     float overscan_right_0 = 1-clamp(overscan_right, 0, 0.9);
@@ -1904,9 +1904,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:57
 #     float overscan_top_0 = 1-clamp(overscan_top, 0, 0.9);
 	functioncall	$const21 581 	%line{57} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp395 overscan_top $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp395 overscan_top $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp394 $tmp395 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:57
 #     float overscan_top_0 = 1-clamp(overscan_top, 0, 0.9);
@@ -1914,9 +1914,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:58
 #     float overscan_bottom_0 = 1-clamp(overscan_bottom, 0, 0.9);
 	functioncall	$const21 585 	%line{58} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp397 overscan_bottom $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp397 overscan_bottom $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp396 $tmp397 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:58
 #     float overscan_bottom_0 = 1-clamp(overscan_bottom, 0, 0.9);
@@ -1924,9 +1924,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:60
 #     float contract_back_0 = 1-clamp(contract_back, 0, 0.9);
 	functioncall	$const21 589 	%line{60} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp399 contract_back $const22 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp399 contract_back $const22 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		$tmp398 $tmp399 $const1 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:60
 #     float contract_back_0 = 1-clamp(contract_back, 0, 0.9);
@@ -1935,9 +1935,9 @@ code ___main___
 #     float middle_depth_0 = clamp(middle_depth, 0.01, depth_0-0.01);
 	sub		$tmp400 ___341_depth_0 $const19 	%line{62} %argrw{"wrr"}
 	functioncall	$const21 594 	%argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:141
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:141
 # float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
-	min		$tmp401 middle_depth $tmp400 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	min		$tmp401 middle_depth $tmp400 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
 	max		___341_middle_depth_0 $tmp401 $const19 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:63
 #     float middle_offset_x_0 = middle_offset_x*-(texture_flop*2-1)*0.1;
@@ -1958,9 +1958,9 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:67
 #     vector obj_I = transform("object", I);
 	functioncall	$const26 608 	%line{67} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:262
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:262
 # vector transform (string to, vector p) { return transform("common",to,p); }
-	transformv	___341_obj_I $const27 $const25 I 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
+	transformv	___341_obj_I $const27 $const25 I 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{262} %argrw{"wrrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:69
 #     vector axis_x = vector(1, 0, 0);
 	assign		___341_axis_x $const28 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{69} %argrw{"wr"}
@@ -2067,92 +2067,92 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:111
 #     obj_I = rotate(obj_I, radians(rotation_x), axis_x);
 	functioncall	$const34 672 	%line{111} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:65
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:65
 # float  radians (float x)  { return x*(M_PI/180.0); }
-	div		$tmp453 $const35 $const36 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
+	div		$tmp453 $const35 $const36 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
 	mul		$tmp452 rotation_x $tmp453 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:111
 #     obj_I = rotate(obj_I, radians(rotation_x), axis_x);
 	functioncall	$const37 724 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{111} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:293
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:293
 #     return rotate (p, angle, point(0), axis);
-	functioncall	$const37 724 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{293} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:270
+	functioncall	$const37 724 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{293} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:270
 #     vector axis = normalize (b - a);
 	sub		$tmp455 ___341_axis_x $const38 	%line{270} %argrw{"wrr"}
 	normalize	___257_axis $tmp455 	%argrw{"wr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:272
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:272
 #     sincos (angle, sinang, cosang);
 	sincos		$tmp452 ___257_sinang ___257_cosang 	%line{272} %argrw{"rww"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:273
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:273
 #     float cosang1 = 1.0 - cosang;
 	sub		___257_cosang1 $const17 ___257_cosang 	%line{273} %argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:274
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:274
 #     float x = axis[0], y = axis[1], z = axis[2];
 	compref		___257_x ___257_axis $const6 	%line{274} %argrw{"wrr"}
 	compref		___257_y ___257_axis $const9 	%argrw{"wrr"}
 	compref		___257_z ___257_axis $const23 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	mul		$tmp456 ___257_x ___257_x 	%line{275} %argrw{"wrr"}
 	mul		$tmp457 ___257_x ___257_x 	%argrw{"wrr"}
 	sub		$tmp458 $const17 $tmp457 	%argrw{"wrr"}
 	mul		$tmp459 $tmp458 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp460 $tmp456 $tmp459 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:276
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:276
 #                        x * y * cosang1 + z * sinang,
 	mul		$tmp461 ___257_x ___257_y 	%line{276} %argrw{"wrr"}
 	mul		$tmp462 $tmp461 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp463 ___257_z ___257_sinang 	%argrw{"wrr"}
 	add		$tmp464 $tmp462 $tmp463 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:277
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:277
 #                        x * z * cosang1 - y * sinang,
 	mul		$tmp465 ___257_x ___257_z 	%line{277} %argrw{"wrr"}
 	mul		$tmp466 $tmp465 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp467 ___257_y ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp468 $tmp466 $tmp467 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:279
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:279
 #                        x * y * cosang1 - z * sinang,
 	mul		$tmp469 ___257_x ___257_y 	%line{279} %argrw{"wrr"}
 	mul		$tmp470 $tmp469 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp471 ___257_z ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp472 $tmp470 $tmp471 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:280
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:280
 #                        y * y + (1.0 - y * y) * cosang,
 	mul		$tmp473 ___257_y ___257_y 	%line{280} %argrw{"wrr"}
 	mul		$tmp474 ___257_y ___257_y 	%argrw{"wrr"}
 	sub		$tmp475 $const17 $tmp474 	%argrw{"wrr"}
 	mul		$tmp476 $tmp475 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp477 $tmp473 $tmp476 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:281
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:281
 #                        y * z * cosang1 + x * sinang,
 	mul		$tmp478 ___257_y ___257_z 	%line{281} %argrw{"wrr"}
 	mul		$tmp479 $tmp478 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp480 ___257_x ___257_sinang 	%argrw{"wrr"}
 	add		$tmp481 $tmp479 $tmp480 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:283
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:283
 #                        x * z * cosang1 + y * sinang,
 	mul		$tmp482 ___257_x ___257_z 	%line{283} %argrw{"wrr"}
 	mul		$tmp483 $tmp482 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp484 ___257_y ___257_sinang 	%argrw{"wrr"}
 	add		$tmp485 $tmp483 $tmp484 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:284
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:284
 #                        y * z * cosang1 - x * sinang,
 	mul		$tmp486 ___257_y ___257_z 	%line{284} %argrw{"wrr"}
 	mul		$tmp487 $tmp486 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp488 ___257_x ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp489 $tmp487 $tmp488 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:285
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:285
 #                        z * z + (1.0 - z * z) * cosang,
 	mul		$tmp490 ___257_z ___257_z 	%line{285} %argrw{"wrr"}
 	mul		$tmp491 ___257_z ___257_z 	%argrw{"wrr"}
 	sub		$tmp492 $const17 $tmp491 	%argrw{"wrr"}
 	mul		$tmp493 $tmp492 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp494 $tmp490 $tmp493 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	matrix		___257_M $tmp460 $tmp464 $tmp468 $const1 $tmp472 $tmp477 $tmp481 $const1 $tmp485 $tmp489 $tmp494 $const1 $const1 $const1 $const1 $const17 	%line{275} %argrw{"wrrrrrrrrrrrrrrrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:288
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:288
 #     return transform (M, p-a) + a;
 	sub		$tmp496 ___341_obj_I $const38 	%line{288} %argrw{"wrr"}
 	transformv	$tmp495 ___257_M $tmp496 	%argrw{"wrr"}
@@ -2160,92 +2160,92 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:112
 #     obj_I = rotate(obj_I, radians(rotation_y), axis_y);
 	functioncall	$const34 727 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{112} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:65
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:65
 # float  radians (float x)  { return x*(M_PI/180.0); }
-	div		$tmp498 $const35 $const36 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
+	div		$tmp498 $const35 $const36 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
 	mul		$tmp497 rotation_y $tmp498 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:112
 #     obj_I = rotate(obj_I, radians(rotation_y), axis_y);
 	functioncall	$const37 779 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{112} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:293
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:293
 #     return rotate (p, angle, point(0), axis);
-	functioncall	$const37 779 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{293} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:270
+	functioncall	$const37 779 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{293} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:270
 #     vector axis = normalize (b - a);
 	sub		$tmp500 ___341_axis_y $const38 	%line{270} %argrw{"wrr"}
 	normalize	___257_axis $tmp500 	%argrw{"wr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:272
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:272
 #     sincos (angle, sinang, cosang);
 	sincos		$tmp497 ___257_sinang ___257_cosang 	%line{272} %argrw{"rww"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:273
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:273
 #     float cosang1 = 1.0 - cosang;
 	sub		___257_cosang1 $const17 ___257_cosang 	%line{273} %argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:274
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:274
 #     float x = axis[0], y = axis[1], z = axis[2];
 	compref		___257_x ___257_axis $const6 	%line{274} %argrw{"wrr"}
 	compref		___257_y ___257_axis $const9 	%argrw{"wrr"}
 	compref		___257_z ___257_axis $const23 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	mul		$tmp501 ___257_x ___257_x 	%line{275} %argrw{"wrr"}
 	mul		$tmp502 ___257_x ___257_x 	%argrw{"wrr"}
 	sub		$tmp503 $const17 $tmp502 	%argrw{"wrr"}
 	mul		$tmp504 $tmp503 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp505 $tmp501 $tmp504 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:276
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:276
 #                        x * y * cosang1 + z * sinang,
 	mul		$tmp506 ___257_x ___257_y 	%line{276} %argrw{"wrr"}
 	mul		$tmp507 $tmp506 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp508 ___257_z ___257_sinang 	%argrw{"wrr"}
 	add		$tmp509 $tmp507 $tmp508 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:277
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:277
 #                        x * z * cosang1 - y * sinang,
 	mul		$tmp510 ___257_x ___257_z 	%line{277} %argrw{"wrr"}
 	mul		$tmp511 $tmp510 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp512 ___257_y ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp513 $tmp511 $tmp512 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:279
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:279
 #                        x * y * cosang1 - z * sinang,
 	mul		$tmp514 ___257_x ___257_y 	%line{279} %argrw{"wrr"}
 	mul		$tmp515 $tmp514 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp516 ___257_z ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp517 $tmp515 $tmp516 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:280
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:280
 #                        y * y + (1.0 - y * y) * cosang,
 	mul		$tmp518 ___257_y ___257_y 	%line{280} %argrw{"wrr"}
 	mul		$tmp519 ___257_y ___257_y 	%argrw{"wrr"}
 	sub		$tmp520 $const17 $tmp519 	%argrw{"wrr"}
 	mul		$tmp521 $tmp520 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp522 $tmp518 $tmp521 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:281
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:281
 #                        y * z * cosang1 + x * sinang,
 	mul		$tmp523 ___257_y ___257_z 	%line{281} %argrw{"wrr"}
 	mul		$tmp524 $tmp523 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp525 ___257_x ___257_sinang 	%argrw{"wrr"}
 	add		$tmp526 $tmp524 $tmp525 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:283
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:283
 #                        x * z * cosang1 + y * sinang,
 	mul		$tmp527 ___257_x ___257_z 	%line{283} %argrw{"wrr"}
 	mul		$tmp528 $tmp527 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp529 ___257_y ___257_sinang 	%argrw{"wrr"}
 	add		$tmp530 $tmp528 $tmp529 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:284
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:284
 #                        y * z * cosang1 - x * sinang,
 	mul		$tmp531 ___257_y ___257_z 	%line{284} %argrw{"wrr"}
 	mul		$tmp532 $tmp531 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp533 ___257_x ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp534 $tmp532 $tmp533 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:285
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:285
 #                        z * z + (1.0 - z * z) * cosang,
 	mul		$tmp535 ___257_z ___257_z 	%line{285} %argrw{"wrr"}
 	mul		$tmp536 ___257_z ___257_z 	%argrw{"wrr"}
 	sub		$tmp537 $const17 $tmp536 	%argrw{"wrr"}
 	mul		$tmp538 $tmp537 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp539 $tmp535 $tmp538 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	matrix		___257_M $tmp505 $tmp509 $tmp513 $const1 $tmp517 $tmp522 $tmp526 $const1 $tmp530 $tmp534 $tmp539 $const1 $const1 $const1 $const1 $const17 	%line{275} %argrw{"wrrrrrrrrrrrrrrrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:288
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:288
 #     return transform (M, p-a) + a;
 	sub		$tmp541 ___341_obj_I $const38 	%line{288} %argrw{"wrr"}
 	transformv	$tmp540 ___257_M $tmp541 	%argrw{"wrr"}
@@ -2253,92 +2253,92 @@ code ___main___
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:113
 #     obj_I = rotate(obj_I, radians(rotation_z), axis_z);
 	functioncall	$const34 782 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{113} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:65
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:65
 # float  radians (float x)  { return x*(M_PI/180.0); }
-	div		$tmp543 $const35 $const36 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
+	div		$tmp543 $const35 $const36 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{65} %argrw{"wrr"}
 	mul		$tmp542 rotation_z $tmp543 	%argrw{"wrr"}
 # /data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl:113
 #     obj_I = rotate(obj_I, radians(rotation_z), axis_z);
 	functioncall	$const37 834 	%filename{"/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders/osl_window_box_s.osl"} %line{113} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:293
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:293
 #     return rotate (p, angle, point(0), axis);
-	functioncall	$const37 834 	%filename{"/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h"} %line{293} %argrw{"r"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:270
+	functioncall	$const37 834 	%filename{"/data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h"} %line{293} %argrw{"r"}
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:270
 #     vector axis = normalize (b - a);
 	sub		$tmp545 ___341_axis_z $const38 	%line{270} %argrw{"wrr"}
 	normalize	___257_axis $tmp545 	%argrw{"wr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:272
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:272
 #     sincos (angle, sinang, cosang);
 	sincos		$tmp542 ___257_sinang ___257_cosang 	%line{272} %argrw{"rww"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:273
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:273
 #     float cosang1 = 1.0 - cosang;
 	sub		___257_cosang1 $const17 ___257_cosang 	%line{273} %argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:274
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:274
 #     float x = axis[0], y = axis[1], z = axis[2];
 	compref		___257_x ___257_axis $const6 	%line{274} %argrw{"wrr"}
 	compref		___257_y ___257_axis $const9 	%argrw{"wrr"}
 	compref		___257_z ___257_axis $const23 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	mul		$tmp546 ___257_x ___257_x 	%line{275} %argrw{"wrr"}
 	mul		$tmp547 ___257_x ___257_x 	%argrw{"wrr"}
 	sub		$tmp548 $const17 $tmp547 	%argrw{"wrr"}
 	mul		$tmp549 $tmp548 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp550 $tmp546 $tmp549 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:276
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:276
 #                        x * y * cosang1 + z * sinang,
 	mul		$tmp551 ___257_x ___257_y 	%line{276} %argrw{"wrr"}
 	mul		$tmp552 $tmp551 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp553 ___257_z ___257_sinang 	%argrw{"wrr"}
 	add		$tmp554 $tmp552 $tmp553 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:277
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:277
 #                        x * z * cosang1 - y * sinang,
 	mul		$tmp555 ___257_x ___257_z 	%line{277} %argrw{"wrr"}
 	mul		$tmp556 $tmp555 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp557 ___257_y ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp558 $tmp556 $tmp557 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:279
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:279
 #                        x * y * cosang1 - z * sinang,
 	mul		$tmp559 ___257_x ___257_y 	%line{279} %argrw{"wrr"}
 	mul		$tmp560 $tmp559 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp561 ___257_z ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp562 $tmp560 $tmp561 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:280
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:280
 #                        y * y + (1.0 - y * y) * cosang,
 	mul		$tmp563 ___257_y ___257_y 	%line{280} %argrw{"wrr"}
 	mul		$tmp564 ___257_y ___257_y 	%argrw{"wrr"}
 	sub		$tmp565 $const17 $tmp564 	%argrw{"wrr"}
 	mul		$tmp566 $tmp565 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp567 $tmp563 $tmp566 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:281
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:281
 #                        y * z * cosang1 + x * sinang,
 	mul		$tmp568 ___257_y ___257_z 	%line{281} %argrw{"wrr"}
 	mul		$tmp569 $tmp568 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp570 ___257_x ___257_sinang 	%argrw{"wrr"}
 	add		$tmp571 $tmp569 $tmp570 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:283
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:283
 #                        x * z * cosang1 + y * sinang,
 	mul		$tmp572 ___257_x ___257_z 	%line{283} %argrw{"wrr"}
 	mul		$tmp573 $tmp572 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp574 ___257_y ___257_sinang 	%argrw{"wrr"}
 	add		$tmp575 $tmp573 $tmp574 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:284
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:284
 #                        y * z * cosang1 - x * sinang,
 	mul		$tmp576 ___257_y ___257_z 	%line{284} %argrw{"wrr"}
 	mul		$tmp577 $tmp576 ___257_cosang1 	%argrw{"wrr"}
 	mul		$tmp578 ___257_x ___257_sinang 	%argrw{"wrr"}
 	sub		$tmp579 $tmp577 $tmp578 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:285
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:285
 #                        z * z + (1.0 - z * z) * cosang,
 	mul		$tmp580 ___257_z ___257_z 	%line{285} %argrw{"wrr"}
 	mul		$tmp581 ___257_z ___257_z 	%argrw{"wrr"}
 	sub		$tmp582 $const17 $tmp581 	%argrw{"wrr"}
 	mul		$tmp583 $tmp582 ___257_cosang 	%argrw{"wrr"}
 	add		$tmp584 $tmp580 $tmp583 	%argrw{"wrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:275
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:275
 #     matrix M = matrix (x * x + (1.0 - x * x) * cosang,
 	matrix		___257_M $tmp550 $tmp554 $tmp558 $const1 $tmp562 $tmp567 $tmp571 $const1 $tmp575 $tmp579 $tmp584 $const1 $const1 $const1 $const1 $const17 	%line{275} %argrw{"wrrrrrrrrrrrrrrrr"}
-# /l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019/osl/include/stdosl.h:288
+# /data/e/myworkspace/td/lynxi/workspace/resource/linux/arnold/osl/include/stdosl.h:288
 #     return transform (M, p-a) + a;
 	sub		$tmp586 ___341_obj_I $const38 	%line{288} %argrw{"wrr"}
 	transformv	$tmp585 ___257_M $tmp586 	%argrw{"wrr"}

@@ -5,11 +5,13 @@ import copy
 
 import os
 
+import six
+
 from lxbasic import bsc_core
 
 from lxdatabase import dtb_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 
 class DtbBaseOpt(object):
@@ -133,7 +135,7 @@ class DtbBaseOpt(object):
         EntityTypes.Tags: EntityCategories.Assign,
     }
 
-    def __init__(self, database):
+    def __init__(self, database, disable_new_connection=False):
         if not database:
             raise RuntimeError()
 
@@ -154,12 +156,16 @@ class DtbBaseOpt(object):
             self._dtb_file_opt.get_path()
         )
 
+        self._disable_new_connection = disable_new_connection
+
     def get_database(self):
         return self._dtb_file_path
+
     database = property(get_database)
 
     def accept(self):
         self._dtb_opt.accept()
+
     # utility
     def add_entity(self, entity_type, data):
         entity_category = self.EntityTypeCategoryMapper[entity_type]
@@ -219,7 +225,7 @@ class DtbBaseOpt(object):
             )
         return table_opt.get_one(
             filters=filters,
-            new_connection=new_connection,
+            new_connection=new_connection if self._disable_new_connection is False else False,
         )
 
     def get_entities(self, entity_type, filters=None, new_connection=True):
@@ -231,7 +237,7 @@ class DtbBaseOpt(object):
             )
         return table_opt.get_all(
             filters=filters,
-            new_connection=new_connection
+            new_connection=new_connection if self._disable_new_connection is False else False
         )
 
     def __enter__(self):
@@ -242,16 +248,16 @@ class DtbBaseOpt(object):
 
 
 class DtbResourceLibraryOpt(DtbBaseOpt):
-    def __init__(self, configure_file, configure_file_extend=None):
+    def __init__(self, configure_file, configure_file_extend=None, disable_new_connection=False):
         self._dtb_cfg_file_path = configure_file
         self._dtb_cfg_file_path_extend = configure_file_extend
-        self._dtb_cfg_opt = bsc_objects.Configure(value=configure_file)
+        self._dtb_cfg_opt = ctt_objects.Configure(value=configure_file)
         if configure_file_extend is not None:
             if bsc_core.StgFileOpt(configure_file_extend).get_is_file() is False:
                 raise RuntimeError()
             #
             self._dtb_cfg_opt.update_from(
-                bsc_objects.Configure(value=configure_file_extend)
+                ctt_objects.Configure(value=configure_file_extend)
             )
 
         self._dtb_cfg_opt.set_flatten()
@@ -275,23 +281,28 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         super(DtbResourceLibraryOpt, self).__init__(
             db_file_pattern.format(
                 **self._dtb_pattern_kwargs
-            )
+            ),
+            disable_new_connection=disable_new_connection
         )
 
     def get_database_configure(self):
         return self._dtb_cfg_file_path
+
     database_configure = property(get_database_configure)
 
     def get_database_configure_opt(self):
         return self._dtb_cfg_opt
+
     database_configure_opt = property(get_database_configure_opt)
 
     def get_database_configure_extend(self):
         return self._dtb_cfg_file_path_extend
+
     database_configure_extend = property(get_database_configure_extend)
 
     def get_stg_root(self):
         return self._dtb_stg_root
+
     stg_root = property(get_stg_root)
 
     def get_pattern(self, keyword):
@@ -395,10 +406,10 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
     def create_category_group(self, path):
         path_opt = bsc_core.DccPathDagOpt(path)
         if not self.get_entity(
-            entity_type=self.EntityTypes.CategoryRoot,
-            filters=[
-                ('path', 'is', path_opt.get_parent_path()),
-            ]
+                entity_type=self.EntityTypes.CategoryRoot,
+                filters=[
+                    ('path', 'is', path_opt.get_parent_path()),
+                ]
         ):
             raise RuntimeError()
         #
@@ -426,10 +437,10 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
     def create_category(self, path):
         path_opt = bsc_core.DccPathDagOpt(path)
         if not self.get_entity(
-            entity_type=self.EntityTypes.CategoryGroup,
-            filters=[
-                ('path', 'is', path_opt.get_parent_path()),
-            ]
+                entity_type=self.EntityTypes.CategoryGroup,
+                filters=[
+                    ('path', 'is', path_opt.get_parent_path()),
+                ]
         ):
             raise RuntimeError()
         #
@@ -455,6 +466,14 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             )
         )
 
+    def get_category(self, path):
+        return self.get_entity(
+            entity_type=self.EntityTypes.Category,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+
     def get_categories(self, category_group):
         return self.get_entities(
             entity_type=self.EntityTypes.Category,
@@ -466,10 +485,10 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
     def create_type(self, path):
         path_opt = bsc_core.DccPathDagOpt(path)
         if not self.get_entity(
-            entity_type=self.EntityTypes.Category,
-            filters=[
-                ('path', 'is', path_opt.get_parent_path()),
-            ]
+                entity_type=self.EntityTypes.Category,
+                filters=[
+                    ('path', 'is', path_opt.get_parent_path()),
+                ]
         ):
             raise RuntimeError()
         #
@@ -492,6 +511,14 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 path=path,
                 **options
             )
+        )
+
+    def get_type(self, path):
+        return self.get_entity(
+            entity_type=self.EntityTypes.Type,
+            filters=[
+                ('path', 'is', path),
+            ]
         )
 
     def get_types(self, category_group, category):
@@ -549,6 +576,22 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         #
         return results[-1]
 
+    def get_all_resources(self):
+        return self.get_entities(
+            entity_type=self.EntityTypes.Resource,
+            filters=[
+                ('kind', 'is', self.Kinds.Resource)
+            ]
+        )
+
+    def get_resource(self, path):
+        return self.get_entity(
+            entity_type=self.EntityTypes.Resource,
+            filters=[
+                ('path', 'is', path),
+            ]
+        )
+
     def create_resource(self, path, **kwargs):
         _ = self.get_entity(
             entity_type=self.EntityTypes.Resource,
@@ -573,6 +616,26 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             )
         )
 
+    def get_resource_type_paths(self, resource_path):
+        return [
+            i.value for i in self.get_entities(
+                entity_type=self.EntityTypes.Types,
+                filters=[
+                    ('node', 'is', resource_path),
+                ]
+            )
+        ]
+
+    def get_resource_types(self, path):
+        return [
+            self.get_type(i.value) for i in self.get_entities(
+                entity_type=self.EntityTypes.Types,
+                filters=[
+                    ('node', 'is', path),
+                ]
+            )
+        ]
+
     def create_version(self, path):
         _ = self.get_entity(
             entity_type=self.EntityTypes.Version,
@@ -594,6 +657,14 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 gui_name=gui_name,
                 **options
             )
+        )
+
+    def get_dtb_version(self, path):
+        return self.get_entity(
+            entity_type=self.EntityTypes.Version,
+            filters=[
+                ('path', 'is', path),
+            ]
         )
 
     def create_property(self, node_path, port_path, value, kind):
@@ -689,6 +760,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
                 value=value
             )
         )
+
     @classmethod
     def guess_type_args(cls, keys):
         c_max = 4
@@ -699,6 +771,45 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             keys = keys[:2]+['_'.join(keys[2:])]
         #
         return keys
+
+    def find_resource_paths_by_category(self, *args):
+        _ = args[0]
+        if isinstance(_, dict):
+            path = _.path
+        elif isinstance(_, six.string_types):
+            path = _
+        else:
+            raise RuntimeError()
+        return map(
+            lambda x: x.node, self.get_entities(
+                entity_type=self.EntityTypes.Types,
+                filters=[
+                    ('kind', 'is', self.Kinds.ResourceType),
+                    #
+                    ('value', 'startswith', path)
+                ]
+            )
+        )
+
+    def find_resources_by_category(self, *args):
+        _ = args[0]
+        if isinstance(_, dict):
+            path = _.path
+        elif isinstance(_, six.string_types):
+            path = _
+        else:
+            raise RuntimeError()
+        return map(
+            lambda x: self.get_resource(x.node),
+            self.get_entities(
+                entity_type=self.EntityTypes.Types,
+                filters=[
+                    ('kind', 'is', self.Kinds.ResourceType),
+                    #
+                    ('value', 'startswith', path)
+                ]
+            )
+        )
 
 
 class DtbNodeOpt(object):
@@ -724,6 +835,88 @@ class DtbNodeOpt(object):
             ],
             new_connection=False
         )
+
+
+class DtbVersionOpt(object):
+    def __init__(self, dtb_opt, dtb_version, disable_new_connection=False):
+        self._dtb_opt = dtb_opt
+        self._dtb_version = dtb_version
+        self.__build_varints()
+
+    def get(self, key):
+        return self._variants[key]
+
+    def __build_varints(self):
+        p = self._dtb_opt.get_pattern(keyword='version-dir')
+        p_o = bsc_core.PtnParseOpt(p)
+        version_stg_path = self._dtb_opt.get_property(
+            self._dtb_version.path, 'location'
+        )
+        self._variants = p_o.get_variants(version_stg_path)
+
+    def get_variants(self):
+        return self._variants
+
+    def get_resource(self):
+        return self._dtb_opt.get_resource(
+            self._dtb_opt.get_property(self._dtb_version.path, 'resource')
+        )
+
+    def get_types(self):
+        return self._dtb_opt.get_resource_types(self.get_resource().path)
+
+    def get_geometry_usd_file(self):
+        p = self._dtb_opt.get_pattern(keyword='geometry-usd-file')
+        p_o = bsc_core.PtnParseOpt(p)
+        path = p_o.set_update_to(**self._variants).get_value()
+        if bsc_core.StgPathMtd.get_is_exists(path):
+            return path
+        return bsc_core.RscFileMtd.get('asset/library/geo/sphere.usda')
+
+    def get_look_preview_usd_file(self):
+        p = self._dtb_opt.get_pattern(keyword='look-preview-usd-file')
+        p_o = bsc_core.PtnParseOpt(p)
+        path = p_o.set_update_to(**self._variants).get_value()
+        if bsc_core.StgPathMtd.get_is_exists(path):
+            return path
+        return bsc_core.RscFileMtd.get('asset/library/preview-material.usda')
+
+    def get_texture_preview_assigns(self):
+        from lxutil import utl_configure
+
+        dict_ = {}
+        for i_key in utl_configure.TextureTypes.All:
+            i_dtb_path = '{}/texture_{}_file'.format(self._dtb_version.path, i_key)
+            i_file_path = self._dtb_opt.get_property(
+                i_dtb_path, 'location'
+            )
+            if i_file_path is not None:
+                i_file_opt = bsc_core.StgFileOpt(i_file_path)
+                if i_file_opt.get_ext() == '.exr':
+                    i_file_opt = i_file_opt.set_ext_repath_to('.jpg')
+                #
+                if i_file_opt.get_is_file() is True:
+                    # map to usd key
+                    if i_key in utl_configure.TextureTypes.UsdPreviewMapper:
+                        i_key = utl_configure.TextureTypes.UsdPreviewMapper[i_key]
+                    #
+                    dict_[i_key] = i_file_opt.get_path()
+        return dict_
+
+    def get_scene_maya_file(self):
+        p = self._dtb_opt.get_pattern(keyword='scene-maya-file')
+        p_o = bsc_core.PtnParseOpt(p)
+        return p_o.set_update_to(**self._variants).get_value()
+
+    def get_file(self, keyword):
+        p = self._dtb_opt.get_pattern(keyword=keyword)
+        p_o = bsc_core.PtnParseOpt(p)
+        return p_o.set_update_to(**self._variants).get_value()
+
+    def get_exists_file(self, keyword):
+        path = self.get_file(keyword)
+        if bsc_core.StgFileOpt(path).get_is_exists() is True:
+            return path
 
 
 if __name__ == '__main__':

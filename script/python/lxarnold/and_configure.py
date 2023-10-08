@@ -328,7 +328,7 @@ class ObjProperty(object):
 
 
 class GeometryProperties(object):
-    ALL = [
+    AllKeys = [
         'opaque',
         'matte',
         # visibility
@@ -358,7 +358,7 @@ class GeometryProperties(object):
         'mode',
         'min_pixel_width',
     ]
-    MAYA_DICT = {
+    MayaMapper = {
         'opaque': 'aiOpaque',
         'matte': 'aiMatte',
         'self_shadows': 'aiSelfShadows',
@@ -383,36 +383,12 @@ class GeometryProperties(object):
         'step_size': 'aiStepSize',
         'volume_padding': 'aiVolumePadding',
     }
-
-    PROPERTIES_TYPE_MAPPER = dict(
-        opaque=unr_configure.Type.CONSTANT_BOOLEAN,
-        matte=None,
-        # visibility
-        self_shadows=None,
-        # export
-        sss_setname=None,
-        trace_sets=None,
-        # volume
-        step_size=None,
-        volume_padding=None,
-        smoothing=None,
-        # mesh-subdiv
-        subdiv_type=None,
-        subdiv_iterations=None,
-        subdiv_adaptive_error=None,
-        subdiv_adaptive_metric=None,
-        subdiv_adaptive_space=None,
-        subdiv_uv_smoothing=None,
-        subdiv_smooth_derivs=None,
-        subdiv_frustum_ignore=None,
-        # mesh-displacement
-        disp_height=None,
-        disp_padding=None,
-        disp_zero_value=None,
-        disp_autobump=None,
-        # curve
-        mode=None,
-        min_pixel_width=None,
+    AdaptiveSubdivision = dict(
+        subdiv_type='catclark',
+        subdiv_iterations=2,
+        subdiv_adaptive_metric='auto',
+        subdiv_adaptive_error=25,
+        subdiv_adaptive_space='raster'
     )
 
 

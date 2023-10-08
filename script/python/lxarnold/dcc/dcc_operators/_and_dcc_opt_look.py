@@ -3,9 +3,7 @@ import collections
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
-
-from lxarnold import and_configure
+import lxcontent.objects as ctt_objects
 
 
 class AbsLookOpt(object):
@@ -23,12 +21,12 @@ class ShapeLookOpt(AbsLookOpt):
     def __init__(self, *args):
         super(ShapeLookOpt, self).__init__(*args)
 
-        self._node_configure = bsc_objects.Configure(
+        self._node_configure = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('arnold/node')
         )
         self._node_configure.set_flatten()
 
-        self._convert_configure = bsc_objects.Configure(
+        self._convert_configure = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
@@ -55,7 +53,7 @@ class ShapeLookOpt(AbsLookOpt):
                 properties[key] = raw
         return properties
 
-    def set_properties_convert_to(self, application):
+    def convert_render_properties_to(self, application):
         dic = collections.OrderedDict()
         dic_ = self.get_properties()
         convert_dict = self._convert_configure.get(

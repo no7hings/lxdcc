@@ -12,13 +12,14 @@ class UsdSetup(utl_abstract.AbsSetup):
         self.add_bin_fnc(
             '{}/bin'.format(self._root)
         )
-        self.add_library_env_fnc(
+        self.add_libraries(
             '{}/lib'.format(self._root),
             '{}/lib64'.format(self._root)
         )
-        self.add_python_env_fnc(
+        self.add_pythons(
             '{}/lib/python'.format(self._root)
         )
+
     @classmethod
     def build_environ(cls):
         cls.add_environ_fnc(
@@ -36,6 +37,6 @@ class UsdArnoldSetup(utl_abstract.AbsSetup):
         super(UsdArnoldSetup, self).__init__(root)
 
     def set_run(self):
-        self.add_library_env_fnc(
-            '{}/lib'.format(self._root), '{}/bin'.format(self._root)
+        self.add_libraries(
+            '{root}/lib', '{root}/bin'
         )

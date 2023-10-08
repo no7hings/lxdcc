@@ -22,6 +22,8 @@ class ObjType(object):
     Mesh = 'Mesh'
     NurbsCurves = 'NurbsCurves'
     BasisCurves = 'BasisCurves'
+    #
+    GeometrySubset = 'GeomSubset'
 
 
 class Obj(object):

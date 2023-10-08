@@ -23,6 +23,6 @@ m = usd_core.UsdGeom.Mesh(p)
 
 print usd_core.UsdMeshOpt(
     m
-).get_display_color_map_from_uv_map('st')
+).compute_vertex_color_map_from_uv_coord('st')
 
 

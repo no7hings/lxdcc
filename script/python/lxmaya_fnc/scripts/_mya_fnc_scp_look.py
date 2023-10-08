@@ -48,7 +48,7 @@ def set_look_export_by_any_scene_file(option):
                     'start'
                 )
                 #
-                mya_dcc_objects.Scene.set_file_open(scene_src_file_path)
+                mya_dcc_objects.Scene.open_file(scene_src_file_path)
                 #
                 _mya_fnc_scp_utility.set_export_check_run(
                     rsv_task_properties
@@ -273,7 +273,7 @@ def set_look_import_by_any_scene_file(option):
             if step in ['mod', 'srf', 'rig']:
                 with_scene = option_opt.get('with_scene')
                 if with_scene is True:
-                    mya_dcc_objects.Scene.set_file_open(scene_file_path)
+                    mya_dcc_objects.Scene.open_file(scene_file_path)
                 #
                 with_surface_preview = option_opt.get('with_surface_preview') or False
                 if with_surface_preview is True:
@@ -283,7 +283,7 @@ def set_look_import_by_any_scene_file(option):
                     version = rsv_task_properties.get('version')
                     scene_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_maya_file(wokspace='publish', version=version)
                     utl_dcc_objects.OsFile(scene_file_path).set_backup()
-                    mya_dcc_objects.Scene.set_file_save_to(scene_file_path)
+                    mya_dcc_objects.Scene.save_file_to(scene_file_path)
 
 
 def set_asset_look_preview_import(rsv_task_properties):
@@ -345,17 +345,17 @@ def set_cfx_look_export_by_any_scene_file(option):
             if create_scene_src is True:
                 result = _mya_fnc_scp_utility.set_asset_cfx_workspace_create(rsv_task_properties)
                 if result is True:
-                    mya_dcc_objects.Scene.set_file_new()
+                    mya_dcc_objects.Scene.new_file()
                     result = _mya_fnc_scp_utility.set_asset_cfx_workspace_create(rsv_task_properties)
                     if result is True:
                         scene_src_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_maya_src_file(
                             version=version
                         )
-                        mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+                        mya_dcc_objects.Scene.save_file_to(scene_src_file_path)
             #
             any_scene_file = utl_dcc_objects.OsFile(any_scene_file_path)
             if any_scene_file.get_is_exists() is True:
-                mya_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                mya_dcc_objects.Scene.open_file(any_scene_file_path)
                 #
                 with_texture = option_opt.get('with_texture') or False
                 if with_texture is True:
@@ -368,7 +368,7 @@ def set_cfx_look_export_by_any_scene_file(option):
                     scene_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_maya_file(
                         version=version
                     )
-                    mya_dcc_objects.Scene.set_file_save_to(scene_file_path)
+                    mya_dcc_objects.Scene.save_file_to(scene_file_path)
 
 
 def set_look_preview_export_by_any_scene_file(option):
@@ -411,16 +411,16 @@ def set_look_preview_export_by_any_scene_file(option):
         if branch == 'asset':
             create_scene_src = option_opt.get('create_scene_src') or False
             if create_scene_src is True:
-                mya_dcc_objects.Scene.set_file_new()
+                mya_dcc_objects.Scene.new_file()
                 _mya_fnc_scp_utility.set_asset_look_preview_workspace_pre_create(rsv_task_properties)
                 #
-                mya_dcc_objects.Scene.set_file_save_to(
+                mya_dcc_objects.Scene.save_file_to(
                     any_scene_file_path
                 )
             else:
                 any_scene_file = utl_dcc_objects.OsFile(any_scene_file_path)
                 if any_scene_file.get_is_exists() is True:
-                    mya_dcc_objects.Scene.set_file_open(any_scene_file_path)
+                    mya_dcc_objects.Scene.open_file(any_scene_file_path)
                 else:
                     raise IOError(
                         utl_core.Log.set_module_error_trace(
@@ -474,7 +474,7 @@ def set_asset_look_preview_workspace_post_create(rsv_task_properties):
     scene_src_file_path = rsv_operators.RsvAssetSceneQuery(rsv_task_properties).get_maya_src_file(
         version=version
     )
-    mya_dcc_objects.Scene.set_file_save_to(scene_src_file_path)
+    mya_dcc_objects.Scene.save_file_to(scene_src_file_path)
 
 
 def set_asset_look_preview_work_scene_src_create(rsv_task_properties):

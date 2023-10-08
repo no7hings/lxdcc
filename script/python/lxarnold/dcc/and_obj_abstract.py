@@ -5,7 +5,7 @@ import arnold as ai
 
 from lxbasic import bsc_core
 
-import lxbasic.objects as bsc_objects
+import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
@@ -43,7 +43,7 @@ class AbsDotMtlxDef(object):
             obj_path = geometry_properties.get('path')
             if root is not None:
                 obj_path = '{}{}'.format(root, obj_path)
-            obj = obj_type.set_obj_create(obj_path)
+            obj = obj_type.create_obj(obj_path)
 
     def _set_load_by_dot_mtlx_(self, file_obj, root=None, path_lstrip=None):
         self.restore_all()
@@ -97,7 +97,7 @@ class AbsObjScene(
         #
         self._platform = bsc_core.PlatformMtd.get_current()
 
-        self._node_configure = bsc_objects.Configure(
+        self._node_configure = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('arnold/node')
         )
         self._node_configure.set_flatten()
@@ -325,7 +325,7 @@ class AbsObjScene(
         and_obj_category_name = shader_and_obj_mtd.category_name
         dcc_obj_type = self.universe.generate_obj_type(and_obj_category_name, and_obj_type_name)
         dcc_obj_path_args = ('', and_prettify_obj_name)
-        dcc_obj = dcc_obj_type.set_obj_create(dcc_obj_path_args)
+        dcc_obj = dcc_obj_type.create_obj(dcc_obj_path_args)
         # port/input
         self._set_dcc_obj_input_ports_build_(shader_and_obj_mtd, dcc_obj)
         # port/output
@@ -361,7 +361,7 @@ class AbsObjScene(
         obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, self._path_lstrip)
         if self._path_mapper_opt is not None:
             obj_path = self._path_mapper_opt.get(obj_path)
-        dcc_obj = dcc_obj_type.set_obj_create(obj_path)
+        dcc_obj = dcc_obj_type.create_obj(obj_path)
         return dcc_obj
 
     def create_mesh_for_maya_fnc(self, maya_obj_path):
@@ -534,7 +534,7 @@ class AbsObjScene(
     def _set_dcc_material_build_(self, material_dcc_obj_name, shader_dcc_obj_names):
         dcc_obj_type = self.universe.generate_obj_type(*and_configure.ObjType.LYNXI_MATERIAL_ARGS)
         obj_path_args = ('', material_dcc_obj_name)
-        dcc_obj = dcc_obj_type.set_obj_create(obj_path_args)
+        dcc_obj = dcc_obj_type.create_obj(obj_path_args)
         # shader port
         and_surface_shader_obj_name, and_displacement_shader_obj_name, and_volume_shader_obj_name = shader_dcc_obj_names
         shader_build_args = [

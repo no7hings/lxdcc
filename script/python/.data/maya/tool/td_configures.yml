@@ -53,7 +53,7 @@ tool:
     #
     scene_packager:
         chn_label: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.ScenePackagerToolPanel().set_window_show()
+        command: ''
         icon: None
         label: Scene-packager
         size:

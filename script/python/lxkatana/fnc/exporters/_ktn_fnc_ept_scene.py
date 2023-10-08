@@ -4,12 +4,15 @@ from lxutil.fnc import utl_fnc_obj_abs
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
 
-class SceneExporter(utl_fnc_obj_abs.AbsDccExporter):
-    OPTION = {}
-    def __init__(self, file_path, root=None, option=None):
-        super(SceneExporter, self).__init__(file_path, root, option)
+class FncSceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+    OPTION = dict(
+        file=''
+    )
 
-    def set_run(self):
+    def __init__(self, option=None):
+        super(FncSceneExporter, self).__init__(option)
+
+    def execute(self):
         ktn_dcc_objects.Scene.set_file_export_to(
-            self._file_path
+            self.get('file')
         )

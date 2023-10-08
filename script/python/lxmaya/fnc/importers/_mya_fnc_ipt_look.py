@@ -15,6 +15,8 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 import lxbasic.objects as bsc_objects
 
+import lxcontent.objects as ctt_objects
+
 from lxutil.fnc import utl_fnc_obj_abs
 
 from lxutil.fnc.importers import utl_fnc_ipt_abs
@@ -35,7 +37,7 @@ class AssImportFnc(object):
         self._with_assign = with_assign
         self._assign_selection_enable = assign_selection_enable
         #
-        self._convert_configure = bsc_objects.Configure(
+        self._convert_configure = ctt_objects.Configure(
             value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
@@ -62,7 +64,7 @@ class AssImportFnc(object):
             if method_args:
                 with utl_core.GuiProgressesRunner.create(
                         maximum=len(method_args), label='execute look create method'
-                        ) as g_p:
+                ) as g_p:
                     for i_method, i_args, i_enable in method_args:
                         g_p.set_update()
                         if i_enable is True:
@@ -81,6 +83,7 @@ class AssImportFnc(object):
                 for material_seq, material_and_obj in enumerate(material_and_objs):
                     g_p.set_update()
                     self.create_material_fnc(material_and_obj)
+
     #
     def create_material_fnc(self, material_and_obj):
         material_and_obj_name = material_and_obj.name
@@ -92,11 +95,12 @@ class AssImportFnc(object):
             #
             self.create_shaders_fnc(material_and_obj, material_dcc_obj)
             #
-            ma_core.CmdObjOpt(material_dcc_obj.path).set_customize_attributes_create(
+            ma_core.CmdObjOpt(material_dcc_obj.path).create_customize_attributes(
                 dict(
                     arnold_name=material_and_obj_name
                 )
             )
+
     #
     def create_shaders_fnc(self, material_and_obj, material_dcc_obj):
         convert_dict = {
@@ -135,7 +139,7 @@ class AssImportFnc(object):
                 self.create_ports_fnc(shader_and_obj, shader_dcc_obj)
                 self.create_node_graph_fnc(shader_and_obj)
                 #
-                ma_core.CmdObjOpt(shader_dcc_obj.path).set_customize_attributes_create(
+                ma_core.CmdObjOpt(shader_dcc_obj.path).create_customize_attributes(
                     dict(
                         arnold_name=shader_and_obj.name
                     )
@@ -182,7 +186,7 @@ class AssImportFnc(object):
             a, b = target_and_port_path.split('.')
             target_dcc_port_path = '{0}.{0}{1}'.format(a, b.upper())
         else:
-            target_dcc_port_path = bsc_objects.StrUnderline(target_and_port_path).to_camelcase()
+            target_dcc_port_path = bsc_core.RawStrUnderlineOpt(target_and_port_path).to_camelcase()
         #
         and_obj_type_names = self._convert_configure.get_branch_keys(
             'input-ports.to-maya'
@@ -260,7 +264,7 @@ class AssImportFnc(object):
             if dcc_obj.get_is_exists() is False:
                 dcc_obj.set_create(dcc_type)
                 #
-                ma_core.CmdObjOpt(dcc_obj.path).set_customize_attributes_create(
+                ma_core.CmdObjOpt(dcc_obj.path).create_customize_attributes(
                     dict(
                         arnold_name=and_obj.get_port('name').get()
                     )
@@ -274,7 +278,7 @@ class AssImportFnc(object):
                 dcc_obj = mya_dcc_objects.AndShader(dcc_obj_name)
                 if dcc_obj.get_is_exists() is False:
                     dcc_obj.set_create(and_obj_type_name)
-                    ma_core.CmdObjOpt(dcc_obj.path).set_customize_attributes_create(
+                    ma_core.CmdObjOpt(dcc_obj.path).create_customize_attributes(
                         dict(
                             arnold_name=and_obj.get_port('name').get()
                         )
@@ -296,7 +300,7 @@ class AssImportFnc(object):
             if and_port.get_is_element() is False and and_port.get_is_channel() is False:
                 and_port_name = and_port.port_name
                 #
-                dcc_port_name = bsc_objects.StrUnderline(and_port_name).to_camelcase()
+                dcc_port_name = bsc_core.RawStrUnderlineOpt(and_port_name).to_camelcase()
                 #
                 if and_obj_type_name in and_obj_type_names:
                     and_port_names = self._convert_configure.get_branch_keys(
@@ -367,24 +371,28 @@ class AssImportFnc(object):
                 i_and_material = self._and_universe.get_obj(i)
                 i_and_material_name = i_and_material.name
                 i_dcc_material = i_and_material_name
-                geometry_dcc_obj_opt.set_material(i_dcc_material)
+                geometry_dcc_obj_opt.assign_material_to_path(i_dcc_material)
+
     @classmethod
     def create_geometry_properties_fnc(cls, geometry_and_obj_opt, geometry_dcc_obj_opt):
-        mya_properties = geometry_and_obj_opt.set_properties_convert_to(application='maya')
-        geometry_dcc_obj_opt.set_properties(mya_properties)
+        mya_properties = geometry_and_obj_opt.convert_render_properties_to(application='maya')
+        geometry_dcc_obj_opt.assign_render_properties(mya_properties)
+
     @classmethod
     def create_geometry_visibilities_fnc(cls, geometry_and_obj_opt, geometry_dcc_obj_opt):
         mya_visibilities = geometry_and_obj_opt.set_visibilities_convert_to(application='maya')
-        geometry_dcc_obj_opt.set_visibilities(mya_visibilities)
+        geometry_dcc_obj_opt.assign_render_visibilities(mya_visibilities)
 
 
 class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
     PLUG_NAMES = ['mtoa']
+
     def __init__(self, option):
         super(FncLookYamlImporter, self).__init__(option)
         self._obj_index = 0
         self._name_dict = {}
         self._connections = []
+
     @mya_modifiers.set_undo_mark_mdf
     def execute(self):
         for i_plug_name in self.PLUG_NAMES:
@@ -479,20 +487,23 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
             atr_path_src = bsc_core.DccAttrPathMtd.get_atr_path(obj_path_src, port_path_src)
             ma_core.CmdPortOpt._set_connection_create_(atr_path_src, atr_path_tgt)
 
-    def create_node_fnc(self, scheme, obj_key, obj_path, create=False, definition=False, customize=False, assigns=False, clear_array_ports=False):
+    def create_node_fnc(
+            self, scheme, obj_key, obj_path, create=False, definition=False, customize=False, assigns=False,
+            clear_array_ports=False
+            ):
         type_name = self._raw.get(
             '{}.{}.properties.type'.format(scheme, obj_key)
         ).split('/')[-1]
         if create is True:
             if ma_core.CmdObjOpt._get_is_exists_(obj_path) is True:
-                ma_core.CmdObjOpt(obj_path).set_file_new()
+                ma_core.CmdObjOpt(obj_path).new_file()
             #
             ma_core.CmdObjOpt._set_create_(obj_path, type_name)
         #
         if ma_core.CmdObjOpt._get_is_exists_(obj_path) is True:
             obj = ma_core.CmdObjOpt(obj_path)
             if clear_array_ports is True:
-                obj.set_array_ports_clear()
+                obj.clear_array_ports()
             #
             if definition is True:
                 definition_attributes = self._raw.get(
@@ -537,7 +548,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                     port.set(value, enumerate_strings)
             else:
                 self._connections.append(
-                    (atr_path_src, ma_core.CmdPortOpt._get_atr_path_(obj_path, port_path))
+                    (atr_path_src, ma_core.CmdPortOpt._to_atr_path_(obj_path, port_path))
                 )
 
     def set_node_definition_properties_fnc(self, type_name, obj_path, attributes):
@@ -565,7 +576,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                             )
             else:
                 self._connections.append(
-                    (atr_path_src, ma_core.CmdPortOpt._get_atr_path_(obj_path, port_path))
+                    (atr_path_src, ma_core.CmdPortOpt._to_atr_path_(obj_path, port_path))
                 )
 
     def create_node_material_assigns_fnc(self, obj_path, material_assigns):
@@ -578,7 +589,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                 v = self._name_dict[v]
             dic[k] = v
         #
-        obj_opt.set_material_assigns(
+        obj_opt.assign_materials(
             dic,
             force=self._option['material_assign_force']
         )
@@ -613,8 +624,10 @@ class FncLookAssImporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         name_join_time_tag=True
     )
+
     def __init__(self, option=None):
         super(FncLookAssImporterNew, self).__init__(option)
+
     @ma_core.Modifier.undo_run
     def execute(self):
         file_path = self.get('file')

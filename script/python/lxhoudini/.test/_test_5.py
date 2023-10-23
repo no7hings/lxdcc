@@ -1,8 +1,7 @@
 # coding:utf-8
-import lxutil.dcc.dcc_objects as utl_dcc_objects
-reload(utl_dcc_objects)
+import lxbasic.core as bsc_core
 
-p = utl_dcc_objects.PyReloader(['lxutil', 'lxhoudini'])
+p = bsc_core.PyReloader(['lxutil', 'lxhoudini'])
 
 p.set_reload()
 

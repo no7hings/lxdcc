@@ -7,6 +7,8 @@ import copy
 
 import collections
 
+import lxlog.core as log_core
+
 from lxbasic import bsc_core
 
 from lxusd import usd_configure, usd_core
@@ -58,7 +60,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def set_uv_map_export(self):
         display_color = self.get('display_color')
-        with utl_core.LogProgressRunner.create_as_bar(
+        with log_core.LogProcessContext.create_as_bar(
                 maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export'
                 ) as l_p:
             for i_usd_prim in self._geometry_stage_0.TraverseAll():
@@ -102,7 +104,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         self._output_stage_opt.export_to(self._file_path)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'fnc-geometry-usd-uv-map-export',
             u'file="{}"'.format(self._file_path)
         )
@@ -162,7 +164,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def set_run(self):
         count = len([i for i in self._usd_stage_src.TraverseAll()])
-        with utl_core.LogProgressRunner.create_as_bar(
+        with log_core.LogProcessContext.create_as_bar(
             maximum=count,
             label='geometry look property create'
         ) as l_p:
@@ -274,7 +276,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def set_run(self):
         count = len([i for i in self._usd_stage_src.TraverseAll()])
         color_scheme = self.get('color_scheme')
-        with utl_core.LogProgressRunner.create_as_bar(
+        with log_core.LogProcessContext.create_as_bar(
                 maximum=count,
                 label='geometry display-color create'
         ) as l_p:
@@ -351,9 +353,8 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
 
         self._output_stage_opt = usd_core.UsdStageOpt()
 
-        with utl_core.LogProgressRunner.create_as_bar(
-                maximum=self._input_stage_opt.get_count(),
-                label='face vertex indices reverse create'
+        with log_core.LogProcessContext.create_as_bar(
+            maximum=self._input_stage_opt.get_count(), label='face vertex indices reverse create'
         ) as l_p:
             for i_input_prim in self._input_stage_opt.usd_instance.TraverseAll():
                 l_p.set_update()

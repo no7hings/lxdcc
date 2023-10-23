@@ -3,13 +3,11 @@ import six
 
 import collections
 
-import lxbasic.objects as bsc_objects
+from lxbasic import bsc_core
 
 import lxcontent.objects as ctt_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
-
-from lxutil import utl_core
 
 import lxutil_fnc.dcc.dcc_objects as utl_fnc_dcc_objects
 
@@ -93,7 +91,7 @@ class AbsTaskMethodsLoader(object):
             obj_attributes = obj.attributes
             module_path = obj_attributes.get('method.{}.module'.format(application))
             if module_path:
-                module = bsc_objects.PyModule(module_path)
+                module = bsc_core.PyModule(module_path)
                 module.set_reload()
                 return module
 
@@ -128,7 +126,7 @@ class AbsTaskMethodsLoader(object):
                             lis.remove(dependent_method_path)
                             lis.insert(index-seq, dependent_method_path)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'method-sorted',
                             'method-path="{}" from dependent(s) is non-assign'.format(dependent_method_path)
                         )
@@ -320,9 +318,8 @@ class AbsMethodCheckDef(object):
         try:
             self.set_check_run()
         except Exception:
-            from lxutil import utl_core
-
-            utl_core.ExceptionCatcher.set_create()
+            from lxbasic import bsc_core
+            bsc_core.LogException.trace()
             raise
 
     def set_check_result_update(self, task_properties):
@@ -333,7 +330,7 @@ class AbsMethodCheckDef(object):
                 if not i_check_tag in check_tags_:
                     check_tags_.append(i_check_tag)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'method-check-result-update',
             u'method-path="{}"'.format(self.obj.path)
         )
@@ -382,9 +379,8 @@ class AbsMethodRepairDef(object):
         try:
             self.set_repair_run()
         except Exception:
-            from lxutil import utl_core
-
-            utl_core.ExceptionCatcher.set_create()
+            from lxbasic import bsc_core
+            bsc_core.LogException.trace()
             raise
 
     def set_repair_result_update(self, task_properties):
@@ -414,9 +410,8 @@ class AbsMethodExportDef(object):
             self._set_export_post_run_()
         #
         except Exception:
-            from lxutil import utl_core
-
-            utl_core.ExceptionCatcher.set_create(use_window)
+            from lxbasic import bsc_core
+            bsc_core.LogException.trace()
             raise
 
     def set_export_result_update(self, task_properties):

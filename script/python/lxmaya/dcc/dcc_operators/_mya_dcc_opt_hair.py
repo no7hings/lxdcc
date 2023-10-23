@@ -4,7 +4,7 @@ import maya.cmds as cmds
 
 from lxbasic import bsc_core
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 from lxmaya import ma_core
 

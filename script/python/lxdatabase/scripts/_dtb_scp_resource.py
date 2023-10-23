@@ -3,10 +3,6 @@ import copy
 
 import glob
 
-from lxbasic import bsc_core
-
-from lxutil import utl_core
-
 import lxcontent.objects as ctt_objects
 
 import lxdatabase.objects as dtb_objects
@@ -66,14 +62,14 @@ class ScpResourcesAddByQuixel(object):
 
         self._resource_dict = dict()
 
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(json_files), label='add resource') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(json_files), label='add resource') as l_p:
             for i_json_file_path in json_files:
                 l_p.set_update()
                 #
                 self.add_resource_by_any_json(i_json_file_path)
 
     def add_resource_by_any_json(self, file_path):
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'add resource',
             'json="{}"'.format(file_path)
         )
@@ -103,8 +99,8 @@ class ScpResourcesAddByQuixel(object):
 
         if category_group in self.ALL_CATEGORY_GROUPS:
             dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-                bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
-                bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(category_group))
+                bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
+                bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(category_group))
             )
             # resource
             resource_directory_path_tgt = self.stg_create_resource_directory_tgt_fnc(
@@ -170,7 +166,7 @@ class ScpResourcesAddByQuixel(object):
                 directory_path_src
             )
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 'resource add', 'category group: {} is not available'.format(category_group)
             )
     @classmethod
@@ -253,7 +249,7 @@ class ScpResourcesAddByQuixel(object):
                     resource_dtb_path, i_type_path, kind=dtb_opt.Kinds.ResourceType
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'add resource', 'type="{}" is not register in database'.format(i_type_path)
                 )
     @classmethod
@@ -449,7 +445,7 @@ class ScpResourcesAddByQuixel(object):
             resource_dtb_path, texture_size_tag_dtb_path, kind=dtb_opt.Kinds.ResourcePropertyTag
         )
         #
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'database register',
             'entity="{}"'.format(file_dtb_path)
         )
@@ -553,7 +549,7 @@ class ScpResourcesAddByQuixel(object):
             resource_dtb_path, texture_size_tag_dtb_path, kind=dtb_opt.Kinds.ResourcePropertyTag
         )
         #
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'database register',
             'entity="{}"'.format(file_dtb_path)
         )
@@ -647,7 +643,7 @@ class ScpResourcesAddByQuixel(object):
             resource_dtb_path, texture_type_tag_dtb_path, kind=dtb_opt.Kinds.ResourceFileTag
         )
         #
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'database register',
             'entity="{}"'.format(file_dtb_path)
         )

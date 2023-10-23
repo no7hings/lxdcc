@@ -67,7 +67,7 @@ class RsvAssetTextureOpt(object):
             self.get_tx_directory_path_at(variant, version)
         )
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'version create',
             'variant="{}", version="{}"'.format(
                 variant, version
@@ -79,7 +79,7 @@ class RsvAssetTextureOpt(object):
         #
         bsc_core.StgPathPermissionMtd.lock(directory_path)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'version lock',
             'variant="{}", version="{}"'.format(
                 variant, version
@@ -187,7 +187,7 @@ class RsvAssetTextureOpt(object):
         )
         unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writeable(i) is True]
         if unlocked_directory_paths:
-            with utl_core.LogProgressRunner.create_as_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
+            with bsc_core.LogProcessContext.create_as_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
                 for _i in unlocked_directory_paths:
                     self.lock_directory(_i)
                     g_p.set_update()

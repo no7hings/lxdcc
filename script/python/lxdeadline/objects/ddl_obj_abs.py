@@ -138,19 +138,19 @@ class AbsDdlSubmiter(object):
         return self.__set_job_submit_(info, plug)
 
     def __set_job_submit_(self, info, plug):
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'deadline-job submit', 'is started'
         )
         self._result = self.CON.Jobs.SubmitJob(info, plug)
         if isinstance(self._result, dict):
             if '_id' in self._result:
                 self._job_id = self._result['_id']
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'deadline-job submit', 'is completed, jon-id="{}"'.format(self._job_id)
                 )
                 return self._job_id
         #
-        utl_core.Log.set_module_error_trace(
+        bsc_core.Log.trace_method_error(
             'deadline-job submit', 'is failed, {}'.format(self._result)
         )
         return None

@@ -48,7 +48,7 @@ def main(argv):
 def __get_app_args(args):
     from lxbasic import bsc_core
     #
-    bsc_core.LogMtd.trace_method_result(
+    bsc_core.Log.trace_method_result(
         KEY,
         'execute from: {}'.format(__file__)
     )

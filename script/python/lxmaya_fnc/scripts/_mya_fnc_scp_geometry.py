@@ -71,7 +71,7 @@ def set_geometry_export_by_any_scene_file(option):
                 'complete'
             )
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             key,
             u'file="{}" is not available'.format(scene_file_path)
         )
@@ -128,7 +128,7 @@ def set_geometry_import_by_any_scene_file(option):
             utl_dcc_objects.OsFile(scene_file_path).set_backup()
             mya_dcc_objects.Scene.save_file_to(scene_file_path)
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             key,
             u'file="{}" is not available'.format(scene_file_path)
         )

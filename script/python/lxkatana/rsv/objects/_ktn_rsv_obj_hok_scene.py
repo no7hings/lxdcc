@@ -392,7 +392,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if geometry_usd_var_file_path_shape:
                 s.append_sublayer(geometry_usd_var_file_path_shape)
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     u'front camera setup',
                     u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )
@@ -456,7 +456,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if geometry_usd_var_file_path_shape:
                 s.append_sublayer(geometry_usd_var_file_path_shape)
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     u'front camera setup',
                     u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )

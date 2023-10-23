@@ -58,7 +58,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
     def __init__(self, root, resource, texture_data):
         self._root_opt = ktn_core.NGObjOpt(root)
         self._cfg = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
+            value=bsc_core.RscConfigure.get_yaml('katana/node-graph/asset-texture-resource')
         )
         self._cfg.set(
             'option.root', self._root_opt.get_path(),

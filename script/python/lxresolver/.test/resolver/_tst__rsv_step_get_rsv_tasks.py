@@ -8,11 +8,13 @@ if __name__ == '__main__':
     # [RsvTask(type="task", path="/nsa_dev/chr/td_test/srf/surface")]
     import collections
 
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
 
     import lxresolver.commands as rsv_commands
 
-    utl_core.Log.TRACE_RESULT_ENABLE = False
+    bsc_core.Log.RESULT_ENABLE = False
 
     r = rsv_commands.get_resolver()
 

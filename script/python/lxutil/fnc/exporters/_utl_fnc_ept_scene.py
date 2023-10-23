@@ -1,11 +1,9 @@
 # coding:utf-8
-import os
-
-import glob
-
 from lxbasic import bsc_core
 
-from lxutil import utl_configure, utl_core
+from lxutil import utl_core
+
+import lxresource.core as rsc_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -19,6 +17,7 @@ class DotMaSceneInfoExporter(utl_fnc_obj_abs.AbsExporter):
         file_path=None,
         root=None
     )
+
     def __init__(self, option):
         super(DotMaSceneInfoExporter, self).__init__(option)
 
@@ -28,6 +27,7 @@ class DotMaSceneInfoExporter(utl_fnc_obj_abs.AbsExporter):
         import lxutil.scripts as utl_scripts
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
+
         #
         file_path = self._option.get('file_path')
         root = self._option.get('root')
@@ -48,6 +48,7 @@ class DotMaExporter(
         file_path_tgt=None,
         root=None
     )
+
     def __init__(self, option):
         super(DotMaExporter, self).__init__(option)
 
@@ -77,6 +78,7 @@ class DotXgenExporter(
         # etc. {xgen}_description
         xgen_collection_name='',
     )
+
     def __init__(self, option):
         super(DotXgenExporter, self).__init__(option)
 
@@ -105,6 +107,7 @@ class DotXgenUsdaExporter(
         location='',
         maya_scene_file='',
     )
+
     def __init__(self, option=None):
         super(DotXgenUsdaExporter, self).__init__(option)
 
@@ -117,11 +120,11 @@ class DotXgenUsdaExporter(
         if maya_scene_file_path:
             xgen_collection_file_paths = self._get_xgen_collection_file_paths_(maya_scene_file_path)
             key = 'usda/asset-xgen'
-            t = utl_core.Jinja.get_template(
+            t = rsc_core.RscJinjaConfigure.get_template(
                 key
             )
 
-            c = utl_core.Jinja.get_configure(
+            c = rsc_core.RscJinjaConfigure.get_configure(
                 key
             )
             for i_xgen_collection_file_path in xgen_collection_file_paths:

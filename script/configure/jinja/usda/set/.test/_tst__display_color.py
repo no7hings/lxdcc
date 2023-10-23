@@ -1,13 +1,13 @@
 # coding:utf-8
-from lxutil import utl_core
+import lxresource.core as rsc_core
 
 key = 'usda/set/surface'
 
-c = utl_core.Jinja.get_configure(key)
+c = rsc_core.RscJinjaConfigure.get_configure(key)
 
 k = 'geo_extra'
 
-t = utl_core.Jinja.get_template('{}/{}'.format(key, k))
+t = rsc_core.Jinja.get_template('{}/{}'.format(key, k))
 
 raw = t.render(
     **c.value

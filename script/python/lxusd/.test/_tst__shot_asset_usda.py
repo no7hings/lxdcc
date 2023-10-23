@@ -1,13 +1,13 @@
 # coding:utf-8
-from lxutil import utl_core
+import lxresource.core as rsc_core
 
 key = 'usda/shot-asset-set'
 
-t = utl_core.Jinja.get_template(
+t = rsc_core.RscJinjaConfigure.get_template(
     key
 )
 
-c = utl_core.Jinja.get_configure(
+c = rsc_core.RscJinjaConfigure.get_configure(
     key
 )
 

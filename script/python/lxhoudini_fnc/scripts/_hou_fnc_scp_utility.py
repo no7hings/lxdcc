@@ -25,7 +25,7 @@ def set_geometry_unify_by_usd_file(option):
         output_scene_file_path
     )
     temp_hda.get_port('execute').hou_port.pressButton()
-    utl_core.Log.set_module_result_trace(
+    bsc_core.Log.trace_method_result(
         'geometry-uv-map-unify',
         'file="{}"'.format(output_file_path)
     )
@@ -55,7 +55,7 @@ def set_geometry_uv_map_assign_by_usd_file(option):
         output_scene_file_path
     )
     temp_hda.get_port('execute').hou_port.pressButton()
-    utl_core.Log.set_module_result_trace(
+    bsc_core.Log.trace_method_result(
         'geometry-uv-map-unify',
         'file="{}"'.format(output_file_path)
     )

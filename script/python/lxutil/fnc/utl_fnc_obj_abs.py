@@ -557,9 +557,9 @@ class AbsFncDccGeometryComparer(object):
             self.update_target_fnc
         ]
         if methods:
-            with utl_core.GuiProgressesRunner.create(
-                    maximum=len(methods), label='execute geometry-comparer method'
-                    ) as g_p:
+            with bsc_core.LogProcessContext.create(
+                maximum=len(methods), label='execute geometry-comparer method'
+            ) as g_p:
                 for method in methods:
                     g_p.set_update()
                     method()
@@ -568,9 +568,9 @@ class AbsFncDccGeometryComparer(object):
         tgt_dcc_geometries = self._dcc_geometries_tgt
         #
         if src_dcc_geometries:
-            with utl_core.GuiProgressesRunner.create(
-                    maximum=len(src_dcc_geometries), label='gain geometry-comparer result'
-                    ) as g_p:
+            with bsc_core.LogProcessContext.create(
+                maximum=len(src_dcc_geometries), label='gain geometry-comparer result'
+            ) as g_p:
                 for i_src_geometry in src_dcc_geometries:
                     g_p.set_update()
                     if i_src_geometry.type_name == 'Mesh':
@@ -598,9 +598,9 @@ class AbsFncDccGeometryComparer(object):
             self.update_target_fnc
         ]
         if methods:
-            with utl_core.GuiProgressesRunner.create(
-                    maximum=len(methods), label='execute geometry-comparer method'
-                    ) as g_p:
+            with bsc_core.LogProcessContext.create(
+                maximum=len(methods), label='execute geometry-comparer method'
+            ) as g_p:
                 for method in methods:
                     g_p.set_update()
                     method()
@@ -610,9 +610,9 @@ class AbsFncDccGeometryComparer(object):
         #
         dcc_geometry_paths = []
         if dcc_geometries_src:
-            with utl_core.GuiProgressesRunner.create(
-                    maximum=len(dcc_geometries_src), label='gain geometry-comparer result'
-                    ) as g_p:
+            with bsc_core.LogProcessContext.create(
+                maximum=len(dcc_geometries_src), label='gain geometry-comparer result'
+            ) as g_p:
                 for i_src_geometry in dcc_geometries_src:
                     g_p.set_update()
                     if i_src_geometry.type_name == 'Mesh':
@@ -784,7 +784,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
         objs_tgt, data_tgt = self._comparer_data[1]
         #
         if objs_src:
-            with utl_core.GuiProgressesRunner.create(maximum=len(objs_src), label='comparer geometry by data') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(objs_src), label='comparer geometry by data') as g_p:
                 for i_obj_src in objs_src:
                     if i_obj_src.type_name == 'Mesh':
                         i_path_src = i_obj_src.path
@@ -824,7 +824,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
             (self.__gain_result_fnc_, ())
         ]
         if ms:
-            with utl_core.GuiProgressesRunner.create(maximum=len(ms), label='execute geometry-comparer method') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(ms), label='execute geometry-comparer method') as g_p:
                 for i_method, i_args in ms:
                     g_p.set_update()
                     i_method(*i_args)
@@ -872,7 +872,7 @@ class AbsFncRenderTextureExportDef(object):
             index_mapper = {}
             # use for file with same name, etc. "/temp/a/a.exr", "/temp/b/a.exr"
             index_query = {}
-            with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
+            with bsc_core.LogProcessContext.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
                 for i_dcc_obj in dcc_objs:
                     l_p.set_update()
                     # dpt to dst, file path can be is multiply
@@ -881,7 +881,7 @@ class AbsFncRenderTextureExportDef(object):
                         j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
                         j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
                         if j_texture_dpt.get_exists_unit_paths() is False:
-                            bsc_core.LogMtd.trace_method_warning(
+                            bsc_core.Log.trace_method_warning(
                                 cls.KEY,
                                 'file="{}" is non exists'.format(j_texture_path_dpt)
                             )
@@ -952,7 +952,7 @@ class AbsFncRenderTextureExportDef(object):
                                                 replace=True
                                             )
                             else:
-                                bsc_core.LogMtd.trace_method_warning(
+                                bsc_core.Log.trace_method_warning(
                                     'texture search',
                                     u'file="{}" is Non-exists'.format(j_texture_path_dpt)
                                 )
@@ -975,12 +975,12 @@ class AbsFncRenderTextureExportDef(object):
                                     j_texture_path_dst,
                                     remove_expression,
                                 )
-                                bsc_core.LogMtd.trace_method_result(
+                                bsc_core.Log.trace_method_result(
                                     cls.KEY,
                                     u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
                                 )
                             else:
-                                bsc_core.LogMtd.trace_method_warning(
+                                bsc_core.Log.trace_method_warning(
                                     cls.KEY,
                                     u'file="{}" is non-exists'.format(j_texture_path_dst)
                                 )
@@ -1009,7 +1009,7 @@ class AbsFncRenderTextureExportDef(object):
         index_mapper = {}
         # use for file with same name, etc. "/temp/a/a.exr", "/temp/b/a.exr"
         index_query = {}
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
             for i_dcc_obj in dcc_objs:
                 l_p.set_update()
                 # dpt to dst
@@ -1018,7 +1018,7 @@ class AbsFncRenderTextureExportDef(object):
                     j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
                     j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
                     if j_texture_dpt.get_exists_units() is False:
-                        bsc_core.LogMtd.trace_method_warning(
+                        bsc_core.Log.trace_method_warning(
                             cls.KEY,
                             'file="{}" is non exists'.format(j_texture_path_dpt)
                         )
@@ -1087,7 +1087,7 @@ class AbsFncRenderTextureExportDef(object):
                                             replace=True
                                         )
                         else:
-                            bsc_core.LogMtd.trace_method_warning(
+                            bsc_core.Log.trace_method_warning(
                                 'texture search',
                                 u'file="{}" is Non-exists'.format(j_texture_path_dpt)
                             )
@@ -1111,12 +1111,12 @@ class AbsFncRenderTextureExportDef(object):
                                 j_texture_path_dst,
                                 remove_expression,
                             )
-                            bsc_core.LogMtd.trace_method_result(
+                            bsc_core.Log.trace_method_result(
                                 'texture export',
                                 u'"{}" >> "{}"'.format(j_texture_path_dpt, j_texture_path_dst)
                             )
                         else:
-                            bsc_core.LogMtd.trace_method_warning(
+                            bsc_core.Log.trace_method_warning(
                                 'texture export',
                                 u'file="{}" is non-exists'.format(j_texture_path_dst)
                             )

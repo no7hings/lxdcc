@@ -1,5 +1,7 @@
 # coding:utf-8
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_log
+import lxlog.core as log_core
+
+from lxbasic.core import _bsc_cor_raw
 
 
 class MsgBaseMtd(object):
@@ -21,11 +23,13 @@ class MsgBaseMtd(object):
     class Verifier(object):
         Login = 'ple'
         Password = 'abcd1234,'
+
     #
     FIX = {
         'fangxiaodong': 'xiaoche',
         'huangxin': 'mofei'
     }
+
     #
     @classmethod
     def send_mail(cls, addresses, subject, content):
@@ -45,10 +49,11 @@ class MsgBaseMtd(object):
 
         result = requests.get(url.decode('utf-8')).text
 
-        _bsc_cor_log.LogMtd.trace_method_result(
+        log_core.Log.trace_method_result(
             'send mail',
             'result is "{}"'.format(result)
         )
+
     @classmethod
     def send_feishu(cls, addresses, subject, content):
         import requests
@@ -73,16 +78,19 @@ class MsgBaseMtd(object):
 
         result = requests.get(url.decode('utf-8')).text
 
-        _bsc_cor_log.LogMtd.trace_method_result(
+        log_core.Log.trace_method_result(
             'send feishu',
             'result is "{}"'.format(result)
         )
+
     @classmethod
     def send_chat(cls, addresses, subject, content):
         pass
+
     @classmethod
     def get_session(cls):
         import requests
+
         session = requests.Session()
         session.verify = False
         session.post(
@@ -96,6 +104,7 @@ class MsgBaseMtd(object):
             allow_redirects=False
         )
         return session
+
     # new api
     @classmethod
     def send_mail_(cls, sender='ple', addresses=None, subject=None, content=None, attachments=None):
@@ -107,11 +116,12 @@ class MsgBaseMtd(object):
         session = cls.get_session()
         response = session.post(url, data=message_data, files=None)
         result = response.json()
-        _bsc_cor_log.LogMtd.trace_method_result(
+        log_core.Log.trace_method_result(
             'send mail',
             'result is "{}"'.format(result.get('message') or 'fail')
         )
         return result
+
     @classmethod
     def send_feishu_(cls, sender='shotgun', receivers=None, subject=None, content=None, attachments=None):
         def to_receives_fnc_(receivers_):
@@ -122,6 +132,7 @@ class MsgBaseMtd(object):
                 return ','.join(receivers_)
             else:
                 raise RuntimeError()
+
         #
         url = cls.MessageServer.FeishuUrl.format(
             sender=sender,
@@ -131,11 +142,12 @@ class MsgBaseMtd(object):
         session = cls.get_session()
         response = session.post(url, data=message_data, files=None)
         result = response.json()
-        _bsc_cor_log.LogMtd.trace_method_result(
+        log_core.Log.trace_method_result(
             'send mail',
             'result is "{}"'.format(result.get('message') or 'fail')
         )
         return result
+
     @classmethod
     def send_chat_(cls, sender, receivers, subject, content):
         pass

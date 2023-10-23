@@ -389,14 +389,14 @@ class AbsDdlJobSender(AbsDdlObj):
                     '{}={}'.format(k, content.get(k))
                 )
 
-    @utl_core.Modifier.time_trace
+    @utl_core.DccModifier.time_trace
     def set_job_submit(self):
         self.properties.set_flatten()
         info = self.job_info.value
         plug = self.job_plug.value
         return self._set_job_submit_(info, plug)
 
-    @utl_core.Modifier.time_trace
+    @utl_core.DccModifier.time_trace
     def _set_job_submit_(self, info, plug):
         self._result = CON.Jobs.SubmitJob(info, plug)
         return self._result
@@ -878,7 +878,7 @@ class DdlJobMonitor(object):
         self.__timer.start()
 
     def __set_logging_(self, text):
-        result = bsc_core.LogMtd.get_result(text)
+        result = bsc_core.Log.get_result(text)
         self.logging.send_emit(
             result
         )

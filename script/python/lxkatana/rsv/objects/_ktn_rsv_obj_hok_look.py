@@ -69,7 +69,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
                     ).set_run()
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'look-ass export',
                     u'file="{}" is exists'.format(i_look_ass_file_path)
                 )

@@ -24,7 +24,7 @@ from lxmaya_fnc import ma_fnc_configure, ma_fnc_core
 
 from lxmaya.modifiers import _mya_mdf_utility
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxutil.scripts as utl_scripts
 
@@ -137,14 +137,14 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._results = self._set_cmd_run_(**kwargs)
         if self._results:
             if self._texture_use_environ_map is True:
-                with utl_core.LogProgressRunner.create_as_bar(maximum=len(self._results), label='texture environ-map') as l_p:
+                with bsc_core.LogProcessContext.create_as_bar(maximum=len(self._results), label='texture environ-map') as l_p:
                     for i in self._results:
                         l_p.set_update()
                         #
                         fr = utl_scripts.DotAssFileReader(i)
                         fr._set_file_paths_convert_()
             #
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'ass export',
                 u'file="{}"'.format(self._file_path)
             )
@@ -265,13 +265,13 @@ class LookMtlxExporter(object):
                 mtx_file.save()
                 self._results.append(self._file_path)
             else:
-                utl_core.Log.set_warning_trace(
+                bsc_core.Log.trace_warning(
                     'non-geometry(s) to exporter'
                 )
         #
         if self._results:
             for i in self._results:
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'look-mtlx-exporter',
                     u'file="{}"'.format(i)
                 )
@@ -365,7 +365,7 @@ class LookAssignExporter(object):
         #
         if self._results:
             for i in self._results:
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'look-assign-exporter',
                     u'file="{}"'.format(i)
                 )
@@ -624,12 +624,12 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         if include_indices:
             mya_mesh_paths = [mya_mesh_paths[i] for i in include_indices]
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture bake',
             'objs=[{}]'.format(', '.join(['"{}"'.format(i) for i in mya_mesh_paths]))
         )
         #
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
                 l_p.set_update()
                 #
@@ -674,7 +674,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         mya_mesh_paths = mya_group.get_all_shape_paths(
             include_obj_type=['mesh']
         )
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
                 l_p.set_update()
                 #
@@ -778,7 +778,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         group = mya_dcc_objects.Group(location_cur)
         nodes = group.get_descendants()
         if nodes:
-            with utl_core.GuiProgressesRunner.create(
+            with bsc_core.LogProcessContext.create(
                 maximum=len(nodes), label='export look yaml at "{}"'.format(location)
             ) as g_p:
                 for i_node in nodes:
@@ -840,7 +840,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         locations = self.get('locations')
         if locations:
             pathsep = self.get('pathsep')
-            with utl_core.GuiProgressesRunner.create(
+            with bsc_core.LogProcessContext.create(
                 maximum=len(locations), label='export look yaml'
             ) as g_p:
                 for i_location in locations:

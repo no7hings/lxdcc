@@ -1,29 +1,29 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxlog.core as log_core
 
-import lxbasic.objects as bsc_objects
+from lxbasic import bsc_core
 
 
 def get_module(framework_scheme):
-    return bsc_objects.PyModule(
+    return bsc_core.PyModule(
         'lxbasic.extra.methods.{}'.format(framework_scheme)
     ).get_module()
 
 
 if bsc_core.EnvExtraMtd.get_scheme() == 'default':
-    bsc_core.LogMtd.trace_method_result(
+    log_core.Log.trace_method_result(
         'extra script',
         'load scheme: "default"'
     )
     from .default import *
 elif bsc_core.EnvExtraMtd.get_scheme() == 'new':
-    bsc_core.LogMtd.trace_method_result(
+    log_core.Log.trace_method_result(
         'extra script',
         'load scheme: "new"'
     )
     from .new import *
 else:
-    bsc_core.LogMtd.trace_method_result(
+    log_core.Log.trace_method_result(
         'extra script',
         'load scheme: "new"'
     )

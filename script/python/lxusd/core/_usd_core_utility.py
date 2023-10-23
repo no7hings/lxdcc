@@ -13,9 +13,7 @@ from lxbasic import bsc_core
 
 from lxusd import usd_configure
 
-from lxutil import utl_core
-
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import os
 
@@ -52,13 +50,13 @@ class UsdStageOpt(UsdBasic):
             elif isinstance(args[0], six.string_types):
                 file_path = args[0]
                 if os.path.isfile(file_path) is True:
-                    bsc_core.LogMtd.trace_method_result(
+                    bsc_core.Log.trace_method_result(
                         self.KEY, 'open file is started: "{}"'.format(
                             file_path
                         )
                     )
                     stage = self._open_file_(file_path)
-                    bsc_core.LogMtd.trace_method_result(
+                    bsc_core.Log.trace_method_result(
                         self.KEY, 'open file is completed: "{}"'.format(
                             file_path
                         )
@@ -83,12 +81,12 @@ class UsdStageOpt(UsdBasic):
         root_layer = self._usd_stage.GetRootLayer()
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.append(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'usd-layer-append',
                 u'file="{}"'.format(file_path)
             )
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 'usd-layer-append',
                 u'file="{}" is non-exist'.format(file_path)
             )
@@ -100,12 +98,12 @@ class UsdStageOpt(UsdBasic):
         root_layer = self._usd_stage.GetRootLayer()
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.insert(0, file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'usd-layer prepend',
                 u'file="{}"'.format(file_path)
             )
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 'usd-layer prepend',
                 u'file="{}" is non-exist'.format(file_path)
             )
@@ -114,7 +112,7 @@ class UsdStageOpt(UsdBasic):
         prim = self._usd_stage.GetPrimAtPath(obj_path)
         self._usd_stage.SetDefaultPrim(prim)
         #
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'default-prim set',
             u'obj="{}"'.format(obj_path)
         )
@@ -124,7 +122,7 @@ class UsdStageOpt(UsdBasic):
 
     def export_to(self, file_path):
         self._usd_stage.Export(file_path)
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'usd-export',
             u'file="{}"'.format(file_path)
         )
@@ -133,13 +131,13 @@ class UsdStageOpt(UsdBasic):
         # base, ext = os.path.splitext(file_path)
         # self._usd_stage.Export(base + '.usda')
         # #
-        # bsc_core.LogMtd.trace_method_result(
+        # bsc_core.Log.trace_method_result(
         #     'usd-geometry-export',
         #     'file-path: "{}"'.format(file_path)
         # )
 
     def set_obj_create_as_override(self, obj_path):
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'override-prim create',
             u'obj="{}"'.format(obj_path)
         )
@@ -504,7 +502,7 @@ class UsdFileWriteOpt(object):
         file_opt = bsc_core.StgFileOpt(self._file_path)
         file_opt.create_directory()
         self._usd_stage.Export(self._file_path)
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'usd-export',
             u'file="{}"'.format(self._file_path)
         )
@@ -1560,7 +1558,7 @@ class UsdMeshOpt(UsdGeometryOpt):
 
         face_points = self.compute_face_points()
         kd_tree = NpKDTree(face_points)
-        bsc_core.LogMtd.debug('generator KDTree: "{}"'.format(self.get_path()))
+        bsc_core.Log.debug('generator KDTree: "{}"'.format(self.get_path()))
         self.__cache[key] = kd_tree
         return kd_tree
 

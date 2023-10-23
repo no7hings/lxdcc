@@ -22,12 +22,12 @@ class ShapeLookOpt(AbsLookOpt):
         super(ShapeLookOpt, self).__init__(*args)
 
         self._node_configure = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('arnold/node')
+            value=bsc_core.RscConfigure.get_yaml('arnold/node')
         )
         self._node_configure.set_flatten()
 
         self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
+            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
 

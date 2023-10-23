@@ -47,15 +47,12 @@ class DccPathDagMtd(object):
         if ':' in dag_args[0]:
             if len(dag_args) == 1:
                 return None
-            else:
-                return pathsep.join(dag_args[:-1])
-        else:
-            if len(dag_args) == 1:
-                return None
-            elif len(dag_args) == 2:
-                return pathsep
-            else:
-                return pathsep.join(dag_args[:-1])
+            return pathsep.join(dag_args[:-1])
+        if len(dag_args) == 1:
+            return None
+        elif len(dag_args) == 2:
+            return pathsep
+        return pathsep.join(dag_args[:-1])
 
     @classmethod
     def get_dag_parent_name(cls, path, pathsep):

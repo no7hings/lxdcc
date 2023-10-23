@@ -73,11 +73,11 @@ ktn_scripts.ScpWorkspaceCreate.new()
     @classmethod
     def new(cls):
         def post_fnc_():
-            bsc_core.LogMtd.ENABLE = False
+            bsc_core.Log.ENABLE = False
             s = ScpWorkspaceCreate(obj_opt)
             s.load_geometry_auto()
             s.load_look_auto()
-            bsc_core.LogMtd.ENABLE = True
+            bsc_core.Log.ENABLE = True
         #
         ktn_obj, i_create = ktn_core.NGObjOpt._get_node_create_args_(
             '/rootNode/workspace', 'Workspace_Wsp'

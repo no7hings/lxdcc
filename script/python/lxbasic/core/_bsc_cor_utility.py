@@ -124,6 +124,13 @@ class ApplicationMtd(object):
         return False
 
     @classmethod
+    def get_is_clarisse(cls):
+        _ = os.environ.get('IX_PYTHON2HOME')
+        if _:
+            return True
+        return False
+
+    @classmethod
     def get_is_lynxi(cls):
         _ = os.environ.get('LYNXI_ROOT')
         if _:
@@ -133,13 +140,6 @@ class ApplicationMtd(object):
     @classmethod
     def get_is_nuke(cls):
         pass
-
-    @classmethod
-    def get_is_clarisse(cls):
-        _ = os.environ.get('IX_PYTHON2HOME')
-        if _:
-            return True
-        return False
 
     @classmethod
     def get_is_dcc(cls):
@@ -237,6 +237,10 @@ class SystemMtd(TimeMtd):
     def get_user_name(cls):
         return getpass.getuser()
 
+    @classmethod
+    def get_user_group_ids(cls):
+        return os.getgroups()
+
     @staticmethod
     def get_is_linux():
         return platform.system() == 'Linux'
@@ -320,13 +324,11 @@ class SystemMtd(TimeMtd):
     @classmethod
     def get_group_id(cls, group_name):
         import grp
-
         return grp.getgrnam(group_name).gr_gid
 
     @classmethod
     def get_group(cls, group_id):
         import grp
-
         return grp.getgrgid(group_id)
 
     @classmethod
@@ -491,6 +493,17 @@ class StgPathMapMtd(object):
 
 class StorageMtd(object):
     PATHSEP = '/'
+
+    @classmethod
+    def glob_fnc(cls, p_str):
+        _ = glob.glob(
+            p_str
+        )
+        if _:
+            if platform.system() == 'Windows':
+                _ = map(lambda x: x.replace('\\', '/'), _)
+            return _
+        return []
 
     @classmethod
     def get_path_is_windows(cls, path):
@@ -658,7 +671,7 @@ class StorageMtd(object):
     @classmethod
     def get_file_name_search_dict(cls, directory_paths):
         def rcs_fnc_(path_):
-            _results = glob.glob(u'{}/*'.format(path_)) or []
+            _results = cls.glob_fnc('{}/*'.format(path_))
             # _results.sort()
             for _i_path in _results:
                 if os.path.isfile(_i_path):
@@ -813,22 +826,6 @@ class UuidMtd(object):
         ).upper()
 
 
-class Bin(object):
-    @classmethod
-    def get_oslc(cls):
-        if SystemMtd.get_is_windows():
-            return '{}/windows/oslc.exe'.format(bsc_configure.Root.BIN)
-        elif SystemMtd.get_is_linux():
-            return '{}/linux/oslc'.format(bsc_configure.Root.BIN)
-
-    @classmethod
-    def get_ffmpeg(cls):
-        if SystemMtd.get_is_windows():
-            return 'l:/packages/pg/third_party/app/ffmpeg/4.4.0/platform-windows/bin/ffmpeg.exe'
-        elif SystemMtd.get_is_linux():
-            return '/l/packages/pg/third_party/app/ffmpeg/4.4.0/platform-linux/bin/ffmpeg'
-
-
 class ExceptionMtd(object):
     @classmethod
     def set_print(cls):
@@ -838,7 +835,7 @@ class ExceptionMtd(object):
         traceback.print_exc()
 
     @classmethod
-    def set_stack_print(cls):
+    def print_stack(cls):
         import sys
         #
         import traceback

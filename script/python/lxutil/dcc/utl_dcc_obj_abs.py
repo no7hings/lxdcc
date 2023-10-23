@@ -7,11 +7,7 @@ import glob
 
 import hashlib
 
-import fnmatch
-
 from lxbasic import bsc_core
-
-from lxutil import utl_core
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -21,49 +17,54 @@ import lxutil.configures as utl_configures
 class AbsStorageGuiDef(object):
     def set_gui_attribute(self, *args, **kwargs):
         raise NotImplementedError()
+
     @property
     def name(self):
         raise NotImplementedError()
+
     @property
     def path(self):
         raise NotImplementedError()
 
-    def set_copy_path_to_clipboard(self):
-        from lxutil_gui.qt import gui_qt_core
-        gui_qt_core.set_text_copy_to_clipboard(self.path)
+    def copy_path_to_clipboard(self):
+        import lxgui.qt.core as gui_qt_core
 
-    def set_copy_name_to_clipboard(self):
-        from lxutil_gui.qt import gui_qt_core
-        gui_qt_core.set_text_copy_to_clipboard(self.name)
+        gui_qt_core.GuiQtUtil.copy_text_to_clipboard(self.path)
+
+    def copy_name_to_clipboard(self):
+        import lxgui.qt.core as gui_qt_core
+
+        gui_qt_core.GuiQtUtil.copy_text_to_clipboard(self.name)
 
 
 class AbsOsDirectory(
     unr_abstracts.AbsOsDirectory,
-    unr_abstracts.AbsObjGuiDef,
+    unr_abstracts.AbsGuiExtraDef,
     AbsStorageGuiDef
 ):
-    LOG = utl_core.Log
+
     def __init__(self, path):
         super(AbsOsDirectory, self).__init__(path)
-        self._set_obj_gui_def_init_()
+        self._init_gui_extra_def_()
         self.set_gui_attribute(
             'gui_menu',
             [
                 ('open folder', 'file/open-folder', self.set_open),
                 (),
-                ('copy path', 'copy', self.set_copy_path_to_clipboard),
-                ('copy name', 'copy', self.set_copy_name_to_clipboard),
+                ('copy path', 'copy', self.copy_path_to_clipboard),
+                ('copy name', 'copy', self.copy_name_to_clipboard),
             ]
         )
 
     def get_icon(self):
-        return utl_core.FileIcon.get_folder()
+        return bsc_core.RscIcon.get('file/folder')
+
     icon = property(get_icon)
 
     def set_create(self):
         if self.get_is_exists() is False:
             bsc_core.StorageMtd.create_directory(self.path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'directory create',
                 u'directory-path="{}"'.format(self.path)
             )
@@ -72,7 +73,7 @@ class AbsOsDirectory(
         directory_tgt = self.__class__(directory_path_tgt)
         if directory_tgt.get_is_exists():
             if replace is False:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'link create',
                     u'path="{}" is exists'.format(directory_tgt.path)
                 )
@@ -81,7 +82,7 @@ class AbsOsDirectory(
                 if os.path.islink(directory_tgt.path) is True:
                     bsc_core.StgPathPermissionMtd.unlock(directory_tgt.path)
                     os.remove(directory_tgt.path)
-                    bsc_core.LogMtd.trace_method_result(
+                    bsc_core.Log.trace_method_result(
                         'path-link-remove',
                         u'path="{}"'.format(directory_tgt.path)
                     )
@@ -89,7 +90,7 @@ class AbsOsDirectory(
         if directory_tgt.get_is_exists() is False:
             self.create_symlink_fnc(self.path, directory_tgt.path)
             #
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'link create',
                 u'connection="{}" >> "{}"'.format(self.path, directory_tgt.path)
             )
@@ -105,9 +106,8 @@ class AbsOsDirectory(
 
 class AbsOsFile(
     unr_abstracts.AbsOsFile,
-    unr_abstracts.AbsObjGuiDef,
-    AbsStorageGuiDef,
-    unr_abstracts.AbsOsFilePackageDef
+    unr_abstracts.AbsGuiExtraDef,
+    AbsStorageGuiDef
 ):
     ICON_DICT = {
         '.ma': 'ma',
@@ -133,24 +133,25 @@ class AbsOsFile(
         (r'(\()[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9](\))(%04d)', 4),
         (r'%04d', 4),
     ]
-    RE_MULTIPLY_KEYS = RE_UDIM_KEYS + RE_SEQUENCE_KEYS
+    RE_MULTIPLY_KEYS = RE_UDIM_KEYS+RE_SEQUENCE_KEYS
     #
     RE_SEQUENCE_PATTERN = None
     #
-    LOG = utl_core.Log
+    LOG = bsc_core.Log
+
     def __init__(self, path):
         super(AbsOsFile, self).__init__(
             bsc_core.StgPathOpt(path).__str__()
         )
-        self._set_obj_gui_def_init_()
+        self._init_gui_extra_def_()
         #
         self.set_gui_attribute(
             'gui_menu',
             [
                 ('open folder', 'file/open-folder', self.open_directory_in_system),
                 (),
-                ('copy path', None, self.set_copy_path_to_clipboard),
-                ('copy name', None, self.set_copy_name_to_clipboard),
+                ('copy path', None, self.copy_path_to_clipboard),
+                ('copy name', None, self.copy_name_to_clipboard),
             ]
         )
         # file reference node
@@ -159,10 +160,11 @@ class AbsOsFile(
 
     def get_icon(self):
         if self.ext:
-            _ = utl_core.FileIcon.get_by_file_ext(self.ext)
+            _ = bsc_core.RscIcon.get('file/{}'.format(self.ext[1:]))
             if _:
                 return _
-        return utl_core.FileIcon.get_default()
+        return bsc_core.RscIcon.get('file/file')
+
     icon = property(get_icon)
 
     @property
@@ -193,6 +195,7 @@ class AbsOsFile(
 
     def get_is_udim(self):
         return self._get_is_udim_(self.path)
+
     @classmethod
     def _get_is_udim_(cls, file_path):
         path_base = os.path.basename(file_path)
@@ -204,6 +207,7 @@ class AbsOsFile(
 
     def get_is_sequence(self):
         return self._get_is_sequence_(self.path)
+
     @classmethod
     def _get_is_sequence_(cls, file_path):
         path_base = os.path.basename(file_path)
@@ -224,7 +228,7 @@ class AbsOsFile(
         if list_:
             list_.sort()
         else:
-            bsc_core.LogMtd.trace_warning('file: "{}" is Non-exists.'.format(self.path))
+            bsc_core.Log.trace_warning('file: "{}" is Non-exists.'.format(self.path))
         return list_
 
     def get_exists_sequence_files(self):
@@ -235,6 +239,7 @@ class AbsOsFile(
 
     def get_is_sequence_exists(self, frame_range):
         pass
+
     # multiply
     @classmethod
     def _get_has_elements_(cls, file_path):
@@ -244,9 +249,10 @@ class AbsOsFile(
             if i_r:
                 return True
         return False
+
     @classmethod
     def _set_file_path_ext_replace_to_(cls, file_path, ext):
-        return os.path.splitext(file_path)[0] + ext
+        return os.path.splitext(file_path)[0]+ext
 
     def get_as_new_ext(self, ext):
         return self.__class__(
@@ -255,10 +261,12 @@ class AbsOsFile(
 
     def get_has_elements(self):
         return self._get_has_elements_(self.path)
+
     @classmethod
     def _get_exists_file_paths_(cls, file_path, ext_includes=None):
         def get_ext_replace_fnc_(file_path_, ext_):
-            return os.path.splitext(file_path_)[0] + ext_
+            return os.path.splitext(file_path_)[0]+ext_
+
         #
         def get_add_fnc_(include_exts_, ext_):
             if isinstance(include_exts_, (tuple, list)):
@@ -269,6 +277,7 @@ class AbsOsFile(
                         _i_add = get_ext_replace_fnc_(_i, _i_ext)
                         if os.path.isfile(_i_add) is True:
                             add_list_.append(_i_add)
+
         #
         re_keys = cls.RE_MULTIPLY_KEYS
         pathsep = cls.PATHSEP
@@ -301,12 +310,14 @@ class AbsOsFile(
         #
         add_list_ = []
         get_add_fnc_(ext_includes, ext)
-        _ = list_ + add_list_
+        _ = list_+add_list_
         return [i for i in _ if os.path.isfile(i)]
+
     @classmethod
     def _get_exists_file_paths__(cls, file_path, ext_includes=None):
         def get_ext_replace_fnc_(file_path_, ext_):
-            return os.path.splitext(file_path_)[0] + ext_
+            return os.path.splitext(file_path_)[0]+ext_
+
         #
         def get_add_fnc_(include_exts_, ext_):
             if isinstance(include_exts_, (tuple, list)):
@@ -317,6 +328,7 @@ class AbsOsFile(
                         _i_add = get_ext_replace_fnc_(_i, _i_ext)
                         if os.path.isfile(_i_add) is True:
                             add_list_.append(_i_add)
+
         #
         re_keys = cls.RE_MULTIPLY_KEYS
         pathsep = cls.PATHSEP
@@ -349,7 +361,7 @@ class AbsOsFile(
         #
         add_list_ = []
         get_add_fnc_(ext_includes, ext)
-        _ = list_ + add_list_
+        _ = list_+add_list_
         return _
 
     def get_exists_file_paths(self, *args, **kwargs):
@@ -357,6 +369,7 @@ class AbsOsFile(
 
     def get_exists_files(self, *args, **kwargs):
         return [self.__class__(i) for i in self.get_exists_unit_paths(*args, **kwargs)]
+
     @classmethod
     def get_exists_unit_paths_fnc(cls, file_path):
         return bsc_core.StgFileMultiplyMtd.get_exists_unit_paths(file_path)
@@ -398,6 +411,7 @@ class AbsOsFile(
         # noinspection PyBroadException
         try:
             import grp
+
             if self.get_is_exists() is True:
                 stat_info = os.stat(self.path)
                 gid = stat_info.st_gid
@@ -411,6 +425,7 @@ class AbsOsFile(
         # noinspection PyBroadException
         try:
             import pwd
+
             if self.get_is_exists() is True:
                 stat_info = os.stat(self.path)
                 uid = stat_info.st_uid
@@ -457,27 +472,25 @@ class AbsOsFile(
             result, copy_log = self.set_copy_to_file(file_path_src)
             # write log
             if copy_log is not None:
-                utl_core.Log.set_log_write(file_path_copy_log_src, copy_log)
+                bsc_core.StgFileOpt(file_path_copy_log_src).append(copy_log)
             #
             file_tgt = self.__class__(file_path_tgt)
             if file_tgt.get_is_exists_file() is True:
                 if replace is True:
                     if bsc_core.StgPathLinkMtd.get_is_link_source_to(
-                        file_path_src, file_path_tgt,
+                            file_path_src, file_path_tgt,
                     ) is False:
                         os.remove(file_tgt.path)
                         #
                         bsc_core.StgPathLinkMtd.link_to(file_path_src, file_tgt.path)
-                        link_log = bsc_core.LogMtd.trace_method_result(
+                        link_log = bsc_core.Log.trace_method_result(
                             'link replace',
                             u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
                         )
-                        utl_core.Log.set_log_write(
-                            file_path_link_log_src, link_log
-                        )
+                        bsc_core.StgFileOpt(file_path_link_log_src).append(link_log)
                         return True, link_log
                 else:
-                    return False, bsc_core.LogMtd.trace_method_warning(
+                    return False, bsc_core.Log.trace_method_warning(
                         'link create',
                         u'file="{}" is exists'.format(file_path_tgt)
                     )
@@ -486,16 +499,14 @@ class AbsOsFile(
                 file_tgt.create_directory()
                 # link src to target
                 bsc_core.StgPathLinkMtd.link_to(file_path_src, file_path_tgt)
-                link_log = bsc_core.LogMtd.trace_method_result(
+                link_log = bsc_core.Log.trace_method_result(
                     'link create',
                     u'connection="{} >> {}"'.format(file_path_src, file_path_tgt)
                 )
-                utl_core.Log.set_log_write(
-                    file_path_link_log_src, link_log
-                )
+                bsc_core.StgFileOpt(file_path_link_log_src).append(link_log)
                 return True, link_log
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 'file base link',
                 'file="{}" not available'.format(self.path)
             )
@@ -510,6 +521,7 @@ class AbsOsFile(
                 fix_name_blank=fix_name_blank,
                 replace=replace
             )
+
     # file reference node ******************************************************************************************** #
     def set_node(self, node):
         self._obj = node
@@ -529,7 +541,7 @@ class AbsOsFile(
             os.rename(
                 self.path, new_path
             )
-            utl_core.Log.set_result_trace(
+            bsc_core.Log.trace_result(
                 u'rename file: "{}" > "{}"'.format(self.path, new_path)
             )
 
@@ -558,7 +570,7 @@ class AbsOsFile(
         if exists_file_paths:
             for i in exists_file_paths:
                 os.remove(i)
-                self.LOG.set_module_result_trace(
+                self.LOG.trace_method_result(
                     'file-delete',
                     u'"{}"'.format(i)
                 )
@@ -578,9 +590,9 @@ class AbsOsFile(
                     if bsc_core.StorageMtd.get_is_writeable(file_path_tgt) is True:
                         if bsc_core.StgPathLinkMtd.get_is_link(file_path_tgt) is True:
                             if bsc_core.StgPathLinkMtd.get_is_link_source_to(
-                                file_path_src, file_path_tgt,
+                                    file_path_src, file_path_tgt,
                             ) is True:
-                                bsc_core.LogMtd.trace_method_warning(
+                                bsc_core.Log.trace_method_warning(
                                     'file link replace',
                                     u'relation="{} >> {}" is non-changed'.format(file_path_src, file_path_tgt)
                                 )
@@ -588,7 +600,7 @@ class AbsOsFile(
                             #
                             os.remove(file_path_tgt)
                             bsc_core.StgPathLinkMtd.link_file_to(file_path_src, file_path_tgt)
-                            bsc_core.LogMtd.trace_method_result(
+                            bsc_core.Log.trace_method_result(
                                 'file link replace',
                                 u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
                             )
@@ -596,19 +608,19 @@ class AbsOsFile(
                         #
                         os.remove(file_path_tgt)
                         bsc_core.StgPathLinkMtd.link_file_to(file_path_src, file_path_tgt)
-                        bsc_core.LogMtd.trace_method_result(
+                        bsc_core.Log.trace_method_result(
                             'file link replace',
                             u'relation="{} >> {}"'.format(file_path_src, file_path_tgt)
                         )
                         return
-                    self.LOG.set_module_error_trace(
+                    self.LOG.trace_method_error(
                         'file link replace',
                         u'file="{}" is locked'.format(file_tgt.path)
                     )
                     return
 
                 else:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         'file link',
                         u'file="{}" is exists'.format(file_path_tgt)
                     )
@@ -621,7 +633,7 @@ class AbsOsFile(
                     self.path, file_tgt.path
                 )
                 #
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'file link',
                     u'relation="{} >> {}"'.format(self.path, file_tgt.path)
                 )
@@ -670,6 +682,7 @@ class AbsOsTextureSeparateDef(object):
         directory_path_src = texture_any.directory.path
         directory_path_tgt = texture_any.directory.path
         return directory_path_src, directory_path_tgt
+
     @classmethod
     def get_directory_args_dst_as_default_fnc(cls, texture_any, target_extension, target_directory):
         target_format = target_extension[1:]
@@ -687,6 +700,7 @@ class AbsOsTextureSeparateDef(object):
         directory_path_src = target_directory
         directory_path_tgt = target_directory
         return directory_path_src, directory_path_tgt
+
     @classmethod
     def get_directory_args_dpt_as_separate_fnc(cls, texture_any, target_extension):
         target_format = target_extension[1:]
@@ -704,6 +718,7 @@ class AbsOsTextureSeparateDef(object):
         directory_path_src = '{}/src'.format(texture_any.directory.path)
         directory_path_tgt = '{}/{}'.format(texture_any.directory.path, target_format)
         return directory_path_src, directory_path_tgt
+
     @classmethod
     def get_directory_args_dst_as_separate_fnc(cls, texture_any, target_extension, target_directory):
         target_format = target_extension[1:]
@@ -721,6 +736,7 @@ class AbsOsTextureSeparateDef(object):
         directory_path_src = '{}/src'.format(target_directory)
         directory_path_tgt = '{}/{}'.format(target_directory, target_format)
         return directory_path_src, directory_path_tgt
+
     @classmethod
     def get_directory_args_dpt_fnc(cls, texture_any, target_extension):
         target_format = target_extension[1:]
@@ -750,7 +766,9 @@ class AbsOsTexture(
     EXR_EXT = '.exr'
     JPG_EXT = '.jpg'
 
-    def get_target_file_path_as_src(self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False):
+    def get_target_file_path_as_src(
+            self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False
+            ):
         if self.get_exists_unit_paths():
             directory_args_dpt = self.get_directory_args_dpt_fnc(
                 self, target_extension
@@ -785,7 +803,46 @@ class AbsOsTexture(
                 texture_path_dst_tgt = '{}/{}'.format(directory_tgt_dst, texture_name_tgt)
                 return texture_path_dst_src, texture_path_dst_tgt
 
-    def copy_unit_with_src(self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False, replace=True):
+    def copy_unit_with_src(
+            self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False, replace=True
+            ):
+        if self.get_is_exists_file():
+            directory_args_dpt = self.get_directory_args_dpt_fnc(
+                self, target_extension
+            )
+            if scheme == 'default':
+                directory_args_dst = self.get_directory_args_dst_as_default_fnc(
+                    self, target_extension, directory_path_dst
+                )
+            elif scheme == 'separate':
+                directory_args_dst = self.get_directory_args_dst_as_separate_fnc(
+                    self, target_extension, directory_path_dst
+                )
+            else:
+                raise RuntimeError()
+            #
+            if directory_args_dpt and directory_args_dst:
+                texture_src, texture_tgt = self.get_args_as_ext_tgt_by_directory_args(
+                    target_extension, directory_args_dpt
+                )
+                directory_src_dst, directory_tgt_dst = directory_args_dst
+                #
+                if texture_src.get_is_exists() is True:
+                    texture_src.copy_unit_to(
+                        directory_src_dst,
+                        fix_name_blank=fix_name_blank, replace=replace
+                    )
+                #
+                if texture_tgt.get_is_exists() is True:
+                    texture_tgt.copy_unit_to(
+                        directory_tgt_dst,
+                        fix_name_blank=fix_name_blank, replace=replace
+                    )
+
+    def copy_unit_as_base_link_with_src(
+            self, directory_path_bsc, directory_path_dst, scheme='separate', target_extension='.tx',
+            fix_name_blank=False, replace=True
+            ):
         if self.get_is_exists_file():
             directory_args_dpt = self.get_directory_args_dpt_fnc(
                 self, target_extension
@@ -808,36 +865,6 @@ class AbsOsTexture(
                 directory_src_dst, directory_tgt_dst = directory_args_dst
                 #
                 if texture_src.get_is_exists() is True:
-                    texture_src.copy_unit_to(
-                        directory_src_dst,
-                        fix_name_blank=fix_name_blank, replace=replace
-                    )
-                #
-                if texture_tgt.get_is_exists() is True:
-                    texture_tgt.copy_unit_to(
-                        directory_tgt_dst,
-                        fix_name_blank=fix_name_blank, replace=replace
-                    )
-
-    def copy_unit_as_base_link_with_src(self, directory_path_bsc, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False, replace=True):
-        if self.get_is_exists_file():
-            directory_args_dpt = self.get_directory_args_dpt_fnc(
-                self, target_extension
-            )
-            if scheme == 'default':
-                directory_args_dst = self.get_directory_args_dst_as_default_fnc(self, target_extension, directory_path_dst)
-            elif scheme == 'separate':
-                directory_args_dst = self.get_directory_args_dst_as_separate_fnc(self, target_extension, directory_path_dst)
-            else:
-                raise RuntimeError()
-            #
-            if directory_args_dpt and directory_args_dst:
-                texture_src, texture_tgt = self.get_args_as_ext_tgt_by_directory_args(
-                    target_extension, directory_args_dpt
-                )
-                directory_src_dst, directory_tgt_dst = directory_args_dst
-                #
-                if texture_src.get_is_exists() is True:
                     texture_src.copy_unit_as_base_link(
                         directory_path_bsc, directory_src_dst,
                         fix_name_blank=fix_name_blank, replace=replace
@@ -847,6 +874,7 @@ class AbsOsTexture(
                         directory_path_bsc, directory_tgt_dst,
                         fix_name_blank=fix_name_blank, replace=replace
                     )
+
     @classmethod
     def _get_unit_is_exists_as_ext_tgt_(cls, file_path_any, ext_tgt):
         tgt_ext_orig_path = cls._get_unit_path_src_as_ext_tgt_(file_path_any, ext_tgt)
@@ -855,6 +883,7 @@ class AbsOsTexture(
         tgt_ext_orig_timestamp = cls(tgt_ext_orig_path).get_modify_timestamp() or 0
         tgt_ext_timestamp = cls(tgt_ext_path).get_modify_timestamp() or 0
         return int(tgt_ext_orig_timestamp) == int(tgt_ext_timestamp)
+
     # find ext source use unit path
     @classmethod
     def _get_unit_ext_src_as_ext_tgt_(cls, file_path_any, ext_tgt, search_directory_path=None):
@@ -872,6 +901,7 @@ class AbsOsTexture(
             if ext_src is not None:
                 return ext_src
         return ext_any
+
     # find path source use unit path
     @classmethod
     def _get_unit_path_src_as_ext_tgt_(cls, file_path_any, ext_tgt):
@@ -881,6 +911,7 @@ class AbsOsTexture(
             if ext_src is not None:
                 return u'{}{}'.format(path_base, ext_src)
         return file_path_any
+
     #
     @classmethod
     def _get_unit_name_base_same_ext_(cls, file_path_any, file_paths_any):
@@ -890,11 +921,13 @@ class AbsOsTexture(
             if i_name_base == name_base:
                 if i_ext != ext_any:
                     return i_ext
+
     @classmethod
     def _get_unit_format_convert_used_color_space_src_(cls, file_path_src):
         return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
             cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
         )
+
     @classmethod
     def _get_unit_tx_create_used_color_space_src_(cls, file_path_src):
         path_base, ext_any = os.path.splitext(file_path_src)
@@ -912,6 +945,7 @@ class AbsOsTexture(
         return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
             cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
         )
+
     @classmethod
     def _get_unit_is_exists_as_tgt_ext_by_src_(cls, file_path_src, ext_tgt, search_directory_path=None):
         file_path_src = bsc_core.auto_encode(file_path_src)
@@ -927,11 +961,13 @@ class AbsOsTexture(
         tgt_ext_orig_timestamp = cls(tgt_ext_orig_path).get_modify_timestamp() or 0
         tgt_ext_timestamp = cls(tgt_ext_path).get_modify_timestamp() or 0
         return int(tgt_ext_orig_timestamp) == int(tgt_ext_timestamp)
+
     @classmethod
     def _set_unit_tx_create_by_src_(cls, file_path_src, search_directory_path=None, block=False):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
             from lxarnold import and_core
+
             #
             color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
             #
@@ -940,9 +976,9 @@ class AbsOsTexture(
             aces_render_color_space = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
             aces_file = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
             if cls._get_unit_is_exists_as_tgt_ext_by_src_(
-                file_path_src,
-                ext_tgt=cls.TX_EXT,
-                search_directory_path=search_directory_path,
+                    file_path_src,
+                    ext_tgt=cls.TX_EXT,
+                    search_directory_path=search_directory_path,
             ) is False:
                 return and_core.AndTextureOpt_(file_path_src).set_unit_tx_create(
                     color_space=color_space_src,
@@ -954,11 +990,13 @@ class AbsOsTexture(
                     block=block
                 )
         return True
+
     @classmethod
     def _get_unit_tx_create_cmd_by_src_(cls, file_path_src, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
             from lxarnold import and_core
+
             #
             color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
             #
@@ -967,9 +1005,9 @@ class AbsOsTexture(
             aces_render_color_space = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
             aces_file = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
             if cls._get_unit_is_exists_as_tgt_ext_by_src_(
-                file_path_src,
-                ext_tgt=cls.TX_EXT,
-                search_directory_path=search_directory_path,
+                    file_path_src,
+                    ext_tgt=cls.TX_EXT,
+                    search_directory_path=search_directory_path,
             ) is False:
                 return and_core.AndTextureOpt_(file_path_src).get_unit_tx_create_cmd(
                     color_space_src=color_space_src,
@@ -979,11 +1017,13 @@ class AbsOsTexture(
                     aces_render_color_space=aces_render_color_space,
                     search_directory_path=search_directory_path,
                 )
+
     @classmethod
     def _get_unit_tx_create_cmd_by_src_force_(cls, file_path_src, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
             from lxarnold import and_core
+
             #
             color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
             #
@@ -999,9 +1039,12 @@ class AbsOsTexture(
                 aces_render_color_space=aces_render_color_space,
                 search_directory_path=search_directory_path,
             )
+
     # tx create command
     @classmethod
-    def _get_unit_create_cmd_as_ext_tgt_by_src_force_(cls, file_path_src, ext_tgt, search_directory_path=None, width=None):
+    def _get_unit_create_cmd_as_ext_tgt_by_src_force_(
+            cls, file_path_src, ext_tgt, search_directory_path=None, width=None
+            ):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != ext_tgt:
             # tx use arnold
@@ -1018,6 +1061,7 @@ class AbsOsTexture(
                     search_directory_path,
                     width
                 )
+
     @classmethod
     def _set_unit_jpg_create_(cls, file_path, block=False):
         path_base, ext_any = os.path.splitext(file_path)
@@ -1025,9 +1069,11 @@ class AbsOsTexture(
             if cls._get_unit_is_exists_as_ext_tgt_(file_path, ext_tgt=cls.JPG_EXT) is False:
                 return bsc_core.ImgFileOpt(file_path).get_jpg(width=2048, block=block)
         return True
+
     @classmethod
     def _create_unit_exr_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
         from lxarnold import and_core
+
         #
         color_space_src = cls._get_unit_format_convert_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
@@ -1040,9 +1086,11 @@ class AbsOsTexture(
         bsc_core.SubProcessMtd.execute_with_result(
             cmd
         )
+
     @classmethod
     def _get_unit_exr_create_cmd_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
         from lxarnold import and_core
+
         #
         color_space_src = cls._get_unit_format_convert_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
@@ -1053,9 +1101,11 @@ class AbsOsTexture(
             use_update_mode=use_update_mode
         )
         return cmd
+
     @classmethod
     def _create_unit_tx_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
         from lxarnold import and_core
+
         #
         color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
@@ -1065,9 +1115,11 @@ class AbsOsTexture(
             use_update_mode=use_update_mode
         )
         bsc_core.SubProcessMtd.execute_with_result(cmd)
+
     @classmethod
     def _get_unit_tx_create_cmd_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
         from lxarnold import and_core
+
         #
         color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
@@ -1077,15 +1129,18 @@ class AbsOsTexture(
             use_update_mode=use_update_mode
         )
         return cmd
+
     @classmethod
     def _convert_unit_format_(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
         from lxarnold import and_core
+
         #
         cmd = and_core.AndTextureOpt_.get_create_exr_as_acescg_command(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt
         )
         bsc_core.SubProcessMtd.execute_with_result(cmd)
+
     # find path source use multipy path
     @classmethod
     def _get_path_src_as_ext_tgt_(cls, file_path_any, ext_tgt, search_directory_path=None):
@@ -1100,6 +1155,7 @@ class AbsOsTexture(
                         path_base = u'{}/{}'.format(search_directory_path, name_base)
                     return u'{}{}'.format(path_base, ext_src)
         return file_path_any
+
     @classmethod
     def _get_path_tgt_as_ext_tgt_(cls, file_path_any, ext_tgt, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_any)
@@ -1109,9 +1165,13 @@ class AbsOsTexture(
                 path_base = u'{}/{}'.format(search_directory_path, name_base)
             return u'{}{}'.format(path_base, ext_tgt)
         return file_path_any
+
     @classmethod
     def _get_path_args_as_ext_tgt_(cls, file_path_any, ext_tgt):
-        return cls._get_path_src_as_ext_tgt_(file_path_any, ext_tgt), cls._get_path_tgt_as_ext_tgt_(file_path_any, ext_tgt)
+        return cls._get_path_src_as_ext_tgt_(file_path_any, ext_tgt), cls._get_path_tgt_as_ext_tgt_(
+            file_path_any, ext_tgt
+            )
+
     @classmethod
     def _get_path_args_as_ext_tgt_by_directory_args_(cls, file_path_any, ext_tgt, directory_path_args):
         directory_path_src, directory_path_tgt = directory_path_args
@@ -1119,17 +1179,19 @@ class AbsOsTexture(
             cls._get_path_src_as_ext_tgt_(file_path_any, ext_tgt, directory_path_src),
             cls._get_path_tgt_as_ext_tgt_(file_path_any, ext_tgt, directory_path_tgt)
         )
+
     @classmethod
     def _get_is_exists_as_tgt_ext_by_src_(cls, file_path_src, ext_tgt, search_directory_path=None):
         file_paths_src = cls._get_exists_file_paths_(file_path_src)
         for i_file_path_src in file_paths_src:
             if cls._get_unit_is_exists_as_tgt_ext_by_src_(
-                i_file_path_src,
-                ext_tgt,
-                search_directory_path,
+                    i_file_path_src,
+                    ext_tgt,
+                    search_directory_path,
             ) is False:
                 return False
         return True
+
     @classmethod
     def _get_is_exists_as_tgt_ext_(cls, file_path_any, ext_tgt, search_directory_path=None):
         file_path_src = cls._get_path_src_as_ext_tgt_(file_path_any, ext_tgt)
@@ -1139,9 +1201,10 @@ class AbsOsTexture(
 
     def __init__(self, path):
         super(AbsOsTexture, self).__init__(path)
+
     @property
     def icon(self):
-        return utl_core.FileIcon.get_image()
+        return bsc_core.RscIcon.get('file/image')
 
     def get_args_as_ext_tgt(self, ext_tgt):
         path_src, path_tgt = self._get_path_args_as_ext_tgt_(self.path, ext_tgt)
@@ -1168,6 +1231,7 @@ class AbsOsTexture(
         return self.get_args_as_ext_tgt_by_directory_args(
             self.TX_EXT, directory_path_args
         )
+
     # udim
     def get_exists_udim_file_paths(self, with_tx=True):
         list_ = []
@@ -1186,14 +1250,14 @@ class AbsOsTexture(
                         if os.path.isfile(i_tx_file_path):
                             tx_list.append(i_tx_file_path)
                         else:
-                            bsc_core.LogMtd.trace_warning(
+                            bsc_core.Log.trace_warning(
                                 u'texture-tx: "{}" is non-exists.'.format(i_tx_file_path)
                             )
                     #
                     if tx_list:
                         list_.extend(tx_list)
             else:
-                bsc_core.LogMtd.trace_warning(
+                bsc_core.Log.trace_warning(
                     u'texture-udim: "{}" is non-exists.'.format(self.path)
                 )
         #
@@ -1287,6 +1351,7 @@ class AbsOsTexture(
                 self.get_path_base(), ext_tgt
             )
         )
+
     # tx
     def get_path_as_tx(self, search_directory_path=None):
         return self.get_path_as_tgt_ext(
@@ -1357,6 +1422,7 @@ class AbsOsTexture(
 
     def get_purpose(self):
         return self.TEXTURE_COLOR_SPACE_CONFIGURE.get_purpose(self.path)
+
     #
     def get_thumbnail_file_path(self):
         _ = self._get_exists_file_paths_(self._path)

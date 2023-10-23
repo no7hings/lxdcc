@@ -40,7 +40,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
             if includes:
                 objs = mya_dcc_objects.TextureReferences._get_objs_(includes)
                 if objs:
-                    gp = utl_core.GuiProgressesRunner(maximum=len(objs), label='texture-check-run')
+                    gp = bsc_core.LogProcessContext(maximum=len(objs), label='texture-check-run')
                     name_base_dict = {}
                     texture_name_match_obj_dic = {}
                     texture_name_match_texture_path_dic = {}
@@ -127,7 +127,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                     #
                     gp.set_stop()
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'look-method-check-run',
                 u'obj="{}" is non-exists'.format(sub_root)
             )
@@ -177,7 +177,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                         includes=objs
                     ).set_tx_create_and_repath()
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'look-method-check-run',
                 'obj="{}" is non-exists'.format(sub_root)
             )
@@ -569,6 +569,8 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
 
     def __set_maya_look_import_(self, user, time_tag):
         import copy
+
+        from lxbasic import bsc_core
         #
         from lxutil import utl_core
         #
@@ -625,7 +627,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                         #
                         i_maya_look_import.execute_with_deadline()
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'maya-geometry-uv-map-import',
                         'task="{}/{}" is non-exists'.format(i_step, i_task)
                     )

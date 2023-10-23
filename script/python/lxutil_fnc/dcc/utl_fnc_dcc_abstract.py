@@ -1,11 +1,12 @@
 # coding:utf-8
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxuniverse.abstracts as unr_abstracts
 
 
 class AbsObjScene(unr_abstracts.AbsObjScene):
     CONFIGURE_CLS = None
+
     def __init__(self):
         super(AbsObjScene, self).__init__()
 
@@ -29,9 +30,10 @@ class AbsObjScene(unr_abstracts.AbsObjScene):
                     if _obj_path:
                         _obj_type_name = v.get('obj_type')
                         _obj_attributes = v.get('obj_attributes')
-                        self._set_obj_create_(_obj_type_name, _obj_path, _obj_properties, _obj_attributes)
+                        self._create_obj_(_obj_type_name, _obj_path, _obj_properties, _obj_attributes)
                 else:
                     rcs_fnc_(v)
+
         #
         self.set_restore()
         #
@@ -43,7 +45,7 @@ class AbsObjScene(unr_abstracts.AbsObjScene):
     def _set_load_by_configure_(self, file_obj):
         pass
 
-    def _set_obj_create_(self, obj_type_name, obj_path, obj_properties, obj_attributes=None):
+    def _create_obj_(self, obj_type_name, obj_path, obj_properties, obj_attributes=None):
         obj_category_name = unr_configure.ObjCategory.LYNXI
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)

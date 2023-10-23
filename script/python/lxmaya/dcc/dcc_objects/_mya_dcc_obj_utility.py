@@ -5,6 +5,8 @@ import os
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
+from lxbasic import bsc_core
+
 from lxmaya import ma_configure
 
 from lxutil import utl_core
@@ -19,6 +21,7 @@ class Port(mya_dcc_obj_abs.AbsMyaPort):
 
 class Connection(mya_dcc_obj_abs.AbsMyaObjConnection):
     PORT_PATHSEP = ma_configure.Util.PORT_PATHSEP
+
     def __init__(self, source, target):
         super(Connection, self).__init__(source, target)
 
@@ -32,8 +35,10 @@ class SceneFile(object):
         '.mb': FILE_TYPE_BINARY,
         '.abc': FILE_TYPE_ALEMBIC
     }
+
     def __init__(self, file_path=None):
         self._file_path = file_path
+
     @classmethod
     def get_type(cls, file_path=None):
         """
@@ -42,6 +47,7 @@ class SceneFile(object):
         """
         ext = os.path.splitext(file_path)[-1]
         return cls.FILE_TYPE_DICT.get(ext, cls.FILE_TYPE_ASCII)
+
     @classmethod
     def get_current_file_path(cls):
         """
@@ -50,10 +56,12 @@ class SceneFile(object):
         _ = cmds.file(query=1, expandName=1)
         if isinstance(_, six.string_types):
             return _.replace('\\', '/')
+
     @classmethod
     def get_current_directory_path(cls):
         file_path = cls.get_current_file_path()
         return os.path.dirname(file_path)
+
     @classmethod
     def set_open(cls, file_path=None, ignore_format=True):
         """
@@ -78,9 +86,10 @@ class SceneFile(object):
                 type=cls.get_type(file_path)
             )
         #
-        utl_core.Log.set_result_trace(
-            u'open file: {}'.format(file_path)
+        bsc_core.Log.trace_result(
+            'open file: {}'.format(file_path)
         )
+
     @classmethod
     def set_reference_create(cls, file_path, namespace=':'):
         return cmds.file(
@@ -101,14 +110,17 @@ class Selection(object):
     def select_all(self):
         exist_paths = [i for i in self._paths if cmds.objExists(i)]
         cmds.select(exist_paths)
+
     @classmethod
     def set_clear(cls):
         cmds.select(clear=1)
+
     @classmethod
     def get_current(cls):
         _ = cmds.ls(selection=1, long=1)
         if _:
             return _[0]
+
     @classmethod
     def get_selected_paths(cls, include=None):
         if include is not None:
@@ -130,18 +142,21 @@ class ConfirmDialog(object):
             title=self._title,
             message=self._message
         )
+
     @classmethod
     def show_warning(cls, message):
         cmds.confirmDialog(
             title='Warning',
             message=message
         )
+
     @classmethod
     def show_result(cls, message):
         cmds.confirmDialog(
             title='Result',
             message=message
         )
+
     @classmethod
     def show_error(cls, message):
         cmds.confirmDialog(

@@ -5,9 +5,11 @@ import maya.cmds as cmds
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.api.OpenMaya as om2
 
+import lxlog.core as log_core
+
 from lxbasic import bsc_core
 
-from lxutil import utl_abstract, utl_core
+from lxutil import utl_abstract
 
 from lxmaya import ma_configure, ma_core
 
@@ -116,9 +118,9 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                     if isinstance(value, six.string_types):
                         cmds.setAttr(self.path, value, type=self.type)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        log_core.Log.trace_method_warning(
                             'port set',
-                            u'attribute="{}", value="{}" is not available'.format(self.path, value)
+                            'attribute="{}", value="{}" is not available'.format(self.path, value)
                         )
                 elif self.type == 'enum':
                     if isinstance(value, six.string_types):
@@ -142,9 +144,9 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         cmds.setAttr(self.path, value, clamp=1)
                 #
             else:
-                utl_core.Log.set_module_warning_trace(
+                log_core.Log.trace_method_warning(
                     'port set',
-                    u'attribute="{}" has source'.format(self.path)
+                    'attribute="{}" has source'.format(self.path)
                 )
 
     def _set_as_array_(self, values):
@@ -162,11 +164,6 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                 else:
                     # Debug ( Clamp Maximum or Minimum Value )
                     cmds.setAttr(atr_path, value, clamp=1)
-            #
-            # utl_core.Log.set_module_result_trace(
-            #     'port set',
-            #     'attribute="{}" value="{}"'.format(self.path, value)
-            # )
 
     def set_source(self, output_port, validation=False):
         self._set_connect_(output_port, self, validation=validation)
@@ -305,7 +302,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                     ]:
                         if cmds.isConnected(source_path, target_path) is False:
                             cmds.connectAttr(source_path, target_path, force=1)
-                            utl_core.Log.set_module_result_trace(
+                            log_core.Log.trace_method_result(
                                 'port connect',
                                 u'connection="{} >> {}"'.format(
                                     source_path,
@@ -326,7 +323,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                             )
                             if cmds.isConnected(source_path, target_path) is False:
                                 cmds.connectAttr(source_path, target_path, force=1)
-                                utl_core.Log.set_module_result_trace(
+                                log_core.Log.trace_method_result(
                                     'port connect',
                                     u'connection="{} >> {}"'.format(
                                         source_path, target_path
@@ -343,7 +340,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                                 )
                                 if cmds.isConnected(source_path, target_path) is False:
                                     cmds.connectAttr(source_path, target_path, force=1)
-                                    utl_core.Log.set_module_result_trace(
+                                    log_core.Log.trace_method_result(
                                         'port connect',
                                         u'connection="{} >> {}"'.format(
                                             source_path, target_path
@@ -371,14 +368,14 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
                         )
                         if cmds.isConnected(source_path, target_path) is False:
                             cmds.connectAttr(source_path, target_path, force=1)
-                            utl_core.Log.set_module_result_trace(
+                            log_core.Log.trace_method_result(
                                 'port connect',
                                 u'connection="{} >> {}"'.format(
                                     source_path, target_path
                                 )
                             )
                     else:
-                        utl_core.Log.set_warning_trace(
+                        log_core.Log.trace_method_warning(
                             'port connect',
                             u'connection="{} >> {}" is not available'.format(
                                 source_path, target_path
@@ -394,7 +391,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
         cmds.setAttr(
             self.path, lock=0
         )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'port unlock',
             'attribute="{}"'.format(self.path)
         )
@@ -435,9 +432,9 @@ class AbsMaUuidDef(object):
         if cmds.objExists(self.path):
             if not cmds.ls(unique_id, long=1):
                 cmds.rename(self.path, unique_id, uuid=1)
-                utl_core.Log.set_result_trace('set unique-id: "{}" >> "{}"'.format(self.path, unique_id))
+                log_core.Log.trace_result('set unique-id: "{}" >> "{}"'.format(self.path, unique_id))
             else:
-                utl_core.Log.set_warning_trace('unique-id: "{}" is Exists'.format(unique_id))
+                log_core.Log.trace_warning('unique-id: "{}" is Exists'.format(unique_id))
 
 
 class AbsMyaObj(
@@ -471,9 +468,9 @@ class AbsMyaObj(
     @property
     def icon(self):
         if ma_core.get_is_ui_mode():
-            from lxutil_gui.qt import gui_qt_core
+            import lxgui.qt.core as gui_qt_core
 
-            return gui_qt_core.QtMayaMtd.get_qt_icon(self.type)
+            return gui_qt_core.GuiQtMaya.generate_qt_icon_by_name(self.type)
 
     @classmethod
     def _get_full_path_(cls, path):
@@ -501,7 +498,7 @@ class AbsMyaObj(
     def set_unlock(self):
         cmds.lockNode(self.path, lock=0)
         cmds.warning('unlock node: {}'.format(self.path))
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             self.KEY,
             'unlock node: {}'.format(self.path)
         )
@@ -509,7 +506,7 @@ class AbsMyaObj(
     def set_lock(self):
         cmds.lockNode(self.path, lock=1)
         cmds.warning('lock node: {}'.format(self.path))
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             self.KEY,
             'lock node: {}'.format(self.path)
         )
@@ -521,7 +518,7 @@ class AbsMyaObj(
                 self.set_unlock()
             #
             cmds.delete(self.path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 self.KEY,
                 'delete: "{}"'.format(self.path)
             )
@@ -534,7 +531,7 @@ class AbsMyaObj(
     def set_rename(self, new_name, force=False):
         if self.get_is_exists() is True:
             cmds.rename(self.path, new_name)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 self.KEY,
                 'rename: "{}" >> "{}"'.format(self.path, new_name)
             )
@@ -597,7 +594,7 @@ class AbsMyaObj(
             return lis
         return cmds.listConnections(self.path, destination=1, source=0) or []
 
-    def set_ancestors_create(self):
+    def create_ancestors(self):
         if self.path:
             if cmds.objExists(self.path) is False:
                 paths = self.get_ancestor_paths()
@@ -613,7 +610,7 @@ class AbsMyaObj(
                             else:
                                 parent_string = cmds.group(empty=1, name=name)
                             #
-                            bsc_core.LogMtd.trace_method_result(
+                            bsc_core.Log.trace_method_result(
                                 self.KEY,
                                 u'create transform: "{}", parent is "{}"'.format(name, parent_string)
                             )
@@ -636,7 +633,7 @@ class AbsMyaObj(
                             else:
                                 parent_string = cmds.group(empty=1, name=name)
                             #
-                            utl_core.Log.set_module_result_trace(
+                            log_core.Log.trace_method_result(
                                 'transform-obj-create',
                                 u'obj-name="{}"'.format(name)
                             )
@@ -647,7 +644,7 @@ class AbsMyaObj(
         if parent_path == self.PATHSEP:
             if cmds.listRelatives(self.path, parent=1):
                 cmds.parent(self.path, world=1)
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'parent set',
                     u'obj="{}"'.format(self.PATHSEP)
                 )
@@ -661,17 +658,17 @@ class AbsMyaObj(
             if current_parent_path != parent_obj.path:
                 cmds.parent(self.path, parent_obj.path)
                 #
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'parent set',
                     'obj="{}"'.format(parent_obj.path)
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                log_core.Log.trace_method_warning(
                     'parent set',
                     'obj="{}" is already child for "{}"'.format(self.get_path(), parent_obj.get_path())
                 )
         else:
-            utl_core.Log.set_module_warning_trace(
+            log_core.Log.trace_method_warning(
                 'parent set',
                 'obj="{}" is non-exists'.format(parent_obj.path)
             )
@@ -707,7 +704,7 @@ class AbsMyaObj(
         if self.get_is_exists() is False:
             parent_path = self.get_parent_path()
             name = self.name
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'obj create',
                 'obj="{}", type="{}"'.format(self.path, obj_type)
             )
@@ -762,7 +759,7 @@ class AbsMyaObj(
                 self.path, name=name,
                 instanceLeaf=1, returnRootsOnly=1
             )
-            dcc_obj.set_ancestors_create()
+            dcc_obj.create_ancestors()
             cmds.parent(results[0], dcc_obj.get_parent_path())
 
     def get_is_reference(self):

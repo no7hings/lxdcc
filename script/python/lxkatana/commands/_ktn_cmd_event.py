@@ -86,7 +86,7 @@ class EventMtd(object):
     @classmethod
     def set_arnold_ramp_write(cls, ktn_obj_opt):
         cls._set_arnold_ramp_write_(ktn_obj_opt)
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'ramp-write',
             'obj-name="{}"'.format(ktn_obj_opt.name)
         )
@@ -122,7 +122,7 @@ class EventMtd(object):
     def set_arnold_ramp_read(cls, ktn_obj_opt):
         def fnc_():
             cls._set_arnold_ramp_read_(ktn_obj_opt)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'ramp-read',
                 'obj-name="{}"'.format(ktn_obj_opt.name)
             )

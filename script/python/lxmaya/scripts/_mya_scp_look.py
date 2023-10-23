@@ -351,10 +351,10 @@ mya_scripts.ScpLibraryLook('/geometries').split_meshes_by_subsets()
             if i_subsets:
                 i_material_paths = i_subsets.keys()
                 i_material_paths.sort()
-                with bsc_core.LogProgress.create_as_bar(maximum=len(i_material_paths), label='mesh split') as l_p:
+                with bsc_core.LogProcessContext.create_as_bar(maximum=len(i_material_paths), label='mesh split') as l_p:
                     for j_seq, j_material_path in enumerate(i_material_paths):
                         j_face_indices = i_subsets[j_material_path]
-                        bsc_core.LogMtd.debug('start at {}'.format(j_seq))
+                        bsc_core.Log.debug('start at {}'.format(j_seq))
                         j_subset = i_mesh_opt.duplicate_faces_(j_face_indices)
                         j_subset_shape_opt = ma_core.CmdShapeOpt(j_subset)
                         j_subset_shape_opt.rename_transform('{}_{}'.format(i_shape_opt.get_transform_name(), str(j_seq+1).zfill(3)))

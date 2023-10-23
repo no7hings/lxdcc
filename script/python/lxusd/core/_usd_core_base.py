@@ -4,7 +4,7 @@ from pxr import Usd, Sdf, Gf, UsdShade, UsdGeom, UsdLux
 
 import six
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 
 # noinspection PyUnresolvedReferences

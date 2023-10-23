@@ -93,7 +93,7 @@ def set_export_check_run(rsv_task_properties):
     #
     if mya_dcc_objects.Group(mya_root_dag_opt.value).get_is_exists() is False:
         raise RuntimeError(
-            utl_core.Log.set_module_error_trace(
+            bsc_core.Log.trace_method_error(
                 key,
                 'obj="{}" is non-exists'.format(mya_root_dag_opt.value)
             )

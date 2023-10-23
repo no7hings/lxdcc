@@ -26,7 +26,7 @@ from lxresolver import rsv_configure
 
 # todo: remove this method
 class AssetWorkspace(object):
-    CONFIGURE_FILE_PATH = bsc_core.CfgFileMtd.get_yaml('katana/workspace/asset-default-v1')
+    CONFIGURE_FILE_PATH = bsc_core.RscConfigure.get_yaml('katana/workspace/asset-default-v1')
     GEOMETRY_TYPES = [
         'subdmesh',
         'renderer procedural',
@@ -34,6 +34,7 @@ class AssetWorkspace(object):
         'polymesh',
         'curves'
     ]
+
     def __init__(self, location=None):
         self._look_configure_dict = {}
         self._default_configure = self.set_configure_create()
@@ -164,7 +165,8 @@ class AssetWorkspace(object):
         list_ = []
         dcc_objs = self.get_all_dcc_geometry_materials_by_location(location)
         for i_dcc_obj in dcc_objs:
-            i_dcc_nodes = [_ktn_dcc_obj_node.Node(i.getName()) for i in ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
+            i_dcc_nodes = [_ktn_dcc_obj_node.Node(i.getName()) for i in
+                           ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
             list_.extend(
                 i_dcc_nodes
             )
@@ -175,9 +177,10 @@ class AssetWorkspace(object):
         return self._get_look_pass_rgb_(
             pass_index
         )
+
     @classmethod
     def _get_look_pass_rgb_(cls, pass_index):
-        h, s, v = 63 + pass_index * 15, .5, .5
+        h, s, v = 63+pass_index*15, .5, .5
         return bsc_core.RawColorMtd.hsv2rgb(
             h, s, v, maximum=1
         )
@@ -238,6 +241,7 @@ class AssetWorkspace(object):
                 if not i_port_path in ['orig']:
                     lis.append(i_port_path)
         return lis
+
     @ktn_core.Modifier.undo_debug_run
     def set_look_pass_add(self, pass_name=None):
         pass_names = self.get_look_pass_names()
@@ -250,19 +254,20 @@ class AssetWorkspace(object):
             r, g, b = self._get_look_pass_rgb_(pass_count+1)
             configure.set('option.look_pass_color', dict(r=r, g=g, b=b))
             w = configure.get('option.w')
-            offset_x = w * pass_count * 2
+            offset_x = w*pass_count*2
             configure.set('option.offset_x', offset_x)
             configure.set_flatten()
             self._set_workspace_create_by_configure_(configure)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'look-pass add',
                 'look-pass"{}"'.format(pass_name)
             )
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 'look pass add',
                 'look-pass="{}" is exists'.format(pass_name)
             )
+
     @classmethod
     def _set_workspace_create_by_configure_(cls, configure):
         workspace_keys = configure.get('workspace').keys()
@@ -272,18 +277,20 @@ class AssetWorkspace(object):
             cls._set_workspace_connections_create_mtd_,
             cls._set_workspace_node_graphs_create_mtd_
         ]
-        with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='create workspace') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(method_args), label='create workspace') as g_p:
             for i_method in method_args:
                 g_p.set_update()
                 i_method(configure, workspace_keys)
+
     @classmethod
     def _set_workspace_nodes_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
-        with utl_core.GuiProgressesRunner.create(maximum=len(workspace_keys), label='crate workspace node') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(workspace_keys), label='crate workspace node') as g_p:
             for i_key in workspace_keys:
                 g_p.set_update()
                 for j_sub_key in ['main', 'backdrop', 'dot']:
                     cls._set_workspace_node_create_(configure, i_key, j_sub_key, pass_name)
+
     @classmethod
     def _set_workspace_node_create_(cls, configure, key, sub_key, pass_name='default'):
         variable = configure.get('workspace.{}.{}.variable'.format(key, sub_key))
@@ -327,14 +334,16 @@ class AssetWorkspace(object):
                     ktn_port = ktn_node.getOutputPort(port_name)
                     if ktn_port is None:
                         ktn_node.addOutputPort(port_name)
+
     @classmethod
     def _set_workspace_connections_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
-        with utl_core.GuiProgressesRunner.create(maximum=len(workspace_keys), label='crate workspace connection') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(workspace_keys), label='crate workspace connection') as g_p:
             for key in workspace_keys:
                 g_p.set_update()
                 for sub_key in ['main', 'node_graph', 'dot']:
                     cls._set_workspace_connections_create_(configure, key, sub_key, pass_name)
+
     @classmethod
     def _set_workspace_connections_create_(cls, configure, key, sub_key, pass_name='default'):
         variable = configure.get('workspace.{}.{}.variable'.format(key, sub_key))
@@ -344,13 +353,15 @@ class AssetWorkspace(object):
         node_connections = configure.get('workspace.{}.{}.connections'.format(key, sub_key))
         if node_connections:
             cls._set_node_connections_create_(node_connections)
+
     @classmethod
     def _set_workspace_node_graphs_create_mtd_(cls, configure, workspace_keys):
         pass_name = configure.get('option.look_pass')
-        with utl_core.GuiProgressesRunner.create(maximum=len(workspace_keys), label='crate workspace node-graph') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(workspace_keys), label='crate workspace node-graph') as g_p:
             for key in workspace_keys:
                 g_p.set_update()
                 cls._set_workspace_node_graph_create_(configure, key, pass_name)
+
     @classmethod
     def _set_workspace_node_graph_create_(cls, configure, key, pass_name):
         node_graph_node_dict = configure.get('workspace.{}.node_graph.nodes'.format(key))
@@ -358,11 +369,13 @@ class AssetWorkspace(object):
         # backdrop_node_dcc_path = configure.get('workspace.{}.backdrop.path'.format(key))
         # d_size = configure.get('option.w'), configure.get('option.h')
         cls._set_node_graph_nodes_create_(configure, key, node_graph_node_dict, pass_name)
+
     @classmethod
     def _set_node_graph_nodes_create_(cls, configure, key, nodes_dict, pass_name='default'):
         if nodes_dict:
             for seq, (k, i_node_dict) in enumerate(nodes_dict.items()):
                 cls._set_node_graph_node_create_(configure, key, i_node_dict, pass_name)
+
     @classmethod
     def _set_node_graph_node_create_(cls, configure, key, node_dict, pass_name='default'):
         variable = node_dict.get('variable')
@@ -423,13 +436,14 @@ class AssetWorkspace(object):
                 cls._set_node_layout_by_backdrop_(
                     dcc_node, dcc_main_node, dcc_backdrop_node, d_size
                 )
+
     @classmethod
     def _set_node_connections_create_(cls, node_connections, extend_variants=None):
         if extend_variants is None:
             extend_variants = {}
         for seq, i in enumerate(node_connections):
-            if not (seq + 1) % 2:
-                source_attr_path = node_connections[seq - 1]
+            if not (seq+1)%2:
+                source_attr_path = node_connections[seq-1]
                 target_attr_path = i
                 if extend_variants:
                     source_attr_path = source_attr_path.format(**extend_variants)
@@ -447,10 +461,12 @@ class AssetWorkspace(object):
                 target_ktn_port, _ = target_dcc_port.get_dcc_instance()
                 #
                 source_ktn_port.connect(target_ktn_port)
+
     @classmethod
     def _set_node_executes_(cls, ktn_obj, executes):
         for i_port_path in executes:
             ktn_core.NGObjOpt(ktn_obj).execute_port(i_port_path)
+
     @classmethod
     def _set_node_layout_by_backdrop_(cls, dcc_node, dcc_main_node, dcc_backdrop_node, d_size):
         if dcc_backdrop_node.get_is_exists() is True:
@@ -458,10 +474,11 @@ class AssetWorkspace(object):
             x, y, w, h = cls._get_layout_backdrop_geometry_(dcc_backdrop_node, d_size)
             d_w, d_h = d_size
             d_c = int(w/d_w)+1
-            column = int(index % d_c)
+            column = int(index%d_c)
             row = int(index/d_c)
             x_0, y_0 = x+column*d_w, y-row*d_h
             NodegraphAPI.SetNodePosition(dcc_node.ktn_obj, (x_0, y_0))
+
     @classmethod
     def _get_node_layout_index_(cls, dcc_node, dcc_main_node):
         path = dcc_node.path
@@ -469,6 +486,7 @@ class AssetWorkspace(object):
         if path in paths:
             return paths.index(path)
         return 0
+
     @classmethod
     def _get_layout_backdrop_geometry_(cls, dcc_backdrop_node, d_size):
         a = dcc_backdrop_node.ktn_obj.getAttributes()
@@ -479,15 +497,16 @@ class AssetWorkspace(object):
         x_ = x-w/2
         y_ = y+h/2
         return x_, y_, w, h
+
     @classmethod
     def _set_node_insert_connections_create_(cls, node_insert_connections, insert_scheme):
         if node_insert_connections:
             for seq, i in enumerate(node_insert_connections):
-                if not (seq + 1) % 4:
-                    source_attr_path = node_insert_connections[seq - 3]
-                    target_attr_path = node_insert_connections[seq - 2]
+                if not (seq+1)%4:
+                    source_attr_path = node_insert_connections[seq-3]
+                    target_attr_path = node_insert_connections[seq-2]
                     #
-                    input_attr_path_ = node_insert_connections[seq - 1]
+                    input_attr_path_ = node_insert_connections[seq-1]
                     output_attr_path_ = i
                     #
                     s_ktn_port, t_ktn_port = cls._get_node_connect_args_(source_attr_path, target_attr_path)
@@ -503,22 +522,23 @@ class AssetWorkspace(object):
                     #
                     if insert_scheme == 'TB':
                         x, y = NodegraphAPI.GetNodePosition(s_ktn_port.getNode())
-                        NodegraphAPI.SetNodePosition(node_ktn_obj_, (x, y - 48))
+                        NodegraphAPI.SetNodePosition(node_ktn_obj_, (x, y-48))
                     elif insert_scheme == 'BT':
                         x, y = NodegraphAPI.GetNodePosition(t_ktn_port.getNode())
-                        NodegraphAPI.SetNodePosition(node_ktn_obj_, (x, y + 48*2))
+                        NodegraphAPI.SetNodePosition(node_ktn_obj_, (x, y+48*2))
                     #
                     s_ktn_port.connect(i_ktn_obj)
                     o_ktn_obj.connect(t_ktn_port)
+
     @classmethod
     def _set_node_spit_connections_create_(cls, node_connections):
         if node_connections:
             for seq, i in enumerate(node_connections):
-                if not (seq + 1) % 4:
-                    source_attr_path = node_connections[seq - 3]
-                    target_attr_path = node_connections[seq - 2]
+                if not (seq+1)%4:
+                    source_attr_path = node_connections[seq-3]
+                    target_attr_path = node_connections[seq-2]
                     #
-                    input_attr_path_ = node_connections[seq - 1]
+                    input_attr_path_ = node_connections[seq-1]
                     output_attr_path_ = i
                     #
                     source_obj_path, source_port_name = source_attr_path.split('.')
@@ -536,21 +556,24 @@ class AssetWorkspace(object):
                     o_ktn_obj = node_ktn_obj_.getOutputPort(output_port_name_)
                     #
                     x, y = NodegraphAPI.GetNodePosition(t_ktn_port.getNode())
-                    NodegraphAPI.SetNodePosition(node_ktn_obj_, (x, y + 48*2))
+                    NodegraphAPI.SetNodePosition(node_ktn_obj_, (x, y+48*2))
                     #
                     s_ktn_port.connect(i_ktn_obj)
                     o_ktn_obj.connect(t_ktn_port)
+
     @classmethod
     def _set_node_parameters_(cls, dcc_node, parameters):
         for i_port_path, i_value in parameters.items():
             i_port_path = i_port_path.replace('/', '.')
             dcc_node.get_port(i_port_path).set(i_value)
+
     # geometry properties
     @classmethod
     def _set_arnold_geometry_properties_(cls, dcc_property_assign, properties_dict):
         for i_port_path, i_value in properties_dict.items():
             i_port_path = i_port_path.replace('/', '.')
             cls._set_arnold_geometry_property_(dcc_property_assign, i_port_path, i_value)
+
     @classmethod
     def _set_arnold_geometry_property_(cls, dcc_node, parameter_port_name, parameter_value):
         convert_dict = dict(
@@ -565,7 +588,7 @@ class AssetWorkspace(object):
         if enable_dcc_port.get_is_exists() is True:
             enable_dcc_port.set(True)
         else:
-            bsc_core.LogMtd.trace_warning(
+            bsc_core.Log.trace_warning(
                 'port-name="{}" is unknown'.format(parameter_port_name)
             )
         #
@@ -573,6 +596,7 @@ class AssetWorkspace(object):
         value_dcc_port = dcc_node.get_port(value_ktn_port_name)
         if value_dcc_port.get_is_exists() is True:
             value_dcc_port.set(parameter_value)
+
     #
     @classmethod
     def _get_node_connect_args_(cls, source_attr_path, target_attr_path):
@@ -588,6 +612,7 @@ class AssetWorkspace(object):
                     if _o_ktn_ports:
                         _o_ktn_port = _o_ktn_ports[0]
                         return rcs_fnc_(_o_ktn_port)
+
         #
         source_obj_path, source_port_name = source_attr_path.split('.')
         o_ktn_port = _ktn_dcc_obj_node.Node(source_obj_path).ktn_obj.getOutputPort(source_port_name)
@@ -598,12 +623,14 @@ class AssetWorkspace(object):
         t_ktn_port = i_ktn_port
         #
         return s_ktn_port, t_ktn_port
+
     @classmethod
     def _get_main_args_(cls, configure, key):
         dcc_path = configure.get('workspace.{}.main.path'.format(key))
         dcc_obj = _ktn_dcc_obj_node.Node(dcc_path)
         ktn_obj = dcc_obj.ktn_obj
         return dcc_obj, ktn_obj, NodegraphAPI.GetNodePosition(ktn_obj)
+
     @classmethod
     def _get_group_args_(cls, configure, key, group_key):
         dcc_path = configure.get('workspace.{}.node_graph.nodes.{}.path'.format(key, group_key))
@@ -628,6 +655,7 @@ class AssetWorkspace(object):
     def get_group_args(self, key, group_key, pass_name='default'):
         configure = self.get_configure(pass_name=pass_name)
         return self._get_group_args_(configure, key, group_key)
+
     # asset-geometry-abc
     def set_geometry_abc_import(self, file_path):
         configure = self.get_configure()
@@ -636,10 +664,11 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
+
     # asset-geometry-usd
     def set_geometry_usd_import(self, file_path):
         configure = self.get_configure()
@@ -648,10 +677,11 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
+
     #
     def set_geometry_xgen_import(self, file_path, extend_variants):
         configure = self.get_configure()
@@ -665,10 +695,11 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
+
     # model-usd
     def set_model_usd_import(self, file_path):
         configure = self.get_configure()
@@ -681,10 +712,11 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
+
     # hair-usd
     def set_groom_geometry_usd_import(self, file_path):
         configure = self.get_configure()
@@ -693,10 +725,11 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'hair-usd-import',
                 u'file="{}"'.format(file_path)
             )
+
     # effect-usd
     def set_effect_usd_import(self, file_path):
         configure = self.get_configure()
@@ -705,10 +738,11 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
+
     # asset-set
     def set_set_usd_import(self, file_path):
         configure = self.get_configure()
@@ -717,7 +751,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             file_parameter_name = configure.get('node.{}.main.file_parameter'.format(key))
             dcc_node.get_port(file_parameter_name).set(file_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -732,7 +766,7 @@ class AssetWorkspace(object):
         if dcc_node is not None:
             dcc_node.get_port('camera.file').set(file_path)
             dcc_node.get_port('camera.path').set('{}{}'.format(camera_root, path))
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 '{}-import'.format(key),
                 u'file="{}"'.format(file_path)
             )
@@ -764,6 +798,7 @@ class AssetWorkspace(object):
         dcc_main_obj.get_port(
             'render_settings.resolution'
         ).set('{}x{}'.format(width, height))
+
     @classmethod
     def _get_merge_index_(cls, merge, target_port_name):
         input_port_paths = [i.port_path for i in merge.get_input_ports()]
@@ -813,7 +848,7 @@ class AssetWorkspace(object):
                 node_attributes = configure.get('node.{}.main.attributes'.format(key))
                 if node_attributes:
                     ktn_node.setAttributes(node_attributes)
-                NodegraphAPI.SetNodePosition(ktn_node, (x - w / 2 + spacing_x * index, y + margin + spacing_y * 2))
+                NodegraphAPI.SetNodePosition(ktn_node, (x-w/2+spacing_x*index, y+margin+spacing_y*2))
             return dcc_main_obj, dcc_node
 
     def set_look_klf_file_export(self, file_path):
@@ -832,7 +867,9 @@ class AssetWorkspace(object):
                     geometry_settings.set('usd.override_enable', False)
                     #
                     ktn_core.NGObjOpt(geometry_settings_ktn_obj).execute_port('usd.guess')
-                    start_frame, end_frame = geometry_settings.get('usd.start_frame'), geometry_settings.get('usd.end_frame')
+                    start_frame, end_frame = geometry_settings.get('usd.start_frame'), geometry_settings.get(
+                        'usd.end_frame'
+                        )
                     if start_frame != end_frame:
                         ktn_core.NGObjOpt(geometry_settings_ktn_obj).execute_port('usd.shot_override.create')
                         geometry_settings.set('usd.override_enable', True)
@@ -852,13 +889,13 @@ class AssetWorkspace(object):
             if geometry_settings.get_is_exists() is True:
                 geometry_settings.set('usd.override_enable', False)
             #
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'look-klf export',
                 '"{}"'.format(file_path)
             )
         else:
             raise RuntimeError(
-                bsc_core.LogMtd.trace_method_error(
+                bsc_core.Log.trace_method_error(
                     'look-klf export',
                     'obj="{}" is non-exists'.format(dcc_obj.path)
                 )
@@ -921,7 +958,9 @@ class AssetWorkspace(object):
                     if i_input_port:
                         i_source_port = i_input_port.get_source()
                         if i_source_port is not None:
-                            i_asset_ass_exporter = _ktn_dcc_obj_node.Node('/rootNode/asset_ass_export__{}'.format(i_look_pass_name))
+                            i_asset_ass_exporter = _ktn_dcc_obj_node.Node(
+                                '/rootNode/asset_ass_export__{}'.format(i_look_pass_name)
+                                )
                             i_asset_ass_exporter.get_dcc_instance('lx_asset_ass_exporter', 'Group')
                             # i_asset_ass_exporter.set(
                             #     'export.look.pass', i_look_pass_name
@@ -969,11 +1008,13 @@ class AssetWorkspace(object):
             return dcc_obj.get('options.scheme')
         else:
             return 'asset'
+
     @classmethod
     def _get_geometry_location_(cls, dcc_obj):
         if dcc_obj.get_is_exists() is True:
             s = ktn_core.KtnStageOpt(dcc_obj.ktn_obj)
             print s.get_obj_exists('/root/world/geo/master')
+
     @ktn_core.Modifier.undo_debug_run
     def set_light_rig_update(self):
         configure = self.get_configure()
@@ -1074,7 +1115,7 @@ class AssetWorkspace(object):
             return scene_graph_opt.get(atr_path)
         else:
             raise RuntimeError(
-                bsc_core.LogMtd.trace_method_error(
+                bsc_core.Log.trace_method_error(
                     'obj="{}" is non-exists'.format(dcc_obj.path)
                 )
             )
@@ -1114,6 +1155,7 @@ class AssetWorkspace(object):
         dcc_name_format = configure.get('node.{}.main.name'.format(key))
         dcc_name = dcc_name_format.format(name=name)
         return dcc_name
+
     # material group
     def get_ng_material_group_path(self, name, pass_name='default'):
         configure = self.get_configure(pass_name)
@@ -1159,10 +1201,10 @@ class AssetWorkspace(object):
             index = self._get_merge_index_(dcc_materials_merge, target_port_name)
             d = 8
             #
-            _x = index % d
-            _y = int(index / d)
+            _x = index%d
+            _y = int(index/d)
             r, g, b = self.get_look_pass_color(pass_name)
-            x, y = x+_x*w, y + h + _y*h/2
+            x, y = x+_x*w, y+h+_y*h/2
             node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
             if node_attributes:
                 node_attributes.set('x', x)
@@ -1178,6 +1220,7 @@ class AssetWorkspace(object):
             dcc_materials_merge.get_input_port(target_port_name)
         )
         return is_create, dcc_obj
+
     # material
     def get_ng_material_path_use_hash(self, and_geometry_opt, pass_name='default'):
         materials = and_geometry_opt.get_material_assigns()
@@ -1201,6 +1244,7 @@ class AssetWorkspace(object):
         # todo: fix bug to "NetworkMaterial" is exists
         def get_exists_material():
             pass
+
         #
         configure = self.get_configure(pass_name)
         key = 'material'
@@ -1227,6 +1271,7 @@ class AssetWorkspace(object):
         #
         dcc_path = '{}/{}'.format(group_dcc_path, dcc_name)
         return dcc_path
+
     # material assign
     def set_ng_material_assigns_cache_update(self, pass_name='default'):
         self._ng_material_assign_query_cache = {}
@@ -1248,6 +1293,7 @@ class AssetWorkspace(object):
 
     def get_ng_material_assign_from_cache(self, sg_geometry):
         return self._ng_material_assign_query_cache.get(sg_geometry.path)
+
     #
     def get_ng_material_assign_path(self, name, pass_name='default'):
         configure = self.get_configure(pass_name)
@@ -1287,6 +1333,7 @@ class AssetWorkspace(object):
                 node_attributes.set('ns_colorb', b)
                 ktn_obj.setAttributes(node_attributes.value)
         return is_create, dcc_obj
+
     #
     def get_ng_material_assign_path_use_hash(self, and_geometry_opt, pass_name='default'):
         materials = and_geometry_opt.get_material_assigns()
@@ -1305,6 +1352,7 @@ class AssetWorkspace(object):
         dcc_path = dcc_path_format.format(name=name)
         self._material_assign_hash_stack[hash_key] = dcc_path
         return dcc_path
+
     # property assign
     def set_ng_property_assign_create(self, name, pass_name='default'):
         configure = self.get_configure(pass_name)
@@ -1414,6 +1462,7 @@ class AssetWorkspace(object):
         dcc_path = dcc_path_format.format(name=name)
         self._property_assign_hash_stack[hash_key] = dcc_path
         return dcc_path
+
     @classmethod
     def _set_assign_cel_value_update_(cls, dcc_node, shape_path):
         p = '[(](.*?)[)]'

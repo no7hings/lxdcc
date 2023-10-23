@@ -114,46 +114,5 @@ class DccMeshCheckStatus(object):
     ]
 
 
-class TextureTypes(object):
-    # usd
-    UsdPreviews = [
-        'diffuse', 'ao',
-        'metalness', 'specular', 'roughness',
-        'coat', 'coat_roughness',
-        'opacity',
-        'normal', 'displacement',
-    ]
-    UsdPreviewMapper = {
-        'albedo': 'diffuse'
-    }
-    All = [
-        'diffuse', 'albedo', 'ao',
-        'metalness', 'specular', 'roughness',
-        'glossiness',
-        'coat', 'coat_roughness',
-        'normal', 'displacement', 'bump',
-        #
-        'transmission', 'opacity', 'translucency',
-        'emission',
-        'cavity',
-        'mask'
-    ]
-
-    class Arnold(object):
-        All = [
-            'diffuse_color',
-            'metalness',
-            'specular', 'specular_roughness',
-            'coat', 'coat_roughness',
-            'transmission', 'opacity',
-            'emission',
-            'normal', 'displacement',
-        ]
-        Mapper = {
-            'albedo': 'diffuse_color',
-            'roughness': 'specular_roughness'
-        }
-
-
 if __name__ == '__main__':
     pass

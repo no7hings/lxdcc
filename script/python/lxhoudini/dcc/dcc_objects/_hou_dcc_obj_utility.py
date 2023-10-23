@@ -17,8 +17,7 @@ from lxhoudini import hou_core
 
 from lxhoudini.dcc.dcc_objects import _hou_dcc_obj_os
 
-from lxutil_gui.qt import gui_qt_core
-
+import lxgui.qt.core as gui_qt_core
 
 __all__ = [
     'Scene',
@@ -28,20 +27,26 @@ __all__ = [
 
 class Scene(utl_abstract.AbsDccScene):
     REFERENCE_FILE_CLS = _hou_dcc_obj_os.OsFile
+
     def __init__(self):
         super(Scene, self).__init__()
+
     @property
     def type(self):
         return 'scene'
+
     @property
     def path(self):
         return hou.hipFile.path()
+
     @property
     def name(self):
         return hou.hipFile.name()
+
     @property
     def icon(self):
-        return utl_core.FileIcon.get_houdini()
+        return bsc_core.RscIcon.get('file/hip')
+
     @classmethod
     def get_houdini_absolutely_path_with_path(cls, path):
         path_ = path
@@ -55,7 +60,7 @@ class Scene(utl_abstract.AbsDccScene):
                     environ_value = os.environ[environ_key]
                     path_ = path_.replace(variant, environ_value)
                 else:
-                    utl_core.Log.set_warning_trace('Variant "{}" in "{}" is Not Available.'.format(variant, path_))
+                    bsc_core.Log.trace_warning('Variant "{}" in "{}" is Not Available.'.format(variant, path_))
         return path_
 
     def get_reference_files(self):
@@ -71,18 +76,23 @@ class Scene(utl_abstract.AbsDccScene):
 
     def _test(self):
         self.get_reference_files()
+
     @classmethod
     def get_current_file_path(cls):
         return hou.hipFile.path()
+
     @classmethod
     def get_scene_is_dirty(cls):
         return hou.hipFile.hasUnsavedChanges()
+
     @classmethod
     def new_file(cls):
         hou.hipFile.clear(suppress_save_prompt=True)
+
     @classmethod
     def set_new_file_create_with_dialog_(cls, file_path):
         hou.hipFile.clear(suppress_save_prompt=False)
+
     @classmethod
     def new_file_with_dialog(cls, file_path, post_method=None):
         def pos_method_run_fnc_():
@@ -100,6 +110,7 @@ class Scene(utl_abstract.AbsDccScene):
             pos_method_run_fnc_()
             #
             hou.hipFile.setName(file_path)
+
         #
         def no_fnc_():
             hou.hipFile.clear(suppress_save_prompt=True)
@@ -110,9 +121,10 @@ class Scene(utl_abstract.AbsDccScene):
             pos_method_run_fnc_()
             #
             hou.hipFile.setName(file_path)
+
         #
         if cls.get_scene_is_dirty() is True:
-            w = utl_core.DialogWindow.set_create(
+            w = utl_core.DccDialog.create(
                 label='New',
                 content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     cls.get_current_file_path()
@@ -127,23 +139,26 @@ class Scene(utl_abstract.AbsDccScene):
             )
         else:
             no_fnc_()
+
     @classmethod
     def set_file_open_with_dialog(cls, file_path):
         pass
+
     @classmethod
     def save_file_to(cls, file_path):
         hou.hipFile.save(file_path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'scene save',
             u'file="{}"'.format(file_path)
         )
+
     @classmethod
     def set_file_save_with_dialog(cls):
         if cls.get_scene_is_dirty():
             if cls.get_is_default():
                 f = gui_qt_core.QtWidgets.QFileDialog()
                 s = f.getSaveFileName(
-                    gui_qt_core.QtHoudiniMtd.get_qt_main_window(),
+                    gui_qt_core.GuiQtHoudini.get_qt_main_window(),
                     caption='Save File',
                     dir=hou.hipFile.path(),
                     filter="Houdini Files (*.hip, *.hipnc)"
@@ -153,14 +168,17 @@ class Scene(utl_abstract.AbsDccScene):
                     cls.save_file_to(_)
             else:
                 pass
+
     @classmethod
     def get_default_file_path(cls):
         # /home/dongchangbao/untitled.hip
         user_directory_path = bsc_core.SystemMtd.get_home_directory()
         return '{}/untitled.hip'.format(user_directory_path)
+
     @classmethod
     def get_is_default(cls):
         return cls.get_current_file_path() == cls.get_default_file_path()
+
     @classmethod
     def open_file(cls, file_path):
         hou.hipFile.load(file_path)
@@ -169,6 +187,7 @@ class Scene(utl_abstract.AbsDccScene):
 class Selection(object):
     def __init__(self, *args):
         self._paths = args[0]
+
     @classmethod
     def _get_current_network_edit_(cls):
         for i in hou.ui.currentPaneTabs():
@@ -184,9 +203,11 @@ class Selection(object):
                 hou_node = hou.node(path)
                 network_editor.setCurrentNode(hou_node)
                 network_editor.homeToSelection()
+
     @classmethod
     def set_clear(cls):
         hou.clearAllSelected()
+
     @classmethod
     def get_selected_geos(cls):
         def add_fnc_(obj_):
@@ -215,6 +236,7 @@ class Selection(object):
             sub_fnc_(i)
 
         return lis
+
     @classmethod
     def get_selected_alembics(cls):
         def add_fnc_(obj_):

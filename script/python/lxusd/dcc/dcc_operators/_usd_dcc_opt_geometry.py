@@ -207,7 +207,7 @@ class MeshOpt(
                     i_uv_map_name
                 )
                 if i_uv_map_name != i_uv_map_name_new:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'usd uv-map set',
                         u'uv-map="{1}" in "{0}" is not available, auto convert to "{2}"'.format(
                             self.path,

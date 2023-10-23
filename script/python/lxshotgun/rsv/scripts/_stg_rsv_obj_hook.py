@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxbasic import bsc_core
 
-from lxsession import ssn_core
+import lxsession.core as ssn_core
 
 from lxutil.rsv import utl_rsv_obj_abstract
 
@@ -38,6 +38,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # texture
         '{branch}-texture-dir',
     ]
+
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvShotgunHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
@@ -49,6 +50,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import copy
 
         import lxresolver.methods as rsv_methods
+
         #
         kwargs = self._rsv_scene_properties.value
         step = kwargs['step']
@@ -106,6 +108,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def execute_qc_stg_version_create(self):
         import copy
+
         #
         kwargs = self._rsv_scene_properties.value
         step = kwargs['step']
@@ -150,6 +153,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def execute_version_link(self):
         import lxutil.dcc.dcc_objects as utl_dcc_objects
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -184,6 +188,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def execute_version_lock(self):
         from lxbasic import bsc_core
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -212,6 +217,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def execute_shotgun_file_export(self):
         import lxshotgun.objects as stg_objects
+
         #
         rsv_scene_properties = self._rsv_scene_properties
 
@@ -244,6 +250,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxresolver.commands as rsv_commands
         #
         import lxshotgun.operators as stg_operators
+
         #
         stg_connector = stg_objects.StgConnector()
         #
@@ -270,7 +277,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             model_geometry_usd_hi_file_path = model_geometry_usd_hi_file_rsv_unit.get_result(version='latest')
             if model_geometry_usd_hi_file_path:
-                file_properties = model_geometry_usd_hi_file_rsv_unit.get_properties_by_result(model_geometry_usd_hi_file_path)
+                file_properties = model_geometry_usd_hi_file_rsv_unit.get_properties_by_result(
+                    model_geometry_usd_hi_file_path
+                    )
                 stg_model_version = stg_connector.get_stg_version(**file_properties.value)
                 stg_version_opt.set_link_model_stg_version(
                     stg_model_version
@@ -350,6 +359,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
 
         import copy
+
         #
         kwargs = self._rsv_scene_properties.value
         step = kwargs['step']
@@ -382,10 +392,11 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             return review_mov_file_path_qc
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 u'qc review mov export',
                 u'file="{}" is non-exists'.format(review_katana_mov_file_path)
             )
+
     # for new pipeline
     @classmethod
     def get_new_registry_file_data_fnc(cls, rsv_task, version):
@@ -418,6 +429,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     locations=i_locations
                 )
         return dict_
+
     @classmethod
     def get_new_registry_info_data_fnc(cls, user, time_cost=0):
         return dict(
@@ -427,9 +439,11 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             db_name='production',
             time_cost=time_cost
         )
+
     # register
     def execute_new_registry_json_create(self):
         from lxbasic import bsc_core
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -452,6 +466,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             bsc_core.StgFileOpt(file_path).set_write(
                 raw
             )
+
     @classmethod
     def get_new_dependency_file_data_fnc(cls, rsv_task, version):
         data = []
@@ -485,4 +500,3 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     keyword=i_keyword,
                     result=i_result
                 )
-

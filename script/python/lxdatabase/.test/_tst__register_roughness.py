@@ -6,8 +6,8 @@ import lxdatabase.objects as dtb_objects
 if __name__ == '__main__':
 
     dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-        bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
-        bsc_core.CfgFileMtd.get_yaml('database/library/resource-imperfection')
+        bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
+        bsc_core.RscConfigure.get_yaml('database/library/resource-imperfection')
     )
 
     p = '/production/library/resource/all/imperfection/{resource_name}/v0001/texture/original/src/{resource_name}.mask.jpg'

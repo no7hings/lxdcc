@@ -15,6 +15,8 @@ import uuid
 
 import os
 
+import lxbasic.core as bsc_core
+
 from lxutil import utl_core
 
 
@@ -108,7 +110,7 @@ class AbsFileReader(object):
 
     def _set_line_raw_update_(self):
         self._lines = []
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'file read is started',
             u'file="{}"'.format(self._file_path)
         )
@@ -118,7 +120,7 @@ class AbsFileReader(object):
                 sep = self.SEP
                 self._lines = self._get_lines_(raw, sep)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'file read is completed',
             u'file="{}"'.format(self._file_path)
         )
@@ -590,41 +592,39 @@ class DotMaFileReader(AbsFileReader):
                     maximum = len(mesh_objs)
                     mesh_dict = collections.OrderedDict()
                     dic['mesh'] = mesh_dict
-                    #
-                    p = utl_core.LogProgressRunner(maximum, 'mesh-info-read')
-                    for seq, (obj_path, obj_properties) in enumerate(mesh_objs.items()):
-                        p.set_update()
-                        #
-                        if self._get_obj_is_io_(obj_properties) is True:
-                            continue
-                        #
-                        obj_orig_path = '{}Orig'.format(obj_path)
-                        if obj_orig_path in mesh_objs:
-                            obj_properties = mesh_objs[obj_orig_path]
-                        #
-                        ports = self._get_obj_ports_(obj_path, obj_properties)
-                        #
-                        face_vertex_counts, face_vertex_indices = DotMaMeshMtd.get_face_vertices(ports)
-                        face_count = len(face_vertex_counts)
-                        face_vertices_uuid = Hash.get_hash_value(
-                            (face_vertex_counts, face_vertex_indices), as_unique_id=True
-                        )
-                        #
-                        points = DotMaMeshMtd.get_points(ports)
-                        point_count = len(points)
-                        points_uuid = Hash.get_hash_value(
-                            points, as_unique_id=True
-                        )
-                        #
-                        info = collections.OrderedDict()
-                        mesh_dict[obj_path] = info
-                        info['face-vertices-uuid'] = face_vertices_uuid
-                        info['face-count'] = face_count
-                        #
-                        info['points-uuid'] = points_uuid
-                        info['point-count'] = point_count
-                    #
-                    p.set_stop()
+
+                    with bsc_core.LogProcessContext.create(maximum, 'mesh-info-read') as l_p:
+                        for seq, (obj_path, obj_properties) in enumerate(mesh_objs.items()):
+                            l_p.set_update()
+                            #
+                            if self._get_obj_is_io_(obj_properties) is True:
+                                continue
+                            #
+                            obj_orig_path = '{}Orig'.format(obj_path)
+                            if obj_orig_path in mesh_objs:
+                                obj_properties = mesh_objs[obj_orig_path]
+                            #
+                            ports = self._get_obj_ports_(obj_path, obj_properties)
+                            #
+                            face_vertex_counts, face_vertex_indices = DotMaMeshMtd.get_face_vertices(ports)
+                            face_count = len(face_vertex_counts)
+                            face_vertices_uuid = Hash.get_hash_value(
+                                (face_vertex_counts, face_vertex_indices), as_unique_id=True
+                            )
+                            #
+                            points = DotMaMeshMtd.get_points(ports)
+                            point_count = len(points)
+                            points_uuid = Hash.get_hash_value(
+                                points, as_unique_id=True
+                            )
+                            #
+                            info = collections.OrderedDict()
+                            mesh_dict[obj_path] = info
+                            info['face-vertices-uuid'] = face_vertices_uuid
+                            info['face-count'] = face_count
+                            #
+                            info['points-uuid'] = points_uuid
+                            info['point-count'] = point_count
             else:
                 print 'root is not exists'
         return dic
@@ -716,7 +716,7 @@ class DotAssFileReader(AbsFileReader):
         for i_line, i_new_line, i_file_path, i_new_file_path in replace_lis:
             index = self._lines.index(i_line)
             self._lines[index] = i_new_line
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'dot-ass path-convert',
                 'file="{}" >> "{}"'.format(i_file_path, i_new_file_path)
             )

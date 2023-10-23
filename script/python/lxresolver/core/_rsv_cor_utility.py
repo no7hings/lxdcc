@@ -1,7 +1,7 @@
 # coding:utf-8
 import collections
 
-from lxbasic import bsc_configure, bsc_core
+from lxbasic import bsc_core
 
 
 class RsvConfigureMtd(object):
@@ -22,7 +22,7 @@ class RsvConfigureMtd(object):
     def get_raw(cls, scheme):
         raw = collections.OrderedDict()
         for i_key in cls.MainKeys:
-            i_file = bsc_core.CfgFileMtd.get_yaml('resolver/{}/{}'.format(scheme, i_key))
+            i_file = bsc_core.RscConfigure.get_yaml('resolver/{}/{}'.format(scheme, i_key))
             if i_file is not None:
                 i_raw = bsc_core.StgFileOpt(i_file).set_read() or {}
                 raw.update(i_raw)

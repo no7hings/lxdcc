@@ -20,6 +20,9 @@ class AbsArnoldSetup(utl_abstract.AbsSetup):
     def add_plugins(self, *args):
         [self.add_environ_fnc('ARNOLD_PLUGIN_PATH', i) for i in map(self._path_process_, args)]
 
+    def add_xgen(self, *args):
+        [self.add_environ_fnc('XGEN_LOCATION', i) for i in map(self._path_process_, args)]
+
     def set_run(self):
         NotImplementedError()
 
@@ -32,9 +35,7 @@ class MtoaSetup(AbsArnoldSetup):
         self.add_pythons('{root}/scripts')
         self.add_libraries('{root}/bin')
         self.add_procedurals('{root}/procedurals')
-        self.add_plugins(
-            '{root}/plugins', '{root}/procedurals'
-        )
+        self.add_plugins('{root}/plugins', '{root}/procedurals')
         self.add_bin_fnc('{root}/bin')
 
 
@@ -69,7 +70,7 @@ class MayaSetup(object):
             ma_ae_setup.set_ae_procs_setup(
                 lis
             )
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'maya-ae setup',
                 'path="{}"'.format(', '.join(lis))
             )

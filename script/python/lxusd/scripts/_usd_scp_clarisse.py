@@ -26,7 +26,7 @@ class ClarisseUsdCleanup(object):
     def __fix_process(self):
         instance_prims = self._stage_opt.get_all_instance_prims()
         proto_prims = []
-        with utl_core.GuiProgressesRunner.create(maximum=len(instance_prims), label='instance process') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(instance_prims), label='instance process') as g_p:
             for i_prim in instance_prims:
                 i_instancer_opt = usd_core.UsdInstancerOpt(i_prim)
                 i_group_prim = self.__fix_instance_process(i_prim)
@@ -85,7 +85,7 @@ class ClarisseUsdCleanup(object):
             opt.create_primvar_as_integer('ist_id', range(len(proto_indices)))
             return opt.create_child('protos', 'Xform')
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 cls.KEY, 'instance error: proto is not found for "{}"'.format(opt.get_path())
             )
 
@@ -112,7 +112,7 @@ class ClarisseUsdCleanup(object):
             prim_new_opt.create_customize_attribute('usd_file', reference_file_path)
             prim_new_opt.add_reference(reference_file_path)
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 cls.KEY, 'reference error: file is not found for "{}"'.format(opt.get_path())
             )
         return prim_new
@@ -254,7 +254,7 @@ class ClarisseUsdCleanup(object):
         c = len(instance_prims)
 
         c_r = bsc_core.RgbRange(c)
-        with utl_core.GuiProgressesRunner.create(maximum=len(instance_prims), label='instance process') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(instance_prims), label='instance process') as g_p:
             for i_seq, i_prim in enumerate(instance_prims):
                 g_p.set_update()
                 i_instancer_opt = usd_core.UsdInstancerOpt(i_prim)
@@ -302,7 +302,7 @@ class ClarisseUsdCleanupNew(object):
 
     def transfer(self):
         instance_prims = self._stage_opt.get_all_instance_prims()
-        with utl_core.GuiProgressesRunner.create(maximum=len(instance_prims), label='instance process') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(instance_prims), label='instance process') as g_p:
             for i_instance_prim in instance_prims:
                 i_instancer_opt = usd_core.UsdInstancerOpt(i_instance_prim)
                 i_proto_indices = i_instancer_opt.get_proto_indices()
@@ -325,7 +325,7 @@ class ClarisseUsdCleanupNew(object):
                             i_instance_parent_opt_new.set_proto_prims([i_instance_prim_new])
                             self.create_proxy(i_instance_parent_prim_new)
                         elif len(i_ps) > 1:
-                            bsc_core.LogMtd.trace_method_error(
+                            bsc_core.Log.trace_method_error(
                                 self.KEY, 'instance nested depth is more then 1: "{}"'.format(i_instancer_opt.get_path())
                             )
                             continue
@@ -362,7 +362,7 @@ class ClarisseUsdCleanupNew(object):
                             self.create_proxy(i_instance_prim_new)
 
                 else:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         self.KEY, 'instance error: proto is not found for "{}"'.format(i_instancer_opt.get_path())
                     )
 
@@ -449,7 +449,7 @@ class ClarisseUsdCleanupNew(object):
             opt.create_primvar_as_integer('ist_id', range(len(proto_indices)))
             return opt.create_child('protos', 'Xform')
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 self.KEY, 'instance error: proto is not found for "{}"'.format(opt.get_path())
             )
 

@@ -7,7 +7,7 @@ from lxbasic import bsc_core
 
 from lxusd import usd_core
 
-bsc_core.LogMtd.TEST = True
+bsc_core.Log.TEST = True
 
 random.seed(1)
 
@@ -25,7 +25,7 @@ def perform_query(data):
 
 p = multiprocessing.Pool(processes=4)
 
-bsc_core.LogMtd.test_start('check')
+bsc_core.Log.test_start('check')
 
 results = p.map(
     perform_query, [(points, i) for i in [points, points, points, points]]
@@ -36,10 +36,10 @@ p.join()
 
 print results
 
-bsc_core.LogMtd.test_end('check')
+bsc_core.Log.test_end('check')
 
 # kd_tree = usd_core.NpKDTree(points)
-# bsc_core.LogMtd.test_start('check')
+# bsc_core.Log.test_start('check')
 # for i in [points, points, points, points]:
 #     print kd_tree.compute_closed_indexes(i)
-# bsc_core.LogMtd.test_end('check')
+# bsc_core.Log.test_end('check')

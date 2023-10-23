@@ -28,7 +28,7 @@ class Command(object):
     def set_build(self):
         self._set_raw_update_()
         self._set_obj_clear_()
-        self._set_obj_create_()
+        self._create_obj_()
 
     def _set_raw_update_(self):
         subnet_dcc_path = self._subnet_dcc_path
@@ -67,7 +67,7 @@ class Command(object):
         for i in input_hou_objs:
             i.destroy()
 
-    def _set_obj_create_(self):
+    def _create_obj_(self):
         root_hou_obj = self._hou_obj.parent()
         display = self._hou_obj.parm('alembic_display').eval()
         if self._build_dict:

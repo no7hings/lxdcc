@@ -50,7 +50,7 @@ for i_key, i_value, i_opt_type in environ_data:
 if platform_name == 'linux':
     for i_key, i_value, i_opt_type in environ_data_linux:
         ops.append_env_op(i_opt_type, i_key, i_value.format(**environ_variants))
-elif platform == 'windows':
+elif platform_name == 'windows':
     for i_key, i_value, i_opt_type in environ_data_windows:
         ops.append_env_op(i_opt_type, i_key, i_value.format(**environ_variants))
 

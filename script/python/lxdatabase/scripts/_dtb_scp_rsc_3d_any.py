@@ -1,11 +1,5 @@
 # coding:utf-8
-import copy
-
-import glob
-
 from lxbasic import bsc_core
-
-from lxutil import utl_core
 
 import lxdatabase.objects as dtb_objects
 
@@ -20,17 +14,21 @@ class ScpResourcesAddFor3dPlant(object):
         ('Shu', 'tree'),
     ]
     TYPE_DICT = {}
+
     def __init__(self):
         pass
+
     @classmethod
     def dtb_create_type(cls, dtb_opt, type_dtb_path):
         return dtb_opt.get_type_force(type_dtb_path)
+
     @classmethod
     def dtb_assign_resource_types_fnc(cls, dtb_opt, resource_dtb_path, type_dtb_paths):
         for i_type_dtb_path in type_dtb_paths:
             dtb_opt.create_type_assign(
                 resource_dtb_path, i_type_dtb_path, kind=dtb_opt.Kinds.ResourceType
             )
+
     @classmethod
     def create_resource_and_version_(cls, dtb_opt, resource_dtb_path, version_dtb_path, pattern_kwargs):
         force = True
@@ -56,6 +54,7 @@ class ScpResourcesAddFor3dPlant(object):
                 version_dtb_path, 'location', version_stg_path, kind=dtb_opt.Kinds.Version
             )
             cls.dtb_create_storage_fnc(dtb_opt, version_dtb_path, version_stg_path, pattern_kwargs)
+
     @classmethod
     def stg_create_resource(cls, dtb_opt, pattern_kwargs):
         p_opt = dtb_opt.get_pattern_opt('resource-dir')
@@ -63,6 +62,7 @@ class ScpResourcesAddFor3dPlant(object):
         path_opt = bsc_core.StgDirectoryOpt(stg_path)
         path_opt.set_create()
         return stg_path
+
     @classmethod
     def stg_create_version(cls, dtb_opt, pattern_kwargs):
         p_opt = dtb_opt.get_pattern_opt('version-dir')
@@ -70,6 +70,7 @@ class ScpResourcesAddFor3dPlant(object):
         path_opt = bsc_core.StgDirectoryOpt(stg_path)
         path_opt.set_create()
         return stg_path
+
     @classmethod
     def stg_copy_preview(cls, dtb_opt, file_path_src, pattern_kwargs, replace=False):
         file_path_png_src = bsc_core.ImgFileOpt(file_path_src).get_thumbnail(width=256, ext='.png')
@@ -79,6 +80,7 @@ class ScpResourcesAddFor3dPlant(object):
             file_path, replace=replace
         )
         return file_path
+
     @classmethod
     def stg_copy_scene_src(cls, dtb_opt, file_path_src, pattern_kwargs, replace=False):
         file_path_opt = dtb_opt.get_pattern_opt('scene-maya-src-file')
@@ -87,6 +89,7 @@ class ScpResourcesAddFor3dPlant(object):
             file_path, replace=replace
         )
         return file_path
+
     @classmethod
     def stg_copy_texture(cls, dtb_opt, file_path, pattern_kwargs, keyword):
         p_opt = dtb_opt.get_pattern_opt(keyword)
@@ -95,6 +98,7 @@ class ScpResourcesAddFor3dPlant(object):
             stg_path
         )
         return stg_path
+
     @classmethod
     def dtb_create_storage_fnc(cls, dtb_opt, version_dtb_path, version_stg_path, pattern_kwargs):
         dtb_cfg_opt = dtb_opt.get_database_configure_opt()
@@ -133,8 +137,8 @@ class ScpResourcesAddFor3dPlant(object):
         category_group_opt = cs[-2]
         category_group = category_group_opt.get_name()
         dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(category_group))
+            bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(category_group))
         )
         #
         variants = {'directory': directory_path_src}
@@ -144,12 +148,13 @@ class ScpResourcesAddFor3dPlant(object):
         resource_p_opt.set_update(**variants)
         #
         matches = resource_p_opt.get_matches(sort=True)
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(matches), label='add any 3d') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(matches), label='add any 3d') as l_p:
             for i_variants in matches:
                 l_p.set_update()
                 self.add_3d(
                     dtb_opt, category_group, type_dtb_path, i_variants
                 )
+
     @classmethod
     def add_3d(cls, dtb_opt, category_group, type_dtb_path, variants):
         force = False

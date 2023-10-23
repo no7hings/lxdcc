@@ -40,7 +40,7 @@ def set_usd_export_by_any_scene_file(option):
                 'complete'
             )
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'look-export',
             u'file="{}" is not available'.format(scene_file_path)
         )
@@ -210,7 +210,7 @@ def set_usd_create_by_any_scene_file(option):
                 'complete'
             )
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'usd create',
             u'file="{}" is not available'.format(scene_file_path)
         )
@@ -218,6 +218,8 @@ def set_usd_create_by_any_scene_file(option):
 
 def create_set_asset_component_usd(rsv_version):
     from lxutil import utl_core
+
+    import lxresource.core as rsc_core
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects
     #
@@ -236,7 +238,7 @@ def create_set_asset_component_usd(rsv_version):
     if step in key_map_dict:
         key = key_map_dict[step]
         #
-        c = utl_core.Jinja.get_configure(key)
+        c = rsc_core.RscJinjaConfigure.get_configure(key)
         c.set_update(
             rsv_version.properties.value
         )
@@ -246,7 +248,7 @@ def create_set_asset_component_usd(rsv_version):
         usda_dict = c.get('usdas')
         #
         for k, v in usda_dict.items():
-            t = utl_core.Jinja.get_template('{}/{}'.format(key, k))
+            t = rsc_core.RscJinjaConfigure.get_template('{}/{}'.format(key, k))
             i_raw = t.render(
                 **c.value
             )

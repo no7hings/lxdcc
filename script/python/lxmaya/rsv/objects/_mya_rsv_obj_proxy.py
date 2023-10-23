@@ -147,7 +147,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     option=i_xarc_option
                 ).set_run()
         else:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.Log.trace_method_error(
                 'proxy-xarc export',
                 'obj="{}" is non-exists'.format(dcc_model_group.path)
             )

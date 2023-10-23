@@ -12,6 +12,7 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
         bsc_core.SubProcessMtd.set_run_with_result_use_thread(
             'rez-env pgrv -- rv "{}"'.format(file_path)
         )
+
     @classmethod
     def convert_to_mov(cls, **kwargs):
         default_kwargs = dict(
@@ -84,5 +85,5 @@ class EtrUsd(bsc_etr_abstracts.AbsEtrUsd):
     def registry_set(cls, file_path):
         # noinspection PyUnresolvedReferences
         import production.gen.record_set_registry as pgs
-        pgs.run(file_path)
 
+        pgs.run(file_path)

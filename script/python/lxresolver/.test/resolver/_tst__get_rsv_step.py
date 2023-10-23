@@ -1,11 +1,12 @@
 # coding:utf-8
 if __name__ == '__main__':
+    from lxbasic import bsc_core
 
     from lxutil import utl_core
 
     import lxresolver.commands as rsv_commands
 
-    utl_core.Log.TRACE_RESULT_ENABLE = False
+    bsc_core.Log.RESULT_ENABLE = False
 
     r = rsv_commands.get_resolver()
 

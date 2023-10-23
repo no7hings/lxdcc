@@ -160,7 +160,7 @@ class ScpRenderBuild(object):
                     #
                     i_obj_opt.set('parameters.render.output.directory', i_result)
                     #
-                    bsc_core.LogMtd.trace_method_result(
+                    bsc_core.Log.trace_method_result(
                         key,
                         'node: "{}"'.format(
                             i_obj_opt.get_path()
@@ -171,14 +171,14 @@ class ScpRenderBuild(object):
                         i_result
                     )
                 else:
-                    bsc_core.LogMtd.trace_method_error(
+                    bsc_core.Log.trace_method_error(
                         key,
                         'node: "{}" is failed'.format(
                             i_obj_opt.get_path()
                         )
                     )
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     key,
                     'node: "{}" not any variant for convert, ignore'.format(
                         i_obj_opt.get_path()
@@ -251,7 +251,7 @@ class ScpRenderBuild(object):
         #
         katana_render_hook_key = 'rsv-project-methods/katana/render'
         rv_video_comp_hook_key = 'rsv-project-methods/rv/video-comp'
-        with bsc_core.LogProgress.create_as_bar(maximum=len(render_nodes), label=cls.KEY) as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(render_nodes), label=cls.KEY) as l_p:
             for i_render_node in render_nodes:
                 l_p.set_update()
                 if ktn_core.NGObjOpt._get_is_exists_(i_render_node) is True:
@@ -275,7 +275,7 @@ class ScpRenderBuild(object):
                     )
                     if i_render_output_image_file_path is None:
                         raise RuntimeError(
-                            bsc_core.LogMtd.trace_method_error(
+                            bsc_core.Log.trace_method_error(
                                 'aov layer "primary" is not found'
                             )
                         )
@@ -349,7 +349,7 @@ class ScpRenderBuild(object):
                             i_rv_movie_convert_hook_option_opt.to_string()
                         )
                 else:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         cls.KEY,
                         'render-node: "{}" is non-exists'.format(i_render_node)
                     )

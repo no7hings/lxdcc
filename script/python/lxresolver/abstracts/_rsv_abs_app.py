@@ -15,8 +15,6 @@ from lxbasic import bsc_core
 
 from lxresolver import rsv_configure
 
-import lxbasic.objects as bsc_objects
-
 import lxcontent.objects as ctt_objects
 
 
@@ -169,7 +167,7 @@ class AbsRsvAppDef(object):
             packages_extend=packages_extend
         )
         if cmd:
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'execute app',
                 'command=`{}` is started'.format(cmd)
             )
@@ -180,7 +178,7 @@ class AbsRsvAppDef(object):
 
     @classmethod
     def execute_with_result(cls, command, **sub_progress_kwargs):
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'execute app',
             'command=`{}` is started'.format(command)
         )
@@ -225,7 +223,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
         list_ = []
         configure_file_path = self._get_configure_file()
         if configure_file_path:
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'app resolved',
                 'app="{project}.{application}"'.format(
                     **dict(project=self._project, application=self._application)
@@ -277,7 +275,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
         list_ = []
         configure_file_path = self._get_configure_file()
         if configure_file_path:
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'app resolved',
                 'app="{project}.{application}"'.format(
                     **dict(project=self._project, application=self._application)
@@ -289,7 +287,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
                 if key in data:
                     app_data = data[key]
                     p_args = app_data['pipeline']
-                    p_c = bsc_objects.PackageContextNew(
+                    p_c = bsc_core.PkgContextNew(
                         p_args
                     )
                     args = p_c.get_args(packages_extend)

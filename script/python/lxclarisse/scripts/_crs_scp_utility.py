@@ -3,10 +3,10 @@ import copy
 
 from lxbasic import bsc_core
 
-import lxbasic.abstracts as bsc_abstracts
+import lxutil.abstracts as utl_abstracts
 
 
-class DotUsdaFile(bsc_abstracts.AbsFileReader):
+class DotUsdaFile(utl_abstracts.AbsFileReader):
     """
     """
     def __init__(self, file_path):

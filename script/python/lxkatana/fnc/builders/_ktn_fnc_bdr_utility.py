@@ -61,7 +61,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         ]
         #
         if method_args:
-            g_p = utl_core.GuiProgressesRunner(maximum=len(method_args))
+            g_p = bsc_core.LogProcessContext(maximum=len(method_args))
             for i_enable, i_method, i_option in method_args:
                 g_p.set_update()
                 #

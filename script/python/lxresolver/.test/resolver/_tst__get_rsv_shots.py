@@ -1,13 +1,9 @@
 # coding:utf-8
-from lxutil import utl_core
+from lxbasic import bsc_core
 
 import lxresolver.commands as rsv_commands
 
-import lxbasic.objects as bsc_objects
-
-env = bsc_objects.PyEnviron_()
-
-utl_core.Log.TRACE_RESULT_ENABLE = False
+bsc_core.Log.RESULT_ENABLE = False
 
 r = rsv_commands.get_resolver()
 

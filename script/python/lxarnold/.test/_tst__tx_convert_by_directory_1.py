@@ -42,7 +42,7 @@ def status_changed_fnc_(index, status):
     print index, status
 
 
-with utl_core.LogProgressRunner.create_as_bar(maximum=len(file_paths), label='test') as l_p:
+with bsc_core.LogProcessContext.create_as_bar(maximum=len(file_paths), label='test') as l_p:
     for i_index, i_file_path in enumerate(file_paths):
         l_p.set_update()
         i_cmd = utl_dcc_objects.OsTexture._get_unit_tx_create_cmd_by_src_(

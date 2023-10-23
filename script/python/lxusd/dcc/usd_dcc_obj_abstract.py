@@ -8,7 +8,7 @@ from lxutil import utl_core
 
 from lxusd import usd_configure
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -16,9 +16,11 @@ import lxuniverse.abstracts as unr_abstracts
 class AbsUsdObjScene(unr_abstracts.AbsObjScene):
     FILE_CLS = None
     UNIVERSE_CLS = None
+
     def __init__(self):
         super(AbsUsdObjScene, self).__init__()
         self._usd_stage = None
+
     @property
     def usd_stage(self):
         return self._usd_stage
@@ -54,7 +56,9 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         #
         usd_root = self._usd_stage.GetPseudoRoot()
         if self._root is not None:
-            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(self._root, pathsep=usd_configure.Obj.PATHSEP)
+            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
+                self._root, pathsep=usd_configure.Obj.PATHSEP
+                )
             if dag_path_comps:
                 dag_path_comps.reverse()
             for i in dag_path_comps:
@@ -91,11 +95,13 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         #
         usd_location.GetReferences().AddReference(file_path, reference_location)
         self._usd_stage.Flatten()
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'build universe',
             'file="{}"'.format(file_path)
         )
-        with utl_core.GuiProgressesRunner.create(maximum=len([i for i in self._usd_stage.TraverseAll()]), label='build universe') as l_p:
+        with bsc_core.LogProcessContext.create(
+                maximum=len([i for i in self._usd_stage.TraverseAll()]), label='build universe'
+                ) as l_p:
             for i_usd_prim in self._usd_stage.TraverseAll():
                 l_p.set_update()
                 self.node_create_fnc(i_usd_prim)
@@ -111,9 +117,10 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         _obj = obj_type.create_obj(obj_path)
         _obj._usd_obj = usd_prim
         if utl_core.get_is_ui_mode() is True:
-            from lxutil_gui.qt import gui_qt_core
+            import lxgui.qt.core as gui_qt_core
+
             if obj_type_name == usd_configure.ObjType.Xform:
-                _obj.set_gui_attribute('icon', gui_qt_core.QtUtilMtd.get_qt_icon('obj/group'))
+                _obj.set_gui_attribute('icon', gui_qt_core.GuiQtIcon.generate_by_name('obj/group'))
             elif obj_type_name == usd_configure.ObjType.Mesh:
-                _obj.set_gui_attribute('icon', gui_qt_core.QtUtilMtd.get_qt_icon('obj/mesh'))
+                _obj.set_gui_attribute('icon', gui_qt_core.GuiQtIcon.generate_by_name('obj/mesh'))
         return _obj

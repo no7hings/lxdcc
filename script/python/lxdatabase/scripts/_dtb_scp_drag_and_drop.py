@@ -1,11 +1,12 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.configure as bsc_configure
 
-from lxutil import utl_configure
+from lxbasic import bsc_core
 
 
 class ScpTextureResourceData(object):
-    TextureTypes = utl_configure.TextureTypes
+    TextureTypes = bsc_configure.TextureTypes
+
     def __init__(self, directory_path):
         self._directory_path = directory_path
 

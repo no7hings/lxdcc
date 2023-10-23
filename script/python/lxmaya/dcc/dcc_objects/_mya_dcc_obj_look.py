@@ -3,6 +3,8 @@ import fnmatch
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
+from lxbasic import bsc_core
+
 from lxmaya import ma_core
 
 from lxmaya.dcc import mya_dcc_obj_abs
@@ -18,6 +20,7 @@ class Material(mya_dcc_obj_abs.AbsMyaObj):
     #
     SHADING_NODE_TYPES = ['mesh', 'pgYetiMaya', 'nurbsHair']
     OBJ_TYPE = 'shadingEngine'
+
     def __init__(self, path):
         super(Material, self).__init__(path)
 
@@ -67,7 +70,7 @@ class Material(mya_dcc_obj_abs.AbsMyaObj):
             ma_core.CmdObjOpt._create_material_(
                 self.name, type_name
             )
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'shader create',
                 u'obj="{}"'.format(self.path)
             )
@@ -78,13 +81,14 @@ class Shader(mya_dcc_obj_abs.AbsMyaObj):
     CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     #
     CATEGORY_DICT = {}
+
     def __init__(self, path):
         super(Shader, self).__init__(path)
 
     def set_create(self, obj_type):
         if self.get_is_exists() is False:
             name = self.name
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 self.KEY,
                 'create node: "{}"'.format(self.path)
             )
@@ -110,13 +114,14 @@ class Shader(mya_dcc_obj_abs.AbsMyaObj):
 
 class AndShader(Shader):
     CATEGORY_DICT = {}
+
     def __init__(self, path):
         super(AndShader, self).__init__(path)
 
     def set_create(self, obj_type):
         if self.get_is_exists() is False:
             name = self.name
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 self.KEY,
                 u'create node: "{}"'.format(self.path)
             )

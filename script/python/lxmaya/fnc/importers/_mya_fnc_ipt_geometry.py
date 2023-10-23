@@ -58,7 +58,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             #
             self._usd_stage.Flatten()
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 '{}'.format(self.__class__.__name__),
                 'file="{}" is non-exist'.format(file_path)
             )
@@ -71,7 +71,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             if root_override is not None:
                 self.create_path_fnc(root_override)
             #
-            with utl_core.LogProgressRunner.create_as_bar(maximum=c, label='usd import') as l_p:
+            with bsc_core.LogProcessContext.create_as_bar(maximum=c, label='usd import') as l_p:
                 for i_usd_prim in self._usd_stage.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.Xform:
@@ -92,7 +92,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             if root_override is not None:
                 cls.create_path_fnc(root_override)
             #
-            with utl_core.GuiProgressesRunner.create(maximum=c, label='usd import') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=c, label='usd import') as g_p:
                 for i_usd_prim in usd_stage.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.Xform:
@@ -162,7 +162,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                 # noinspection PyArgumentEqualDefault
                                 mesh_mya_obj_opt.assign_uv_maps(uv_maps, clear=False)
                             else:
-                                utl_core.Log.set_module_warning_trace(
+                                bsc_core.Log.trace_method_warning(
                                     'uv-map(s)-import',
                                     'obj="{}" uv-map-face-vertices is changed'.format(obj_path)
                                 )
@@ -172,17 +172,17 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             clear = uv_map_face_vertices_uuid_src != uv_map_face_vertices_uuid_tgt
                             mesh_mya_obj_opt.assign_uv_maps(uv_maps, clear=clear)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'uv-map(s)-import',
                             'obj="{}" uv-map is non-exists'.format(obj_path)
                         )
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'uv-map(s)-import',
                         'obj="{}" face-vertices is changed'.format(obj_path)
                     )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'uv-map(s)-import',
                 'obj="{}" is non-exists'.format(obj_path)
             )
@@ -196,7 +196,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def import_uv_map_fnc(cls, usd_state, uv_map_face_vertices_contrast):
         c = len([i for i in usd_state.TraverseAll()])
         if c:
-            with utl_core.GuiProgressesRunner.create(maximum=c, label='usd uv-map import') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=c, label='usd uv-map import') as g_p:
                 for i_usd_prim in usd_state.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
                     if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
@@ -326,7 +326,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             namespace=namespace_temporary,
             preserveReferences=1
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'geometry abc import',
             'file="{}"'.format(file_path)
         )
@@ -337,7 +337,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._results = []
         objs = namespace_obj.get_objs()
         for obj in objs:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'geometry abc import',
                 u'obj="{}"'.format(obj.path)
             )
@@ -468,7 +468,7 @@ class DatabaseGeometryImporter(object):
 
     def _set_uv_map_export_import_(self):
         if self._selected_path:
-            g_p = utl_core.GuiProgressesRunner(maximum=len(self._selected_path))
+            g_p = bsc_core.LogProcessContext(maximum=len(self._selected_path))
             for path in self._selected_path:
                 g_p.set_update()
                 mesh = mya_dcc_objects.Mesh(path)

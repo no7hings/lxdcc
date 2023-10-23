@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxlog.core as log_core
 
-import lxbasic.objects as bsc_objects
+from lxbasic import bsc_core
 
 import lxbasic.extra.abstracts as bsc_etr_abstracts
 
@@ -17,12 +17,12 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
-        args_execute = bsc_objects.PackageContextNew.convert_args_execute(
+        args_execute = bsc_core.PkgContextNew.convert_args_execute(
             args_execute
         )
 
         args = [
-            bsc_objects.PackageContextNew.get_bin_source(),
+            bsc_core.PkgContextNew.get_bin_source(),
             ' '.join(packages_extend or []),
             ' '.join(args_execute or [])
         ]
@@ -30,7 +30,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def packages_completed_to(cls, packages):
-        return bsc_objects.PackageContextNew()._completed_packages_to(packages)
+        return bsc_core.PkgContextNew()._completed_packages_to(packages)
 
     @classmethod
     def get_project_environs_extend(cls, project):
@@ -182,7 +182,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                 title=kwargs['subject'],
                 message=kwargs.get('content') or '',
             )
-        bsc_core.LogMtd.trace_method_warning(
+        log_core.Log.trace_method_warning(
             'send messages failed', 'module "cosmos" is not found'
         )
         return False
@@ -200,7 +200,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                 file_type=kwargs['keyword'],
                 depend_file_paths=[kwargs['result']],
             )
-        bsc_core.LogMtd.trace_method_warning(
+        log_core.Log.trace_method_warning(
             'register dependency failed', 'module "cosmos" is not found'
         )
         return False
@@ -209,4 +209,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 if __name__ == '__main__':
     print EtrBase.packages_completed_to(
         ['lxdcc', 'arnold']
+    )
+    print EtrBase.get_base_command(
+        ['-- lxhook-command']
     )

@@ -52,7 +52,7 @@ class ScpAssetBatcher(object):
         surface_publish = self._option.get('surface_publish') or False
 
         if self._assets_tgt:
-            with utl_core.GuiProgressesRunner.create(maximum=len(self._assets_tgt), label='execute batch') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(self._assets_tgt), label='execute batch') as g_p:
                 for i_asset_tgt in self._assets_tgt:
                     g_p.set_update()
                     #
@@ -381,7 +381,7 @@ class AbsScpLibShotgunDef(object):
                         'image', i_thumbnail_file_path
                     )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'shotgun entity create',
                 'surface task in non-exists'
             )

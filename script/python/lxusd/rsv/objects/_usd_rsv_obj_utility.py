@@ -9,6 +9,8 @@ import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
+import lxresource.core as rsc_core
+
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxutil.fnc import utl_fnc_obj_abs
@@ -117,7 +119,7 @@ class RsvUsdAssetSetCreator(object):
                 i_shot_asset = i_location.split('/')[-1]
                 dict_[i_shot_asset] = i_location
         except:
-            bsc_core.LogMtd.trace_method_error(
+            bsc_core.Log.trace_method_error(
                 'shot-asset resolver',
                 'file="{}" is error'.format(shot_set_dress_usd_file_path)
             )
@@ -564,11 +566,11 @@ class RsvUsdAssetSetCreator(object):
         )
         key = 'usda/asset-set-v002'
 
-        t = utl_core.Jinja.get_template(
+        t = rsc_core.RscJinjaConfigure.get_template(
             key
         )
 
-        c = utl_core.Jinja.get_configure(
+        c = rsc_core.RscJinjaConfigure.get_configure(
             key
         )
 
@@ -612,11 +614,11 @@ class RsvUsdAssetSetCreator(object):
 
             key = 'usda/shot-asset-set-v002'
 
-            t = utl_core.Jinja.get_template(
+            t = rsc_core.RscJinjaConfigure.get_template(
                 key
             )
 
-            c = utl_core.Jinja.get_configure(
+            c = rsc_core.RscJinjaConfigure.get_configure(
                 key
             )
             c.set('file', asset_shot_set_usd_file_path)
@@ -851,8 +853,8 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
                     )
             #
             if elements:
-                i_c = utl_core.Jinja.get_configure('usda/geometry/all/{}'.format(key))
-                i_t = utl_core.Jinja.get_template('usda/geometry/all/{}'.format(key))
+                i_c = rsc_core.RscJinjaConfigure.get_configure('usda/geometry/all/{}'.format(key))
+                i_t = rsc_core.RscJinjaConfigure.get_template('usda/geometry/all/{}'.format(key))
                 i_c.set('elements', elements)
                 i_raw = i_t.render(**i_c.get_value())
                 bsc_core.StgFileOpt(
@@ -911,7 +913,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         )
         key = 'usda/set/shot-asset'
-        c = utl_core.Jinja.get_configure(key)
+        c = rsc_core.RscJinjaConfigure.get_configure(key)
         c.set_update(
             self._rsv_scene_properties.value
         )
@@ -926,7 +928,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         usda_dict = c.get('usdas')
         #
         for k, v in usda_dict.items():
-            t = utl_core.Jinja.get_template(
+            t = rsc_core.RscJinjaConfigure.get_template(
                 '{}/{}'.format(key, k)
             )
             i_raw = t.render(
@@ -984,7 +986,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_geometry_usd_var_file_path:
                 s.append_sublayer(i_geometry_usd_var_file_path)
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'look property create',
                     'variant="{}" is not found'.format(i_var_name)
                 )
@@ -1055,7 +1057,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_geometry_usd_var_file_path:
                 s.append_sublayer(i_geometry_usd_var_file_path)
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'geometry display-color create',
                     'file="{}" is not found'.format(i_geometry_usd_var_file_path)
                 )
@@ -1128,7 +1130,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if step in step_mapper:
             key = step_mapper[step]
             #
-            c = utl_core.Jinja.get_configure(key)
+            c = rsc_core.RscJinjaConfigure.get_configure(key)
             #
             c.set_update(
                 self._rsv_scene_properties.value
@@ -1152,7 +1154,8 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     i_replace = v['replace']
                 else:
                     raise RuntimeError()
-                t = utl_core.Jinja.get_template('{}/{}'.format(key, k))
+
+                t = rsc_core.RscJinjaConfigure.get_template('{}/{}'.format(key, k))
                 i_raw = t.render(
                     **c.value
                 )
@@ -1179,7 +1182,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
             #
             if workspace in [rsv_scene_properties.get('workspaces.release')]:
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'register usd',
                     'framework scheme use "{}"'.format(framework_scheme)
                 )

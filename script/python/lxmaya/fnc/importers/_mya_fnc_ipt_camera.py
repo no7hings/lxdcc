@@ -67,7 +67,7 @@ class CameraAbcImporter(
         self._results = []
         objs = namespace_obj.get_objs()
         for i_obj in objs:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'alembic import',
                 u'obj="{}"'.format(i_obj.path)
             )

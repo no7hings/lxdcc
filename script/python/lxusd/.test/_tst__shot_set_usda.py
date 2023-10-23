@@ -1,9 +1,9 @@
 # coding:utf-8
-from lxutil import utl_core
+import lxresource.core as rsc_core
 
 key = 'usda/set/asset-shot'
 
-c = utl_core.Jinja.get_configure(
+c = rsc_core.RscJinjaConfigure.get_configure(
     key
 )
 
@@ -37,7 +37,7 @@ c.set_flatten()
 usda_dict = c.get('usdas')
 #
 for k, v in usda_dict.items():
-    t = utl_core.Jinja.get_template(
+    t = rsc_core.RscJinjaConfigure.get_template(
         '{}/{}'.format(key, k)
     )
     i_raw = t.render(

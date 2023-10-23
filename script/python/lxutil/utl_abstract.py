@@ -7,15 +7,15 @@ import fnmatch
 
 from lxbasic import bsc_core
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxuniverse.abstracts as unr_abstracts
 
 from lxutil import utl_core
 
 
-class AbsObjGuiDef(object):
-    def _set_obj_gui_def_init_(self):
+class AbsGuiExtraDef(object):
+    def _init_gui_extra_def_(self):
         self._gui_menu_raw = None
         self._obj_gui = None
 
@@ -107,27 +107,6 @@ class AbsDccObjDef(object):
         return hash(self._path)
 
 
-class AbsDccMtd(object):
-    @classmethod
-    def get_is_maya(cls):
-        return bsc_core.ApplicationMtd.get_is_maya()
-
-    @classmethod
-    def get_is_houdini(cls):
-        return bsc_core.ApplicationMtd.get_is_houdini()
-
-    @classmethod
-    def get_is_katana(cls):
-        _ = os.environ.get('KATANA_ROOT')
-        if _:
-            return True
-        return bsc_core.ApplicationMtd.get_is_katana()
-
-    @classmethod
-    def get_is_clarisse(cls):
-        return bsc_core.ApplicationMtd.get_is_clarisse()
-
-
 class AbsDccDagDef(object):
     OBJ_PATHSEP = None
     PORT_PATHSEP = None
@@ -175,7 +154,7 @@ class AbsDccPort(AbsDccObjDef):
 
     @property
     def icon(self):
-        return utl_core.Icon.get_port()
+        return bsc_core.RscIcon.get('attribute')
 
     @property
     def node(self):
@@ -495,22 +474,22 @@ class AbsDccObj(
     AbsDccObjDef,
     AbsDccObjSourceDef,
     AbsDccObjTargetDef,
-    unr_abstracts.AbsObjDagDef,
-    unr_abstracts.AbsObjGuiDef,
-    # AbsObjGuiDef
+    unr_abstracts.AbsObjDagExtraDef,
+    unr_abstracts.AbsGuiExtraDef,
+    # AbsGuiExtraDef
 ):
     # attribute
     PORT_CLS = None
     CONNECTION_CLS = None
 
     def __init__(self, path):
-        self._set_obj_dag_def_init_(path)
+        self._init_obj_dag_extra_def_(path)
         if self.path.startswith(self.PATHSEP):
             self._name = self.path.split(self.PATHSEP)[-1]
         else:
             self._name = self.path
 
-        self._set_obj_gui_def_init_()
+        self._init_gui_extra_def_()
 
     # property ******************************************************************************************************* #
     @property
@@ -580,7 +559,7 @@ class AbsDccObj(
     def _get_child_paths_(self, path):
         pass
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         pass
 
     def get_is_exists(self):
@@ -757,7 +736,7 @@ class AbsDccObjs(object):
         pass
 
     @classmethod
-    def _set_obj_create_(cls, path_):
+    def _create_obj_(cls, path_):
         return cls.DCC_NODE_CLS(path_)
 
     @classmethod
@@ -766,7 +745,7 @@ class AbsDccObjs(object):
 
     @classmethod
     def get_objs(cls, **kwargs):
-        return [cls._set_obj_create_(i) for i in cls.get_paths(**kwargs)]
+        return [cls._create_obj_(i) for i in cls.get_paths(**kwargs)]
 
     @classmethod
     def get_custom_paths(cls, **kwargs):
@@ -774,7 +753,7 @@ class AbsDccObjs(object):
 
     @classmethod
     def get_custom_nodes(cls, **kwargs):
-        return [cls._set_obj_create_(i) for i in cls.get_custom_paths(**kwargs)]
+        return [cls._create_obj_(i) for i in cls.get_custom_paths(**kwargs)]
 
 
 class AbsSetup(object):
@@ -793,7 +772,7 @@ class AbsSetup(object):
     def set_environ_fnc(cls, key, value):
         if value is not None:
             os.environ[key] = value
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'environ set',
                 u'key="{}", value="{}"'.format(key, value)
             )
@@ -805,13 +784,13 @@ class AbsSetup(object):
                 v = os.environ[key]
                 if value not in v:
                     os.environ[key] += os.pathsep+value
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'environ add',
                         u'key="{}", value="{}"'.format(key, value)
                     )
             else:
                 os.environ[key] = value
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'environ set',
                     u'key="{}", value="{}"'.format(key, value)
                 )
@@ -823,7 +802,7 @@ class AbsSetup(object):
             if i_path is not None:
                 if i_path not in paths_exists:
                     sys.path.insert(0, i_path)
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'python-path add',
                         'value="{}"'.format(i_path)
                     )

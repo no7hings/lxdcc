@@ -1,12 +1,16 @@
 # coding:utf-8
-import os.path
-
-import parse
-import six
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, _bsc_cor_time, _bsc_cor_log, _bsc_cor_dict, \
-    _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
+import parse
+
+import six
+
+import os
+
+import lxlog.core as log_core
+
+from lxbasic.core import _bsc_cor_utility, _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, \
+    _bsc_cor_time, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
 
 
 class StgRpcMtd(object):
@@ -47,7 +51,7 @@ class StgRpcMtd(object):
                 cost_time = int(time.time()-start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
-                        _bsc_cor_log.LogMtd.trace_method_error(
+                        log_core.Log.trace_method_error(
                             key,
                             'path="{}" is timeout, cost time {}s'.format(directory_path, cost_time)
                         )
@@ -58,7 +62,7 @@ class StgRpcMtd(object):
                 #
                 time.sleep(1)
             #
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 key,
                 'path="{}" is cost time {}s'.format(directory_path, cost_time)
             )
@@ -83,7 +87,7 @@ class StgRpcMtd(object):
                 cost_time = int(time.time()-start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
-                        _bsc_cor_log.LogMtd.trace_method_error(
+                        log_core.Log.trace_method_error(
                             'rpc delete',
                             'path="{}" is timeout, cost time {}s'.format(file_path, cost_time)
                         )
@@ -94,7 +98,7 @@ class StgRpcMtd(object):
                 #
                 time.sleep(1)
             #
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 'rpc delete',
                 'path="{}" is completed, cost time {}s'.format(file_path, cost_time)
             )
@@ -121,7 +125,7 @@ class StgRpcMtd(object):
                 cost_time = int(time.time()-start_time)
                 if cost_time > timeout:
                     raise RuntimeError(
-                        _bsc_cor_log.LogMtd.trace_method_error(
+                        log_core.Log.trace_method_error(
                             key,
                             'path="{}" is timeout, cost time {}s'.format(file_path_tgt, cost_time)
                         )
@@ -141,7 +145,7 @@ class StgRpcMtd(object):
                 mode='775'
             )
             #
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 key,
                 'path="{} >> {}"'.format(file_path_src, file_path_tgt)
             )
@@ -157,7 +161,7 @@ class StgRpcMtd(object):
                 p = os.path.dirname(path)
                 os.system('ls {} > /dev/null'.format(p))
             #
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 key,
                 'path="{}", mode="{}"'.format(path, mode)
             )
@@ -171,7 +175,7 @@ class StgRpcMtd(object):
             p = os.path.dirname(path)
             if SystemMtd.get_is_linux():
                 os.system('ls {} > /dev/null'.format(p))
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 key,
                 'path="{}", user="{}", group="{}"'.format(path, user, group)
             )
@@ -230,7 +234,7 @@ class StgSshMtd(object):
             j = 0
             for i in range(0, n):
                 b1 = b[i]
-                b2 = b1^self.key
+                b2 = b1 ^ self.key
                 c1 = b2%16
                 c2 = b2//16
                 c1 = c1+65
@@ -268,7 +272,7 @@ class StgSshMtd(object):
         import paramiko
 
         #
-        _bsc_cor_log.LogMtd.trace_method_result(
+        log_core.Log.trace_method_result(
             'nas-cmd-run',
             'command=`{}`'.format(cmd)
         )
@@ -618,7 +622,7 @@ class StgExtraMtd(object):
         if _:
             # fix windows path
             if platform.system() == 'Windows':
-                _ = [i.replace('\\', '/') for i in _]
+                _ = map(lambda x: x.replace('\\', '/'), _)
             if len(_) > 1:
                 # sort by number
                 if sort_by == 'number':
@@ -629,7 +633,7 @@ class StgExtraMtd(object):
     def create_directory(cls, directory_path):
         if os.path.exists(directory_path) is False:
             os.makedirs(directory_path)
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 'create-directory',
                 'directory="{}"'.format(directory_path)
             )
@@ -868,7 +872,7 @@ class StgDirectoryMtd(object):
     def set_copy_to(cls, src_directory_path, directory_path_tgt, excludes=None):
         def copy_fnc_(src_file_path_, tgt_file_path_):
             shutil.copy2(src_file_path_, tgt_file_path_)
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 'file copy',
                 'file="{}" >> "{}"'.format(src_file_path_, tgt_file_path_)
             )
@@ -1067,6 +1071,8 @@ class StgPathOpt(object):
         else:
             self._root = '/'
 
+        self.__gui = None
+
     def get_type_name(self):
         if self.get_is_file():
             return 'file'
@@ -1112,7 +1118,7 @@ class StgPathOpt(object):
     def get_is_file(self):
         return os.path.isfile(self.get_path())
 
-    def set_open_in_system(self):
+    def open_in_system(self):
         if self.get_path():
             StgSystem.open(self.get_path())
 
@@ -1149,6 +1155,38 @@ class StgPathOpt(object):
     def set_modify_time(self, timestamp):
         os.utime(self.get_path(), (timestamp, timestamp))
 
+    def get_component_paths(self):
+        return _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(
+            path=self.get_path(), pathsep=self.PATHSEP
+        )
+
+    def get_parent_path(self):
+        return _bsc_cor_path.DccPathDagMtd.get_dag_parent_path(
+            path=self.get_path(), pathsep=self.PATHSEP
+        )
+
+    def get_ancestor_paths(self):
+        return self.get_component_paths()[1:]
+
+    def get_path_prettify(self):
+        p = self.get_path()
+        pathsep = self.PATHSEP
+        #
+        _ = p.split(pathsep)
+        if len(_) > 6:
+            if StorageMtd.get_path_is_windows(p):
+                return six.u('{0}{2}...{2}{1}'.format(pathsep.join(_[:3]), pathsep.join(_[-3:]), pathsep))
+            elif StorageMtd.get_path_is_linux(p):
+                return six.u('{0}{2}...{2}{1}'.format(pathsep.join(_[:2]), pathsep.join(_[-3:]), pathsep))
+            return p
+        return p
+
+    def set_gui(self, gui):
+        self.__gui = gui
+
+    def get_gui(self):
+        return self.__gui
+
     def __str__(self):
         return self._path
 
@@ -1169,7 +1207,7 @@ class StgFileSearchOpt(object):
         self._search_dict = collections.OrderedDict()
         for i in directory_paths:
             self.append_search_directory(i, below_enable=below_enable)
-            _bsc_cor_log.LogMtd.trace_method_result(
+            log_core.Log.trace_method_result(
                 self.KEY,
                 'append search directory: "{}"'.format(i)
             )
@@ -1191,8 +1229,8 @@ class StgFileSearchOpt(object):
             # noinspection PyBroadException
             try:
                 self._search_dict['{}/{}{}'.format(i_directory_path, i_name_base, i_ext)] = i
-            except:
-                _bsc_cor_log.LogMtd.trace_error(
+            except Exception:
+                log_core.Log.trace_error(
                     'file "{}" is not valid'.format(i)
                 )
         # sort
@@ -1236,6 +1274,9 @@ class StgDirectoryOpt(StgPathOpt):
     def __init__(self, path):
         super(StgDirectoryOpt, self).__init__(path)
 
+    def create_dag_fnc(self, path):
+        return self.__class__(path)
+
     def set_create(self):
         StorageMtd.create_directory(
             self.path
@@ -1255,6 +1296,9 @@ class StgDirectoryOpt(StgPathOpt):
         return StgDirectoryMtd.get_all_directory_paths__(
             self._path
         )
+
+    def get_child_names(self):
+        return os.listdir(self.get_path()) or []
 
     def get_directory_paths(self):
         return StgDirectoryMtd.get_directory_paths__(
@@ -1380,7 +1424,7 @@ class StgFileOpt(StgPathOpt):
                     return raw
             elif self.get_ext() in {'.yml'}:
                 with open(self.path) as y:
-                    raw = _bsc_cor_dict.YamlMtd.load(y)
+                    raw = _bsc_cor_dict.CttYamlBase.load(y)
                     y.close()
                     return raw
             else:
@@ -1395,7 +1439,7 @@ class StgFileOpt(StgPathOpt):
             # noinspection PyBroadException
             try:
                 os.makedirs(directory)
-            except:
+            except Exception:
                 pass
         if self.ext in {'.json'}:
             with open(self.path, 'w') as j:
@@ -1406,7 +1450,7 @@ class StgFileOpt(StgPathOpt):
                 )
         elif self.ext in {'.yml'}:
             with open(self.path, 'w') as y:
-                _bsc_cor_dict.YamlMtd.dump(
+                _bsc_cor_dict.CttYamlBase.dump(
                     raw,
                     y,
                     indent=4,
@@ -1519,7 +1563,7 @@ class StgGzipFileOpt(StgFileOpt):
                     fileobj=open(self.path, 'rb')
             ) as g:
                 if self.get_ext() in {'.yml'}:
-                    raw = _bsc_cor_dict.YamlMtd.load(g)
+                    raw = _bsc_cor_dict.CttYamlBase.load(g)
                     g.close()
                     return raw
 
@@ -1534,7 +1578,7 @@ class StgGzipFileOpt(StgFileOpt):
                 fileobj=open(self.path, 'wb')
         ) as g:
             if self.get_ext() in ['.yml']:
-                _bsc_cor_dict.YamlMtd.dump(
+                _bsc_cor_dict.CttYamlBase.dump(
                     raw,
                     g,
                     indent=4,

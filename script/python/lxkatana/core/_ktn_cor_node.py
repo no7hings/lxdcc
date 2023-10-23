@@ -163,7 +163,7 @@ class KtnStageOpt(object):
         while True:
             if (int(time.time())-start_time) > timeout:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_method_error(
+                    bsc_core.Log.trace_method_error(
                         'location traversal is timeout'
                     )
                 )
@@ -201,7 +201,7 @@ class KtnStageOpt(object):
         while True:
             if (int(time.time())-start_time) > timeout:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_method_error(
+                    bsc_core.Log.trace_method_error(
                         'location traversal is timeout'
                     )
                 )
@@ -1199,7 +1199,7 @@ class NGObjOpt(object):
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path)
                     )
                 )
@@ -1236,7 +1236,7 @@ class NGObjOpt(object):
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path)
                     )
                 )
@@ -1307,7 +1307,7 @@ class NGObjOpt(object):
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path)
                     )
                 )
@@ -1337,7 +1337,7 @@ class NGObjOpt(object):
             i_p_tgt = i_obj_opt_tgt.get_port(i_port_path_tgt)
             if i_p_tgt is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path_tgt)
                     )
                 )
@@ -1356,7 +1356,7 @@ class NGObjOpt(object):
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path)
                     )
                 )
@@ -1394,7 +1394,7 @@ class NGObjOpt(object):
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path)
                     )
                 )
@@ -1422,7 +1422,7 @@ class NGObjOpt(object):
         p = self.ktn_obj.getParameter(port_path)
         if p is None:
             raise RuntimeError(
-                bsc_core.LogMtd.trace_warning(
+                bsc_core.Log.trace_warning(
                     'port="{}" is non-exists'.format(port_path)
                 )
             )
@@ -1442,7 +1442,7 @@ class NGObjOpt(object):
             i_p = self.ktn_obj.getParameter(i_port_path)
             if i_p is None:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_warning(
+                    bsc_core.Log.trace_warning(
                         'port="{}" is non-exists'.format(i_port_path)
                     )
                 )

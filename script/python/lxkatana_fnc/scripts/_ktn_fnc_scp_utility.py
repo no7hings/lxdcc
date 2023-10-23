@@ -16,8 +16,8 @@ def set_asset_cfx_look_workspace_create(rsv_task_properties):
 
 
 def set_work_look_ass_import(rsv_task_properties):
-    from lxutil import utl_core
-    #
+    from lxbasic import bsc_core
+
     import lxutil.dcc.dcc_objects as utl_dcc_objects
     #
     import lxresolver.operators as rsv_operators
@@ -35,7 +35,7 @@ def set_work_look_ass_import(rsv_task_properties):
             ),
         ).set_run()
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'work-look-ass-import',
             'file="{}" is non-exists'.format(work_look_ass_file_path)
         )

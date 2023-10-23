@@ -22,12 +22,12 @@ from lxutil import utl_core
 
 import lxutil.configures as utl_configures
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 from lxarnold import and_configure
 
 ACES_COLOR_CONFIGURE = ctt_objects.Properties(
-    None, bsc_core.CfgFileMtd.get_yaml('colorspace/aces-color')
+    None, bsc_core.RscConfigure.get_yaml('colorspace/aces-color')
 )
 
 if platform.system().lower() == 'windows':
@@ -590,10 +590,10 @@ class AndTextureOpt(object):
             info['bit_depth'] = 8
             info['format'] = "unknown"
         return info
-    @utl_core.Modifier.debug_trace
+    @utl_core.DccModifier.debug_trace
     def get_resolution(self):
         return ai.AiTextureGetResolution(self._file_path)
-    @utl_core.Modifier.debug_trace
+    @utl_core.DccModifier.debug_trace
     def get_bit_depth(self):
         return ai.AiTextureGetBitDepth(self._file_path)
 
@@ -618,7 +618,7 @@ class AndTextureOpt(object):
             else:
                 raise TypeError()
         except:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 'color-space-guess',
                 u'file-obj="{}" guess color-space error'.format(self._file_path)
             )
@@ -658,22 +658,22 @@ class AndTextureOpt(object):
             return False
 
 
-@utl_core.Modifier.debug_trace
+@utl_core.DccModifier.debug_trace
 def _get_resolution_(file_path):
     return ai.AiTextureGetResolution(file_path)
 
 
-@utl_core.Modifier.debug_trace
+@utl_core.DccModifier.debug_trace
 def _get_bit_(file_path):
     return ai.AiTextureGetBitDepth(file_path)
 
 
-@utl_core.Modifier.debug_trace
+@utl_core.DccModifier.debug_trace
 def _get_type_(file_path):
     return ai.AiTextureGetFormat(file_path)
 
 
-@utl_core.Modifier.debug_trace
+@utl_core.DccModifier.debug_trace
 def _get_channels_count_(file_path):
     return ai.AiTextureGetNumChannels(file_path)
 

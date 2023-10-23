@@ -5,13 +5,14 @@ from lxutil import utl_core
 
 from lxutil.scripts import _utl_scp_video
 
-from lxsession import ssn_core
+import lxsession.core as ssn_core
 
 import lxsession.commands as ssn_commands
 
 
 class ScpGeneralPublish(object):
     VERSION_NAME_PATTERN = '{project}.{resource}.{task}.{version}'
+
     def __init__(self, window, session, rsv_task, version_properties, options):
         self._window = window
         self._session = session
@@ -200,7 +201,7 @@ class ScpGeneralPublish(object):
             option=option_opt.to_string()
         )
 
-    @utl_core.Modifier.exception_catch
+    @utl_core.DccModifier.debug_run
     def execute(self):
         fncs = [
             self.pre_fnc,
@@ -217,7 +218,7 @@ class ScpGeneralPublish(object):
         #
         self._window.show_message(
             'publish process is complected',
-            self._window.ValidatorStatus.Correct
+            self._window.ValidationStatus.Correct
         )
 
 
@@ -296,7 +297,8 @@ class ScpAssetSurfacePublish(object):
         ssn_commands.set_option_hook_execute_by_deadline(
             option=option_opt.to_string()
         )
-    @utl_core.Modifier.exception_catch
+
+    @utl_core.DccModifier.debug_run
     def execute(self):
         fncs = [
             self.collection_review_fnc,
@@ -310,6 +312,5 @@ class ScpAssetSurfacePublish(object):
         #
         self._window.show_message(
             'publish process is complected',
-            self._window.ValidatorStatus.Correct
+            self._window.ValidationStatus.Correct
         )
-

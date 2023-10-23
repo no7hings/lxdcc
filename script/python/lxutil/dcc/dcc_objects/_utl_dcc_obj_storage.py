@@ -3,6 +3,8 @@ import json
 
 import re
 
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 from lxutil.dcc import utl_dcc_obj_abs
@@ -25,7 +27,7 @@ class OsFile(utl_dcc_obj_abs.AbsOsFile):
         self.directory.set_create()
         with open(self.path, u'w') as f:
             f.write(raw)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'file-write',
                 u'file="{}"'.format(self.path)
             )

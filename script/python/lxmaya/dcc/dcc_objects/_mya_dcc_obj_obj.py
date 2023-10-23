@@ -3,13 +3,11 @@ import fnmatch
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
-from lxmaya import ma_core
+import lxlog.core as log_core
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
 from lxmaya.dcc.dcc_objects import _mya_dcc_obj_utility
-
-from lxutil import utl_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -22,8 +20,10 @@ class Port(mya_dcc_obj_abs.AbsMyaPort):
 class Node(mya_dcc_obj_abs.AbsMyaObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     CONNECTION_CLS = _mya_dcc_obj_utility.Connection
+
     def __init__(self, path):
         super(Node, self).__init__(path)
+
     # dag
     def get_child_paths(self):
         return cmds.listRelatives(self.path, children=1, fullPath=1) or []
@@ -38,6 +38,7 @@ class Node(mya_dcc_obj_abs.AbsMyaObj):
             if _:
                 for _i in _:
                     _rcs_fnc(lis_, _i)
+
         lis = []
         _rcs_fnc(lis, self.path)
         return lis
@@ -62,6 +63,7 @@ class DisplayLayer(mya_dcc_obj_abs.AbsMyaObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     CONNECTION_CLS = _mya_dcc_obj_utility.Connection
     DCC_NODE_CLS = Node
+
     def __init__(self, path):
         super(DisplayLayer, self).__init__(path)
 
@@ -80,6 +82,7 @@ class DisplayLayer(mya_dcc_obj_abs.AbsMyaObj):
 class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     OS_FILE_CLS = utl_dcc_objects.OsFile
+
     def __init__(self, path):
         super(Reference, self).__init__(self._get_full_path_(path))
 
@@ -92,7 +95,7 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
     def set_replace(self, file_path):
         cmds.file(file_path, loadReference=self.name)
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'reference replace',
             u'file="{}"'.format(file_path)
         )
@@ -154,6 +157,7 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 class FileReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     OS_FILE_CLS = utl_dcc_objects.OsFile
+
     def __init__(self, path, file_path=None):
         super(FileReference, self).__init__(self._get_full_path_(path))
         self._set_file_reference_def_init_(file_path)
@@ -162,6 +166,7 @@ class FileReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 class TextureReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     OS_FILE_CLS = utl_dcc_objects.OsTexture
+
     def __init__(self, path, file_path=None):
         super(TextureReference, self).__init__(self._get_full_path_(path), file_path)
 
@@ -172,7 +177,7 @@ class TextureReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
         if self.get_color_space() != color_space:
             self.get_port('ignoreColorSpaceFileRules').set(True)
             self.get_port('colorSpace').set(color_space)
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'color-space switch',
                 'obj="{}", color-space="{}"'.format(self.path, color_space)
             )
@@ -181,6 +186,7 @@ class TextureReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 class Alembic(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     OS_FILE_CLS = utl_dcc_objects.OsFile
+
     def __init__(self, path):
         super(Alembic, self).__init__(path)
 
@@ -188,6 +194,7 @@ class Alembic(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 class Set(mya_dcc_obj_abs.AbsMyaObj):
     PORT_CLS = _mya_dcc_obj_utility.Port
     CONNECTION_CLS = _mya_dcc_obj_utility.Connection
+
     def __init__(self, path):
         super(Set, self).__init__(path)
 
@@ -197,7 +204,7 @@ class Set(mya_dcc_obj_abs.AbsMyaObj):
 
     def add_element(self, path):
         cmds.sets(path, addElement=self.path, edit=1)
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'set-element-add',
             'connection="{}" >> "{}"'.format(path, self.path)
         )
@@ -210,7 +217,7 @@ class Set(mya_dcc_obj_abs.AbsMyaObj):
 
     def set_element_remove(self, path):
         cmds.sets(path, remove=self.path, edit=1)
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'set-element-remove',
             'connection="{}" >> "{}"'.format(path, self.path)
         )

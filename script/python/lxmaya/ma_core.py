@@ -578,10 +578,10 @@ class Om2MeshOpt(object):
         :param color_maps:
         :return:
         """
-        bsc_core.LogMtd.debug('start create transform')
+        bsc_core.Log.debug('start create transform')
         transform = cmds.createNode('transform', name=name, skipSelect=1)
         transform_name = bsc_core.DccPathDagMtd.get_dag_name(transform, '|')
-        bsc_core.LogMtd.debug('start create mesh')
+        bsc_core.Log.debug('start create mesh')
         om2_fnc = om2.MFnMesh()
         face_vertex_counts, face_vertex_indices = face_vertices
         om2_fnc.create(
@@ -589,7 +589,7 @@ class Om2MeshOpt(object):
             face_vertex_counts, face_vertex_indices,
             parent=Om2Method._get_om2_dag_obj_(transform)
         )
-        bsc_core.LogMtd.debug('start assign uv map')
+        bsc_core.Log.debug('start assign uv map')
         if isinstance(uv_coords_maps, dict):
             if uv_coords_maps:
                 if 'map1' not in uv_coords_maps:
@@ -789,7 +789,7 @@ class Om2MeshOpt(object):
             om2_fnc.setUVs(us, vs, uv_map_name)
             om2_fnc.assignUVs(uv_face_vertex_counts, uv_face_vertex_indices, uv_map_name)
         except:
-            bsc_core.LogMtd.trace_error(
+            bsc_core.Log.trace_error(
                 'assign uv expression: path is "{}", uv map name is "{}"'.format(self.get_path(), uv_map_name)
             )
             bsc_core.ExceptionMtd.set_print()
@@ -819,11 +819,11 @@ print ma_core.Om2MeshOpt(
         :param face_indices:
         :return:
         """
-        bsc_core.LogMtd.debug('start duplicate faces, count is {}'.format(len(face_indices)))
+        bsc_core.Log.debug('start duplicate faces, count is {}'.format(len(face_indices)))
         om2_fnc = self._om2_obj_fnc
         om2_itr_face = om2.MItMeshPolygon(om2_fnc.object())
         # geometry
-        bsc_core.LogMtd.debug('start build geometry data')
+        bsc_core.Log.debug('start build geometry data')
         face_vertex_counts = []
         face_vertex_indices_ = []
         points_ = []
@@ -838,7 +838,7 @@ print ma_core.Om2MeshOpt(
             i_indices = points_opt.extend(Om2Method.to_point_array(i_points))
             face_vertex_indices_.extend(i_indices)
         # uv map
-        bsc_core.LogMtd.debug('start build uv map data')
+        bsc_core.Log.debug('start build uv map data')
         uv_map_names = self.get_uv_map_names()
         uv_maps = {}
         for i_map_name in uv_map_names:
@@ -856,7 +856,7 @@ print ma_core.Om2MeshOpt(
             #
             uv_maps[i_map_name] = i_uv_face_vertex_counts, i_uv_face_vertex_indices, i_uv_coords
         #
-        bsc_core.LogMtd.debug('start create subset')
+        bsc_core.Log.debug('start create subset')
         return Om2MeshOpt.create_fnc(
             'mesh_subset',
             face_vertices=(face_vertex_counts, face_vertex_indices_),
@@ -865,11 +865,11 @@ print ma_core.Om2MeshOpt(
         )
 
     def duplicate_faces_(self, face_indices):
-        bsc_core.LogMtd.debug('start duplicate faces, count is {}'.format(len(face_indices)))
+        bsc_core.Log.debug('start duplicate faces, count is {}'.format(len(face_indices)))
         om2_fnc = self._om2_obj_fnc
         om2_itr_face = om2.MItMeshPolygon(om2_fnc.object())
         # geometry
-        bsc_core.LogMtd.debug('start build geometry data')
+        bsc_core.Log.debug('start build geometry data')
         face_vertex_counts = []
         face_vertex_indices_old = []
         om2_itr_face.reset()
@@ -895,7 +895,7 @@ print ma_core.Om2MeshOpt(
         for i_index_new in range(index_count):
             points_new.append(om2_fnc.getPoint(index_old_dict[i_index_new]))
         # uv map
-        bsc_core.LogMtd.debug('start build uv map data')
+        bsc_core.Log.debug('start build uv map data')
         uv_map_names = self.get_uv_map_names()
         uv_maps = {}
         for i_map_name in uv_map_names:
@@ -912,7 +912,7 @@ print ma_core.Om2MeshOpt(
             #
             uv_maps[i_map_name] = face_vertex_counts, i_uv_face_vertex_indices, i_uv_coords
         #
-        bsc_core.LogMtd.debug('start create subset')
+        bsc_core.Log.debug('start create subset')
         return Om2MeshOpt.create_fnc(
             'mesh_subset',
             face_vertices=(face_vertex_counts, face_vertex_indices_new),

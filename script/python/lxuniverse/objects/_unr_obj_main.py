@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxcontent.objects as ctt_objects
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxuniverse.abstracts as unr_abstracts
 

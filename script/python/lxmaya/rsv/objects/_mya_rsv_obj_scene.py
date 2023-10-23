@@ -67,7 +67,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             return scene_file_path
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.Log.trace_method_error(
                     key,
                     u'obj="{}" is non-exists'.format(mya_group.path)
                 )
@@ -147,14 +147,14 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             )
                     else:
                         raise RuntimeError(
-                            utl_core.Log.set_module_error_trace(
+                            bsc_core.Log.trace_method_error(
                                 'camera scene create',
                                 u'obj="{}" is non-exists'.format(mya_root)
                             )
                         )
                 else:
                     raise RuntimeError(
-                        utl_core.Log.set_module_error_trace(
+                        bsc_core.Log.trace_method_error(
                             'camera scene create',
                             u'obj="{}" is non-exists'.format(mya_camera_location)
                         )
@@ -304,8 +304,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     ],
                     #
                     with_surface=(
-                        self._hook_option_opt.get_as_boolean('with_surface_look')
-                        or self._hook_option_opt.get_as_boolean('with_surface_geometry_uv_map')
+                            self._hook_option_opt.get_as_boolean('with_surface_look')
+                            or self._hook_option_opt.get_as_boolean('with_surface_geometry_uv_map')
                     ),
                     # surface
                     surface_space='release',
@@ -380,7 +380,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         #
                         user=self._hook_option_opt.get('user'), time_tag=self._hook_option_opt.get('time_tag'),
                         #
-                        td_enable=self._hook_option_opt.get('td_enable'), rez_beta=self._hook_option_opt.get('rez_beta'),
+                        td_enable=self._hook_option_opt.get('td_enable'),
+                        rez_beta=self._hook_option_opt.get('rez_beta'),
                         #
                         with_texture_bake_convert=True,
                         bake_resolution=bake_resolution,
@@ -396,7 +397,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.Log.trace_method_error(
                     key,
                     u'obj="{}" is non-exists'.format(mya_group.path)
                 )
@@ -537,7 +538,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     scene_file_path
                 ).link_to(new_work_scene_src_file_path)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'preview work-scene-src link create',
                     u'link="{}" >> "{}" is exists'.format(
                         scene_file_path, latest_work_scene_src_file_path
@@ -687,6 +688,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         else:
             raise RuntimeError()
+
     @classmethod
     def _set_shot_asset_rig_replace_(cls, namespace, file_path):
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
@@ -695,11 +697,12 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             obj.set_replace(file_path)
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.Log.trace_method_error(
                     'usd export',
                     'namespace="{}" is non-exists'.format(namespace)
                 )
             )
+
     # TODO need support for pg_namespace
     @classmethod
     def get_shot_asset_dict(cls):

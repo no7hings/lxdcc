@@ -81,12 +81,12 @@ def set_look_export_by_any_scene_file(option):
                     'complete'
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'maya-look-export-script-run',
                     u'file="{}" is non-exists'.format(scene_src_file_path)
                 )
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             key,
             u'file="{}" is not available'.format(scene_src_file_path)
         )
@@ -174,7 +174,7 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
                     )
                 ).execute()
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             key,
             'obj="{}" is non-exists'.format(root_mya_obj.path)
         )
@@ -224,7 +224,7 @@ def set_asset_look_preview_yml_export(rsv_task_properties):
             )
         ).execute()
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             key,
             'obj="{}" is non-exists'.format(root)
         )
@@ -423,7 +423,7 @@ def set_look_preview_export_by_any_scene_file(option):
                     mya_dcc_objects.Scene.open_file(any_scene_file_path)
                 else:
                     raise IOError(
-                        utl_core.Log.set_module_error_trace(
+                        bsc_core.Log.trace_method_error(
                             'look-preview-export',
                             'file="{}" is non-exists'.format(any_scene_file_path)
                         )
@@ -506,7 +506,7 @@ def set_asset_look_preview_work_scene_src_create(rsv_task_properties):
                 scene_file_path
             ).link_to(work_scene_src_file_path)
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'preview work-scene-src link create',
                 u'link="{}" >> "{}" is exists'.format(
                     scene_file_path, latest_scene_src_file_path

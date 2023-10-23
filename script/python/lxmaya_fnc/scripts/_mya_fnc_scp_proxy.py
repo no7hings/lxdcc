@@ -58,12 +58,12 @@ def set_proxy_export_by_any_scene_file(option):
                             'complete'
                         )
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'maya-look-export-script-run',
                             u'file="{}" is non-exists'.format(scene_src_file_path)
                         )
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             key,
             u'file="{}" is not available'.format(scene_src_file_path)
         )

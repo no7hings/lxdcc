@@ -72,7 +72,7 @@ class AbsJobSender(object):
                 if '_id' in result:
                     return result['_id']
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'deadline-job-method',
                         'deadline-job="{}" is false or not start'.format(self._job_key)
                     )
@@ -169,7 +169,7 @@ class AbsJobSender2(object):
                 if '_id' in result:
                     return result['_id']
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'deadline-job-method',
                         'deadline-job is false or not start'
                     )
@@ -246,7 +246,7 @@ class AbsHookExecutor(AbsJobSender2):
         self._js_result = self._ddl_job_sender.set_job_submit()
         ddl_job_id = self.get_ddl_job_id()
         if ddl_job_id is not None:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'deadline-job-sender-result',
                 u'group-name="{}";name="{}";id="{}"option="{}"'.format(
                     self._ddl_job_sender.method.get('job.group_name'),
@@ -255,7 +255,7 @@ class AbsHookExecutor(AbsJobSender2):
                     self._script_option
                 )
             )
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'deadline-job-sender-result',
                 u'command=`{}`'.format(self._deadline_command)
             )
@@ -319,7 +319,7 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
             self._js_result = self._ddl_job_sender.set_job_submit()
             ddl_job_id = self.get_ddl_job_id()
             if ddl_job_id is not None:
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'deadline-job-sender-result',
                     u'group-name="{}";name="{}";id="{}"option="{}"'.format(
                         self._ddl_job_sender.method.get('job.group_name'),
@@ -328,7 +328,7 @@ class AbsRsvTaskHookExecutor(AbsHookExecutor):
                         self._script_option
                     )
                 )
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'deadline-job-sender-result',
                     u'command=`{}`'.format(self._deadline_command)
                 )
@@ -416,7 +416,7 @@ class AbsDdlRsvTaskRender(AbsHookExecutor):
             self._js_result = self._ddl_job_sender.set_job_submit()
             ddl_job_id = self.get_ddl_job_id()
             if ddl_job_id is not None:
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'deadline-job-sender-result',
                     u'group-name="{}";name="{}";id="{}"option="{}"'.format(
                         self._ddl_job_sender.method.get('job.group_name'),
@@ -425,7 +425,7 @@ class AbsDdlRsvTaskRender(AbsHookExecutor):
                         self._script_option
                     )
                 )
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'deadline-job-sender-result',
                     u'command=`{}`'.format(self._deadline_command)
                 )

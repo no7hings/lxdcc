@@ -7,9 +7,11 @@ import os
 
 import copy
 
+import lxlog.core as log_core
+
 from lxbasic import bsc_core
 
-from lxutil import utl_core
+import lxresource.core as rsc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -230,13 +232,13 @@ class GeometryAbcExporter(object):
         j = self._get_j_(js)
         if j:
             self._results = self._set_cmd_run_(j)
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'alembic export',
                 'file="{}"'.format(file_.path)
             )
             if self._results:
                 for i in self._results:
-                    utl_core.Log.set_result_trace(
+                    bsc_core.Log.trace_result(
                         'export ".abc": "{}"'.format(i)
                     )
         return self._results
@@ -329,7 +331,7 @@ class GeometryUsdExporter(object):
         #
         if self._results:
             for i in self._results:
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'maya-usd-exporter',
                     u'file="{}"'.format(i)
                 )
@@ -372,7 +374,7 @@ class GeometryUsdExporter1(object):
         self._results = [self._file_path]
         if self._results:
             for i in self._results:
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'maya-usd-exporter',
                     u'file="{}"'.format(i)
                 )
@@ -397,29 +399,28 @@ class DatabaseGeometryExport(object):
 
     def _set_uv_map_export_run_(self):
         if self._selected_path:
-            gp = utl_core.GuiProgressesRunner(maximum=len(self._selected_path))
-            for path in self._selected_path:
-                gp.set_update()
-                mesh = mya_dcc_objects.Mesh(path)
-                mesh_opt = mya_dcc_operators.MeshOpt(mesh)
-                if mesh_opt.get_shell_count() == 1:
-                    uv_maps = mesh_opt.get_uv_maps()
-                    key = mesh_opt.get_face_vertices_as_uuid()
-                    if bsc_core.DtbGeometryUvMapFileMtd.set_value(
-                            key=key,
-                            value=uv_maps,
-                            force=self._option['force']
-                    ) is True:
-                        utl_core.Log.set_module_result_trace(
+            with bsc_core.LogProcessContext.create(maximum=len(self._selected_path)) as gp:
+                for path in self._selected_path:
+                    gp.set_update()
+                    mesh = mya_dcc_objects.Mesh(path)
+                    mesh_opt = mya_dcc_operators.MeshOpt(mesh)
+                    if mesh_opt.get_shell_count() == 1:
+                        uv_maps = mesh_opt.get_uv_maps()
+                        key = mesh_opt.get_face_vertices_as_uuid()
+                        if bsc_core.DtbGeometryUvMapFileMtd.set_value(
+                                key=key,
+                                value=uv_maps,
+                                force=self._option['force']
+                        ) is True:
+                            log_core.Log.trace_method_result(
+                                '{}'.format(self.__class__.__name__),
+                                'obj="{}"'.format(mesh.path)
+                            )
+                    else:
+                        bsc_core.Log.trace_method_warning(
                             '{}'.format(self.__class__.__name__),
-                            'obj="{}"'.format(mesh.path)
+                            'obj="{}" shell is more than "one"'.format(mesh.path)
                         )
-                else:
-                    utl_core.Log.set_module_warning_trace(
-                        '{}'.format(self.__class__.__name__),
-                        'obj="{}" shell is more than "one"'.format(mesh.path)
-                    )
-            gp.set_stop()
 
     def set_run(self):
         self._set_uv_map_export_run_()
@@ -537,7 +538,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     )
                 )
                 c = len(mya_objs)
-                with utl_core.GuiProgressesRunner.create(maximum=c, label='geometry-usd export') as g_p:
+                with bsc_core.LogProcessContext.create(maximum=c, label='geometry-usd export') as g_p:
                     for i_mya_obj in mya_objs:
                         i_mya_type_name = i_mya_obj.get_type_name()
                         i_mya_api_type_name = i_mya_obj.get_api_type_name()
@@ -557,7 +558,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             i_rgb = display_color
                         # clean namespace
                         if ':' in i_usd_obj_path:
-                            utl_core.Log.set_module_warning_trace(
+                            bsc_core.Log.trace_method_warning(
                                 'usd-mesh export',
                                 'obj="{}" has namespace'.format(i_usd_obj_path)
                             )
@@ -616,7 +617,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                     if i_rgb is not None:
                                         i_usd_mesh_opt.fill_display_color(i_rgb)
                                 else:
-                                    utl_core.Log.set_module_error_trace(
+                                    bsc_core.Log.trace_method_error(
                                         'usd-mesh export',
                                         'obj="{}" is invalid'.format(i_mya_obj.path)
                                     )
@@ -671,7 +672,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 usd_geometry_exporter.execute()
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'maya-usd-export',
                 'obj="{}" is non-exists'.format(location)
             )
@@ -849,16 +850,16 @@ class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
         if export_args:
             payload_key = 'payload'
             payload_cfg_key = 'usda/geometry/{}'.format(payload_key)
-            payload_c = utl_core.Jinja.get_configure(payload_cfg_key)
-            payload_t = utl_core.Jinja.get_template(payload_cfg_key)
-            with utl_core.GuiProgressesRunner(maximum=len(export_args)) as g_p:
+            payload_c = rsc_core.RscJinjaConfigure.get_configure(payload_cfg_key)
+            payload_t = rsc_core.RscJinjaConfigure.get_template(payload_cfg_key)
+            with bsc_core.LogProcessContext.create(maximum=len(export_args)) as g_p:
                 for i_branch_key, i_branch_data in export_args:
                     g_p.set_update()
                     #
                     if i_branch_data:
                         i_branch_cfg_key = 'usda/geometry/all/{}'.format(i_branch_key)
-                        i_branch_c = utl_core.Jinja.get_configure(i_branch_cfg_key)
-                        i_branch_t = utl_core.Jinja.get_template(i_branch_cfg_key)
+                        i_branch_c = rsc_core.RscJinjaConfigure.get_configure(i_branch_cfg_key)
+                        i_branch_t = rsc_core.RscJinjaConfigure.get_template(i_branch_cfg_key)
                         for j_leaf_option in i_branch_data:
                             i_branch_c.append_element('elements', j_leaf_option)
                             #
@@ -903,7 +904,7 @@ class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 payload_raw
             )
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 self.KEY,
                 'nothing to export'
             )

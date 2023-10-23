@@ -55,7 +55,7 @@ central:
                         - 'switch "file" color-space'
                     type: PrxPressItem
                     path: <...path>/<..key>
-                    click_method: set_texture_color_spaces_switch
+                    click_method: ''
 
                 generate_texture_tiles_preview:
                     enable: True

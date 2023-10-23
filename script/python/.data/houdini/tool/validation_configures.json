@@ -7,7 +7,7 @@
 			"chn_description": null,
 			"icon": null,
 			"size": [720, 560],
-        	"command": "from lxhoudini.panel import widgets; widgets.SceneCheckerToolPanel('/project/asset/surface').set_window_show()"
+        	"command": ""
         },
 		"/project/shot/light/render": {
 			"label": "Shot-light-render",
@@ -16,7 +16,7 @@
 			"chn_description": null,
 			"icon": null,
 			"size": [720, 560],
-        	"command": "from lxhoudini.panel import widgets; widgets.SceneCheckerToolPanel('/project/shot/light/render').set_window_show()"
+        	"command": ""
 		}
     },
     "menu": {

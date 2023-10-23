@@ -17,10 +17,10 @@ class _MacroMtd(object):
         #
         if contents:
             if ktn_core.get_is_ui_mode():
-                utl_core.DialogWindow.set_create(
+                utl_core.DccDialog.create(
                     label,
                     content=u'\n'.join(contents),
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -28,7 +28,7 @@ class _MacroMtd(object):
                 )
             else:
                 for i in contents:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         label, i
                     )
 
@@ -274,10 +274,10 @@ class LxAsset(object):
 
         if content is not None:
             if ktn_core.get_is_ui_mode():
-                utl_core.DialogWindow.set_create(
+                utl_core.DccDialog.create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -392,7 +392,7 @@ class LxAsset(object):
                 )
                 self.__set_usd_variant_by_dict_(usd_variant_dict)
                 #
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
@@ -464,7 +464,7 @@ class LxAsset(object):
                     usd_variant_dict
                 )
                 #
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'set usd create for shot-asset',
                     'file="{}"'.format(asset_shot_set_usd_file_path)
                 )
@@ -534,10 +534,10 @@ class LxAsset(object):
         #
         if content is not None:
             if ktn_core.get_is_ui_mode():
-                utl_core.DialogWindow.set_create(
+                utl_core.DccDialog.create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -588,10 +588,10 @@ class LxAsset(object):
         #
         if content is not None:
             if ktn_core.get_is_ui_mode():
-                utl_core.DialogWindow.set_create(
+                utl_core.DccDialog.create(
                     'Shot Asset Loader',
                     content=content,
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -782,7 +782,7 @@ class LxAssetAss(object):
             stat_frame, end_frame = obj_opt.get('export.start_frame'), obj_opt.get('export.end_frame')
             if stat_frame != end_frame:
                 frames = range(int(stat_frame), int(end_frame)+1)
-                with utl_core.LogProgressRunner.create_as_bar(maximum=len(frames), label='ass sequence export') as l_p:
+                with bsc_core.LogProcessContext.create_as_bar(maximum=len(frames), label='ass sequence export') as l_p:
                     for i_frame in frames:
                         ktn_core.NGObjOpt(
                             NodegraphAPI.GetRootNode()
@@ -795,7 +795,7 @@ class LxAssetAss(object):
                             settings=rss
                         )
                         l_p.set_update()
-                        bsc_core.LogMtd.trace_method_result(
+                        bsc_core.Log.trace_method_result(
                             'ass sequence export',
                             'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
                         )
@@ -1281,7 +1281,7 @@ class LxRenderer(object):
     def set_submit_to_deadline(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-        import lxutil_gui.panel.utl_pnl_widgets as utl_pnl_widgets
+        import lxutil_gui.panel.widgets as utl_pnl_widgets
 
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
 

@@ -24,7 +24,7 @@ class GrowMesh(_mya_dcc_obj_dag.Shape):
 
     def get_painter_file_node_paths(self):
         return cmds.listConnections(self.path, destination=0, source=1, type=ma_configure.Util.FILE_TYPE_NAME) or []
-    
+
     def get_painter_file_nodes(self):
         lis = []
         for path in self.get_painter_file_node_paths():
@@ -80,17 +80,20 @@ class XGenObj(object):
     def __init__(self, *args):
         self._name = str(args[0])
         self._path = str(self._get_path(*args[1:]))
+
     @property
     def path(self):
         return self._path
 
     def _get_path(self, *args):
         if args:
-            return '/' + '/'.join([i.name for i in args]) + '/' + self.name
-        return '/' + self.name
+            return '/'+'/'.join([i.name for i in args])+'/'+self.name
+        return '/'+self.name
+
     @property
     def name(self):
         return self._name
+
     @property
     def type(self):
         return self.__class__.__name__
@@ -124,15 +127,18 @@ class Description(XGenObj):
     def __init__(self, name, platte):
         super(Description, self).__init__(name, platte)
         self._platte = platte
+
     @property
     def platte(self):
         return self._platte
+
     # property
     def get_id(self):
         return self.get_port('descriptionId').get()
 
     def get_data_directory(self):
         return '{}/{}'.format(self.platte.get_data_directory(), self.name)
+
     # object
     def get_object_exists(self, name):
         return name in xg.objects(self.platte.name, self.name)
@@ -145,6 +151,7 @@ class Description(XGenObj):
 
     def get_objects(self):
         return [self.get_object(name=i) for i in self.get_object_names()]
+
     # module
     def get_module(self, name):
         return Module(name, self.platte, self)
@@ -157,6 +164,7 @@ class Description(XGenObj):
 
     def set_module_import(self, file_path):
         xg.importFXModule(self.platte.name, self.name, file_path)
+
     # attribute
     def get_port_is_exists(self, name):
         return name in xg.allAttrs(self.platte.name, self.name)
@@ -173,6 +181,7 @@ class Description(XGenObj):
             self.get_port(name=i)
             for i in fnc(self.platte.name, self.name)
         ]
+
     # file port
     def get_file_attributes(self):
         def get_fnc_(lis_, obj_):
@@ -188,6 +197,7 @@ class Description(XGenObj):
         for i in self.get_modules():
             get_fnc_(lis, i)
         return lis
+
     # grow mesh
     def get_grow_mesh_names(self):
         return xg.boundGeometry(self.platte.name, self.name)
@@ -225,8 +235,10 @@ class Description(XGenObj):
 
 class Palette(XGenObj):
     DESCRIPTION_CLS = Description
+
     def __init__(self, name):
         super(Palette, self).__init__(name)
+
     # property
     def get_data_directory(self):
         s = self.get_port('xgDataPath').get()
@@ -248,6 +260,7 @@ class Palette(XGenObj):
 
     def set_project_directory_repath(self, dir_path):
         self.get_port('xgProjectPath').set(dir_path)
+
     # compose
     def get_description(self, name):
         return self.DESCRIPTION_CLS(
@@ -256,6 +269,7 @@ class Palette(XGenObj):
 
     def get_descriptions(self):
         return [self.get_description(name=i) for i in xg.descriptions(self.name)]
+
     # port
     def get_port_is_exists(self, name):
         return name in xg.allAttrs(self.name)
@@ -285,6 +299,7 @@ class Palette(XGenObj):
             for i in
             list(set([j for i in self.get_descriptions() for j in i.get_grow_mesh_names()]))
         ]
+
     @classmethod
     def _get_files_in_node(cls, collection, node):
         ports = node.get_ports()
@@ -292,6 +307,7 @@ class Palette(XGenObj):
             if port.get_is_use_as_files() is True:
                 if port.get_is_file_enable():
                     [collection.append(i) for i in port.get_os_file_paths() if i not in collection]
+
     # description
     def get_description_file_paths(self):
         lis = []
@@ -308,6 +324,7 @@ class Palette(XGenObj):
 
     def get_file_description_nodes(self):
         pass
+
     # grow mesh
     def get_grow_mesh_painter_file_nodes(self):
         lis = []
@@ -330,16 +347,20 @@ class Palette(XGenObj):
 class Object(XGenObj):
     def __init__(self, name, platte, description):
         super(Object, self).__init__(name, platte, description)
-        self._platte, self._description,  = platte, description
+        self._platte, self._description, = platte, description
+
     @property
     def platte(self):
         return self._platte
+
     @property
     def type(self):
         return self.name
+
     @property
     def description(self):
         return self._description
+
     # port
     def get_port_is_exists(self, name):
         return name in xg.allAttrs(self.platte.name, self.description.name, self.name)
@@ -370,6 +391,7 @@ class Object(XGenObj):
 class Module(Object):
     def __init__(self, name, platte, description):
         super(Module, self).__init__(name, platte, description)
+
     @property
     def type(self):
         return xg.fxModuleType(self.platte.name, self.description.name, self.name)
@@ -380,27 +402,34 @@ class Module(Object):
 
 class Port(object):
     OS_FILE_CLS = utl_dcc_objects.OsFile
+
     # noinspection PyUnusedLocal,PyShadowingBuiltins
     def __init__(self, name, platte=None, description=None, object=None):
         self._name, self._platte, self._description, self._object = name, platte, description, object
 
     def _get_sub_args(self):
         return [i.name for i in [self.platte, self.description, self.object] if i is not None]
+
     @property
     def name(self):
         return self._name
+
     @property
     def path(self):
-        return self.node.path + '.' + self.name
+        return self.node.path+'.'+self.name
+
     @property
     def node(self):
         return [i for i in [self.platte, self.description, self.object] if i is not None][-1]
+
     @property
     def platte(self):
         return self._platte
+
     @property
     def description(self):
         return self._description
+
     @property
     def object(self):
         return self._object
@@ -502,6 +531,7 @@ class Port(object):
 class GroomFnc(object):
     def __init__(self):
         self._check_dict = {}
+
     # description
     @classmethod
     def get_description_files(cls):
@@ -510,6 +540,7 @@ class GroomFnc(object):
         for p in s.get_palettes():
             [lis.append(i) for i in p.get_description_files() if i not in lis]
         return lis
+
     @classmethod
     def get_description_file_paths(cls):
         lis = []
@@ -517,6 +548,7 @@ class GroomFnc(object):
         for p in s.get_palettes():
             [lis.append(i) for i in p.get_description_file_paths() if i not in lis]
         return lis
+
     @classmethod
     def get_description_lost_files(cls):
         lis = []
@@ -526,9 +558,11 @@ class GroomFnc(object):
                 if file_.get_is_exists() is False:
                     lis.append(file_)
         return lis
+
     @classmethod
     def get_description_lost_file_paths(cls):
         return [i.file_path for i in cls.get_description_lost_files()]
+
     # grow mesh
     @classmethod
     def get_grow_mesh_painter_file_nodes(cls):
@@ -537,12 +571,15 @@ class GroomFnc(object):
         for p in s.get_palettes():
             [lis.append(i) for i in p.get_grow_mesh_painter_file_nodes()]
         return lis
+
     @classmethod
     def get_grow_mesh_painter_file_node_paths(cls):
         return list(set([i.path for i in cls.get_grow_mesh_painter_file_nodes()]))
+
     @classmethod
     def get_grow_mesh_painter_file_paths(cls):
         return list(set([i.get_file().file_path for i in cls.get_grow_mesh_painter_file_nodes()]))
+
     # lost
     @classmethod
     def get_grow_mesh_lost_painter_file_nodes(cls):
@@ -553,15 +590,19 @@ class GroomFnc(object):
                 if file_node.get_file().get_is_exists() is False:
                     lis.append(file_node)
         return lis
+
     @classmethod
     def get_grow_mesh_lost_painter_file_node_paths(cls):
         return list(set([i.path for i in cls.get_grow_mesh_lost_painter_file_nodes()]))
+
     @classmethod
     def get_grow_mesh_lost_painter_files(cls):
         return list(set([i.get_file() for i in cls.get_grow_mesh_lost_painter_file_nodes()]))
+
     @classmethod
     def get_grow_mesh_lost_painter_file_paths(cls):
         return list(set([i.file_path for i in cls.get_grow_mesh_lost_painter_files()]))
+
     # action
     @classmethod
     def set_grow_mesh_painter_file_collection(cls, target_dir_path, repath=False):

@@ -2,6 +2,8 @@
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 
@@ -49,7 +51,7 @@ def set_unknown_nodes_clear():
         if cmds.objExists(unknown_node) is True:
             cmds.lockNode(unknown_node, lock=0)
             cmds.delete(unknown_node)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'scene-clear',
                 u'unknown-node: "{}"'.format(unknown_node)
             )
@@ -58,7 +60,7 @@ def set_unknown_nodes_clear():
 def set_unknown_plug_ins_clear():
     for unknown_plug_in in cmds.unknownPlugin(query=1, list=1) or []:
         cmds.unknownPlugin(unknown_plug_in, remove=1)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'scene-clear',
             u'unknown-plug: "{}"'.format(unknown_plug_in)
         )
@@ -94,7 +96,7 @@ def set_unused_namespaces_clear():
     #
     def set_remove_fnc(namespace_):
         cmds.namespace(removeNamespace=namespace_)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'scene-clear',
             u'unused-namespace: "{}"'.format(namespace_)
         )
@@ -134,7 +136,7 @@ def set_unused_windows_clear():
                 window = panel + 'Window'
                 if cmds.window(window, query=1, exists=1):
                     cmds.deleteUI(window, window=1)
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'scene-clear',
                         u'unused-window: "{}"'.format(window)
                     )
@@ -151,7 +153,7 @@ def set_unload_references_clear():
         if is_loaded is False:
             cmds.lockNode(reference_node, lock=0)
             cmds.delete(reference_node)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'scene-clear',
                 u'unload-reference-node: "{}"'.format(reference_node)
             )

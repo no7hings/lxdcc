@@ -8,16 +8,16 @@ class Packages(object):
 
 
 def set_reload(modules=None):
-    import lxbasic.objects as bsc_objects
+    import lxbasic.core as bsc_core
     #
     if isinstance(modules, (tuple, list)):
-        p = bsc_objects.PyReloader(modules)
+        p = bsc_core.PyReloader(modules)
     else:
-        p = bsc_objects.PyReloader(
+        p = bsc_core.PyReloader(
             [
                 'lxbasic', 'lxcontent', 'lxsession', 'lxdatabase', 'lxdeadline', 'lxuniverse', 'lxresolver', 'lxarnold',
                 'lxusd',
-                'lxutil', 'lxutil_gui',
+                'lxutil', 'lxgui', 'lxutil_gui',
                 'lxshotgun', 'lxshotgun_gui',
                 'lxkatana', 'lxkatana_gui'
             ]

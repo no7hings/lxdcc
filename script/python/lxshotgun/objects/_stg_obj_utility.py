@@ -78,7 +78,7 @@ class StgObjQuery(object):
             self.type, self.id,
             {key: value}
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun property set',
             'type="{}", id="{}", property="{}"'.format(
                 self.type,
@@ -96,7 +96,7 @@ class StgObjQuery(object):
             value,
             field_name=key
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun entity upload',
             'type="{}", id="{}", property="{}"'.format(
                 self.type,
@@ -317,7 +317,7 @@ class StgConnector(object):
             )
         )
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun entity create',
             u'stg-{}="{}"'.format(branch, entity_name)
         )
@@ -515,7 +515,7 @@ class StgConnector(object):
                 content=task
             )
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun entity create',
             u'task="{}"'.format(task)
         )
@@ -677,7 +677,7 @@ class StgConnector(object):
                 user=self.get_stg_user(**kwargs),
             )
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun entity create',
             u'stg-version="{}"'.format(name)
         )
@@ -742,7 +742,7 @@ class StgConnector(object):
                         "version_number": version_number,
                     }
                 )
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'shotgun entity create',
                     u'stg-published-file="{}"'.format(file_path)
                 )
@@ -773,7 +773,7 @@ class StgConnector(object):
                 dict(name=tag_name)
             )
         ]
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun entity create',
             u'stg-tag="{}"'.format(tag_name)
         )
@@ -804,7 +804,7 @@ class StgConnector(object):
                 project=self.get_stg_project(**kwargs)
             )
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'shotgun entity create',
             u'stg-playlist="{}"'.format(name)
         )
@@ -823,7 +823,7 @@ class StgConnector(object):
             'Task', task_id,
             {'sg_last_version': stg_version}
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'stg-version-movie-update',
             u'file="{}"'.format(movie_file_path)
         )
@@ -859,7 +859,7 @@ class StgConnector(object):
                     )
                 )
             ]
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'shotgun entity create',
                 u'stg-look-pass="{}"'.format(look_pass_code)
             )

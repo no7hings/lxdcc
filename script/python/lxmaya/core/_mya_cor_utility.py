@@ -271,7 +271,7 @@ class UtlScriptJob(object):
             for i in _:
                 index = i.split(': ')[0]
                 cmds.scriptJob(kill=int(index), force=1)
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'job-script kill',
                     'job-script="{}"'.format(i.lstrip().rstrip())
                 )
@@ -303,9 +303,8 @@ class Modifier(object):
                 _method = fnc(*args, **kwargs)
                 return _method
             except Exception:
-                from lxutil import utl_core
-                is_ui_mode = not cmds.about(batch=1)
-                utl_core.ExceptionCatcher.set_create(use_window=is_ui_mode)
+                from lxbasic import bsc_core
+                bsc_core.LogException.trace()
                 raise
             #
             finally:
@@ -323,7 +322,7 @@ class CallbackOpt(object):
         _index = cmds.scriptJob(
             parent='modelPanel4', event=[self._callback_type, self._function]
         )
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'callback',
             'add as "{}" at "{}"'.format(self._callback_type, _index)
         )

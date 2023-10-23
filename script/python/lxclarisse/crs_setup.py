@@ -4,7 +4,7 @@ import ix
 
 import lxcontent.objects as ctt_objects
 
-from lxutil_gui import gui_core
+import lxgui.core as gui_core
 
 
 class MenuSetup(object):
@@ -65,7 +65,7 @@ class MenuSetup(object):
                     i_icon_name = c.get('{}.icon_name'.format(i_key))
                     if i_icon_name:
                         i_item.set_icon(
-                            gui_core.RscIconFile.get(i_icon_name)
+                            gui_core.GuiIcon.get(i_icon_name)
                         )
                 elif i_type == 'separator':
                     i_item = cls._add_separator_(i_path)
@@ -75,7 +75,7 @@ class MenuSetup(object):
                     i_icon_name = c.get('{}.icon_name'.format(i_key))
                     if i_icon_name:
                         i_item.set_icon(
-                            gui_core.RscIconFile.get(i_icon_name)
+                            gui_core.GuiIcon.get(i_icon_name)
                         )
 
                 print 'add {}: "{}"'.format(i_type, '.'.join(i_args))

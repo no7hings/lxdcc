@@ -42,7 +42,7 @@ class AbsLookOpt(object):
         shape_path = self._obj.path
         value = 'initialShadingGroup'
         cmds.sets(shape_path, forceElement=value)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'material-assign',
             u'assign="{}" >> "{}"'.format(shape_path, value)
         )
@@ -73,18 +73,18 @@ class AbsLookOpt(object):
                 # noinspection PyBroadException
                 try:
                     cmds.sets(geometry_path, forceElement=material_path)
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'material-assign',
                         u'assign="{}" >> "{}"'.format(geometry_path, material_path)
                     )
-                except:
+                except Exception:
                     bsc_core.ExceptionMtd.set_print()
-                    utl_core.Log.set_module_error_trace(
+                    bsc_core.Log.trace_method_error(
                         'material-assign',
                         u'assign="{}" >> "{}"'.format(geometry_path, material_path)
                     )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'material-assign',
                 'material-obj="{}" is non-exists'.format(material_path)
             )
@@ -191,7 +191,7 @@ class MeshLookOpt(AbsLookOpt):
                         value = port.get()
                         properties[key] = value
                     else:
-                        utl_core.Log.set_warning_trace(
+                        bsc_core.Log.trace_warning(
                             'port: "{}" is Non-exists'.format(port.path)
                         )
         return properties
@@ -299,7 +299,7 @@ class XgenDescriptionLookOpt(AbsLookOpt):
                         value = port.get()
                         properties[key] = value
                     else:
-                        utl_core.Log.set_warning_trace(
+                        bsc_core.Log.trace_warning(
                             'port: "{}" is Non-exists'.format(port.path)
                         )
         return properties

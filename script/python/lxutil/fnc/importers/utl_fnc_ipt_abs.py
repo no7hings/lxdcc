@@ -19,15 +19,18 @@ class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         auto_rename_node=True
     )
+
     def __init__(self, option):
         super(AbsDccLookYamlImporter, self).__init__(option)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'look-yml-import',
             'file="{}"'.format(self._option['file'])
         )
         file_path = self.get('file')
         if bsc_core.StgPathMtd.get_is_exists(file_path) is True:
-            self._time_tag = bsc_core.TimestampOpt(bsc_core.StgFileOpt(file_path).get_modify_timestamp()).get_as_tag_36()
+            self._time_tag = bsc_core.TimestampOpt(
+                bsc_core.StgFileOpt(file_path).get_modify_timestamp()
+                ).get_as_tag_36()
             self._raw = ctt_objects.Content(
                 value=self.get('file')
             )

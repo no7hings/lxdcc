@@ -96,7 +96,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
     def pre_run_fnc(cls):
         _ = NodegraphAPI.GetAllNodesByType('NetworkMaterialEdit') or []
         if _:
-            gp = utl_core.GuiProgressesRunner(maximum=len(_))
+            gp = bsc_core.LogProcessContext(maximum=len(_))
             #
             for i_ktn_obj in _:
                 gp.set_update()
@@ -106,7 +106,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
                 except:
                     bsc_core.ExceptionMtd.set_print()
                     #
-                    bsc_core.LogMtd.trace_error(
+                    bsc_core.Log.trace_error(
                         'materials update "NetworkMaterialEdit" "{}" is failed'.format(i_ktn_obj.getName())
                     )
             #
@@ -147,7 +147,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
                 except:
                     bsc_core.ExceptionMtd.set_print()
                     #
-                    bsc_core.LogMtd.trace_error(
+                    bsc_core.Log.trace_error(
                         'shaders update "NetworkMaterialEdit" "{}" is failed'.format(i_ktn_obj.getName())
                     )
 
@@ -239,7 +239,7 @@ class AbsTextureReferences(object):
                     i_e_new = cls.EXPRESSION_PATTERN_TGT.format(**i_kwargs)
                     if not e == i_e_new:
                         ktn_port.setExpression(i_e_new)
-                        bsc_core.LogMtd.trace_method_result(
+                        bsc_core.Log.trace_method_result(
                             'file repath',
                             u'attribute="{}", expression="{}"'.format(port.path, i_e_new)
                         )
@@ -248,7 +248,7 @@ class AbsTextureReferences(object):
             if remove_expression is True:
                 ktn_port.setExpressionFlag(False)
                 ktn_port.setValue(file_path, 0)
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'file repath',
                     u'attribute="{}", file="{}"'.format(port.path, file_path)
                 )
@@ -257,7 +257,7 @@ class AbsTextureReferences(object):
             v = ktn_port.getValue(0)
             if not v == file_path:
                 ktn_port.setValue(file_path, 0)
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'file repath',
                     u'attribute="{}", file="{}"'.format(port.path, file_path)
                 )

@@ -1,7 +1,7 @@
 # coding:utf-8
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_process, _bsc_cor_storage, _bsc_cor_executes
+from lxbasic.core import _bsc_cor_process, _bsc_cor_storage, _bsc_cor_execute
 
 
 class OslFileMtd(object):
@@ -16,7 +16,7 @@ class OslFileMtd(object):
         compile_file_path = '{}.oso'.format(file_opt.path_base)
         #
         cmd_args = [
-            _bsc_cor_executes.Executes.oslc(),
+            _bsc_cor_execute.Executes.oslc(),
             '-o "{}" "{}"'.format(compile_file_path, file_opt.path),
         ]
         _bsc_cor_process.SubProcessMtd.execute_with_result(' '.join(cmd_args))
@@ -29,7 +29,7 @@ class OslFileMtd(object):
         compile_file_path = '{}.oso'.format(file_opt.path_base)
         #
         cmd_args = [
-            _bsc_cor_executes.Executes.oslinfo(),
+            _bsc_cor_execute.Executes.oslinfo(),
             '-v "{}"'.format(compile_file_path),
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))

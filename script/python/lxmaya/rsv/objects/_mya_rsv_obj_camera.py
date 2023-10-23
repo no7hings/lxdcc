@@ -37,7 +37,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword = 'asset-camera-main-abc-file'
             else:
                 raise RuntimeError(
-                    utl_core.Log.set_module_error_trace(
+                    bsc_core.Log.trace_method_error(
                         key,
                         u'workspace="{}" is not available'.format(workspace)
                     )
@@ -60,7 +60,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             ).set_run()
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.Log.trace_method_error(
                     key,
                     u'obj="{}" is non-exists'.format(mya_group.path)
                 )

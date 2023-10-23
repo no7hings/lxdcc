@@ -4,16 +4,18 @@ import maya.cmds as cmds
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.api.OpenMaya as om2
 
+from lxbasic import bsc_core
+
 from lxutil import utl_core, utl_abstract
 
 from lxmaya.dcc.dcc_objects import _mya_dcc_obj_utility, _mya_dcc_obj_dag
 
 from lxmaya.modifiers import _mya_mdf_utility
 
-from lxutil_gui import gui_core
+import lxgui.core as gui_core
 
 
-class MeshComponent(utl_abstract.AbsObjGuiDef):
+class MeshComponent(utl_abstract.AbsGuiExtraDef):
     PATHSEP = '.'
     TYPE_DICT = {
         'f': 'face',
@@ -31,9 +33,10 @@ class MeshComponent(utl_abstract.AbsObjGuiDef):
     def object(self):
         return self._obj
 
-    @property
-    def type(self):
+    def get_type(self):
         return self._type
+
+    type = property(get_type)
 
     @property
     def name(self):
@@ -47,7 +50,7 @@ class MeshComponent(utl_abstract.AbsObjGuiDef):
 
     @property
     def icon(self):
-        return utl_core.Icon.get('obj/{}'.format(self.type))
+        return gui_core.GuiIcon.get('obj/{}'.format(self.get_type()))
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
@@ -60,7 +63,7 @@ class MeshComponent(utl_abstract.AbsObjGuiDef):
         return self.__str__()
 
 
-class Component(utl_abstract.AbsObjGuiDef):
+class Component(utl_abstract.AbsGuiExtraDef):
     PATHSEP = '.'
     TYPE_DICT = {
         'f': 'face',
@@ -88,7 +91,7 @@ class Component(utl_abstract.AbsObjGuiDef):
 
     @property
     def icon(self):
-        return gui_core.RscIconFile.get('obj/{}'.format(self.type))
+        return gui_core.GuiIcon.get('obj/{}'.format(self.type))
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
@@ -395,7 +398,7 @@ class Mesh(_mya_dcc_obj_dag.Shape):
         if clear_history is True:
             cmds.delete(tgt_obj_path, constructionHistory=1)
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'mesh-uv-transfer',
             u'obj="{}" > "{}"'.format(src_obj_path, tgt_obj_path)
         )

@@ -1,35 +1,35 @@
 # coding:utf-8
 from lxutil import utl_abstract
 
-from lxutil_gui import gui_core
+import lxgui.core as gui_core
 
 import lxuniverse.abstracts as unr_abstracts
 
 
 class Obj(
     utl_abstract.AbsDccObjDef,
-    unr_abstracts.AbsObjDagDef,
-    unr_abstracts.AbsObjGuiDef
+    unr_abstracts.AbsObjDagExtraDef,
+    unr_abstracts.AbsGuiExtraDef
 ):
     PATHSEP = '/'
     def __init__(self, path, **kwargs):
-        self._set_obj_dag_def_init_(path)
+        self._init_obj_dag_extra_def_(path)
         if self.path.startswith(self.PATHSEP):
             self._name = self.path.split(self.PATHSEP)[-1]
         else:
             self._name = self.path
 
         if 'icon_name' in kwargs:
-            self._icon_file_path = gui_core.RscIconFile.get(kwargs.get('icon_name'))
+            self._icon_file_path = gui_core.GuiIcon.get(kwargs.get('icon_name'))
         else:
-            self._icon_file_path = gui_core.RscIconFile.get('obj/object')
+            self._icon_file_path = gui_core.GuiIcon.get('obj/object')
 
         if 'type_name' in kwargs:
             self._type_name = kwargs.get('type_name')
         else:
             self._type_name = 'null'
 
-        self._set_obj_gui_def_init_()
+        self._init_gui_extra_def_()
     def get_type_name(self):
         return self._type_name
 
@@ -42,17 +42,17 @@ class Obj(
 
     def create_dag_fnc(self, path):
         _ = self.__class__(path)
-        _._icon_file_path = gui_core.RscIconFile.get('obj/group')
+        _._icon_file_path = gui_core.GuiIcon.get('obj/group')
         return _
 
     def _get_child_paths_(self, path):
         pass
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         pass
 
 
-class Component(utl_abstract.AbsObjGuiDef):
+class Component(utl_abstract.AbsGuiExtraDef):
     PATHSEP = '.'
     TYPE_DICT = {
         'f': 'face',
@@ -75,7 +75,7 @@ class Component(utl_abstract.AbsObjGuiDef):
         return self._path
     @property
     def icon(self):
-        return gui_core.RscIconFile.get('obj/{}'.format(self.type))
+        return gui_core.GuiIcon.get('obj/{}'.format(self.type))
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(

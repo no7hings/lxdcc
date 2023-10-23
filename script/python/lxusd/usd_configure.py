@@ -3,8 +3,6 @@ import os
 
 import jinja2
 
-from lxutil import utl_configure
-
 
 class Data(object):
     ROOT = os.path.dirname(__file__.replace('\\', '/'))

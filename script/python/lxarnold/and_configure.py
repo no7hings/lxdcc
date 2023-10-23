@@ -4,7 +4,7 @@ import arnold as ai
 
 import os
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 
 class Data(object):
@@ -263,7 +263,6 @@ class GeometryPort(object):
 
 
 class ObjProperty(object):
-    from lxbasic import objects
     AR_MESH_BLACKLIST = [
         'id',
         'visibility',

@@ -1,6 +1,6 @@
 # coding:utf-8
-import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects)
-p = utl_dcc_objects.PyReloader(
+import lxbasic.core as bsc_core
+p = bsc_core.PyReloader(
     [
         'lxuniverse', 'lxresolver',
         'lxarnold', 'lxusd',

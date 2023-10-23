@@ -32,7 +32,7 @@ class EventOpt(object):
             enabled=True
         )
         #
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'event register',
             'event-type="{}"'.format(self._event_type)
         )
@@ -43,7 +43,7 @@ class EventOpt(object):
                 handler=self._handler,
                 eventType=self._event_type
             )
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'event deregister',
                 'event-type="{}"'.format(self._event_type)
             )
@@ -66,7 +66,7 @@ class CallbackOpt(object):
             callbackFcn=self._function
         )
         #
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'callback register',
             'callback-type="{}"'.format(self._callback_type)
         )
@@ -76,7 +76,7 @@ class CallbackOpt(object):
             callbackType=self._callback_type,
             callbackFcn=self._function
         )
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'callback deregister',
             'callback-type="{}"'.format(self._callback_type)
         )
@@ -155,7 +155,7 @@ class EventMtd(object):
     @classmethod
     def set_arnold_ramp_write(cls, ktn_obj_opt):
         cls._set_arnold_ramp_write_(ktn_obj_opt)
-        # bsc_core.LogMtd.trace_method_result(
+        # bsc_core.Log.trace_method_result(
         #     'ramp-write',
         #     'obj-name="{}"'.format(ktn_obj_opt.name)
         # )
@@ -193,7 +193,7 @@ class EventMtd(object):
     def set_arnold_ramp_read(cls, ktn_obj_opt):
         def fnc_():
             cls._set_arnold_ramp_read_(ktn_obj_opt)
-            # bsc_core.LogMtd.trace_method_result(
+            # bsc_core.Log.trace_method_result(
             #     'ramp-read',
             #     'obj-name="{}"'.format(ktn_obj_opt.name)
             # )
@@ -529,7 +529,7 @@ class VariablesSetting(object):
 class WorkspaceSetting(object):
     def __init__(self):
         self._cfg = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml(
+            value=bsc_core.RscConfigure.get_yaml(
                 'katana/script/scene'
             )
         )
@@ -633,14 +633,14 @@ class WorkspaceSetting(object):
                         _n = o.get('dcc.node')
                         self.set_current_look_output(_n)
                     #
-                    w = utl_core.DialogWindow.set_create(
+                    w = utl_core.DccDialog.create(
                         'Workspace Setting',
                         content=(
                             'More then one "LookFileBake" in scene:\n'
                             '   1, choose one use as current\n'
                             '   2, press "Confirm" to continue'
                         ),
-                        status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                        status=utl_core.DccDialog.ValidationStatus.Warning,
                         options_configure=self._cfg.get('main.look.dialog_options'),
                         #
                         yes_method=yes_fnc_,
@@ -678,14 +678,14 @@ class WorkspaceSetting(object):
                             _n = o.get('dcc.node')
                             self.set_current_look_output(_n)
                         #
-                        w = utl_core.DialogWindow.set_create(
+                        w = utl_core.DccDialog.create(
                             'Workspace Setting',
                             content=(
                                 'More then one "LookFileBake" in scene:\n'
                                 '   1, choose one use as current\n'
                                 '   2, press "Confirm" to continue'
                             ),
-                            status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                            status=utl_core.DccDialog.ValidationStatus.Warning,
                             options_configure=self._cfg.get('main.look.dialog_options'),
                             #
                             yes_method=yes_fnc_,

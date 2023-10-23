@@ -73,7 +73,7 @@ class MtdBasic(object):
                     return json.load(j, object_pairs_hook=collections.OrderedDict)
             elif ext in ['.yml']:
                 with open(file_path) as y:
-                    return bsc_core.YamlMtd.load(y)
+                    return bsc_core.CttYamlBase.load(y)
             else:
                 raise TypeError(
                     'ext: "{}" is not available'.format(ext)
@@ -211,8 +211,8 @@ class MtdBasic(object):
             name
         )
         if _:
-            if rsv_core.TRACE_WARNING_ENABLE is True:
-                bsc_core.LogMtd.trace_method_warning(
+            if rsv_core.WARNING_ENABLE is True:
+                bsc_core.Log.trace_method_warning(
                     'name check',
                     u'{}-name="{}" is not available'.format(rsv_type, name)
                 )
@@ -358,7 +358,7 @@ class RawOpt(object):
 
     def get_as_unfold(self, key):
         keys_all = self.get_all_keys()
-        return ctt_abstracts.ContentMtd.unfold_fnc(
+        return ctt_abstracts.CttBase.unfold_fnc(
             key, keys_all, self._keys_exclude, self.get
         )
 
@@ -618,7 +618,7 @@ class AbsRsvMatcher(
         for i in keys:
             if i not in format_dict:
                 raise RuntimeError(
-                    bsc_core.LogMtd.trace_method_error(
+                    bsc_core.Log.trace_method_error(
                         'path resolver',
                         'key "{}" in pattern "{}" is not value assigned'.format(
                             i,
@@ -726,7 +726,7 @@ class AbsRsvDef(object):
 class AbsRsvObjDef(object):
     PATHSEP = '/'
 
-    def _set_obj_def_init_(self):
+    def _init_obj_base_def_(self):
         self._rsv_properties = None
         self._rsv_path = None
         self._rsv_matcher = None
@@ -798,9 +798,9 @@ class AbsRsvObj(
     AbsRsvDef,
     AbsRsvObjDef,
     AbsRsvPropertiesDef,
-    unr_abstracts.AbsObjDagDef,
+    unr_abstracts.AbsObjDagExtraDef,
     # gui
-    unr_abstracts.AbsObjGuiDef
+    unr_abstracts.AbsGuiExtraDef
 ):
     @classmethod
     def _completion_kwargs_from_parent_(cls, rsv_parent, kwargs):
@@ -812,7 +812,7 @@ class AbsRsvObj(
     #
     def __init__(self, *args, **kwargs):
         self._set_rsv_properties_def_init_()
-        self._set_obj_def_init_()
+        self._init_obj_base_def_()
         #
         rsv_project = args[0]
         #
@@ -821,8 +821,8 @@ class AbsRsvObj(
         self._set_rsv_obj_def_init_(
             self.PROPERTIES_CLS(self, bsc_core.DictMtd.sort_key_to(kwargs))
         )
-        self._set_obj_dag_def_init_(self._rsv_path)
-        self._set_obj_gui_def_init_()
+        self._init_obj_dag_extra_def_(self._rsv_path)
+        self._init_gui_extra_def_()
         #
         self._rsv_matcher = self._rsv_project._project__project__create_rsv_matcher_(
             self._rsv_properties.value
@@ -886,7 +886,7 @@ class AbsRsvObj(
 
     def _open_source_directory_open_(self):
         directory_path = self._get_source_directory_path_()
-        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
 
     # user
     def _get_user_directory_path_(self):
@@ -903,7 +903,7 @@ class AbsRsvObj(
 
     def _open_user_directory_open_(self):
         directory_path = self._get_user_directory_path_()
-        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
 
     # release
     def _get_release_directory_path_(self):
@@ -919,7 +919,7 @@ class AbsRsvObj(
 
     def _open_release_directory_open_(self):
         directory_path = self._get_release_directory_path_()
-        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
 
     # temporary
     def _get_temporary_directory_path_(self):
@@ -935,7 +935,7 @@ class AbsRsvObj(
 
     def _open_temporary_directory_open_(self):
         directory_path = self._get_temporary_directory_path_()
-        bsc_core.StgDirectoryOpt(directory_path).set_open_in_system()
+        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
 
     @property
     def rsv_project(self):
@@ -943,7 +943,7 @@ class AbsRsvObj(
 
     @property
     def icon(self):
-        return bsc_core.RscIconFileMtd.get('file/folder')
+        return bsc_core.RscIcon.get('file/folder')
 
     def create_dag_fnc(self, path):
         return self.rsv_project._project__get_rsv_obj_(path)
@@ -954,7 +954,7 @@ class AbsRsvObj(
     def get_descendants(self):
         return self.rsv_project._project__get_rsv_objs_(regex='{}/*'.format(self.path))
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         return self.rsv_project._project__get_rsv_obj_(path)
 
     def get_location(self):
@@ -1215,7 +1215,7 @@ class AbsRsvUnitVersion(
 
     def _set_directory_open_(self):
         if self._result:
-            bsc_core.StgPathOpt(self._result).set_open_in_system()
+            bsc_core.StgPathOpt(self._result).open_in_system()
 
 
 class AbsRsvTaskVersion(
@@ -1256,7 +1256,7 @@ class AbsRsvTask(
 
     @property
     def icon(self):
-        return bsc_core.RscIconFileMtd.get('file/file')
+        return bsc_core.RscIcon.get('file/file')
 
     def get_work_scene_src_directory_open_menu_raw(self):
         def add_fnc_(application_):
@@ -1264,7 +1264,7 @@ class AbsRsvTask(
                 return bsc_core.StgDirectoryOpt(_directory_path).get_is_exists()
 
             def set_directory_open_fnc_():
-                bsc_core.StgDirectoryOpt(_directory_path).set_open_in_system()
+                bsc_core.StgDirectoryOpt(_directory_path).open_in_system()
 
             #
             _branch = self.properties.get('branch')
@@ -1510,7 +1510,7 @@ class AbsRsvResource(
 
     @property
     def icon(self):
-        return bsc_core.RscIconFileMtd.get('resolver/asset')
+        return bsc_core.RscIcon.get('resolver/asset')
 
     def get_rsv_steps(self, **kwargs):
         self._completion_kwargs_from_parent_(self, kwargs)
@@ -1577,6 +1577,7 @@ class AbsRsvResourceGroup(
         self._rsv_project._project__completion_kwargs_from_parent_(
             self.EntityCategories.Resource, self, kwargs
         )
+        kwargs['branch'] = self.get('branch')
         return self._rsv_project._project__get_rsv_resources_(
             **kwargs
         )
@@ -1650,7 +1651,7 @@ class AbsRsvExtraDef(AbsRsvDef):
                     return json.load(j, object_pairs_hook=collections.OrderedDict)
             elif ext in ['.yml']:
                 with open(file_path) as y:
-                    return bsc_core.YamlMtd.load(y)
+                    return bsc_core.CttYamlBase.load(y)
             else:
                 raise TypeError(
                     'ext: "{}" is not available'.format(ext)
@@ -1863,8 +1864,8 @@ class AbsRsvExtraDef(AbsRsvDef):
 class AbsRsvProject(
     AbsRsvObjDef,
     AbsRsvExtraDef,
-    unr_abstracts.AbsObjGuiDef,
-    unr_abstracts.AbsObjDagDef,
+    unr_abstracts.AbsGuiExtraDef,
+    unr_abstracts.AbsObjDagExtraDef,
 ):
     RSV_MATCHER_CLS = None
     #
@@ -1887,7 +1888,7 @@ class AbsRsvProject(
     CACHE = dict()
 
     def __init__(self, *args, **kwargs):
-        self._set_obj_def_init_()
+        self._init_obj_base_def_()
         self._set_rsv_def_init_()
         #
         project_root, project_raw = args[:2]
@@ -1900,8 +1901,8 @@ class AbsRsvProject(
         self._set_rsv_obj_def_init_(
             self.PROPERTIES_CLS(self, bsc_core.DictMtd.sort_key_to(kwargs))
         )
-        self._set_obj_dag_def_init_(self._rsv_path)
-        self._set_obj_gui_def_init_()
+        self._init_obj_dag_extra_def_(self._rsv_path)
+        self._init_gui_extra_def_()
         #
         self._root_dict = collections.OrderedDict()
         self._root_step_choice = None
@@ -2092,7 +2093,7 @@ class AbsRsvProject(
 
     @property
     def icon(self):
-        return bsc_core.RscIconFileMtd.get('resolver/project')
+        return bsc_core.RscIcon.get('resolver/project')
 
     def get_workspaces(self):
         return self._rsv_properties.get(
@@ -2227,7 +2228,7 @@ class AbsRsvProject(
     def _get_child_paths_(self, *args, **kwargs):
         return self._project__get_rsv_obj_child_paths_(self._rsv_path)
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         return self._project__get_rsv_obj_(path)
 
     def get_descendants(self):
@@ -2634,9 +2635,10 @@ class AbsRsvProject(
 
     # task
     def _step__get_rsv_task_(self, **kwargs):
-        rsv_step = self.get_rsv_step(**kwargs)
-        if rsv_step is not None:
-            return rsv_step.get_rsv_task(**kwargs)
+        rsv_entity = self.get_rsv_step(**kwargs)
+        if rsv_entity is not None:
+            if isinstance(rsv_entity, AbsRsvStep):
+                return rsv_entity.get_rsv_task(**kwargs)
 
     def _any__get_rsv_tasks_(self, **kwargs):
         list_ = []
@@ -3075,8 +3077,8 @@ class AbsRsvProject(
 
     def _project__set_rsv_obj_add_(self, rsv_obj):
         self._rsv_obj_stack.set_object_add(rsv_obj)
-        if rsv_core.TRACE_RESULT_ENABLE is True:
-            bsc_core.LogMtd.trace_method_result(
+        if rsv_core.RESULT_ENABLE is True:
+            bsc_core.Log.trace_method_result(
                 'resolver',
                 u'{}="{}"'.format(rsv_obj.type, rsv_obj.path)
             )
@@ -3208,8 +3210,8 @@ class AbsRsvProject(
 # <resolver>
 class AbsRsvRoot(
     AbsRsvExtraDef,
-    unr_abstracts.AbsObjGuiDef,
-    unr_abstracts.AbsObjDagDef,
+    unr_abstracts.AbsGuiExtraDef,
+    unr_abstracts.AbsObjDagExtraDef,
 ):
     OBJ_UNIVERSE_CLS = None
     #
@@ -3220,8 +3222,8 @@ class AbsRsvRoot(
 
     def __init__(self):
         self._set_rsv_def_init_()
-        self._set_obj_dag_def_init_('/')
-        self._set_obj_gui_def_init_()
+        self._init_obj_dag_extra_def_('/')
+        self._init_gui_extra_def_()
         #
         self._rsv_project_stack = self.RSV_PROJECT_STACK_CLS()
         self._obj_universe = self.OBJ_UNIVERSE_CLS()
@@ -3271,7 +3273,7 @@ class AbsRsvRoot(
 
     @property
     def icon(self):
-        return bsc_core.RscIconFileMtd.get('resolver/root')
+        return bsc_core.RscIcon.get('resolver/root')
 
     def create_dag_fnc(self, path):
         if path == self.path:
@@ -3280,7 +3282,7 @@ class AbsRsvRoot(
     def _get_child_paths_(self, *args, **kwargs):
         return self._rsv_project_stack.get_keys()
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         return self._rsv_project_stack.get_object(path)
 
     @property
@@ -3408,8 +3410,8 @@ class AbsRsvRoot(
         obj_type = rsv_project.type
         obj_path = rsv_project.path
         self._rsv_project_stack.set_object_add(rsv_project)
-        if rsv_core.TRACE_RESULT_ENABLE is True:
-            bsc_core.LogMtd.trace_method_result(
+        if rsv_core.RESULT_ENABLE is True:
+            bsc_core.Log.trace_method_result(
                 'resolver',
                 u'{}="{}"'.format(obj_type, obj_path)
             )
@@ -3516,8 +3518,8 @@ class AbsRsvRoot(
                 file_path
             )
         else:
-            if rsv_core.TRACE_WARNING_ENABLE is True:
-                bsc_core.LogMtd.trace_method_warning(
+            if rsv_core.WARNING_ENABLE is True:
+                bsc_core.Log.trace_method_warning(
                     'project-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3530,8 +3532,8 @@ class AbsRsvRoot(
                 file_path
             )
         else:
-            if rsv_core.TRACE_WARNING_ENABLE is True:
-                bsc_core.LogMtd.trace_method_warning(
+            if rsv_core.WARNING_ENABLE is True:
+                bsc_core.Log.trace_method_warning(
                     'project-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3554,8 +3556,8 @@ class AbsRsvRoot(
                     )
                     i_project_properties = i_rsv_matcher._get_project_properties_by_default_(file_path)
                     i_project = i_project_properties.get('project')
-                    if rsv_core.TRACE_RESULT_ENABLE is True:
-                        bsc_core.LogMtd.trace_method_result(
+                    if rsv_core.RESULT_ENABLE is True:
+                        bsc_core.Log.trace_method_result(
                             'resolver project create',
                             'project-name="{}", create use "default"'.format(i_project)
                         )
@@ -3566,8 +3568,8 @@ class AbsRsvRoot(
         if _ is not None:
             return _
         else:
-            if rsv_core.TRACE_WARNING_ENABLE is True:
-                bsc_core.LogMtd.trace_method_warning(
+            if rsv_core.WARNING_ENABLE is True:
+                bsc_core.Log.trace_method_warning(
                     'work-scene-src-file-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3584,8 +3586,8 @@ class AbsRsvRoot(
         if _ is not None:
             return _
         else:
-            if rsv_core.TRACE_WARNING_ENABLE is True:
-                bsc_core.LogMtd.trace_method_warning(
+            if rsv_core.WARNING_ENABLE is True:
+                bsc_core.Log.trace_method_warning(
                     'scene-src-file-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )

@@ -4,12 +4,15 @@
 class ScpCbkGui(object):
     def __init__(self):
         pass
+
     @classmethod
     def refresh_tool_kit(cls):
-        from lxutil_gui.qt import gui_qt_core
-        w = gui_qt_core.get_session_window_by_name('dcc-tool-panels/gen-tool-kit')
+        import lxgui.proxy.core as gui_prx_core
+
+        w = gui_prx_core.GuiProxyUtil.find_window_proxy_by_session_name('dcc-tool-panels/gen-tool-kit')
         if w is not None:
             w.refresh_all()
+
     @classmethod
     def refresh_all(cls):
         cls.refresh_tool_kit()

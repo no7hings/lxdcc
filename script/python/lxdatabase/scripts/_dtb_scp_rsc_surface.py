@@ -1,11 +1,5 @@
 # coding:utf-8
-import copy
-
-import glob
-
 from lxbasic import bsc_core
-
-from lxutil import utl_core
 
 import lxdatabase.objects as dtb_objects
 
@@ -25,8 +19,8 @@ class ScpResourcesAddForSurface(object):
         category_group_opt = cs[-2]
         category_group = category_group_opt.get_name()
         dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(category_group))
+            bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(category_group))
         )
         #
         dtb_opt.get_type_force(type_dtb_path)
@@ -37,7 +31,7 @@ class ScpResourcesAddForSurface(object):
         all_file_path = bsc_core.StgDirectoryOpt(directory_path_src).get_all_file_paths(
             ext_includes=ext_includes
         )
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(all_file_path), label='add resource') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(all_file_path), label='add resource') as l_p:
             for i_file_path in all_file_path:
                 l_p.set_update()
                 self.add_texture(

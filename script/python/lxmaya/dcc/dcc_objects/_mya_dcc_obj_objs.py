@@ -19,11 +19,13 @@ from lxmaya import ma_configure, ma_core
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
-from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag, _mya_dcc_obj_xgen, _mya_dcc_obj_arnold, _mya_dcc_obj_look
+from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag, _mya_dcc_obj_xgen, _mya_dcc_obj_arnold, \
+    _mya_dcc_obj_look
 
 
 class Nodes(object):
     DCC_NODE_CLS = _mya_dcc_obj_obj.Node
+
     def __init__(self, type_names):
         self._type_names = type_names
 
@@ -38,6 +40,7 @@ class Sets(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['objectSet']
     EXCLUDE_DCC_PATHS = ['defaultLightSet', 'defaultObjectSet']
     DCC_NODE_CLS = _mya_dcc_obj_dag.Shape
+
     def __init__(self, *args):
         super(Sets, self).__init__(*args)
 
@@ -46,6 +49,7 @@ class Cameras(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['camera']
     EXCLUDE_DCC_PATHS = ['|persp|perspShape', '|top|topShape', '|front|frontShape', '|side|sideShape']
     DCC_NODE_CLS = _mya_dcc_obj_dag.Shape
+
     def __init__(self, *args):
         super(Cameras, self).__init__(*args)
 
@@ -54,6 +58,7 @@ class AnimationLayers(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['animLayer']
     EXCLUDE_DCC_PATHS = ['BaseAnimation']
     DCC_NODE_CLS = _mya_dcc_obj_obj.Node
+
     def __init__(self, *args):
         super(AnimationLayers, self).__init__(*args)
 
@@ -62,6 +67,7 @@ class DisplayLayers(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['displayLayer']
     EXCLUDE_DCC_PATHS = ['defaultLayer']
     DCC_NODE_CLS = _mya_dcc_obj_obj.DisplayLayer
+
     def __init__(self, *args):
         super(DisplayLayers, self).__init__(*args)
 
@@ -75,6 +81,7 @@ class Constrains(mya_dcc_obj_abs.AbsMyaObjs):
     ]
     EXCLUDE_DCC_PATHS = []
     DCC_NODE_CLS = _mya_dcc_obj_obj.Node
+
     def __init__(self, *args):
         super(Constrains, self).__init__(*args)
 
@@ -83,6 +90,7 @@ class UnknownNodes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['unknown']
     EXCLUDE_DCC_PATHS = []
     DCC_NODE_CLS = _mya_dcc_obj_obj.Node
+
     def __init__(self, *args):
         super(UnknownNodes, self).__init__(*args)
 
@@ -91,6 +99,7 @@ class References(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['reference']
     EXCLUDE_DCC_PATHS = ['_UNKNOWN_REF_NODE_', 'sharedReferenceNode']
     DCC_NODE_CLS = _mya_dcc_obj_obj.Reference
+
     def __init__(self, *args):
         super(References, self).__init__(*args)
 
@@ -143,6 +152,7 @@ class Materials(mya_dcc_obj_abs.AbsMyaObjs):
         'defaultObjectSet'
     ]
     DCC_NODE_CLS = _mya_dcc_obj_look.Material
+
     def __init__(self, *args):
         super(Materials, self).__init__(*args)
 
@@ -159,6 +169,7 @@ class TemporaryNodes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['mesh', 'nurbsCurve', 'nurbsSurface', 'brush', 'nParticle']
     EXCLUDE_DCC_PATHS = []
     DCC_NODE_CLS = _mya_dcc_obj_obj.Node
+
     def __init__(self, *args):
         super(TemporaryNodes, self).__init__(*args)
 
@@ -206,6 +217,7 @@ class AbsFileReferences(object):
         with_reference=True,
         includes=[]
     )
+
     def __init__(self, *args, **kwargs):
         self._raw = {}
         #
@@ -216,6 +228,7 @@ class AbsFileReferences(object):
                 for k, v in option.items():
                     if k in self.OPTION:
                         self._option[k] = v
+
     # convert for file
     @classmethod
     def _set_file_gain_value_convert_(cls, obj, file_path):
@@ -246,6 +259,7 @@ class AbsFileReferences(object):
             return file_path
         else:
             return file_path
+
     @classmethod
     def _get_real_file_path_(cls, port):
         obj = port.obj
@@ -253,6 +267,7 @@ class AbsFileReferences(object):
         return cls._set_file_gain_value_convert_(
             obj, file_path
         )
+
     @classmethod
     def _set_real_file_path_(cls, port, new_value, remove_expression=False):
         if port.get_is_locked():
@@ -262,8 +277,9 @@ class AbsFileReferences(object):
         obj = port.obj
         #
         cls._set_file_value_repair_(obj)
+
     @classmethod
-    @utl_core.Modifier.debug_trace
+    @utl_core.DccModifier.debug_trace
     def _set_file_value_repair_(cls, obj):
         if obj.type_name == 'file':
             port = obj.get_port('fileTextureName')
@@ -289,10 +305,11 @@ class AbsFileReferences(object):
                 if ma_core.get_is_ui_mode():
                     mel.eval('generateUvTilePreview {}'.format(obj.path))
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'file value repair',
                     'attribute="{}" gain "None" value'.format(port.path)
                 )
+
     @classmethod
     def set_files_value_repair(cls):
         fs = cmds.ls(type='file')
@@ -300,11 +317,13 @@ class AbsFileReferences(object):
             cls._set_file_value_repair_(
                 _mya_dcc_obj_obj.Node(i_f)
             )
+
     @classmethod
     def _get_obj_cls_(cls, obj_type_name):
         if obj_type_name in cls.DCC_NODE_CLS_DICT:
             return cls.DCC_NODE_CLS_DICT[obj_type_name]
         return cls.DCC_NODE_CLS_DICT['custom']
+
     @classmethod
     def _get_type_is_available_(cls, *args):
         return True
@@ -314,9 +333,9 @@ class AbsFileReferences(object):
         directory_paths = cmds.filePathEditor(query=1, listDirectories="") or []
         for directory_path in directory_paths:
             raw = cmds.filePathEditor(query=1, listFiles=directory_path, withAttribute=1) or []
-            for i in range(len(raw) / 2):
-                i_file_name = raw[i * 2]
-                i_atr_path = raw[i * 2 + 1]
+            for i in range(len(raw)/2):
+                i_file_name = raw[i*2]
+                i_atr_path = raw[i*2+1]
                 search_key = cmds.filePathEditor(i_atr_path, query=1, attributeType=1)
                 #
                 search_key_s = search_key.split(self.PORT_PATHSEP)
@@ -355,7 +374,7 @@ class AbsFileReferences(object):
                 continue
             #
             if i_obj_type_name not in all_obj_type_names:
-                utl_core.Log.set_warning_trace(
+                bsc_core.Log.trace_warning(
                     'obj-type="{}" is "unknown" / "unload"'.format(i_obj_type_name)
                 )
                 continue
@@ -366,7 +385,7 @@ class AbsFileReferences(object):
                     j_atr_path = self.PORT_PATHSEP.join([j_obj_path, j_port_path])
                     j_file_path = cmds.getAttr(j_atr_path)
                     if not j_file_path:
-                        utl_core.Log.set_warning_trace(
+                        bsc_core.Log.trace_warning(
                             'port="{}" is "empty"'.format(j_atr_path)
                         )
                         continue
@@ -428,6 +447,7 @@ class AbsFileReferences(object):
                 #
                 lis.append(file_path)
         return lis
+
     @classmethod
     def repath_fnc(cls, obj, port_path, file_path_new, remove_expression=False):
         port = obj.get_port(port_path)
@@ -460,11 +480,13 @@ class TextureReferences(AbsFileReferences):
         #
         'aiJiWindowBoxArnold',
     ]
+
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)
 
     def _get_type_is_available_(self, file_type):
         return file_type in self.INCLUDE_TYPES
+
     @classmethod
     def _get_objs_(cls, obj_paths):
         lis = []
@@ -476,6 +498,7 @@ class TextureReferences(AbsFileReferences):
                 cls._set_obj_reference_update_(i_obj)
                 lis.append(i_obj)
         return lis
+
     @classmethod
     def _set_obj_reference_update_(cls, obj):
         obj_type_name = obj.type_name
@@ -495,6 +518,7 @@ class XgenPalettes(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['xgmPalette']
     EXCLUDE_DCC_PATHS = []
     DCC_NODE_CLS = _mya_dcc_obj_xgen.XgnPalette
+
     def __init__(self):
         super(XgenPalettes, self).__init__(XgenPalettes)
 
@@ -503,5 +527,6 @@ class XgenDescriptions(mya_dcc_obj_abs.AbsMyaObjs):
     INCLUDE_DCC_TYPES = ['xgmDescription']
     EXCLUDE_DCC_PATHS = []
     DCC_NODE_CLS = _mya_dcc_obj_xgen.XgnDescription
+
     def __init__(self):
         super(XgenDescriptions, self).__init__(XgenPalettes)

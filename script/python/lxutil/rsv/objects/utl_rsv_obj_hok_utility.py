@@ -1,4 +1,6 @@
 # coding:utf-8
+from lxbasic import bsc_core
+
 from lxutil.rsv import utl_rsv_obj_abstract
 
 
@@ -10,6 +12,7 @@ class RsvUtilityOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvRecyclerHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
+
     #
     def set_texture_recycles(self):
         from lxbasic import bsc_core
@@ -38,14 +41,14 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 directory_path_opt_src.set_copy_to_directory(
                     directory_path_tgt
                 )
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'asset texture recycles',
                     u'directory="{}" >> directory="{}"'.format(
                         directory_path_src, directory_path_tgt
                     )
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset texture recycles',
                     u'directory="{}" is non-exists'.format(
                         directory_path_src
@@ -88,7 +91,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                 ).set_run()
 
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'asset maya recycles',
                     u'file="{}" '.format(
                         file_path_tgt
@@ -109,7 +112,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 if convert_maya_to_katana_enable is True:
                     self.set_maya_ass_export()
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset maya recycles',
                     u'file="{}" is non-exists'.format(
                         file_path_src
@@ -146,14 +149,14 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 directory_path_opt_src.set_copy_to_directory(
                     directory_path_tgt
                 )
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'asset xgen cache recycles',
                     u'directory="{}" >> directory="{}"'.format(
                         directory_path_src, directory_path_tgt
                     )
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset xgen cache recycles',
                     u'directory="{}" is non-exists'.format(
                         directory_path_src
@@ -184,14 +187,14 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     i_file_path_opt_src.set_copy_to_directory(
                         directory_path_tgt
                     )
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'asset sp recycles',
                         u'file="{}" >> directory="{}"'.format(
                             i_file_path_opt_src, directory_path_tgt
                         )
                     )
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'asset sp recycles',
                         u'file="{}" is non-exists'.format(
                             i_file_path_src
@@ -223,19 +226,20 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     i_file_path_opt_src.set_copy_to_directory(
                         directory_path_tgt
                     )
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'asset zb recycles',
                         u'file="{}" >> directory="{}"'.format(
                             i_file_path_opt_src, directory_path_tgt
                         )
                     )
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'asset zb recycles',
                         u'file="{}" is non-exists'.format(
                             i_file_path_src
                         )
                     )
+
     # maya
     def set_maya_xgen_repath(self):
         import lxutil.fnc.exporters as utl_fnc_exporters
@@ -284,7 +288,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version='latest', extend_variants=dict(variant=variant)
             )
             if directory_path_0:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset xgen repath',
                     u'directory="{}" is not found, use "{}" instance'.format(
                         xgen_main_directory_path_tgt, directory_path_0
@@ -347,7 +351,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 ]
             )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'texture search',
                 'texture directory is not found'
             )
@@ -385,6 +389,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 texture_use_environ_map=True,
             )
         ).execute()
+
     # katana
     def set_katana_create(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
@@ -438,7 +443,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
             ]
 
-            with utl_core.GuiProgressesRunner.create(maximum=len(ms), label='execute workspace load method') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(ms), label='execute workspace load method') as g_p:
                 for i_m, i_as in ms:
                     g_p.set_update()
                     if i_as:
@@ -540,7 +545,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_v['image_resize'] = i_f_tgt
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.fit_to(i_f_src, i_f_tgt, (2048, 2048))
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'image resize',
                 u'file="{}"'.format(
                     i_f_tgt
@@ -556,7 +561,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_v['image_background'] = i_f_tgt
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'image background create',
                 u'file="{}"'.format(
                     i_f_tgt
@@ -573,7 +578,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_background = i_v['image_background']
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_over_by(i_resize, i_background, i_f_tgt, (0, 0))
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'image background add',
                 u'file="{}"'.format(
                     i_f_tgt
@@ -590,7 +595,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_foreground = i_v['image_foreground']
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'image foreground add',
                 u'file="{}"'.format(
                     i_f_tgt

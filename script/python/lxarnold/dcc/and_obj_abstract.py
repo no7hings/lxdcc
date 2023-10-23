@@ -9,7 +9,7 @@ import lxcontent.objects as ctt_objects
 
 from lxutil import utl_core
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -79,6 +79,7 @@ class AbsObjScene(
         #
         look_pass='default',
     )
+
     def __init__(self, option=None):
         super(AbsObjScene, self).__init__()
         #
@@ -98,9 +99,10 @@ class AbsObjScene(
         self._platform = bsc_core.PlatformMtd.get_current()
 
         self._node_configure = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('arnold/node')
+            value=bsc_core.RscConfigure.get_yaml('arnold/node')
         )
         self._node_configure.set_flatten()
+
     @property
     def ar_universe(self):
         return self._and_universe
@@ -119,6 +121,7 @@ class AbsObjScene(
     def set_load_from_dot_mtlx(self, file_path, root=None, path_lstrip=None):
         file_obj = self.FILE_CLS(file_path)
         self._set_load_by_dot_mtlx_(file_obj, root=root, path_lstrip=path_lstrip)
+
     # node
     def _set_dcc_obj_build_(self, and_obj_mtd):
         and_universe = and_obj_mtd.universe
@@ -145,6 +148,7 @@ class AbsObjScene(
         else:
             shader_and_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_obj)
             self._set_dcc_shader_objs_build(shader_and_obj_mtd)
+
     # <input-port>
     def _set_dcc_obj_input_ports_build_(self, and_obj_mtd, dcc_obj, include=None, exclude=None):
         and_obj = and_obj_mtd.obj
@@ -195,6 +199,7 @@ class AbsObjScene(
             )
         # custom port iterator finish
         ai.AiUserParamIteratorDestroy(custom_input_port_iterator)
+
     #
     def _set_dcc_obj_input_port_build_(self, and_obj_mtd, and_port_mtd, dcc_obj, is_custom):
         and_port_name = and_port_mtd.port_name
@@ -249,6 +254,7 @@ class AbsObjScene(
                 and_type=and_exact_type,
                 dcc_port=dcc_input_port
             )
+
     # <output-port>
     def _set_dcc_obj_output_ports_build_(self, and_obj_mtd, dcc_obj):
         and_type_is_array = False
@@ -264,6 +270,7 @@ class AbsObjScene(
             and_type=and_output_type,
             dcc_port=dcc_output
         )
+
     # <port-element>
     def _set_dcc_port_elements_build_(self, and_obj_mtd, and_type, ar_element_count, dcc_port):
         if ar_element_count > 0:
@@ -282,6 +289,7 @@ class AbsObjScene(
                     and_type=and_type,
                     dcc_port=port_element_dcc_obj
                 )
+
     # <port-channel>
     def _set_dcc_port_channels_build_(self, and_obj_mtd, and_type, dcc_port):
         port_channel_dcc_names = and_core.AndTypeMtd(and_type).get_dcc_channel_names()
@@ -293,6 +301,7 @@ class AbsObjScene(
                 and_obj_mtd=and_obj_mtd,
                 and_port_name=port_channel_dcc_path
             )
+
     # <obj-connection>
     def _set_dcc_obj_connection_build_(self, and_obj_mtd, and_port_name):
         target_and_obj_name = and_obj_mtd.name
@@ -308,12 +317,15 @@ class AbsObjScene(
                 source_and_obj = and_core.AndUniverseMtd(and_universe).get_obj(source_and_obj_name)
                 source_and_obj_mtd = and_core.AndObjMtd(and_universe, source_and_obj)
                 source_index = self._index_dict[source_and_obj_name]
-                source_and_prettify_obj_name = source_and_obj_mtd.set_name_prettify(source_index, self._look_pass_name, self._time_tag)
+                source_and_prettify_obj_name = source_and_obj_mtd.set_name_prettify(
+                    source_index, self._look_pass_name, self._time_tag
+                    )
                 dcc_source_obj_args = ('', source_and_prettify_obj_name)
                 self.universe.set_connection_create(
                     dcc_source_obj_args, dcc_source_port_args,
-                    ('', target_and_prettify_obj_name), (and_port_name, )
+                    ('', target_and_prettify_obj_name), (and_port_name,)
                 )
+
     #
     def _set_dcc_shader_objs_build(self, shader_and_obj_mtd):
         and_orig_obj_name = shader_and_obj_mtd.get_orig_name()
@@ -325,11 +337,12 @@ class AbsObjScene(
         and_obj_category_name = shader_and_obj_mtd.category_name
         dcc_obj_type = self.universe.generate_obj_type(and_obj_category_name, and_obj_type_name)
         dcc_obj_path_args = ('', and_prettify_obj_name)
-        dcc_obj = dcc_obj_type.create_obj(dcc_obj_path_args)
+        dcc_obj = dcc_obj_type.generate_obj(dcc_obj_path_args)
         # port/input
         self._set_dcc_obj_input_ports_build_(shader_and_obj_mtd, dcc_obj)
         # port/output
         self._set_dcc_obj_output_ports_build_(shader_and_obj_mtd, dcc_obj)
+
     # mesh
     def _set_dcc_mesh_objs_build_(self, shape_and_obj_mtd):
         and_obj_name = shape_and_obj_mtd.name
@@ -348,7 +361,6 @@ class AbsObjScene(
                 shape_and_obj_mtd, i_dcc_mesh,
                 blacklist=and_configure.ObjProperty.AR_MESH_BLACKLIST
             )
-            # i_dcc_mesh.set_gui_attribute('icon', utl_core.Icon.get('obj/mesh'))
             # visibility
             self._set_dcc_geometry_obj_visibilities_build_(shape_and_obj_mtd, i_dcc_mesh)
 
@@ -376,6 +388,7 @@ class AbsObjScene(
             and_configure.ObjType.LYNXI_MESH_ARGS, shape_and_obj_path.split(and_configure.Node.ARNOLD_PATHSEP)
         )
         return [dcc_obj]
+
     # geometry-properties
     def _set_dcc_geometry_obj_properties_build_(self, and_obj_mtd, dcc_obj, blacklist):
         dcc_obj_type_name = dcc_obj.type.name
@@ -408,6 +421,7 @@ class AbsObjScene(
         _dcc_material_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
         _dcc_material_port.set(dcc_port_raw)
         _dcc_material_port.set_default(dcc_port_raw_default)
+
     # curve
     def _set_dcc_curves_build_(self, shape_and_obj_mtd):
         and_obj_name = shape_and_obj_mtd.name
@@ -441,6 +455,7 @@ class AbsObjScene(
             and_configure.ObjType.LYNXI_CURVE_ARGS, maya_obj_path.split(and_configure.Node.MAYA_PATHSEP)
         )
         return [dcc_obj]
+
     # xgen
     def _set_dcc_xgen_objs_build_(self, shape_and_obj_mtd):
         and_obj_name = shape_and_obj_mtd.name
@@ -478,6 +493,7 @@ class AbsObjScene(
             obj_type_args=and_configure.ObjType.LYNXI_XGEN_DESCRIPTION_ARGS, obj_path_args=obj_path_args
         )
         return [dcc_obj]
+
     # material
     def _set_dcc_materials_build_(self, shape_and_obj_mtd):
         # material
@@ -490,7 +506,9 @@ class AbsObjScene(
             if orig_and_surface_shader_obj_name is not None:
                 if orig_and_surface_shader_obj_name != 'ai_default_reflection_shader':
                     surface_index = self._index_dict[orig_and_surface_shader_obj_name]
-                    and_surface_shader_obj_name = and_surface_shader_obj_mtd.set_name_prettify(surface_index, self._look_pass_name, self._time_tag)
+                    and_surface_shader_obj_name = and_surface_shader_obj_mtd.set_name_prettify(
+                        surface_index, self._look_pass_name, self._time_tag
+                        )
         #
         and_displacement_shader_obj_name = None
         and_displacement_shader_objs = shape_and_obj_mtd.get_displacement_shader_objs()
@@ -500,17 +518,22 @@ class AbsObjScene(
             if orig_and_displacement_shader_obj_name is not None:
                 if orig_and_displacement_shader_obj_name != 'ai_default_reflection_shader':
                     displacement_index = self._index_dict[orig_and_displacement_shader_obj_name]
-                    and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.set_name_prettify(displacement_index, self._look_pass_name, self._time_tag)
+                    and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.set_name_prettify(
+                        displacement_index, self._look_pass_name, self._time_tag
+                        )
         # volume
         and_volume_shader_obj_name = None
         #
         material_key = ';'.join(
-            [str(i) for i in (and_surface_shader_obj_name, and_displacement_shader_obj_name, and_volume_shader_obj_name)]
+            [str(i) for i in
+             (and_surface_shader_obj_name, and_displacement_shader_obj_name, and_volume_shader_obj_name)]
         )
         if material_key != ';'.join([str(None)]*3):
             if material_key not in self._material_name_dict:
                 if self._time_tag is not None:
-                    dcc_material_name = '{}__material__{}__{}'.format(self._look_pass_name, len(self._material_name_dict), self._time_tag)
+                    dcc_material_name = '{}__material__{}__{}'.format(
+                        self._look_pass_name, len(self._material_name_dict), self._time_tag
+                        )
                 else:
                     dcc_material_name = '{}__material__{}'.format(self._look_pass_name, len(self._material_name_dict))
                 #
@@ -534,7 +557,7 @@ class AbsObjScene(
     def _set_dcc_material_build_(self, material_dcc_obj_name, shader_dcc_obj_names):
         dcc_obj_type = self.universe.generate_obj_type(*and_configure.ObjType.LYNXI_MATERIAL_ARGS)
         obj_path_args = ('', material_dcc_obj_name)
-        dcc_obj = dcc_obj_type.create_obj(obj_path_args)
+        dcc_obj = dcc_obj_type.generate_obj(obj_path_args)
         # shader port
         and_surface_shader_obj_name, and_displacement_shader_obj_name, and_volume_shader_obj_name = shader_dcc_obj_names
         shader_build_args = [
@@ -565,6 +588,7 @@ class AbsObjScene(
 
     def _set_ar_universe_load_(self):
         pass
+
     # main method
     def load_from_dot_ass_fnc(self, file_obj, path_lstrip=None, path_mapper=None, time_tag=None):
         self.restore_all()
@@ -586,11 +610,11 @@ class AbsObjScene(
         # node iterator start
         and_obj_iterator = ai.AiUniverseGetNodeIterator(self._and_universe, sum(self.AR_OBJ_CATEGORY_MASK))
         self.get_index_dict()
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'ass load',
             u'file="{}"'.format(file_path)
         )
-        with utl_core.GuiProgressesRunner.create(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
+        with bsc_core.LogProcessContext.create(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
             while not ai.AiNodeIteratorFinished(and_obj_iterator):
                 l_p.set_update()
                 and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)
@@ -623,6 +647,7 @@ class AbsObjScene(
         self._path_mapper_opt = None
         self._and_universe = None
         self._material_name_dict = {}
+
     #
     def _test(self):
         pass

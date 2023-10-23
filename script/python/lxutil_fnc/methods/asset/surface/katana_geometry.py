@@ -223,6 +223,8 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
 
     def set_export_run(self):
         import copy
+
+        from lxbasic import bsc_core
         #
         from lxutil import utl_core
         #
@@ -311,7 +313,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
                                         #
                                         i_maya_geometry_import.execute_with_deadline()
                                 else:
-                                    utl_core.Log.set_module_warning_trace(
+                                    bsc_core.Log.trace_method_warning(
                                         'maya-geometry-uv-map-import',
                                         'task="{}/{}" is non-exists'.format(i_step, i_task)
                                     )

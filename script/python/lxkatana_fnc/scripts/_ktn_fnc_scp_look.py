@@ -41,7 +41,7 @@ def set_look_export_by_any_scene_file(option):
         #
         branch = rsv_task_properties.get('branch')
         if branch == 'asset':
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'katana-look-export',
                 'option="{}"'.format(option)
             )
@@ -93,28 +93,30 @@ def set_look_export_by_any_scene_file(option):
                     'complete'
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'katana-look-export-script-run',
                     u'file="{}" is non-exists'.format(any_scene_file_path)
                 )
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'katana-scene-look-export',
             u'file="{}" is not available'.format(any_scene_file_path)
         )
 
 
 def set_asset_look_ass_export(rsv_task_properties, force=False):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
-    #
+
     import lxutil.dcc.dcc_objects as utl_dcc_objects
-    #
+
     import lxkatana.fnc.exporters as ktn_fnc_exporters
-    #
+
     import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-    #
+
     import lxresolver.operators as rsv_operators
-    #
+
     version = rsv_task_properties.get('option.version')
     #
     ktn_workspace = ktn_dcc_objects.AssetWorkspace()
@@ -133,7 +135,7 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
             )
         ).set_run()
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'katana-look-ass-export',
             u'file="{}" is exists'.format(default_look_ass_file_path)
         )
@@ -161,6 +163,8 @@ def set_asset_look_ass_export(rsv_task_properties, force=False):
 
 
 def set_asset_work_look_ass_export(rsv_task_properties, force=False):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
     #
     import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -188,13 +192,15 @@ def set_asset_work_look_ass_export(rsv_task_properties, force=False):
             )
         ).set_run()
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'katana-look-ass-export',
             u'file="{}" is exists'.format(default_look_ass_file_path)
         )
 
 
 def set_asset_look_klf_export(rsv_task_properties, force=False):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
     #
     import lxresolver.operators as rsv_operators
@@ -215,7 +221,7 @@ def set_asset_look_klf_export(rsv_task_properties, force=False):
         asset_geometries_dcc_node.get_port('lynxi_variants.look').set('asset-work')
     else:
         raise RuntimeError(
-            utl_core.Log.set_module_error_trace(
+            bsc_core.Log.trace_method_error(
                 'obj="{}" is non-exists'.format(
                     asset_geometries_dcc_node.path
                 )
@@ -271,7 +277,7 @@ def set_cfx_look_export_by_any_scene_file(option):
     #
     rsv_task_properties = resolver.get_task_properties_by_any_scene_file_path(file_path=any_scene_file_path)
     if rsv_task_properties:
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'katana-look-export',
             'option="{}"'.format(option)
         )

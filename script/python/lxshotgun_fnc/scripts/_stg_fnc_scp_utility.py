@@ -321,21 +321,23 @@ def set_shotgun_create_by_any_scene_file(option):
             if create_shotgun_version is True:
                 set_asset_shot_version_create(rsv_version)
     else:
-        utl_core.Log.set_module_warning_trace(
+        bsc_core.Log.trace_method_warning(
             'shotgun-version create',
             u'file="{}" is not available'.format(any_scene_file_path)
         )
 
 
 def set_asset_shotgun_task_create(rsv_version):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
-    #
+
     import lxshotgun.objects as stg_objects
-    #
+
     kwargs = rsv_version.properties.value
-    #
+
     stg_connector = stg_objects.StgConnector()
-    #
+
     stg_project = stg_connector.get_stg_project(
         **kwargs
     )
@@ -358,18 +360,20 @@ def set_asset_shotgun_task_create(rsv_version):
                     **kwargs
                 )
         else:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.Log.trace_method_error(
                 'shotgun-entity create',
                 'step="{}" is non-exists.'.format(kwargs['step'])
             )
     else:
-        utl_core.Log.set_module_error_trace(
+        bsc_core.Log.trace_method_error(
             'shotgun-entity create',
             'project="{}" is non-exists.'.format(kwargs['project'])
         )
 
 
 def set_asset_shot_version_create(rsv_version):
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
     #
     import lxshotgun.objects as stg_objects
@@ -386,7 +390,7 @@ def set_asset_shot_version_create(rsv_version):
             **kwargs
         )
     else:
-        utl_core.Log.set_module_error_trace(
+        bsc_core.Log.trace_method_error(
             'shotgun-entity create',
             'task="{}" is non-exists.'.format(kwargs['task'])
         )

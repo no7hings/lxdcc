@@ -18,7 +18,7 @@ class Method(utl_fnc_obj_abs.AbsTaskMethod):
         root = rsv_task_properties.get('dcc.root')
         #
         if ktn_dcc_objects.Scene.get_scene_is_dirty():
-            w = utl_core.DialogWindow.set_create(
+            w = utl_core.DccDialog.create(
                 label='Save',
                 content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     ktn_dcc_objects.Scene.get_current_file_path()

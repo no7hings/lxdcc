@@ -13,8 +13,6 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
-import lxbasic.objects as bsc_objects
-
 import lxcontent.objects as ctt_objects
 
 from lxutil.fnc import utl_fnc_obj_abs
@@ -38,7 +36,7 @@ class AssImportFnc(object):
         self._assign_selection_enable = assign_selection_enable
         #
         self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
+            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
 
@@ -62,8 +60,8 @@ class AssImportFnc(object):
                 (self.create_assigns_fnc, (geometry_and_objs,), self._with_assign)
             ]
             if method_args:
-                with utl_core.GuiProgressesRunner.create(
-                        maximum=len(method_args), label='execute look create method'
+                with bsc_core.LogProcessContext.create(
+                    maximum=len(method_args), label='execute look create method'
                 ) as g_p:
                     for i_method, i_args, i_enable in method_args:
                         g_p.set_update()
@@ -71,7 +69,7 @@ class AssImportFnc(object):
                             i_method(*i_args)
         else:
             raise RuntimeError(
-                utl_core.Log.set_module_error_trace(
+                bsc_core.Log.trace_method_error(
                     'look import',
                     'material(s) is not found'
                 )
@@ -79,7 +77,7 @@ class AssImportFnc(object):
 
     def create_materials_fnc(self, material_and_objs):
         if material_and_objs:
-            with utl_core.GuiProgressesRunner.create(maximum=len(material_and_objs), label='create material') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(material_and_objs), label='create material') as g_p:
                 for material_seq, material_and_obj in enumerate(material_and_objs):
                     g_p.set_update()
                     self.create_material_fnc(material_and_obj)
@@ -220,14 +218,14 @@ class AssImportFnc(object):
         )
         #
         if source_dcc_obj.get_is_exists() is False:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'connection create',
                 'obj="{}" is non-exists'.format(source_and_obj.path)
             )
             return
 
         if target_dcc_obj.get_is_exists() is False:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'connection create',
                 'obj="{}" is non-exists'.format(target_and_obj.path)
             )
@@ -240,13 +238,13 @@ class AssImportFnc(object):
             source_dcc_obj.get_port(source_dcc_port_path), target_dcc_obj.get_port(target_dcc_port_path)
         )
         if source_dcc_port.get_is_exists() is False:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'connection create', 'atr-src-path:"{}" is non-exists'.format(source_dcc_port.path)
             )
             return
 
         if target_dcc_port.get_is_exists() is False:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'connection create', 'atr-tgt-path:"{}" is non-exists'.format(target_dcc_port.path)
             )
             return
@@ -286,7 +284,7 @@ class AssImportFnc(object):
                     return dcc_obj, True
                 return dcc_obj, False
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'shader create',
                     'obj-type="{}" is not available'.format(and_obj_type_name)
                 )
@@ -328,14 +326,14 @@ class AssImportFnc(object):
                     if and_port_name == 'name':
                         pass
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'shader-port set',
                             'attribute="{}" is non-exists'.format(dcc_port.path)
                         )
 
     def create_assigns_fnc(self, geometry_and_objs):
         if geometry_and_objs:
-            with utl_core.GuiProgressesRunner.create(maximum=len(geometry_and_objs), label='create assign') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(geometry_and_objs), label='create assign') as g_p:
                 for geometry_seq, geometry_and_obj in enumerate(geometry_and_objs):
                     g_p.set_update()
                     #
@@ -416,8 +414,8 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
             (self.create_geometries_fnc, None),
             (self.create_connections_fnc, None),
         ]
-        with utl_core.GuiProgressesRunner.create(
-                maximum=len(method_args), label='execute look yaml import method'
+        with bsc_core.LogProcessContext.create(
+            maximum=len(method_args), label='execute look yaml import method'
         ) as g_p:
             for i_method, i_args in method_args:
                 g_p.set_update()
@@ -566,9 +564,9 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                                     value = bsc_core.StgPathMapMtd.map_to_current(value)
                             #
                             port.set(value)
-                        except:
+                        except Exception:
                             bsc_core.ExceptionMtd.set_print()
-                            utl_core.Log.set_module_error_trace(
+                            bsc_core.Log.trace_method_error(
                                 'attribute-set',
                                 'obj="{}", port="{}" >> value="{}"'.format(
                                     obj_path, port_path, value

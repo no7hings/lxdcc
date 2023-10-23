@@ -39,11 +39,11 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                 content_0.set('file', file_path)
                 dcc_objs = self._stage.get_objs()
                 if dcc_objs:
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         'comparer-data build',
                         'file="{}"'.format(file_path)
                     )
-                    with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='build comparer-data') as g_p:
+                    with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='build comparer-data') as g_p:
                         for dcc_obj in dcc_objs:
                             g_p.set_update()
                             obj_type_name = dcc_obj.type.name
@@ -96,7 +96,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         content_0 = ctt_objects.Content(value={})
         dcc_objs = stage.get_objs()
         if dcc_objs:
-            with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='gain build comparer-data') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='gain build comparer-data') as g_p:
                 for dcc_obj in dcc_objs:
                     g_p.set_update()
                     obj_type_name = dcc_obj.type.name

@@ -3,7 +3,7 @@ import os.path
 
 from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_process, _bsc_cor_storage
+from lxbasic.core import _bsc_cor_process, _bsc_cor_storage, _bsc_cor_execute
 
 
 class VdoFileOpt(object):
@@ -28,7 +28,7 @@ class VdoFileOpt(object):
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
-                    Bin.get_ffmpeg(),
+                    _bsc_cor_execute.Executes.ffmpeg(),
                     u'-i "{}"'.format(self.path),
                     '-vf scale={}:-1'.format(width),
                     '-vframes 1',
@@ -54,7 +54,7 @@ class VdoFileOpt(object):
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
-                    Bin.get_ffmpeg(),
+                    _bsc_cor_execute.Executes.ffmpeg(),
                     u'-i "{}"'.format(self.path),
                     '-vf scale={}:-1'.format(width),
                     '-vframes 1',
@@ -70,7 +70,7 @@ class VdoFileOpt(object):
     def set_mov_create_from(self, image_file_path, width=1024, fps=24, block=False):
         if StorageMtd(self._file_path).get_is_exists() is False:
             cmd_args = [
-                Bin.get_ffmpeg(),
+                _bsc_cor_execute.Executes.ffmpeg(),
                 '-i "{}"'.format(image_file_path),
                 '-r {}'.format(fps),
                 '-f mov',
@@ -105,7 +105,7 @@ class VdoFileOpt(object):
 
     def get_size(self):
         cmd_args = [
-            Bin.get_ffmpeg(),
+            _bsc_cor_execute.Executes.ffmpeg(),
             u'-i "{}"'.format(self.path),
         ]
         cmd = ' '.join(cmd_args)

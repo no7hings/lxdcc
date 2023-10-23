@@ -9,7 +9,7 @@ import six
 
 from lxbasic import bsc_core
 
-from lxdatabase import dtb_core
+import lxdatabase.core as dtb_core
 
 import lxcontent.objects as ctt_objects
 
@@ -142,7 +142,7 @@ class DtbBaseOpt(object):
         # if os.path.isfile(database) is False:
         #     raise RuntimeError()
 
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'database', 'setup from: {}'.format(database)
         )
 
@@ -871,7 +871,7 @@ class DtbVersionOpt(object):
         path = p_o.set_update_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
-        return bsc_core.RscFileMtd.get('asset/library/geo/sphere.usda')
+        return bsc_core.Resource.get('asset/library/geo/sphere.usda')
 
     def get_look_preview_usd_file(self):
         p = self._dtb_opt.get_pattern(keyword='look-preview-usd-file')
@@ -879,13 +879,13 @@ class DtbVersionOpt(object):
         path = p_o.set_update_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
-        return bsc_core.RscFileMtd.get('asset/library/preview-material.usda')
+        return bsc_core.Resource.get('asset/library/preview-material.usda')
 
     def get_texture_preview_assigns(self):
-        from lxutil import utl_configure
+        import lxbasic.configure as bsc_configure
 
         dict_ = {}
-        for i_key in utl_configure.TextureTypes.All:
+        for i_key in bsc_configure.TextureTypes.All:
             i_dtb_path = '{}/texture_{}_file'.format(self._dtb_version.path, i_key)
             i_file_path = self._dtb_opt.get_property(
                 i_dtb_path, 'location'
@@ -897,8 +897,8 @@ class DtbVersionOpt(object):
                 #
                 if i_file_opt.get_is_file() is True:
                     # map to usd key
-                    if i_key in utl_configure.TextureTypes.UsdPreviewMapper:
-                        i_key = utl_configure.TextureTypes.UsdPreviewMapper[i_key]
+                    if i_key in bsc_configure.TextureTypes.UsdPreviewMapper:
+                        i_key = bsc_configure.TextureTypes.UsdPreviewMapper[i_key]
                     #
                     dict_[i_key] = i_file_opt.get_path()
         return dict_
@@ -933,8 +933,8 @@ if __name__ == '__main__':
         '3d_plant_proxy',
     ]:
         dtb_opt_ = DtbResourceLibraryOpt(
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-basic'),
-            bsc_core.CfgFileMtd.get_yaml('database/library/resource-{}'.format(_i_key)),
+            bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(_i_key)),
         )
         #
         dtb_opt_.setup_entity_categories()

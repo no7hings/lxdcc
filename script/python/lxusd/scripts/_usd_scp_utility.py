@@ -35,7 +35,7 @@ class ShotUsdCombine(object):
 
         list_ = []
         cs = prim_opt.get_children()
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(cs), label='usd combine') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(cs), label='usd combine') as l_p:
             for i_prim in cs:
                 l_p.set_update()
                 #
@@ -46,12 +46,12 @@ class ShotUsdCombine(object):
                     i_path
                 )
                 if i_port is None:
-                    utl_core.Log.set_error_trace(
+                    bsc_core.Log.trace_error(
                         'attribute="{}.fileName" is non-exists'.format(i_path)
                     )
                     continue
                 if i_port.Get() is None:
-                    utl_core.Log.set_error_trace(
+                    bsc_core.Log.trace_error(
                         'attribute="{}.fileName" is non-data'.format(i_path)
                     )
                     continue
@@ -90,7 +90,7 @@ class ShotUsdCombine(object):
 
         file_write_opt.set_location_add(location)
 
-        with utl_core.LogProgressRunner.create_as_bar(maximum=len(list_), label='usd create') as l_p:
+        with bsc_core.LogProcessContext.create_as_bar(maximum=len(list_), label='usd create') as l_p:
             for i in list_:
                 l_p.set_update()
                 file_write_opt.set_obj_add(i)

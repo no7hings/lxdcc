@@ -7,9 +7,11 @@ import parse
 
 from lxbasic import bsc_core
 
-import lxbasic.abstracts as bsc_abstracts
-
 from lxutil import utl_core
+
+import lxresource.core as rsc_core
+
+import lxutil.abstracts as utl_abstracts
 
 import lxcontent.objects as ctt_objects
 
@@ -45,7 +47,7 @@ class _Pattern(object):
         return self._fnmatch_pattern
 
 
-class DotAssReader(bsc_abstracts.AbsFileReader):
+class DotAssReader(utl_abstracts.AbsFileReader):
     def __init__(self, file_path):
         super(DotAssReader, self).__init__(file_path)
 
@@ -96,7 +98,7 @@ class DotAssReader(bsc_abstracts.AbsFileReader):
         return self._get_file_paths_()
 
 
-class DotXgenFileReader(bsc_abstracts.AbsFileReader):
+class DotXgenFileReader(utl_abstracts.AbsFileReader):
     SEP = '\n\n'
     FILE_REFERENCE_DICT = {
         'Palette': ['xgDataPath', 'xgProjectPath'],
@@ -108,7 +110,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
 
     def _get_obj_raws_(self):
         lis = []
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'file parse is started', 'file="{}"'.format(
                 self._file_path
             )
@@ -124,7 +126,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
             if p:
                 variant = p.named
                 lis.append((line, variant))
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'file parse is completed', 'file="{}"'.format(
                 self._file_path
             )
@@ -192,7 +194,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
                         lis.append(
                             (i_line_index, i_new_line)
                         )
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.Log.trace_method_result(
                             u'xgen collection directory repair',
                             u'directory="{}" >> "{}"'.format(
                                 i_raw, i_new_raw
@@ -215,7 +217,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
     def set_collection_directory_repath(self, xgen_collection_directory_path, xgen_collection_name):
         _ = self.get_file_paths()
         lis = []
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             u'xgen collection directory repath is started',
             u'directory="{}"'.format(
                 xgen_collection_directory_path
@@ -244,13 +246,13 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
                     lis.append(
                         (i_line_index, i_new_line)
                     )
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         u'xgen collection directory repath',
                         u'obj="{}"'.format(
                             i_obj_name
                         )
                     )
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         u'xgen collection directory repath',
                         u'directory="{}" >> "{}"'.format(
                             i_raw, i_new_raw
@@ -260,7 +262,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
         for i_line_index, i_line in lis:
             self.lines[i_line_index] = i_line
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             u'xgen collection directory repath is completed',
             u'directory="{}"'.format(
                 xgen_collection_directory_path
@@ -270,7 +272,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
     def set_project_directory_repath(self, xgen_project_directory_path):
         _ = self.get_file_paths()
         lis = []
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             u'xgen project directory repath is started',
             u'directory="{}"'.format(
                 xgen_project_directory_path
@@ -295,13 +297,13 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
                     lis.append(
                         (i_line_index, i_new_line)
                     )
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         u'xgen project directory repath',
                         u'obj="{}"'.format(
                             i_obj_name
                         )
                     )
-                    utl_core.Log.set_module_result_trace(
+                    bsc_core.Log.trace_method_result(
                         u'xgen project directory repath',
                         u'directory="{}" >> "{}"'.format(
                             i_raw, i_new_raw
@@ -311,7 +313,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
         for i_line_index, i_line in lis:
             self.lines[i_line_index] = i_line
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             u'xgen project directory repath is completed',
             u'directory="{}"'.format(
                 xgen_project_directory_path
@@ -320,7 +322,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
 
     def get_description_properties(self):
         d = ctt_objects.Dict()
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'file parse is started', 'file="{}"'.format(
                 self._file_path
             )
@@ -368,7 +370,7 @@ class DotXgenFileReader(bsc_abstracts.AbsFileReader):
         )
 
 
-class DotMaFileReader(bsc_abstracts.AbsFileReader):
+class DotMaFileReader(utl_abstracts.AbsFileReader):
     SEP = ';\n'
     FILE_REFERENCE_DICT = {
         'file': 'ftn',
@@ -571,7 +573,7 @@ class DotMaFileReader(bsc_abstracts.AbsFileReader):
         return self._get_file_paths_()
 
 
-class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
+class DotMtlxFileReader(utl_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
     PROPERTIES_CLS = ctt_objects.Properties
@@ -630,7 +632,7 @@ class DotMtlxFileReader(bsc_abstracts.AbsFileReader):
         return lis
 
 
-class DotOslFileReader(bsc_abstracts.AbsFileReader):
+class DotOslFileReader(utl_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
     PROPERTIES_CLS = ctt_objects.Properties
@@ -701,7 +703,7 @@ class DotUsdaFile(object):
     def _set_write_(cls, key, file_path, option):
         directory_path = os.path.dirname(file_path)
         #
-        j2_template = utl_core.Jinja.get_template('usda/{}'.format(key))
+        j2_template = rsc_core.RscJinjaConfigure.get_template('usda/{}'.format(key))
         kwargs = copy.copy(cls.OPTION)
         #
         cls._set_option_update_(option, directory_path)
@@ -711,7 +713,7 @@ class DotUsdaFile(object):
         bsc_core.StgFileOpt(file_path).set_write(
             raw
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'usda-file-write',
             u'file="{}"'.format(file_path)
         )

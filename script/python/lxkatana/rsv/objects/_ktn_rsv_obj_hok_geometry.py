@@ -48,7 +48,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 replace=True
             )
         else:
-            bsc_core.LogMtd.trace_method_error(
+            bsc_core.Log.trace_method_error(
                 'usd export',
                 'file="{}" is non-exists'.format(file_path)
             )
@@ -94,7 +94,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 replace=True
             )
         else:
-            bsc_core.LogMtd.trace_method_error(
+            bsc_core.Log.trace_method_error(
                 'usd export',
                 'file="{}" is non-exists'.format(file_path)
             )

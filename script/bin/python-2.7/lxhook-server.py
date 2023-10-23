@@ -53,7 +53,7 @@ def __execute_with_option(option):
 
 
 def __start_server():
-    from lxsession import ssn_configure
+    import lxsession.configure as ssn_configure
     #
     app.run(
         host="0.0.0.0",
@@ -69,15 +69,15 @@ def set_cmd_run():
     import threading
 
     from flask import request
-    #
-    from lxbasic import bsc_core
-    #
-    from lxutil import utl_core
 
-    from lxsession import ssn_core
-    #
+    import lxlog.core as log_core
+
+    from lxbasic import bsc_core
+
+    import lxsession.core as ssn_core
+
     kwargs = request.args
-    #
+
     unique_id = kwargs.get('uuid')
     if unique_id:
         hook_yml_file_path = ssn_core.SsnHookServerMtd.get_file_path(unique_id=unique_id)
@@ -87,7 +87,7 @@ def set_cmd_run():
             if raw:
                 cmd = raw.get('cmd')
                 if cmd:
-                    utl_core.Log.set_module_result_trace(
+                    log_core.Log.trace_method_result(
                         'hook run',
                         'key="{}"'.format(unique_id)
                     )
@@ -99,7 +99,7 @@ def set_cmd_run():
                     #
                     t.start()
         else:
-            utl_core.Log.set_module_warning_trace(
+            log_core.Log.trace_method_warning(
                 'hook run',
                 'key="{}" is non-exists'.format(hook_yml_file_path)
             )

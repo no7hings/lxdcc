@@ -11,10 +11,8 @@ def set_undo_mark_mdf(method):
             _method = method(*args, **kwargs)
             return _method
         except Exception:
-            from lxutil import utl_core
-            #
-            is_ui_mode = not cmds.about(batch=1)
-            utl_core.ExceptionCatcher.set_create(use_window=is_ui_mode)
+            from lxbasic import bsc_core
+            bsc_core.LogException.trace()
             raise
         #
         finally:

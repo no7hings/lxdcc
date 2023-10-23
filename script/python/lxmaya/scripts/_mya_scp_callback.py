@@ -13,7 +13,7 @@ class ScpCbkEnvironment(object):
 
     def __init__(self):
         self._cfg = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml(
+            value=bsc_core.RscConfigure.get_yaml(
                 'katana/script/scene'
             )
         )
@@ -29,7 +29,7 @@ class ScpCbkEnvironment(object):
             bsc_core.EnvironMtd.set(
                 i_env_key, i_env_value
             )
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 cls.KEY,
                 'register: key="{}", value="{}"'.format(i_env_key, i_env_value)
             )
@@ -77,6 +77,6 @@ class ScpCbkEnvironment(object):
                 self.save(i_data)
                 return True
 
-        bsc_core.LogMtd.trace_method_error(
+        bsc_core.Log.trace_method_error(
             self.KEY, 'failed to load form any where'
         )

@@ -8,13 +8,15 @@ from lxkatana import ktn_core
 
 class ScpCbkEnvironment(object):
     KEY = 'workspace environment build'
+
     def __init__(self):
         self._cfg = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml(
+            value=bsc_core.RscConfigure.get_yaml(
                 'katana/script/scene'
             )
         )
         self._cfg.set_flatten()
+
     @classmethod
     def save(cls, data):
         workspace_setting = ktn_core.WorkspaceSetting()
@@ -24,13 +26,14 @@ class ScpCbkEnvironment(object):
             workspace_setting.save_env(
                 i_index, i_key, i_env_key, i_env_value
             )
+
     @classmethod
     def register(cls, data):
         for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
             bsc_core.EnvironMtd.set(
                 i_env_key, i_env_value
             )
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 cls.KEY,
                 'register: key="{}", value="{}"'.format(i_env_key, i_env_value)
             )
@@ -42,10 +45,12 @@ class ScpCbkEnvironment(object):
             f = ktn_core.NodegraphAPI.GetProjectFile()
         #
         import lxresolver.scripts as rsv_scripts
+
         return rsv_scripts.ScpEnvironment.get_data(f)
 
     def add_from_work_environment(self, *args, **kwargs):
         import lxshotgun.scripts as stg_objects
+
         task_id = bsc_core.EnvironMtd.get(
             'PAPER_TASK_ID'
         )
@@ -55,12 +60,13 @@ class ScpCbkEnvironment(object):
         workspace_setting = ktn_core.WorkspaceSetting()
         data = workspace_setting.get_env_data()
         if data:
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 self.KEY,
                 'load from scene'
             )
             return True, data
         return False, None
+
     @ktn_core.Modifier.undo_run
     def execute(self, *args, **kwargs):
         if ktn_core.get_is_ui_mode():
@@ -83,7 +89,7 @@ class ScpCbkEnvironment(object):
                 self.save(i_data)
                 return True
 
-        bsc_core.LogMtd.trace_method_error(
+        bsc_core.Log.trace_method_error(
             self.KEY, 'failed to load form any where'
         )
 
@@ -91,12 +97,15 @@ class ScpCbkEnvironment(object):
 class ScpCbkGui(object):
     def __init__(self):
         pass
+
     @classmethod
     def refresh_tool_kit(cls):
-        from lxutil_gui.qt import gui_qt_core
-        w = gui_qt_core.get_session_window_by_name('dcc-tool-panels/gen-tool-kit')
+        import lxgui.proxy.core as gui_prx_core
+
+        w = gui_prx_core.GuiProxyUtil.find_window_proxy_by_session_name('dcc-tool-panels/gen-tool-kit')
         if w is not None:
             w.refresh_all()
+
     @classmethod
     def refresh_all(cls):
         cls.refresh_tool_kit()

@@ -683,7 +683,7 @@ class RawTextMtd(object):
     def find_words(text):
         if isinstance(text, six.text_type):
             text = text.encode('utf-8')
-        return re.findall(r'[A-Za-z]+', text)
+        return re.findall(r'[A-Z](?:[a-z]+)?|[A-Za-z]+', text)
 
 
 class RawTextOpt(object):

@@ -1,5 +1,7 @@
 # coding:utf-8
 if __name__ == '__main__':
+    from lxbasic import bsc_core
+
     from lxutil import utl_core
 
     import lxresolver.commands as rsv_commands
@@ -48,7 +50,7 @@ if __name__ == '__main__':
                             yml_file = utl_dcc_objects.OsYamlFile(scene_info_file_path)
                             if yml_file.get_is_exists() is True:
                                 continue
-                            utl_core.Log.set_module_result_trace(
+                            bsc_core.Log.trace_method_result(
                                 'file-open',
                                 u'file="{}"'.format(scene_file_path)
                             )
@@ -71,7 +73,7 @@ if __name__ == '__main__':
                             yml_file = utl_dcc_objects.OsYamlFile(scene_info_file_path)
                             if yml_file.get_is_exists() is True:
                                 continue
-                            utl_core.Log.set_module_result_trace(
+                            bsc_core.Log.trace_method_result(
                                 'file-open',
                                 u'file="{}"'.format(scene_src_file_path)
                             )

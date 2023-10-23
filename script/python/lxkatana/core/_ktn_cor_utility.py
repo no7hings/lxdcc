@@ -152,12 +152,10 @@ class Modifier(object):
                 return _fnc
             except Exception:
                 if get_is_ui_mode() is True:
-                    from lxutil import utl_core
-
-                    utl_core.ExceptionCatcher.set_create()
+                    from lxbasic import bsc_core
+                    bsc_core.LogException.trace()
                 else:
                     from lxbasic import bsc_core
-
                     bsc_core.ExceptionMtd.set_print()
                 raise
             #

@@ -2,6 +2,8 @@
 # noinspection PyUnresolvedReferences
 import hou
 
+from lxbasic import bsc_core
+
 from lxutil import utl_core, utl_abstract
 
 from lxhoudini import hou_configure
@@ -74,7 +76,7 @@ class AbsHouObj(utl_abstract.AbsDccObj):
         hou_parent = hou.node(parent_path)
         if hou_parent is not None:
             hou_obj = hou_parent.createNode(obj_type, self.name)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'obj create',
                 'obj="{}", type="{}"'.format(self.path, obj_type)
             )
@@ -116,14 +118,14 @@ class AbsHouObj(utl_abstract.AbsDccObj):
             return [i.path() for i in hou_obj.children()]
         return []
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         return self.__class__(path)
 
     def set_delete(self):
         hou_obj = self.hou_obj
         if hou_obj is not None:
             hou_obj.destroy()
-            utl_core.Log.set_result_trace(
+            bsc_core.Log.trace_result(
                 'delete node: "{}"'.format(self.path)
             )
 

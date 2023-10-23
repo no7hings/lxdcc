@@ -49,7 +49,7 @@ tool:
     scene_method_runner:
         label: Scene-method-runner
         icon: None
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneMethodRunnerPanel().set_window_show()
+        command: ''
     #
     scene_packager:
         chn_label: None
@@ -62,7 +62,7 @@ tool:
     #
     scene_checker:
         chn_label: null
-        command: from lxmaya_gui.panel import pnl_widgets; pnl_widgets.SceneCheckerToolPanel().set_window_show()
+        command: ''
         icon: null
         label: Scene-checker
         size:

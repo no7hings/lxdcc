@@ -2,6 +2,8 @@
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.cmds as cmds
 
+from lxbasic import bsc_core
+
 import lxuniverse.objects as unr_objects
 
 from lxmaya import ma_configure
@@ -38,7 +40,7 @@ class AttributeTranslator(object):
             if clear_history is True:
                 cmds.delete(tgt_obj_path, constructionHistory=1)
             #
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'mesh-uv-translate',
                 u'obj="{}"'.format(tgt_obj_path)
             )

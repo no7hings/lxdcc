@@ -10,13 +10,11 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     @classmethod
     def dcc_texture_check_fnc(cls, validation_checker, check_group, dcc_objs):
         from lxbasic import bsc_core
-        #
-        from lxutil import utl_core
-        #
+
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
         check_dict = {}
-        with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='check texture') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='check texture') as g_p:
             for i_obj in dcc_objs:
                 g_p.set_update()
                 #
@@ -121,8 +119,6 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def dcc_texture_space_check_fnc(self, validation_checker, check_group, location, dcc_objs):
         from lxbasic import bsc_core
 
-        from lxutil import utl_core
-        #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
         import lxutil.rsv.objects as utl_rsv_objects
@@ -149,7 +145,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             check_pattern_opts.append(i_check_p_opt)
 
         check_dict = {}
-        with utl_core.GuiProgressesRunner.create(maximum=len(dcc_objs), label='check texture space') as g_p:
+        with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='check texture space') as g_p:
             for i_obj in dcc_objs:
                 g_p.set_update()
                 #
@@ -267,7 +263,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
-        from lxutil_gui.qt import gui_qt_core
+        import lxgui.qt.core as gui_qt_core
         #
         check_group = 'Scene Check'
         #
@@ -281,7 +277,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if ma_core.get_is_ui_mode() is True:
             file_path = mya_dcc_objects.Scene.get_current_file_path()
             if mya_dcc_objects.Scene.get_scene_is_dirty():
-                w = utl_core.DialogWindow.set_create(
+                w = utl_core.DccDialog.create(
                     label='Save',
                     content=u'scene has been modified, do you want to save changed to "{}"'.format(
                         mya_dcc_objects.Scene.get_current_file_path()
@@ -293,9 +289,9 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     yes_label='Save',
                     no_label='Don\'t save',
                     #
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
-                    parent=gui_qt_core.QtDccMtd.get_active_window()
+                    parent=gui_qt_core.GuiQtDcc.get_active_window()
                 )
                 #
                 if not w.get_result():
@@ -332,7 +328,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         geometry_paths = mya_dcc_objects.Group(dcc_model_location).get_all_shape_paths(include_obj_type=['mesh'])
         if geometry_paths:
-            with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check geometry') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(geometry_paths), label='check geometry') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
                     g_p.set_update()
                     #
@@ -459,10 +455,12 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
 
     def execute_maya_look_check(self, validation_checker):
+        from lxbasic import bsc_core
+
         from lxutil import utl_core
-        #
+
         from lxmaya import ma_configure
-        #
+
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
         import lxmaya.dcc.dcc_operators as mya_dcc_operators
@@ -480,7 +478,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if dcc_model_location:
             geometry_paths = mya_dcc_objects.Group(dcc_model_location).get_all_shape_paths(include_obj_type=['mesh'])
             if geometry_paths:
-                with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check look') as g_p:
+                with bsc_core.LogProcessContext.create(maximum=len(geometry_paths), label='check look') as g_p:
                     for i_geometry_path in geometry_paths:
                         g_p.set_update()
                         #
@@ -508,7 +506,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         dcc_groom_location_cur = self.maya_check_location_fnc(validation_checker, check_group, dcc_groom_location, pathsep, ignore_check=True)
         if dcc_groom_location_cur:
             geometry_paths = mya_dcc_objects.Group(dcc_groom_location_cur).get_all_shape_paths(include_obj_type=[ma_configure.Types.XgenDescription])
-            with utl_core.GuiProgressesRunner.create(maximum=len(geometry_paths), label='check look') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(geometry_paths), label='check look') as g_p:
                 for i_geometry_path in geometry_paths:
                     g_p.set_update()
                     #
@@ -613,7 +611,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxkatana.scripts as ktn_scripts
 
-        from lxutil_gui.qt import gui_qt_core
+        import lxgui.qt.core as gui_qt_core
         #
         check_group = 'Scene Check'
         w_s = ktn_core.WorkspaceSetting()
@@ -640,7 +638,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if ktn_core.get_is_ui_mode() is True:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
             if ktn_dcc_objects.Scene.get_scene_is_dirty():
-                w = utl_core.DialogWindow.set_create(
+                w = utl_core.DccDialog.create(
                     label='Save',
                     content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                         ktn_dcc_objects.Scene.get_current_file_path()
@@ -652,9 +650,9 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     yes_label='Save',
                     no_label='Don\'t save',
                     #
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
-                    parent=gui_qt_core.QtDccMtd.get_active_window()
+                    parent=gui_qt_core.GuiQtDcc.get_active_window()
                 )
                 #
                 if not w.get_result():

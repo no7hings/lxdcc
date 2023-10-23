@@ -9,28 +9,28 @@ if __name__ == '__main__':
     # )
     #
     # os.environ['LYNXI_CONFIGURES'] = '/data/e/myworkspace/td/lynxi/script/configure'
-    # print CfgFileMtd.get_yaml('storage/path-mapper')
-    # print CfgFileMtd.get_yaml('session/deadline/submiter')
-    # print CfgFileMtd.get_yaml('session/deadline/rsv-task-submiter')
-    # print CfgFileMtd.get_yaml('katana/node-graph/asset-texture-resource')
+    # print RscConfigure.get_yaml('storage/path-mapper')
+    # print RscConfigure.get_yaml('session/deadline/submiter')
+    # print RscConfigure.get_yaml('session/deadline/rsv-task-submiter')
+    # print RscConfigure.get_yaml('katana/node-graph/asset-texture-resource')
     #
-    # print CfgFileMtd.get_yaml('colorspace/aces-color')
+    # print RscConfigure.get_yaml('colorspace/aces-color')
     #
-    # print CfgFileMtd.get_yaml('arnold/node')
-    # print CfgFileMtd.get_yaml('arnold/convert')
+    # print RscConfigure.get_yaml('arnold/node')
+    # print RscConfigure.get_yaml('arnold/convert')
     #
-    # print CfgFileMtd.get_yaml('clarisse/gui/menu')
+    # print RscConfigure.get_yaml('clarisse/gui/menu')
     #
-    # print CfgFileMtd.get_yaml('database/library/resource-basic')
+    # print RscConfigure.get_yaml('database/library/resource-basic')
     #
-    # print CfgFileMtd.get_yaml('storage/asset-system-workspace')
+    # print RscConfigure.get_yaml('storage/asset-system-workspace')
 
     # print RawTextMtd.to_integer(
     #     'merge'
     # )
     # print RawTextOpt('abc').to_rgb_()
     #
-    # print RscFileMtd.get(
+    # print Resource.get(
     #     'lua-scripts'
     # )
     # print RawTextOpt(
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     #     '/production/library/resource/all/atlas/sword_fern_pjvef2/v0001/image/preview.png'
     # ).get_thumbnail(ext='.png')
 
-    # print RscFileMtd.get(
+    # print Resource.get(
     #     'asset/library/geometry_sphere.usda'
     # )
     # print SystemMtd.get_environment()
@@ -231,6 +231,8 @@ if __name__ == '__main__':
     # r, g, b = 255, 127, 63
     # print ((b+1)/2+32)-1
 
-    print RscIconFileMtd.get_all_keys_at('application')
+    # print RscIcon.find_all_file_keys_at('application')
+
+    print RawTextMtd.find_words('IWork a')
 
 

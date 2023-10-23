@@ -1,6 +1,8 @@
 # coding:utf-8
 from ._bsc_cor_utility import *
 
+from ._bsc_cor_python import *
+
 from ._bsc_cor_raw import *
 
 from ._bsc_cor_path import *
@@ -17,7 +19,7 @@ from ._bsc_cor_environ import *
 
 from ._bsc_cor_process import *
 
-from ._bsc_cor_executes import *
+from ._bsc_cor_execute import *
 
 from ._bsc_cor_dict import *
 
@@ -44,6 +46,9 @@ from ._bsc_cor_color_space import *
 from ._bsc_cor_gui import *
 
 from ._bsc_cor_url import *
+
+from ._bsc_cor_package import *
+
 
 
 

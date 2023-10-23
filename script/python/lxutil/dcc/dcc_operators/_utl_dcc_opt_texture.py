@@ -11,7 +11,7 @@ from lxbasic import bsc_core
 
 from lxutil import utl_core
 
-import lxbasic.abstracts as bsc_abstracts
+import lxutil.abstracts as utl_abstracts
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -30,6 +30,7 @@ class DccTexturesOpt(object):
             self._objs = self._texture_references.get_objs()
         #
         self._force = force
+
     @classmethod
     def _get_tx_action_queue_(cls, objs, force=False, check_exists=True):
         tx_create_queue = []
@@ -63,11 +64,12 @@ class DccTexturesOpt(object):
                         if i_texture_orig not in tx_create_queue:
                             tx_create_queue.append(i_texture_orig)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'texture-tx create',
                             u'file="{}" orig is non-exists'.format(j_file_path)
                         )
         return tx_create_queue, tx_repath_queue
+
     #
     def set_tx_create(self, use_deferred=False, force=False):
         tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
@@ -75,12 +77,14 @@ class DccTexturesOpt(object):
         )
         #
         return self._get_tx_create_process_(tx_create_queue, use_deferred)
+
     #
     def set_tx_repath(self, check_exists=True):
         tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
             self._objs, check_exists=check_exists
         )
         return self._set_repath_queue_run_(tx_repath_queue)
+
     #
     def set_tx_create_and_repath_use_thread(self, use_deferred=False, force=False):
         objs = self._objs
@@ -111,18 +115,18 @@ class DccTexturesOpt(object):
                         if i_texture_orig not in tx_create_queue:
                             tx_create_queue.append(i_texture_orig)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'texture-tx create',
                             u'file="{}" orig is non-exists'.format(j_file_path)
                         )
         #
         method_args = [
             ('tx-create', self._get_tx_create_process_, (tx_create_queue, use_deferred)),
-            ('repath', self._set_repath_queue_run_, (repath_queue, ))
+            ('repath', self._set_repath_queue_run_, (repath_queue,))
         ]
         results_dict = {}
         if method_args:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(method_args)
             )
             for key, method, args in method_args:
@@ -140,10 +144,11 @@ class DccTexturesOpt(object):
         )
         self._set_tx_create_queue_run_(tx_create_queue)
         self._set_repath_queue_run_(tx_repath_queue)
+
     @classmethod
     def _set_tx_create_queue_run_(cls, queue):
         if queue:
-            with utl_core.LogProgressRunner.create(maximum=len(queue), label='texture-tx create') as l_p:
+            with bsc_core.LogProcessContext.create(maximum=len(queue), label='texture-tx create') as l_p:
                 for i_texture_src in queue:
                     l_p.set_update()
                     if i_texture_src.get_is_exists_as_tx() is False:
@@ -155,19 +160,20 @@ class DccTexturesOpt(object):
                                         j_texture_tile.path,
                                         block=True
                                     )
-                                    utl_core.Log.set_module_result_trace(
+                                    bsc_core.Log.trace_method_result(
                                         'texture-tx create',
                                         u'file="{}"'.format(j_texture_tile.path)
                                     )
+
     @classmethod
     def _get_tx_create_process_(cls, queue, use_deferred):
         lis = []
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture-tx process create',
             'start'
         )
         if queue:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(queue)
             )
             #
@@ -189,11 +195,12 @@ class DccTexturesOpt(object):
         else:
             process.set_start()
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture-tx process create',
             'complete'
         )
         return process
+
     @classmethod
     def _get_jpg_action_queue_(cls, objs, force=False, check_exists=True):
         jpg_create_queue = []
@@ -228,7 +235,7 @@ class DccTexturesOpt(object):
                     if i_tgt_ext_texture_orig is not None:
                         jpg_create_queue.append(i_tgt_ext_texture_orig)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'texture-jpg create',
                             u'file="{}" orig is non-exists'.format(j_file_path)
                         )
@@ -276,7 +283,7 @@ class DccTexturesOpt(object):
                     if i_tgt_ext_texture_orig is not None:
                         jpg_create_queue.append(i_tgt_ext_texture_orig)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'texture-tx create',
                             u'file="{}" orig is non-exists'.format(j_file_path)
                         )
@@ -287,7 +294,7 @@ class DccTexturesOpt(object):
         ]
         results_dict = {}
         if method_args:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(method_args)
             )
             for key, method, args in method_args:
@@ -305,10 +312,11 @@ class DccTexturesOpt(object):
         )
         self._set_jpg_create_queue_run_(jpg_create_queue)
         self._set_repath_queue_run_(jpg_repath_queue)
+
     @classmethod
     def _set_jpg_create_queue_run_(cls, queue):
         if queue:
-            with utl_core.LogProgressRunner.create(maximum=len(queue), label='texture-jpg create') as l_p:
+            with bsc_core.LogProcessContext.create(maximum=len(queue), label='texture-jpg create') as l_p:
                 for i_texture in queue:
                     l_p.set_update()
                     if i_texture.get_is_exists_as_tx() is False:
@@ -318,16 +326,17 @@ class DccTexturesOpt(object):
                                 utl_dcc_objects.OsTexture._set_unit_jpg_create_(
                                     j_texture_tile.path, block=True
                                 )
+
     @classmethod
     def _get_jpg_create_process_(cls, queue, use_deferred):
         lis = []
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture-jpg-process create',
             'start'
         )
         if queue:
             ext_tgt = '.jpg'
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(queue)
             )
             #
@@ -349,19 +358,20 @@ class DccTexturesOpt(object):
         else:
             process.set_start()
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture-jpg-process create',
             'complete'
         )
         return process
+
     @classmethod
     def _set_copy_queue_run_(cls, queue):
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture copy',
             'start'
         )
         if queue:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(queue)
             )
             for i_src_stg_file, i_tgt_stg_file in queue:
@@ -372,52 +382,52 @@ class DccTexturesOpt(object):
             #
             g_p.set_stop()
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture copy',
             'complete'
         )
 
     def _set_repath_queue_run_(self, queue, force=False):
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture repath',
             'start'
         )
         if queue:
-            g_p = utl_core.GuiProgressesRunner(
-                maximum=len(queue)
-            )
-            for i_port, i_args in queue:
-                g_p.set_update()
-                #
-                if isinstance(i_args, (tuple, list)):
-                    check_file_obj, tgt_stg_file = i_args
-                else:
-                    check_file_obj = tgt_stg_file = i_args
-                #
-                if check_file_obj.get_exists_units() or force is True:
-                    self._set_port_repath_(i_port, tgt_stg_file)
-                    color_space = tgt_stg_file.get_color_space_src()
-                    if tgt_stg_file.get_exists_units() is True:
-                        i_port.obj.set_color_space(color_space)
-                else:
-                    utl_core.Log.set_module_warning_trace(
-                        'texture repath',
-                        u'file="{}" is non-exists'.format(tgt_stg_file.path)
-                    )
+            with bsc_core.LogProcessContext.create(maximum=len(queue), label='texture repath') as g_p:
+                for i_port, i_args in queue:
+                    g_p.set_update()
+                    #
+                    if isinstance(i_args, (tuple, list)):
+                        check_file_obj, tgt_stg_file = i_args
+                    else:
+                        check_file_obj = tgt_stg_file = i_args
+                    #
+                    if check_file_obj.get_exists_units() or force is True:
+                        self._set_port_repath_(i_port, tgt_stg_file)
+                        color_space = tgt_stg_file.get_color_space_src()
+                        if tgt_stg_file.get_exists_units() is True:
+                            i_port.obj.set_color_space(color_space)
+                    else:
+                        bsc_core.Log.trace_method_warning(
+                            'texture repath',
+                            u'file="{}" is non-exists'.format(tgt_stg_file.path)
+                        )
             #
             g_p.set_stop()
             #
             self._set_repath_post_run_()
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture repath',
             'complete'
         )
-    @utl_core.Modifier.debug_trace
+
+    @utl_core.DccModifier.debug_trace
     def _set_repath_post_run_(self):
 
         if bsc_core.ApplicationMtd.get_is_maya():
             import lxmaya.commands as mya_commands
+
             #
             mya_commands.set_texture_tiles_repair()
 
@@ -426,7 +436,7 @@ class DccTexturesOpt(object):
             port,
             stg_texture.path
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'texture repath',
             u'attribute="{}", file="{}"'.format(port.path, stg_texture.path)
         )
@@ -436,6 +446,7 @@ class DccTexturesOpt(object):
 
     def set_repair(self, use_deferred=False):
         return self.set_tx_create_and_repath()
+
     @classmethod
     def _get_search_dict_(cls, target_directory_paths):
         def _rcs_fnc(path_):
@@ -480,7 +491,7 @@ class DccTexturesOpt(object):
         search_dict = self._get_search_dict_(target_directory_paths)
         #
         if objs:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(objs)
             )
             for i_obj in objs:
@@ -518,12 +529,12 @@ class DccTexturesOpt(object):
                             repath_queue.append(
                                 (j_port, tgt_texture_file_obj)
                             )
-                            utl_core.Log.set_module_result_trace(
+                            bsc_core.Log.trace_method_result(
                                 'file-search',
                                 u'file="{}" >> "{}"'.format(i_texture.path, tgt_texture_file_obj.path)
                             )
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'file-search',
                             u'file="{}" target is not found'.format(i_texture.path)
                         )
@@ -544,7 +555,7 @@ class DccTexturesOpt(object):
         )
         search_opt.set_search_directories(directory_paths_tgt, below_enable=below_enable)
         if dcc_objs:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(dcc_objs)
             )
             for i_dcc_obj in dcc_objs:
@@ -559,12 +570,12 @@ class DccTexturesOpt(object):
                         repath_queue.append(
                             (j_port, tgt_texture_tgt)
                         )
-                        bsc_core.LogMtd.trace_method_result(
+                        bsc_core.Log.trace_method_result(
                             'file-search',
                             'file="{}" >> "{}"'.format(j_texture_src.path, tgt_texture_tgt.path)
                         )
                     else:
-                        bsc_core.LogMtd.trace_method_warning(
+                        bsc_core.Log.trace_method_warning(
                             'file-search',
                             'file="{}" target is not found'.format(j_texture_src.path)
                         )
@@ -599,11 +610,11 @@ class DccTexturesOpt(object):
                     )
         #
         method_args = [
-            (self._set_copy_queue_run_, (copy_queue, )),
-            (self._set_repath_queue_run_, (repath_queue, ))
+            (self._set_copy_queue_run_, (copy_queue,)),
+            (self._set_repath_queue_run_, (repath_queue,))
         ]
         if method_args:
-            g_p = utl_core.GuiProgressesRunner(
+            g_p = bsc_core.LogProcessContext(
                 maximum=len(method_args)
             )
             for method, args in method_args:
@@ -639,7 +650,7 @@ class DccTexturesOpt(object):
     def set_color_space_auto_switch(self):
         dcc_nodes = self._texture_references.get_objs()
         if dcc_nodes:
-            with utl_core.GuiProgressesRunner.create(maximum=len(dcc_nodes), label='switch color-space auto') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(dcc_nodes), label='switch color-space auto') as g_p:
                 for i_dcc_node in dcc_nodes:
                     g_p.set_update()
                     stg_files = i_dcc_node.get_file_objs()
@@ -709,8 +720,9 @@ class DccTexturesOpt(object):
                     self._set_port_repath_(j_port, tgt_stg_texture)
 
 
-class TextureTxSubProcess(bsc_abstracts.AbsProcess):
-    LOGGER = utl_core.Log
+class TextureTxSubProcess(utl_abstracts.AbsProcess):
+    LOGGER = bsc_core.Log
+
     #
     def __init__(self, file_path):
         super(TextureTxSubProcess, self).__init__()
@@ -724,22 +736,23 @@ class TextureTxSubProcess(bsc_abstracts.AbsProcess):
             result = self._f._set_unit_tx_create_by_src_(
                 self._file_path
             )
-            TextureTxMainProcess.PROCESS_COUNT = pre_count + 1
+            TextureTxMainProcess.PROCESS_COUNT = pre_count+1
         else:
             result = None
         return result
 
     def _set_finished_fnc_run_(self):
         pre_count = TextureTxMainProcess.PROCESS_COUNT
-        TextureTxMainProcess.PROCESS_COUNT = pre_count - 1
+        TextureTxMainProcess.PROCESS_COUNT = pre_count-1
 
 
-class TextureTxMainProcess(bsc_abstracts.AbsProcess):
-    LOGGER = utl_core.Log
+class TextureTxMainProcess(utl_abstracts.AbsProcess):
+    LOGGER = bsc_core.Log
     #
     PROCESS_COUNT = 0
     PROCESS_COUNT_MAXIMUM = 2
     ELEMENT_PROCESS_CLS = TextureTxSubProcess
+
     def __init__(self, file_paths):
         super(TextureTxMainProcess, self).__init__()
         self._file_paths = list(set(file_paths))
@@ -755,8 +768,9 @@ class TextureTxMainProcess(bsc_abstracts.AbsProcess):
         return True
 
 
-class TextureJpgSubProcess(bsc_abstracts.AbsProcess):
-    LOGGER = utl_core.Log
+class TextureJpgSubProcess(utl_abstracts.AbsProcess):
+    LOGGER = bsc_core.Log
+
     #
     def __init__(self, file_path):
         super(TextureJpgSubProcess, self).__init__()
@@ -768,22 +782,23 @@ class TextureJpgSubProcess(bsc_abstracts.AbsProcess):
         maximum = TextureJpgMainProcess.PROCESS_COUNT_MAXIMUM
         if pre_count < maximum:
             result = self._f._set_unit_jpg_create_(self._file_path)
-            TextureJpgMainProcess.PROCESS_COUNT = pre_count + 1
+            TextureJpgMainProcess.PROCESS_COUNT = pre_count+1
         else:
             result = None
         return result
 
     def _set_finished_fnc_run_(self):
         pre_count = TextureJpgMainProcess.PROCESS_COUNT
-        TextureJpgMainProcess.PROCESS_COUNT = pre_count - 1
+        TextureJpgMainProcess.PROCESS_COUNT = pre_count-1
 
 
-class TextureJpgMainProcess(bsc_abstracts.AbsProcess):
-    LOGGER = utl_core.Log
+class TextureJpgMainProcess(utl_abstracts.AbsProcess):
+    LOGGER = bsc_core.Log
     #
     PROCESS_COUNT = 0
     PROCESS_COUNT_MAXIMUM = 2
     ELEMENT_PROCESS_CLS = TextureJpgSubProcess
+
     def __init__(self, file_paths):
         super(TextureJpgMainProcess, self).__init__()
         self._file_paths = list(set(file_paths))

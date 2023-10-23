@@ -66,15 +66,15 @@ def __execute_option_hook(hook_option):
     :param hook_option:
     :return:
     """
+    import lxlog.core as log_core
+
     from lxbasic import bsc_core
     #
     import lxbasic.extra.methods as bsc_etr_methods
     #
     import lxresolver.commands as rsv_commands
     #
-    from lxutil import utl_core
-    #
-    from lxsession import ssn_core
+    import lxsession.core as ssn_core
     #
     resolver = rsv_commands.get_resolver()
     #
@@ -90,7 +90,7 @@ def __execute_option_hook(hook_option):
     # check engine is in configure
     if hook_engine not in all_hook_engines:
         raise RuntimeError(
-            utl_core.Log.set_module_error_trace(
+            log_core.Log.trace_method_error(
                 'hook-run',
                 'engine="{}" is not available'.format(hook_engine)
             )

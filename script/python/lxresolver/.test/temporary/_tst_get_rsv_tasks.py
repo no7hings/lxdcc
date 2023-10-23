@@ -1,9 +1,11 @@
 # coding:utf-8
 if __name__ == '__main__':
-    from lxutil import utl_core
+    from lxbasic import bsc_core
+
     import lxresolver.commands as rsv_commands
 
-    utl_core.Log.PRINT_ENABLE = False
+    bsc_core.Log.ENABLE = False
+
     r = rsv_commands.get_resolver()
 
     rsv_project = r.get_rsv_project(project='cjd')

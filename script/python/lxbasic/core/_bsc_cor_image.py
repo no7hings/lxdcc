@@ -3,7 +3,7 @@ from ._bsc_cor_utility import *
 
 import os
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_time, _bsc_cor_process, _bsc_cor_storage, _bsc_cor_executes
+from lxbasic.core import _bsc_cor_raw, _bsc_cor_time, _bsc_cor_process, _bsc_cor_storage, _bsc_cor_execute
 
 
 class ImgFileOpt(object):
@@ -28,7 +28,7 @@ class ImgFileOpt(object):
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
-                    _bsc_cor_executes.Executes.oiiotool(),
+                    _bsc_cor_execute.Executes.oiiotool(),
                     '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
@@ -48,7 +48,7 @@ class ImgFileOpt(object):
                     os.makedirs(directory_path)
                 #
                 cmd_args = [
-                    _bsc_cor_executes.Executes.oiiotool(),
+                    _bsc_cor_execute.Executes.oiiotool(),
                     '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     '--resize {}x0'.format(width),
                     '-o "{}"'.format(thumbnail_file_path)
@@ -96,7 +96,7 @@ class ImgFileOpt(object):
                 background_file_path = self._create_background_(width, background_rgba)
                 #
                 cmd_args = [
-                    _bsc_cor_executes.Executes.oiiotool(),
+                    _bsc_cor_execute.Executes.oiiotool(),
                     '-i "{}"'.format(_bsc_cor_raw.auto_encode(self._file_path)),
                     # use fit, move to center
                     '--fit {}x{}'.format(width, width),
@@ -127,7 +127,7 @@ class ImgFileOpt(object):
                 self.TIME_MARK_PATTERN, _bsc_cor_storage.StgFileOpt(file_path).get_modify_timestamp()
             )
             cmd_args = [
-                _bsc_cor_executes.Executes.oiiotool(),
+                _bsc_cor_execute.Executes.oiiotool(),
                 u'-i "{}"'.format(file_path),
                 '--resize {}x0'.format(width),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
@@ -159,7 +159,7 @@ class ImgFileOpt(object):
             self.TIME_MARK_PATTERN, file_path_src_opt.get_modify_timestamp()
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             u'-i "{}"'.format(file_path_src_opt.path),
             '--attrib:type=string DateTime "{}"'.format(time_mark),
             '--adjust-time ',
@@ -191,7 +191,7 @@ class ImgFileOpt(object):
                 self.TIME_MARK_PATTERN, file_opt_src.get_modify_timestamp()
             )
             cmd_args = [
-                _bsc_cor_executes.Executes.oiiotool(),
+                _bsc_cor_execute.Executes.oiiotool(),
                 '-i "{}"'.format(_bsc_cor_raw.auto_encode(file_opt_src.get_path())),
                 '--attrib:type=string DateTime "{}"'.format(time_mark),
                 '--adjust-time ',
@@ -212,7 +212,7 @@ class ImgFileOpt(object):
             )
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '-i "{input}"',
             '--ch 0,0,0',
             '--attrib:type=string DateTime "{time_mark}"',
@@ -234,7 +234,7 @@ class ImgOiioMtd(object):
             size='{}x{}'.format(*size)
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             u'-i "{input}"',
             '--fit {size}',
             u'-o "{output}"',
@@ -251,7 +251,7 @@ class ImgOiioMtd(object):
             output=file_path_tgt
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             # u'-i "{}"'.format(file_path_src),
@@ -269,7 +269,7 @@ class ImgOiioMtd(object):
             output=_bsc_cor_raw.auto_encode(file_path)
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             '-o "{output}"',
@@ -287,7 +287,7 @@ class ImgOiioMtd(object):
             offset_foreground='-{}-{}'.format(*offset_fgd)
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             u'"{foreground}" --originoffset {offset_foreground}',
             u'"{background}"',
             '--over',
@@ -344,7 +344,7 @@ class ImgOiioMtd(object):
 
         option['box'] = ' '.join(box_args)
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             '{box}',
@@ -403,7 +403,7 @@ class ImgOiioMtd(object):
 
         option['box'] = ' '.join(box_args)
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '--create {size} 4',
             '--fill:color={color} {size}',
             '{box}',
@@ -422,7 +422,7 @@ class ImgOiioMtd(object):
             output=file_path_tgt,
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             u'-i "{input}"',
             '--ch R,G,B,A=1.0',
             u'-o "{output}"',
@@ -440,7 +440,7 @@ class ImgOiioMtd(object):
             to_color_space=color_space_tgt,
         )
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '-i "{input}"',
             # '--colorconfig "{}"'.format('/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'),
             # '--iscolorspace "{from_color_space}"',
@@ -696,7 +696,7 @@ class ImgFileOiioOpt(object):
     @classmethod
     def _get_info_(cls, file_path):
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '--info:verbose=1 "{}"'.format(file_path),
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))
@@ -709,7 +709,7 @@ class ImgFileOiioOpt(object):
     @classmethod
     def _get_metadata_(cls, file_path):
         cmd_args = [
-            _bsc_cor_executes.Executes.oiiotool(),
+            _bsc_cor_execute.Executes.oiiotool(),
             '--info:verbose=1 "{}"'.format(file_path),
         ]
         p = _bsc_cor_process.SubProcessMtd.set_run(' '.join(cmd_args))

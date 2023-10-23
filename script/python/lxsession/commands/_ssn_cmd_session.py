@@ -50,7 +50,7 @@ def set_session_option_hooks_execute_by_deadline(session):
                     _batch_choice_scheme,
                     _choice_scheme_includes
             ) is False:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'scheme choice',
                     'option-hook="{}" is ignore'.format(option_hook_key_)
                 )
@@ -71,7 +71,7 @@ def set_session_option_hooks_execute_by_deadline(session):
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
-    with bsc_core.LogProgress.create_as_bar(
+    with bsc_core.LogProcessContext.create_as_bar(
         maximum=len(option_hook_keys),
         label='option-hooks execute by deadline',
     ) as g_p:

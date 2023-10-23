@@ -1,7 +1,31 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
+# from ._bsc_cor_utility import *
 
-from lxbasic.core import _bsc_cor_log, _bsc_cor_environ
+from lxbasic.core import _bsc_cor_utility
+
+import sys
+
+import six
+
+import os
+
+import platform
+
+import copy
+
+import subprocess
+
+import fnmatch
+
+import re
+
+import threading
+
+import functools
+
+import lxlog.core as log_core
+
+from lxbasic.core import _bsc_cor_environ
 
 
 class SubProcessMtd(object):
@@ -27,7 +51,7 @@ class SubProcessMtd(object):
                     env_opt.set(
                         k, v
                     )
-                    _bsc_cor_log.LogMtd.trace_method_result(
+                    log_core.Log.trace_method_result(
                         'sub-process',
                         'environ set: "{}"="{}"'.format(k, v)
                     )
@@ -37,7 +61,7 @@ class SubProcessMtd(object):
                         env_opt.set(
                             k, v
                         )
-                        _bsc_cor_log.LogMtd.trace_method_result(
+                        log_core.Log.trace_method_result(
                             'sub-process',
                             'environ set: "{}"="{}"'.format(k, v)
                         )
@@ -45,7 +69,7 @@ class SubProcessMtd(object):
                         env_opt.append(
                             k, i_v
                         )
-                        _bsc_cor_log.LogMtd.trace_method_result(
+                        log_core.Log.trace_method_result(
                             'sub-process',
                             'environ append: "{}"="{}"'.format(k, i_v)
                         )
@@ -53,7 +77,7 @@ class SubProcessMtd(object):
                         env_opt.prepend(
                             k, i_v
                         )
-                        _bsc_cor_log.LogMtd.trace_method_result(
+                        log_core.Log.trace_method_result(
                             'sub-process',
                             'environ prepend: "{}"="{}"'.format(k, i_v)
                         )
@@ -68,10 +92,16 @@ class SubProcessMtd(object):
     @classmethod
     def check_command_clear_environ(cls, cmd):
         # todo, read form configure?
-        if fnmatch.filter(
-                [cmd], '*/paper-bin*'
-        ):
-            return True
+
+        ps = [
+            r'(.*)/paper-bin\s(.*)', r'paper\s(.*)',
+            r'(.*)/windows/paper\s(.*)'
+        ]
+
+        # print 'command is', cmd
+        for i_p in ps:
+            if re.search(i_p, cmd) is not None:
+                return True
         return False
 
     @classmethod
@@ -91,7 +121,7 @@ class SubProcessMtd(object):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 startupinfo=cls.NO_WINDOW,
-                env=SystemMtd.get_environment()
+                env=dict()
             )
         else:
             environs_extend = kwargs.get('environs_extend', {})
@@ -129,7 +159,7 @@ class SubProcessMtd(object):
             # noinspection PyBroadException
             try:
                 print(return_line.encode('gbk').rstrip())
-            except:
+            except Exception:
                 pass
         #
         retcode = s_p.poll()
@@ -203,9 +233,9 @@ class SubProcessMtd(object):
 
     @classmethod
     def execute_with_result(cls, cmd, **kwargs):
-        if SystemMtd.get_is_windows():
+        if _bsc_cor_utility.SystemMtd.get_is_windows():
             cls.execute_with_result_in_windows(cmd, **kwargs)
-        elif SystemMtd.get_is_linux():
+        elif _bsc_cor_utility.SystemMtd.get_is_linux():
             cls.execute_with_result_in_linux(cmd, **kwargs)
 
     @classmethod
@@ -221,11 +251,12 @@ class SubProcessMtd(object):
         return _sp
 
     @classmethod
-    def set_run_with_result_use_thread(cls, cmd):
+    def set_run_with_result_use_thread(cls, cmd, **kwargs):
         t_0 = threading.Thread(
             target=functools.partial(
                 cls.execute_with_result,
-                cmd=cmd
+                cmd=cmd,
+                **kwargs
             )
         )
         t_0.start()
@@ -345,3 +376,14 @@ class SubProcessMtd(object):
             )
         )
         t_0.start()
+
+
+if __name__ == '__main__':
+    pass
+    # text = '/job/PLE/support/wrappers/paper-bin --j'
+    # p = r'(.*)/paper-bin\s(.*)'
+    # m = re.search(p, text)
+    # print m.group(1)
+    # print m.group(2)
+
+

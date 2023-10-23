@@ -7,9 +7,11 @@ import types
 # noinspection PyUnresolvedReferences
 from maya import cmds, mel
 
+import lxlog.core as log_core
+
 from lxbasic import bsc_core
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 import lxuniverse.objects as unv_objects
 
@@ -26,14 +28,14 @@ from lxmaya.dcc.dcc_objects import _mya_dcc_obj_obj, _mya_dcc_obj_dag
 
 class Namespace(
     utl_abstract.AbsDccObjDef,
-    utl_abstract.AbsObjGuiDef,
+    utl_abstract.AbsGuiExtraDef,
 ):
     PATHSEP = ':'
     Obj_CLS = _mya_dcc_obj_obj.Node
 
     # noinspection PyMissingConstructor
     def __init__(self, path):
-        self._set_obj_gui_def_init_()
+        self._init_gui_extra_def_()
 
         self._path = path
         self._name = self._path.split(self.PATHSEP)[-1]
@@ -44,7 +46,7 @@ class Namespace(
 
     @property
     def icon(self):
-        return utl_core.Icon.get('name')
+        return bsc_core.RscIcon.get('name')
 
     @property
     def name(self):
@@ -70,7 +72,7 @@ class Namespace(
 
     def set_delete(self):
         cmds.namespace(removeNamespace=self.name, mergeNamespaceWithRoot=1)
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'namespace-clear',
             u'unused-namespace: "{}"'.format(self.path)
         )
@@ -318,7 +320,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
 
         #
         if cls.get_scene_is_dirty() is True:
-            w = utl_core.DialogWindow.set_create(
+            w = utl_core.DccDialog.create(
                 label='New',
                 content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     cls.get_current_file_path()
@@ -341,7 +343,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         :param ignore_format: bool, etc. for save ".mb" but rename to ".ma"
         :return:
         """
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'scene open',
             u'file="{}" is started'.format(file_path)
         )
@@ -360,7 +362,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 force=1,
                 type=cls._get_file_type_name_(file_path)
             )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'scene open',
             u'file="{}" is completed'.format(file_path)
         )
@@ -383,7 +385,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             force=1,
             type=cls._get_file_type_name_(file_path)
         )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'scene save',
             u'file="{}"'.format(file_path)
         )
@@ -397,7 +399,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             force=1,
             type=cls._get_file_type_name_(file_path)
         )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'scene save',
             u'file="{}"'.format(file_path)
         )
@@ -413,7 +415,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             if namespace is None:
                 namespace = f.base
             #
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'file-reference',
                 u'file="{}"'.format(file_path)
             )
@@ -426,31 +428,6 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 options='v=0;',
                 type=cls._get_file_type_name_(file_path)
             )
-            # if cls.get_file_is_reference_exists(file_path) is False:
-            #     if namespace is None:
-            #         namespace = f.base
-            #     #
-            #     utl_core.Log.set_module_result_trace(
-            #         'file-reference',
-            #         'file="{}"'.format(file_path)
-            #     )
-            #     return cmds.file(
-            #         file_path,
-            #         ignoreVersion=1,
-            #         reference=1,
-            #         mergeNamespacesOnClash=0,
-            #         namespace=namespace,
-            #         options='v=0;',
-            #         type=cls._get_file_type_name_(file_path)
-            #     )
-            # else:
-            #     reference_node = cls.get_file_reference_node(file_path)
-            #     if reference_node is not None:
-            #         utl_core.Log.set_module_result_trace(
-            #             'file-reference-reload',
-            #             'file="{}"'.format(file_path)
-            #         )
-            #         cmds.file(loadReference=reference_node)
 
     @classmethod
     def get_file_reference_node(cls, file_path):
@@ -471,7 +448,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             displayLights='default',
             shadows=0
         )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'viewport-set',
             u'mode="{}"'.format(
                 'shader'
@@ -489,7 +466,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             displayLights='default',
             shadows=0
         )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'viewport-set',
             u'mode="{}"'.format(
                 'texture'
@@ -507,7 +484,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             displayLights='all',
             shadows=1
         )
-        utl_core.Log.set_module_result_trace(
+        log_core.Log.trace_method_result(
             'viewport-set',
             u'mode="{}"'.format(
                 'light'
@@ -563,11 +540,11 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             for i_obj in objs:
                 if i_obj.type in {'mesh'}:
                     if i_obj.get_port('intermediateObject').get() is False:
-                        self._set_obj_create_(i_obj)
+                        self._create_obj_(i_obj)
                 elif i_obj.get_api_type_name() in ma_configure.ApiTypes.Transforms:
-                    self._set_obj_create_(i_obj)
+                    self._create_obj_(i_obj)
 
-    def _set_obj_create_(self, mya_obj):
+    def _create_obj_(self, mya_obj):
         obj_category_name = unr_configure.ObjCategory.MAYA
         obj_type_name = mya_obj.type
         mya_obj_path = mya_obj.path
@@ -579,21 +556,21 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         obj_type = obj_category.generate_type(obj_type_name)
         obj = obj_type.create_obj(dcc_obj_path)
         if ma_core.get_is_ui_mode():
-            from lxutil_gui.qt import gui_qt_core
+            import lxgui.qt.core as gui_qt_core
 
             obj.set_gui_attribute(
-                'icon', gui_qt_core.QtMayaMtd.get_qt_icon(obj_type_name)
+                'icon', gui_qt_core.GuiQtMaya.generate_qt_icon_by_name(obj_type_name)
             )
         return obj
 
     # clear
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unused_scripts_clear(cls):
         for i in cmds.scriptJob(listJobs=1):
             for k in ['leukocyte.antivirus()']:
                 if k in i:
-                    utl_core.Log.set_result_trace(
+                    log_core.Log.trace_result(
                         'unused-script-job-remove: "{}"'.format(k)
                     )
                     index = i.split(': ')[0]
@@ -601,45 +578,45 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         for i in cmds.ls(type='script'):
             if i in ['breed_gene', 'vaccine_gene']:
-                utl_core.Log.set_result_trace(
+                log_core.Log.trace_result(
                     'unused-script-remove: "{}"'.format(i)
                 )
                 cmds.delete(i)
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unused_shaders_clear(cls):
         mel.eval('MLdeleteUnused;')
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unused_windows_clear(cls, exclude_window_names=None):
         for panel in cmds.getPanel(visiblePanels=1) or []:
             if cmds.panel(panel, query=1, exists=1):
                 window = panel+'Window'
                 if cmds.window(window, query=1, exists=1):
                     cmds.deleteUI(window, window=1)
-                    utl_core.Log.set_module_result_trace(
+                    log_core.Log.trace_method_result(
                         'unused-window-clear',
                         u'window="{}"'.format(window)
                     )
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unknown_plug_ins_clear(cls):
         _ = cmds.unknownPlugin(query=1, list=1) or []
         if _:
-            with utl_core.GuiProgressesRunner.create(maximum=len(_), label='clean unknown-plug') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unknown-plug') as g_p:
                 for i in _:
                     g_p.set_update()
                     cmds.unknownPlugin(i, remove=1)
-                    utl_core.Log.set_module_result_trace(
+                    log_core.Log.trace_method_result(
                         'unknown-plug-in-clear',
                         u'plug-in="{}"'.format(i)
                     )
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unused_namespaces_clear(cls):
         def get_obj_parent_path_fnc_(path_):
             parent = cmds.listRelatives(path_, parent=1, fullPath=1)
@@ -672,7 +649,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         #
         def set_remove_fnc(namespace_):
             cmds.namespace(removeNamespace=namespace_)
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'scene-clear',
                 u'unused-namespace: "{}"'.format(namespace_)
             )
@@ -707,24 +684,24 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         fnc_1_()
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unknown_nodes_clear(cls):
         _ = cmds.ls(type='unknown', long=1) or []
         if _:
-            with utl_core.GuiProgressesRunner.create(maximum=len(_), label='clean unknown-node') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unknown-node') as g_p:
                 for i in _:
                     g_p.set_update()
                     if cmds.objExists(i) is True:
                         if cmds.referenceQuery(i, isNodeReferenced=1) is False:
                             cmds.lockNode(i, lock=0)
                             cmds.delete(i)
-                            utl_core.Log.set_module_result_trace(
+                            log_core.Log.trace_method_result(
                                 'scene-clear',
                                 u'unknown-node: "{}"'.format(i)
                             )
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unload_references_clear(cls):
         for reference_node in cmds.ls(type='reference'):
             # noinspection PyBroadException
@@ -736,17 +713,17 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             if is_loaded is False:
                 cmds.lockNode(reference_node, lock=0)
                 cmds.delete(reference_node)
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'scene-clear',
                     u'unload-reference-node: "{}"'.format(reference_node)
                 )
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unused_names_clear(cls):
         _ = cmds.ls('pasted__*', long=1) or []
         if _:
-            with utl_core.GuiProgressesRunner.create(maximum=len(_), label='clean unused-name') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unused-name') as g_p:
                 for i in _:
                     g_p.set_update()
                     if cmds.objExists(i) is True:
@@ -758,11 +735,11 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                             )
 
     @classmethod
-    @utl_core.Modifier.ignore_run
+    @utl_core.DccModifier.ignore_run
     def set_unused_display_layers_clear(cls):
         _ = cmds.ls(type='displayLayer', long=1) or []
         if _:
-            with utl_core.GuiProgressesRunner.create(maximum=len(_), label='clean unknown-plug') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unknown-plug') as g_p:
                 for i in _:
                     g_p.set_update()
                     #
@@ -773,7 +750,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                         if cmds.referenceQuery(i, isNodeReferenced=1) is False:
                             cmds.lockNode(i, lock=0)
                             cmds.delete(i)
-                            utl_core.Log.set_module_result_trace(
+                            log_core.Log.trace_method_result(
                                 'scene-clear',
                                 u'display-layer: "{}"'.format(i)
                             )

@@ -170,7 +170,7 @@ class References(object):
                     environ_value = os.environ[environ_key]
                     path_ = path_.replace(variant, environ_value)
                 else:
-                    utl_core.Log.set_warning_trace('Variant "{}" in "{}" is Not Available.'.format(variant, path_))
+                    bsc_core.Log.trace_warning('Variant "{}" in "{}" is Not Available.'.format(variant, path_))
         return path_
 
     def get_file_plf_objs(self):

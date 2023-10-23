@@ -90,7 +90,7 @@ def set_scene_export_by_any_scene_file(option):
                     'complete'
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'maya-scene-export-script-run',
                     u'file="{}" is non-exists'.format(any_scene_file_path)
                 )

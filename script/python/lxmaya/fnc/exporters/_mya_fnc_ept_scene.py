@@ -72,7 +72,7 @@ class FncSceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 for i in ss.get_paths():
                     i_set = mya_dcc_objects.Set(i)
                     if i_set.get_elements_match('|master|*'):
-                        utl_core.Log.set_module_result_trace(
+                        bsc_core.Log.trace_method_result(
                             'maya scene export',
                             u'set="{}" is add to export'.format(i_set.path)
                         )
@@ -103,7 +103,7 @@ class FncSceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         if self._results:
             for i in self._results:
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'maya scene export',
                     u'file="{}"'.format(i)
                 )
@@ -303,18 +303,18 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
         if root_mya_obj.get_is_exists() is True:
             if use_render is True:
                 self._set_render_run_()
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'maya-render-preview-export',
                     u'file="{}"'.format(self._file_path)
                 )
             else:
                 self._set_snapshot_run_()
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'maya-snapshot-preview-export',
                     u'file="{}"'.format(self._file_path)
                 )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'maya-preview-export',
                 u'obj="{}" is non-exists'.format(self._root)
             )
@@ -464,7 +464,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             )
         #
         self._raw.save_to(file_path)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'camera-yml-export',
             'file="{}"'.format(file_path)
         )

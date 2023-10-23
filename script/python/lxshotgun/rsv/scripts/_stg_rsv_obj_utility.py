@@ -132,12 +132,12 @@ class RsvStgTaskOpt(object):
                         **kwargs
                     )
             else:
-                utl_core.Log.set_module_error_trace(
+                bsc_core.Log.trace_method_error(
                     'shotgun-entity create',
                     'step="{}" is non-exists.'.format(kwargs['step'])
                 )
         else:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.Log.trace_method_error(
                 'shotgun-entity create',
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
@@ -208,7 +208,7 @@ class RsvStgTaskOpt(object):
             if movie_file_opt.get_is_exists() is True:
                 stg_version_opt.upload_stg_movie(movie_file)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'shotgun movie upload',
                     'file="{}" is non-exists'.format(movie_file)
                 )

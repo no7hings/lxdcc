@@ -58,12 +58,12 @@ class ImgFileOpt(object):
             utl_core.SubProcessRunner.execute_with_result(
                 ' '.join(arguments)
             )
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'dot-mov-convert',
                 u'file="{}"'.format(output_file_path)
             )
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'dot-mov-convert',
                 u'bin="{}" is non-exists'.format(self._rv_io_path)
             )
@@ -322,7 +322,7 @@ class StgVersionOpt(AbsStgObjOpt):
     def set_stg_type(self, stg_type):
         if stg_type:
             self._stg_obj_query.set_update('sg_version_type', stg_type)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'stg-version set',
                 u'stg-type="{}"'.format(stg_type)
             )
@@ -330,7 +330,7 @@ class StgVersionOpt(AbsStgObjOpt):
     def set_stg_user(self, stg_user):
         if stg_user:
             self._stg_obj_query.set_update('user', stg_user)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'stg-version set',
                 u'user="{}"'.format(stg_user)
             )
@@ -340,7 +340,7 @@ class StgVersionOpt(AbsStgObjOpt):
 
     def set_stg_status(self, stg_status):
         self._stg_obj_query.set_update('sg_status_list', stg_status)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'stg-version set',
             u'stg-status="{}"'.format(stg_status)
         )
@@ -350,7 +350,7 @@ class StgVersionOpt(AbsStgObjOpt):
 
     def set_stg_todo(self, stg_todo):
         self._stg_obj_query.set_update('sg_todo', stg_todo)
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'stg-version set',
             u'stg-todo="{}"'.format(stg_todo)
         )
@@ -373,12 +373,12 @@ class StgVersionOpt(AbsStgObjOpt):
                     'l:/prod', '${RV_PATHSWAP_ROOT}'
                 )
             )
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'stg-version set',
                 u'file="{}"'.format(file_path)
             )
         else:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'stg-version set',
                 u'file="{}" is non-exists'.format(file_path)
             )
@@ -444,12 +444,12 @@ class StgLookPassOpt(AbsStgObjOpt):
     def set_image_upload(self, file_path):
         if os.path.isfile(file_path):
             self._stg_obj_query.set_upload('image', file_path)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'stg-look-pass-upload',
                 u'file="{}"'.format(file_path)
             )
         else:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'stg-look-pass-upload',
                 u'file="{}" is non-exists'.format(file_path)
             )

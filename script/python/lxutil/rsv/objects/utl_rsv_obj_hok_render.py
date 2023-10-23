@@ -48,7 +48,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if layer_from_geometry_variant is True:
             geometry_variant_names = self.get_asset_exists_geometry_variant_names()
             layers = [layer_variant_mapper[i] for i in geometry_variant_names]
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'load layer form geometry variant',
                 'layers={}'.format(', '.join(map(lambda x: '"{}"'.format(x), layers)))
             )
@@ -79,7 +79,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             variants_dic
         )
         render_ddl_job_ids = []
-        with utl_core.LogProgressRunner.create(maximum=len(combinations), label='cmb-render-create') as l_p:
+        with bsc_core.LogProcessContext.create(maximum=len(combinations), label='cmb-render-create') as l_p:
             for i_seq, i_variants in enumerate(combinations):
                 l_p.set_update()
                 #

@@ -122,7 +122,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 i_output_file = utl_dcc_objects.OsFile(i_output_file_path)
                 if i_output_file.get_is_exists() is True:
-                    bsc_core.LogMtd.trace_method_result(
+                    bsc_core.Log.trace_method_result(
                         'ass export',
                         'file="{}"'.format(i_output_file_path)
                     )
@@ -130,7 +130,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         fr = utl_scripts.DotAssFileReader(i_output_file_path)
                         fr._set_file_paths_convert_()
                         #
-                        bsc_core.LogMtd.trace_method_result(
+                        bsc_core.Log.trace_method_result(
                             'katana-ass-sequence-export',
                             u'file="{}"'.format(file_path)
                         )
@@ -147,7 +147,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             #
             output_file = utl_dcc_objects.OsFile(output_file_path)
             if output_file.get_is_exists() is True:
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'ass export',
                     'file="{}"'.format(output_file_path)
                 )
@@ -155,7 +155,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     fr = utl_scripts.DotAssFileReader(output_file_path)
                     fr._set_file_paths_convert_()
                     #
-                    bsc_core.LogMtd.trace_method_result(
+                    bsc_core.Log.trace_method_result(
                         'katana-ass-export',
                         u'file="{}"'.format(file_path)
                     )
@@ -170,7 +170,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         camera_location = self.get('camera_location')
         look_pass_node = self.get('look_pass_node')
         look_pass_name = self.get('look_pass')
-        bsc_core.LogMtd.trace_method_result(
+        bsc_core.Log.trace_method_result(
             'ass export',
             'obj="{}", look_pass="{}"'.format(
                 look_pass_node,

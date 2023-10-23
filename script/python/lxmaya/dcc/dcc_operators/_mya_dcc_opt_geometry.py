@@ -12,11 +12,13 @@ import fnmatch
 
 import parse
 
+import lxlog.core as log_core
+
 from lxbasic import bsc_core
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
-from lxutil import utl_core, utl_configure
+from lxutil import utl_configure
 
 from lxmaya import ma_configure, ma_core
 
@@ -67,7 +69,7 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
                     )
                     om2_obj.setName(name)
                     #
-                    utl_core.Log.set_module_result_trace(
+                    log_core.Log.trace_method_result(
                         'transform-obj-create',
                         'obj="{}"'.format(self.obj.path)
                     )
@@ -78,7 +80,7 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
                 #
                 om2_obj.setName(name)
                 #
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'transform-obj-create',
                     'obj="{}"'.format(self.obj.path)
                 )
@@ -133,7 +135,7 @@ class MeshOpt(
                 #
                 _om2_obj = ma_core.Om2Method._get_om2_mesh_fnc_(shape_path)
                 #
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'mesh-obj-create',
                     u'obj="{}"'.format(shape_path)
                 )
@@ -399,7 +401,7 @@ class MeshOpt(
         uv_map_names = self.get_uv_map_names()
         if uv_map_name not in uv_map_names:
             om2_obj.createUVSet(uv_map_name)
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'uv-map-create',
                 u'uv-map-name="{}"'.format(uv_map_name)
             )
@@ -415,13 +417,13 @@ class MeshOpt(
                 om2_obj.setUVs(u_coords, v_coords, uv_map_name)
                 om2_obj.assignUVs(uv_face_vertex_counts, uv_face_vertex_indices, uv_map_name)
                 #
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'mesh uv-map assign',
                     u'obj="{}"; uv-map-name="{}"'.format(self.obj.path, uv_map_name)
                 )
-        except:
+        except Exception:
             bsc_core.ExceptionMtd.set_print()
-            utl_core.Log.set_module_error_trace(
+            log_core.Log.trace_method_error(
                 'mesh uv-map assign',
                 'obj="{}"'.format(self.obj.path)
             )

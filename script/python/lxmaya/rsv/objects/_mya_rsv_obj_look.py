@@ -70,7 +70,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
                     ).execute()
                 else:
-                    utl_core.Log.set_module_warning_trace(
+                    bsc_core.Log.trace_method_warning(
                         'look-ass export',
                         u'file="{}" is exists'.format(i_look_ass_file_path)
                     )
@@ -87,7 +87,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
                     ).execute()
         else:
-            utl_core.Log.set_module_error_trace(
+            bsc_core.Log.trace_method_error(
                 'ass export',
                 'obj="{}" is non-exists'.format(mya_root.path)
             )
@@ -133,7 +133,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             ).execute()
         else:
-            utl_core.Log.set_module_warning_trace(
+            bsc_core.Log.trace_method_warning(
                 'look-yml export',
                 'obj="{}" is non-exists'.format(root)
             )

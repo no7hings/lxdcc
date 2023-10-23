@@ -7,6 +7,8 @@ import collections
 
 import lxuniverse.abstracts as unr_abstracts
 
+from lxbasic import bsc_core
+
 from lxutil import utl_configure, utl_core
 
 from lxutil.dcc.dcc_objects import _utl_dcc_obj_utility
@@ -19,9 +21,11 @@ class AbsTaskMethodCreator(object):
     #
     APPLICATION_NAME = None
     METHOD_MODULE_PATH = None
+
     def __init__(self, method_keys):
         self._method_keys = method_keys
         self._method_dict = collections.OrderedDict()
+
     @property
     def application_name(self):
         return self.APPLICATION_NAME
@@ -37,6 +41,7 @@ class AbsTaskMethodCreator(object):
 
     def set_methods_create(self):
         return [self._set_method_create_(i) for i in self.get_method_keys() if i]
+
     # noinspection PyUnusedLocal
     def _set_method_create_(self, method_key, *args):
         sub_paths = method_key.split('/')
@@ -68,22 +73,28 @@ class AbsFncLoaderDef(object):
         # python
         self._command = self.configure.get('command')
         self._method = self.configure.get('method')
+
     @property
     def configure(self):
         return self._configure
+
     @property
     def key(self):
         return self.configure.key
+
     @property
     def enable(self):
         return self._enable
+
     @property
     def language(self):
         return self._language
+
     # ui
     @property
     def icon(self):
         return self._icon
+
     @property
     def label(self):
         if isinstance(self._label, six.string_types):
@@ -91,9 +102,11 @@ class AbsFncLoaderDef(object):
         elif isinstance(self._label, dict):
             return self._label.keys()[0]
         return ''
+
     @label.setter
     def label(self, raw):
         self._label = raw
+
     @property
     def description(self):
         if isinstance(self._description, six.string_types):
@@ -101,10 +114,12 @@ class AbsFncLoaderDef(object):
         elif isinstance(self._description, dict):
             return self._description.keys()[0]
         return ''
+
     #
     @property
     def command(self):
         return self._command
+
     @property
     def method(self):
         return self._method
@@ -122,15 +137,18 @@ class AbsFncLoaderDef(object):
 class AbsCheckerLoader(AbsFncLoaderDef):
     METHODS_CONFIGURE = None
     METHODS_CONFIGURE_PATH = None
+
     def __init__(self, method_key):
         super(AbsCheckerLoader, self).__init__()
         configure = self.METHODS_CONFIGURE.get_content(method_key)
         self._set_fnc_loader_def_init_(configure)
         #
         self._descriptions = self.configure.get('descriptions')
+
     @property
     def descriptions(self):
         return self._descriptions
+
     @descriptions.setter
     def descriptions(self, raw):
         if isinstance(raw, (tuple, list)):
@@ -168,13 +186,13 @@ class AbsCheckerLoader(AbsFncLoaderDef):
         raw = _[index]
         if isinstance(raw, six.string_types):
             lis.append(
-                '{}.{}'.format(index + 1, raw)
+                '{}.{}'.format(index+1, raw)
             )
         elif isinstance(raw, dict):
             key = raw.keys()[0]
             value = raw.values()[0]
             lis.append(
-                '{}.{}'.format(index + 1, key)
+                '{}.{}'.format(index+1, key)
             )
             content = self.configure._set_content_create_(key, value)
             #
@@ -223,8 +241,10 @@ class AbsCheckerLoader(AbsFncLoaderDef):
 
 class AbsStpLoader(object):
     STEPS_SCHEME = None
+
     def __init__(self, method_key):
         self._scheme = self.STEPS_SCHEME.get_content(method_key)
+
     @classmethod
     def get_key(cls, properties):
         project = properties.get('project')
@@ -241,6 +261,7 @@ class AbsStpLoader(object):
         if cls.STEPS_SCHEME.get(branch_key) is not None:
             return branch_key
         return 'project'
+
     @property
     def scheme(self):
         return self._scheme
@@ -261,14 +282,17 @@ class AbsIspObjDef(object):
     FNC_ISP_IGNORE_CLS = None
     #
     FNC_OBJ_CLS = _utl_dcc_obj_utility.Obj
+
     def _set_isp_obj_def_init_(self):
         self._error_obj_raw_dict = {}
         #
         self._is_check_passed = False
         self._is_check_ignored = False
+
     @property
     def loader(self):
         raise NotImplementedError()
+
     @property
     def error_object_raw_dict(self):
         return self._error_obj_raw_dict
@@ -367,11 +391,13 @@ class AbsIspObjDef(object):
 # inspection object with component definition
 class AbsIspObjCompDef(object):
     FNC_OBJ_CLS = _utl_dcc_obj_utility.Obj
+
     def _set_isp_obj_component_def_init_(self):
         self._error_obj_comp_raw_dict = {}
 
     def set_error_obj_raw_add(self, error_obj, check_index):
         raise NotImplementedError
+
     @property
     def error_object_component_raw_dict(self):
         return self._error_obj_comp_raw_dict
@@ -412,6 +438,7 @@ class AbsIspObjFileDef(object):
 
     def set_error_obj_raw_add(self, error_obj, check_index):
         raise NotImplementedError
+
     @property
     def error_object_file_raw_dict(self):
         return self._error_obj_file_raw_dict
@@ -450,6 +477,7 @@ class AbsIspObjSourceDef(object):
 
     def set_error_obj_raw_add(self, error_obj, check_index):
         raise NotImplementedError
+
     @property
     def error_object_source_raw_dict(self):
         return self._error_obj_source_raw_dict
@@ -491,6 +519,7 @@ class AbsChecker(
     FNC_CHECKER_LOADER_CLS = None
     #
     EXCEPT_DCC_PATHS = []
+
     def __init__(self, method_key, *args):
         self.op_isp_loader = self.FNC_CHECKER_LOADER_CLS(
             method_key
@@ -504,9 +533,11 @@ class AbsChecker(
         self._set_isp_obj_source_def_init_()
         #
         self._error_obj_source_raw_dict = {}
+
     @property
     def icon(self):
         return None
+
     @property
     def loader(self):
         return self.op_isp_loader
@@ -542,7 +573,7 @@ class AbsChecker(
                 if check_method is not None:
                     _results = check_method(obj, check_index)
                 else:
-                    utl_core.Log.set_error_trace(
+                    bsc_core.Log.trace_error(
                         u"\"{}\" check method is Non-exists".format(self.loader.label)
                     )
 
@@ -567,7 +598,7 @@ class AbsChecker(
                 if repair_method is not None:
                     repair_method(obj)
                 else:
-                    utl_core.Log.set_error_trace(
+                    bsc_core.Log.trace_error(
                         u"\"{}\" repair method is Non-configure".format(self.loader.label)
                     )
 
@@ -580,52 +611,60 @@ class AbsChecker(
 
 
 class AbsConfigureDef(
-    unr_abstracts.AbsObjDef,
-    unr_abstracts.AbsObjDagDef,
-    unr_abstracts.AbsObjGuiDef
+    unr_abstracts.AbsObjBaseDef,
+    unr_abstracts.AbsObjDagExtraDef,
+    unr_abstracts.AbsGuiExtraDef
 ):
     PATHSEP = '/'
     PROPERTIES_CLS = None
+
     def _set_configure_def_init_(self, key, raw):
         self._key = key
         self._properties = self.PROPERTIES_CLS(key, raw)
         #
         path = self.get('path')
-        self._set_obj_dag_def_init_(path)
-        self._set_obj_def_init_(
+        self._init_obj_dag_extra_def_(path)
+        self._init_obj_base_def_(
             self._get_obj_name_(path)
         )
-        self._set_obj_gui_def_init_()
+        self._init_gui_extra_def_()
+
     #
     @property
     def key(self):
         return self._key
+
     @property
     def properties(self):
         return self._properties
 
     def get(self, key):
         return self._properties.get(key)
+
     #
     @property
     def pathsep(self):
         return self.PATHSEP
+
     @property
     def type(self):
         return self.get('type')
+
     #
     @property
     def icon(self):
         icon_name = self.get('icon')
-        return utl_core.Icon.get(icon_name)
+        return bsc_core.RscIcon.get(icon_name)
+
     @property
     def label(self):
         return self.get('label')
+
     @property
     def description(self):
         _ = self.get('description')
         if isinstance(_, (tuple, list)):
-            return u';\n'.join(_) + u'.'
+            return u';\n'.join(_)+u'.'
         return str(_)
 
     def _set_dag_create_(self, path):
@@ -634,7 +673,7 @@ class AbsConfigureDef(
     def _get_child_paths_(self, *args, **kwargs):
         pass
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         pass
 
 
@@ -642,6 +681,7 @@ class AbsTaskMethodConfigure(AbsConfigureDef):
     CONFIGURE_CLS = None
     #
     METHODS_CONFIGURE_PATH = None
+
     def __init__(self, key):
         methods_configure = self.CONFIGURE_CLS(None, self.METHODS_CONFIGURE_PATH)
         methods_configure.set_flatten()
@@ -662,8 +702,10 @@ class AbsExporterConfigure(AbsTaskMethodConfigure):
 
 class AbsTaskMethod(object):
     METHOD_CONFIGURE_CLS = None
+
     def __init__(self, key):
         self._configure = self.METHOD_CONFIGURE_CLS(key)
+
     @property
     def configure(self):
         return self._configure
@@ -674,6 +716,7 @@ class AbsTaskExporter(AbsTaskMethod):
         super(AbsTaskExporter, self).__init__(key)
         self._task_properties = task_properties
         self._is_check_passed = False
+
     @property
     def task_properties(self):
         return self._task_properties

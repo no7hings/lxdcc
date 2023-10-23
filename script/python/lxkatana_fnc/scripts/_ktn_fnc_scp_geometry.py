@@ -52,7 +52,7 @@ def set_geometry_export_by_any_scene_file(option):
                     import lxusd_fnc.scripts as usd_scripts
                     usd_scripts.set_asset_geometry_uv_map_usd_link_export(rsv_task_properties)
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'katana-geometry-export-script-run',
                     u'file="{}" is non-exists'.format(any_scene_file_path)
                 )

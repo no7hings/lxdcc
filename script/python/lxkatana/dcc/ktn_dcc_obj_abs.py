@@ -6,7 +6,7 @@ from Katana import CacheManager
 
 from lxbasic import bsc_core
 
-from lxuniverse import unr_configure
+import lxuniverse.configure as unr_configure
 
 from lxutil import utl_core, utl_abstract
 
@@ -58,7 +58,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             path=self._port_path, pathsep=self.PATHSEP
         )
         if ktn_port is None:
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'port create',
                 'attribute="{}"'.format(self.path)
             )
@@ -138,7 +138,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             ktn_target = target.ktn_port
             if ktn_source is not None and ktn_target is not None:
                 ktn_source.connect(ktn_target)
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'port connect',
                     'connection="{} >> {}"'.format(
                         source.path, target.path
@@ -146,7 +146,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                 )
         else:
             source.ktn_port.connect(target.ktn_port)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'port connect',
                 'connection="{} >> {}"'.format(
                     source.path, target.path
@@ -157,7 +157,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
     def _set_disconnect_(cls, source, target):
         if source.ktn_port is not None and target.ktn_port is not None:
             source.ktn_port.disconnect(target.ktn_port)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'port-disconnect',
                 'connection="{} >> {}"'.format(
                     source.path, target.path
@@ -260,7 +260,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     @property
     def icon(self):
-        return utl_core.Icon.get_katana_obj()
+        return bsc_core.RscIcon.get('application/katana')
 
     @property
     def ktn_obj(self):
@@ -283,7 +283,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     name_ktn_port.setValue(self.name, 0)
                 #
                 ktn_obj.setName(self.name)
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'obj create',
                     'obj="{}", type="{}"'.format(self.path, obj_type_name)
                 )
@@ -373,14 +373,14 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                     lis.append('{}{}{}'.format(self.path, self.pathsep, i.getName()))
         return lis
 
-    def _set_child_create_(self, path):
+    def _get_child_(self, path):
         return self.__class__(path)
 
     def set_delete(self):
         ktn_obj = NodegraphAPI.GetNode(self.name)
         if ktn_obj is not None:
             ktn_obj.delete()
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'obj-delete',
                 '"{}"'.format(self.path)
             )
@@ -527,7 +527,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                         if j_ktn_parent.getName() == ktn_parent.getName():
                             j_ktn_obj.setAttributes(j_atr_)
             #
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'network-layout',
                 'obj="{}"'.format(self.path)
             )
@@ -553,7 +553,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
             if port.get_is_exists() is True:
                 dic[key] = port.get()
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'property-get',
                     'port: "{}" is Non-exists'.format(port.path)
                 )
@@ -564,12 +564,12 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
             port = self.get_port(k)
             if port.get_is_exists() is True:
                 port.set(v)
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'property-set',
                     'port: "{}" >> "{}"'.format(port.path, v)
                 )
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     'property-set',
                     'port: "{}" is Non-exists'.format(port.path)
                 )

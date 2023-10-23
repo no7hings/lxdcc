@@ -10,16 +10,4 @@ tool:
         size:
             - 320
             - 240
-        command:
-            "import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects);
-            p = utl_dcc_objects.PyReloader(
-                [
-                    'lxuniverse', 'lxresolver',
-                    'lxarnold', 'lxar2mtx',
-                    'lxutil', 'lxutil_gui', 'lxutil_fnc',
-                    'lxshotgun', 'lxshotgun_fnc',
-                    'lxshotgun_gui',
-                    'lxkatana'
-                ]
-            );
-            p.set_reload()"
+        command: ''

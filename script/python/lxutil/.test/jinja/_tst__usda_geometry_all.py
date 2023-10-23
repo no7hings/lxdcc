@@ -1,17 +1,15 @@
 # coding:utf-8
-from lxbasic import bsc_core
-
-from lxutil import utl_core
+import lxresource.core as rsc_core
 
 key_name = 'auxiliary'
 
 key = 'usda/geometry/all/{}'.format(key_name)
 
-c = utl_core.Jinja.get_configure(
+c = rsc_core.RscJinjaConfigure.get_configure(
     key
 )
 
-t = utl_core.Jinja.get_template(key)
+t = rsc_core.RscJinjaConfigure.get_template(key)
 
 raw = t.render(
     **c.value

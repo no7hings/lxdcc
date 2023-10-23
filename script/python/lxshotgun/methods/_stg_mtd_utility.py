@@ -1,7 +1,9 @@
 # coding:utf-8
 import copy
 
-from lxutil import utl_configure, utl_core
+from lxbasic import bsc_core
+
+from lxutil import utl_configure
 
 import lxresolver.commands as rsv_commands
 
@@ -14,12 +16,13 @@ class StgTaskMtd(object):
     SHOTGUN_TEMPLATE_CONFIGURE = utl_configure.MainData.get_as_configure(
         'shotgun/template'
     )
+
     @classmethod
     def set_entities_create_by_template(cls, project, entities, task_template):
         stg_connector = stg_objects.StgConnector()
         entity_key = cls.SHOTGUN_TEMPLATE_CONFIGURE.get('task-templates.{}.entity-key'.format(task_template))
         if entities:
-            gp = utl_core.GuiProgressesRunner(maximum=len(entities))
+            gp = bsc_core.LogProcessContext(maximum=len(entities))
             entity_kwargs = dict(
                 project=project
             )
@@ -65,6 +68,7 @@ class StgTaskMtd(object):
                     #
             #
             gp.set_stop()
+
     @classmethod
     def set_asset_create(cls, project, asset, role):
         entity_kwargs = dict(
@@ -102,6 +106,7 @@ class StgTaskMtd(object):
                 )
         #
         # cls.set_entity_directories_create(**entity_kwargs)
+
     @classmethod
     def set_entity_directories_create(cls, **kwargs):
         """
@@ -112,6 +117,7 @@ class StgTaskMtd(object):
         """
         # noinspection PyUnresolvedReferences
         import sgtk.api as stg_api
+
         #
         r = rsv_commands.get_resolver()
         rsv_project = r.get_rsv_project(**kwargs)

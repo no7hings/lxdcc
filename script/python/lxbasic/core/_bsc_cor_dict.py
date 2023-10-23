@@ -3,56 +3,12 @@ from ._bsc_cor_utility import *
 
 from lxbasic.core import _bsc_cor_raw
 
-
-class YamlMtd(object):
-    @classmethod
-    def dump(cls, raw, stream=None, **kwargs):
-        class _Cls(yaml.SafeDumper):
-            pass
-
-        # noinspection PyUnresolvedReferences
-        def _fnc(dumper_, data_):
-            return dumper_.represent_mapping(
-                yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-                data_.items(),
-            )
-
-        _Cls.add_representer(collections.OrderedDict, _fnc)
-        return yaml.dump(raw, stream, _Cls, **kwargs)
-
-    @classmethod
-    def load(cls, stream):
-        class _Cls(yaml.SafeLoader):
-            pass
-
-        # noinspection PyArgumentList
-        def _fnc(loader_, node_):
-            loader_.flatten_mapping(node_)
-            return collections.OrderedDict(loader_.construct_pairs(node_))
-
-        # noinspection PyUnresolvedReferences
-        _Cls.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _fnc)
-        return yaml.load(stream, _Cls)
+import lxcontent.core as ctt_core
 
 
-class YamlFileOpt(object):
-    def __init__(self, file_path):
-        self._file_path = file_path
+CttYamlBase = ctt_core.CttYamlBase
 
-    def write(self, raw):
-        with open(self._file_path, 'w') as y:
-            YamlMtd.dump(
-                raw,
-                y,
-                indent=4,
-                default_flow_style=False,
-            )
-
-    def read(self):
-        with open(self._file_path) as y:
-            raw = YamlMtd.load(y)
-            y.close()
-            return raw
+CttYaml = ctt_core.CttYaml
 
 
 class DictMtd(object):
@@ -67,7 +23,7 @@ class DictMtd(object):
 
     @classmethod
     def get_as_yaml_style(cls, dict_):
-        return YamlMtd.dump(
+        return CttYamlBase.dump(
             dict_,
             indent=4,
             default_flow_style=False

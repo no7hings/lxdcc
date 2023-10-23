@@ -259,6 +259,19 @@ class PtnFnmatch(object):
         return list_
 
 
+class PtnBase(object):
+    @classmethod
+    def glob_fnc(cls, p_str):
+        _ = glob.glob(
+            p_str
+        )
+        if _:
+            if platform.system() == 'Windows':
+                _ = map(lambda x: x.replace('\\', '/'), _)
+            return _
+        return []
+
+
 class AbsPtnParseOpt(object):
     def __init__(self, p, key_format=None):
         self._pattern_origin = p
@@ -317,9 +330,17 @@ class AbsPtnParseOpt(object):
         )
 
     def get_variants(self, result):
-        i_p = parse.parse(
-            self._pattern, result, case_sensitive=True
-        )
+        if SystemMtd.get_is_linux():
+            i_p = parse.parse(
+                self._pattern, result, case_sensitive=True
+            )
+        elif SystemMtd.get_is_windows():
+            i_p = parse.parse(
+                self._pattern, result, case_sensitive=False
+            )
+        else:
+            raise SystemError()
+
         if i_p:
             i_r = i_p.named
             if i_r:
@@ -335,11 +356,11 @@ class PtnParseOpt(AbsPtnParseOpt):
 
     def get_matches(self, sort=False):
         list_ = []
-        paths = glob.glob(
+        paths = PtnBase.glob_fnc(
             PtnParseMtd.get_as_fnmatch(
                 self._pattern, self._key_format
             )
-        ) or []
+        )
         if sort is True:
             paths = _bsc_cor_raw.RawTextsOpt(paths).sort_by_number()
         #
@@ -368,22 +389,20 @@ class PtnParseOpt(AbsPtnParseOpt):
         )
 
     def _get_exists_results_(self):
-        return glob.glob(
+        return PtnBase.glob_fnc(
             self._fnmatch_pattern
-        ) or []
+        )
 
     def get_exists_results(self, **kwargs):
         p = self.set_update_to(**kwargs)
-        return glob.glob(
-            p._fnmatch_pattern
-        ) or []
+        return PtnBase.glob_fnc(p._fnmatch_pattern)
 
     def get_match_results(self, sort=False):
-        paths = glob.glob(
+        paths = PtnBase.glob_fnc(
             PtnParseMtd.get_as_fnmatch(
                 self._pattern, self._key_format
             )
-        ) or []
+        )
         if sort is True:
             paths = _bsc_cor_raw.RawTextsOpt(paths).sort_by_number()
         return paths

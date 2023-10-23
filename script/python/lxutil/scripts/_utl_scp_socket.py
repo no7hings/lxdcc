@@ -40,11 +40,11 @@ class ScpMayaNetExport(AbsScpNet):
         try:
             self.connect(self.__host, self.__port)
         except Exception as e:
-            utl_core.DialogWindow.set_create(
+            utl_core.DccDialog.create(
                 label='Connect',
                 sub_label='Maya Connect',
                 content='Connection to Maya is Failed',
-                status=utl_core.DialogWindow.ValidatorStatus.Error,
+                status=utl_core.DccDialog.ValidationStatus.Error,
                 #
                 yes_label='Close',
                 #
@@ -100,11 +100,11 @@ class ScpClarisseNetExport(AbsScpNet):
         try:
             self.connect(self.__host, self.__port)
         except Exception as e:
-            utl_core.DialogWindow.set_create(
+            utl_core.DccDialog.create(
                 label='Connect',
                 sub_label='Clarisse Connect',
                 content='Connection to Clarisse is Failed',
-                status=utl_core.DialogWindow.ValidatorStatus.Error,
+                status=utl_core.DccDialog.ValidationStatus.Error,
                 #
                 yes_label='Close',
                 #

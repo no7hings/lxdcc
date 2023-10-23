@@ -393,10 +393,10 @@ class ScpMacro(object):
         #
         if contents:
             if ktn_core.get_is_ui_mode():
-                utl_core.DialogWindow.set_create(
+                utl_core.DccDialog.create(
                     label,
                     content=u'\n'.join(contents),
-                    status=utl_core.DialogWindow.ValidatorStatus.Warning,
+                    status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
                     yes_label='Close',
                     #
@@ -404,7 +404,7 @@ class ScpMacro(object):
                 )
             else:
                 for i in contents:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         label, i
                     )
 
@@ -752,7 +752,7 @@ class ScpWspAssetGeometry(AbsWsp):
                 #
                 self._obj_opt.set('parameters.usd.enable', 1)
                 #
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
@@ -804,7 +804,7 @@ class ScpWspAssetGeometry(AbsWsp):
                 #
                 self._obj_opt.set('parameters.usd.enable', 1)
                 #
-                bsc_core.LogMtd.trace_method_result(
+                bsc_core.Log.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
@@ -905,7 +905,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
 
 class ScpWspGeometry(AbsWsp):
-    CFG_YAML = bsc_core.CfgFileMtd.get_yaml(
+    CFG_YAML = bsc_core.RscConfigure.get_yaml(
         'katana/script/macro/geometry'
     )
 
@@ -1319,7 +1319,7 @@ class ScpWspAssetLightRig(AbsWsp):
 
 
 class ScpWspWorkspace(AbsWsp):
-    CFG_YAML = bsc_core.CfgFileMtd.get_yaml(
+    CFG_YAML = bsc_core.RscConfigure.get_yaml(
         'katana/script/macro/workspace'
     )
 
@@ -1661,7 +1661,7 @@ class ScpAssetAssExport(AbsWsp):
             stat_frame, end_frame = obj_opt.get('parameters.start_frame'), obj_opt.get('parameters.end_frame')
             if stat_frame != end_frame:
                 frames = range(int(stat_frame), int(end_frame)+1)
-                with utl_core.LogProgressRunner.create_as_bar(maximum=len(frames), label='ass sequence export') as l_p:
+                with bsc_core.LogProcessContext.create_as_bar(maximum=len(frames), label='ass sequence export') as l_p:
                     for i_frame in frames:
                         ktn_core.NGObjOpt(
                             NodegraphAPI.GetRootNode()
@@ -1674,7 +1674,7 @@ class ScpAssetAssExport(AbsWsp):
                             settings=rss
                         )
                         l_p.set_update()
-                        bsc_core.LogMtd.trace_method_result(
+                        bsc_core.Log.trace_method_result(
                             'ass sequence export',
                             'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
                         )
@@ -1731,7 +1731,7 @@ ktn_scripts.ScpInstanceColorMap(
         cache_usd_file_path = '{}/{}.usd'.format(cache_usd_directory_path, cache_file_name)
         self._obj_opt.set('parameters.grow.cache.usd', cache_usd_file_path)
         if bsc_core.StgPathMtd.get_is_exists(cache_usd_file_path) is False or force is True:
-            import lxutil_gui.proxy.widgets as prx_widgets
+            import lxgui.proxy.widgets as prx_widgets
 
             from lxutil import utl_process
 
@@ -1773,7 +1773,7 @@ ktn_scripts.ScpInstanceColorMap(
         cache_json_file_path = '{}/{}.json'.format(cache_json_directory_path, cache_file_name)
         self._obj_opt.set('parameters.instance.cache.json', cache_json_file_path)
         if bsc_core.StgPathMtd.get_is_exists(cache_usd_file_path) is False or force is True:
-            import lxutil_gui.proxy.widgets as prx_widgets
+            import lxgui.proxy.widgets as prx_widgets
 
             from lxutil import utl_process
 

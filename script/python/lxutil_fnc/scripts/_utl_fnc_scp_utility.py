@@ -27,7 +27,7 @@ def set_maya_asset_task_batch_run_(option):
                     option='file={}'.format(work_maya_scene_src_file_path)
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset-maya-export',
                     '"work-scene-src-file" is non-exists'
                 )
@@ -59,7 +59,7 @@ def set_asset_export_by_work_maya_scene_src_file(option):
         if maya_scene_src_file_path is not None:
             maya_scene_src_file = utl_dcc_objects.OsFile(maya_scene_src_file_path)
             if work_maya_scene_src_file.get_timestamp_is_same_to(maya_scene_src_file) is True:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset-maya-export',
                     u'file="{}" is non-changed'.format(maya_scene_src_file_path)
                 )
@@ -173,7 +173,7 @@ def set_asset_publish_by_katana_scene_src(option):
         method_paths = methods_loader.get_entity_method_obj_paths(entity_path)
         sorted_method_paths = methods_loader.get_sorted_objs(method_paths)
         if sorted_method_paths:
-            g_p = utl_core.GuiProgressesRunner(maximum=len(sorted_method_paths))
+            g_p = bsc_core.LogProcessContext(maximum=len(sorted_method_paths))
             for i_method_path in sorted_method_paths:
                 g_p.set_update()
                 i_method = methods_loader.get_method(i_method_path)
@@ -219,12 +219,8 @@ def set_copy_publish_to_work_batch_run(option):
                     utl_dcc_objects.OsFile(work_katana_scene_src_file_path)
                 ):
                     continue
-                #
-                # utl_dcc_objects.OsFile(katana_scene_src_file_path).set_copy_to_file(
-                #     new_work_katana_scene_src_file_path
-                # )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset-maya-export',
                     '"work-scene-src-file" is non-exists'
                 )
@@ -254,7 +250,7 @@ def set_work_file_repair_batch_run(option):
             if work_katana_scene_src_file_path:
                 set_work_file_repair('file={}'.format(work_katana_scene_src_file_path))
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'asset-maya-export',
                     '"work-scene-src-file" is non-exists'
                 )

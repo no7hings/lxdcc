@@ -73,7 +73,7 @@ class ProxyGpuExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         results = self._set_cmd_run_(*args, **kwargs)
 
         for i in results:
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'gpu-export',
                 'file="{}"'.format(i)
             )

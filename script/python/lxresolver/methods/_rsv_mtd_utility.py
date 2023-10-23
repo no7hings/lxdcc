@@ -12,7 +12,7 @@ class RsvPermissionMtd(bsc_core.StgSshMtd):
         task_directory_paths = r.get_rsv_resource_task_directory_paths(**kwargs)
         for i_task_directory_path in task_directory_paths:
             bsc_core.StorageMtd.create_directory(i_task_directory_path)
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'directory create',
                 'directory="{}"'.format(i_task_directory_path)
             )

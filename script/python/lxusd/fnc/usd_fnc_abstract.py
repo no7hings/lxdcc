@@ -28,7 +28,7 @@ class AbsUsdScene(object):
                 if i != usd_configure.Obj.PATHSEP:
                     usd_root = stage.DefinePrim(i, '')
         #
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'usd-reference-add',
             u'file="{}"'.format(file_path)
         )

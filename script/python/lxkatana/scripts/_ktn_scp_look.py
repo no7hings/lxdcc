@@ -46,22 +46,26 @@ ktn_scripts.ScpLookOutput(
         'polymesh',
         'curves'
     ]
+
     def __init__(self, obj_opt):
         self._obj_opt = obj_opt
 
         self._dcc_node = ktn_dcc_objects.Node(
             self._obj_opt.get_path()
         )
+
     @classmethod
     def get_look_output_nodes(cls):
         return ktn_core.NGObjsMtd.find_nodes(
             type_name='LookFileBake', ignore_bypassed=True
         )
+
     @classmethod
     def get_look_output_node_opts(cls):
         return [
             ktn_core.NGObjOpt(i) for i in cls.get_look_output_nodes()
         ]
+
     @classmethod
     def get_all_source_nodes(cls):
         list_ = []
@@ -117,7 +121,8 @@ ktn_scripts.ScpLookOutput(
         list_ = []
         dcc_objs = self.get_all_dcc_geometry_materials_by_location(location)
         for i_dcc_obj in dcc_objs:
-            i_dcc_nodes = [ktn_dcc_objects.Node(i.getName()) for i in ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
+            i_dcc_nodes = [ktn_dcc_objects.Node(i.getName()) for i in
+                           ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
             list_.extend(
                 i_dcc_nodes
             )
@@ -205,7 +210,9 @@ ktn_scripts.ScpLookOutput(
                     if i_input_port:
                         i_source_port = i_input_port.get_source()
                         if i_source_port is not None:
-                            i_node = ktn_dcc_objects.Node('{}/asset_ass_export__{}'.format(parent_path, i_look_pass_name))
+                            i_node = ktn_dcc_objects.Node(
+                                '{}/asset_ass_export__{}'.format(parent_path, i_look_pass_name)
+                                )
                             i_node.get_dcc_instance('AssetAssExport_Wsp', 'Group')
                             i_node.set(
                                 'parameters.look_pass', i_look_pass_name
@@ -249,7 +256,7 @@ ktn_scripts.ScpLookOutput(
             #
             node.ktn_obj.WriteToLookFile(None, file_path)
             #
-            bsc_core.LogMtd.trace_method_result(
+            bsc_core.Log.trace_method_result(
                 'look-klf export',
                 '"{}"'.format(file_path)
             )
@@ -321,6 +328,7 @@ class ScpLookAssImport(object):
         ]
     )
     CACHE = {}
+
     def __init__(self, file_path, option=None):
         self._file_path = file_path
         self._option = copy.copy(self.OPTION)
@@ -333,10 +341,12 @@ class ScpLookAssImport(object):
         self._geometry_root_location = self._option.get('geometry_location')
         self._material_root_location = self._option.get('material_location')
 
-        self._time_tag = bsc_core.TimestampOpt(bsc_core.StgFileOpt(self._file_path).get_modify_timestamp()).get_as_tag_36()
+        self._time_tag = bsc_core.TimestampOpt(
+            bsc_core.StgFileOpt(self._file_path).get_modify_timestamp()
+            ).get_as_tag_36()
 
         self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
+            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
 
@@ -380,12 +390,13 @@ class ScpLookAssImport(object):
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
         self._and_geometries = mesh_and_objs+curve_and_objs+xgen_and_objs
+
     @ktn_core.Modifier.undo_run
     def create_materials(self, material_group_opt):
         and_geometries = self._and_geometries
         if and_geometries:
             look_pass_name = self._look_pass_name
-            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create material') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material') as g_p:
                 for i_and_geometry in and_geometries:
                     g_p.set_update()
                     self._create_network_material_(material_group_opt, i_and_geometry, look_pass_name)
@@ -483,7 +494,9 @@ class ScpLookAssImport(object):
                 i_and_shader = self._and_universe.get_obj(i_raw)
                 if i_and_shader is not None:
                     i_shader_type_name = i_and_shader.type.name
-                    i_shader_path = self._get_node_path_(network_material_path, i_and_shader.name, look_pass_name, tag='SDR')
+                    i_shader_path = self._get_node_path_(
+                        network_material_path, i_and_shader.name, look_pass_name, tag='SDR'
+                        )
                     i_ktn_obj, i_is_create = ktn_core.NGObjOpt._get_material_node_graph_create_args_(
                         i_shader_path, 'ArnoldShadingNode', i_shader_type_name
                     )
@@ -503,7 +516,7 @@ class ScpLookAssImport(object):
                     #
                     self._create_material_shader_node_graph_(i_and_shader, network_material_path, look_pass_name)
                 else:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         'shader create',
                         'obj="{}" is non-exists'.format(i_raw)
                     )
@@ -516,7 +529,9 @@ class ScpLookAssImport(object):
             i_and_node_type_name = i_and_source_node.type.name
             #
             i_dcc_node_type_name = i_and_source_node.type.name
-            i_dcc_node_path = self._get_node_path_(network_material_path, i_and_source_node.name, look_pass_name, tag='SDR')
+            i_dcc_node_path = self._get_node_path_(
+                network_material_path, i_and_source_node.name, look_pass_name, tag='SDR'
+                )
             #
             if i_and_node_type_name in ['ramp_float', 'ramp_rgb']:
                 i_dcc_node = ktn_dcc_objects.AndRamp(i_dcc_node_path)
@@ -564,7 +579,7 @@ class ScpLookAssImport(object):
                 nod_source_dcc_obj.ktn_obj, nod_target_dcc_obj.ktn_obj
             )
             nod_source_ktn_port_path, nod_target_ktn_port_path = (
-                '.'.join(['out'] + nod_source_ar_port_path.split('.')[1:]),
+                '.'.join(['out']+nod_source_ar_port_path.split('.')[1:]),
                 convert_dict.get(nod_target_ar_port_path, nod_target_ar_port_path)
             )
             nod_source_ktn_port, nod_target_ktn_port = (
@@ -572,12 +587,12 @@ class ScpLookAssImport(object):
                 nod_target_ktn_obj.getInputPort(nod_target_ktn_port_path)
             )
             if nod_source_ktn_port is None:
-                bsc_core.LogMtd.trace_error(
+                bsc_core.Log.trace_error(
                     'connection: "{}" >> "{}"'.format(i_and_source_port.path, i_and_target_port.path)
                 )
                 continue
             if nod_target_ktn_port is None:
-                bsc_core.LogMtd.trace_error(
+                bsc_core.Log.trace_error(
                     'connection: "{}" >> "{}"'.format(i_and_source_port.path, i_and_target_port.path)
                 )
                 continue
@@ -629,19 +644,21 @@ class ScpLookAssImport(object):
                     if i_and_port_name == 'name':
                         dcc_obj.get_port('arnold_name').set_create('string', i_raw)
                     else:
-                        bsc_core.LogMtd.trace_method_warning(
+                        bsc_core.Log.trace_method_warning(
                             'shader-port set',
                             'attribute="{}" is non-exists'.format(i_value_dcc_port.path)
                         )
+
     @ktn_core.Modifier.undo_run
     def create_material_assigns(self, material_assign_group_opt):
         and_geometries = self._and_geometries
         if and_geometries:
             look_pass_name = self._look_pass_name
-            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create material-assign') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material-assign') as g_p:
                 for i_and_geometry in and_geometries:
                     g_p.set_update()
                     self._create_material_assign_(material_assign_group_opt, i_and_geometry, look_pass_name)
+
     # assign
     def _create_material_assign_(self, material_assign_group_opt, and_geometry, look_pass_name):
         and_geometry_opt = and_dcc_operators.ShapeLookOpt(and_geometry)
@@ -682,12 +699,15 @@ class ScpLookAssImport(object):
         and_geometries = self._and_geometries
         if and_geometries:
             look_pass_name = self._look_pass_name
-            with utl_core.GuiProgressesRunner.create(
+            with bsc_core.LogProcessContext.create(
                     maximum=len(and_geometries), label='create geometry properties-assign'
-                    ) as g_p:
+            ) as g_p:
                 for i_and_geometry in and_geometries:
                     g_p.set_update()
-                    self._create_geometry_properties_assign_(geometry_properties_assign_group_opt, i_and_geometry, look_pass_name)
+                    self._create_geometry_properties_assign_(
+                        geometry_properties_assign_group_opt, i_and_geometry, look_pass_name
+                        )
+
     @ktn_core.Modifier.undo_run
     def _create_geometry_properties_assign_(self, geometry_properties_assign_group_opt, and_geometry, look_pass_name):
         geometry_properties_assign_group_path = geometry_properties_assign_group_opt.get_path()
@@ -717,6 +737,7 @@ class ScpLookAssImport(object):
             self._set_geometry_property_ports_(and_geometry_opt, dcc_geometry)
             #
             self._set_geometry_visibility_ports_(and_geometry_opt, dcc_geometry)
+
     @classmethod
     def _set_geometry_property_ports_(cls, and_geometry_opt, dcc_geometry):
         port_name_convert_dict = dict(
@@ -744,7 +765,7 @@ class ScpLookAssImport(object):
             if i_enable_dcc_port.get_is_exists() is True:
                 i_enable_dcc_port.set(True)
             else:
-                bsc_core.LogMtd.trace_warning(
+                bsc_core.Log.trace_warning(
                     'port-name="{}" is unknown'.format(i_dcc_port_name)
                 )
             #
@@ -761,6 +782,7 @@ class ScpLookAssImport(object):
                 #
                 if i_raw is not None:
                     i_value_dcc_port.set(i_raw)
+
     @classmethod
     def _set_geometry_visibility_ports_(cls, and_geometry_opt, dcc_geometry):
         # port_name_convert_dict = dict()
@@ -779,7 +801,7 @@ class ScpLookAssImport(object):
             if i_enable_dcc_port.get_is_exists() is True:
                 i_enable_dcc_port.set(True)
             else:
-                bsc_core.LogMtd.trace_warning(
+                bsc_core.Log.trace_warning(
                     'port-name="{}" is unknown'.format(i_dcc_port_name)
                 )
             #
@@ -812,6 +834,7 @@ ktn_scripts.ScpLookMaterialImport(
     '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/scene/v001/all.ass'
 )
     """
+
     def __init__(self, obj_opt, option=None):
         self._obj_opt = obj_opt
         self._option = option
@@ -842,4 +865,3 @@ class ScpLookGeometryPropertiesAssignImport(object):
         ScpLookAssImport(file_path, self._option).create_geometry_properties_assigns(
             self._obj_opt
         )
-

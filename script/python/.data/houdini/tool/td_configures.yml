@@ -7,17 +7,7 @@ menu:
 tool:
     package_reloader:
         chn_label: None
-        command:
-            "import lxutil.dcc.dcc_objects as utl_dcc_objects; reload(utl_dcc_objects);
-            p = utl_dcc_objects.PyReloader(
-                [
-                    'lxuniverse', 'lxresolver',
-                    'lxarnold', 'lxar2mtx',
-                    'lxutil', 'lxutil_fnc', 'lxutil_gui',
-                    'lxshotgun', 'lxshotgun_fnc', 'lxshotgun_gui',
-                    'lxhoudini', 'lxhoudini_fnc', 'lxhoudini_gui'
-                ]);
-            p.set_reload()"
+        command: ''
         icon: None
         label: Package-reloader
         size:

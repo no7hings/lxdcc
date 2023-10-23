@@ -3,6 +3,8 @@ import six
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
+from lxbasic import bsc_core
+
 from lxutil import utl_core
 
 from lxmaya import ma_configure
@@ -139,9 +141,9 @@ class Shape(
             name = self.name
             shape_name = '{}Shape' .format(name)
             transform = cmds.createNode(obj_type, name=shape_name, skipSelect=1)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'shape create',
-                u'obj="{}"'.format(self.path)
+                'obj="{}"'.format(self.path)
             )
             return self.__class__(transform)
 
@@ -183,7 +185,7 @@ class Camera(Shape):
             fitFactor=percent,
             animate=0
         )
-        utl_core.Log.set_module_result_trace(
+        bsc_core.Log.trace_method_result(
             'camera frame to',
             'camera="{}", obj="{}"'.format(self.path, location)
         )
@@ -200,7 +202,7 @@ class Light(Shape):
             name = self.name
             shape_name = '{}Shape' .format(name)
             transform = cmds.shadingNode(obj_type, name=shape_name, asLight=True)
-            utl_core.Log.set_module_result_trace(
+            bsc_core.Log.trace_method_result(
                 'light create',
                 u'obj="{}"'.format(self.path)
             )

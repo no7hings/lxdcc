@@ -2,6 +2,8 @@
 # noinspection PyUnresolvedReferences
 from pxr import Usd, Sdf, Vt, UsdGeom, Gf
 
+import lxlog.core as log_core
+
 from lxbasic import bsc_core
 
 import lxcontent.objects as ctt_objects
@@ -22,6 +24,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
             self._namespace = namespace
         else:
             self._namespace = 'usd'
+
     @property
     def stage(self):
         return self._stage
@@ -32,14 +35,14 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                 file_path, 'mesh-comparer-{}'.format(self._namespace)
             )
             return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
-        else:
-            return ctt_objects.Content(value={})
+        return ctt_objects.Content(value={})
+
     @classmethod
     def _get_mesh_data_content_(cls, stage, file_path, yml_file_path):
         yml_file = utl_dcc_objects.OsYamlFile(yml_file_path)
         if yml_file.get_is_exists() is True:
             if yml_file.set_read():
-                utl_core.Log.set_module_result_trace(
+                log_core.Log.trace_method_result(
                     'geometry-comparer data read',
                     'cache="{}", source="{}"'.format(yml_file_path, file_path)
                 )
@@ -48,7 +51,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         content_0 = ctt_objects.Content(value={})
         c = len([i for i in stage.TraverseAll()])
         if c:
-            with utl_core.GuiProgressesRunner.create(maximum=c, label='gain geometry-comparer data') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=c, label='gain geometry-comparer data') as g_p:
                 for i_prim in stage.TraverseAll():
                     g_p.set_update()
                     i_obj_type_name = i_prim.GetTypeName()
@@ -66,13 +69,13 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                         )
         #
         if content_0.value:
-            utl_core.Log.set_module_result_trace(
+            log_core.Log.trace_method_result(
                 'geometry comparer-data write',
                 'cache="{}", source="{}"'.format(yml_file_path, file_path)
             )
             yml_file.set_write(content_0.value)
         else:
-            utl_core.Log.set_module_warning_trace(
+            log_core.Log.trace_method_warning(
                 'geometry comparer-data resolver',
                 'file="{}" geometry is not found'.format(file_path)
             )

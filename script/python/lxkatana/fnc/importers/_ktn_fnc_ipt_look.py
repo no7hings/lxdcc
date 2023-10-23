@@ -50,6 +50,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         auto_white_disp_assign=False,
         auto_white_zbrush_assign=False,
     )
+
     @classmethod
     def _set_look_create_by_geometry_(cls, and_geometry):
         obj_universe = and_geometry.universe
@@ -59,12 +60,14 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             for i in v:
                 pass
                 # i_and_material = obj_universe.get_obj(i)
+
     @classmethod
     def _set_pst_run_(cls):
         for i in ktn_dcc_objects.AndShaders().get_objs():
             if i.get_port('nodeType').get() in ['ramp_float', 'ramp_rgb']:
                 a = ktn_dcc_objects.AndRamp(i.path)
                 a._set_ramp_dict_read_()
+
     @classmethod
     def _set_geometry_property_ports_(cls, and_geometry_opt, dcc_geometry):
         port_name_convert_dict = dict(
@@ -92,7 +95,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             if i_enable_dcc_port.get_is_exists() is True:
                 i_enable_dcc_port.set(True)
             else:
-                bsc_core.LogMtd.trace_warning(
+                bsc_core.Log.trace_warning(
                     'port-name="{}" is unknown'.format(i_dcc_port_name)
                 )
             #
@@ -109,6 +112,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 if i_raw is not None:
                     i_value_dcc_port.set(i_raw)
+
     @classmethod
     def _set_geometry_visibility_ports_(cls, and_geometry_opt, dcc_geometry):
         # port_name_convert_dict = dict()
@@ -127,7 +131,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             if i_enable_dcc_port.get_is_exists() is True:
                 i_enable_dcc_port.set(True)
             else:
-                bsc_core.LogMtd.trace_warning(
+                bsc_core.Log.trace_warning(
                     'port-name="{}" is unknown'.format(i_dcc_port_name)
                 )
             #
@@ -150,7 +154,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._material_root = self.get('material_root')
         #
         self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.CfgFileMtd.get_yaml('arnold/convert')
+            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
         )
         self._convert_configure.set_flatten()
         #
@@ -194,23 +198,24 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         xgen_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
-        and_geometries = mesh_and_objs + curve_and_objs + xgen_and_objs
+        and_geometries = mesh_and_objs+curve_and_objs+xgen_and_objs
         # material
         # material_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
         # and_materials = material_and_type.get_objs()
         #
         method_args = [
-            (self.create_materials_fnc, (and_geometries, )),
-            (self.create_assigns_fnc, (and_geometries, ))
+            (self.create_materials_fnc, (and_geometries,)),
+            (self.create_assigns_fnc, (and_geometries,))
         ]
         if method_args:
-            with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute look create method') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(method_args), label='execute look create method') as g_p:
                 for i_method, i_args in method_args:
                     g_p.set_update()
                     #
                     i_method(*i_args)
         #
         self.__set_ramp_build_()
+
     #
     def __set_ramp_build_(self):
         for i in self._ramp_dcc_objs:
@@ -237,7 +242,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def create_materials_fnc(self, and_geometries):
         if and_geometries:
             pass_name = self._pass_name
-            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create material') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
                     self.create_material_fnc(i_and_geometry, pass_name)
@@ -249,7 +254,9 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         if and_material_paths:
             and_material = self._and_universe.get_obj(and_material_paths[0])
             material_group_dcc_path = self._workspace.get_ng_material_group_path_use_hash(and_geometry_opt, pass_name)
-            is_material_group_create, dcc_material_group = self._workspace.get_ng_material_group_force(material_group_dcc_path, pass_name)
+            is_material_group_create, dcc_material_group = self._workspace.get_ng_material_group_force(
+                material_group_dcc_path, pass_name
+                )
             if is_material_group_create is True:
                 show_obj = [i for i in dcc_material_group.get_children() if i.type_name == 'NetworkMaterial'][0]
                 self.__set_tags_add_(show_obj, and_material.path, parent_port_path='shaders.parameters')
@@ -301,7 +308,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     #
                     self.__set_tags_add_(i_dcc_shader, i_and_shader.path)
                 else:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         'shader create',
                         'obj="{}" is non-exists'.format(i_raw)
                     )
@@ -374,7 +381,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 nod_source_dcc_obj.ktn_obj, nod_target_dcc_obj.ktn_obj
             )
             nod_source_ktn_port_path, nod_target_ktn_port_path = (
-                '.'.join(['out'] + nod_source_ar_port_path.split('.')[1:]),
+                '.'.join(['out']+nod_source_ar_port_path.split('.')[1:]),
                 convert_dict.get(nod_target_ar_port_path, nod_target_ar_port_path)
             )
             nod_source_ktn_port, nod_target_ktn_port = (
@@ -382,12 +389,12 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 nod_target_ktn_obj.getInputPort(nod_target_ktn_port_path)
             )
             if nod_source_ktn_port is None:
-                bsc_core.LogMtd.trace_error(
+                bsc_core.Log.trace_error(
                     'connection: "{}" >> "{}"'.format(i_and_source_port.path, i_and_target_port.path)
                 )
                 continue
             if nod_target_ktn_port is None:
-                bsc_core.LogMtd.trace_error(
+                bsc_core.Log.trace_error(
                     'connection: "{}" >> "{}"'.format(i_and_source_port.path, i_and_target_port.path)
                 )
                 continue
@@ -434,7 +441,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     if i_and_port_name == 'name':
                         dcc_obj.get_port('arnold_name').set_create('string', i_raw)
                     else:
-                        bsc_core.LogMtd.trace_method_warning(
+                        bsc_core.Log.trace_method_warning(
                             'shader-port set',
                             'attribute="{}" is non-exists'.format(i_value_dcc_port.path)
                         )
@@ -445,22 +452,27 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             #
             key = 'material_assign'
             node_key = self._configure.get('node.{}.keyword'.format(key))
-            dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
+            dcc_group, ktn_group, pos = self._workspace.get_group_args(
+                node_key, group_key='definition', pass_name=pass_name
+                )
             dcc_group.clear_children()
-            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create material-assign') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
                     self.create_material_assign_fnc(i_and_geometry)
             #
             key = 'property_assign'
             node_key = self._configure.get('node.{}.keyword'.format(key))
-            dcc_group, ktn_group, pos = self._workspace.get_group_args(node_key, group_key='definition', pass_name=pass_name)
+            dcc_group, ktn_group, pos = self._workspace.get_group_args(
+                node_key, group_key='definition', pass_name=pass_name
+                )
             dcc_group.clear_children()
             #
-            with utl_core.GuiProgressesRunner.create(maximum=len(and_geometries), label='create property-assign') as g_p:
+            with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create property-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
                     g_p.set_update()
                     self.create_geometry_properties_fnc(i_and_geometry)
+
     # assign
     def create_material_assign_fnc(self, and_geometry):
         pass_name = self._pass_name
@@ -488,6 +500,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 material_assign_dcc_opt.assign_material(dcc_material)
                 #
                 self.__set_tags_add_(dcc_material_assign, and_geometry.path)
+
     #
     def create_geometry_properties_fnc(self, and_geometry):
         pass_name = self._pass_name
@@ -512,6 +525,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 self._set_geometry_visibility_ports_(and_geometry_opt, dcc_properties_assign)
             #
             self.__set_tags_add_(dcc_properties_assign, and_geometry.path)
+
     @ktn_core.Modifier.undo_debug_run
     def set_run(self):
         self.__set_obj_universe_create_()

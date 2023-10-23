@@ -4,9 +4,9 @@
 class MayaProcess(object):
     @classmethod
     def get_command(cls, option):
-        import lxbasic.objects as bsc_objects
+        import lxbasic.core as bsc_core
 
-        c = bsc_objects.PackageContextNew(
+        c = bsc_core.PkgContextNew(
             ' '.join(['lxdcc', 'maya', 'maya@2019.2', 'usd', 'mtoa@4.2.1.1'])
         ).get_command(
             args_execute=[
@@ -29,14 +29,12 @@ class PythonProcess(object):
     def generate_command(cls, option):
         from lxbasic import bsc_core
 
-        import lxbasic.objects as bsc_objects
-
-        c = bsc_objects.PackageContextNew(
+        c = bsc_core.PkgContextNew(
             ' '.join(['lxdcc', 'usd'])
         ).get_command(
             args_execute=[
                 r'-- lxdcc-python {process_file} "{option}"'.format(
-                    process_file=bsc_core.RscFileMtd.get('python-process/usd-script.py'), option=option
+                    process_file=bsc_core.Resource.get('python-process/usd-script.py'), option=option
                 )
             ],
         )

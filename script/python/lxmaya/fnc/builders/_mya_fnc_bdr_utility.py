@@ -27,9 +27,10 @@ class GeometryAlembicBlender(object):
         )
         _ = '|'.join(self._src_root.split('|')[:2])
         if cmds.objExists(
-            _
+                _
         ) is True:
             cmds.delete(_)
+
     @classmethod
     def _get_mesh_dic_(cls, mesh_paths):
         dic = {}
@@ -40,6 +41,7 @@ class GeometryAlembicBlender(object):
                 face_vertices_as_uuid, []
             ).append(i_mesh_path)
         return dic
+
     @classmethod
     def _set_meshes_connect_(cls, src_dic, tgt_dic):
         for seq, (i_uuid, i_paths_src) in enumerate(src_dic.items()):
@@ -48,19 +50,21 @@ class GeometryAlembicBlender(object):
                 i_paths_tgt = tgt_dic[i_uuid]
                 i_path_tgt = i_paths_tgt[0]
                 cls._set_mesh_shape_blend_(seq, i_path_src, i_path_tgt)
-                utl_core.Log.set_module_result_trace(
+                bsc_core.Log.trace_method_result(
                     'mesh connect',
                     'obj="{}"'.format(i_path_src)
                 )
             else:
-                utl_core.Log.set_module_warning_trace(
+                bsc_core.Log.trace_method_warning(
                     'mesh connect',
                     'obj="{}" is non-matched founded'.format(i_path_src)
                 )
+
     @classmethod
     def _set_blend_histories_clear_(cls, obj_path):
         _ = cmds.listConnections(obj_path, destination=0, source=1, type='tweak') or []
         [cmds.delete(i) for i in _ if cmds.objExists(i)]
+
     @classmethod
     def _set_shape_parent_(cls, src_shape_path, tgt_shape_path, blend_path):
         if cmds.objExists(src_shape_path) and cmds.objExists(tgt_shape_path):
@@ -82,6 +86,7 @@ class GeometryAlembicBlender(object):
                     '{}.worldMesh[0]'.format(new_tgt_shape_path),
                     '{}.inputTarget[0].inputTargetGroup[0].inputTargetItem[6000].inputGeomTarget'.format(blend_path)
                 )
+
     @classmethod
     def _set_mesh_shape_blend_(cls, seq, src_mesh_path, tgt_mesh_path):
         tgt_shape_name = src_mesh_path.split('|')[-1]
@@ -145,16 +150,19 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         render_resolution=[2048, 2048]
     )
+
     def __init__(self, option=None):
         super(AssetBuilder, self).__init__(option)
+
     @classmethod
     def _build_geometry_from_usd_(cls, rsv_task, enable, geometry_var_names):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if enable is True:
             root = None
             if rsv_task:
-                g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
+                g_p = bsc_core.LogProcessContext(maximum=len(geometry_var_names))
                 for i_var_name in geometry_var_names:
                     g_p.set_update()
                     #
@@ -171,17 +179,21 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                         )
                         ipt.execute()
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'asset-build',
                             'unit="{}" is non-exists'.format(keyword)
                         )
                 #
                 g_p.set_stop()
+
     @classmethod
-    def _set_model_act_geometry_dyn_build_(cls, rsv_task, with_model_act_geometry_dyn, model_act_properties, geometry_var_names):
+    def _set_model_act_geometry_dyn_build_(
+            cls, rsv_task, with_model_act_geometry_dyn, model_act_properties, geometry_var_names
+            ):
         import lxmaya.fnc.importers as mya_fnc_importers
         #
         from lxusd import usd_core
+
         #
         if with_model_act_geometry_dyn is True:
             dyn_sub_root = '/dyn/master/hi'
@@ -222,19 +234,24 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                     ma_core.CmdObjOpt(
                         bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
                     ).create_customize_attributes(customize_attributes)
+
     @classmethod
     def _set_model_act_geometry_dyn_connect_(cls, with_model_act_geometry_dyn_connect):
         GeometryAlembicBlender(
             '/dyn/master/hi', '/master/hi'
         ).set_run()
+
     @classmethod
-    def _set_geometry_uv_map_build_by_usd_(cls, rsv_task, with_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast):
+    def _set_geometry_uv_map_build_by_usd_(
+            cls, rsv_task, with_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast
+            ):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if with_surface_geometry_uv_map is True:
             root = None
             if rsv_task:
-                g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
+                g_p = bsc_core.LogProcessContext(maximum=len(geometry_var_names))
                 for i_var_name in geometry_var_names[:1]:
                     g_p.set_update()
                     #
@@ -252,20 +269,24 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                             uv_map_face_vertices_contrast
                         )
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'asset-build',
                             'unit="{}" is non-exists'.format(keyword)
                         )
                 #
                 g_p.set_stop()
+
     @classmethod
-    def _set_work_geometry_uv_map_build_by_usd_(cls, rsv_task, with_surface_work_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast):
+    def _set_work_geometry_uv_map_build_by_usd_(
+            cls, rsv_task, with_surface_work_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast
+            ):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if with_surface_work_geometry_uv_map is True:
             root = None
             if rsv_task:
-                g_p = utl_core.GuiProgressesRunner(maximum=len(geometry_var_names))
+                g_p = bsc_core.LogProcessContext(maximum=len(geometry_var_names))
                 for i_var_name in geometry_var_names[:1]:
                     g_p.set_update()
                     #
@@ -281,15 +302,17 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                         )
                         ipt.import_uv_map(uv_map_face_vertices_contrast)
                     else:
-                        utl_core.Log.set_module_warning_trace(
+                        bsc_core.Log.trace_method_warning(
                             'asset-build',
                             'unit="{}" is non-exists'.format(keyword)
                         )
                 #
                 g_p.set_stop()
+
     @classmethod
     def _set_groom_geometry_build_(cls, rsv_task, with_groom_geometry, with_groom_grow_geometry):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if with_groom_geometry is True:
             if rsv_task:
@@ -321,9 +344,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                     mya_fnc_importers.FncGeometryXgenImporter(
                         option=option
                     ).execute()
+
     @classmethod
     def _set_look_build_by_ass_(cls, rsv_task, enable):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if enable is True:
             root = None
@@ -340,13 +365,15 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                         )
                     ).execute()
                 else:
-                    bsc_core.LogMtd.trace_method_warning(
+                    bsc_core.Log.trace_method_warning(
                         cls.KEY,
                         'rsv-unit={} is non-exists'.format(look_ass_file)
                     )
+
     @classmethod
     def _set_look_preview_build_by_yml_(cls, rsv_task, with_surface_look_preview):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if with_surface_look_preview is True:
             if rsv_task:
@@ -360,9 +387,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                             file=look_yml_file_path
                         )
                     ).execute()
+
     @classmethod
     def _set_work_look_preview_build_by_yml_(cls, rsv_task, with_surface_work_look_preview):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if with_surface_work_look_preview is True:
             if rsv_task:
@@ -374,9 +403,11 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                             file=work_look_yml_file_path
                         )
                     ).execute()
+
     @classmethod
     def _set_camera_build_by_abc_(cls, rsv_task, with_camera):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         #
         if with_camera is True:
             if rsv_task is not None:
@@ -389,6 +420,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                             location='/camera_grp'
                         )
                     ).set_run()
+
     @classmethod
     def _set_light_build_by_ass_(cls, rsv_task, with_light):
         if with_light is True:
@@ -406,15 +438,19 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                         # mode=6
                     )
                     [obj.get_port(k).set(v) for k, v in atr_raw.items()]
+
     @classmethod
     def _set_scene_save_(cls, rsv_asset, save_scene):
         if save_scene is True:
             if rsv_asset is not None:
                 user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('builder')
                 # print user_directory_path
-                file_path = '{}/{}.ma'.format(user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()]))
+                file_path = '{}/{}.ma'.format(
+                    user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()])
+                    )
 
                 mya_dcc_objects.Scene.save_file_to(file_path)
+
     @classmethod
     def _set_render_(cls, render_resolution):
         mya_dcc_objects.Scene.set_render_resolution(
@@ -422,7 +458,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         )
 
     def set_run_with_window(self):
-        import lxutil_gui.panel.utl_pnl_widgets as utl_pnl_widgets
+        import lxutil_gui.panel.widgets as utl_pnl_widgets
 
         w = utl_pnl_widgets.FncPanel()
 
@@ -430,6 +466,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def set_run(self):
         import lxresolver.commands as rsv_commands
+
         #
         with_model_geometry = self.get('with_model_geometry')
         with_model_act_geometry_dyn = self.get('with_model_act_geometry_dyn')
@@ -513,14 +550,17 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         method_args = [
             (self._build_geometry_from_usd_, (model_rsv_task, with_model_geometry, geometry_var_names)),
-            (self._set_model_act_geometry_dyn_build_, (model_act_rsv_task, with_model_act_geometry_dyn, model_act_properties, geometry_var_names)),
+            (self._set_model_act_geometry_dyn_build_,
+             (model_act_rsv_task, with_model_act_geometry_dyn, model_act_properties, geometry_var_names)),
             #
             (self._build_geometry_from_usd_, (surface_cfx_rsv_task, with_surface_cfx_geometry, geometry_var_names)),
             #
             (self._set_groom_geometry_build_, (groom_rsv_task, with_groom_geometry, with_groom_grow_geometry)),
             #
-            (self._set_geometry_uv_map_build_by_usd_, (surface_rsv_task, with_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
-            (self._set_work_geometry_uv_map_build_by_usd_, (surface_rsv_task, with_surface_work_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
+            (self._set_geometry_uv_map_build_by_usd_,
+             (surface_rsv_task, with_surface_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
+            (self._set_work_geometry_uv_map_build_by_usd_,
+             (surface_rsv_task, with_surface_work_geometry_uv_map, geometry_var_names, uv_map_face_vertices_contrast)),
             #
             (self._set_look_build_by_ass_, (surface_rsv_task, with_surface_look)),
             (self._set_look_build_by_ass_, (surface_cfx_rsv_task, with_surface_cfx_look)),
@@ -528,17 +568,19 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
             (self._set_look_preview_build_by_yml_, (surface_occ_rsv_task, with_surface_look_preview)),
             (self._set_work_look_preview_build_by_yml_, (surface_occ_rsv_task, with_surface_work_look_preview)),
             #
-            (self._set_model_act_geometry_dyn_connect_, (with_model_act_geometry_dyn_connect, )),
+            (self._set_model_act_geometry_dyn_connect_, (with_model_act_geometry_dyn_connect,)),
             #
             (self._set_camera_build_by_abc_, (camera_rsv_task, with_camera)),
             (self._set_light_build_by_ass_, (light_rsv_task, with_light)),
             #
-            (self._set_render_, (render_resolution, )),
+            (self._set_render_, (render_resolution,)),
             #
             (self._set_scene_save_, (rsv_asset, save_scene)),
         ]
         if method_args:
-            with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute geometry build method') as g_p:
+            with bsc_core.LogProcessContext.create(
+                maximum=len(method_args), label='execute geometry build method'
+            ) as g_p:
                 for i_method, i_args in method_args:
                     g_p.set_update()
                     #
@@ -583,9 +625,11 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
             'renderable'
         ]
     )
+
     def __init__(self, option=None):
         super(FncAssetBuilderNew, self).__init__(option)
         import lxresolver.commands as rsv_commands
+
         #
         project = self.get('project')
         asset = self.get('asset')
@@ -620,10 +664,12 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
             step=rsv_project.properties.get('asset_steps.surface'),
             task=rsv_project.properties.get('asset_tasks.surface_prv')
         )
+
     @classmethod
     def build_model_geometry_fnc(cls, rsv_task, space):
         if rsv_task is not None:
             import lxmaya.fnc.importers as mya_fnc_importers
+
             #
             if space == 'work':
                 keyword = 'asset-source-geometry-usd-payload-file'
@@ -651,6 +697,7 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                         port_match_patterns=['pg_*']
                     )
                 ).execute()
+
     @classmethod
     def build_model_dynamic_geometry_fnc(cls, rsv_task, space, property_names):
         if rsv_task:
@@ -658,6 +705,7 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
             from lxusd import usd_core
 
             import lxmaya.fnc.importers as mya_fnc_importers
+
             #
             keyword = 'asset-geometry-abc-hi-dyn-file'
             model__act_abc_dyn__file = rsv_task.get_rsv_unit(keyword=keyword)
@@ -699,9 +747,11 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 ma_core.CmdObjOpt(
                     bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
                 ).create_customize_attributes(customize_attributes)
+
     @classmethod
     def build_groom_geometry_fnc(cls, rsv_task, space, with_groom_grow):
         import lxmaya.fnc.importers as mya_fnc_importers
+
         if rsv_task:
             xgen_collection_directory_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-geometry-xgen-collection-dir')
             xgen_collection_directory_path = xgen_collection_directory_rsv_unit.get_exists_result()
@@ -731,10 +781,12 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 mya_fnc_importers.FncGeometryXgenImporter(
                     option=option
                 ).execute()
+
     @classmethod
     def build_surface_geometry_uv_map_fnc(cls, rsv_task, space):
         if rsv_task is not None:
             import lxmaya.fnc.importers as mya_fnc_importers
+
             #
             if space == 'work':
                 keyword = 'asset-source-geometry-usd-payload-file'
@@ -764,10 +816,12 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                         uv_map_only=True
                     )
                 ).execute()
+
     @classmethod
     def build_surface_look_fnc(cls, rsv_task, space):
         if rsv_task:
             import lxmaya.fnc.importers as mya_fnc_importers
+
             #
             if space == 'work':
                 keyword = 'asset-source-look-ass-file'
@@ -788,14 +842,16 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                     )
                 ).execute()
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     cls.KEY,
                     'rsv-unit={} is non-exists'.format(rsv_unit)
                 )
+
     @classmethod
     def build_surface_look_preview_fnc(cls, rsv_task, space):
         if rsv_task:
             import lxmaya.fnc.importers as mya_fnc_importers
+
             #
             if space == 'work':
                 keyword = 'asset-source-look-yml-file'
@@ -813,13 +869,13 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                     )
                 ).execute()
             else:
-                bsc_core.LogMtd.trace_method_warning(
+                bsc_core.Log.trace_method_warning(
                     cls.KEY,
                     'file is not found'
                 )
 
         else:
-            bsc_core.LogMtd.trace_method_warning(
+            bsc_core.Log.trace_method_warning(
                 cls.KEY,
                 'task is not found'
             )
@@ -834,11 +890,13 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 )
             if self.get('with_model_dynamic') is True:
                 method_args.append(
-                    (self.build_model_dynamic_geometry_fnc, (self._model_dynamic_rsv_task, self.get('model_space'), self.get('model_act_properties')))
+                    (self.build_model_dynamic_geometry_fnc,
+                     (self._model_dynamic_rsv_task, self.get('model_space'), self.get('model_act_properties')))
                 )
             if self.get('with_groom') is True:
                 method_args.append(
-                    (self.build_groom_geometry_fnc, (self._groom_rsv_task, self.get('groom_space'), self.get('with_groom_grow')))
+                    (self.build_groom_geometry_fnc,
+                     (self._groom_rsv_task, self.get('groom_space'), self.get('with_groom_grow')))
                 )
         # geometry uv map
         if self.get('with_geometry_uv_map') is True:
@@ -860,7 +918,9 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 )
         #
         if method_args:
-            with utl_core.GuiProgressesRunner.create(maximum=len(method_args), label='execute asset build method') as g_p:
+            with bsc_core.LogProcessContext.create(
+                maximum=len(method_args), label='execute asset build method'
+            ) as g_p:
                 for i_mtd, i_args in method_args:
                     g_p.set_update()
                     #

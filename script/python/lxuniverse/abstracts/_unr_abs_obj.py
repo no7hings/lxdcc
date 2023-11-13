@@ -844,7 +844,7 @@ class AbsObj(
         return self.__str__()
 
 
-class AbsObjStorageExtraDef(object):
+class AbsObjStgExtraDef(object):
     PATHSEP = '/'
 
     @staticmethod
@@ -945,10 +945,10 @@ class AbsObjStorageExtraDef(object):
         pass
 
 
-class AbsOsDirectory(
+class AbsStgDirectory(
     _unr_abs_base.AbsObjBaseDef,
     AbsObjDagExtraDef,
-    AbsObjStorageExtraDef
+    AbsObjStgExtraDef
 ):
     # <obj-pathsep>
     PATHSEP = '/'
@@ -1080,10 +1080,10 @@ class AbsOsDirectory(
         return self.__str__()
 
 
-class AbsOsFile(
+class AbsStgFile(
     _unr_abs_base.AbsObjBaseDef,
     AbsObjDagExtraDef,
-    AbsObjStorageExtraDef
+    AbsObjStgExtraDef
 ):
     # dag
     PATHSEP = '/'

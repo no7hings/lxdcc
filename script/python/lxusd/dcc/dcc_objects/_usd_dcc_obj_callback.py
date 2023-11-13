@@ -1,6 +1,5 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd
+from lxusd.warp import *
 
 from lxusd.dcc.dcc_objects import _usd_dcc_obj_utility
 

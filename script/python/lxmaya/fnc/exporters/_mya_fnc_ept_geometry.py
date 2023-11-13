@@ -566,7 +566,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
                             i_usd_obj_path
                         )
-                        i_usd_obj_path = bsc_core.DccPathDagMtd.set_dag_path_cleanup(
+                        i_usd_obj_path = bsc_core.DccPathDagMtd.cleanup_dag_path(
                             i_usd_obj_path
                         )
                         if i_mya_api_type_name in ma_configure.ApiTypes.Transforms:

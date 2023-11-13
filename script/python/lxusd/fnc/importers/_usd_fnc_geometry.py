@@ -1,6 +1,5 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, UsdGeom
+from lxusd.warp import *
 
 from lxusd.fnc import usd_fnc_abstract
 

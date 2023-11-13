@@ -59,7 +59,7 @@ class MtdBasic(object):
         lis_1.sort(key=lis_0.index)
         return lis_1
     @classmethod
-    def _set_pattern_update_(cls, pattern, format_variant):
+    def _update_pattern_fnc_(cls, pattern, format_variant):
         if pattern is not None:
             keys = cls._get_keys_by_parse_pattern_(pattern)
             s = pattern
@@ -206,7 +206,7 @@ class Matcher(MtdBasic):
 
     def set_variant_update(self, format_variant):
         if isinstance(format_variant, dict):
-            self._current_pattern = self._set_pattern_update_(self._current_pattern, format_variant)
+            self._current_pattern = self._update_pattern_fnc_(self._current_pattern, format_variant)
 
     def get_matches(self, trim=None):
         return self._get_matches_(self._rsv_pattern, self._current_pattern, trim)
@@ -229,7 +229,7 @@ class Matcher(MtdBasic):
                 rsv_version = self.RSV_TASK_VERSION_CLS(version)
                 rsv_version += 1
                 parameters['version'] = str(rsv_version)
-                return self._set_pattern_update_(self._rsv_pattern, parameters)
+                return self._update_pattern_fnc_(self._rsv_pattern, parameters)
 
     def get_current(self):
         return self._current_pattern

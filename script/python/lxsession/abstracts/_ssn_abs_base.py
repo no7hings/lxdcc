@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxbasic.core as bsc_core
 
-import lxbasic.session.abstracts as bsc_abstracts
+import lxbasic.session.core as bsc_ssn_core
 
 import lxcontent.objects as ctt_objects
 
@@ -12,7 +12,7 @@ import lxresolver.commands as rsv_commands
 import lxdatabase.objects as dtb_objects
 
 
-class AbsSsnGenerForResolver(bsc_abstracts.AbsSsnGener):
+class AbsSsnGenerForResolver(bsc_ssn_core.AbsSsnGener):
     def __init__(self, *args, **kwargs):
         self._rsv_obj = args[0]
         self._rsv_properties = self._rsv_obj.properties
@@ -41,9 +41,9 @@ class AbsSsnShotgunBaseDef(object):
         pass
 
     def get_shotgun_connector(self):
-        import lxshotgun.objects as stg_objects
+        import lxwarp.shotgun.core as wrp_stg_core
 
-        return stg_objects.StgConnector()
+        return wrp_stg_core.StgConnector()
 
     shotgun_connector = property(get_shotgun_connector)
 
@@ -53,7 +53,7 @@ class AbsSsnRsvUnitDef(object):
         self._rsv_keyword = configure.get('resolver.rsv_unit.keyword')
         #
         self._rsv_unit_version = configure.get('resolver.rsv_unit.version')
-        self._rsv_unit_extend_variants = configure.get('resolver.rsv_unit.extend_variants') or {}
+        self._rsv_unit_extend_variants = configure.get('resolver.rsv_unit.variants_extend') or {}
         self._rsv_unit = None
         if self._rsv_keyword:
             variants = configure.get('variants')
@@ -144,7 +144,7 @@ class AbsSsnRsvUnitAction(
             #
             result = self.rsv_unit.get_result(
                 version=self.rsv_unit_version,
-                extend_variants=self.rsv_unit_extend_variants
+                variants_extend=self.rsv_unit_extend_variants
             )
             if result:
                 return True
@@ -165,8 +165,8 @@ class AbsSsnOptionExecuteDef(object):
             raise TypeError()
 
     #
-    def _set_option_execute_def_init_(self, ddl_configure):
-        self._ddl_configure = ddl_configure
+    def _set_option_execute_def_init_(self, configure):
+        self._ddl_configure = configure
         self._ddl_job_id = None
 
     def get_ddl_configure(self):
@@ -199,7 +199,7 @@ class AbsSsnOptionExecuteDef(object):
 
 
 class AbsSsnOptionGui(
-    bsc_abstracts.AbsSsnGener,
+    bsc_ssn_core.AbsSsnGener,
     AbsSsnOptionExecuteDef
 ):
     def __init__(self, *args, **kwargs):
@@ -237,7 +237,7 @@ class AbsSsnOptionGui(
 
 
 class AbsSsnDatabaseOptionAction(
-    bsc_abstracts.AbsSsnOptionGener
+    bsc_ssn_core.AbsSsnOptionGener
 ):
     def __init__(self, *args, **kwargs):
         super(AbsSsnDatabaseOptionAction, self).__init__(*args, **kwargs)
@@ -296,7 +296,7 @@ class AbsSsnShellExecuteDef(object):
 
 
 class AbsSsnOptionToolPanel(
-    bsc_abstracts.AbsSsnOptionGener,
+    bsc_ssn_core.AbsSsnOptionGener,
     AbsSsnShellExecuteDef
 ):
     def __init__(self, *args, **kwargs):
@@ -305,7 +305,7 @@ class AbsSsnOptionToolPanel(
 
 
 class AbsSsnRsvOptionToolPanel(
-    bsc_abstracts.AbsSsnOptionGener,
+    bsc_ssn_core.AbsSsnOptionGener,
     AbsSsnShotgunBaseDef,
 ):
     def __init__(self, *args, **kwargs):
@@ -316,7 +316,7 @@ class AbsSsnRsvOptionToolPanel(
 
 # session for deadline job
 class AbsSsnOptionMethod(
-    bsc_abstracts.AbsSsnOptionGener,
+    bsc_ssn_core.AbsSsnOptionGener,
     AbsSsnOptionExecuteDef
 ):
     STD_KEYS = [
@@ -894,7 +894,7 @@ class AbsOptionRsvTaskBatcherSession(
 
 
 if __name__ == '__main__':
-    print bsc_abstracts.AbsSsnGener._match_fnc_(
+    print bsc_ssn_core.AbsSsnGener._match_fnc_(
         'branch=asset&step=srf',
         {
             "root": "/production/shows",

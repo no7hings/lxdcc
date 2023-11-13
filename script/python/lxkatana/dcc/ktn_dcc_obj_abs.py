@@ -54,7 +54,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
 
     def set_create(self, *args):
         ktn_port = self._get_ktn_port_()
-        parent = bsc_core.DccPortPathMtd.get_dag_parent_path(
+        parent = bsc_core.DccPortDagMtd.get_dag_parent_path(
             path=self._port_path, pathsep=self.PATHSEP
         )
         if ktn_port is None:

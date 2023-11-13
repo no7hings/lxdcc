@@ -27,7 +27,7 @@ class ScpTextureCreate(object):
         )
     @classmethod
     def to_exr_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
-        bsc_core.StgDirectoryOpt_(directory_path_tgt).set_create()
+        bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
         #
         directory_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
         directory_opt_tgt = bsc_core.StgDirectoryOpt(directory_path_tgt)
@@ -79,7 +79,7 @@ class ScpTextureCreate(object):
     @classmethod
     def get_exr_create_cmds_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
         list_ = []
-        bsc_core.StgDirectoryOpt_(directory_path_tgt).set_create()
+        bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
         #
         directory_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
         directory_opt_tgt = bsc_core.StgDirectoryOpt(directory_path_tgt)
@@ -108,7 +108,7 @@ class ScpTextureCreate(object):
     # tx
     @classmethod
     def to_tx_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
-        bsc_core.StgDirectoryOpt_(directory_path_tgt).set_create()
+        bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
         #
         directory_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
         directory_opt_tgt = bsc_core.StgDirectoryOpt(directory_path_tgt)
@@ -143,7 +143,7 @@ class ScpTextureCreate(object):
     @classmethod
     def get_tx_create_cmds_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
         list_ = []
-        bsc_core.StgDirectoryOpt_(directory_path_tgt).set_create()
+        bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
         #
         directory_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
         directory_opt_tgt = bsc_core.StgDirectoryOpt(directory_path_tgt)

@@ -293,7 +293,11 @@ class ScpAssetSurfacePublish(object):
                 localhost_enable=self._options['process.deadline.scheme'] == 'localhost'
             )
         )
-        #
+
+        if bsc_core.ApplicationMtd.get_is_katana():
+            import lxkatana.core as ktn_core
+            option_opt.set('katana_version', ktn_core.get_katana_version())
+
         ssn_commands.set_option_hook_execute_by_deadline(
             option=option_opt.to_string()
         )

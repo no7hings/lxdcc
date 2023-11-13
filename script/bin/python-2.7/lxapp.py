@@ -7,37 +7,46 @@ import os
 
 import getopt
 
-KEY = 'lxapp'
+KEY = 'lx-app'
 
 
 def main(argv):
     try:
         opt_kwargs_0, opt_args_0 = getopt.getopt(
             argv[1:],
-            'h',
-            ['help']
+            'ho:',
+            ['help', 'option=']
         )
         option = None
         args_execute = None
         args_extend = None
         environs_extend = None
+        # etc. -o "project=nsa_dev&application=maya"
         if opt_kwargs_0:
+            input_option = None
             for i_key, i_value in opt_kwargs_0:
                 if i_key in ('-h', '--help'):
                     __print_help()
                     #
                     sys.exit()
+                elif i_key in ('-o', '--option'):
+                    input_option = i_value
+
+            if input_option:
+                _ = __guess_by_kwargs(input_option)
+                if _:
+                    option, args_execute, args_extend, environs_extend = _
         # etc. nsa_dev.maya
         else:
             if opt_args_0:
-                _ = __get_app_args(
+                _ = __guess_by_args(
                     opt_args_0
                 )
                 if _ is not None:
                     option, args_execute, args_extend, environs_extend = _
         #
         if option is not None:
-            __execute_with_option(option, args_execute, args_extend, environs_extend)
+            __execute(option, args_execute, args_extend, environs_extend)
     #
     except getopt.GetoptError:
         # import traceback
@@ -45,9 +54,59 @@ def main(argv):
         sys.stderr.write('argv error\n')
 
 
-def __get_app_args(args):
-    from lxbasic import bsc_core
-    #
+def __guess_by_kwargs(opt_string):
+    import lxbasic.core as bsc_core
+
+    option_opt = bsc_core.ArgDictStringOpt(opt_string)
+    project = option_opt.get('project')
+    if not project:
+        return
+
+    # find resolver project
+    import lxbasic.extra.methods as bsc_etr_methods
+    import lxresolver.commands as rsv_commands
+    resolver = rsv_commands.get_resolver()
+    rsv_project = resolver.get_rsv_project(project=project)
+    if not rsv_project:
+        return
+
+    app_arg = option_opt.get('application')
+    if not app_arg:
+        return
+    # guess execute argument
+    framework_scheme = rsv_project.get_framework_scheme()
+    m = bsc_etr_methods.get_module(framework_scheme)
+    app_execute_mapper = m.EtrBase.get_app_execute_mapper(rsv_project)
+    if app_arg in app_execute_mapper:
+        cfg = app_execute_mapper[app_arg]
+        application = cfg['application']
+        args_execute = cfg['args_execute']
+    else:
+        application = app_arg
+        args_execute = ['-- {}'.format(application)]
+    # guess extend and task arguments
+    args_extend = []
+    kwargs_task = None
+    if 'task' in option_opt:
+        task = option_opt['task']
+        if 'asset' in option_opt:
+            kwargs_task = dict(project=project, asset=option_opt['asset'], task=task)
+        elif 'sequence' in option_opt:
+            kwargs_task = dict(project=project, sequence=option_opt['sequence'], task=task)
+        elif 'shot' in option_opt:
+            kwargs_task = dict(project=project, shot=option_opt['shot'], task=task)
+        elif 'resource' in option_opt:
+            kwargs_task = dict(project=project, resource=option_opt['resource'], task=task)
+        else:
+            kwargs_task = dict(project=project, task=task)
+    # generate option
+    option = 'project={}&application={}'.format(project, application)
+    return option, args_execute, args_extend, kwargs_task
+
+
+def __guess_by_args(args):
+    import lxbasic.core as bsc_core
+
     bsc_core.Log.trace_method_result(
         KEY,
         'execute from: {}'.format(__file__)
@@ -67,21 +126,17 @@ def __get_app_args(args):
     #
     project = _[0]
     app_arg = '.'.join(_[1:])
-    #
+    # guess resolver project
     import lxbasic.extra.methods as bsc_etr_methods
-    #
     import lxresolver.commands as rsv_commands
-    # find resolver project
     resolver = rsv_commands.get_resolver()
     rsv_project = resolver.get_rsv_project(project=project)
     if not rsv_project:
         return
-
+    # guess execute argument
     framework_scheme = rsv_project.get_framework_scheme()
     m = bsc_etr_methods.get_module(framework_scheme)
-    #
     app_execute_mapper = m.EtrBase.get_app_execute_mapper(rsv_project)
-    #
     if app_arg in app_execute_mapper:
         cfg = app_execute_mapper[app_arg]
         application = cfg['application']
@@ -89,45 +144,45 @@ def __get_app_args(args):
     else:
         application = app_arg
         args_execute = ['-- {}'.format(application)]
-    #
+    # guess extend and task arguments
     args_extend = args[1:]
-    args_task = None
+    kwargs_task = None
     if len(args) == 2:
         arg_sub = args[1]
         # when arg_sub is file path, ignore
         if os.path.exists(arg_sub) is False:
             task_arg = arg_sub
+            # asset/sequence/shot task, etc. td_tst.surfacing
             if '.' in task_arg:
                 arg_sub = task_arg.split('.')
                 if len(arg_sub) == 2:
                     resource, task = arg_sub
-                    args_task = [project, resource, task]
+                    kwargs_task = dict(project=project, resource=resource, task=task)
                     args_extend = []
-            # project task
+            # project task, etc. template
             else:
                 task = args[1]
-                args_task = [project, project, task]
+                kwargs_task = dict(project=project, task=task)
                 args_extend = []
-    #
+    # generate option
     option = 'project={}&application={}'.format(project, application)
-    return option, args_execute, args_extend, args_task
+    return option, args_execute, args_extend, kwargs_task
 
 
 def __print_help():
     sys.stdout.write(
         '***** lxapp *****\n'
         'etc.\n'
-        '# open app\n'
-        'lxapp cgm.katana\n'
-        'lxapp -a cgm.katana -- katana\n'
-        'lxapp -a cgm.katana -c "katana"\n'
-        '# execute script\n'
-        'lxapp -a cgm.katana -- katana --script=script.py\n'
-        'lxapp -a cgm.katana -c "katana --script=script.py"\n'
+        'lxapp {project}.{application}\n'
+        '   lxapp nsa_dev.katana\n'
+        'lxapp {project}.{application} {asset/sequence/shot/project}.{task}\n'
+        '   lxapp nsa_dev.katana td_test.surfacing\n'
+        'lxapp -o "project={project}&application={application}"\n'
+        '   lxapp -o "project=nsa_dev&application=maya"\n'
     )
 
 
-def __execute_with_option(option, args_execute=None, args_extend=None, args_task=None):
+def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
     from lxbasic import bsc_core
     #
     import lxbasic.extra.methods as bsc_etr_methods
@@ -175,8 +230,8 @@ def __execute_with_option(option, args_execute=None, args_extend=None, args_task
             ).format(command)
         )
     #
-    if args_task is not None:
-        environs_extend = m.EtrBase.get_task_environs_extend(*args_task)
+    if kwargs_task:
+        environs_extend = m.EtrBase.get_task_environs_extend_(**kwargs_task)
     else:
         environs_extend = m.EtrBase.get_project_environs_extend(project)
     #

@@ -83,7 +83,7 @@ class AbsRsvObjHookOpt(object):
             keyword=keyword_0
         )
         rsv_render_output_directory_path = render_output_directory_rsv_unit.get_result(
-            version=version, extend_variants=dict(variant='main')
+            version=version, variants_extend=dict(variant='main')
         )
         return rsv_render_output_directory_path
 
@@ -202,7 +202,7 @@ class AbsRsvObjHookOpt(object):
         for i_var_name in var_names:
             i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_exists_result(
                 version=version,
-                extend_variants=dict(var=i_var_name)
+                variants_extend=dict(var=i_var_name)
             )
             if i_geometry_usd_var_file_path:
                 list_.append(i_var_name)

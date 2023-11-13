@@ -45,34 +45,34 @@ class ArgDictStringOpt(object):
     ARGUMENT_SEP = '&'
 
     def __init__(self, option, default_option=None):
-        dic = collections.OrderedDict()
+        dict_ = collections.OrderedDict()
         if isinstance(default_option, six.string_types):
-            self._set_update_by_string_(dic, default_option)
+            self._update_by_string_(dict_, default_option)
         elif isinstance(default_option, dict):
-            dic.update(default_option)
+            dict_.update(default_option)
 
         if isinstance(option, six.string_types):
-            self._set_update_by_string_(dic, option)
+            self._update_by_string_(dict_, option)
         elif isinstance(option, dict):
-            dic.update(option)
+            dict_.update(option)
         else:
             raise TypeError()
         #
-        self._option_dict = dic
+        self.__dict = dict_
         #
         self._string_dict = {
             'key': self.to_string()
         }
 
     @classmethod
-    def _set_update_by_string_(cls, dic, option_string):
+    def _update_by_string_(cls, dict_, option_string):
         ks = [i.lstrip().rstrip() for i in option_string.split(cls.ARGUMENT_SEP)]
         for k in ks:
             key, value = k.split('=')
             value = value.lstrip().rstrip()
             #
             value = cls._set_value_convert_by_string_(value)
-            dic[key.lstrip().rstrip()] = value
+            dict_[key.lstrip().rstrip()] = value
 
     @classmethod
     def _set_value_convert_by_string_(cls, value_string):
@@ -91,13 +91,13 @@ class ArgDictStringOpt(object):
                 return value_string
 
     def get_value(self):
-        return self._option_dict
+        return self.__dict
 
     value = property(get_value)
 
     def get(self, key, as_array=False, as_integer=False, as_float=False):
-        if key in self._option_dict:
-            _ = self._option_dict[key]
+        if key in self.__dict:
+            _ = self.__dict[key]
             if as_integer is True:
                 if isinstance(_, int):
                     return _
@@ -132,7 +132,7 @@ class ArgDictStringOpt(object):
                 if _:
                     return [_]
                 return []
-            return self._option_dict[key]
+            return self.__dict[key]
 
     def get_as_path(self, key):
         pass
@@ -150,8 +150,8 @@ class ArgDictStringOpt(object):
         return self.get(key, as_float=True)
 
     def pop(self, key):
-        if key in self._option_dict:
-            return self._option_dict.pop(
+        if key in self.__dict:
+            return self.__dict.pop(
                 key
             )
 
@@ -159,41 +159,47 @@ class ArgDictStringOpt(object):
         pass
 
     def set(self, key, value):
-        self._option_dict[key] = value
+        self.__dict[key] = value
 
-    def set_update(self, dic, override=True):
+    def set_update(self, dict_, override=True):
         if override is False:
-            [dic.pop(k) for k in dic if k in self._option_dict]
+            [dict_.pop(k) for k in dict_ if k in self.__dict]
         #
-        self._option_dict.update(dic)
+        self.__dict.update(dict_)
 
     def set_update_by_string(self, option):
-        self._option_dict.update(
+        self.__dict.update(
             self.__class__(option).get_value()
         )
 
     def get_key_is_exists(self, key):
-        return key in self._option_dict
+        return key in self.__dict
 
     def get_raw(self):
-        return self._option_dict
+        return self.__dict
 
     def to_option(self):
         return self.to_string()
 
     def to_string(self):
         return ArgDictStringMtd.to_string(
-            **self._option_dict
+            **self.__dict
         )
 
     def __str__(self):
         return json.dumps(
-            self._option_dict,
+            self.__dict,
             indent=4,
             skipkeys=True,
             sort_keys=True
         )
+    
+    def __contains__(self, item):
+        return item in self.__dict
 
+    def __getitem__(self, item):
+        return self.__dict[item]
+    
 
 class ArgListStringOpt(object):
     PATTERN = r'[\[](.*?)[\]]'

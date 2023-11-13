@@ -1,8 +1,0 @@
-{
-	"port":{
-		"BatchName":{
-			"type": "string",
-			"default_value": null
-		}
-	}
-}

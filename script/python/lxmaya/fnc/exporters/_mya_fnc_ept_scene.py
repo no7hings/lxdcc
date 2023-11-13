@@ -2,12 +2,6 @@
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
-import os
-
-import glob
-
-import copy
-
 import collections
 
 from lxbasic import bsc_core
@@ -15,8 +9,6 @@ from lxbasic import bsc_core
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 import lxcontent.objects as ctt_objects
-
-from lxutil import utl_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -259,7 +251,7 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             light = light.set_create('aiStandIn')
         #
         atr_raw = dict(
-            dso=utl_core.Path.map_to_current(
+            dso=bsc_core.StgPathMapper.map_to_current(
                 '/l/resource/td/asset/ass/default-light.ass'
             )
         )
@@ -320,9 +312,6 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
             )
 
     def _set_snapshot_run_(self):
-        import lxshotgun.operators as stg_operators
-
-        #
         self._file_obj = utl_dcc_objects.OsFile(self._file_path)
         file_path_base = self._file_obj.path_base
         #
@@ -343,9 +332,6 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
                 ).set_create_from(
                     jpg_seq_file_path
                 )
-                # stg_operators.ImgFileOpt(
-                #     jpg_seq_file
-                # ).convert_to(mov_file_path)
         else:
             jpg_seq_file = utl_dcc_objects.OsFile(jpg_seq_file_path)
             exist_files = jpg_seq_file.get_exists_units()
@@ -376,9 +362,6 @@ class PreviewExporter(utl_fnc_obj_abs.AbsDccExporter):
                 ).set_create_from(
                     jpg_seq_file_path
                 )
-                # stg_operators.ImgFileOpt(
-                #     utl_dcc_objects.OsFile(jpg_seq_file_path)
-                # ).convert_to(mov_file_path)
 
         self._results = [mov_file_path]
 

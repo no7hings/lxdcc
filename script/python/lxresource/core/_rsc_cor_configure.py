@@ -18,6 +18,12 @@ print RscConfigure.get_yaml('database/library/resource-basic')
         return cls.get('{}.yml'.format(key))
 
     @classmethod
+    def get_as_content(cls, key):
+        return ctt_objects.Configure(
+            value=cls.get_yaml(key)
+        )
+
+    @classmethod
     def get_jinja(cls, key):
         return cls.get('{}.j2'.format(key))
 

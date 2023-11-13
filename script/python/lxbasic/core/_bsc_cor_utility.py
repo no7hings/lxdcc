@@ -340,7 +340,7 @@ class SystemMtd(TimeMtd):
         return sys.stderr.write(text+'\n')
 
 
-class StgPathMapper(object):
+class StgPathMapDict(object):
     def __init__(self, raw):
         self._raw = raw
         if SystemMtd.get_is_windows() is True:
@@ -370,7 +370,7 @@ class StgPathMapper(object):
         return dic
 
 
-class StgPathEnvMapper(object):
+class StgEnvPathMapDict(object):
     def __init__(self, raw):
         self._raw = raw
         if SystemMtd.get_is_windows() is True:
@@ -399,9 +399,9 @@ class StgPathEnvMapper(object):
         return dic
 
 
-class StgPathMapMtd(object):
+class StgBasePathMapper(object):
     PATHSEP = '/'
-    MAPPER = StgPathMapper(
+    MAPPER = StgPathMapDict(
         {
             "windows": {
                 "L:": [
@@ -507,11 +507,15 @@ class StorageMtd(object):
 
     @classmethod
     def get_path_is_windows(cls, path):
-        return fnmatch.filter([path.lower()], '[a-zA-Z]:*') != []
+        return not not re.findall(
+            r'^[a-zA-Z]:(.*)', path
+        )
 
     @classmethod
     def get_path_is_linux(cls, path):
-        return fnmatch.filter([path.lower()], '/*') != []
+        return not not re.findall(
+            r'/(.*)', path
+        )
 
     @classmethod
     def get_root(cls, path):
@@ -793,7 +797,7 @@ class UuidMtd(object):
 
     @classmethod
     def to_file_str(cls, file_path):
-        file_path = StgPathMapMtd.map_to_linux(file_path)
+        file_path = StgBasePathMapper.map_to_linux(file_path)
         if os.path.isfile(file_path):
             timestamp = os.stat(file_path).st_mtime
             size = os.path.getsize(file_path)

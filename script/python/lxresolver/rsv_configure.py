@@ -184,6 +184,10 @@ class VariantKeysExtend(object):
     ]
 
 
+class VariantKeys(object):
+    All = VariantTypes.Mains + [VariantKeysExtend.Category, VariantKeysExtend.Type]
+
+
 class VariantsKeys(object):
     Schemes = 'schemes'
     Roles = 'roles'
@@ -211,17 +215,18 @@ class VariantsKeys(object):
 
 
 class WorkspaceKeys(object):
-    Source = 'source'
     User = 'user'
+    Source = 'source'
     Release = 'release'
     Temporary = 'temporary'
+
     Mains = [
         Source,
         Release
     ]
     All = [
-        Source,
         User,
+        Source,
         Release,
         Temporary
     ]

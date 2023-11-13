@@ -1,6 +1,5 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, UsdGeom
+from lxusd.warp import *
 
 from lxbasic import bsc_core
 
@@ -14,9 +13,11 @@ class AbsUsdScene(object):
         self._file_path = file_path
         self._root = root
         self._set_stage_create_()
+
     @classmethod
     def _set_stage_create_(cls):
         return Usd.Stage.CreateInMemory()
+
     @classmethod
     def _set_reference_add_(cls, stage, file_path, root):
         usd_root = stage.GetPseudoRoot()

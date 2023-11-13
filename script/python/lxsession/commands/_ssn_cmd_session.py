@@ -11,6 +11,7 @@ def set_session_option_hooks_execute_by_deadline(session):
     from lxsession.commands import _ssn_cmd_hook
     #
     from lxbasic import bsc_core
+
     #
     def run_branch_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
         _batch_hook_option_opt = bsc_core.ArgDictStringOpt(batch_hook_option_)
@@ -22,6 +23,9 @@ def set_session_option_hooks_execute_by_deadline(session):
                 batch_file=_batch_hook_option_opt.get('batch_file'),
                 # python option
                 file=_batch_hook_option_opt.get('file'),
+                # application version
+                katana_version=_batch_hook_option_opt.get('katana_version'),
+                application_version=_batch_hook_option_opt.get('application_version'),
                 # standard keys
                 user=_batch_hook_option_opt.get('user'),
                 host=_batch_hook_option_opt.get('host'),
@@ -67,13 +71,14 @@ def set_session_option_hooks_execute_by_deadline(session):
         _ssn_cmd_hook.set_option_hook_execute_by_deadline(
             option=_hook_option_opt.to_string()
         )
+
     #
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')
     with bsc_core.LogProcessContext.create_as_bar(
-        maximum=len(option_hook_keys),
-        label='option-hooks execute by deadline',
+            maximum=len(option_hook_keys),
+            label='option-hooks execute by deadline',
     ) as g_p:
         for i_args in option_hook_keys:
             g_p.set_update()

@@ -642,7 +642,7 @@ class LxAssetAss(object):
             usd_file_rsv_unit = rsv_task.get_rsv_unit(
                 keyword=keyword
             )
-            return usd_file_rsv_unit.get_exists_result(version='latest', extend_variants=dict(var='hi'))
+            return usd_file_rsv_unit.get_exists_result(version='latest', variants_extend=dict(var='hi'))
     @classmethod
     def _get_output_ass_file_(cls, rsv_scene_properties, rsv_task, look_pass_name):
         workspace = rsv_scene_properties.get('workspace')
@@ -662,7 +662,7 @@ class LxAssetAss(object):
         else:
             look_ass_file_rsv_unit = rsv_task.get_rsv_unit(keyword=keyword_1)
             look_ass_file_path = look_ass_file_rsv_unit.get_result(
-                version=version, extend_variants=dict(look_pass=look_pass_name)
+                version=version, variants_extend=dict(look_pass=look_pass_name)
             )
         return look_ass_file_path
     @classmethod
@@ -1281,11 +1281,11 @@ class LxRenderer(object):
     def set_submit_to_deadline(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-        import lxutil_gui.panel.widgets as utl_pnl_widgets
+        import lxtool.submitter.gui.widgets as smt_gui_widgets
 
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
 
-        w = utl_pnl_widgets.AssetRenderSubmitter(
+        w = smt_gui_widgets.PnlRenderSubmitterForAsset(
             hook_option='file={}'.format(
                 file_path
             )

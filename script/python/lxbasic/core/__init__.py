@@ -27,6 +27,8 @@ from ._bsc_cor_thread import *
 
 from ._bsc_cor_storage import *
 
+from ._bsc_cor_storage_mapper import *
+
 from ._bsc_cor_configure import *
 
 from ._bsc_cor_resource import *

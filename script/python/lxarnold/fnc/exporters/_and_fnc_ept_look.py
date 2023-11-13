@@ -1,10 +1,7 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom
-
-from lxbasic import bsc_core
+from lxusd.warp import *
 #
-from lxusd import usd_configure, usd_core
+from lxusd import usd_core
 #
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -16,6 +13,7 @@ class LookPropertiesUsdExporter(utl_fnc_obj_abs.AbsDccExporter):
         ass_file=None,
         ignore_default=False
     )
+
     def __init__(self, file_path, root=None, option=None):
         super(LookPropertiesUsdExporter, self).__init__(file_path, root, option)
         #
@@ -60,4 +58,3 @@ class LookPropertiesUsdExporter(utl_fnc_obj_abs.AbsDccExporter):
         self._usd_stage_opt.export_to(
             self._file_path
         )
-

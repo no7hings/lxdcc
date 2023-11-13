@@ -28,10 +28,12 @@ class AbsSsnRsvApplication(object):
         return self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
             self._any_scene_file_path
         )
+
     @classmethod
     def get_stg_connector(cls):
-        import lxshotgun.objects as stg_objects
-        return stg_objects.StgConnector()
+        import lxwarp.shotgun.core as wrp_stg_core
+
+        return wrp_stg_core.StgConnector()
 
     def get_release_scene_src_file(self, version_scheme='match', ext_extras=None):
         """

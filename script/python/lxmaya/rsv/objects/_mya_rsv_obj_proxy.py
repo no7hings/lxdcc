@@ -39,7 +39,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
                 i_proxy_jpg_sub_file_path = i_proxy_jpg_sub_file.get_result(
                     version=version,
-                    extend_variants=dict(
+                    variants_extend=dict(
                         look_pass=i_look_pass
                     )
                 )
@@ -51,7 +51,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
                 i_proxy_gpu_act_file_path = i_proxy_gpu_act_file.get_result(
                     version=version,
-                    extend_variants=dict(
+                    variants_extend=dict(
                         look_pass=i_look_pass,
                         act=act
                     )
@@ -70,7 +70,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
                 i_proxy_ass_var_file_path = i_proxy_ass_var_file.get_result(
                     version=version,
-                    extend_variants=dict(
+                    variants_extend=dict(
                         look_pass=i_look_pass,
                         act=act
                     )
@@ -90,7 +90,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                     j_proxy_gpu_act_lod_file_path = j_proxy_gpu_act_lod_file.get_result(
                         version=version,
-                        extend_variants=dict(
+                        variants_extend=dict(
                             look_pass=i_look_pass,
                             act=act,
                             lod=str(j_lod + 1).zfill(2)
@@ -113,7 +113,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                     j_proxy_ass_var_lod_file_path = j_proxy_ass_var_lod_file.get_result(
                         version=version,
-                        extend_variants=dict(
+                        variants_extend=dict(
                             look_pass=i_look_pass,
                             act=act,
                             lod=str(j_lod + 1).zfill(2)
@@ -136,7 +136,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 #
                 i_proxy_xarc_sub_act_file_path = i_proxy_xarc_sub_act_file.get_result(
                     version=version,
-                    extend_variants=dict(
+                    variants_extend=dict(
                         act=act,
                         look_pass=i_look_pass
                     )

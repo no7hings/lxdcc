@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-export PATH=$PATH:$LXDCC_LIB_BASE/bin/linux-x64-python-2.7.18/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LXDCC_LIB_BASE/bin/linux-x64-python-2.7.18/lib
-export PYTHONPATH=$PYTHONPATH:$LXDCC_LIB_BASE/bin/linux-x64-python-2.7.18-packages
-export LYNXI_BIN_PYTHON=$LXDCC_LIB_BASE/bin/linux-x64-python-2.7.18/bin/python
-#
-$LYNXI_BIN_PYTHON $LXDCC_BASE/script/bin/lxscript.py $@

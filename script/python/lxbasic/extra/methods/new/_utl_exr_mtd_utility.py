@@ -41,10 +41,9 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def get_task_environs_extend(cls, project, resource, task):
-        import lxshotgun.objects as stg_objects
+        import lxwarp.shotgun.core as wrp_stg_core
 
-        #
-        c = stg_objects.StgConnector()
+        c = wrp_stg_core.StgConnector()
         task_id = c.find_task_id(
             project=project,
             resource=resource,
@@ -58,6 +57,27 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             )
         return dict(
             PAPER_SHOW_NAME=project.upper(),
+            PAPER_DB_NAME='production'
+        )
+
+    @classmethod
+    def get_task_environs_extend_(cls, **kwargs):
+        if 'project' in kwargs:
+            import lxwarp.shotgun.core as wrp_stg_core
+            c = wrp_stg_core.StgConnector()
+            stg_task = c.find_stg_task(**kwargs)
+            if stg_task:
+                task_id = stg_task['id']
+                return dict(
+                    PAPER_SHOW_NAME=kwargs['project'].upper(),
+                    PAPER_DB_NAME='production',
+                    PAPER_TASK_ID=str(task_id)
+                )
+            return dict(
+                PAPER_SHOW_NAME=kwargs['project'].upper(),
+                PAPER_DB_NAME='production'
+            )
+        return dict(
             PAPER_DB_NAME='production'
         )
 

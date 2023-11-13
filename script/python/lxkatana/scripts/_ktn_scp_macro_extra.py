@@ -1512,7 +1512,7 @@ class ScpAssetAssExport(AbsWsp):
                 keyword=keyword
             )
             return usd_file_rsv_unit.get_exists_result(
-                version='latest', extend_variants=dict(var='hi')
+                version='latest', variants_extend=dict(var='hi')
             )
 
     @classmethod
@@ -1545,7 +1545,7 @@ class ScpAssetAssExport(AbsWsp):
             look_ass_file_rsv_unit = rsv_task.get_rsv_unit(keyword=keyword_1)
             look_ass_file_path = look_ass_file_rsv_unit.get_result(
                 version=version,
-                extend_variants=dict(look_pass=look_pass_name)
+                variants_extend=dict(look_pass=look_pass_name)
             )
         return look_ass_file_path
 

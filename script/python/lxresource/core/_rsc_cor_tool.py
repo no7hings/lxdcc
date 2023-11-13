@@ -50,13 +50,13 @@ class RscDesktopTool(object):
         return RscTool.get_shell('{}/{}'.format(cls.BRANCH, key))
 
     @classmethod
-    def find_all_keys_at(cls, group_name):
+    def find_all_tool_keys_at(cls, group_name):
         return RscTool.find_all_file_keys_at(
             cls.BRANCH, group_name, ext_includes={'.yml'}
         )
 
     @classmethod
-    def find_all_group_keys_at(cls, group_name):
+    def find_all_page_keys_at(cls, group_name):
         return RscTool.find_all_directory_keys_at(
             cls.BRANCH, group_name
         )
@@ -90,6 +90,6 @@ if __name__ == '__main__':
     pass
     # print RscTool.get_yaml('desktop/Share/quixel_python')
     # print RscDesktopTool.get_yaml('Share/quixel_python')
-    print RscDesktopTool.find_all_keys_at('Studio')
-    print RscDesktopTool.find_all_group_keys_at('User')
+    print RscDesktopTool.find_all_tool_keys_at('Studio')
+    print RscDesktopTool.find_all_page_keys_at('User')
     # print RscDesktopTool.get_args('Share/quixel_python')

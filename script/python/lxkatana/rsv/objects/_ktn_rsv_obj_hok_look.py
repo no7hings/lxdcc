@@ -50,7 +50,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             else:
                 i_look_ass_file_rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword_1)
                 i_look_ass_file_path = i_look_ass_file_rsv_unit.get_result(
-                    version=version, extend_variants=dict(look_pass=i_look_pass_name)
+                    version=version, variants_extend=dict(look_pass=i_look_pass_name)
                 )
             #
             i_look_ass_file = utl_dcc_objects.OsFile(i_look_ass_file_path)

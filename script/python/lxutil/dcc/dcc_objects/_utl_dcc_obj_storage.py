@@ -10,13 +10,14 @@ from lxutil import utl_core
 from lxutil.dcc import utl_dcc_obj_abs
 
 
-class OsDirectory_(utl_dcc_obj_abs.AbsOsDirectory):
+class StgDirectory(utl_dcc_obj_abs.AbsStgDirectory):
     def __init__(self, path):
-        super(OsDirectory_, self).__init__(path)
+        super(StgDirectory, self).__init__(path)
 
 
-class OsFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLS = OsDirectory_
+class OsFile(utl_dcc_obj_abs.AbsStgFile):
+    OS_DIRECTORY_CLS = StgDirectory
+
     def __init__(self, path):
         super(OsFile, self).__init__(path)
 
@@ -42,11 +43,12 @@ class OsFile(utl_dcc_obj_abs.AbsOsFile):
         self.set_copy_to_file(backup_file_path)
 
 
-OsDirectory_.OS_FILE_CLS = OsFile
+StgDirectory.OS_FILE_CLS = OsFile
 
 
-class OsPythonFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLS = OsDirectory_
+class OsPythonFile(utl_dcc_obj_abs.AbsStgFile):
+    OS_DIRECTORY_CLS = StgDirectory
+
     def __init__(self, path):
         super(OsPythonFile, self).__init__(path)
 
@@ -58,9 +60,10 @@ class OsPythonFile(utl_dcc_obj_abs.AbsOsFile):
                 return raw
 
 
-class OsMultiplyFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLS = OsDirectory_
+class OsMultiplyFile(utl_dcc_obj_abs.AbsStgFile):
+    OS_DIRECTORY_CLS = StgDirectory
     RE_MULTIPLY_PATTERNS = [r'.*?(\$F.*?)[\.]']
+
     def __init__(self, path):
         super(OsMultiplyFile, self).__init__(path)
 
@@ -83,8 +86,9 @@ class OsMultiplyFile(utl_dcc_obj_abs.AbsOsFile):
             return new_file_path
 
 
-class OsJsonFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLS = OsDirectory_
+class OsJsonFile(utl_dcc_obj_abs.AbsStgFile):
+    OS_DIRECTORY_CLS = StgDirectory
+
     def __init__(self, path):
         super(OsJsonFile, self).__init__(path)
 
@@ -100,8 +104,9 @@ class OsJsonFile(utl_dcc_obj_abs.AbsOsFile):
         utl_core.File.set_write(self.path, raw)
 
 
-class OsYamlFile(utl_dcc_obj_abs.AbsOsFile):
-    OS_DIRECTORY_CLS = OsDirectory_
+class OsYamlFile(utl_dcc_obj_abs.AbsStgFile):
+    OS_DIRECTORY_CLS = StgDirectory
+
     def __init__(self, path):
         super(OsYamlFile, self).__init__(path)
 
@@ -113,15 +118,16 @@ class OsYamlFile(utl_dcc_obj_abs.AbsOsFile):
 
 
 class OsTexture(utl_dcc_obj_abs.AbsOsTexture):
-    OS_DIRECTORY_CLS = OsDirectory_
+    OS_DIRECTORY_CLS = StgDirectory
     RE_SEQUENCE_PATTERN = r'.*?(####).*?'
+
     def __init__(self, path):
         super(OsTexture, self).__init__(path)
 
 
 if __name__ == '__main__':
-    OsDirectory_(
+    StgDirectory(
         '/l/prod/shl/publish/assets/chr/shuitao/srf/surfacing/shuitao.srf.surfacing.v070/texture'
     ).set_copy_to_directory(
-       '/l/prod/lib/publish/assets/chr/shl__shuitao/srf/surfacing/shl__shuitao.srf.surfacing.v001/texture'
+        '/l/prod/lib/publish/assets/chr/shl__shuitao/srf/surfacing/shl__shuitao.srf.surfacing.v001/texture'
     )

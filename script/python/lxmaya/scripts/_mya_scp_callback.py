@@ -45,12 +45,12 @@ class ScpCbkEnvironment(object):
         return rsv_scripts.ScpEnvironment.get_data(f)
 
     def add_from_work_environment(self, *args, **kwargs):
-        import lxshotgun.scripts as stg_objects
+        import lxshotgun.scripts as stg_scripts
 
         task_id = bsc_core.EnvironMtd.get(
             'PAPER_TASK_ID'
         )
-        return stg_objects.ScpEnvironment.get_data(task_id)
+        return stg_scripts.ScpEnvironment.get_data(task_id)
 
     def add_from_scene(self, *args, **kwargs):
         return False, None

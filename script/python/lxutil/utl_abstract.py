@@ -628,7 +628,7 @@ class AbsDccScene(AbsDccObjDef):
     def get_current_file_path(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def save_file_to(self, *args, **kwargs):
+    def save_to_file(self, *args, **kwargs):
         raise NotImplementedError()
 
 

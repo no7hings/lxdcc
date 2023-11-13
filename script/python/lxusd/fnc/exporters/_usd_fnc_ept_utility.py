@@ -1,6 +1,5 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom
+from lxusd.warp import *
 
 
 class Usd2Usda(object):

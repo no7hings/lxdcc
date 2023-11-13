@@ -9,12 +9,12 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.fnc.exporters as mya_fnc_exporter
 
-import lxshotgun.objects as stg_objects
+import lxwarp.shotgun.core as wrp_stg_core
 
 f = mya_dcc_objects.Scene.get_current_file_path()
 
 r = rsv_commands.get_resolver()
-s_c = stg_objects.StgConnector()
+s_c = wrp_stg_core.StgConnector()
 rsv_task_properties = r.get_task_properties_by_any_scene_file_path(file_path=f)
 if rsv_task_properties:
     asset = rsv_task_properties.get('asset')
@@ -41,7 +41,7 @@ if rsv_task_properties:
             if s_c_q:
                 a = s_c_q.get('sg_asset')
                 if a:
-                    a_n = stg_objects.StgObjQuery(s_c, a).get('code')
+                    a_n = wrp_stg_core.StgEntityQuery(s_c, a).get('code')
                     if a_n == asset:
                         s_c_q.set_upload(
                             'image', '/data/f/look_pass/{}/{}.snapshot/image.0000.jpg'.format(asset, i_passe_name)

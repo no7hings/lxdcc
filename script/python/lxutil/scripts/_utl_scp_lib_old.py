@@ -9,19 +9,15 @@ import parse
 
 from lxbasic import bsc_core
 #
-from lxutil import utl_configure, utl_core
+from lxutil import utl_configure
 #
 import lxresolver.commands as rsv_commands
 #
 import lxresolver.methods as rsv_methods
-#
-import lxshotgun.objects as stg_objects
-#
-import lxshotgun.methods as stg_methods
-#
-import lxdeadline.objects as ddl_objects
-#
-import lxdeadline.methods as ddl_methods
+
+import lxwarp.shotgun.core as wrp_stg_core
+
+import lxshotgun.scripts as stg_scripts
 #
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 #
@@ -34,6 +30,7 @@ class ScpAssetBatcher(object):
         surface_katana_publish=False,
         surface_katana_render=False
     )
+
     def __init__(self, project, assets, option=None):
         self._project_tgt = project
         self._assets_tgt = assets
@@ -66,104 +63,17 @@ class ScpAssetBatcher(object):
                             self._set_i_rsv_asset_surface_katana_render_(i_rsv_asset_tgt)
                         if surface_publish is True:
                             self._set_i_rsv_asset_surface_publish_(i_rsv_asset_tgt)
+
     @classmethod
     def _set_i_rsv_asset_surface_publish_(cls, i_rsv_asset_tgt, user=None, time_tag=None):
-        import lxutil_fnc.scripts as utl_fnc_scripts
-        #
-        if user is None:
-            user = bsc_core.SystemMtd.get_user_name()
-        #
-        if time_tag is None:
-            time_tag = bsc_core.TimeMtd.get_time_tag()
-        #
-        i_rsv_task = i_rsv_asset_tgt.get_rsv_task(step='srf', task='surfacing')
-        if i_rsv_task:
-            i_katana_scene_src_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
-            i_katana_scene_src_src_file_path = i_katana_scene_src_src_file_unit.get_result(version='latest')
-            if i_katana_scene_src_src_file_path:
-                i_katana_scene_src_src_file_properties = i_katana_scene_src_src_file_unit.get_properties_by_result(
-                    i_katana_scene_src_src_file_path
-                )
-                version = i_katana_scene_src_src_file_properties.get('version')
-                # must clear ass file first
-                i_look_ass_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-look-ass-file')
-                i_look_ass_file_path = i_look_ass_file_unit.get_result(version=version)
-                i_look_ass_file = utl_dcc_objects.OsFile(i_look_ass_file_path)
-                if i_look_ass_file.get_is_exists() is True:
-                    i_look_ass_file.set_delete()
-                #
-                i_look_klf_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-look-klf-file')
-                i_look_klf_file_path = i_look_klf_file_unit.get_result(version=version)
-                i_look_klf_file = utl_dcc_objects.OsFile(i_look_klf_file_path)
-                if i_look_klf_file.get_is_exists() is True:
-                    element_names = bsc_core.StgZipFileOpt(i_look_klf_file_path).get_element_names()
-                    look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
-                    for j_look_pass_name in look_pass_names:
-                        if j_look_pass_name != 'default':
-                            j_look_ass_sub_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-look-ass-sub-file')
-                            j_look_ass_sub_file_path = j_look_ass_sub_file_unit.get_result(
-                                version=version, extend_variants=dict(look_pass=j_look_pass_name)
-                            )
-                            j_look_ass_sub_file = utl_dcc_objects.OsFile(j_look_ass_sub_file_path)
-                            if j_look_ass_sub_file.get_is_exists() is True:
-                                j_look_ass_sub_file.set_delete()
-                #
-                utl_fnc_scripts.set_asset_publish_by_katana_scene_src(
-                    option='file={file}&user={user}&time_tag={time_tag}'.format(
-                        **dict(
-                            file=i_katana_scene_src_src_file_path,
-                            #
-                            user=user, time_tag=time_tag
-                        )
-                    )
-                )
-            else:
-                i_maya_scene_src_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-maya-scene-src-file')
-                i_maya_scene_src_src_file_path = i_maya_scene_src_src_file_unit.get_result(version='latest')
-                if i_maya_scene_src_src_file_path:
-                    utl_fnc_scripts.set_asset_publish_by_maya_scene_src(
-                        option='file={file}&user={user}&time_tag={time_tag}'.format(
-                            **dict(
-                                file=i_maya_scene_src_src_file_path,
-                                #
-                                user=user, time_tag=time_tag
-                            )
-                        )
-                    )
+        raise RuntimeError(
+            'this method is removed'
+        )
 
     def _set_i_rsv_asset_surface_katana_render_(self, i_rsv_asset_tgt):
-        i_rsv_task = i_rsv_asset_tgt.get_rsv_task(step='srf', task='surfacing')
-        if i_rsv_task:
-            i_katana_scene_src_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-katana-scene-src-file')
-            i_katana_scene_src_file_path = i_katana_scene_src_file_unit.get_result()
-            #
-            i_render_katana_scene_file_unit = i_rsv_task.get_rsv_unit(keyword='asset-render-katana-scene-file')
-            i_render_katana_scene_file_path = i_render_katana_scene_file_unit.get_result()
-            if i_render_katana_scene_file_path is None:
-                if i_katana_scene_src_file_path:
-                    i_rsv_task_properties = self._resolver.get_task_properties_by_any_scene_file_path(
-                        file_path=i_katana_scene_src_file_path)
-                    #
-                    i_export_query = ddl_objects.DdlRsvTaskQuery(
-                        'katana-render-export', i_rsv_task_properties
-                    )
-                    i_export = ddl_methods.RsvTaskHookExecutor(
-                        method_option=i_export_query.get_method_option(),
-                        script_option=i_export_query.get_script_option(
-                            file=i_katana_scene_src_file_path,
-                            create_camera=True,
-                            create_scene=True,
-                            create_render=True,
-                            #
-                            with_shotgun_render=True,
-                            width=1024, height=1024,
-                            #
-                            td_enable=self._td_enable,
-                            #
-                            user=self._user, time_tag=self._time_tag
-                        )
-                    )
-                    i_export.execute_with_deadline()
+        raise RuntimeError(
+            'this method is removed'
+        )
 
 
 class AbsScpLibFileDef(object):
@@ -174,6 +84,7 @@ class AbsScpLibFileDef(object):
         #
         cls._set_j_rsv_task_file_copy_(j_rsv_task_src, j_rsv_task_tgt)
         cls._set_j_rsv_task_files_copy_(j_rsv_task_src, j_rsv_task_tgt)
+
     @classmethod
     def _set_j_rsv_task_work_scene_src_file_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
@@ -183,6 +94,7 @@ class AbsScpLibFileDef(object):
             'asset-source-nuke-scene-src-file',
         ]:
             cls._set_k_rsv_unit_scene_file_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
+
     @classmethod
     def _set_j_rsv_task_work_scene_src_file_link_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keywords in [
@@ -192,6 +104,7 @@ class AbsScpLibFileDef(object):
             ('asset-nuke-scene-file', 'asset-source-nuke-scene-src-file'),
         ]:
             cls._set_k_rsv_unit_scene_file_link_to_(j_rsv_task_src, j_rsv_task_tgt, k_keywords)
+
     @classmethod
     def _set_j_rsv_task_scene_file_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
@@ -206,6 +119,7 @@ class AbsScpLibFileDef(object):
             'asset-nuke-scene-file',
         ]:
             cls._set_k_rsv_unit_scene_file_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
+
     @classmethod
     def _set_k_rsv_unit_scene_file_copy_(cls, j_rsv_task_src, j_rsv_task_tgt, k_keyword):
         rsv_unit_file_src = j_rsv_task_src.get_rsv_unit(
@@ -229,6 +143,7 @@ class AbsScpLibFileDef(object):
                 file_src.set_copy_to_file(
                     file_path_tgt
                 )
+
     @classmethod
     def _set_j_rsv_task_file_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
@@ -239,6 +154,7 @@ class AbsScpLibFileDef(object):
             'asset-look-ass-file', 'asset-look-klf-file',
         ]:
             cls._set_k_rsv_unit_file_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
+
     @classmethod
     def _set_j_rsv_task_files_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
@@ -246,12 +162,14 @@ class AbsScpLibFileDef(object):
             'asset-geometry-xgen-grow-mesh-file',
         ]:
             cls._set_k_rsv_unit_files_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
+
     @classmethod
     def _set_j_rsv_task_directory_copy_(cls, j_rsv_task_src, j_rsv_task_tgt):
         for k_keyword in [
             'asset-texture-dir',
         ]:
             cls._set_k_rsv_unit_directory_copy_(j_rsv_task_src, j_rsv_task_tgt, k_keyword)
+
     @classmethod
     def _set_k_rsv_unit_file_copy_(cls, j_rsv_task_src, j_rsv_task_tgt, k_keyword):
         rsv_unit_file_src = j_rsv_task_src.get_rsv_unit(
@@ -266,6 +184,7 @@ class AbsScpLibFileDef(object):
             utl_dcc_objects.OsFile(file_path_src).set_copy_to_file(
                 file_path_tgt
             )
+
     @classmethod
     def _set_k_rsv_unit_files_copy_(cls, j_rsv_task_src, j_rsv_task_tgt, k_keyword):
         rsv_unit_file_src = j_rsv_task_src.get_rsv_unit(
@@ -277,10 +196,11 @@ class AbsScpLibFileDef(object):
         src_file_paths = rsv_unit_file_src.get_results(version='latest')
         for i_file_path_src in src_file_paths:
             i_extend_variants = rsv_unit_file_src.get_extend_variants(i_file_path_src)
-            i_file_path_tgt = rsv_unit_file_tgt.get_result(version='v001', extend_variants=i_extend_variants)
+            i_file_path_tgt = rsv_unit_file_tgt.get_result(version='v001', variants_extend=i_extend_variants)
             utl_dcc_objects.OsFile(i_file_path_src).set_copy_to_file(
                 i_file_path_tgt
             )
+
     @classmethod
     def _set_k_rsv_unit_directory_copy_(cls, j_rsv_task_src, j_rsv_task_tgt, k_keyword):
         k_rsv_unit_dir_src = j_rsv_task_src.get_rsv_unit(
@@ -292,10 +212,11 @@ class AbsScpLibFileDef(object):
         k_rsv_unit_dir_path_src = k_rsv_unit_dir_src.get_result(version='latest')
         k_rsv_unit_dir_path_tgt = k_rsv_unit_dir_tgt.get_result(version='v001')
         if k_rsv_unit_dir_path_src:
-            k_rsv_unit_dir = utl_dcc_objects.OsDirectory_(k_rsv_unit_dir_path_src)
+            k_rsv_unit_dir = utl_dcc_objects.StgDirectory(k_rsv_unit_dir_path_src)
             k_rsv_unit_dir.set_copy_to_directory(
                 k_rsv_unit_dir_path_tgt
             )
+
     @classmethod
     def _set_k_rsv_unit_scene_file_link_to_(cls, j_rsv_task_src, j_rsv_task_tgt, k_keywords):
         k_keyword_src, k_keyword_tgt = k_keywords
@@ -315,6 +236,7 @@ class AbsScpLibFileDef(object):
 
 class AbsScpLibSystemDef(object):
     SHOTGUN_TEMPLATE_CONFIGURE = None
+
     @classmethod
     def _set_i_rsv_asset_system_create_(cls, i_project_tgt, i_role_tgt, i_asset_tgt):
         i_asset_kwargs_tgt = dict(
@@ -340,8 +262,9 @@ class AbsScpLibSystemDef(object):
             #
             j_task_directory_paths = r.get_rsv_resource_task_directory_paths(**j_task_kwargs)
             for k_task_directory_path in j_task_directory_paths:
-                k_task_directory = utl_dcc_objects.OsDirectory_(k_task_directory_path)
+                k_task_directory = utl_dcc_objects.StgDirectory(k_task_directory_path)
                 k_task_directory.set_create()
+
     @classmethod
     def _set_i_rsv_asset_system_permission_create_(cls, i_rsv_asset_tgt):
         i_rsv_tasks_tgt = i_rsv_asset_tgt.get_rsv_tasks()
@@ -355,12 +278,12 @@ class AbsScpLibSystemDef(object):
 class AbsScpLibShotgunDef(object):
     @classmethod
     def _set_i_rsv_asset_shotgun_create_(cls, i_rsv_asset_tgt):
-        stg_connector = stg_objects.StgConnector()
+        stg_connector = wrp_stg_core.StgConnector()
         #
         project = i_rsv_asset_tgt.get('project')
         role = i_rsv_asset_tgt.get('role')
         asset = i_rsv_asset_tgt.get('asset')
-        stg_methods.StgTaskMtd.set_asset_create(
+        stg_scripts.StgScpTask.set_asset_create(
             project=project,
             role=role,
             asset=asset,
@@ -405,6 +328,7 @@ class AbsScpLib(
         #
         with_surface_publish=False,
     )
+
     @classmethod
     def _get_lib_asset_(cls, project, asset):
         if fnmatch.filter([asset], 'ast_*_*'):

@@ -24,11 +24,11 @@ class UsdSetup(utl_abstract.AbsSetup):
     def build_environ(cls):
         cls.add_environ_fnc(
             'PXR_AR_DEFAULT_SEARCH_PATH',
-            bsc_core.StgPathMapMtd.map_to_current('/l/prod')
+            bsc_core.StgBasePathMapper.map_to_current('/l/prod')
         )
         cls.add_environ_fnc(
             'PXR_AR_DEFAULT_SEARCH_PATH',
-            bsc_core.StgPathMapMtd.map_to_current('/t/prod')
+            bsc_core.StgBasePathMapper.map_to_current('/t/prod')
         )
 
 

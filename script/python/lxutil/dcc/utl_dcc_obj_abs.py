@@ -14,7 +14,7 @@ import lxuniverse.abstracts as unr_abstracts
 import lxutil.configures as utl_configures
 
 
-class AbsStorageGuiDef(object):
+class AbsObjStgGuiExtraDef(object):
     def set_gui_attribute(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -37,14 +37,14 @@ class AbsStorageGuiDef(object):
         gui_qt_core.GuiQtUtil.copy_text_to_clipboard(self.name)
 
 
-class AbsOsDirectory(
-    unr_abstracts.AbsOsDirectory,
+class AbsStgDirectory(
+    unr_abstracts.AbsStgDirectory,
     unr_abstracts.AbsGuiExtraDef,
-    AbsStorageGuiDef
+    AbsObjStgGuiExtraDef
 ):
 
     def __init__(self, path):
-        super(AbsOsDirectory, self).__init__(path)
+        super(AbsStgDirectory, self).__init__(path)
         self._init_gui_extra_def_()
         self.set_gui_attribute(
             'gui_menu',
@@ -104,10 +104,10 @@ class AbsOsDirectory(
         return
 
 
-class AbsOsFile(
-    unr_abstracts.AbsOsFile,
+class AbsStgFile(
+    unr_abstracts.AbsStgFile,
     unr_abstracts.AbsGuiExtraDef,
-    AbsStorageGuiDef
+    AbsObjStgGuiExtraDef
 ):
     ICON_DICT = {
         '.ma': 'ma',
@@ -140,7 +140,7 @@ class AbsOsFile(
     LOG = bsc_core.Log
 
     def __init__(self, path):
-        super(AbsOsFile, self).__init__(
+        super(AbsStgFile, self).__init__(
             bsc_core.StgPathOpt(path).__str__()
         )
         self._init_gui_extra_def_()
@@ -750,7 +750,7 @@ class AbsOsTextureSeparateDef(object):
 
 
 class AbsOsTexture(
-    AbsOsFile,
+    AbsStgFile,
     AbsOsTextureSeparateDef
 ):
     TEXTURE_COLOR_SPACE_CONFIGURE = utl_configures.get_color_space_configure()

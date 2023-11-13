@@ -25,4 +25,4 @@ def set_surface_light_rig_update_(task_properties):
         )
         render_dir_path = render_dir.get_result()
         node_dcc_obj.get_port('user.Output_Path').set(render_dir_path)
-        utl_dcc_objects.OsDirectory_(render_dir_path).set_create()
+        utl_dcc_objects.StgDirectory(render_dir_path).set_create()

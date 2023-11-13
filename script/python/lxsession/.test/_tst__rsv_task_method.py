@@ -12,16 +12,6 @@ for i_f in [
 ]:
     for j_seq, (j_option_hook_key, j_script_option) in enumerate(
         [
-            # ('rsv-task-methods/asset/maya/scene-clear', dict(clear_unused_shaders=True)),
-            # ('rsv-task-methods/asset/shotgun/shotgun-create', {}),
-            # ('rsv-task-methods/asset/maya/scene-export', dict(create_review_link=True)),
-            # ('rsv-task-methods/asset/maya/geometry-export', {}),
-            # ('rsv-task-methods/asset/maya/look-export', {}),
-            # ('rsv-task-methods/asset/maya/look-preview-export', {}),
-            # ('rsv-task-methods/asset/maya/camera-export', {}),
-            # ('rsv-task-methods/asset/usd/usd-create', dict(dependencies=['rsv-task-methods/asset/maya/geometry-export'])),
-            # ('rsv-task-methods/asset/maya/test', {}),
-            # ('rsv-task-methods/asset/shotgun/shotgun-export', {}),
             ('rsv-task-methods/asset/katana/render-scene-create', {}),
         ]
     ):

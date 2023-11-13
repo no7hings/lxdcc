@@ -9,7 +9,7 @@ from lxutil import utl_core
 def setup_fnc_():
     from lxutil import utl_setup
     utl_setup.OcioSetup(
-        bsc_core.StgPathMapMtd.map_to_current(
+        bsc_core.StgBasePathMapper.map_to_current(
             '/l/packages/pg/third_party/ocio/aces/1.2'
         )
     ).set_run()
@@ -22,14 +22,14 @@ def setup_fnc_():
 
 setup_fnc_()
 
-d = utl_dcc_objects.OsDirectory_('/l/temp/td/dongchangbao/tx_convert_test/exr_1')
+d = utl_dcc_objects.StgDirectory('/l/temp/td/dongchangbao/tx_convert_test/exr_1')
 
 output_directory_path = '/l/temp/td/dongchangbao/tx_convert_test/tx_17'
 
 file_paths = d.get_all_file_paths(ext_includes=['.exr'])
 
 if output_directory_path:
-    utl_dcc_objects.OsDirectory_(
+    utl_dcc_objects.StgDirectory(
         output_directory_path
     ).set_create()
 

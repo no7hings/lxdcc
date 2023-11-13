@@ -24,7 +24,7 @@ class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     @classmethod
     def _set_j2_option_update_(cls, option, include_keys):
         def convert_fnc_(path_):
-            return utl_core.PathEnv.map_to_env(
+            return bsc_core.StgEnvPathMapper.map_to_env(
                 path_, pattern='${KEY}'
             )
 

@@ -1,12 +1,10 @@
 # coding:utf-8
-import re
-from lxutil import utl_core
 from lxbasic import bsc_core
 
 p = "L:\FTP\qihe\to_diezhi\shl\20210511\1x\shengbei\shengbei"
 print repr(p)
 
-print utl_core.Path.map_to_linux(bsc_core.StgPathOpt(p).__str__())
+print bsc_core.StgPathMapper.map_to_linux(bsc_core.StgPathOpt(p).__str__())
 
 
 # p_0 = p

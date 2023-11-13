@@ -81,7 +81,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     #
                     mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
                         port_match_patterns
-                        )
+                    )
                     #
                     l_p.set_update()
 

@@ -1,30 +1,18 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Gf, UsdShade, UsdGeom, UsdLux
+from lxusd.warp import *
 
 import six
 
 import lxuniverse.configure as unr_configure
 
+from lxusd import usd_configure
 
-# noinspection PyUnresolvedReferences
+
 class UsdTypeMtd(object):
-    TYPE_MAPPER = {
-        unr_configure.Type.CONSTANT_BOOLEAN: Sdf.ValueTypeNames.Bool,
-        unr_configure.Type.CONSTANT_INTEGER: Sdf.ValueTypeNames.Int,
-        unr_configure.Type.CONSTANT_FLOAT: Sdf.ValueTypeNames.Float,
-        unr_configure.Type.CONSTANT_STRING: Sdf.ValueTypeNames.String,
-        #
-        unr_configure.Type.COLOR_COLOR3: Sdf.ValueTypeNames.Color3f,
-        unr_configure.Type.ARRAY_COLOR3: Sdf.ValueTypeNames.Color3fArray,
-        #
-        unr_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
-    }
-
     @classmethod
     def get(cls, key):
-        if key in cls.TYPE_MAPPER:
-            return cls.TYPE_MAPPER[key]
+        if key in usd_configure.Type.MAPPER:
+            return usd_configure.Type.MAPPER[key]
 
 
 class UsdPrimQuery(object):

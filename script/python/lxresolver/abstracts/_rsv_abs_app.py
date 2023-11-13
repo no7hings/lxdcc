@@ -262,7 +262,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
 
     def __init__(self, *args, **kwargs):
         super(AbsRsvAppNew, self).__init__(*args, **kwargs)
-        self._bin_source = bsc_core.StgPathMapMtd.map_to_current(self.BIN_SOURCE)
+        self._bin_source = bsc_core.StgBasePathMapper.map_to_current(self.BIN_SOURCE)
 
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:

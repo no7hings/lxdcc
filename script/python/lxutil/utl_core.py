@@ -9,13 +9,13 @@ if __name__ == '__main__':
         ).set_read()
     )
     print(
-        PathEnv.map_to_path(
+        bsc_core.StgEnvPathMapper.map_to_path(
             '[PAPER_PRODUCTION_ROOT]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
             pattern='[KEY]'
         )
     )
     print(
-        PathEnv.map_to_env(
+        bsc_core.StgEnvPathMapper.map_to_env(
             '/production/shows',
             pattern='[KEY]'
         )

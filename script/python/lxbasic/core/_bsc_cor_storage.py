@@ -1150,7 +1150,7 @@ class StgPathOpt(object):
         return os.access(self._path, os.W_OK)
 
     def map_to_current(self):
-        self._path = StgPathMapMtd.map_to_current(self._path)
+        self._path = StgBasePathMapper.map_to_current(self._path)
 
     def set_modify_time(self, timestamp):
         os.utime(self.get_path(), (timestamp, timestamp))
@@ -1167,6 +1167,11 @@ class StgPathOpt(object):
 
     def get_ancestor_paths(self):
         return self.get_component_paths()[1:]
+
+    def get_ancestors(self):
+        return map(
+            self.__class__, self.get_ancestor_paths()
+        )
 
     def get_path_prettify(self):
         p = self.get_path()
@@ -1287,6 +1292,11 @@ class StgDirectoryOpt(StgPathOpt):
             self.path, ext_includes
         )
 
+    def get_files(self, ext_includes=None):
+        return map(
+            StgFileOpt, self.get_file_paths(ext_includes)
+        )
+
     def get_all_file_paths(self, ext_includes=None):
         return StgDirectoryMtd.get_all_file_paths__(
             self.path, ext_includes
@@ -1295,6 +1305,11 @@ class StgDirectoryOpt(StgPathOpt):
     def get_all_directory_paths(self):
         return StgDirectoryMtd.get_all_directory_paths__(
             self._path
+        )
+
+    def get_all_directories(self):
+        return map(
+            self.__class__, self.get_all_directory_paths()
         )
 
     def get_child_names(self):
@@ -1326,7 +1341,7 @@ class StgDirectoryOpt(StgPathOpt):
                 )
 
 
-class StgDirectoryOpt_(object):
+class StgDirectoryOptExtra(object):
     def __init__(self, directory_path):
         self._path = directory_path
 
@@ -1646,7 +1661,7 @@ class StgTmpBaseMtd(object):
 
     @classmethod
     def get_user_directory(cls, tag):
-        return StgPathMapMtd.map_to_current(
+        return StgBasePathMapper.map_to_current(
             u'{root}/temporary/{tag}/{date_tag}-{user}'.format(
                 **dict(
                     root=cls.ROOT,
@@ -1659,7 +1674,7 @@ class StgTmpBaseMtd(object):
 
     @classmethod
     def get_cache_directory(cls, tag):
-        return StgPathMapMtd.map_to_current(
+        return StgBasePathMapper.map_to_current(
             u'{root}/temporary/{tag}/{user}'.format(
                 **dict(
                     root=cls.ROOT,
@@ -2098,7 +2113,7 @@ class StgTextureOpt(StgFileOpt):
 
     def get_units(self):
         return map(
-            lambda x: self.__class__(x), StgTextureMtd.get_unit_paths(self.get_path())
+            self.__class__, StgTextureMtd.get_unit_paths(self.get_path())
         )
 
     def get_unit_paths(self):

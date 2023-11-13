@@ -1,7 +1,4 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom, Gf
-
 import lxlog.core as log_core
 
 from lxbasic import bsc_core

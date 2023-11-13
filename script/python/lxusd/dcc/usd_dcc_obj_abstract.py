@@ -1,6 +1,5 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, UsdGeom
+from lxusd.warp import *
 
 from lxbasic import bsc_core
 

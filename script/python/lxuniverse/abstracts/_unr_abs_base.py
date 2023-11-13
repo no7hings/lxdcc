@@ -92,6 +92,9 @@ class AbsObjStack(object):
             return []
         return self._obj_list
 
+    def get_all_objects(self):
+        return self._obj_list
+
     def get_object_exists(self, key):
         """
         :param key: str(<obj-key>)

@@ -35,7 +35,7 @@ if __name__ == '__main__':
     directory_path_src = '/l/resource/library/texture/all/surface/rough_concrete_ogioE0/v0001/texture/original/src'
     directory_path_tgt = '/l/resource/library/texture/all/surface/rough_concrete_ogioE0/v0001/texture/acescg/src'
 
-    bsc_core.StgDirectoryOpt_(directory_path_tgt).set_create()
+    bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
 
     d_original_src_opt = bsc_core.StgDirectoryOpt(directory_path_src)
     d_acescg_src_opt = bsc_core.StgDirectoryOpt(directory_path_tgt)

@@ -59,7 +59,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         else:
             pass
     @classmethod
-    def save_file_to(cls, file_path):
+    def save_to_file(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         file_obj.create_directory()
         bsc_core.Log.trace_method_result(
@@ -199,7 +199,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             #
             pos_method_run_fnc_()
             #
-            cls.save_file_to(file_path)
+            cls.save_to_file(file_path)
         #
         def no_fnc_():
             cls.new_file()
@@ -209,7 +209,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             #
             pos_method_run_fnc_()
             #
-            cls.save_file_to(file_path)
+            cls.save_to_file(file_path)
         #
         if cls.get_scene_is_dirty() is True:
             w = utl_core.DccDialog.create(
@@ -257,7 +257,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             if result is True:
                 pass
     @classmethod
-    def import_file_from(cls, file_path):
+    def import_from_file(cls, file_path):
         KatanaFile.Import(file_path)
 
 

@@ -1,11 +1,11 @@
 # coding:utf-8
+from lxusd.warp import *
+
 import six
-# noinspection PyUnresolvedReferences
+
 import collections
-#
+
 import math
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, Gf, Kind, UsdGeom, UsdShade, UsdLux
 
 import fnmatch
 
@@ -213,7 +213,7 @@ class UsdStageOpt(UsdBasic):
         #
         dag_path_opt = bsc_core.DccPathDagOpt(regex)
         #
-        child_paths = bsc_core.DccPathDagMtd.get_dag_child_paths(
+        child_paths = bsc_core.DccPathDagMtd.find_dag_child_paths(
             dag_path_opt.get_parent_path(), list_
         )
         #
@@ -680,8 +680,10 @@ class UsdPrimOpt(object):
         dic = collections.OrderedDict()
         for i in self.get_variant_sets():
             i_variant_set_opt = UsdVariantSetOpt(i)
-            dic[
-                i_variant_set_opt.get_name()] = i_variant_set_opt.get_current_variant_name(), i_variant_set_opt.get_variant_names()
+            dic[i_variant_set_opt.get_name()] = (
+                i_variant_set_opt.get_current_variant_name(),
+                i_variant_set_opt.get_variant_names()
+            )
         return dic
 
     @classmethod
@@ -697,7 +699,7 @@ class UsdPrimOpt(object):
         else:
             raise TypeError()
         #
-        usd_type = UsdDataMapper.MAPPER[dcc_type_name]
+        usd_type = usd_configure.Type.MAPPER[dcc_type_name]
         p = usd_fnc.CreatePrimvar(
             key,
             usd_type
@@ -782,27 +784,14 @@ class UsdVariantSetOpt(object):
 
 
 class UsdDataMapper(object):
-    # noinspection PyUnresolvedReferences
-    MAPPER = {
-        unr_configure.Type.CONSTANT_BOOLEAN: Sdf.ValueTypeNames.Bool,
-        unr_configure.Type.CONSTANT_INTEGER: Sdf.ValueTypeNames.Int,
-        unr_configure.Type.CONSTANT_FLOAT: Sdf.ValueTypeNames.Float,
-        unr_configure.Type.CONSTANT_STRING: Sdf.ValueTypeNames.String,
-        #
-        unr_configure.Type.COLOR_COLOR3: Sdf.ValueTypeNames.Color3f,
-        unr_configure.Type.ARRAY_COLOR3: Sdf.ValueTypeNames.Color3fArray,
-        #
-        unr_configure.Type.ARRAY_STRING: Sdf.ValueTypeNames.StringArray,
-    }
-
     def __init__(self, dcc_type, dcc_value):
         self._dcc_type = dcc_type
         self._dcc_value = dcc_value
 
     def to_usd_args(self):
         key = self._dcc_type.category.name, self._dcc_type.name
-        if key in self.MAPPER:
-            usd_type = self.MAPPER[key]
+        if key in usd_configure.Type.MAPPER:
+            usd_type = usd_configure.Type.MAPPER[key]
             return usd_type, None
         return None, None
 
@@ -957,8 +946,8 @@ class UsdGeometryOpt(UsdPrimOpt):
     def create_customize_port_(self, port_path, type_path, dcc_value):
         category_name, type_name = type_path.split(unr_configure.Type.PATHSEP)
         key = category_name, type_name
-        if key in UsdDataMapper.MAPPER:
-            usd_type = UsdDataMapper.MAPPER[key]
+        if key in usd_configure.Type.MAPPER:
+            usd_type = usd_configure.Type.MAPPER[key]
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 usd_type
@@ -968,8 +957,8 @@ class UsdGeometryOpt(UsdPrimOpt):
     def create_customize_port_as_face_color(self, port_path, type_path, usd_value):
         category_name, type_name = type_path.split(unr_configure.Type.PATHSEP)
         key = category_name, type_name
-        if key in UsdDataMapper.MAPPER:
-            usd_type = UsdDataMapper.MAPPER[key]
+        if key in usd_configure.Type.MAPPER:
+            usd_type = usd_configure.Type.MAPPER[key]
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 usd_type,
@@ -1128,24 +1117,42 @@ class UsdGeometryMeshOpt(UsdGeometryOpt):
         list_ = []
         usd_mesh = self._usd_fnc
         usd_primvars = usd_mesh.GetAuthoredPrimvars()
-        for i_primvar in usd_primvars:
-            i_name = i_primvar.GetPrimvarName()
-            if i_primvar.GetIndices():
+        for i_p in usd_primvars:
+            i_name = i_p.GetPrimvarName()
+            i_a = self._usd_prim.GetAttribute('primvars:{}'.format(i_name))
+            if i_a.GetNumTimeSamples():
+                i_v = i_p.GetIndices(0)
+            else:
+                i_v = i_p.GetIndices()
+            if i_v:
                 list_.append(i_name)
         return list_
 
     def get_uv_map(self, uv_map_name):
-        a = self._usd_fnc.GetPrimvar(uv_map_name)
+        p = self._usd_fnc.GetPrimvar(uv_map_name)
+        a = self._usd_prim.GetAttribute('primvars:{}'.format(uv_map_name))
         uv_face_vertex_counts = self.get_face_vertex_counts()
-        return uv_face_vertex_counts, UsdBase.to_integer_array(a.GetIndices()), a.Get()
+        if a.GetNumTimeSamples():
+            uv_face_vertex_indices = p.GetIndices(0)
+            uv_map_coords = p.Get(0)
+        else:
+            uv_face_vertex_indices = p.GetIndices()
+            uv_map_coords = p.Get()
+        return uv_face_vertex_counts, uv_face_vertex_indices, uv_map_coords
 
     def get_uv_map_coords(self, uv_map_name):
-        a = self._usd_fnc.GetPrimvar(uv_map_name)
-        return a.Get()
+        p = self._usd_fnc.GetPrimvar(uv_map_name)
+        a = self._usd_prim.GetAttribute('primvars:{}'.format(uv_map_name))
+        if a.GetNumTimeSamples():
+            return p.Get(0)
+        return p.Get()
 
     def get_uv_map_face_vertex_indices(self, uv_map_name):
-        a = self._usd_fnc.GetPrimvar(uv_map_name)
-        return UsdBase.to_integer_array(a.GetIndices())
+        p = self._usd_fnc.GetPrimvar(uv_map_name)
+        a = self._usd_prim.GetAttribute('primvars:{}'.format(uv_map_name))
+        if a.GetNumTimeSamples():
+            return p.GetIndices(0)
+        return p.GetIndices()
 
     def get_uv_maps(self):
         dic = {}

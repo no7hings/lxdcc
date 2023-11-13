@@ -4,8 +4,6 @@ if __name__ == '__main__':
 
     import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-    import lxdeadline.methods as ddl_methods
-
     r = rsv_commands.get_resolver()
     for rsv_entity in r.get_rsv_resources(project='shl', branch='asset', role='flg'):
         rsv_task = rsv_entity.get_rsv_task(step='srf', task='surfacing')

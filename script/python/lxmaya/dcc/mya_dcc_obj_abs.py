@@ -420,9 +420,10 @@ class AbsMaUuidDef(object):
     def _set_ma_uuid_def_(self, uuid):
         self._uuid = uuid
 
-    @property
-    def unique_id(self):
+    def get_unique_id(self):
         return self._uuid
+
+    unique_id = property(get_unique_id)
 
     @property
     def path(self):
@@ -481,8 +482,9 @@ class AbsMyaObj(
         return path
 
     def _update_path_(self):
-        if self.unique_id:
-            _ = cmds.ls(self.unique_id, long=1)
+        if self.get_unique_id():
+            _ = cmds.ls(self.get_unique_id(), long=1)
+            print _
             if _:
                 self._path = _[0]
 
@@ -531,6 +533,7 @@ class AbsMyaObj(
     def set_rename(self, new_name, force=False):
         if self.get_is_exists() is True:
             cmds.rename(self.path, new_name)
+            self._update_path_()
             bsc_core.Log.trace_method_result(
                 self.KEY,
                 'rename: "{}" >> "{}"'.format(self.path, new_name)

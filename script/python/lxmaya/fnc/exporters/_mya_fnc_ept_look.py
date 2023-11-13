@@ -6,21 +6,13 @@ import os
 
 import collections
 
-import copy
-
 import glob
-
-from lxutil import utl_core
-
-import lxmaya.modifiers as mya_modifiers
 
 from lxmaya import ma_configure, ma_core
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
-
-from lxmaya_fnc import ma_fnc_configure, ma_fnc_core
 
 from lxmaya.modifiers import _mya_mdf_utility
 
@@ -47,6 +39,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         texture_use_environ_map=False,
     )
+
     def __init__(self, option=None):
         super(FncLookAssExporter, self).__init__(option)
         self._file_path = self.get('file')
@@ -63,6 +56,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._camera_path = mya_dcc_objects.Scene.get_current_render_camera_path(self._camera)
         #
         self._results = []
+
     @classmethod
     def _set_cmd_run_(cls, **kwargs):
         """
@@ -110,12 +104,14 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         cmds.loadPlugin(cls.PLUG_NAME, quiet=1)
         # noinspection PyArgumentList
         return cmds.arnoldExportAss(**kwargs)
+
     @_mya_mdf_utility.set_undo_mark_mdf
     def execute(self):
         # noinspection PyUnresolvedReferences
         import arnold as ai
+
         #
-        mask = ai.AI_NODE_SHADER + ai.AI_NODE_SHAPE
+        mask = ai.AI_NODE_SHADER+ai.AI_NODE_SHAPE
         #
         kwargs = dict(
             filename=self._file_path,
@@ -137,7 +133,9 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._results = self._set_cmd_run_(**kwargs)
         if self._results:
             if self._texture_use_environ_map is True:
-                with bsc_core.LogProcessContext.create_as_bar(maximum=len(self._results), label='texture environ-map') as l_p:
+                with bsc_core.LogProcessContext.create_as_bar(
+                        maximum=len(self._results), label='texture environ-map'
+                        ) as l_p:
                     for i in self._results:
                         l_p.set_update()
                         #
@@ -197,17 +195,11 @@ class LookMtlxExporter(object):
             mesh_obj = self._universe.get_obj(k)
             mesh_obj.get_input_port('subdiv_type').set('catclark')
             mesh_obj.get_input_port('subdiv_iterations').set(v)
+
     @classmethod
     def _set_cache_restore_(cls):
-        from LxMtx import mtxObjects
-        #
-        from lxar2mtx import ar_mtx_obectjs, ar2mtx_objects
-        # restore materialx
-        mtxObjects.GRH_OBJ_QUEUE.restore()
-        # restore arnold materialx
-        ar_mtx_obectjs.GRH_OBJ_QUEUE.restore()
-        # restore arnold to materialx
-        ar2mtx_objects.GRH_TRS_OBJ_QUEUE.restore()
+        raise RuntimeError('this method is removed')
+
     @_mya_mdf_utility.set_undo_mark_mdf
     def set_run(self):
         from lxarnold import and_configure
@@ -215,6 +207,7 @@ class LookMtlxExporter(object):
         from lxar2mtx import ar2mtx_objects
         #
         import lxarnold.commands as ar_commands
+
         #
         self._set_cache_restore_()
         #
@@ -254,7 +247,7 @@ class LookMtlxExporter(object):
             )
             xgens = xgen_type.get_objs() if xgen_type is not None else []
             #
-            geometries = meshes + curves + xgens
+            geometries = meshes+curves+xgens
             if geometries:
                 mtx_file = ar2mtx_objects.File(self._file_path)
                 #
@@ -280,100 +273,6 @@ class LookMtlxExporter(object):
         return self._results
 
 
-class LookAssignExporter(object):
-    GEOMETRY_TYPES = [
-        ma_configure.Util.MESH_TYPE
-    ]
-    HAIR_TYPES = [
-        ma_configure.Util.XGEN_DESCRIPTION
-    ]
-    PATH_KEY = 'path'
-    NAME_KEY = 'name'
-    POINTS_KEY = 'points'
-    FACE_VERTICES_KEY = 'face_vertices'
-    #
-    SEARCH_ORDER = [
-        POINTS_KEY,
-        FACE_VERTICES_KEY
-    ]
-    def __init__(self, file_path, root=None, look='default', path_lstrip=None):
-        self._file_path = file_path
-        self._root = root
-        self._look = look
-        self._path_lstrip = path_lstrip
-        #
-        self._look_content = ma_fnc_core.LookContent(collections.OrderedDict())
-        #
-        self._results = []
-
-    def set_run(self):
-        group = mya_dcc_objects.Group(self._root)
-        #
-        var = 'geometry'
-        geometry_paths = group.get_all_shape_paths(include_obj_type=ma_fnc_configure.Look.GEOMETRY_TYPES)
-        for seq, geometry_path in enumerate(geometry_paths):
-            obj_type = mya_dcc_objects.Node(geometry_path).type
-            if obj_type == ma_configure.Util.MESH_TYPE:
-                mesh_obj = mya_dcc_objects.Mesh(geometry_path)
-                mesh_obj_opt = mya_dcc_operators.MeshOpt(mesh_obj)
-                # key
-                name = mesh_obj_opt.get_name()
-                points_uuid = mesh_obj_opt.get_points_as_uuid(ordered=True)
-                face_vertices_uuid = mesh_obj_opt.get_face_vertices_as_uuid()
-                #
-                self._look_content.set_name_key(self._look, var, seq, name)
-                self._look_content.set_points_uuid_key(self._look, var, seq, points_uuid)
-                self._look_content.set_face_vertices_uuid_key(self._look, var, seq, face_vertices_uuid)
-                # value
-
-                look_opt = mya_dcc_operators.MeshLookOpt(mesh_obj)
-                path = mesh_obj_opt.get_path(lstrip=self._path_lstrip)
-                self._look_content.set_type_value(self._look, var, seq, obj_type)
-                self._look_content.set_path_value(self._look, var, seq, path)
-                material_assigns = look_opt.get_material_assigns()
-                properties = look_opt.get_render_properties()
-                visibilities = look_opt.get_render_visibilities()
-                self._look_content.set_material_assigns_value(self._look, var, seq, material_assigns)
-                self._look_content.set_properties_value(self._look, var, seq, properties)
-                self._look_content.set_visibilities_value(self._look, var, seq, visibilities)
-        var = 'hair'
-        hair_paths = group.get_all_shape_paths(include_obj_type=ma_fnc_configure.Look.HAIR_TYPES)
-        for seq, hair_path in enumerate(hair_paths):
-            obj_type = mya_dcc_objects.Node(hair_path).type
-            if obj_type == ma_configure.Util.XGEN_DESCRIPTION:
-                xgen_description = mya_dcc_objects.XgenDescription(hair_path)
-                xgen_description_opt = mya_dcc_operators.XgenDescriptionOpt(xgen_description)
-                look_opt = mya_dcc_operators.XgenDescriptionLookOpt(xgen_description)
-                path = xgen_description_opt.get_path(lstrip=self._path_lstrip)
-                name = xgen_description_opt.get_name()
-                material_assigns = look_opt.get_material_assigns()
-                properties = look_opt.get_render_properties()
-                visibilities = look_opt.get_render_visibilities()
-                # key
-                self._look_content.set_name_key(self._look, var, seq, name)
-                # value
-                self._look_content.set_type_value(self._look, var, seq, obj_type)
-                self._look_content.set_path_value(self._look, var, seq, path)
-                self._look_content.set_material_assigns_value(self._look, var, seq, material_assigns)
-                self._look_content.set_properties_value(self._look, var, seq, properties)
-                self._look_content.set_visibilities_value(self._look, var, seq, visibilities)
-        #
-        raw = self._look_content.get_raw()
-        if raw:
-            utl_core.File.set_write(self._file_path, raw)
-            self._results = [self._file_path]
-        #
-        if self._results:
-            for i in self._results:
-                bsc_core.Log.trace_method_result(
-                    'look-assign-exporter',
-                    u'file="{}"'.format(i)
-                )
-
-    def get_outputs(self):
-        return self._results
-
-
 class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
     OPTION = dict(
         directory='',
@@ -383,6 +282,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         resolution=512,
         aa_samples=3
     )
+
     @classmethod
     def _set_cmd_run_(cls, mya_mesh_path, **kwargs):
         # folder = '',
@@ -412,14 +312,17 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             **kwargs
         )
         cmds.select(clear=1)
+
     @classmethod
     def convert_arnold_visibilities_fnc(cls, mya_set):
         from lxarnold import and_configure
+
         #
         c = and_configure.Visibility.MAYA_VISIBILITY_DICT
         cmd_obj_opt = ma_core.CmdObjOpt(mya_set.path)
         for k, v in c.items():
             cmd_obj_opt.create_customize_attribute(v, False)
+
     @classmethod
     def convert_preview_shaders_fnc(cls, directory, mya_mesh):
         beauty_texture_exr_path_pattern = '{}/*_{}_[0-9][0-9][0-9][0-9].exr'.format(
@@ -443,6 +346,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             cls.create_preview_shaders_fnc(
                 mya_mesh, beauty_texture_jpg
             )
+
     @classmethod
     def convert_preview_textures_fnc(cls, patterns):
         dic = {}
@@ -462,6 +366,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                         j_texture_exr_path
                     )
         return dic
+
     @classmethod
     def create_preview_shaders_fnc(cls, mya_mesh, texture_jpg):
         material_name = '{}__material'.format(mya_mesh.name)
@@ -498,11 +403,13 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         mya_mesh_look_opt.assign_material_to_path(material.path)
         if ma_core.get_is_ui_mode() is True:
             mel.eval('generateUvTilePreview {}'.format(image.path))
+
     @classmethod
     def create_arnold_options_fnc(cls):
         cmds.loadPlugin('mtoa', quiet=1)
         # noinspection PyUnresolvedReferences
         import mtoa.core as core
+
         core.createOptions()
         #
         mya_dcc_objects.Node(
@@ -510,6 +417,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         ).set(
             'ignoreDisplacement', True
         )
+
     @classmethod
     def create_arnold_lights_fnc(cls):
         light = mya_dcc_objects.Shape('light')
@@ -519,9 +427,11 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         atr_raw = dict(dso='/l/resource/td/asset/ass/look-preview-light.ass')
         [light.get_port(k).set(v) for k, v in atr_raw.items()]
         return light.transform.path
+
     @classmethod
     def create_arnold_aovs_fnc(cls):
         from lxarnold import and_configure
+
         #
         dic = {
             'transmission': {'type': 'rgb'},
@@ -539,6 +449,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                 lis.append(i_aov)
 
         cls.set_aovs_link_create(lis)
+
     @classmethod
     def set_aovs_link_create(cls, aovs):
         def set_option_link_create_fnc_(aov_):
@@ -559,18 +470,21 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                 if _index == _maximum:
                     _is_end = True
                     break
+
         #
         def set_driver_create_fnc_(aov_):
             _output_atr_path = 'defaultArnoldDriver.message'
             _input_atr_path = '{}.outputs[0].driver'.format(aov_)
             if cmds.connectionInfo(_input_atr_path, isExactDestination=1) is False:
                 cmds.connectAttr(_output_atr_path, _input_atr_path)
+
         #
         def set_filter_create_fnc_(aov_):
             _output_atr_path = 'defaultArnoldFilter.message'
             _input_atr_path = '{}.outputs[0].filter'.format(aov_)
             if cmds.connectionInfo(_input_atr_path, isExactDestination=1) is False:
                 cmds.connectAttr(_output_atr_path, _input_atr_path)
+
         #
         if aovs:
             for i_aov in aovs:
@@ -585,7 +499,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         directory_path = self.get('directory')
         location_path = self.option.get('location')
         include_indices = self.get('include_indices')
-        directory = utl_dcc_objects.OsDirectory_(directory_path)
+        directory = utl_dcc_objects.StgDirectory(directory_path)
         directory.set_create()
         #
         mya_hide_set = mya_dcc_objects.Set('look_preview_export_hide_set')
@@ -659,14 +573,14 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         # file_path = mya_dcc_objects.Scene.get_current_file_path()
         # import os
         # base, ext = os.path.splitext(file_path)
-        # mya_dcc_objects.Scene.save_file_to(
+        # mya_dcc_objects.Scene.save_to_file(
         #     '{}.bck.ma'.format(base)
         # )
 
     def set_convert_run(self):
         directory_path = self.get('directory')
         location_path = self.option.get('location')
-        directory = utl_dcc_objects.OsDirectory_(directory_path)
+        directory = utl_dcc_objects.StgDirectory(directory_path)
 
         mya_group = mya_dcc_objects.Group(
             bsc_core.DccPathDagOpt(location_path).translate_to('|').get_value()
@@ -701,6 +615,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         'colorManagementGlobals'
     ]
+
     def __init__(self, option=None):
         super(FncLookYamlExporter, self).__init__(option)
 
@@ -714,7 +629,9 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             return True
         return False
 
-    def update_node_properties_fnc(self, scheme, obj_path, definition=False, customize=False, definition_includes=None, customize_includes=None):
+    def update_node_properties_fnc(
+            self, scheme, obj_path, definition=False, customize=False, definition_includes=None, customize_includes=None
+            ):
         if definition is True:
             self._raw.set(
                 '{}.{}.properties.definition-attributes'.format(scheme, obj_path),
@@ -741,6 +658,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             '{}.{}.properties.material-assigns'.format(scheme, obj_path),
             material_assigns
         )
+
     @classmethod
     def get_node_definition_properties_fnc(cls, obj_path, includes=None):
         dic = collections.OrderedDict()
@@ -756,6 +674,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     i_port_raw['value'] = i_port.get()
                     dic[i_port.get_port_path()] = i_port_raw
         return dic
+
     @classmethod
     def get_node_customize_properties_fnc(cls, obj_path, includes=None):
         dic = collections.OrderedDict()
@@ -779,7 +698,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         nodes = group.get_descendants()
         if nodes:
             with bsc_core.LogProcessContext.create(
-                maximum=len(nodes), label='export look yaml at "{}"'.format(location)
+                    maximum=len(nodes), label='export look yaml at "{}"'.format(location)
             ) as g_p:
                 for i_node in nodes:
                     g_p.set_update()
@@ -841,7 +760,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         if locations:
             pathsep = self.get('pathsep')
             with bsc_core.LogProcessContext.create(
-                maximum=len(locations), label='export look yaml'
+                    maximum=len(locations), label='export look yaml'
             ) as g_p:
                 for i_location in locations:
                     g_p.set_update()

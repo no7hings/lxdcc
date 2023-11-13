@@ -12,7 +12,7 @@ variant-fnmatch-patterns:
     version: '[a-z][0-9][0-9][0-9]*'
     version_extra: '[0-9][0-9][0-9]*'
     look_pass: '[A-Za-z]*'
-    shot: '{sequence}*'
+    shot: '[a-z]*'
 #
 root-step-choice:
     source: {}

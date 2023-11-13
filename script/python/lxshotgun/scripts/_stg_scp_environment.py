@@ -6,14 +6,14 @@ class ScpEnvironment(object):
     @classmethod
     def get_data(cls, task_id):
         if task_id:
-            import lxshotgun.objects as stg_objects
+            import lxwarp.shotgun.core as wrp_stg_core
 
             import lxresolver.commands as rsv_commands
 
             data = []
 
             resolver = rsv_commands.get_resolver()
-            c = stg_objects.StgConnector()
+            c = wrp_stg_core.StgConnector()
             dict_ = c.get_data_from_task_id(task_id)
             keys = resolver.VariantTypes.All
             for i_key in keys:

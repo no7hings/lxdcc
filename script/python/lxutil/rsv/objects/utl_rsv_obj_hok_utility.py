@@ -30,7 +30,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword
             )
             directory_path_tgt = directory_rsv_unit_tgt.get_result(
-                version=version, extend_variants=dict(variant=variant)
+                version=version, variants_extend=dict(variant=variant)
             )
 
             directory_path_src = directory_paths_src[0]
@@ -139,7 +139,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword
             )
             directory_path_tgt = directory_rsv_unit_tgt.get_result(
-                version=version, extend_variants=dict(variant=variant)
+                version=version, variants_extend=dict(variant=variant)
             )
             #
             directory_path_src = directory_paths_src[0]
@@ -178,7 +178,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword
             )
             directory_path_tgt = directory_rsv_unit_tgt.get_result(
-                version=version, extend_variants=dict(variant=variant)
+                version=version, variants_extend=dict(variant=variant)
             )
             for i_file_path_src in file_paths_src:
                 i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
@@ -216,7 +216,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword
             )
             directory_path_tgt = directory_rsv_unit_tgt.get_result(
-                version=version, extend_variants=dict(variant=variant)
+                version=version, variants_extend=dict(variant=variant)
             )
             for i_file_path_src in file_paths_src:
                 i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
@@ -266,7 +266,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             keyword=keyword_0
         )
         xgen_main_directory_path_tgt = xgen_main_directory_rsv_unit_tgt.get_result(
-            version=version, extend_variants=dict(variant=variant)
+            version=version, variants_extend=dict(variant=variant)
         )
 
         xgen_project_directory_rsv_unit_tgt = self._rsv_task.get_rsv_unit(
@@ -285,7 +285,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         if bsc_core.StgDirectoryOpt(xgen_main_directory_path_tgt).get_is_exists() is False:
             directory_path_0 = xgen_main_directory_rsv_unit_tgt.get_exists_result(
-                version='latest', extend_variants=dict(variant=variant)
+                version='latest', variants_extend=dict(variant=variant)
             )
             if directory_path_0:
                 bsc_core.Log.trace_method_warning(
@@ -336,7 +336,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
         directory_path_tgt = directory_rsv_unit_tgt.get_exists_result(
-            version=version, extend_variants=dict(variant=variant)
+            version=version, variants_extend=dict(variant=variant)
         )
         if directory_path_tgt:
             utl_dcc_operators.DccTexturesOpt(
@@ -379,7 +379,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
         ass_file_path = ass_file_rsv_unit.get_result(
-            version=version, extend_variants=dict(variant=variant)
+            version=version, variants_extend=dict(variant=variant)
         )
 
         mya_fnc_exporters.FncLookAssExporter(
@@ -405,13 +405,13 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version='{}__outsource'.format(version)
         )
         # save first
-        ktn_dcc_objects.Scene.save_file_to(katana_scene_src_file_path)
+        ktn_dcc_objects.Scene.save_to_file(katana_scene_src_file_path)
 
         self.set_katana_load_workspace()
 
         self.set_katana_import_ass()
 
-        ktn_dcc_objects.Scene.save_file_to(katana_scene_src_file_path)
+        ktn_dcc_objects.Scene.save_to_file(katana_scene_src_file_path)
 
     def set_katana_load_workspace(self):
         from lxutil import utl_core
@@ -438,7 +438,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
 
             ms = [
-                (ktn_dcc_objects.Scene.import_file_from, (file_path,)),
+                (ktn_dcc_objects.Scene.import_from_file, (file_path,)),
                 (ktn_dcc_objects.AssetWorkspace().set_all_executes_run, ()),
                 (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
             ]
@@ -463,7 +463,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             keyword=keyword
         )
         ass_file_path = ass_file_rsv_unit.get_result(
-            version=version, extend_variants=dict(variant=variant)
+            version=version, variants_extend=dict(variant=variant)
         )
 
         ktn_fnc_importers.LookAssImporter(

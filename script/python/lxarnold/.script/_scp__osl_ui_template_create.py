@@ -7,7 +7,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 d_p = '/data/e/workspace/lynxi/test/osl'
 
-d = utl_dcc_objects.OsDirectory_(d_p)
+d = utl_dcc_objects.StgDirectory(d_p)
 
 for i_f_p in d.get_child_file_paths():
     i_f = utl_dcc_objects.OsFile(i_f_p)

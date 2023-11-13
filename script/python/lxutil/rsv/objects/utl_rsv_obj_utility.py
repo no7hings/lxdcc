@@ -33,19 +33,19 @@ class RsvAssetTextureOpt(object):
     def get_directory_path_at(self, variant, version):
         return self._work_texture_version_directory_rsv_unit.get_result(
             version=version,
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
 
     def get_src_directory_path_at(self, variant, version):
         return self._work_texture_src_directory_rsv_unit.get_result(
             version=version,
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
 
     def get_tx_directory_path_at(self, variant, version):
         return self._work_texture_tx_directory_rsv_unit.get_result(
             version=version,
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
 
     def get_all_variants(self):
@@ -107,22 +107,22 @@ class RsvAssetTextureOpt(object):
 
     def get_latest_version_at(self, variant):
         return self._work_texture_version_directory_rsv_unit.get_latest_version(
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
 
     def get_new_version_at(self, variant):
         return self._work_texture_version_directory_rsv_unit.get_new_version(
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
 
     def get_all_versions_at(self, variant):
         return self._work_texture_version_directory_rsv_unit.get_all_exists_versions(
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
 
     def get_all_locked_versions_at(self, variant):
         matches = self._work_texture_version_directory_rsv_unit.get_all_exists_matches(
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
         list_ = []
         for i in matches:
@@ -133,7 +133,7 @@ class RsvAssetTextureOpt(object):
 
     def get_all_unlocked_versions_at(self, variant):
         matches = self._work_texture_version_directory_rsv_unit.get_all_exists_matches(
-            extend_variants=dict(variant=variant)
+            variants_extend=dict(variant=variant)
         )
         list_ = []
         for i in matches:
@@ -174,7 +174,7 @@ class RsvAssetTextureOpt(object):
         for i_file_path in file_paths:
             for i_check_p_opt in check_pattern_opts:
                 i_variants = i_check_p_opt.get_variants(i_file_path)
-                if i_variants is not None:
+                if i_variants is not None and 'project' not in i_variants:
                     i_directory_path = directory_pattern.format(**i_variants)
                     set_.add(i_directory_path)
                     break

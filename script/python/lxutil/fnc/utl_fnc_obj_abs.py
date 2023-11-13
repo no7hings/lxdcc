@@ -849,23 +849,23 @@ class AbsFncRenderTextureExportDef(object):
 
     @classmethod
     def copy_and_repath_as_base_link_fnc(
-            cls,
-            directory_path_bsc, directory_path_dst,
-            #
-            dcc_objs,
-            # file name auto replace " " to "_"
-            fix_name_blank,
-            #
-            with_reference=False,
-            ignore_missing_texture=False,
-            remove_expression=False,
-            use_environ_map=False,
-            repath_fnc=None,
-            # copy option
-            #   copy source file, etc. use ".tx", auto copy ".exr"
-            copy_source=False,
-            copy_source_scheme='separate',
-            target_extension='.tx',
+        cls,
+        directory_path_bsc, directory_path_dst,
+        #
+        dcc_objs,
+        # file name auto replace " " to "_"
+        fix_name_blank,
+        #
+        with_reference=False,
+        ignore_missing_texture=False,
+        remove_expression=False,
+        use_environ_map=False,
+        repath_fnc=None,
+        # copy option
+        #   copy source file, etc. use ".tx", auto copy ".exr"
+        copy_source=False,
+        copy_source_scheme='separate',
+        target_extension='.tx',
     ):
         if dcc_objs:
             copy_cache = []
@@ -877,8 +877,10 @@ class AbsFncRenderTextureExportDef(object):
                     l_p.set_update()
                     # dpt to dst, file path can be is multiply
                     for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
+                        if bsc_core.StgPathMtd.get_is_exists(j_texture_path_dpt) is False:
+                            continue
                         # map path to current platform
-                        j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
+                        j_texture_path_dpt = bsc_core.StgPathMapper.map_to_current(j_texture_path_dpt)
                         j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
                         if j_texture_dpt.get_exists_unit_paths() is False:
                             bsc_core.Log.trace_method_warning(
@@ -963,7 +965,7 @@ class AbsFncRenderTextureExportDef(object):
                                 # environ map
                                 if use_environ_map is True:
                                     # noinspection PyArgumentEqualDefault
-                                    j_texture_path_dst_new = utl_core.PathEnv.map_to_env(
+                                    j_texture_path_dst_new = bsc_core.StgEnvPathMapper.map_to_env(
                                         j_texture_path_dst, pattern='[KEY]'
                                     )
                                     if j_texture_path_dst_new != j_texture_path_dst:
@@ -1015,7 +1017,7 @@ class AbsFncRenderTextureExportDef(object):
                 # dpt to dst
                 for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
                     # map path to current platform
-                    j_texture_path_dpt = utl_core.Path.map_to_current(j_texture_path_dpt)
+                    j_texture_path_dpt = bsc_core.StgPathMapper.map_to_current(j_texture_path_dpt)
                     j_texture_dpt = utl_dcc_objects.OsTexture(j_texture_path_dpt)
                     if j_texture_dpt.get_exists_units() is False:
                         bsc_core.Log.trace_method_warning(
@@ -1099,7 +1101,7 @@ class AbsFncRenderTextureExportDef(object):
                             # environ map
                             if use_environ_map is True:
                                 # noinspection PyArgumentEqualDefault
-                                j_texture_path_dst_new = utl_core.PathEnv.map_to_env(
+                                j_texture_path_dst_new = bsc_core.StgEnvPathMapper.map_to_env(
                                     j_texture_path_dst, pattern='[KEY]'
                                 )
                                 if j_texture_path_dst_new != j_texture_path_dst:

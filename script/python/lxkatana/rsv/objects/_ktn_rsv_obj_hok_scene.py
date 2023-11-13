@@ -34,11 +34,11 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
         # save file first
-        ktn_dcc_objects.Scene.save_file_to(scene_src_file_path)
+        ktn_dcc_objects.Scene.save_to_file(scene_src_file_path)
 
         ktn_scripts.ScpWorkspaceCreate.new()
 
-        ktn_dcc_objects.Scene.save_file_to(scene_src_file_path)
+        ktn_dcc_objects.Scene.save_to_file(scene_src_file_path)
         #
         if self._hook_option_opt.get_as_boolean('with_scene_link') is True:
             scene_file_rsv_unit = self._rsv_task.get_rsv_unit(
@@ -71,7 +71,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         scene_file_path = scene_file_rsv_unit.get_result(
             version=version
         )
-        ktn_dcc_objects.Scene.save_file_to(scene_file_path)
+        ktn_dcc_objects.Scene.save_to_file(scene_file_path)
         return scene_file_path
 
     def get_scene_src_file_path(self):
@@ -126,7 +126,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         render_file_path = scene_file_path
         # save file first
-        ktn_dcc_objects.Scene.save_file_to(render_file_path)
+        ktn_dcc_objects.Scene.save_to_file(render_file_path)
         #
         katana_workspace = ktn_dcc_objects.AssetWorkspace()
         # create workspace
@@ -376,7 +376,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         geometry_usd_var_file_path_hi = geometry_usd_var_file_rsv_unit.get_result(
             version='latest',
-            extend_variants=dict(var='hi')
+            variants_extend=dict(var='hi')
         )
         if geometry_usd_var_file_path_hi:
             s.append_sublayer(geometry_usd_var_file_path_hi)
@@ -387,7 +387,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version_hi = file_properties.get('version')
             geometry_usd_var_file_path_shape = geometry_usd_var_file_rsv_unit.get_exists_result(
                 version=version_hi,
-                extend_variants=dict(var='shape')
+                variants_extend=dict(var='shape')
             )
             if geometry_usd_var_file_path_shape:
                 s.append_sublayer(geometry_usd_var_file_path_shape)
@@ -440,7 +440,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # ensure all usd file use same version
         geometry_usd_var_file_path_hi = geometry_usd_var_file_rsv_unit.get_result(
             version='latest',
-            extend_variants=dict(var='hi')
+            variants_extend=dict(var='hi')
         )
         if geometry_usd_var_file_path_hi:
             s.append_sublayer(geometry_usd_var_file_path_hi)
@@ -451,7 +451,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version_hi = file_properties.get('version')
             geometry_usd_var_file_path_shape = geometry_usd_var_file_rsv_unit.get_exists_result(
                 version=version_hi,
-                extend_variants=dict(var='shape')
+                variants_extend=dict(var='shape')
             )
             if geometry_usd_var_file_path_shape:
                 s.append_sublayer(geometry_usd_var_file_path_shape)

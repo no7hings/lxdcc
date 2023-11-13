@@ -94,7 +94,8 @@ main:
             end
             
             function get_world_matrix(path)
-                local t=Interface.GetGlobalXFormGroup('/root/world/cam/renderCamera/defaultCamera/defaultCameraLeft/defaultCameraLeftShape')
+                local camera_path = Interface.GetAttr('renderSettings.cameraName', '/root'):getValue()
+                local t=Interface.GetGlobalXFormGroup(camera_path)
                 local m = XFormUtils.CalcTransformMatrixAtTimes(t, {0}):getSamples():get(0)
                 local mtx = {}
                 for i, i_s in ipairs(m) do

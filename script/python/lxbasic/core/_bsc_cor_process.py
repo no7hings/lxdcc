@@ -82,6 +82,7 @@ class SubProcessMtd(object):
                             'environ prepend: "{}"="{}"'.format(k, i_v)
                         )
             return environs
+        return {str(k): str(v) for k, v in dict(os.environ).items()}
 
     @classmethod
     def get_clear_environs(cls, keys_exclude):

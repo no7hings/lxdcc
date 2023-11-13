@@ -41,6 +41,14 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         )
 
     @classmethod
+    def get_task_environs_extend_(cls, **kwargs):
+        if 'project' in kwargs:
+            return dict(
+                PG_SHOW=kwargs['project'].upper(),
+            )
+        return dict()
+
+    @classmethod
     def get_shotgun_step_name(cls, step):
         return step
 

@@ -4,7 +4,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 class FileCollection(object):
     def __init__(self, source_path, target_path):
-        d = utl_dcc_objects.OsDirectory_(source_path)
+        d = utl_dcc_objects.StgDirectory(source_path)
         dds = d.get_descendants()
         dic = {}
         for dd in dds:

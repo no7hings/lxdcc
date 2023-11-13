@@ -449,7 +449,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                     user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()])
                     )
 
-                mya_dcc_objects.Scene.save_file_to(file_path)
+                mya_dcc_objects.Scene.save_to_file(file_path)
 
     @classmethod
     def _set_render_(cls, render_resolution):

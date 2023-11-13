@@ -1,6 +1,5 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom, UsdShade, Gf, Tf
+from lxusd.warp import *
 
 from lxbasic import bsc_core
 
@@ -165,27 +164,39 @@ class MeshOpt(
         return usd_mesh.GetPointsAttr().Set(points)
 
     def get_uv_map_names(self):
-        lis = []
+        list_ = []
         usd_mesh = self.usd_mesh
         usd_primvars = usd_mesh.GetAuthoredPrimvars()
-        for i_primvar in usd_primvars:
-            i_name = i_primvar.GetPrimvarName()
-            if i_primvar.GetIndices():
-                lis.append(i_name)
-        return lis
+        for i_p in usd_primvars:
+            i_name = i_p.GetPrimvarName()
+            i_a = self._usd_prim.GetAttribute('primvars:{}'.format(i_name))
+            if i_a.GetNumTimeSamples():
+                i_v = i_p.GetIndices(0)
+            else:
+                i_v = i_p.GetIndices()
+            if i_v:
+                list_.append(i_name)
+        return list_
 
     def get_uv_map_coords(self, uv_map_name):
         usd_mesh = self.usd_mesh
-        uv_primvar = usd_mesh.GetPrimvar(uv_map_name)
-        uv_map_coords = uv_primvar.Get()
-        return uv_map_coords
+        p = usd_mesh.GetPrimvar(uv_map_name)
+        a = self._usd_prim.GetAttribute('primvars:{}'.format(uv_map_name))
+        if a.GetNumTimeSamples():
+            return p.Get(0)
+        return p.Get()
 
     def get_uv_map(self, uv_map_name):
         usd_mesh = self.usd_mesh
-        a = usd_mesh.GetPrimvar(uv_map_name)
+        p = usd_mesh.GetPrimvar(uv_map_name)
+        a = self._usd_prim.GetAttribute('primvars:{}'.format(uv_map_name))
         uv_face_vertex_counts = self.get_face_vertex_counts()
-        uv_face_vertex_indices = a.GetIndices()
-        uv_map_coords = a.Get()
+        if a.GetNumTimeSamples():
+            uv_face_vertex_indices = p.GetIndices(0)
+            uv_map_coords = p.Get(0)
+        else:
+            uv_face_vertex_indices = p.GetIndices()
+            uv_map_coords = p.Get()
         return uv_face_vertex_counts, usd_core.UsdBase.to_integer_array(uv_face_vertex_indices), uv_map_coords
 
     def get_uv_maps(self, default_uv_map_name='st'):

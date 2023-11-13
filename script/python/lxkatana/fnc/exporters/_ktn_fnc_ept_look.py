@@ -1,7 +1,8 @@
 # coding:utf-8
 import six
 # noinspection PyUnresolvedReferences
-from Katana import Configuration, RenderManager, ScenegraphManager, KatanaFile, FarmAPI, CacheManager, Nodes3DAPI, NodegraphAPI
+from Katana import Configuration, RenderManager, ScenegraphManager, KatanaFile, FarmAPI, CacheManager, Nodes3DAPI, \
+    NodegraphAPI
 # noinspection PyUnresolvedReferences
 from UI4 import Manifest
 
@@ -37,6 +38,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         texture_use_environ_map=False,
     )
+
     def __init__(self, option=None):
         super(FncLookAssExporter, self).__init__(option)
         self._file_path = self.get('file')
@@ -46,9 +48,10 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         frame = ktn_dcc_objects.Scene.get_frame_range(frame=self.get('frame'))
         self.__set_export_(
             file_path=self._file_path,
-            frame=frame, 
+            frame=frame,
             location=self._location,
         )
+
     @classmethod
     def _get_katana_is_ui_mode_(cls):
         return Configuration.get('KATANA_UI_MODE')
@@ -64,7 +67,9 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         merge_node = ktn_dcc_objects.Node('{}/look_ass_export__merge'.format(group_path))
         camera_node = ktn_dcc_objects.Node('{}/look_ass_export__camera'.format(group_path))
         render_settings_node = ktn_dcc_objects.Node('{}/look_ass_export__render_settings'.format(group_path))
-        arnold_render_settings_node = ktn_dcc_objects.Node('{}/look_ass_export__arnold_render_settings'.format(group_path))
+        arnold_render_settings_node = ktn_dcc_objects.Node(
+            '{}/look_ass_export__arnold_render_settings'.format(group_path)
+            )
         #
         merge_node.get_dcc_instance('Merge')
         camera_node.get_dcc_instance('CameraCreate')
@@ -106,13 +111,13 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
         #
         if frame[0] != frame[1]:
-            for i_current_frame in range(frame[0], frame[1] + 1):
-                i_output_file_path = u'{}.{}{}'.format(path_base, str(i_current_frame).zfill(4), ext)
+            for i_frame_cur in range(frame[0], frame[1]+1):
+                i_output_file_path = u'{}.{}{}'.format(path_base, str(i_frame_cur).zfill(4), ext)
                 arnold_render_settings_node.set('args.arnoldGlobalStatements.assFile.value', i_output_file_path)
                 #
-                NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(i_current_frame, 0)
-                ktn_dcc_objects.Scene.set_current_frame(i_current_frame)
-                rss.frame = i_current_frame
+                NodegraphAPI.GetRootNode().getParameter("currentTime").setValue(i_frame_cur, 0)
+                ktn_dcc_objects.Scene.set_current_frame(i_frame_cur)
+                rss.frame = i_frame_cur
                 RenderManager.StartRender(
                     self.RENDER_MODE,
                     node=arnold_render_settings_node.ktn_obj,
@@ -197,6 +202,7 @@ class LookKlfExtraExporter(utl_fnc_obj_abs.AbsDccExporter):
 
     def set_run(self):
         import parse
+
         #
         texture_references = ktn_dcc_objects.TextureReferences()
         objs = texture_references.get_objs()

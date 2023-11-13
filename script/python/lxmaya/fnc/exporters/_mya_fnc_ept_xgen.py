@@ -71,7 +71,7 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             i_xgen_collection_data_directory_path_src = i_xgen_palette_opt.get_data_directory()
             # copy xgen-data
             i_xgen_collection_directory_path_tgt = '{}/{}'.format(xgen_collection_directory_path, i_xgen_collection_name)
-            utl_dcc_objects.OsDirectory_(i_xgen_collection_data_directory_path_src).set_copy_to_directory(
+            utl_dcc_objects.StgDirectory(i_xgen_collection_data_directory_path_src).set_copy_to_directory(
                 i_xgen_collection_directory_path_tgt
             )
             i_xgen_collection_file_path = i_xgen_palette_opt.get_file_path()

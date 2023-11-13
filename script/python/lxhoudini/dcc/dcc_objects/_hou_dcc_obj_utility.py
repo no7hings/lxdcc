@@ -145,7 +145,7 @@ class Scene(utl_abstract.AbsDccScene):
         pass
 
     @classmethod
-    def save_file_to(cls, file_path):
+    def save_to_file(cls, file_path):
         hou.hipFile.save(file_path)
         bsc_core.Log.trace_method_result(
             'scene save',
@@ -165,7 +165,7 @@ class Scene(utl_abstract.AbsDccScene):
                 )
                 if s:
                     _ = s[0]
-                    cls.save_file_to(_)
+                    cls.save_to_file(_)
             else:
                 pass
 

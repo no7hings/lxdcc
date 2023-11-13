@@ -7,7 +7,7 @@ import types
 def get_hook_args(key, search_paths=None):
     from lxbasic import bsc_core
 
-    import lxbasic.session.objects as bsc_ssn_objects
+    import lxbasic.session.core as bsc_ssn_core
 
     import lxsession.core as ssn_core
 
@@ -27,7 +27,7 @@ def get_hook_args(key, search_paths=None):
             'dcc-tool-panel', 'dcc-menu',
             'rsv-tool-panel', 'rsv-loader', 'rsv-publisher'
         }:
-            session = bsc_ssn_objects.GenerSession(
+            session = bsc_ssn_core.GenerSession(
                 type=type_name,
                 hook=key,
                 configure=configure
@@ -35,7 +35,7 @@ def get_hook_args(key, search_paths=None):
         elif type_name in {
             'python-command', 'shell-command'
         }:
-            session = bsc_ssn_objects.CommandSession(
+            session = bsc_ssn_core.CommandSession(
                 type=type_name,
                 hook=key,
                 configure=configure
@@ -78,7 +78,7 @@ def get_option_hook_args(option, search_paths=None):
 
     from lxbasic import bsc_core
 
-    import lxbasic.session.objects as bsc_ssn_objects
+    import lxbasic.session.core as bsc_ssn_core
 
     import lxcontent.objects as ctt_objects
 
@@ -104,7 +104,7 @@ def get_option_hook_args(option, search_paths=None):
                 'action',
                 'launcher'
             }:
-                session = bsc_ssn_objects.OptionGenerSession(
+                session = bsc_ssn_core.OptionGenerSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,
@@ -118,7 +118,7 @@ def get_option_hook_args(option, search_paths=None):
                     option=option_opt.to_string()
                 )
             elif type_name == 'launcher':
-                session = bsc_ssn_objects.OptionGenerSession(
+                session = bsc_ssn_core.OptionGenerSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,

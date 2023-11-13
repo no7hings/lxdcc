@@ -88,7 +88,7 @@ class DDlMonitor(object):
     def set_create(cls, label, job_id, parent=None):
         import lxgui.proxy.widgets as prx_widgets
 
-        import lxdeadline.objects as ddl_objects
+        import lxdeadline.core as ddl_core
 
         w = prx_widgets.PrxMonitorWindow(parent=parent)
         w.set_window_title(
@@ -97,7 +97,7 @@ class DDlMonitor(object):
             )
         )
         button = w.get_status_button()
-        j_m = ddl_objects.DdlJobMonitor(job_id)
+        j_m = ddl_core.DdlJobMonitor(job_id)
         button.set_statuses(j_m.get_task_statuses())
         button.set_initialization(j_m.get_task_count())
         j_m.logging.connect_to(w.set_logging)
@@ -243,127 +243,6 @@ class File(object):
             ).set_read()
 
 
-class Path(object):
-    PATHSEP = '/'
-    #
-    MAPPER = bsc_core.StgPathMapper(
-        bsc_core.StgFileOpt(
-            bsc_core.RscConfigure.get_yaml('storage/path-mapper')
-        ).set_read()
-    )
-
-    @classmethod
-    def map_to_current(cls, path):
-        if path is not None:
-            if bsc_core.SystemMtd.get_is_windows():
-                return cls.map_to_windows(path)
-            elif bsc_core.SystemMtd.get_is_linux():
-                return cls.map_to_linux(path)
-            return bsc_core.StgPathOpt(path).__str__()
-        return path
-
-    @classmethod
-    def map_to_windows(cls, path):
-        # clear first
-        path = bsc_core.StgPathOpt(path).__str__()
-        if bsc_core.StorageMtd.get_path_is_linux(path):
-            mapper_dict = cls.MAPPER._windows_dict
-            for i_root_src, i_root_tgt in mapper_dict.items():
-                if path == i_root_src:
-                    return i_root_tgt
-                elif path.startswith(i_root_src+cls.PATHSEP):
-                    return i_root_tgt+path[len(i_root_src):]
-            return path
-        return path
-
-    @classmethod
-    def map_to_linux(cls, path):
-        """
-print Path.map_to_linux(
-    'l:/a'
-)
-        :param path:
-        :return:
-        """
-        # clear first
-        path = bsc_core.StgPathOpt(path).__str__()
-        if bsc_core.StorageMtd.get_path_is_windows(path):
-            mapper_dict = cls.MAPPER._linux_dict
-            for i_root_src, i_root_tgt in mapper_dict.items():
-                if path == i_root_src:
-                    return i_root_tgt
-                elif path.startswith(i_root_src+cls.PATHSEP):
-                    return i_root_tgt+path[len(i_root_src):]
-            return path
-        return path
-
-
-class PathEnv(object):
-    MAPPER = bsc_core.StgPathEnvMapper(
-        bsc_core.StgFileOpt(
-            bsc_core.RscConfigure.get_yaml('storage/path-environment-mapper')
-        ).set_read()
-    )
-
-    @classmethod
-    def map_to_path(cls, path, pattern='[KEY]'):
-        """
-        print(
-            PathEnv.map_to_path(
-                '[PAPER_PRODUCTION_ROOT]/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-                pattern='[KEY]'
-            )
-        )
-        print(
-            PathEnv.map_to_path(
-                '${PAPER_PRODUCTION_ROOT}/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-                pattern='${KEY}'
-            )
-        )
-        :param path:
-        :param pattern:
-        :return:
-        """
-        path = bsc_core.StgPathOpt(path).__str__()
-        mapper_dict = cls.MAPPER._env_dict
-        for i_env_key, i_root in mapper_dict.items():
-            i_string = pattern.replace('KEY', i_env_key)
-            if path == i_string:
-                return i_root
-            elif path.startswith(i_string+'/'):
-                return i_root+path[len(i_string):]
-        return path
-
-    @classmethod
-    def map_to_env(cls, path, pattern='[KEY]'):
-        """
-        print(
-            PathEnv.map_to_env(
-                '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-                pattern='[KEY]'
-            ),
-        )
-        print(
-            PathEnv.map_to_env(
-                '/production/shows/nsa_dev/assets/chr/td_test/user/team.srf/extend/look/klf/v001/all.json',
-                pattern='${KEY}'
-            )
-        )
-        :param path:
-        :param pattern:
-        :return:
-        """
-        path = bsc_core.StgPathOpt(path).__str__()
-        mapper_dict = cls.MAPPER._path_dict
-        for i_root, i_env_key in mapper_dict.items():
-            i_string = pattern.replace('KEY', i_env_key)
-            if path == i_root:
-                return i_string
-            elif path.startswith(i_root+'/'):
-                return i_string+path[len(i_root):]
-        return path
-
-
 class AppLauncher(object):
     # TODO fix 9.9.9
     LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_home_directory())
@@ -387,9 +266,9 @@ class AppLauncher(object):
             application: <application-name>
         """
         if bsc_core.StgPathOpt(self.LOCAL_ROOT).get_is_exists():
-            self._root = Path.map_to_current(self.LOCAL_ROOT)
+            self._root = bsc_core.StgPathMapper.map_to_current(self.LOCAL_ROOT)
         else:
-            self._root = Path.map_to_current(self.SERVER_ROOT)
+            self._root = bsc_core.StgPathMapper.map_to_current(self.SERVER_ROOT)
         #
         self._kwargs = dict(
             root=self._root,

@@ -706,11 +706,11 @@ class DccTexturesOpt(object):
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     stg_texture = utl_dcc_objects.OsTexture(j_file_path)
                     if target_platform is None:
-                        tgt_stg_texture_path = utl_core.Path.map_to_current(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StgPathMapper.map_to_current(stg_texture.path)
                     elif target_platform == 'windows':
-                        tgt_stg_texture_path = utl_core.Path.map_to_windows(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StgPathMapper.map_to_windows(stg_texture.path)
                     elif target_platform == 'linux':
-                        tgt_stg_texture_path = utl_core.Path.map_to_linux(stg_texture.path)
+                        tgt_stg_texture_path = bsc_core.StgPathMapper.map_to_linux(stg_texture.path)
                     else:
                         raise TypeError()
                     #

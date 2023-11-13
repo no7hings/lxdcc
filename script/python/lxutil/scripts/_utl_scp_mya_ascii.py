@@ -671,7 +671,7 @@ class DotMaFileReader(AbsFileReader):
                         variants = p.named
                         file_path = variants.get('file_path')
                         if auto_convert is True:
-                            file_path = utl_core.Path.map_to_current(file_path)
+                            file_path = bsc_core.StgPathMapper.map_to_current(file_path)
                         lis.append(file_path)
                         break
         return lis
@@ -702,7 +702,7 @@ class DotAssFileReader(AbsFileReader):
                         i_variants = i_p.named
                         i_file_path = i_variants['file_path']
                         # noinspection PyArgumentEqualDefault
-                        i_new_file_path = utl_core.PathEnv.map_to_env(
+                        i_new_file_path = bsc_core.StgEnvPathMapper.map_to_env(
                             i_file_path, pattern='[KEY]'
                         )
                         #

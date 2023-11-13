@@ -3,7 +3,7 @@ import functools
 
 import lxresource.core as rsc_core
 
-import lxbasic.session.objects as bsc_ssn_objects
+import lxbasic.session.core as bsc_ssn_core
 
 
 class Hook(object):
@@ -17,13 +17,13 @@ class Hook(object):
             if hook_type in {
                 'python-command', 'shell-command'
             }:
-                session = bsc_ssn_objects.CommandSession(
+                session = bsc_ssn_core.CommandSession(
                     type=hook_type,
                     hook=hook_key,
                     configure=hook_configure
                 )
             else:
-                session = bsc_ssn_objects.GenerSession(
+                session = bsc_ssn_core.GenerSession(
                     type=hook_type,
                     hook=hook_key,
                     configure=hook_configure

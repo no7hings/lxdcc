@@ -1,7 +1,7 @@
 # coding:utf-8
+from lxusd.warp import *
+
 import six
-# noinspection PyUnresolvedReferences
-from pxr import Usd, Sdf, Vt, UsdGeom
 
 import copy
 
@@ -12,8 +12,6 @@ import lxlog.core as log_core
 from lxbasic import bsc_core
 
 from lxusd import usd_configure, usd_core
-
-from lxutil import utl_core
 
 import lxcontent.objects as ctt_objects
 

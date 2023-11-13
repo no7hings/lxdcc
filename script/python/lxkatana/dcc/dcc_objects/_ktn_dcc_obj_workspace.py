@@ -438,16 +438,16 @@ class AssetWorkspace(object):
                 )
 
     @classmethod
-    def _set_node_connections_create_(cls, node_connections, extend_variants=None):
-        if extend_variants is None:
-            extend_variants = {}
+    def _set_node_connections_create_(cls, node_connections, variants_extend=None):
+        if variants_extend is None:
+            variants_extend = {}
         for seq, i in enumerate(node_connections):
             if not (seq+1)%2:
                 source_attr_path = node_connections[seq-1]
                 target_attr_path = i
-                if extend_variants:
-                    source_attr_path = source_attr_path.format(**extend_variants)
-                    target_attr_path = target_attr_path.format(**extend_variants)
+                if variants_extend:
+                    source_attr_path = source_attr_path.format(**variants_extend)
+                    target_attr_path = target_attr_path.format(**variants_extend)
                 #
                 source_obj_path, source_port_name = source_attr_path.split('.')
                 target_obj_path, target_port_name = target_attr_path.split('.')
@@ -683,13 +683,13 @@ class AssetWorkspace(object):
             )
 
     #
-    def set_geometry_xgen_import(self, file_path, extend_variants):
+    def set_geometry_xgen_import(self, file_path, variants_extend):
         configure = self.get_configure()
         key = 'geometry_xgen'
         dcc_main_obj, dcc_node = self._set_main_node_create_(
             configure,
             key,
-            extend_variants=extend_variants,
+            variants_extend=variants_extend,
             break_source_connections=False
         )
         if dcc_node is not None:
@@ -806,9 +806,9 @@ class AssetWorkspace(object):
             return input_port_paths.index(target_port_name)
         return len(input_port_paths)
 
-    def _set_main_node_create_(self, configure, key, extend_variants=None, break_source_connections=True):
-        if extend_variants is None:
-            extend_variants = {}
+    def _set_main_node_create_(self, configure, key, variants_extend=None, break_source_connections=True):
+        if variants_extend is None:
+            variants_extend = {}
         #
         node_key = configure.get('node.{}.keyword'.format(key))
         dcc_main_obj, ktn_main_obj, (x, y) = self._get_main_args_(configure, node_key)
@@ -823,7 +823,7 @@ class AssetWorkspace(object):
             spacing_y = configure.get('option.spacing_y')
             #
             node_obj_path = configure.get('node.{}.main.path'.format(key))
-            node_obj_path = node_obj_path.format(**extend_variants)
+            node_obj_path = node_obj_path.format(**variants_extend)
             node_obj_type = configure.get('node.{}.main.obj_type'.format(key))
             #
             dcc_node = _ktn_dcc_obj_node.Node(node_obj_path)
@@ -833,14 +833,14 @@ class AssetWorkspace(object):
             if node_parameters:
                 for i_parameter_port_path, i_parameter_value in node_parameters.items():
                     i_parameter_port_path = i_parameter_port_path.replace('/', '.')
-                    i_parameter_value = i_parameter_value.format(**extend_variants)
+                    i_parameter_value = i_parameter_value.format(**variants_extend)
                     dcc_node.get_port(i_parameter_port_path).set(i_parameter_value)
             #
             node_connections = configure.get('node.{}.main.connections'.format(key))
             if node_connections:
                 self._set_node_connections_create_(
                     node_connections,
-                    extend_variants=extend_variants
+                    variants_extend=variants_extend
                 )
             #
             index = len([i.getName() for i in ktn_main_obj.getInputPorts()])

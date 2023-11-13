@@ -1,13 +1,9 @@
 # coding:utf-8
-from lxutil import utl_core
-
 from lxbasic import bsc_core
 
 import lxcontent.objects as ctt_objects
 
 from lxutil.dcc import utl_dcc_opt_abs
-
-import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxmaya import ma_configure
 
@@ -33,7 +29,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         #
         if file_path:
             yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'mesh-comparer')
-            yml_file = utl_dcc_objects.OsYamlFile(yml_file_path)
+            yml_file = bsc_core.StgFileOpt(yml_file_path)
             if yml_file.get_is_exists() is False:
                 content_0 = ctt_objects.Content(value={})
                 content_0.set('file', file_path)
@@ -89,7 +85,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         from lxmaya.dcc.dcc_operators import _mya_dcc_opt_geometry
 
         #
-        yml_file = utl_dcc_objects.OsYamlFile(yml_file_path)
+        yml_file = bsc_core.StgFileOpt(yml_file_path)
         if yml_file.get_is_exists() is True:
             return ctt_objects.Content(value=yml_file_path)
         #

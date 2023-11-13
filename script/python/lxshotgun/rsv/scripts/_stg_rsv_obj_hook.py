@@ -44,7 +44,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def set_stg_task_create(self):
         rsv_task = self._rsv_task
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).execute_stg_task_create()
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).create_stg_task()
 
     def set_qc_stg_task_create(self):
         import copy
@@ -69,9 +69,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         #
         rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).execute_stg_task_create()
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).create_stg_task()
 
-    def execute_stg_version_create(self):
+    def create_stg_version(self):
         rsv_task = self._rsv_task
         version = self._rsv_scene_properties.get('version')
         #
@@ -93,7 +93,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version_type = extra_data.get('version_type')
                 version_status = extra_data.get('version_status')
         #
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).execute_stg_version_create(
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).create_stg_version(
             version=version,
             user=user,
             movie_file=movie_file,
@@ -133,7 +133,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if with_qc_review_mov is True:
             review_mov_file_path_qc = self.execute_qc_review_mov_export(version_qc)
         #
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).execute_stg_version_create(
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).create_stg_version(
             version=version_qc,
             version_type=version_type,
             movie_file=review_mov_file_path_qc,
@@ -145,7 +145,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = self._rsv_scene_properties.get('version')
         movie_file = self.get_exists_asset_review_mov_file()
         description = self._hook_option_opt.get('description')
-        _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).execute_stg_version_create(
+        _stg_rsv_obj_utility.RsvStgTaskOpt(self._rsv_task).create_stg_version(
             version=version,
             movie_file=movie_file,
             description=description
@@ -182,7 +182,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
-        utl_dcc_objects.OsDirectory_(version_directory_path).link_to(
+        utl_dcc_objects.StgDirectory(version_directory_path).link_to(
             no_version_directory_path, replace=True
         )
 
@@ -216,12 +216,11 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def execute_shotgun_file_export(self):
-        import lxshotgun.objects as stg_objects
+        import lxwarp.shotgun.core as wrp_stg_core
 
-        #
         rsv_scene_properties = self._rsv_scene_properties
 
-        stg_connector = stg_objects.StgConnector()
+        stg_connector = wrp_stg_core.StgConnector()
 
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
@@ -245,20 +244,17 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def set_dependency_export(self):
-        import lxshotgun.objects as stg_objects
-        #
-        import lxresolver.commands as rsv_commands
-        #
-        import lxshotgun.operators as stg_operators
+        import lxwarp.shotgun.core as wrp_stg_core
 
-        #
-        stg_connector = stg_objects.StgConnector()
+        import lxresolver.commands as rsv_commands
+
+        stg_connector = wrp_stg_core.StgConnector()
         #
         stg_version_query = stg_connector.get_stg_version_query(
             **self._rsv_scene_properties.value
         )
         #
-        stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
+        stg_version_opt = wrp_stg_core.StgVersionOpt(stg_version_query)
 
         resolver = rsv_commands.get_resolver()
         #

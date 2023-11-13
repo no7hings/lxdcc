@@ -89,7 +89,7 @@ class AbsPortDagPath(object):
 
     @property
     def name(self):
-        return bsc_core.DccPortPathMtd.get_dag_name(
+        return bsc_core.DccPortDagMtd.get_dag_name(
             path=self._path, pathsep=self._pathsep
         )
 

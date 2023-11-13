@@ -223,7 +223,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         return cls.FILE_TYPE_DICT.get(ext, cls.FILE_TYPE_ASCII)
 
     @classmethod
-    def import_file_from(cls, file_path, namespace=':'):
+    def import_from_file(cls, file_path, namespace=':'):
         return cmds.file(
             file_path,
             i=True,
@@ -235,7 +235,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         )
 
     @classmethod
-    def export_file_to(cls, file_path, root=None):
+    def export_to_file(cls, file_path, root=None):
         option = dict(
             type=cls._get_file_type_name_(file_path),
             options='v=0;',
@@ -374,7 +374,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         cls.set_workspace_create(workspace_directory.path)
 
     @classmethod
-    def save_file_to(cls, file_path):
+    def save_to_file(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
         file_obj.create_directory()
         #

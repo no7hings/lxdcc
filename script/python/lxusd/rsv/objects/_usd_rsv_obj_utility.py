@@ -150,7 +150,7 @@ class RsvUsdAssetSetCreator(object):
             )
             register_usd_file_path = comp_register_usd_file_rsv_unit.get_result(
                 version=cur_version,
-                extend_variants=dict(
+                variants_extend=dict(
                     asset_shot=asset_shot,
                     shot_asset=shot_asset
                 )
@@ -304,7 +304,7 @@ class RsvUsdAssetSetCreator(object):
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version='new',
-                    extend_variants=dict(
+                    variants_extend=dict(
                         asset_shot=rsv_shot.get('shot')
                     )
                 )
@@ -314,7 +314,7 @@ class RsvUsdAssetSetCreator(object):
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version=version,
-                    extend_variants=dict(
+                    variants_extend=dict(
                         asset_shot=rsv_shot.get('shot')
                     )
                 )
@@ -324,7 +324,7 @@ class RsvUsdAssetSetCreator(object):
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(
                     version=version,
-                    extend_variants=dict(
+                    variants_extend=dict(
                         asset_shot=rsv_shot.get('shot')
                     )
                 )
@@ -907,7 +907,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         component_usd_directory_path = component_usd_directory_rsv_unit.get_result(
             version=version,
-            extend_variants=dict(
+            variants_extend=dict(
                 asset_shot=asset_shot,
                 shot_asset=shot_asset,
             )
@@ -981,7 +981,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         for i_var_name in var_names:
             i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_exists_result(
                 version=version,
-                extend_variants=dict(var=i_var_name)
+                variants_extend=dict(var=i_var_name)
             )
             if i_geometry_usd_var_file_path:
                 s.append_sublayer(i_geometry_usd_var_file_path)
@@ -1052,7 +1052,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         for i_var_name in var_names:
             i_geometry_usd_var_file_path = geometry_usd_var_file_rsv_unit.get_exists_result(
                 version=version,
-                extend_variants=dict(var=i_var_name)
+                variants_extend=dict(var=i_var_name)
             )
             if i_geometry_usd_var_file_path:
                 s.append_sublayer(i_geometry_usd_var_file_path)

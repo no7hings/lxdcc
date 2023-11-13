@@ -161,7 +161,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         keyword=keyword
                     )
                     i_geometry_usd_abc_file_path = i_geometry_abc_var_file_rsv_unit.get_result(
-                        version=version, extend_variants=dict(var=i_location_name)
+                        version=version, variants_extend=dict(var=i_location_name)
                     )
                     #
                     i_location = '{}/{}'.format(root, i_location_name)
@@ -273,7 +273,7 @@ class RsvDccShotGeometryHookOpt(
 
         asset_shot_geometry_usd_directory_path = asset_shot_geometry_usd_directory_rsv_unit.get_result(
             version=version,
-            extend_variants=dict(
+            variants_extend=dict(
                 asset_shot=asset_shot,
                 shot_asset=shot_asset,
             )
@@ -343,7 +343,7 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         component_usd_directory_path = component_usd_directory_rsv_unit.get_result(
             version=version,
-            extend_variants=dict(
+            variants_extend=dict(
                 asset_shot=asset_shot,
                 shot_asset=shot_asset,
             )

@@ -221,7 +221,7 @@ class AbsObjScene(
         #
         if and_port_name == 'filename':
             if and_exact_type == ai.AI_TYPE_STRING:
-                dcc_port_raw = utl_core.PathEnv.map_to_path(dcc_port_raw)
+                dcc_port_raw = bsc_core.StgEnvPathMapper.map_to_path(dcc_port_raw)
         #
         dcc_input_port = dcc_obj.generate_port(dcc_type, and_port_name, unr_configure.PortAssign.INPUTS)
         dcc_input_port.set_custom(is_custom)

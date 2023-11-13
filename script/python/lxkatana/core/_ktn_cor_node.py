@@ -1327,7 +1327,7 @@ class NGObjOpt(object):
             self.set_port_hint(
                 i_port_path_src, dict(
                     text=bsc_core.RawStrUnderlineOpt(
-                        bsc_core.DccPortPathMtd.get_dag_name(i_port_path_src)
+                        bsc_core.DccPortDagMtd.get_dag_name(i_port_path_src)
                     ).to_prettify(capitalize=False)
                 )
             )
@@ -1537,10 +1537,10 @@ class NGObjOpt(object):
 
     def set_port_create(self, port_path, port_type, default_value):
         _ = self.get_port(port_path)
-        port_parent = bsc_core.DccPortPathMtd.get_dag_parent_path(
+        port_parent = bsc_core.DccPortDagMtd.get_dag_parent_path(
             path=port_path, pathsep=self.PORT_PATHSEP
         )
-        port_name = bsc_core.DccPortPathMtd.get_dag_name(
+        port_name = bsc_core.DccPortDagMtd.get_dag_name(
             path=port_path, pathsep=self.PORT_PATHSEP
         )
         if _ is None:

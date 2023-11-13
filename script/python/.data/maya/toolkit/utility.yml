@@ -78,4 +78,4 @@ central:
                     #
                     type: PrxPressItem
                     path: <...path>/<..key>
-                    click_command: 'import lxmaya.dcc.dcc_objects as mya_dcc_objects; from lxutil import utl_core; mya_dcc_objects.Scene.reference_file_from(utl_core.Path.map_to_current("/l/resource/srf/std_lgt_rig/maya_rig/srf_light_rig.ma"))'
+                    click_command: 'raise RuntimeError("this method is removed")'

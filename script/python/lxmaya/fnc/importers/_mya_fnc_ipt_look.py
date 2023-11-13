@@ -561,7 +561,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                         try:
                             if type_name == 'file':
                                 if port_path == 'fileTextureName':
-                                    value = bsc_core.StgPathMapMtd.map_to_current(value)
+                                    value = bsc_core.StgBasePathMapper.map_to_current(value)
                             #
                             port.set(value)
                         except Exception:

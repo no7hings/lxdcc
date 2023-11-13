@@ -1,5 +1,6 @@
 # coding:utf-8
 import copy
+
 from urllib import quote, unquote
 
 import datetime
@@ -8,11 +9,7 @@ import six
 
 from lxbasic import bsc_core
 
-from lxutil import utl_core
-
-import lxshotgun.objects as stg_objects
-
-import lxshotgun.operators as stg_operators
+import lxwarp.shotgun.core as wrp_stg_core
 
 import lxresolver.commands as rsv_commands
 
@@ -21,7 +18,7 @@ class RsvStgProjectOpt(object):
     def __init__(self, rsv_project):
         self._resolver = rsv_commands.get_resolver()
         self._rsv_project = rsv_project
-        self._stg_connector = stg_objects.StgConnector()
+        self._stg_connector = wrp_stg_core.StgConnector()
 
     def get_default_light_rig_rsv_asset(self):
         properties = self._rsv_project.properties
@@ -84,7 +81,7 @@ class RsvStgProjectOpt(object):
 class RsvStgTaskOpt(object):
     def __init__(self, rsv_task):
         self._rsv_task = rsv_task
-        self._stg_connector = stg_objects.StgConnector()
+        self._stg_connector = wrp_stg_core.StgConnector()
 
     def get_version_name(self, version):
         p = self._rsv_task.properties
@@ -105,7 +102,7 @@ class RsvStgTaskOpt(object):
             **kwargs
         )
 
-    def execute_stg_task_create(self):
+    def create_stg_task(self):
         from lxutil import utl_core
         #
         kwargs = self._rsv_task.properties.value
@@ -128,7 +125,7 @@ class RsvStgTaskOpt(object):
                     **kwargs
                 )
                 if stg_task is None:
-                    self._stg_connector.execute_stg_task_create(
+                    self._stg_connector.create_stg_task(
                         **kwargs
                     )
             else:
@@ -142,7 +139,7 @@ class RsvStgTaskOpt(object):
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
 
-    def execute_stg_version_create(
+    def create_stg_version(
         self,
         version,
         version_type=None,
@@ -163,13 +160,13 @@ class RsvStgTaskOpt(object):
         stg_task_query = self._stg_connector.get_stg_task_query(
             **stg_version_kwargs
         )
-        stg_task_opt = stg_operators.StgTaskOpt(stg_task_query)
+        stg_task_opt = wrp_stg_core.StgTaskOpt(stg_task_query)
         #
         stg_version_query = self._stg_connector.get_stg_version_query(
             **stg_version_kwargs
         )
         if stg_version_query is None:
-            self._stg_connector.execute_stg_version_create(
+            self._stg_connector.create_stg_version(
                 **stg_version_kwargs
             )
             stg_version_query = self._stg_connector.get_stg_version_query(
@@ -178,7 +175,7 @@ class RsvStgTaskOpt(object):
         # task set last version
         stg_task_opt.set_last_stg_version(stg_version_query.stg_obj)
         # version
-        stg_version_opt = stg_operators.StgVersionOpt(stg_version_query)
+        stg_version_opt = wrp_stg_core.StgVersionOpt(stg_version_query)
         #
         version_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='{}-release-version-dir'.format(branch)

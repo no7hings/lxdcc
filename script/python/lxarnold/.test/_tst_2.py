@@ -11,7 +11,7 @@ and_setup.MtoaSetup('/l/packages/pg/prod/mtoa/4.2.1.1/platform-linux/maya-2019')
 
 d_p = '/data/e/myworkspace/td/lynxi/script/python/.setup/arnold/shaders'
 
-d = utl_dcc_objects.OsDirectory_(d_p)
+d = utl_dcc_objects.StgDirectory(d_p)
 
 for i_f_p in d.get_child_file_paths():
     i_f = utl_dcc_objects.OsFile(i_f_p)

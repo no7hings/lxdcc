@@ -48,21 +48,21 @@ class AbsAssetQuery(object):
         )
         if rsv_unit:
             extend_var_keys = rsv_task.rsv_project.get_value('extent-var-keys')
-            extend_variants = {}
+            variants_extend = {}
             for k, v in custom_kwargs.items():
                 if k in extend_var_keys:
-                    extend_variants[k] = v
+                    variants_extend[k] = v
             #
             if _kwargs['version'] == 'all':
                 result = rsv_unit.get_result(
                     version='all',
-                    extend_variants=extend_variants,
+                    variants_extend=variants_extend,
                     trim=(-5, None)
                 )
             else:
                 result = rsv_unit.get_result(
                     version=_kwargs['version'],
-                    extend_variants=extend_variants
+                    variants_extend=variants_extend
                 )
             return result
 
@@ -126,9 +126,9 @@ class AbsAssetQuery(object):
             )
             if results:
                 for i_result in results:
-                    extend_variants = rsv_unit.get_extend_variants(i_result)
+                    variants_extend = rsv_unit.get_extend_variants(i_result)
                     lis.append(
-                        (i_result, extend_variants)
+                        (i_result, variants_extend)
                     )
         return lis
 

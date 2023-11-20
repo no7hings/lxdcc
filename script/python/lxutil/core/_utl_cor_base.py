@@ -46,7 +46,7 @@ class SubProcessRunner(object):
     def execute_with_result(cls, cmd, **sub_progress_kwargs):
         bsc_core.Log.trace_method_result(
             'sub-process',
-            'start for: `{}`'.format(cmd.decode('utf-8'))
+            'start for: `{}`'.format(cmd)
         )
         bsc_core.SubProcessMtd.execute_with_result(
             cmd, **sub_progress_kwargs

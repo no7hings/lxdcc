@@ -10,7 +10,7 @@ class VertexColorBaker(object):
         self._stage_opt = usd_core.UsdStageOpt()
         self._stage_opt.append_sublayer(file_path)
 
-        for i_prim in self._stage_opt.get_all_mesh_prims():
+        for i_prim in self._stage_opt.get_all_mesh_objs():
             i_key = i_prim.GetPath().pathString.split('/')[-1]
             i_image_file_path = image_mapper[i_key]
             i_mesh_opt = usd_core.UsdMeshOpt(i_prim)

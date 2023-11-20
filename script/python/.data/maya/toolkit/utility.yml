@@ -45,7 +45,7 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxmaya_gui.panel.pnl_widgets as mya_pnl_widgets; mya_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+                    click_command: ''
                 #
                 switch_color_spaces:
                     enable: True

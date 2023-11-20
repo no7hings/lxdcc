@@ -28,7 +28,7 @@ class ScpInstance(object):
         grow_usd_stage_opt = usd_core.UsdStageOpt()
 
         grow_usd_stage_opt.append_sublayer(grow_usd_file_path)
-        mesh_prims = grow_usd_stage_opt.get_all_mesh_prims()
+        mesh_prims = grow_usd_stage_opt.get_all_mesh_objs()
 
         cache_usd_opt = usd_core.UsdStageOpt()
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(mesh_prims), label='generator grow cache') as g_p:
@@ -59,7 +59,7 @@ class ScpInstance(object):
     ):
         grow_usd_stage_opt = usd_core.UsdStageOpt(grow_usd_file_path)
         instance_usd_stage_opt = usd_core.UsdStageOpt(instance_usd_file_path)
-        mesh_prims = grow_usd_stage_opt.get_all_mesh_prims()
+        mesh_prims = grow_usd_stage_opt.get_all_mesh_objs()
         mesh_opt_dict = {}
         for i_mesh_prim in mesh_prims:
             i_mesh_opt = usd_core.UsdMeshOpt(i_mesh_prim)
@@ -70,7 +70,7 @@ class ScpInstance(object):
         image_opt = usd_core.ImageOpt(image_file_path)
 
         color_dict = {}
-        instance_prims = instance_usd_stage_opt.get_all_instance_prims()
+        instance_prims = instance_usd_stage_opt.get_all_instance_objs()
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(instance_prims), label='generator instance cache') as g_p:
             for i_seq, i_instance_prim in enumerate(instance_prims):
                 i_instance_opt = usd_core.UsdInstancerOpt(i_instance_prim)

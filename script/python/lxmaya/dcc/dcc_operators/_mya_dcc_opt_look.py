@@ -6,8 +6,6 @@ import collections
 
 from lxbasic import bsc_core
 
-from lxutil import utl_core
-
 from lxarnold import and_configure
 
 from lxmaya import ma_configure, ma_core

@@ -196,7 +196,7 @@ class DccPathDagOpt(object):
 
     def __init__(self, path):
         self.__pathsep = path[0]
-        self.__path = path
+        self.__path_text = path
 
     def get_pathsep(self):
         return self.__pathsep
@@ -204,19 +204,19 @@ class DccPathDagOpt(object):
     pathsep = property(get_pathsep)
 
     def get_path(self):
-        return self.__path
+        return self.__path_text
 
     path = property(get_path)
 
     def get_name(self):
         return DccPathDagMtd.get_dag_name(
-            path=self.__path, pathsep=self.__pathsep
+            path=self.__path_text, pathsep=self.__pathsep
         )
 
     name = property(get_name)
 
     def set_name(self, name):
-        self.__path = self.get_path_as_new_name(name)
+        self.__path_text = self.get_path_as_new_name(name)
 
     def get_path_as_new_name(self, name):
         parent = self.get_parent_path()
@@ -234,7 +234,7 @@ class DccPathDagOpt(object):
         )
 
     def get_value(self):
-        return self.__path
+        return self.__path_text
 
     value = property(get_value)
 
@@ -246,12 +246,12 @@ class DccPathDagOpt(object):
 
     def get_parent_path(self):
         return DccPathDagMtd.get_dag_parent_path(
-            path=self.__path, pathsep=self.__pathsep
+            path=self.__path_text, pathsep=self.__pathsep
         )
 
     def parent_to_path(self, path):
         # noinspection PyAugmentAssignment
-        self.__path = path+self.__path
+        self.__path_text = path+self.__path_text
 
     def get_ancestor_paths(self):
         return self.get_component_paths()[1:]
@@ -268,7 +268,7 @@ class DccPathDagOpt(object):
 
     def get_component_paths(self):
         return DccPathDagMtd.get_dag_component_paths(
-            path=self.__path, pathsep=self.__pathsep
+            path=self.__path_text, pathsep=self.__pathsep
         )
 
     def get_components(self):
@@ -323,7 +323,7 @@ class DccPathDagOpt(object):
 
     def get_plant_rgb(self, maximum=255):
         for k, v in self.PLANT_HSV_MAPPER.items():
-            if fnmatch.filter([self.__path], '*{}*'.format(k)):
+            if fnmatch.filter([self.__path_text], '*{}*'.format(k)):
                 return _bsc_cor_raw.RawColorMtd.hsv2rgb(
                     v[0], v[1], v[2], maximum
                 )
@@ -332,26 +332,34 @@ class DccPathDagOpt(object):
     def generate_child(self, name):
         return self.__class__(
             DccPathDagMtd.get_dag_child_path(
-                self.__path, name, pathsep=self.__pathsep
+                self.__path_text, name, pathsep=self.__pathsep
             )
         )
 
     def get_depth(self):
         return len(
             DccPathDagMtd.get_dag_args(
-                self.__path,
+                self.__path_text,
                 pathsep=self.__pathsep
             )
         )
 
     def __str__(self):
-        return self.__path
+        return self.__path_text
 
     def __repr__(self):
         return self.__str__()
 
     def to_string(self):
-        return self.__path
+        return self.__path_text
+
+    def to_dcc_path(self):
+        return re.sub(r'/(\d+)([^/]+)', lambda x: '/_{}{}'.format(x.group(1), x.group(2)), self.__path_text)
+
+    def to_dcc(self):
+        return self.__class__(
+            self.to_dcc_path()
+        )
 
 
 class DccPathMapOpt(object):
@@ -434,7 +442,7 @@ class DccPortDagMtd(object):
 class DccPortDagOpt(object):
 
     def __init__(self, path, pathsep='.'):
-        self.__path = path
+        self.__path_text = path
         self.__pathsep = pathsep
 
     def get_pathsep(self):
@@ -443,13 +451,13 @@ class DccPortDagOpt(object):
     pathsep = property(get_pathsep)
 
     def get_path(self):
-        return self.__path
+        return self.__path_text
 
     path = property(get_path)
 
     def get_name(self):
         return DccPortDagMtd.get_dag_name(
-            path=self.__path, pathsep=self.__pathsep
+            path=self.__path_text, pathsep=self.__pathsep
         )
 
     def get_is_top_level(self):
@@ -457,7 +465,7 @@ class DccPortDagOpt(object):
 
     def get_component_paths(self):
         return DccPortDagMtd.get_dag_component_paths(
-            path=self.__path, pathsep=self.__pathsep
+            path=self.__path_text, pathsep=self.__pathsep
         )
 
     def get_components(self):
@@ -465,7 +473,7 @@ class DccPortDagOpt(object):
 
     def get_parent_path(self):
         return DccPortDagMtd.get_dag_parent_path(
-            path=self.__path, pathsep=self.__pathsep
+            path=self.__path_text, pathsep=self.__pathsep
         )
 
     def get_parent(self):
@@ -479,10 +487,10 @@ class DccPortDagOpt(object):
         return self.get_component_paths()[1:]
 
     def to_string(self):
-        return self.__path
+        return self.__path_text
 
     def __str__(self):
-        return self.__path
+        return self.__path_text
 
     def __repr__(self):
         return self.__str__()

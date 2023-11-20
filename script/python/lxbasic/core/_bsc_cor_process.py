@@ -107,7 +107,7 @@ class SubProcessMtd(object):
 
     @classmethod
     def execute_with_result_in_windows(cls, cmd, **kwargs):
-        cmd = cmd.replace("&", "^&")
+        cmd = re.sub(r'(?<!&)&(?!&)', '^&', cmd)
         #
         clear_environ = kwargs.get('clear_environ', False)
         if clear_environ == 'auto':
@@ -223,7 +223,7 @@ class SubProcessMtd(object):
             # noinspection PyBroadException
             try:
                 print(return_line.encode('utf-8').rstrip())
-            except:
+            except Exception:
                 pass
         #
         retcode = s_p.poll()
@@ -262,6 +262,17 @@ class SubProcessMtd(object):
         )
         t_0.start()
         # t_0.join()
+
+    @classmethod
+    def execute_with_result_use_thread(cls, cmd, **kwargs):
+        t_0 = threading.Thread(
+            target=functools.partial(
+                cls.execute_with_result,
+                cmd=cmd,
+                **kwargs
+            )
+        )
+        t_0.start()
 
     @classmethod
     def execute_as_block(cls, cmd, **kwargs):
@@ -355,6 +366,27 @@ class SubProcessMtd(object):
             # close_fds=True,
             universal_newlines=True,
             stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=cls.NO_WINDOW,
+        )
+        #
+        output, unused_err = s_p.communicate()
+        #
+        if s_p.returncode != 0:
+            for i in output.decode('utf-8').splitlines():
+                sys.stderr.write(i+'\n')
+            raise subprocess.CalledProcessError(s_p.returncode, cmd)
+        s_p.wait()
+        return output.decode('utf-8').splitlines()
+
+    @classmethod
+    def execute_(cls, cmd):
+        s_p = subprocess.Popen(
+            cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.STDOUT,
             stderr=subprocess.STDOUT,
             startupinfo=cls.NO_WINDOW,
         )

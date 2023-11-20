@@ -44,5 +44,5 @@ central:
                     type: PrxPressItem
                     path: <...path>/<..key>
                     click_method: ''
-                    click_command: 'import lxkatana_gui.panel.pnl_widgets as ktn_pnl_widgets; ktn_pnl_widgets.SceneTextureManagerPanel().set_window_show()'
+                    click_command: ')'
 

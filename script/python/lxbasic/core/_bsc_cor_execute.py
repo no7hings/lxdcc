@@ -123,7 +123,6 @@ class ExcExtra(object):
         if _bsc_cor_utility.PlatformMtd.get_is_linux():
             # cmds = ['bash', '-l', '-c', file_path]
             cmds = ['gnome-terminal', '-t', kwargs.get('title') or 'untitled', '--', 'bash', '-l', '-c', cmd]
-            print ' '.join(cmds)
             _bsc_cor_process.SubProcessMtd.execute(
                 ' '.join(cmds)
             )

@@ -108,13 +108,13 @@ class UsdStageOpt(UsdBasic):
                 u'file="{}" is non-exist'.format(file_path)
             )
 
-    def set_default_prim(self, obj_path):
-        prim = self._usd_stage.GetPrimAtPath(obj_path)
+    def set_default_prim(self, path_text):
+        prim = self._usd_stage.GetPrimAtPath(path_text)
         self._usd_stage.SetDefaultPrim(prim)
         #
         bsc_core.Log.trace_method_result(
             'default-prim set',
-            u'obj="{}"'.format(obj_path)
+            u'obj="{}"'.format(path_text)
         )
 
     def get_default_prim(self):
@@ -136,56 +136,70 @@ class UsdStageOpt(UsdBasic):
         #     'file-path: "{}"'.format(file_path)
         # )
 
-    def set_obj_create_as_override(self, obj_path):
+    def set_obj_create_as_override(self, path_text):
         bsc_core.Log.trace_method_result(
             'override-prim create',
-            u'obj="{}"'.format(obj_path)
+            u'obj="{}"'.format(path_text)
         )
-        return self._usd_stage.OverridePrim(obj_path)
+        return self._usd_stage.OverridePrim(path_text)
 
-    def get_obj_is_exists(self, obj_path):
-        return self._usd_stage.GetPrimAtPath(obj_path).IsValid()
+    def get_obj_is_exists(self, path_text):
+        return self._usd_stage.GetPrimAtPath(path_text).IsValid()
 
-    def get_obj(self, obj_path):
-        return self._usd_stage.GetPrimAtPath(obj_path)
+    def get_obj(self, path_text):
+        return self._usd_stage.GetPrimAtPath(path_text)
 
-    def get_exists_obj(self, obj_path):
-        _ = self._usd_stage.GetPrimAtPath(obj_path)
+    def get_exists_obj(self, path_text):
+        _ = self._usd_stage.GetPrimAtPath(path_text)
         if _.IsValid():
             return _
 
-    def create_obj(self, obj_path, type_name=''):
-        dag_path_opt = bsc_core.DccPathDagOpt(obj_path)
-        paths = dag_path_opt.get_component_paths()
+    def create_obj(self, path_text, type_name=''):
+        path_opt = bsc_core.DccPathDagOpt(path_text)
+        paths = path_opt.get_component_paths()
         paths.reverse()
         for i_path in paths:
             if i_path != '/':
-                if self._usd_stage.GetPrimAtPath(obj_path).IsValid() is False:
+                if self._usd_stage.GetPrimAtPath(path_text).IsValid() is False:
                     self._usd_stage.DefinePrim(i_path, type_name)
-        return self.get_obj(obj_path)
+        return self.get_obj(path_text)
 
-    def create_one(self, obj_path, type_name=''):
+    def create_one(self, path_text, type_name=''):
         return self._usd_stage.DefinePrim(
-            obj_path, type_name
+            path_text, type_name
         )
 
-    def copy_many_from(self, usd_prim):
+    def copy_dag_from(self, usd_prim):
         usd_stage = usd_prim.GetStage()
-        obj_path = usd_prim.GetPath().pathString
-        dag_path_opt = bsc_core.DccPathDagOpt(obj_path)
-        paths = dag_path_opt.get_component_paths()
+        path_text = usd_prim.GetPath().pathString
+        path_opt = bsc_core.DccPathDagOpt(path_text)
+        paths = path_opt.get_component_paths()
         paths.reverse()
         for i_path in paths:
             if i_path != '/':
-                if self._usd_stage.GetPrimAtPath(obj_path).IsValid() is False:
-                    self._usd_stage.DefinePrim(
-                        i_path, usd_stage.GetPrimAtPath(i_path).GetTypeName()
-                    )
-        return self.get_obj(obj_path)
+                if self._usd_stage.GetPrimAtPath(path_text).IsValid() is False:
+                    i_prim = usd_stage.GetPrimAtPath(i_path)
+                    i_type_name = i_prim.GetTypeName()
+                    i_prim_new = self._usd_stage.DefinePrim(i_path, i_type_name)
+                    self.copy_prim_attributes_fnc(i_prim, i_prim_new)
+        return self.get_obj(path_text)
 
-    def copy_one_from(self, usd_prim):
+    @staticmethod
+    def copy_prim_attributes_fnc(prim, prim_new):
+        attributes = prim.GetAuthoredAttributes()
+        for i_attribute in attributes:
+            i_attribute_new = prim_new.CreateAttribute(
+                i_attribute.GetName(), i_attribute.GetTypeName(), i_attribute.IsCustom(), i_attribute.GetVariability()
+            )
+            i_attribute_new.Set(i_attribute.Get())
+
+    def copy_one_from(self, usd_prim, path_text=None, type_name=None):
+        if path_text is None:
+            path_text = usd_prim.GetPath().pathString
+        if type_name is None:
+            type_name = usd_prim.GetTypeName()
         return self._usd_stage.DefinePrim(
-            usd_prim.GetPath().pathString, usd_prim.GetTypeName()
+            path_text, type_name
         )
 
     def set_root_create(self, root, override=False):
@@ -211,10 +225,10 @@ class UsdStageOpt(UsdBasic):
             i_usd_prim_opt = UsdPrimOpt(i_usd_prim)
             list_.append(i_usd_prim_opt.get_path())
         #
-        dag_path_opt = bsc_core.DccPathDagOpt(regex)
+        path_opt = bsc_core.DccPathDagOpt(regex)
         #
         child_paths = bsc_core.DccPathDagMtd.find_dag_child_paths(
-            dag_path_opt.get_parent_path(), list_
+            path_opt.get_parent_path(), list_
         )
         #
         return [
@@ -441,13 +455,13 @@ class UsdStageOpt(UsdBasic):
         #
         usd_location.GetReferences().AddReference(file_path, location_source)
 
-    def get_all_mesh_prims(self):
+    def get_all_mesh_objs(self):
         return [i for i in self._usd_stage.TraverseAll() if i.IsA(UsdGeom.Mesh)]
 
-    def get_all_instance_prims(self):
+    def get_all_instance_objs(self):
         return [i for i in self._usd_stage.TraverseAll() if i.IsA(UsdGeom.PointInstancer)]
 
-    def get_all_points_prims(self):
+    def get_all_points_objs(self):
         return [i for i in self._usd_stage.TraverseAll() if i.IsA(UsdGeom.Points)]
 
     def get_reference_dict(self):
@@ -735,7 +749,7 @@ class UsdPrimOpt(object):
         r = b_box.GetRange()
         return r.GetMin(), r.GetMidpoint(), r.GetSize()
 
-    def get_references(self):
+    def get_all_references(self):
         list_ = []
         _ = self._usd_prim.GetPrimStack()
         for i in _:
@@ -858,70 +872,6 @@ class UsdBase(object):
             list_.append(rows)
         #
         return Gf.Matrix4d(list_)
-
-
-class UsdInstancerOpt(UsdPrimOpt):
-    def __init__(self, usd_prim):
-        self._usd_prim = usd_prim
-        self._usd_fnc = UsdGeom.PointInstancer(self._usd_prim)
-        super(UsdInstancerOpt, self).__init__(self._usd_prim)
-
-    def get_proto_prims(self):
-        return map(
-            lambda x: self._usd_prim.GetStage().GetPrimAtPath(x),
-            self._usd_fnc.GetPrototypesRel().GetForwardedTargets()
-        )
-
-    def clear_proto(self):
-        self._usd_fnc.GetPrototypesRel().BlockTargets()
-
-    def set_proto_prims(self, prims):
-        for i in prims:
-            self._usd_fnc.GetPrototypesRel().AddTarget(i.GetPath())
-
-    def get_positions(self):
-        p = self._usd_fnc.GetPositionsAttr()
-        if p:
-            return p.Get()
-
-    def set_positions(self, values):
-        p = self._usd_fnc.GetPositionsAttr()
-        if not p:
-            p = self._usd_fnc.CreatePositionsAttr()
-        p.Set(values)
-
-    def get_orientations(self):
-        p = self._usd_fnc.GetOrientationsAttr()
-        if p:
-            return p.Get()
-
-    def set_orientations(self, values):
-        p = self._usd_fnc.GetOrientationsAttr()
-        if not p:
-            p = self._usd_fnc.CreateOrientationsAttr()
-        p.Set(values)
-
-    def get_scales(self):
-        p = self._usd_fnc.GetScalesAttr()
-        if p:
-            return p.Get()
-
-    def set_scales(self, values):
-        p = self._usd_fnc.GetScalesAttr()
-        if not p:
-            p = self._usd_fnc.CreateScalesAttr()
-        p.Set(values)
-
-    def get_proto_indices(self):
-        p = self._usd_fnc.GetProtoIndicesAttr()
-        if p:
-            return p.Get()
-
-    def set_proto_indices(self, values):
-        p = self._usd_fnc.GetProtoIndicesAttr()
-        if not p:
-            p = self._usd_fnc.CreateProtoIndicesAttr()
-        p.Set(values)
 
 
 class UsdGeometryOpt(UsdPrimOpt):
@@ -1075,6 +1025,69 @@ class UsdGeometryOpt(UsdPrimOpt):
                 UsdGeom.Tokens.uniform
             )
 
+        p.Set(values)
+
+
+class UsdInstancerOpt(UsdGeometryOpt):
+    def __init__(self, usd_prim):
+        super(UsdInstancerOpt, self).__init__(usd_prim)
+        self._usd_fnc = UsdGeom.PointInstancer(self._usd_prim)
+
+    def get_proto_prims(self):
+        return map(
+            lambda x: self._usd_prim.GetStage().GetPrimAtPath(x),
+            self._usd_fnc.GetPrototypesRel().GetForwardedTargets()
+        )
+
+    def clear_proto(self):
+        self._usd_fnc.GetPrototypesRel().BlockTargets()
+
+    def set_proto_prims(self, prims):
+        for i in prims:
+            self._usd_fnc.GetPrototypesRel().AddTarget(i.GetPath())
+
+    def get_positions(self):
+        p = self._usd_fnc.GetPositionsAttr()
+        if p:
+            return p.Get()
+
+    def set_positions(self, values):
+        p = self._usd_fnc.GetPositionsAttr()
+        if not p:
+            p = self._usd_fnc.CreatePositionsAttr()
+        p.Set(values)
+
+    def get_orientations(self):
+        p = self._usd_fnc.GetOrientationsAttr()
+        if p:
+            return p.Get()
+
+    def set_orientations(self, values):
+        p = self._usd_fnc.GetOrientationsAttr()
+        if not p:
+            p = self._usd_fnc.CreateOrientationsAttr()
+        p.Set(values)
+
+    def get_scales(self):
+        p = self._usd_fnc.GetScalesAttr()
+        if p:
+            return p.Get()
+
+    def set_scales(self, values):
+        p = self._usd_fnc.GetScalesAttr()
+        if not p:
+            p = self._usd_fnc.CreateScalesAttr()
+        p.Set(values)
+
+    def get_proto_indices(self):
+        p = self._usd_fnc.GetProtoIndicesAttr()
+        if p:
+            return p.Get()
+
+    def set_proto_indices(self, values):
+        p = self._usd_fnc.GetProtoIndicesAttr()
+        if not p:
+            p = self._usd_fnc.CreateProtoIndicesAttr()
         p.Set(values)
 
 

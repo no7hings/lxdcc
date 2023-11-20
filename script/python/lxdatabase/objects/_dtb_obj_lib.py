@@ -865,13 +865,28 @@ class DtbVersionOpt(object):
     def get_types(self):
         return self._dtb_opt.get_resource_types(self.get_resource().path)
 
-    def get_geometry_usd_file(self):
+    def get_geometry_usd_file(self, force=False):
         p = self._dtb_opt.get_pattern(keyword='geometry-usd-file')
         p_o = bsc_core.PtnParseOpt(p)
         path = p_o.set_update_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
-        return bsc_core.Resource.get('asset/library/geo/sphere.usda')
+        if force is True:
+            return bsc_core.Resource.get('asset/library/geo/sphere.usda')
+
+    def get_geometry_abc_file(self):
+        p = self._dtb_opt.get_pattern(keyword='geometry-abc-file')
+        p_o = bsc_core.PtnParseOpt(p)
+        path = p_o.set_update_to(**self._variants).get_value()
+        if bsc_core.StgPathMtd.get_is_exists(path):
+            return path
+
+    def get_geometry_fbx_file(self):
+        p = self._dtb_opt.get_pattern(keyword='geometry-fbx-file')
+        p_o = bsc_core.PtnParseOpt(p)
+        path = p_o.set_update_to(**self._variants).get_value()
+        if bsc_core.StgPathMtd.get_is_exists(path):
+            return path
 
     def get_look_preview_usd_file(self):
         p = self._dtb_opt.get_pattern(keyword='look-preview-usd-file')

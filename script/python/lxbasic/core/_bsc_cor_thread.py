@@ -161,13 +161,13 @@ class TrdCommandPool(threading.Thread):
     def get_status(self):
         return self._status
 
-    def set_kill(self):
+    def do_kill(self):
         self.__set_status_update(
             self.Status.Killed
         )
         self._is_kill = True
 
-    def set_quit(self):
+    def do_quit(self):
         pass
 
 
@@ -242,7 +242,7 @@ class TrdCommand(threading.Thread):
     def set_stopped(self):
         self.__is_stopped = True
 
-    def set_kill(self):
+    def do_kill(self):
         self.__is_killed = True
 
     def run(self):
@@ -487,7 +487,7 @@ class TrdFncsChainPool(object):
 
             threads[0].start()
 
-        def set_kill(self):
+        def do_kill(self):
             self._is_kill = True
 
     def __init__(self):
@@ -523,7 +523,7 @@ class TrdFncsChainPool(object):
 
     def kill_all(self):
         for i_index, i in enumerate(self._threads):
-            i.set_kill()
+            i.do_kill()
             del self._threads[i_index]
 
     def __update_finish(self, index):

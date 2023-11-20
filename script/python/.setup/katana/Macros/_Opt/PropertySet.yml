@@ -110,7 +110,7 @@ main:
             
             function filter_fnc(atr_s, p)
                 local all_atr_ss = {}
-                local atr = Interface.GetAttr(atr_s)
+                local atr = Interface.GetGlobalAttr(atr_s)
                 local c = atr:getNumberOfChildren()
                 local re_p = string.gsub(p, '*', '.*')
                 for j=0, c-1 do
@@ -138,7 +138,7 @@ main:
             
             function set_fnc(atr_ss, value)
                 for i, i_atr_s in ipairs(atr_ss) do
-                    local i_atr = Interface.GetAttr(i_atr_s)
+                    local i_atr = Interface.GetGlobalAttr(i_atr_s)
                     if i_atr ~= nil then
                         if (Attribute.IsInt(i_atr)) then
                             local atr_value = tonumber(value)

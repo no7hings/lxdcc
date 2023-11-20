@@ -4,8 +4,6 @@ import maya.cmds as cmds
 
 from lxbasic import bsc_core
 
-from lxutil import utl_core
-
 from lxutil.fnc import utl_fnc_obj_abs
 
 from lxmaya import ma_core
@@ -456,13 +454,6 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         mya_dcc_objects.Scene.set_render_resolution(
             *render_resolution
         )
-
-    def set_run_with_window(self):
-        import lxutil_gui.panel.widgets as utl_pnl_widgets
-
-        w = utl_pnl_widgets.FncPanel()
-
-        w.set_window_show()
 
     def set_run(self):
         import lxresolver.commands as rsv_commands
@@ -928,10 +919,4 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
 
 
 if __name__ == '__main__':
-    import lxmaya
-
-    lxmaya.set_reload()
-
-    import lxmaya.fnc.builders as mya_fnc_builders
-
-    mya_fnc_builders.AssetBuilder(option=dict(project='cjd', asset='huayao')).set_run_with_window()
+    pass

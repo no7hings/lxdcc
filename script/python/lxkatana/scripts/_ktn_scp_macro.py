@@ -1285,7 +1285,7 @@ class LxRenderer(object):
 
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
 
-        w = smt_gui_widgets.PnlRenderSubmitterForAsset(
+        w = smt_gui_widgets.PnlSubmitterForAssetRender(
             hook_option='file={}'.format(
                 file_path
             )

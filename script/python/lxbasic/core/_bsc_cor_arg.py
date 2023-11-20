@@ -186,6 +186,9 @@ class ArgDictStringOpt(object):
             **self.__dict
         )
 
+    def to_dict(self):
+        return self.__dict
+
     def __str__(self):
         return json.dumps(
             self.__dict,

@@ -474,9 +474,9 @@ class StgUserMtd(object):
 
     @classmethod
     def get_windows_user_directory(cls):
-        return '{}/{}/.lynxi'.format(
+        return '{}{}/.lynxi'.format(
             os.environ.get('HOMEDRIVE', 'c:'),
-            os.environ.get('HOMEPATH', 'c:/temp')
+            os.environ.get('HOMEPATH', '/temp')
         ).replace('\\', '/')
 
     @classmethod
@@ -1079,6 +1079,11 @@ class StgPathOpt(object):
         return 'directory'
 
     type_name = property(get_type_name)
+
+    def get_type(self):
+        return self.get_type_name()
+
+    type = property(get_type)
 
     def get_path(self):
         return self._path

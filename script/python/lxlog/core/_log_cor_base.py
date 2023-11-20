@@ -68,9 +68,9 @@ class LogBase(object):
 
     @classmethod
     def get_windows_user_directory(cls):
-        return '{}/{}/.lynxi'.format(
+        return '{}{}/.lynxi'.format(
             os.environ.get('HOMEDRIVE', 'c:'),
-            os.environ.get('HOMEPATH', 'c:/temp')
+            os.environ.get('HOMEPATH', '/temp')
         ).replace('\\', '/')
 
     @classmethod
@@ -188,6 +188,10 @@ class Log(object):
     def error(cls, text):
         if cls.ENABLE is True:
             sys.stderr.write(text+'\n')
+
+    @classmethod
+    def trace(cls, *args):
+        cls.trace_result(*args)
 
     @classmethod
     def trace_result(cls, *args):

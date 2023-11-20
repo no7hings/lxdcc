@@ -244,13 +244,5 @@ def get_menu_content_by_hook_options_(hook_options):
 
 
 if __name__ == '__main__':
-    c = get_menu_content_by_hook_options_(
-        [
-            {
-                'option_hook_key=dtb-panels/resource-library&category=texture': {'gui_parent': '/Asset', 'gui_icon_name': 'window/loader'}
-            }
-        ]
-    )
-
-    print c.get_value()
+    pass
 

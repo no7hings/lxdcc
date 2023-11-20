@@ -262,6 +262,7 @@ class AbsSsnGener(
                 'gnome-terminal', '-t', '"{}"'.format(session.gui_configure.get('name')),
                 '-e "bash -l {}"'.format(file_path)
             ]
+
             bsc_core.SubProcessMtd.execute(
                 ' '.join(cmds)
             )
@@ -282,7 +283,6 @@ class AbsSsnGener(
     def execute_shell_script_use_terminal(cmd, **kwargs):
         session = kwargs['session']
         if bsc_core.PlatformMtd.get_is_linux():
-            # cmds = ['bash', '-l', '-c', file_path]
             cmds = ['gnome-terminal', '-t', session.gui_configure.get('name'), '--', 'bash', '-l', '-c', cmd]
             bsc_core.SubProcessMtd.execute(
                 ' '.join(cmds)

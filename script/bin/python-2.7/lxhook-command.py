@@ -64,8 +64,6 @@ def __execute_with_option(option):
 def __execute_hook(option):
     from lxbasic import bsc_core
     #
-    from lxutil import utl_core
-    #
     import lxbasic.extra.methods as bsc_etr_methods
     #
     import lxsession.commands as ssn_commands
@@ -124,7 +122,7 @@ def __execute_hook(option):
             for k, v in hook_environs_extend:
                 environs_extend[k] = v
         # run command by subprocess
-        utl_core.SubProcessRunner.set_run_with_result_use_thread(
+        bsc_core.SubProcessMtd.execute_with_result_use_thread(
             opt_cmd, environs_extend=environs_extend
         )
 

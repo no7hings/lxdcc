@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxsession.core as ssn_core
 
@@ -42,34 +42,9 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvShotgunHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_stg_task_create(self):
+    def create_stg_task(self):
         rsv_task = self._rsv_task
         _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task).create_stg_task()
-
-    def set_qc_stg_task_create(self):
-        import copy
-
-        import lxresolver.methods as rsv_methods
-
-        #
-        kwargs = self._rsv_scene_properties.value
-        step = kwargs['step']
-        task = kwargs['task']
-        #
-        kwargs_qc = copy.copy(kwargs)
-        kwargs_qc['step'] = '{}_qc'.format(step)
-        kwargs_qc['task'] = '{}_qc'.format(task)
-        #
-        rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
-        if rsv_task_qc is not None:
-            pass
-        else:
-            rsv_methods.RsvPermissionMtd.set_entity_task_create(
-                **kwargs_qc
-            )
-        #
-        rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
-        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).create_stg_task()
 
     def create_stg_version(self):
         rsv_task = self._rsv_task
@@ -106,7 +81,32 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             create_shotgun_playlists=create_shotgun_playlists
         )
 
-    def execute_qc_stg_version_create(self):
+    def create_qc_stg_task(self):
+        import copy
+
+        import lxresolver.scripts as rsv_scripts
+
+        #
+        kwargs = self._rsv_scene_properties.value
+        step = kwargs['step']
+        task = kwargs['task']
+        #
+        kwargs_qc = copy.copy(kwargs)
+        kwargs_qc['step'] = '{}_qc'.format(step)
+        kwargs_qc['task'] = '{}_qc'.format(task)
+        #
+        rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
+        if rsv_task_qc is not None:
+            pass
+        else:
+            rsv_scripts.RsvPermissionMtd.set_entity_task_create(
+                **kwargs_qc
+            )
+        #
+        rsv_task_qc = self._resolver.get_rsv_task(**kwargs_qc)
+        _stg_rsv_obj_utility.RsvStgTaskOpt(rsv_task_qc).create_stg_task()
+
+    def create_qc_stg_version(self):
         import copy
 
         #
@@ -187,7 +187,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def execute_version_lock(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         #
         rsv_scene_properties = self._rsv_scene_properties
@@ -237,7 +237,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         scene_file_path = scene_file_rsv_unit.get_result(version=version)
 
-        file_properties = scene_file_rsv_unit.get_properties_by_result(scene_file_path)
+        file_properties = scene_file_rsv_unit.generate_properties_by_result(scene_file_path)
 
         stg_connector.set_stg_published_file_create(
             file=scene_file_path, **file_properties.value
@@ -273,7 +273,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             model_geometry_usd_hi_file_path = model_geometry_usd_hi_file_rsv_unit.get_result(version='latest')
             if model_geometry_usd_hi_file_path:
-                file_properties = model_geometry_usd_hi_file_rsv_unit.get_properties_by_result(
+                file_properties = model_geometry_usd_hi_file_rsv_unit.generate_properties_by_result(
                     model_geometry_usd_hi_file_path
                     )
                 stg_model_version = stg_connector.get_stg_version(**file_properties.value)
@@ -336,7 +336,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def execute_qc_review_mov_export(self, version_qc):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -438,7 +438,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     # register
     def execute_new_registry_json_create(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         #
         rsv_scene_properties = self._rsv_scene_properties

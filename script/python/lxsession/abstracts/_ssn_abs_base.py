@@ -3,7 +3,7 @@ import lxbasic.core as bsc_core
 
 import lxbasic.session.core as bsc_ssn_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import lxsession.core as ssn_core
 
@@ -216,7 +216,7 @@ class AbsSsnOptionGui(
             self.__set_option_completion_()
             #
             self._set_option_execute_def_init_(
-                self._configure.get_content('hook_option.deadline')
+                self._configure.get_as_content('hook_option.deadline')
             )
 
     def __set_option_completion_(self):
@@ -331,7 +331,7 @@ class AbsSsnOptionMethod(
         self._set_option_completion_()
         #
         self._set_option_execute_def_init_(
-            self._configure.get_content('hook_option.deadline')
+            self._configure.get_as_content('hook_option.deadline')
         )
 
     def _set_option_completion_(self):
@@ -376,7 +376,7 @@ class AbsSsnOptionMethod(
         )
         main_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = ctt_objects.Configure(value=f)
+        c = ctt_core.Content(value=f)
         #
         dependent_option_hook_keys = hook_option_opt.get(
             'dependencies', as_array=True
@@ -398,7 +398,7 @@ class AbsSsnOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = ctt_objects.Configure(value=f)
+        c = ctt_core.Content(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -417,7 +417,7 @@ class AbsSsnOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = ctt_objects.Configure(value=f)
+        c = ctt_core.Content(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -776,7 +776,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = ctt_objects.Configure(value=f)
+        c = ctt_core.Content(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -800,7 +800,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
         option_hook_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = ctt_objects.Configure(value=f)
+        c = ctt_core.Content(value=f)
         #
         keys = [option_hook_key]
         option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
@@ -838,7 +838,7 @@ class AbsSsnRsvTaskOptionMethod(
         )
         main_key = hook_option_opt.get('option_hook_key')
         f = self.get_batch_file_path()
-        c = ctt_objects.Configure(value=f)
+        c = ctt_core.Content(value=f)
         #
         dependent_option_hook_keys = hook_option_opt.get(
             'dependencies', as_array=True

@@ -4,7 +4,7 @@ from maya import cmds
 
 import fnmatch
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -287,7 +287,7 @@ class Modifier(object):
                 _method = fnc(*args, **kwargs)
                 return _method
             except Exception:
-                from lxbasic import bsc_core
+                import lxbasic.core as bsc_core
                 bsc_core.ExceptionMtd.set_print()
             #
             finally:
@@ -303,7 +303,7 @@ class Modifier(object):
                 _method = fnc(*args, **kwargs)
                 return _method
             except Exception:
-                from lxbasic import bsc_core
+                import lxbasic.core as bsc_core
                 bsc_core.LogException.trace()
                 raise
             #

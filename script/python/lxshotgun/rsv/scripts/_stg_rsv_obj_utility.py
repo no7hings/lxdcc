@@ -7,7 +7,7 @@ import datetime
 
 import six
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxwarp.shotgun.core as wrp_stg_core
 
@@ -154,7 +154,7 @@ class RsvStgTaskOpt(object):
         import lxbasic.extra.methods as bsc_etr_methods
         #
         branch = self._rsv_task.get('branch')
-        stg_version_kwargs = self._rsv_task.properties.copy_value
+        stg_version_kwargs = self._rsv_task.properties.value_as_copy
         stg_version_kwargs['version'] = version
         #
         stg_task_query = self._stg_connector.get_stg_task_query(

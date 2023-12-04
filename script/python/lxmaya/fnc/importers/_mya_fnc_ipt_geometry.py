@@ -17,17 +17,15 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 from lxmaya.fnc import mya_fnc_obj_core
 
-import lxusd.dcc.dcc_objects as usd_dcc_objects
-
 import lxusd.dcc.dcc_operators as usd_dcc_operators
 
-from lxusd import usd_configure, usd_core
+import lxusd.core as usd_core
 
 from lxutil import utl_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
@@ -74,16 +72,16 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             with bsc_core.LogProcessContext.create_as_bar(maximum=c, label='usd import') as l_p:
                 for i_usd_prim in self._usd_stage.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
-                    if i_usd_prim_type_name == usd_configure.ObjType.Xform:
+                    if i_usd_prim_type_name == usd_core.UsdNodeTypes.Xform:
                         mya_fnc_obj_core.FncUsdTransform(i_usd_prim, location=root_override).set_create()
-                    elif i_usd_prim_type_name == usd_configure.ObjType.Mesh:
+                    elif i_usd_prim_type_name == usd_core.UsdNodeTypes.Mesh:
                         mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
                     #
                     mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
                         port_match_patterns
                     )
                     #
-                    l_p.set_update()
+                    l_p.do_update()
 
     @classmethod
     def import_fnc(cls, usd_stage, root_override, port_match_patterns):
@@ -95,16 +93,16 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             with bsc_core.LogProcessContext.create(maximum=c, label='usd import') as g_p:
                 for i_usd_prim in usd_stage.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
-                    if i_usd_prim_type_name == usd_configure.ObjType.Xform:
+                    if i_usd_prim_type_name == usd_core.UsdNodeTypes.Xform:
                         mya_fnc_obj_core.FncUsdTransform(i_usd_prim, location=root_override).set_create()
-                    elif i_usd_prim_type_name == usd_configure.ObjType.Mesh:
+                    elif i_usd_prim_type_name == usd_core.UsdNodeTypes.Mesh:
                         mya_fnc_obj_core.FncUsdMesh(i_usd_prim, location=root_override).set_create()
                     #
                     mya_fnc_obj_core.FncUsdObj(i_usd_prim, location=root_override).set_customize_ports_create(
                         port_match_patterns
                         )
                     #
-                    g_p.set_update()
+                    g_p.do_update()
 
     @classmethod
     def create_root_fnc(cls, path, type_name):
@@ -199,13 +197,13 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             with bsc_core.LogProcessContext.create(maximum=c, label='usd uv-map import') as g_p:
                 for i_usd_prim in usd_state.TraverseAll():
                     i_usd_prim_type_name = i_usd_prim.GetTypeName()
-                    if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
+                    if i_usd_prim_type_name == usd_core.UsdNodeTypes.Mesh:
                         cls.create_mesh_uv_map_fnc(
                             i_usd_prim,
                             uv_map_face_vertices_contrast=uv_map_face_vertices_contrast
                         )
                     #
-                    g_p.set_update()
+                    g_p.do_update()
 
 
 class FncGeometryFbxImporter(utl_fnc_obj_abs.AbsFncOptionBase):
@@ -301,7 +299,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     PLUG_NAME = 'AbcImport'
     OBJ_PATHSEP = ma_configure.Util.OBJ_PATHSEP
 
-    def __init__(self, file_path, root=None, option=None):
+    def __init__(self, option=None):
         super(FncGeometryAbcImporter, self).__init__(option)
 
     def execute(self):
@@ -470,7 +468,7 @@ class DatabaseGeometryImporter(object):
         if self._selected_path:
             g_p = bsc_core.LogProcessContext(maximum=len(self._selected_path))
             for path in self._selected_path:
-                g_p.set_update()
+                g_p.do_update()
                 mesh = mya_dcc_objects.Mesh(path)
                 mesh_opt = mya_dcc_operators.MeshOpt(mesh)
                 if mesh_opt.get_shell_count() == 1:

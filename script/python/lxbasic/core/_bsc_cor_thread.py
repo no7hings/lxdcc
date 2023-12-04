@@ -1,9 +1,17 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
+import sys
+
+import six
 
 import threading
 
-from lxbasic.core import _bsc_cor_process
+import subprocess
+
+import functools
+
+from ..core import \
+    _bsc_cor_configure, \
+    _bsc_cor_process
 
 
 class TrdSignal(object):
@@ -30,7 +38,7 @@ class TrdCommandPool(threading.Thread):
     EVENT = threading.Event()
     LOCK = threading.Lock()
     #
-    Status = bsc_configure.Status
+    Status = _bsc_cor_configure.BscStatus
 
     def __init__(self, cmd, index=0):
         threading.Thread.__init__(self)
@@ -172,7 +180,7 @@ class TrdCommandPool(threading.Thread):
 
 
 class TrdCommand(threading.Thread):
-    Status = bsc_configure.Status
+    Status = _bsc_cor_configure.BscStatus
 
     def __init__(self, cmd):
         threading.Thread.__init__(self)
@@ -309,7 +317,7 @@ class TrdMethod(threading.Thread):
     EVENT = threading.Event()
     LOCK = threading.Lock()
     #
-    Status = bsc_configure.Status
+    Status = _bsc_cor_configure.BscStatus
 
     def __init__(self, fnc, index, *args, **kwargs):
         threading.Thread.__init__(self)
@@ -613,6 +621,9 @@ class TrdFncProcessing(threading.Thread):
 
 
 class TrdGainSignal(object):
+    THREAD_MAXIMUM = threading.Semaphore(1024)
+
+    # noinspection PyUnusedLocal
     def __init__(self, *args, **kwargs):
         self._methods = []
 
@@ -621,7 +632,7 @@ class TrdGainSignal(object):
 
     def send_emit(self, *args, **kwargs):
         if self._methods:
-            THREAD_MAXIMUM.acquire()
+            TrdGainSignal.THREAD_MAXIMUM.acquire()
             #
             ts = [threading.Thread(target=i_method, args=args, kwargs=kwargs) for i_method in self._methods]
             for t in ts:
@@ -629,7 +640,7 @@ class TrdGainSignal(object):
             for t in ts:
                 t.join()
             #
-            THREAD_MAXIMUM.release()
+            TrdGainSignal.THREAD_MAXIMUM.release()
 
 
 class TrdGain(threading.Thread):
@@ -720,7 +731,7 @@ class TrdGainStack(object):
 
 
 class TrdProcessMonitor(object):
-    Status = bsc_configure.Status
+    Status = _bsc_cor_configure.BscStatus
 
     def __init__(self, process):
         self._process = process
@@ -798,7 +809,7 @@ class TrdProcessMonitor(object):
         # signal.send_emit(*args, **kwargs)
         try:
             signal.send_emit(*args, **kwargs)
-        except:
+        except Exception:
             self.__set_error_occurred_()
             raise
 

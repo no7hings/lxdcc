@@ -1,9 +1,9 @@
 # coding:utf-8
 import six
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 from lxuniverse.abstracts import _unr_abs_base
 
@@ -16,7 +16,7 @@ class AbsPortBaseDef(object):
     def _init_port_base_def_(self, obj, type_path, port_path, port_assign):
         self._obj = obj
         if isinstance(type_path, six.string_types):
-            _type = self.obj.universe._get_type_(type_path)
+            _type = self.obj.universe._get_type(type_path)
         else:
             _type = type_path
         #
@@ -111,10 +111,10 @@ class AbsPortBaseDef(object):
 
     # port_assign
     def get_is_input_port(self):
-        return self.port_assign == unr_configure.PortAssign.INPUTS
+        return self.port_assign == unr_core.UnrPortAssign.INPUTS
 
     def get_is_output_port(self):
-        return self.port_assign == unr_configure.PortAssign.OUTPUTS
+        return self.port_assign == unr_core.UnrPortAssign.OUTPUTS
 
     # gain
     def _get_stack_key_(self):
@@ -127,7 +127,7 @@ class AbsPortBaseDef(object):
             'port_path': self.port_path,
             'element_index': element_index
         }
-        return unr_configure.Port.ELEMENT_PATH_FORMAT.format(**format_dict)
+        return unr_core.UnrPort.ELEMENT_PATH_FORMAT.format(**format_dict)
 
     def _get_channel_port_path_(self, channel_name):
         format_dict = {
@@ -135,7 +135,7 @@ class AbsPortBaseDef(object):
             'port_path': self.port_path,
             'channel_name': channel_name
         }
-        return unr_configure.Port.CHANNEL_PATH_FORMAT.format(**format_dict)
+        return unr_core.UnrPort.CHANNEL_PATH_FORMAT.format(**format_dict)
 
     def set_custom(self, boolean):
         self._is_custom = boolean
@@ -163,7 +163,7 @@ class AbsPortBaseDef(object):
             'port_path': port_path,
             'port_assign': port_assign
         }
-        return unr_configure.Port.PORT_TOKEN_FORMAT.format(**format_dict)
+        return unr_core.UnrPort.PORT_TOKEN_FORMAT.format(**format_dict)
 
     @classmethod
     def _get_channel_path_(cls, port_path, channel_name):
@@ -172,7 +172,7 @@ class AbsPortBaseDef(object):
             'port_path': port_path,
             'channel_name': channel_name
         }
-        return unr_configure.Port.CHANNEL_PATH_FORMAT.format(**format_dict)
+        return unr_core.UnrPort.CHANNEL_PATH_FORMAT.format(**format_dict)
 
     @property
     def parent(self):
@@ -700,7 +700,7 @@ class AbsPort(
         return False
 
     def to_properties(self):
-        p = ctt_objects.Properties(self)
+        p = ctt_core.Properties(self)
         p.set(
             'type', self.type_path
         )

@@ -7,11 +7,11 @@ import os
 
 import six
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxdatabase.core as dtb_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class DtbBaseOpt(object):
@@ -251,16 +251,16 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
     def __init__(self, configure_file, configure_file_extend=None, disable_new_connection=False):
         self._dtb_cfg_file_path = configure_file
         self._dtb_cfg_file_path_extend = configure_file_extend
-        self._dtb_cfg_opt = ctt_objects.Configure(value=configure_file)
+        self._dtb_cfg_opt = ctt_core.Content(value=configure_file)
         if configure_file_extend is not None:
             if bsc_core.StgFileOpt(configure_file_extend).get_is_file() is False:
                 raise RuntimeError()
             #
-            self._dtb_cfg_opt.update_from(
-                ctt_objects.Configure(value=configure_file_extend)
+            self._dtb_cfg_opt.update_from_content(
+                ctt_core.Content(value=configure_file_extend)
             )
 
-        self._dtb_cfg_opt.set_flatten()
+        self._dtb_cfg_opt.do_flatten()
 
         self._dtb_pattern_kwargs = {}
         if bsc_core.SystemMtd.get_is_linux():
@@ -313,7 +313,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
     def get_pattern_opt(self, keyword):
         p = self.get_pattern(keyword)
         p_opt = bsc_core.PtnParseOpt(p)
-        return p_opt.set_update_to(
+        return p_opt.update_variants_to(
             **self._dtb_pattern_kwargs
         )
 
@@ -868,39 +868,37 @@ class DtbVersionOpt(object):
     def get_geometry_usd_file(self, force=False):
         p = self._dtb_opt.get_pattern(keyword='geometry-usd-file')
         p_o = bsc_core.PtnParseOpt(p)
-        path = p_o.set_update_to(**self._variants).get_value()
+        path = p_o.update_variants_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
         if force is True:
-            return bsc_core.Resource.get('asset/library/geo/sphere.usda')
+            return bsc_core.ExtendResource.get('asset/library/geo/sphere.usda')
 
     def get_geometry_abc_file(self):
         p = self._dtb_opt.get_pattern(keyword='geometry-abc-file')
         p_o = bsc_core.PtnParseOpt(p)
-        path = p_o.set_update_to(**self._variants).get_value()
+        path = p_o.update_variants_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
 
     def get_geometry_fbx_file(self):
         p = self._dtb_opt.get_pattern(keyword='geometry-fbx-file')
         p_o = bsc_core.PtnParseOpt(p)
-        path = p_o.set_update_to(**self._variants).get_value()
+        path = p_o.update_variants_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
 
     def get_look_preview_usd_file(self):
         p = self._dtb_opt.get_pattern(keyword='look-preview-usd-file')
         p_o = bsc_core.PtnParseOpt(p)
-        path = p_o.set_update_to(**self._variants).get_value()
+        path = p_o.update_variants_to(**self._variants).get_value()
         if bsc_core.StgPathMtd.get_is_exists(path):
             return path
-        return bsc_core.Resource.get('asset/library/preview-material.usda')
+        return bsc_core.ExtendResource.get('asset/library/preview-material.usda')
 
     def get_texture_preview_assigns(self):
-        import lxbasic.configure as bsc_configure
-
         dict_ = {}
-        for i_key in bsc_configure.TextureTypes.All:
+        for i_key in bsc_core.BscTextureTypes.All:
             i_dtb_path = '{}/texture_{}_file'.format(self._dtb_version.path, i_key)
             i_file_path = self._dtb_opt.get_property(
                 i_dtb_path, 'location'
@@ -912,8 +910,8 @@ class DtbVersionOpt(object):
                 #
                 if i_file_opt.get_is_file() is True:
                     # map to usd key
-                    if i_key in bsc_configure.TextureTypes.UsdPreviewMapper:
-                        i_key = bsc_configure.TextureTypes.UsdPreviewMapper[i_key]
+                    if i_key in bsc_core.BscTextureTypes.UsdPreviewMapper:
+                        i_key = bsc_core.BscTextureTypes.UsdPreviewMapper[i_key]
                     #
                     dict_[i_key] = i_file_opt.get_path()
         return dict_
@@ -921,12 +919,12 @@ class DtbVersionOpt(object):
     def get_scene_maya_file(self):
         p = self._dtb_opt.get_pattern(keyword='scene-maya-file')
         p_o = bsc_core.PtnParseOpt(p)
-        return p_o.set_update_to(**self._variants).get_value()
+        return p_o.update_variants_to(**self._variants).get_value()
 
     def get_file(self, keyword):
         p = self._dtb_opt.get_pattern(keyword=keyword)
         p_o = bsc_core.PtnParseOpt(p)
-        return p_o.set_update_to(**self._variants).get_value()
+        return p_o.update_variants_to(**self._variants).get_value()
 
     def get_exists_file(self, keyword):
         path = self.get_file(keyword)
@@ -948,8 +946,8 @@ if __name__ == '__main__':
         '3d_plant_proxy',
     ]:
         dtb_opt_ = DtbResourceLibraryOpt(
-            bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
-            bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(_i_key)),
+            bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
+            bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(_i_key)),
         )
         #
         dtb_opt_.setup_entity_categories()

@@ -1,7 +1,9 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
+import time
 
-from lxbasic.core import _bsc_cor_raw
+import datetime
+
+from ..core import _bsc_cor_raw
 
 
 class TimeExtraMtd(object):
@@ -80,9 +82,9 @@ class TimePrettifyMtd(object):
 
     @classmethod
     def to_prettify_by_timetuple(cls, timetuple, language=0):
-        year, month, day, hour, minute, second, week, dayCount, isDst = timetuple
+        year, month, day, hour, minute, second, week, count_day, is_dst = timetuple
         cur_timetuple = time.localtime(time.time())
-        year_, month_, day_, hour_, minute_, second_, week_, dayCount_, isDst_ = cur_timetuple
+        year_, month_, day_, hour_, minute_, second_, week_, count_day_, is_dst_ = cur_timetuple
         #
         monday = day-week
         monday_ = day_-week_

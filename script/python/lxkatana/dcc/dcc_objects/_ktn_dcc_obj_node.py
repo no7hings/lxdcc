@@ -1,15 +1,13 @@
 # coding:utf-8
 # noinspection PyUnresolvedReferences
 import NodegraphAPI
-#
-import collections
-#
-from lxbasic import bsc_core
-#
-import lxcontent.objects as ctt_objects
-#
+
+import lxbasic.core as bsc_core
+
+import lxcontent.core as ctt_core
+
 from lxkatana import ktn_configure, ktn_core
-#
+
 from lxkatana.dcc import ktn_dcc_obj_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
@@ -114,7 +112,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
         #     print source_obj.get_shader_properties()
 
     def get_shader_properties(self):
-        properties = ctt_objects.Properties(self)
+        properties = ctt_core.Properties(self)
         properties.set(
             'type', self.get_shader_type_name(),
         )
@@ -131,7 +129,7 @@ class AndShader(ktn_dcc_obj_abs.AbsKtnObj):
         return self.get_port('parameters').get_children()
 
     def get_shader_attributes(self):
-        attributes = ctt_objects.Properties(self)
+        attributes = ctt_core.Properties(self)
         ports = self.get_shader_ports()
         for port in ports:
             port_name = port.port_name

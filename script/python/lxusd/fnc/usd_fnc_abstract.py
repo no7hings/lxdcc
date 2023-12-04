@@ -1,11 +1,9 @@
 # coding:utf-8
-from lxusd.warp import *
+from lxusd.core.wrap import *
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-from lxusd import usd_configure
-
-from lxutil import utl_core
+import lxusd.core as usd_core
 
 
 class AbsUsdScene(object):
@@ -22,11 +20,11 @@ class AbsUsdScene(object):
     def _set_reference_add_(cls, stage, file_path, root):
         usd_root = stage.GetPseudoRoot()
         if root is not None:
-            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(root, pathsep=usd_configure.Obj.PATHSEP)
+            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(root, pathsep=usd_core.UsdNodes.PATHSEP)
             if dag_path_comps:
                 dag_path_comps.reverse()
             for i in dag_path_comps:
-                if i != usd_configure.Obj.PATHSEP:
+                if i != usd_core.UsdNodes.PATHSEP:
                     usd_root = stage.DefinePrim(i, '')
         #
         bsc_core.Log.trace_method_result(

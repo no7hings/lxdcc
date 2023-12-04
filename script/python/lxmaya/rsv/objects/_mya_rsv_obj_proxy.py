@@ -7,7 +7,7 @@ class RsvDccProxyHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccProxyHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_proxy_xarc_export(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         import lxutil.fnc.exporters as utl_fnc_exporters
         #

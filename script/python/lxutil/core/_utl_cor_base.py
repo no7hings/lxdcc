@@ -21,9 +21,9 @@ import functools
 
 import copy
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import lxgui.core as gui_core
 
@@ -88,7 +88,7 @@ class DDlMonitor(object):
     def set_create(cls, label, job_id, parent=None):
         import lxgui.proxy.widgets as prx_widgets
 
-        import lxdeadline.core as ddl_core
+        import lxwarp.deadline.core as ddl_core
 
         w = prx_widgets.PrxMonitorWindow(parent=parent)
         w.set_window_title(
@@ -331,8 +331,8 @@ class AppLauncher(object):
                     **kwargs
                 )
             )
-            configure = ctt_objects.Configure(value=configure_file_path)
-            keys = configure.get_leaf_keys()
+            configure = ctt_core.Content(value=configure_file_path)
+            keys = configure.get_all_leaf_keys()
             for key in keys:
                 i_run_args = configure.get(key)
                 lis.extend(i_run_args)
@@ -932,7 +932,7 @@ class UsdViewLauncher(object):
 
 class DccModifier(object):
     @staticmethod
-    def debug_trace(fnc):
+    def run_as_ignore(fnc):
         def fnc_(*args, **kw):
             # noinspection PyBroadException
             try:
@@ -943,7 +943,7 @@ class DccModifier(object):
         return fnc_
 
     @staticmethod
-    def time_trace(fnc):
+    def run_with_time_trace(fnc):
         def fnc_(*args, **kwargs):
             start_timestamp = time.time()
             #
@@ -957,7 +957,7 @@ class DccModifier(object):
             )
             bsc_core.SystemMtd.trace(message)
 
-            _fnc = fnc(*args, **kwargs)
+            _result = fnc(*args, **kwargs)
 
             end_timestamp = time.time()
             message = u'complete function: "{}.{}" at {} use {}s'.format(
@@ -970,12 +970,12 @@ class DccModifier(object):
                 (end_timestamp-start_timestamp)
             )
             bsc_core.SystemMtd.trace(message)
-            return _fnc
+            return _result
 
         return fnc_
 
     @staticmethod
-    def ignore_run(fnc):
+    def run_with_result_trace(fnc):
         def fnc_(*args, **kwargs):
             if isinstance(fnc, types.FunctionType):
                 fnc_path = '{}'.format(
@@ -1004,6 +1004,7 @@ class DccModifier(object):
                         fnc_path
                     )
                 )
+                return _result
             except Exception:
                 bsc_core.Log.trace_method_error(
                     'fnc run',
@@ -1016,7 +1017,7 @@ class DccModifier(object):
         return fnc_
 
     @staticmethod
-    def completion_trace(fnc):
+    def run_with_result_trace_extra(fnc):
         def fnc_(*args, **kwargs):
             if isinstance(fnc, types.FunctionType):
                 fnc_path = '{}'.format(
@@ -1053,6 +1054,7 @@ class DccModifier(object):
                             fnc_path
                         )
                     )
+                return _result
             except Exception:
                 bsc_core.Log.trace_method_error(
                     'fnc run',
@@ -1065,14 +1067,14 @@ class DccModifier(object):
         return fnc_
 
     @staticmethod
-    def debug_run(fnc):
+    def run_with_exception_catch(fnc):
         def fnc_(*args, **kwargs):
             # noinspection PyBroadException
             try:
-                _fnc = fnc(*args, **kwargs)
-                return _fnc
+                _result = fnc(*args, **kwargs)
+                return _result
             except Exception:
-                from lxbasic import bsc_core
+                import lxbasic.core as bsc_core
                 bsc_core.LogException.trace()
                 raise
 

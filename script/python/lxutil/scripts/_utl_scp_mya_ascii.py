@@ -72,10 +72,10 @@ class Hash(object):
 class LineMatcher(object):
     def __init__(self, pattern):
         self._pattern = pattern
-        self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
+        self._pattern_fnmatch = self.to_fnmatch_pattern(self._pattern)
 
     @classmethod
-    def _get_fnmatch_pattern_(cls, variant):
+    def to_fnmatch_pattern(cls, variant):
         if variant is not None:
             re_pattern = re.compile(r'[{](.*?)[}]', re.S)
             #
@@ -93,11 +93,11 @@ class LineMatcher(object):
 
     @property
     def pattern(self):
-        return self._fnmatch_pattern
+        return self._pattern_fnmatch
 
     @property
     def fnmatch_pattern(self):
-        return self._fnmatch_pattern
+        return self._pattern_fnmatch
 
 
 class AbsFileReader(object):
@@ -595,7 +595,7 @@ class DotMaFileReader(AbsFileReader):
 
                     with bsc_core.LogProcessContext.create(maximum, 'mesh-info-read') as l_p:
                         for seq, (obj_path, obj_properties) in enumerate(mesh_objs.items()):
-                            l_p.set_update()
+                            l_p.do_update()
                             #
                             if self._get_obj_is_io_(obj_properties) is True:
                                 continue

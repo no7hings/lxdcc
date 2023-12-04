@@ -1,5 +1,9 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
+import sys
+
+import os
+
+from ..core import _bsc_cor_base
 
 
 class EnvironMtd(object):
@@ -27,8 +31,8 @@ class EnvironMtd(object):
     def get_temporary_root(cls):
         _ = cls.get(cls.TEMPORARY_ROOT_KEY)
         if _ is not None:
-            return StgBasePathMapper.map_to_current(_)
-        return StgBasePathMapper.map_to_current(cls.TEMPORARY_ROOT_DEFAULT)
+            return _bsc_cor_base.StgBasePathMapper.map_to_current(_)
+        return _bsc_cor_base.StgBasePathMapper.map_to_current(cls.TEMPORARY_ROOT_DEFAULT)
 
     @classmethod
     def set_temporary_path(cls, path):
@@ -38,15 +42,15 @@ class EnvironMtd(object):
     def get_session_root(cls):
         _ = cls.get(cls.SESSION_ROOT_KEY)
         if _ is not None:
-            return StgBasePathMapper.map_to_current(_)
-        return StgBasePathMapper.map_to_current(cls.SESSION_ROOT_DEFAULT)
+            return _bsc_cor_base.StgBasePathMapper.map_to_current(_)
+        return _bsc_cor_base.StgBasePathMapper.map_to_current(cls.SESSION_ROOT_DEFAULT)
 
     @classmethod
     def get_database_path(cls):
         _ = cls.get(cls.DATABASE_PATH_KEY)
         if _ is not None:
-            return StgBasePathMapper.map_to_current(_)
-        return StgBasePathMapper.map_to_current(cls.DATABASE_PATH_DEFAULT)
+            return _bsc_cor_base.StgBasePathMapper.map_to_current(_)
+        return _bsc_cor_base.StgBasePathMapper.map_to_current(cls.DATABASE_PATH_DEFAULT)
 
     @classmethod
     def get_data_paths(cls):
@@ -85,7 +89,7 @@ class EnvironMtd(object):
 
     @classmethod
     def get_qt_thread_enable(cls):
-        if ApplicationMtd.get_is_maya():
+        if _bsc_cor_base.ApplicationMtd.get_is_maya():
             return False
         return True
 
@@ -191,8 +195,8 @@ class EnvExtraMtd(EnvironMtd):
                 variants = dict(
                     root=root,
                     tag=tag,
-                    date_tag=TimeMtd.get_date_tag(),
-                    user=SystemMtd.get_user_name()
+                    date_tag=_bsc_cor_base.TimeMtd.get_date_tag(),
+                    user=_bsc_cor_base.SystemMtd.get_user_name()
                 )
                 _ = '{root}/debuggers/lynxi/{user}/{date_tag}/{tag}'.format(**variants)
                 if create is True:

@@ -9,7 +9,7 @@ import fnmatch
 
 import math
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -109,14 +109,6 @@ class Om2Method(object):
 
     @classmethod
     def to_point_array(cls, om2_point_array, round_count=None):
-        """
-        :param om2_point_array: instance(OpenMaya.MPoint)
-        :return:
-            list(
-                tuple(float(x), float(y), float(z)),
-                ...
-            )
-        """
         return map(lambda x: cls._to_point_(x, round_count=round_count), om2_point_array)
 
     @classmethod
@@ -254,27 +246,27 @@ class Om2Method(object):
         lis = []
         knot_minimum, knot_maximum = 0.0, float(M)
         #
-        [lis.append(knot_minimum) for i in range(degree)]
+        [lis.append(knot_minimum) for _ in range(degree)]
         #
         add_count = count-N-1
         for seq in range(add_count):
             lis.append(float(seq+1)*knot_maximum/(add_count+1))
         #
-        [lis.append(knot_maximum) for i in range(degree)]
+        [lis.append(knot_maximum) for _ in range(degree)]
         return lis
 
     @classmethod
     def _get_surface_knots_(cls, count, degree):
         lis = []
-        minKnots, maxKnots = 0.0, 1.0
+        knots_min, knots_max = 0.0, 1.0
         #
-        iPCount = count-2
-        [lis.append(minKnots) for _ in range(degree)]
+        c_ip = count-2
+        [lis.append(knots_min) for _ in range(degree)]
         #
-        for seq in range(iPCount):
-            lis.append(float(seq+1)*maxKnots/(iPCount+1))
+        for seq in range(c_ip):
+            lis.append(float(seq+1)*knots_max/(c_ip+1))
         #
-        [lis.append(maxKnots) for _ in range(degree)]
+        [lis.append(knots_max) for _ in range(degree)]
         return lis
 
     @classmethod
@@ -332,13 +324,13 @@ class Om2CurveCreator(object):
         lis = []
         knot_minimum, knot_maximum = 0.0, float(M)
         #
-        [lis.append(knot_minimum) for i in range(degree)]
+        [lis.append(knot_minimum) for _ in range(degree)]
         #
         add_count = count-N-1
         for seq in range(add_count):
             lis.append(float(seq+1)*knot_maximum/(add_count+1))
         #
-        [lis.append(knot_maximum) for i in range(degree)]
+        [lis.append(knot_maximum) for _ in range(degree)]
         return lis
 
     @classmethod
@@ -2036,6 +2028,7 @@ class CmdPortOpt(object):
 class CmdAtrOpt(object):
     PATHSEP = '.'
 
+    # noinspection PyUnusedLocal
     def __init__(self, atr_path):
         pass
 
@@ -2498,28 +2491,28 @@ class CmdShapeOpt(CmdObjOpt):
                 # noinspection PyBroadException
                 try:
                     cmds.sets(self.get_path(), forceElement=path)
-                except:
+                except Exception:
                     bsc_core.ExceptionMtd.set_print()
 
     def get_render_properties(self, renderer='arnold'):
         properties = {}
         if renderer == 'arnold':
-            from lxarnold import and_configure
+            import lxarnold.core as and_core
 
-            for i_key in and_configure.GeometryProperties.AllKeys:
-                if i_key in and_configure.GeometryProperties.MayaMapper:
-                    i_port_path = and_configure.GeometryProperties.MayaMapper[i_key]
+            for i_key in and_core.AndGeometryProperties.AllKeys:
+                if i_key in and_core.AndGeometryProperties.MayaMapper:
+                    i_port_path = and_core.AndGeometryProperties.MayaMapper[i_key]
                     value = self.get(i_port_path)
                     properties[i_key] = value
         return properties
 
     def assign_render_properties(self, properties, renderer='arnold'):
         if renderer == 'arnold':
-            from lxarnold import and_configure
+            import lxarnold.core as and_core
 
             for i_key, i_value in properties.items():
-                if i_key in and_configure.GeometryProperties.MayaMapper:
-                    i_port_path = and_configure.GeometryProperties.MayaMapper[i_key]
+                if i_key in and_core.AndGeometryProperties.MayaMapper:
+                    i_port_path = and_core.AndGeometryProperties.MayaMapper[i_key]
                     self.set(i_port_path, i_value)
 
     def delete_transform(self):

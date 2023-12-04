@@ -1,11 +1,11 @@
 # coding:utf-8
 import lxresource.core as rsc_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class StgUtil(object):
-    CONFIGURE = rsc_core.RscConfigure.get_as_content('shotgun/main')
+    CONFIGURE = rsc_core.ResourceContent.get_as_content('shotgun/main')
 
     URL = CONFIGURE.get('connection.url')
     SCRIPT = CONFIGURE.get('connection.script')

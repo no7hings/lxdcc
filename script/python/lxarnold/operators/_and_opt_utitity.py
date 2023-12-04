@@ -1,16 +1,17 @@
 # coding:utf-8
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class StatsFileOpt(object):
     def __init__(self, obj):
         self._obj = obj
 
-        self._content = ctt_objects.Content(
+        self._content = ctt_core.Content(
             value=self._obj.path
         )
+
     # memory
     def get_capacity_memory_byte(self):
         return self._content.get(
@@ -119,6 +120,7 @@ class StatsFileOpt(object):
         ]
         vs = [self._content.get(i) or 0 for i in keys]
         return sum(vs)
+
     #
     def get_curve_memory_gb(self):
         b = self.get_curve_memory_byte()
@@ -140,6 +142,7 @@ class StatsFileOpt(object):
             return bsc_core.RawIntegerMtd.byte_to_gb(
                 b
             )
+
     # time
     def get_render_microsecond_(self):
         ks = self._content.get_keys('*.microseconds')
@@ -181,7 +184,7 @@ class ProfileFileOpt(object):
     def __init__(self, obj):
         self._obj = obj
 
-        self._content = ctt_objects.Content(
+        self._content = ctt_core.Content(
             value=self._obj.path
         )
 

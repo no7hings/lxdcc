@@ -75,7 +75,7 @@ for i in [
     '_Wsp_Usr/QualitySpace',
     '_Wsp_Usr/LayerSpace',
 ]:
-    i_f = '/data/e/myworkspace/td/lynxi/script/python/.setup/katana/Macros/{}.yml'.format(i)
+    i_f = '/data/e/workspace/lynxi/script/python/.setup/katana/Macros/{}.yml'.format(i)
     i_m = ktn_scripts.ScpMacro(i_f)
     # if i_m.get_is_changed() is True:
     KatanaFile.New()

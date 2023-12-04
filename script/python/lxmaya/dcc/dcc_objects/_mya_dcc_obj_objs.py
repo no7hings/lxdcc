@@ -9,7 +9,7 @@ import maya.cmds as cmds
 # noinspection PyUnresolvedReferences
 import maya.mel as mel
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -279,7 +279,7 @@ class AbsFileReferences(object):
         cls._set_file_value_repair_(obj)
 
     @classmethod
-    @utl_core.DccModifier.debug_trace
+    @bsc_core.Modifiers.run_as_ignore
     def _set_file_value_repair_(cls, obj):
         if obj.type_name == 'file':
             port = obj.get_port('fileTextureName')

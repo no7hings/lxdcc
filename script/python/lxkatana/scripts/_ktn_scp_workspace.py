@@ -1,7 +1,5 @@
 # coding:utf-8
-import threading
-
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxkatana import ktn_core
 
@@ -20,8 +18,10 @@ import lxkatana.scripts as ktn_scripts
 ktn_scripts.ScpWorkspaceCreate.new()
     """
     KEY = 'workspace'
+
     def __init__(self, obj_opt):
         self._obj_opt = obj_opt
+
     @classmethod
     def load_geometry_auto(cls):
         g_ns = ktn_core.NGObjsMtd.filter_nodes(
@@ -36,6 +36,7 @@ ktn_scripts.ScpWorkspaceCreate.new()
             g_n_opt.execute_port(
                 'parameters.usd.tools', index=1
             )
+
     @classmethod
     def load_look_auto(cls):
         m_gs = ktn_core.NGObjsMtd.filter_nodes(
@@ -70,6 +71,7 @@ ktn_scripts.ScpWorkspaceCreate.new()
             gpa_g = gpa_gs[0]
             ktn_core.NGObjOpt(gpa_g).execute_port('user.parameters.ass.tools', index=0)
             ktn_core.NGObjOpt(gpa_g).execute_port('user.parameters.ass.tools', index=1)
+
     @classmethod
     def new(cls):
         def post_fnc_():
@@ -78,6 +80,7 @@ ktn_scripts.ScpWorkspaceCreate.new()
             s.load_geometry_auto()
             s.load_look_auto()
             bsc_core.Log.ENABLE = True
+
         #
         ktn_obj, i_create = ktn_core.NGObjOpt._get_node_create_args_(
             '/rootNode/workspace', 'Workspace_Wsp'

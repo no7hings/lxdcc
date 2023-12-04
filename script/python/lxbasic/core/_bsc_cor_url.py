@@ -3,7 +3,7 @@ import os
 
 import lxlog.core as log_core
 
-from lxbasic.core import _bsc_cor_utility
+from ..core import _bsc_cor_base
 
 
 class UrlMtd(object):
@@ -17,9 +17,9 @@ class UrlMtd(object):
 
     @classmethod
     def open_in_chrome(cls, url):
-        if _bsc_cor_utility.SystemMtd.get_is_linux():
+        if _bsc_cor_base.SystemMtd.get_is_linux():
             bin_paths = cls.LINUX_BIN_PATHS
-        elif _bsc_cor_utility.SystemMtd.get_is_windows():
+        elif _bsc_cor_base.SystemMtd.get_is_windows():
             bin_paths = cls.WINDOWS_BIN_PATHS
         else:
             raise SystemError()

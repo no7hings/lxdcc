@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class ScpEnvironment(object):
@@ -15,7 +15,7 @@ class ScpEnvironment(object):
             resolver = rsv_commands.get_resolver()
             c = wrp_stg_core.StgConnector()
             dict_ = c.get_data_from_task_id(task_id)
-            keys = resolver.VariantTypes.All
+            keys = resolver.VariantTypes.Constructs
             for i_key in keys:
                 i_env_key = 'PG_{}'.format(i_key.upper())
                 #

@@ -1,21 +1,13 @@
 # coding:utf-8
-from lxusd.warp import *
-
 import six
 
-import copy
-
-import collections
+from lxusd.core.wrap import *
 
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-from lxusd import usd_configure, usd_core
-
-import lxcontent.objects as ctt_objects
-
-import lxutil.dcc.dcc_objects as utl_dcc_objects
+import lxusd.core as usd_core
 
 import lxusd.dcc.dcc_operators as usd_dcc_operators
 
@@ -62,7 +54,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 maximum=len([i for i in self._geometry_stage_0.TraverseAll()]), label='geometry look export'
                 ) as l_p:
             for i_usd_prim in self._geometry_stage_0.TraverseAll():
-                l_p.set_update()
+                l_p.do_update()
                 i_obj_type_name = i_usd_prim.GetTypeName()
                 obj_path = i_usd_prim.GetPath().pathString
                 output_prim = self._output_stage_opt.set_obj_create_as_override(obj_path)
@@ -169,14 +161,14 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
             display_color = self.get('display_color')
             asset_color = bsc_core.RawTextOpt(self._asset_name).to_rgb_(maximum=1, seed=self._color_seed)
             for i_usd_prim_src in self._usd_stage_src.TraverseAll():
-                l_p.set_update()
+                l_p.do_update()
                 #
                 i_obj_type_name = i_usd_prim_src.GetTypeName()
                 i_obj_path = i_usd_prim_src.GetPath().pathString
                 i_obj_path_opt = bsc_core.DccPathDagOpt(i_obj_path)
                 #
                 i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path)
-                if i_obj_type_name in [usd_configure.ObjType.Mesh, usd_configure.ObjType.NurbsCurves]:
+                if i_obj_type_name in [usd_core.UsdNodeTypes.Mesh, usd_core.UsdNodeTypes.NurbsCurves]:
                     i_usd_geometry_opt_tgt = usd_core.UsdGeometryOpt(i_usd_prim_tgt)
                     #
                     if self.get('with_object_color') is True:
@@ -195,7 +187,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                             'asset_color', 'color/color3', asset_color
                         )
                     #
-                    if i_obj_type_name == usd_configure.ObjType.Mesh:
+                    if i_obj_type_name == usd_core.UsdNodeTypes.Mesh:
                         i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
                         i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
                         #
@@ -286,7 +278,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 #
                 i_usd_prim_src = self._usd_stage_src.GetPrimAtPath(i_obj_path)
                 i_usd_prim_tgt = self._usd_stage_tgt.OverridePrim(i_obj_path)
-                if i_obj_type_name in [usd_configure.ObjType.Mesh, usd_configure.ObjType.NurbsCurves]:
+                if i_obj_type_name in [usd_core.UsdNodeTypes.Mesh, usd_core.UsdNodeTypes.NurbsCurves]:
                     #
                     i_usd_mesh_src = UsdGeom.Mesh(i_usd_prim_src)
                     i_usd_mesh_opt_src = usd_core.UsdMeshOpt(i_usd_mesh_src)
@@ -309,7 +301,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         elif color_scheme == 'asset_color':
                             i_usd_mesh_opt_tgt.fill_display_color(asset_color)
                         # for mesh
-                        if i_obj_type_name == usd_configure.ObjType.Mesh:
+                        if i_obj_type_name == usd_core.UsdNodeTypes.Mesh:
                             if color_scheme == 'uv_map_color':
                                 i_color_map = i_usd_mesh_opt_src.compute_vertex_color_map_from_uv_coord('st')
                                 i_usd_mesh_opt_tgt.set_display_colors_as_vertex(i_color_map)
@@ -321,7 +313,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     elif isinstance(color_scheme, dict):
                         pass
                 #
-                l_p.set_update()
+                l_p.do_update()
         #
         component_paths = bsc_core.DccPathDagOpt(self._location_path).get_component_paths()
         if component_paths:
@@ -355,90 +347,13 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
             maximum=self._input_stage_opt.get_count(), label='face vertex indices reverse create'
         ) as l_p:
             for i_input_prim in self._input_stage_opt.usd_instance.TraverseAll():
-                l_p.set_update()
+                l_p.do_update()
                 #
                 i_obj_type_name = i_input_prim.GetTypeName()
                 if i_obj_type_name == 'Mesh':
                     i_input_mesh = UsdGeom.Mesh(i_input_prim)
                     i_input_mesh_opt = usd_core.UsdMeshOpt(i_input_mesh)
                     print i_input_mesh_opt.get_face_vertex_indices()
-
-
-class GeometryInfoXmlExporter(utl_fnc_obj_abs.AbsDccExporter):
-    ROOT_LSTRIP = 'path_lstrip'
-    GEOMETRY_FILE = 'geometry_file'
-    OPTION = dict(
-        path_lstrip=None,
-        geometry_file=None,
-    )
-
-    def __init__(self, file_path, root=None, option=None):
-        super(GeometryInfoXmlExporter, self).__init__(file_path, root, option)
-        #
-        self._usd_stage = Usd.Stage.CreateInMemory()
-        self._usd_stage_opt = usd_core.UsdStageOpt(self._usd_stage)
-        #
-        geometry_file_path = self._option.get('geometry_file')
-        if geometry_file_path is not None:
-            self._usd_stage_opt.append_sublayer(geometry_file_path)
-        #
-        self._usd_stage.Flatten()
-
-    @classmethod
-    def _get_info_raw(cls, stage, root=None, lstrip=None):
-        info_configure = ctt_objects.Content(value=collections.OrderedDict())
-        for prim in stage.TraverseAll():
-            i_obj_type_name = prim.GetTypeName()
-            obj_path = prim.GetPath().pathString
-            #
-            obj_path_ = bsc_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, lstrip)
-            if obj_path_:
-                obj_properties = ctt_objects.Content(value=collections.OrderedDict())
-                #
-                if i_obj_type_name == 'Mesh':
-                    obj_type_name_ = 'mesh'
-                    obj_attributes = collections.OrderedDict()
-                    mesh_obj_opt = usd_dcc_operators.MeshOpt(prim)
-                    obj_attributes['face-count'] = mesh_obj_opt.get_face_count()
-                    obj_attributes['point-count'] = mesh_obj_opt.get_vertex_count()
-                    obj_attributes['face-vertices-uuid'] = mesh_obj_opt.get_face_vertices_as_uuid()
-                    obj_attributes['points-uuid'] = mesh_obj_opt.get_points_as_uuid(ordered=True)
-                    obj_attributes['uv-maps-uuid'] = mesh_obj_opt.get_uv_maps_as_uuid()
-                else:
-                    obj_type_name_ = 'transform'
-                    obj_attributes = collections.OrderedDict()
-                #
-                info_key_path = '.'.join([i for i in obj_path_.split('/') if i])
-                obj_properties.set('properties.type', obj_type_name_)
-                obj_properties.set('properties.attributes', obj_attributes)
-                #
-                info_configure.set(info_key_path, obj_properties.value)
-
-        j2_template = usd_configure.JinJa2.ENVIRONMENT.get_template('geometry-xml-template.j2')
-
-        ks = dict(
-            option=dict(
-                indent=4,
-                linesep='\n'
-            ),
-            objs=info_configure.value
-        )
-
-        raw = j2_template.render(**ks)
-        return raw
-
-    def set_run(self):
-        raw = self._get_info_raw(
-            self._usd_stage,
-            root=self._root, lstrip=self._option.get('path_lstrip')
-        )
-        #
-        f = utl_dcc_objects.OsFile(self._file_path)
-        f.set_write(raw)
-        #
-        # import os
-        # base, ext = os.path.splitext(self._file_path)
-        # self._usd_stage.Export(base + '.usda')
 
 
 class FncGeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
@@ -465,15 +380,15 @@ class FncGeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def _create_location_fnc_(cls, stage, location):
-        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(location, pathsep=usd_configure.Obj.PATHSEP)
+        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(location, pathsep=usd_core.UsdNodes.PATHSEP)
         if dag_path_comps:
             dag_path_comps.reverse()
         #
         stage.GetPseudoRoot()
         for i in dag_path_comps:
-            if i != usd_configure.Obj.PATHSEP:
+            if i != usd_core.UsdNodes.PATHSEP:
                 stage.DefinePrim(
-                    i, usd_configure.ObjType.Xform
+                    i, usd_core.UsdNodeTypes.Xform
                 )
         #
         default_prim_path = stage.GetPrimAtPath(dag_path_comps[1])
@@ -481,35 +396,35 @@ class FncGeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def create_transform_opt(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.Xform)
+            prim = self._output_stage.OverridePrim(obj_path, usd_core.UsdNodeTypes.Xform)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.Xform)
+            prim = self._output_stage.DefinePrim(obj_path, usd_core.UsdNodeTypes.Xform)
         obj_opt = usd_dcc_operators.TransformOpt(prim)
         return obj_opt
 
     def create_mesh_opt(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.Mesh)
+            prim = self._output_stage.OverridePrim(obj_path, usd_core.UsdNodeTypes.Mesh)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.Mesh)
+            prim = self._output_stage.DefinePrim(obj_path, usd_core.UsdNodeTypes.Mesh)
         #
         obj_opt = usd_dcc_operators.MeshOpt(prim)
         return obj_opt
 
     def create_nurbs_curve_opt(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.NurbsCurves)
+            prim = self._output_stage.OverridePrim(obj_path, usd_core.UsdNodeTypes.NurbsCurves)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.NurbsCurves)
+            prim = self._output_stage.DefinePrim(obj_path, usd_core.UsdNodeTypes.NurbsCurves)
         #
         obj_opt = usd_dcc_operators.NurbsCurveOpt(prim)
         return obj_opt
 
     def create_basis_curves_opt(self, obj_path, use_override=False):
         if use_override is True:
-            prim = self._output_stage.OverridePrim(obj_path, usd_configure.ObjType.BasisCurves)
+            prim = self._output_stage.OverridePrim(obj_path, usd_core.UsdNodeTypes.BasisCurves)
         else:
-            prim = self._output_stage.DefinePrim(obj_path, usd_configure.ObjType.BasisCurves)
+            prim = self._output_stage.DefinePrim(obj_path, usd_core.UsdNodeTypes.BasisCurves)
         #
         obj_opt = usd_dcc_operators.BasisCurveOpt(prim)
         return obj_opt
@@ -530,17 +445,3 @@ class FncGeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def execute(self):
         self._set_export_run_()
-
-
-if __name__ == '__main__':
-    import lxusd.fnc.exporters as usd_fnc_exporters
-
-    e = usd_fnc_exporters.GeometryInfoXmlExporter(
-        file_path='/data/xml_test/test.info.xml',
-        root='/master',
-        option=dict(
-            geometry_file='/l/prod/shl/publish/assets/chr/nn_gongshifu/mod/modeling/nn_gongshifu.mod.modeling.v007/cache/usd/geo/hi.usd'
-        )
-    )
-
-    e.set_run()

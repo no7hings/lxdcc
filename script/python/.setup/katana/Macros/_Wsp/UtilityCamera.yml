@@ -50,19 +50,57 @@ main:
             value: '<option.create_type>'
             tool_tip: '...'
             lock: True
-        #
+
         parameters/branch:
             widget: capsule_string
             value: ['asset', 'shot']
             default: 'asset'
             tool_tip: '...'
         # setting
+        parameters/setting/scheme:
+            widget: capsule_string
+            value: ['default', 'abc']
+            default: 'default'
+            tool_tip: '...'
+
         parameters/setting/add_to_camera_list:
             widget: boolean
             value: True
             tool_tip: '...'
 
-        parameters/setting/fov:
+        parameters/setting/abc:
+            widget: group
+            expand: True
+            tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../scheme', conditionalVisValue: 'abc'
+            }
+
+        parameters/setting/abc/file:
+            widget: file
+            value: ''
+            tool_tip: '...'
+
+        parameters/setting/abc/element:
+            widget: enumerate
+            value: ['None']
+            default: 'None'
+            tool_tip: '...'
+
+        parameters/setting/abc/refresh:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspUtilityCamera(node).refresh_abc()'
+            tool_tip: '...'
+
+        parameters/setting/default:
+            widget: group
+            expand: True
+            tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../scheme', conditionalVisValue: 'default'
+            }
+
+        parameters/setting/default/fov:
             widget: float
             value: 35
             tool_tip: '...'
@@ -80,6 +118,11 @@ main:
             value: ['horizontal', 'vertical', 'fill']
             tool_tip: '...'
         #   render
+        parameters/setting/render/enable:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
         parameters/setting/render/resolution:
             widget: resolution
             value: '2048x2048'
@@ -90,12 +133,18 @@ main:
             value: ['No adjustment', 'Adjust width to match resolution', 'Adjust height to match resolution']
             default: 'Adjust height to match resolution'
             tool_tip: '...'
+
         # option
         option/variant_key:
             widget: string
             value: '<option.variant_key>'
             tool_tip: '...'
             lock: True
+
+        option/location:
+            widget: path
+            value: '/root/world/cam'
+            tool_tip: '...'
 
         option/root:
             widget: path
@@ -151,7 +200,92 @@ node:
         #
         expressions:
             name: 'getParent().option.default'
-            fov: 'getParent().parameters.setting.fov'
+            fov: 'getParent().parameters.setting.default.fov'
+            includeInCameraList: 'getParent().parameters.setting.add_to_camera_list'
+    #  abc
+    abc:
+        type: 'Alembic_In'
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.out'
+        #
+        expressions:
+            abcAsset: 'getParent().parameters.setting.abc.file'
+            name:
+                |-
+                '{}/abc'.format(getParent().option.location)
+
+    abc_transform:
+        type: TransformEdit
+        path: '<main.path>/<option.type_abr>__<..key>'
+        input: '<.path>.in'
+        output: '<.path>.out'
+        #
+        expressions:
+            path: 'getParent().parameters.setting.abc.element'
+        #
+        connections:
+            # camera
+            - '<..abc.output>'
+            - '<.input>'
+
+    copy_merge:
+        type: Merge
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.out'
+
+        input_ports:
+            - 'placeholder'
+            - 'abc'
+
+        connections:
+            # placeholder
+            - '<..placeholder.output>'
+            - '<.path>.placeholder'
+            # abc
+            - '<..abc_transform.output>'
+            - '<.path>.abc'
+
+    copy_opt:
+        tag: CCO
+        type: CameraCopy_Opt
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        #
+        parameters:
+            user/option/enable: True
+        #
+        expressions:
+            CEL: 'getParent().option.default'
+            user/option/from: 'getParent().parameters.setting.abc.element'
+        #
+        connections:
+            - '<..copy_merge.output>'
+            - '<.input>'
+
+    abc_enable:
+        type: Switch
+        path: '<main.path>/<option.type_abr>__<..key>'
+        output: '<.path>.output'
+        #
+        input_ports:
+            - 'off'
+            - 'on'
+        #
+        expressions:
+            in:
+                |-
+                1 if getParent().parameters.setting.scheme == 'abc' else 0
+        #
+        connections:
+            # off
+            - '<..placeholder.output>'
+            - '<.path>.off'
+            # on
+            - '<..copy_opt.output>'
+            - '<.path>.on'
+
     # upstream_merge
     upstream_merge:
         tag: 'UMG'
@@ -170,7 +304,7 @@ node:
             - '<..join_upstream_dot.output>'
             - '<.path>.join_upstream'
             # join current
-            - '<..placeholder.output>'
+            - '<..abc_enable.output>'
             - '<.path>.join_current'
             # join other
             - '<..join_other_dot.output>'
@@ -233,6 +367,7 @@ node:
             user/option/builtin/enable: True
         #
         expressions:
+            user/option/builtin/enable: 'getParent().parameters.setting.render.enable'
             user/option/builtin/camera: 'getParent().option.default'
             user/option/builtin/resolution: 'getParent().parameters.setting.render.resolution'
             user/option/builtin/adjust_screen_window: 'getParent().parameters.setting.render.adjust_screen_window'

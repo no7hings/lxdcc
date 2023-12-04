@@ -13,13 +13,13 @@ import subprocess
 
 import lxlog.core as log_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import lxbasic.core as bsc_core
 
 from lxuniverse.abstracts import _unr_abs_base
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 
 # obj/type/def
@@ -340,23 +340,23 @@ class AbsObjPortExtraDef(object):
             self._build_port_(k, v, raw_convert_method)
 
     def _build_port_(self, key, value, raw_convert_method=None):
-        port_path = key.replace('/', unr_configure.Port.PATHSEP)
+        port_path = key.replace('/', unr_core.UnrPort.PATHSEP)
         if isinstance(value, dict):
             type_path = value.get(
                 'type',
-                unr_configure.Type.CONSTANT_RAW_
-            ).replace('/', unr_configure.Type.PATHSEP)
+                unr_core.UnrType.CONSTANT_RAW_
+            ).replace('/', unr_core.UnrType.PATHSEP)
             port_assign = value.get(
                 'port_assign',
-                unr_configure.PortAssign.VARIANTS
+                unr_core.UnrPortAssign.VARIANTS
             )
             if raw_convert_method is not None:
                 raw = raw_convert_method(value.get('raw'))
             else:
                 raw = value.get('raw')
         else:
-            port_assign = unr_configure.PortAssign.VARIANTS
-            type_path = unr_configure.Type.CONSTANT_RAW_
+            port_assign = unr_core.UnrPortAssign.VARIANTS
+            type_path = unr_core.UnrType.CONSTANT_RAW_
             raw = value
         #
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
@@ -382,13 +382,13 @@ class AbsObjPortExtraDef(object):
         return port
 
     def generate_variant_port(self, type_args, port_path):
-        return self.generate_port(type_args, port_path, unr_configure.PortAssign.VARIANTS)
+        return self.generate_port(type_args, port_path, unr_core.UnrPortAssign.VARIANTS)
 
     def generate_input_port(self, type_args, port_path):
-        return self.generate_port(type_args, port_path, unr_configure.PortAssign.INPUTS)
+        return self.generate_port(type_args, port_path, unr_core.UnrPortAssign.INPUTS)
 
     def generate_output_port(self, type_args, port_path):
-        return self.generate_port(type_args, port_path, unr_configure.PortAssign.OUTPUTS)
+        return self.generate_port(type_args, port_path, unr_core.UnrPortAssign.OUTPUTS)
 
     def _create_port_(self, type_args, port_path, port_assign):
         port = self.PORT_CLS(
@@ -405,7 +405,7 @@ class AbsObjPortExtraDef(object):
             port_token = port_string
             return self._port_stack.get_object(port_token)
         else:
-            port_assigns = unr_configure.PortAssign.ALL
+            port_assigns = unr_core.UnrPortAssign.ALL
             port_path = port_string
             for port_assign in port_assigns:
                 port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
@@ -424,12 +424,12 @@ class AbsObjPortExtraDef(object):
 
     # input
     def get_input_port_exists(self, port_path):
-        port_assign = unr_configure.PortAssign.INPUTS
+        port_assign = unr_core.UnrPortAssign.INPUTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_is_exists(port_token)
 
     def get_input_port(self, port_path):
-        port_assign = unr_configure.PortAssign.INPUTS
+        port_assign = unr_core.UnrPortAssign.INPUTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port(port_token)
 
@@ -439,19 +439,19 @@ class AbsObjPortExtraDef(object):
             return port.get()
 
     def get_input_ports(self):
-        port_assign = unr_configure.PortAssign.INPUTS
+        port_assign = unr_core.UnrPortAssign.INPUTS
         port_path = '*'
         regex = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self._port_stack.get_objects(regex=regex)
 
     # output
     def get_output_port_exists(self, port_path):
-        port_assign = unr_configure.PortAssign.OUTPUTS
+        port_assign = unr_core.UnrPortAssign.OUTPUTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_is_exists(port_token)
 
     def get_output_port(self, port_path):
-        port_assign = unr_configure.PortAssign.OUTPUTS
+        port_assign = unr_core.UnrPortAssign.OUTPUTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port(port_token)
 
@@ -461,19 +461,19 @@ class AbsObjPortExtraDef(object):
             return port.get()
 
     def get_output_ports(self):
-        port_assign = unr_configure.PortAssign.OUTPUTS
+        port_assign = unr_core.UnrPortAssign.OUTPUTS
         port_path = '*'
         regex = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self._port_stack.get_objects(regex=regex)
 
     # bind
     def get_bind_port_exists(self, port_path):
-        port_assign = unr_configure.PortAssign.BINDS
+        port_assign = unr_core.UnrPortAssign.BINDS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_is_exists(port_token)
 
     def get_bind_port(self, port_path):
-        port_assign = unr_configure.PortAssign.BINDS
+        port_assign = unr_core.UnrPortAssign.BINDS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port(port_token)
 
@@ -483,25 +483,25 @@ class AbsObjPortExtraDef(object):
             return port.get()
 
     def get_bind_ports(self):
-        port_assign = unr_configure.PortAssign.BINDS
+        port_assign = unr_core.UnrPortAssign.BINDS
         port_path = '*'
         regex = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self._port_stack.get_objects(regex=regex)
 
     # variant
     def get_variant_port_exists(self, port_path):
-        port_assign = unr_configure.PortAssign.VARIANTS
+        port_assign = unr_core.UnrPortAssign.VARIANTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_is_exists(port_token)
 
     def get_variant_port(self, port_path):
-        port_assign = unr_configure.PortAssign.VARIANTS
+        port_assign = unr_core.UnrPortAssign.VARIANTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port(port_token)
 
     # noinspection PyUnusedLocal
     def get_variant_ports(self, regex=None):
-        port_assign = unr_configure.PortAssign.VARIANTS
+        port_assign = unr_core.UnrPortAssign.VARIANTS
         port_path = '*'
         regex = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self._port_stack.get_objects(regex=regex)
@@ -695,7 +695,7 @@ class AbsObjPropertiesExtraDef(object):
     PROPERTIES_CLS = None
 
     def _init_obj_properties_extra_def_(self):
-        self._obj_properties = ctt_objects.Properties(
+        self._obj_properties = ctt_core.Properties(
             self
         )
 
@@ -776,7 +776,7 @@ class AbsObj(
         if obj is not None:
             return obj
         else:
-            obj = self.universe.get_obj_type(unr_configure.ObjType.NULL)._create_obj_(path)
+            obj = self.universe.get_obj_type(unr_core.UnrObjType.NULL)._create_obj_(path)
             self.universe._add_obj_(obj)
             return obj
 
@@ -822,7 +822,7 @@ class AbsObj(
         )
 
     def to_properties(self):
-        p = ctt_objects.Properties(self)
+        p = ctt_core.Properties(self)
         p.set(
             'type', self.type_path
         )
@@ -935,8 +935,8 @@ class AbsObjStgExtraDef(object):
     def get_permission(self):
         return bsc_core.StorageMtd.get_permission(self.path)
 
-    def get_is_writeable(self):
-        return bsc_core.StorageMtd.get_is_writeable(self.path)
+    def get_is_writable(self):
+        return bsc_core.StorageMtd.get_is_writable(self.path)
 
     def get_is_readable(self):
         return bsc_core.StorageMtd.get_is_readable(self.path)
@@ -1252,7 +1252,7 @@ class AbsStgFile(
 
     def set_delete(self):
         if self.get_is_exists() is True:
-            if self.get_is_writeable() is True:
+            if self.get_is_writable() is True:
                 os.remove(self.path)
                 log_core.Log.trace_method_result(
                     'file delete',
@@ -1261,7 +1261,7 @@ class AbsStgFile(
             else:
                 log_core.Log.trace_method_error(
                     'file delete',
-                    u'file="{}" is not writeable'.format(self.path)
+                    u'file="{}" is not writable'.format(self.path)
                 )
 
     def set_copy_to_file(self, file_path_tgt, replace=False):
@@ -1269,7 +1269,7 @@ class AbsStgFile(
             file_tgt = self.__class__(file_path_tgt)
             if replace is True:
                 if bsc_core.StorageMtd.get_is_exists(file_path_tgt) is True:
-                    if bsc_core.StorageMtd.get_is_writeable(file_path_tgt) is True:
+                    if bsc_core.StorageMtd.get_is_writable(file_path_tgt) is True:
                         os.remove(file_tgt.path)
                         shutil.copy2(self.path, file_tgt.path)
                         return True, log_core.Log.trace_method_result(
@@ -1279,7 +1279,7 @@ class AbsStgFile(
                     #
                     return False, log_core.Log.trace_method_error(
                         'file copy replace',
-                        u'file="{}" is not writeable'.format(file_tgt.path)
+                        u'file="{}" is not writable'.format(file_tgt.path)
                     )
             #
             if file_tgt.get_is_exists() is False:

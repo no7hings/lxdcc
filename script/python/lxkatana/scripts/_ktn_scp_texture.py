@@ -1,9 +1,9 @@
 # coding:utf-8
 import threading
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxkatana import ktn_core
 
@@ -15,7 +15,7 @@ import lxkatana
 
 lxkatana.set_reload()
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -57,8 +57,8 @@ ktn_scripts.ScpTextureImportFromDatabase(
 
     def __init__(self, root, resource, texture_data):
         self._root_opt = ktn_core.NGObjOpt(root)
-        self._cfg = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('katana/node-graph/asset-texture-resource')
+        self._cfg = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('katana/node-graph/asset-texture-resource')
         )
         self._cfg.set(
             'option.root', self._root_opt.get_path(),
@@ -78,7 +78,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
             self.gui_layout_nodes()
 
         if self._root_opt.get_name() == 'rootNode':
-            self._cfg.set_flatten()
+            self._cfg.do_flatten()
             #
             self.create_material_group_and_material(to_view_center=True)
             self.create_node_groups()
@@ -95,7 +95,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
                 self._cfg.set(
                     'node.material_group.path', self._root_opt.get_path()
                 )
-                self._cfg.set_flatten()
+                self._cfg.do_flatten()
                 #
                 self.create_material()
                 self.create_node_groups()
@@ -108,7 +108,7 @@ ktn_scripts.ScpTextureImportFromDatabase(
                 timer = threading.Timer(.25, post_fnc_)
                 timer.start()
             elif type_name == 'Group':
-                self._cfg.set_flatten()
+                self._cfg.do_flatten()
                 #
                 self.create_material_group_and_material(to_view_center=True)
                 self.create_node_groups()

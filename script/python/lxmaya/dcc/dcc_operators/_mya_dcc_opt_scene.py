@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxutil.dcc import utl_dcc_opt_abs
 
@@ -31,7 +31,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
             yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'mesh-comparer')
             yml_file = bsc_core.StgFileOpt(yml_file_path)
             if yml_file.get_is_exists() is False:
-                content_0 = ctt_objects.Content(value={})
+                content_0 = ctt_core.Content(value={})
                 content_0.set('file', file_path)
                 dcc_objs = self._stage.get_objs()
                 if dcc_objs:
@@ -41,7 +41,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                     )
                     with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='build comparer-data') as g_p:
                         for dcc_obj in dcc_objs:
-                            g_p.set_update()
+                            g_p.do_update()
                             obj_type_name = dcc_obj.type.name
                             if obj_type_name == 'mesh':
                                 dcc_path = dcc_obj.path
@@ -66,9 +66,9 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                 #
                 return content_0
             else:
-                return ctt_objects.Content(value=yml_file_path)
+                return ctt_core.Content(value=yml_file_path)
         else:
-            return ctt_objects.Content(value={})
+            return ctt_core.Content(value={})
 
     #
     def get_mesh_comparer_data(self, file_path):
@@ -76,7 +76,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
             yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'mesh-comparer')
             return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
         else:
-            return ctt_objects.Content(value={})
+            return ctt_core.Content(value={})
 
     @classmethod
     def _get_mesh_data_content_(cls, stage, file_path, yml_file_path):
@@ -87,14 +87,14 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
         #
         yml_file = bsc_core.StgFileOpt(yml_file_path)
         if yml_file.get_is_exists() is True:
-            return ctt_objects.Content(value=yml_file_path)
+            return ctt_core.Content(value=yml_file_path)
         #
-        content_0 = ctt_objects.Content(value={})
+        content_0 = ctt_core.Content(value={})
         dcc_objs = stage.get_objs()
         if dcc_objs:
             with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='gain build comparer-data') as g_p:
                 for dcc_obj in dcc_objs:
-                    g_p.set_update()
+                    g_p.do_update()
                     obj_type_name = dcc_obj.type.name
                     if obj_type_name == 'mesh':
                         dcc_path = dcc_obj.path

@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 import ix
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import lxgui.core as gui_core
 
@@ -46,13 +46,13 @@ class MenuSetup(object):
 
     @classmethod
     def _create_by_yaml_(cls, file_path):
-        c = ctt_objects.Configure(
+        c = ctt_core.Content(
             value=file_path
         )
 
         menu_bar = cls._get_menu_bar_()
 
-        for i_k in c.get_leaf_keys():
+        for i_k in c.get_all_leaf_keys():
             if i_k.endswith('type'):
                 i_type = c.get(i_k)
                 i_args = i_k.split('.')[:-1]

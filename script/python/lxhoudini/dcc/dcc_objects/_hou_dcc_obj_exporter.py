@@ -4,7 +4,7 @@ import hou
 
 import collections
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class LookContent(object):
@@ -14,7 +14,7 @@ class LookContent(object):
 
     def __init__(self, root, look='default'):
         self._hou_root = hou.node(root)
-        self._raw_content = ctt_objects.Properties(None, collections.OrderedDict())
+        self._raw_content = ctt_core.Properties(None, collections.OrderedDict())
         self._look = look
         self._set_run_()
 

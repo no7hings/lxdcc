@@ -3,14 +3,16 @@ import copy
 
 import glob
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
+
+import lxbasic.core as bsc_core
 
 import lxdatabase.objects as dtb_objects
 
 
 class ScpResourcesAddByQuixel(object):
     """
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     import lxdatabase.objects as dtb_objects
     scp = ScpResourcesAddByQuixel()
@@ -33,7 +35,7 @@ class ScpResourcesAddByQuixel(object):
         '3d_plant'
     ]
     #
-    ALL_CATEGORY_GROUPS = TEXTURE_CATEGORY_GROUPS + ASSET_CATEGORY_GROUPS
+    ALL_CATEGORY_GROUPS = TEXTURE_CATEGORY_GROUPS+ASSET_CATEGORY_GROUPS
     #
     TEXTURE_PATTERN = '{texture_key}_{texture_size_tag}K_{texture_type_tag}.{ext}'
     TEXTURE_LOD_PATTERN = '{texture_key}_{texture_size_tag}K_{texture_type_tag}_LOD{lod_level}.{ext}'
@@ -50,6 +52,7 @@ class ScpResourcesAddByQuixel(object):
     GEOMETRY_VAR_KEY = 'Var{var_index}'
     GEOMETRY_VAR_PATTERN = ''
     GEOMETRY_VAR_LOD_PATTERN = '{key_extra}_LOD{lod_level}.{format}'
+
     def __init__(self):
         self._resource_dict = dict()
 
@@ -64,7 +67,7 @@ class ScpResourcesAddByQuixel(object):
 
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(json_files), label='add resource') as l_p:
             for i_json_file_path in json_files:
-                l_p.set_update()
+                l_p.do_update()
                 #
                 self.add_resource_by_any_json(i_json_file_path)
 
@@ -74,7 +77,7 @@ class ScpResourcesAddByQuixel(object):
             'json="{}"'.format(file_path)
         )
         quixel_json_file_opt = bsc_core.StgFileOpt(file_path)
-        json_content = ctt_objects.Configure(
+        json_content = ctt_core.Content(
             value=file_path
         )
         directory_path_src = quixel_json_file_opt.directory_path
@@ -99,8 +102,8 @@ class ScpResourcesAddByQuixel(object):
 
         if category_group in self.ALL_CATEGORY_GROUPS:
             dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-                bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
-                bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(category_group))
+                bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
+                bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(category_group))
             )
             # resource
             resource_directory_path_tgt = self.stg_create_resource_directory_tgt_fnc(
@@ -169,32 +172,36 @@ class ScpResourcesAddByQuixel(object):
             bsc_core.Log.trace_method_warning(
                 'resource add', 'category group: {} is not available'.format(category_group)
             )
+
     @classmethod
     def stg_create_resource_directory_tgt_fnc(cls, dtb_opt, pattern_kwargs):
         pattern_opt = dtb_opt.get_pattern_opt('resource-dir')
-        directory_path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
+        directory_path = pattern_opt.update_variants_to(**pattern_kwargs).get_value()
         path_opt = bsc_core.StgDirectoryOpt(directory_path)
         path_opt.set_create()
         return directory_path
+
     @classmethod
     def stg_create_version_directory_tgt_fnc(cls, dtb_opt, pattern_kwargs):
         pattern_opt = dtb_opt.get_pattern_opt('version-dir')
-        directory_path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
+        directory_path = pattern_opt.update_variants_to(**pattern_kwargs).get_value()
         path_opt = bsc_core.StgDirectoryOpt(directory_path)
         path_opt.set_create()
         return directory_path
+
     @classmethod
     def stg_create_metadata_tgt_fnc(cls, dtb_opt, pattern_kwargs, file_opt_src):
         pattern_opt = dtb_opt.get_pattern_opt('quixel-metadata-json-file')
-        path = pattern_opt.set_update_to(**pattern_kwargs).get_value()
+        path = pattern_opt.update_variants_to(**pattern_kwargs).get_value()
         file_opt_src.set_copy_to_file(path)
         return path
+
     @classmethod
     def stg_create_preview_tgt_fnc(cls, dtb_opt, pattern_kwargs, directory_path_src):
         quixel_image_png_file_pattern_opt = dtb_opt.get_pattern_opt('quixel-image-png-file')
-        quixel_image_png_file_path = quixel_image_png_file_pattern_opt.set_update_to(**pattern_kwargs).get_value()
+        quixel_image_png_file_path = quixel_image_png_file_pattern_opt.update_variants_to(**pattern_kwargs).get_value()
         image_preview_png_file_pattern_opt = dtb_opt.get_pattern_opt('image-preview-png-file')
-        file_path = image_preview_png_file_pattern_opt.set_update_to(**pattern_kwargs).get_value()
+        file_path = image_preview_png_file_pattern_opt.update_variants_to(**pattern_kwargs).get_value()
         file_path_glog_pattern_src = '{}/*_Preview.png'.format(directory_path_src)
         file_paths_src = glob.glob(file_path_glog_pattern_src)
         if file_paths_src:
@@ -203,8 +210,11 @@ class ScpResourcesAddByQuixel(object):
             file_opt_src.set_copy_to_file(quixel_image_png_file_path)
             file_opt_src.set_copy_to_file(file_path)
         return file_path
+
     @classmethod
-    def dtb_create_resource_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, resource_directory_path_tgt, json_content):
+    def dtb_create_resource_fnc(
+            cls, dtb_opt, resource_dtb_path, version_dtb_path, resource_directory_path_tgt, json_content
+            ):
         is_create, dtb_resource = dtb_opt.create_resource(resource_dtb_path, gui_name=json_content.get('name'))
         if is_create is True:
             # add properties
@@ -224,10 +234,11 @@ class ScpResourcesAddByQuixel(object):
                 dtb_opt,
                 resource_dtb_path, json_content
             )
+
     @classmethod
     def dtb_assign_resource_types_fnc(cls, dtb_opt, resource_dtb_path, json_content):
-        c_c = json_content.get_content('assetCategories')
-        keys = c_c.get_leaf_keys()
+        c_c = json_content.get_as_content('assetCategories')
+        keys = c_c.get_all_leaf_keys()
         c = 4
         for i_key in keys:
             i_keys = i_key.split('.')
@@ -236,7 +247,7 @@ class ScpResourcesAddByQuixel(object):
             if i_c < 3:
                 i_key_args += ['other']*(c-i_c-1)
             elif i_c > 3:
-                i_key_args = i_key_args[:2] + ['_'.join(i_key_args[2:])]
+                i_key_args = i_key_args[:2]+['_'.join(i_key_args[2:])]
             #
             i_key_args = [bsc_core.RawTextMtd.clear_up_to(i).lower() for i in i_key_args]
             #
@@ -252,6 +263,7 @@ class ScpResourcesAddByQuixel(object):
                 bsc_core.Log.trace_method_warning(
                     'add resource', 'type="{}" is not register in database'.format(i_type_path)
                 )
+
     @classmethod
     def dtb_assign_resource_tags_fnc(cls, dtb_opt, resource_dtb_path, json_content):
         # add semantic tags
@@ -281,8 +293,12 @@ class ScpResourcesAddByQuixel(object):
                 else:
                     pass
         # add other tags
+
     @classmethod
-    def dtb_create_version_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, version_stg_path_tgt, metadata_file_path_tgt, preview_file_path_tgt):
+    def dtb_create_version_fnc(
+            cls, dtb_opt, resource_dtb_path, version_dtb_path, version_stg_path_tgt, metadata_file_path_tgt,
+            preview_file_path_tgt
+            ):
         is_create, dtb_version = dtb_opt.create_version(
             version_dtb_path
         )
@@ -300,6 +316,7 @@ class ScpResourcesAddByQuixel(object):
             dtb_opt.create_property(
                 version_dtb_path, 'image_preview_file', preview_file_path_tgt, kind=dtb_opt.Kinds.Version
             )
+
     @classmethod
     def dtb_create_storage_fnc(cls, dtb_opt, pattern_kwargs, version_dtb_path, version_stg_path):
         dtb_cfg_opt = dtb_opt.get_database_configure_opt()
@@ -308,7 +325,7 @@ class ScpResourcesAddByQuixel(object):
             i_kind = i_v['kind']
             i_keyword = i_v['keyword']
             i_pattern_opt = dtb_opt.get_pattern_opt(i_keyword)
-            i_storage_stg_path = i_pattern_opt.set_update_to(**pattern_kwargs).get_value()
+            i_storage_stg_path = i_pattern_opt.update_variants_to(**pattern_kwargs).get_value()
             if i_storage_stg_path.startswith(version_stg_path):
                 i_storage_dtb_path = '{}/{}'.format(version_dtb_path, i_k)
                 i_is_create, i_dtb_storage = dtb_opt.create_storage(
@@ -331,14 +348,19 @@ class ScpResourcesAddByQuixel(object):
                     )
             else:
                 raise RuntimeError()
+
     # texture
     @classmethod
-    def stg_and_dtb_add_textures_fnc(cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src):
+    def stg_and_dtb_add_textures_fnc(
+            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+            ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-texture-dir')
         #
-        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.set_update_to(**pattern_kwargs).get_value()
+        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
         #
-        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(ext_includes=['.jpg', '.png', '.tga', '.exr'])
+        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(
+            ext_includes=['.jpg', '.png', '.tga', '.exr']
+            )
         for i_file_path_src in file_paths:
             # copy to quixel
             bsc_core.StgFileOpt(i_file_path_src).set_copy_to_directory(
@@ -347,7 +369,7 @@ class ScpResourcesAddByQuixel(object):
             # lod texture
             i_lod_pattern_opt_src = bsc_core.PtnParseOpt(
                 '{}/{}'.format(directory_path_src, cls.TEXTURE_LOD_PATTERN),
-                key_format=dict(texture_key='*', texture_size_tag='[0-9]')
+                variants=dict(texture_key='*', texture_size_tag='[0-9]')
             )
             if i_lod_pattern_opt_src.get_is_matched(i_file_path_src) is True:
                 cls.stg_and_dtb_add_any_texture_fnc(
@@ -373,7 +395,7 @@ class ScpResourcesAddByQuixel(object):
             else:
                 pattern_opt_src = bsc_core.PtnParseOpt(
                     '{}/{}'.format(directory_path_src, cls.TEXTURE_PATTERN),
-                    key_format=dict(texture_key='*', texture_size_tag='[0-9]')
+                    variants=dict(texture_key='*', texture_size_tag='[0-9]')
                 )
                 if pattern_opt_src.get_is_matched(i_file_path_src) is True:
                     cls.stg_and_dtb_add_any_texture_fnc(
@@ -384,8 +406,12 @@ class ScpResourcesAddByQuixel(object):
                         'texture-original-src-file',
                         is_lod=False
                     )
+
     @classmethod
-    def stg_and_dtb_add_any_texture_fnc(cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, keyword, is_lod):
+    def stg_and_dtb_add_any_texture_fnc(
+            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, keyword,
+            is_lod
+            ):
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
         pattern_kwargs_src = copy.copy(pattern_kwargs)
         variants_src = pattern_opt_src.get_variants(file_path_src)
@@ -395,7 +421,7 @@ class ScpResourcesAddByQuixel(object):
         texture_type_tag = bsc_core.RawTextMtd.clear_up_to(texture_type_tag).strip().lower()
         pattern_kwargs_src['texture_type_tag'] = texture_type_tag
         #
-        texture_stg_path = pattern_opt_tgt.set_update_to(
+        texture_stg_path = pattern_opt_tgt.update_variants_to(
             **pattern_kwargs_src
         ).get_value()
         #
@@ -410,8 +436,11 @@ class ScpResourcesAddByQuixel(object):
                 texture_stg_path, texture_type_tag,
                 keyword
             )
+
     @classmethod
-    def dtb_create_any_texture_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, texture_type_tag, keyword):
+    def dtb_create_any_texture_fnc(
+            cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, texture_type_tag, keyword
+            ):
         key = 'texture_{}_file'.format(texture_type_tag)
         # texture
         file_dtb_path = '{}/{}'.format(version_dtb_path, key)
@@ -449,12 +478,15 @@ class ScpResourcesAddByQuixel(object):
             'database register',
             'entity="{}"'.format(file_dtb_path)
         )
+
     # texture extra
     @classmethod
-    def stg_and_dtb_add_textures_extra_fnc(cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src):
+    def stg_and_dtb_add_textures_extra_fnc(
+            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+            ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-texture-dir')
         #
-        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.set_update_to(**pattern_kwargs).get_value()
+        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
         for i_index, i_key_extra in enumerate(cls.TEXTURE_EXTRA_KEYS):
             i_directory_path_extra = '{}/{}'.format(directory_path_src, i_key_extra)
             if bsc_core.StgDirectoryOpt(i_directory_path_extra).get_is_exists() is True:
@@ -465,7 +497,7 @@ class ScpResourcesAddByQuixel(object):
                 if i_file_paths_src:
                     i_pattern_opt_extra_src = bsc_core.PtnParseOpt(
                         '{}/{}'.format(i_directory_path_extra, cls.TEXTURE_EXTRA_PATTERN),
-                        key_format=dict(texture_key='*', texture_size_tag='[0-9]')
+                        variants=dict(texture_key='*', texture_size_tag='[0-9]')
                     )
                     for j_file_path_src in i_file_paths_src:
                         if i_pattern_opt_extra_src.get_is_matched(j_file_path_src) is True:
@@ -486,8 +518,12 @@ class ScpResourcesAddByQuixel(object):
                                     j_file_path_src,
                                     i_key_extra, 'texture-original-extra-src-file'
                                 )
+
     @classmethod
-    def stg_and_dtb_add_any_texture_extra_fnc(cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, key_extra, keyword):
+    def stg_and_dtb_add_any_texture_extra_fnc(
+            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src,
+            key_extra, keyword
+            ):
         key_extra = key_extra.lower()
         #
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
@@ -501,7 +537,7 @@ class ScpResourcesAddByQuixel(object):
         # over texture key
         pattern_kwargs_src['key_extra'] = key_extra
         #
-        file_stg_path = pattern_opt_tgt.set_update_to(
+        file_stg_path = pattern_opt_tgt.update_variants_to(
             **pattern_kwargs_src
         ).get_value()
         #
@@ -514,8 +550,11 @@ class ScpResourcesAddByQuixel(object):
             texture_type_tag, file_stg_path,
             key_extra, keyword
         )
+
     @classmethod
-    def dtb_create_any_texture_extra_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, texture_type_tag, file_stg_path, key_extra, keyword):
+    def dtb_create_any_texture_extra_fnc(
+            cls, dtb_opt, resource_dtb_path, version_dtb_path, texture_type_tag, file_stg_path, key_extra, keyword
+            ):
         key = '{}/texture_{}_file'.format(key_extra, texture_type_tag)
         # file
         file_dtb_path = '{}/{}'.format(version_dtb_path, key)
@@ -553,14 +592,19 @@ class ScpResourcesAddByQuixel(object):
             'database register',
             'entity="{}"'.format(file_dtb_path)
         )
+
     # geometry
     @classmethod
-    def stg_and_dtb_add_geometries_fnc(cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src):
+    def stg_and_dtb_add_geometries_fnc(
+            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+            ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-geometry-dir')
         #
-        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.set_update_to(**pattern_kwargs).get_value()
+        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
         #
-        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(ext_includes=['.fbx', '.abc', '.obj', '.usd'])
+        file_paths = bsc_core.StgDirectoryOpt(directory_path_src).get_file_paths(
+            ext_includes=['.fbx', '.abc', '.obj', '.usd']
+            )
         for i_file_path_src in file_paths:
             # copy to quixel
             bsc_core.StgFileOpt(i_file_path_src).set_copy_to_directory(
@@ -594,14 +638,18 @@ class ScpResourcesAddByQuixel(object):
                         i_file_format, i_keyword,
                         is_lod=False,
                     )
+
     @classmethod
-    def stg_and_dtb_add_any_geometry_fnc(cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, ext, keyword, is_lod):
+    def stg_and_dtb_add_any_geometry_fnc(
+            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, ext,
+            keyword, is_lod
+            ):
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
         pattern_kwargs_src = copy.copy(pattern_kwargs)
         variants_src = pattern_opt_src.get_variants(file_path_src)
         pattern_kwargs_src.update(variants_src)
         #
-        file_stg_path = pattern_opt_tgt.set_update_to(
+        file_stg_path = pattern_opt_tgt.update_variants_to(
             **pattern_kwargs_src
         ).get_value()
         #
@@ -615,6 +663,7 @@ class ScpResourcesAddByQuixel(object):
                 file_stg_path,
                 ext, keyword
             )
+
     @classmethod
     def dtb_create_any_geometry_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, ext, keyword):
         key = 'geometry_{}_file'.format(ext)
@@ -647,12 +696,15 @@ class ScpResourcesAddByQuixel(object):
             'database register',
             'entity="{}"'.format(file_dtb_path)
         )
+
     # geometry variable
     @classmethod
-    def stg_and_dtb_add_geometries_var_fnc(cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src):
+    def stg_and_dtb_add_geometries_var_fnc(
+            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+            ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-geometry-dir')
         #
-        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.set_update_to(**pattern_kwargs).get_value()
+        quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
         for i_var_index in range(20):
             i_var_index = str(i_var_index)
             i_key_extra = cls.GEOMETRY_VAR_KEY.format(
@@ -708,8 +760,12 @@ class ScpResourcesAddByQuixel(object):
                                     j_file_format, j_keyword,
                                     is_var=False, is_lod=False
                                 )
+
     @classmethod
-    def stg_and_dtb_add_any_geometry_var_fnc(cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, var_index, ext, keyword, is_var, is_lod):
+    def stg_and_dtb_add_any_geometry_var_fnc(
+            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src,
+            var_index, ext, keyword, is_var, is_lod
+            ):
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
         #
         pattern_kwargs_src = copy.copy(pattern_kwargs)
@@ -718,7 +774,7 @@ class ScpResourcesAddByQuixel(object):
         # over texture key
         pattern_kwargs_src['var_index'] = var_index
         #
-        file_stg_path = pattern_opt_tgt.set_update_to(
+        file_stg_path = pattern_opt_tgt.update_variants_to(
             **pattern_kwargs_src
         ).get_value()
 
@@ -735,8 +791,6 @@ class ScpResourcesAddByQuixel(object):
 
 
 if __name__ == '__main__':
-    from lxbasic import bsc_core
-
     scp = ScpResourcesAddByQuixel()
     # scp.add_resource_by_any_json(
     #     '/l/temp/zeqi/lib/3d/rock_granite_ohlx3/ohlx3.json'

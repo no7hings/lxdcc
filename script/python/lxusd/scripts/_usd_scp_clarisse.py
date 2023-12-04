@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-from lxusd import usd_core
+import lxusd.core as usd_core
 
 
 class UsdScpForClarisseCleanup(object):

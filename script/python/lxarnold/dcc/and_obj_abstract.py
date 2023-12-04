@@ -3,19 +3,17 @@ import copy
 # noinspection PyUnresolvedReferences
 import arnold as ai
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-from lxutil import utl_core
-
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxuniverse.abstracts as unr_abstracts
 
-from lxutil.objects import _utl_obj_raw
+import lxarnold.core as and_core
 
-from lxarnold import and_configure, and_core
+from lxutil.objects import _utl_obj_raw
 
 
 class AbsDotAssDef(object):
@@ -35,9 +33,9 @@ class AbsDotMtlxDef(object):
         pass
 
     def _set_geometry_objs_build_(self, geometries_properties, root):
-        and_obj_type = ai.AiNodeEntryLookUp(and_configure.ObjType.AND_MESH_NAME)
+        and_obj_type = ai.AiNodeEntryLookUp(and_core.AndNodeTypes.AND_MESH_NAME)
         for geometry_properties in geometries_properties:
-            obj_category = self.universe.generate_obj_category(and_configure.ObjCategory.LYNXI)
+            obj_category = self.universe.generate_obj_category(and_core.AndNodeCategories.LYNXI)
             obj_type_name = geometry_properties.get('type')
             obj_type = obj_category.generate_type(obj_type_name)
             obj_path = geometry_properties.get('path')
@@ -98,10 +96,10 @@ class AbsObjScene(
         #
         self._platform = bsc_core.PlatformMtd.get_current()
 
-        self._node_configure = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('arnold/node')
+        self._node_configure = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('arnold/node')
         )
-        self._node_configure.set_flatten()
+        self._node_configure.do_flatten()
 
     @property
     def ar_universe(self):
@@ -129,24 +127,24 @@ class AbsObjScene(
         and_obj_type_name = and_obj_mtd.type_name
         and_obj_category_name = and_obj_mtd.category_name
         # shape
-        if and_obj_category_name in {and_configure.ObjCategory.AND_SHAPE_NAME}:
-            shape_and_obj_mtd = and_core.AndShapeObjMtd(and_universe, and_obj)
+        if and_obj_category_name in {and_core.AndNodeCategories.AND_SHAPE_NAME}:
+            shape_and_obj_mtd = and_core.AndShapeOpt(and_universe, and_obj)
             # mesh
-            if and_obj_type_name in {and_configure.ObjType.AND_MESH_NAME}:
+            if and_obj_type_name in {and_core.AndNodeTypes.AND_MESH_NAME}:
                 self._set_dcc_mesh_objs_build_(shape_and_obj_mtd)
             # curve
-            elif and_obj_type_name in {and_configure.ObjType.AND_CURVE_NAME}:
+            elif and_obj_type_name in {and_core.AndNodeTypes.AND_CURVE_NAME}:
                 self._set_dcc_curves_build_(shape_and_obj_mtd)
             # xgen
-            elif and_obj_type_name in {and_configure.ObjType.AND_XGEN_NAME}:
+            elif and_obj_type_name in {and_core.AndNodeTypes.AND_XGEN_NAME}:
                 self._set_dcc_xgen_objs_build_(shape_and_obj_mtd)
         # shader
-        elif and_obj_category_name in {and_configure.ObjCategory.AND_SHADER_NAME}:
-            shader_and_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_obj)
+        elif and_obj_category_name in {and_core.AndNodeCategories.AND_SHADER_NAME}:
+            shader_and_obj_mtd = and_core.AndShaderOpt(and_universe, and_obj)
             self._set_dcc_shader_objs_build(shader_and_obj_mtd)
         # others
         else:
-            shader_and_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_obj)
+            shader_and_obj_mtd = and_core.AndShaderOpt(and_universe, and_obj)
             self._set_dcc_shader_objs_build(shader_and_obj_mtd)
 
     # <input-port>
@@ -157,7 +155,7 @@ class AbsObjScene(
         input_port_iterator = ai.AiNodeEntryGetParamIterator(and_obj_type)
         while not ai.AiParamIteratorFinished(input_port_iterator):
             and_input_port = ai.AiParamIteratorGetNext(input_port_iterator)
-            and_input_port_mtd = and_core.AndPortMtd(and_obj, and_input_port)
+            and_input_port_mtd = and_core.AndPortOpt(and_obj, and_input_port)
             and_input_port_name = and_input_port_mtd.port_name
             #
             if isinstance(include, (tuple, list)):
@@ -180,7 +178,7 @@ class AbsObjScene(
         custom_input_port_iterator = ai.AiNodeGetUserParamIterator(and_obj)
         while not ai.AiUserParamIteratorFinished(custom_input_port_iterator):
             and_custom_input_port = ai.AiUserParamIteratorGetNext(custom_input_port_iterator)
-            and_custom_input_port_mtd = and_core.AndCustomPortMtd(and_obj, and_custom_input_port)
+            and_custom_input_port_mtd = and_core.AndPortOptForCustomize(and_obj, and_custom_input_port)
             and_custom_input_port_name = and_custom_input_port_mtd.port_name
             #
             if isinstance(include, (tuple, list)):
@@ -212,7 +210,7 @@ class AbsObjScene(
             ar_port_enumerate_strings = []
         # type
         and_exact_type = and_port_mtd.exact_type
-        dcc_category_name, dcc_type_name = and_core.AndTypeMtd(and_exact_type).get_dcc_type_args(and_type_is_array)
+        dcc_category_name, dcc_type_name = and_core.AndTypeOpt(and_exact_type).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe.generate_type(dcc_category_name, dcc_type_name)
         #
         dcc_port_raw_default = and_port_mtd.get_default()
@@ -223,7 +221,7 @@ class AbsObjScene(
             if and_exact_type == ai.AI_TYPE_STRING:
                 dcc_port_raw = bsc_core.StgEnvPathMapper.map_to_path(dcc_port_raw)
         #
-        dcc_input_port = dcc_obj.generate_port(dcc_type, and_port_name, unr_configure.PortAssign.INPUTS)
+        dcc_input_port = dcc_obj.generate_port(dcc_type, and_port_name, unr_core.UnrPortAssign.INPUTS)
         dcc_input_port.set_custom(is_custom)
         #
         dcc_input_port.set(dcc_port_raw)
@@ -240,7 +238,7 @@ class AbsObjScene(
         if and_type_is_array is True:
             # input element
             and_input_port_array = and_port_mtd.get_array()
-            and_input_port_array_element_count = and_core.AndArrayMtd(and_input_port_array).get_element_count()
+            and_input_port_array_element_count = and_core.AndArrayOpt(and_input_port_array).get_element_count()
             self._set_dcc_port_elements_build_(
                 and_obj_mtd=and_obj_mtd,
                 and_type=and_exact_type,
@@ -261,9 +259,9 @@ class AbsObjScene(
         and_output_type = and_obj_mtd.output_type
         dcc_output_port_name = and_obj_mtd.get_dcc_output_port_name()
 
-        dcc_category_name, dcc_type_name = and_core.AndTypeMtd(and_output_type).get_dcc_type_args(and_type_is_array)
+        dcc_category_name, dcc_type_name = and_core.AndTypeOpt(and_output_type).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe.generate_type(dcc_category_name, dcc_type_name)
-        dcc_output = dcc_obj.generate_port(dcc_type, dcc_output_port_name, unr_configure.PortAssign.OUTPUTS)
+        dcc_output = dcc_obj.generate_port(dcc_type, dcc_output_port_name, unr_core.UnrPortAssign.OUTPUTS)
         # output channel
         self._set_dcc_port_channels_build_(
             and_obj_mtd=and_obj_mtd,
@@ -292,7 +290,7 @@ class AbsObjScene(
 
     # <port-channel>
     def _set_dcc_port_channels_build_(self, and_obj_mtd, and_type, dcc_port):
-        port_channel_dcc_names = and_core.AndTypeMtd(and_type).get_dcc_channel_names()
+        port_channel_dcc_names = and_core.AndTypeOpt(and_type).get_dcc_channel_names()
         for port_channel_dcc_name in port_channel_dcc_names:
             port_channel_dcc_obj = dcc_port._set_channel_create_(port_channel_dcc_name)
             port_channel_dcc_path = port_channel_dcc_obj.port_path
@@ -314,8 +312,8 @@ class AbsObjScene(
                 dcc_source_obj_args, dcc_source_port_args = source_args
                 source_and_obj_name = dcc_source_obj_args[-1]
                 and_universe = and_obj_mtd.universe
-                source_and_obj = and_core.AndUniverseMtd(and_universe).get_obj(source_and_obj_name)
-                source_and_obj_mtd = and_core.AndObjMtd(and_universe, source_and_obj)
+                source_and_obj = and_core.AndUniverseOpt(and_universe).get_obj(source_and_obj_name)
+                source_and_obj_mtd = and_core.AndNodeOpt(and_universe, source_and_obj)
                 source_index = self._index_dict[source_and_obj_name]
                 source_and_prettify_obj_name = source_and_obj_mtd.set_name_prettify(
                     source_index, self._look_pass_name, self._time_tag
@@ -359,7 +357,7 @@ class AbsObjScene(
             # property
             self._set_dcc_geometry_obj_properties_build_(
                 shape_and_obj_mtd, i_dcc_mesh,
-                blacklist=and_configure.ObjProperty.AR_MESH_BLACKLIST
+                blacklist=and_core.AndNodeProperties.AR_MESH_BLACKLIST
             )
             # visibility
             self._set_dcc_geometry_obj_visibilities_build_(shape_and_obj_mtd, i_dcc_mesh)
@@ -379,13 +377,13 @@ class AbsObjScene(
     def create_mesh_for_maya_fnc(self, maya_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
             # trim <shape-name>
-            and_configure.ObjType.LYNXI_MESH_ARGS, maya_obj_path.split(and_configure.Node.MAYA_PATHSEP)
+            and_core.AndNodeTypes.LYNXI_MESH_ARGS, maya_obj_path.split(and_core.AndNodes.MAYA_PATHSEP)
         )
         return [dcc_obj]
 
     def create_mesh_fnc(self, shape_and_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
-            and_configure.ObjType.LYNXI_MESH_ARGS, shape_and_obj_path.split(and_configure.Node.ARNOLD_PATHSEP)
+            and_core.AndNodeTypes.LYNXI_MESH_ARGS, shape_and_obj_path.split(and_core.AndNodes.ARNOLD_PATHSEP)
         )
         return [dcc_obj]
 
@@ -405,20 +403,20 @@ class AbsObjScene(
 
     def _set_dcc_geometry_obj_visibility_build_(self, dcc_obj, dcc_port_name, dcc_port_raw):
         and_type_is_array = False
-        dcc_category_name, dcc_type_name = and_core.AndTypeMtd(ai.AI_TYPE_BOOLEAN).get_dcc_type_args(and_type_is_array)
+        dcc_category_name, dcc_type_name = and_core.AndTypeOpt(ai.AI_TYPE_BOOLEAN).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe.generate_type(dcc_category_name, dcc_type_name)
-        dcc_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
+        dcc_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_core.UnrPortAssign.INPUTS)
         dcc_port.set(dcc_port_raw)
         dcc_port.set_default(True)
         return dcc_port
 
     def _set_dcc_obj_material_input_build_(self, dcc_obj, dcc_port_raw, dcc_port_raw_default):
         and_type_is_array = True
-        dcc_category_name, dcc_type_name = and_core.AndTypeMtd(ai.AI_TYPE_NODE).get_dcc_type_args(and_type_is_array)
+        dcc_category_name, dcc_type_name = and_core.AndTypeOpt(ai.AI_TYPE_NODE).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe.generate_type(dcc_category_name, dcc_type_name)
-        dcc_port_name = and_configure.GeometryPort.MATERIAL
+        dcc_port_name = and_core.AndGeometryPorts.MATERIAL
         #
-        _dcc_material_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
+        _dcc_material_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_core.UnrPortAssign.INPUTS)
         _dcc_material_port.set(dcc_port_raw)
         _dcc_material_port.set_default(dcc_port_raw_default)
 
@@ -438,21 +436,21 @@ class AbsObjScene(
             # property
             self._set_dcc_geometry_obj_properties_build_(
                 shape_and_obj_mtd, dcc_curve_obj,
-                blacklist=and_configure.ObjProperty.AR_CURVE_BLACKLIST
+                blacklist=and_core.AndNodeProperties.AR_CURVE_BLACKLIST
             )
             # visibility
             self._set_dcc_geometry_obj_visibilities_build_(shape_and_obj_mtd, dcc_curve_obj)
 
     def _set_curve_objs_create_(self, shape_and_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
-            and_configure.ObjType.LYNXI_CURVE_ARGS, shape_and_obj_path.split(and_configure.Node.ARNOLD_PATHSEP)
+            and_core.AndNodeTypes.LYNXI_CURVE_ARGS, shape_and_obj_path.split(and_core.AndNodes.ARNOLD_PATHSEP)
         )
         return [dcc_obj]
 
     def _get_maya_curve_objs_(self, maya_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
             # trim <shape-name>
-            and_configure.ObjType.LYNXI_CURVE_ARGS, maya_obj_path.split(and_configure.Node.MAYA_PATHSEP)
+            and_core.AndNodeTypes.LYNXI_CURVE_ARGS, maya_obj_path.split(and_core.AndNodes.MAYA_PATHSEP)
         )
         return [dcc_obj]
 
@@ -472,7 +470,7 @@ class AbsObjScene(
             # property
             self._set_dcc_geometry_obj_properties_build_(
                 shape_and_obj_mtd, dcc_xgen_obj,
-                blacklist=and_configure.ObjProperty.AR_XGEN_BLACKLIST
+                blacklist=and_core.AndNodeProperties.AR_XGEN_BLACKLIST
             )
             # visibility
             self._set_dcc_geometry_obj_visibilities_build_(shape_and_obj_mtd, dcc_xgen_obj)
@@ -480,17 +478,17 @@ class AbsObjScene(
     def _get_maya_xgen_objs_(self, maya_obj_path):
         dcc_obj = self._set_dcc_geometry_create_(
             # trim <shape-name>
-            and_configure.ObjType.LYNXI_XGEN_DESCRIPTION_ARGS, maya_obj_path.split(and_configure.Node.MAYA_PATHSEP)[:-1]
+            and_core.AndNodeTypes.LYNXI_XGEN_DESCRIPTION_ARGS, maya_obj_path.split(and_core.AndNodes.MAYA_PATHSEP)[:-1]
         )
         return [dcc_obj]
 
     def _set_xgen_description_objs_create_(self, dcc_obj_path):
-        obj_path_args = dcc_obj_path.split(and_configure.Node.ARNOLD_PATHSEP)
+        obj_path_args = dcc_obj_path.split(and_core.AndNodes.ARNOLD_PATHSEP)
         if obj_path_args[-1].endswith('Shape'):
             obj_path_args = obj_path_args[:-1]
         dcc_obj = self._set_dcc_geometry_create_(
             # trim <shape-name>
-            obj_type_args=and_configure.ObjType.LYNXI_XGEN_DESCRIPTION_ARGS, obj_path_args=obj_path_args
+            obj_type_args=and_core.AndNodeTypes.LYNXI_XGEN_DESCRIPTION_ARGS, obj_path_args=obj_path_args
         )
         return [dcc_obj]
 
@@ -501,7 +499,7 @@ class AbsObjScene(
         and_surface_shader_objs = shape_and_obj_mtd.get_surface_shader_objs()
         and_surface_shader_obj_name = None
         if and_surface_shader_objs:
-            and_surface_shader_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_surface_shader_objs[0])
+            and_surface_shader_obj_mtd = and_core.AndShaderOpt(and_universe, and_surface_shader_objs[0])
             orig_and_surface_shader_obj_name = and_surface_shader_obj_mtd.name
             if orig_and_surface_shader_obj_name is not None:
                 if orig_and_surface_shader_obj_name != 'ai_default_reflection_shader':
@@ -513,7 +511,7 @@ class AbsObjScene(
         and_displacement_shader_obj_name = None
         and_displacement_shader_objs = shape_and_obj_mtd.get_displacement_shader_objs()
         if and_displacement_shader_objs:
-            and_displacement_shader_obj_mtd = and_core.AndShaderObjMtd(and_universe, and_displacement_shader_objs[0])
+            and_displacement_shader_obj_mtd = and_core.AndShaderOpt(and_universe, and_displacement_shader_objs[0])
             orig_and_displacement_shader_obj_name = and_displacement_shader_obj_mtd.name
             if orig_and_displacement_shader_obj_name is not None:
                 if orig_and_displacement_shader_obj_name != 'ai_default_reflection_shader':
@@ -555,15 +553,15 @@ class AbsObjScene(
         return dcc_nodes
 
     def _set_dcc_material_build_(self, material_dcc_obj_name, shader_dcc_obj_names):
-        dcc_obj_type = self.universe.generate_obj_type(*and_configure.ObjType.LYNXI_MATERIAL_ARGS)
+        dcc_obj_type = self.universe.generate_obj_type(*and_core.AndNodeTypes.LYNXI_MATERIAL_ARGS)
         obj_path_args = ('', material_dcc_obj_name)
         dcc_obj = dcc_obj_type.generate_obj(obj_path_args)
         # shader port
         and_surface_shader_obj_name, and_displacement_shader_obj_name, and_volume_shader_obj_name = shader_dcc_obj_names
         shader_build_args = [
-            (and_surface_shader_obj_name, and_configure.MaterialPort.SURFACE),
-            (and_displacement_shader_obj_name, and_configure.MaterialPort.DISPLACEMENT),
-            (and_volume_shader_obj_name, and_configure.MaterialPort.VOLUME)
+            (and_surface_shader_obj_name, and_core.AndMaterialPorts.SURFACE),
+            (and_displacement_shader_obj_name, and_core.AndMaterialPorts.DISPLACEMENT),
+            (and_volume_shader_obj_name, and_core.AndMaterialPorts.VOLUME)
         ]
         for shader_and_obj_name, material_dcc_port_name in shader_build_args:
             self._set_dcc_material_bind_port_build_(
@@ -575,9 +573,9 @@ class AbsObjScene(
 
     def _set_dcc_material_bind_port_build_(self, dcc_obj, dcc_port_name, dcc_port_raw):
         and_type_is_array = False
-        dcc_category_name, dcc_type_name = and_core.AndTypeMtd(ai.AI_TYPE_CLOSURE).get_dcc_type_args(and_type_is_array)
+        dcc_category_name, dcc_type_name = and_core.AndTypeOpt(ai.AI_TYPE_CLOSURE).get_dcc_type_args(and_type_is_array)
         dcc_type = self.universe.generate_type(dcc_category_name, dcc_type_name)
-        dcc_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_configure.PortAssign.INPUTS)
+        dcc_port = dcc_obj.generate_port(dcc_type, dcc_port_name, unr_core.UnrPortAssign.INPUTS)
         if dcc_port_raw is not None:
             shader_obj_path = '/{}'.format(dcc_port_raw)
         else:
@@ -616,11 +614,11 @@ class AbsObjScene(
         )
         with bsc_core.LogProcessContext.create(maximum=len(self._index_dict.keys()), label='ass load') as l_p:
             while not ai.AiNodeIteratorFinished(and_obj_iterator):
-                l_p.set_update()
+                l_p.do_update()
                 and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)
-                and_obj_mtd = and_core.AndObjMtd(self._and_universe, and_obj)
+                and_obj_mtd = and_core.AndNodeOpt(self._and_universe, and_obj)
                 and_obj_name = and_obj_mtd.name
-                if and_obj_name not in and_configure.Node.BUILTINS:
+                if and_obj_name not in and_core.AndNodes.BUILTINS:
                     # filter by node-type-category
                     self._set_dcc_obj_build_(and_obj_mtd)
         # node iterator finish
@@ -635,7 +633,7 @@ class AbsObjScene(
         index = 0
         while not ai.AiNodeIteratorFinished(and_obj_iterator):
             and_obj = ai.AiNodeIteratorGetNext(and_obj_iterator)
-            and_obj_mtd = and_core.AndObjMtd(self._and_universe, and_obj)
+            and_obj_mtd = and_core.AndNodeOpt(self._and_universe, and_obj)
             and_obj_name = and_obj_mtd.name
             #
             index += 1

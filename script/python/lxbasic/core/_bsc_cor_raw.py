@@ -3,7 +3,17 @@ import hashlib
 
 import six
 
-from ._bsc_cor_utility import *
+import math
+
+import copy
+
+import re
+
+import fnmatch
+
+import collections
+
+import itertools
 
 
 class RawColorMtd(object):
@@ -48,6 +58,7 @@ class RawColorMtd(object):
             r, g, b = float((r_+m)), float((g_+m)), float((b_+m))
         return r, g, b
 
+    # noinspection PyUnusedLocal
     @classmethod
     def rgb_to_hsv(cls, r, g, b, maximum=255):
         r, g, b = r/255.0, g/255.0, b/255.0
@@ -78,10 +89,12 @@ class RawColorMtd(object):
         v_ = v
         return h_, s_, v_
 
+    # noinspection PyUnusedLocal
     @classmethod
     def get_complementary_rgb(cls, r, g, b, maximum=255):
         return abs(255-r), abs(255-g), abs(255-b)
 
+    # noinspection PyUnusedLocal
     @classmethod
     def set_rgb_offset(cls, rgb, hsv_offset):
         r, g, b = rgb
@@ -111,7 +124,6 @@ class RawColorMtd(object):
         p = float(index)/float(count)
         i_0 = 360.0*p
         i_1 = 360.0*(1.0-p)
-        i_offset = i_0%60.0
         i_offset = 0
         a_0 = i_0+offset+seed+i_offset
         a_1 = i_1+offset+seed-i_offset
@@ -349,12 +361,12 @@ class RawValueMtd(object):
         return value
 
     @classmethod
-    def map_to(cls, value, sourceValueRange, targetValueRange):
-        assert isinstance(sourceValueRange, (tuple, list)), 'Argument Error, "sourceValueRange" Must "tuple" or "list".'
-        assert isinstance(targetValueRange, (tuple, list)), 'Argument Error, "targetValueRange" Must "tuple" or "list".'
+    def map_to(cls, value, range_0, range_1):
+        assert isinstance(range_0, (tuple, list)), 'Argument Error, "range_0" Must "tuple" or "list".'
+        assert isinstance(range_1, (tuple, list)), 'Argument Error, "range_1" Must "tuple" or "list".'
 
-        min0, max0 = sourceValueRange
-        min1, max1 = targetValueRange
+        min0, max0 = range_0
+        min1, max1 = range_1
         #
         if max0-min0 > 0:
             percent = float(value-min0)/float(max0-min0)
@@ -939,13 +951,6 @@ class RawSizeMtd(object):
         x, y = int((w_1-w)/2), int((h_1-h)/2)
         return x, y, w, h
 
-    @classmethod
-    def set_fill_to(cls, size_0, size_1):
-        w_0, h_0 = size_0
-        w_1, h_1 = size_1
-        p_0 = float(w_0)/float(h_0)
-        p_1 = float(w_1)/float(h_1)
-
 
 class RawRectMtd(object):
     @classmethod
@@ -1023,6 +1028,7 @@ class RawMatrix33Opt(object):
     def get_identity(cls):
         return cls.identity_to(cls.get_default())
 
+    # noinspection PyUnusedLocal
     def add_to(self, matrix):
         m1 = self._raw
         m2 = matrix

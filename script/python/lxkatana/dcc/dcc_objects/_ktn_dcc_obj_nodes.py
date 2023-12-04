@@ -10,7 +10,7 @@ import NodegraphAPI
 
 from lxutil import utl_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxkatana import ktn_configure, ktn_core
 
@@ -24,8 +24,10 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
         'NetworkMaterial'
     ]
     DCC_NODE_CLS = _ktn_dcc_obj_node.Material
+
     def __init__(self, *args):
         super(Materials, self).__init__(*args)
+
     @classmethod
     def get_material_dict(cls):
         dic_0 = {}
@@ -52,6 +54,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
                 #     print nmc_objs
                 dic[k] = nmc_objs[0]
         return dic
+
     @classmethod
     def get_nmc_material_dict(cls):
         dic_0 = {}
@@ -72,6 +75,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
             if nmc_objs:
                 dic[k] = nmc_objs[0]
         return dic
+
     @classmethod
     def get_nme_material_dict(cls):
         dic_0 = {}
@@ -92,6 +96,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
             if nme_objs:
                 dic[k] = nme_objs[0]
         return dic
+
     @classmethod
     def pre_run_fnc(cls):
         _ = NodegraphAPI.GetAllNodesByType('NetworkMaterialEdit') or []
@@ -99,7 +104,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
             gp = bsc_core.LogProcessContext(maximum=len(_))
             #
             for i_ktn_obj in _:
-                gp.set_update()
+                gp.do_update()
                 # noinspection PyBroadException
                 try:
                     ktn_core.NGNmeOpt(i_ktn_obj).set_contents_update()
@@ -118,8 +123,10 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
         'ArnoldShadingNode'
     ]
     DCC_NODE_CLS = _ktn_dcc_obj_node.AndShader
+
     def __init__(self, *args):
         super(AndShaders, self).__init__(*args)
+
     @classmethod
     def get_texture_references(cls, **kwargs):
         lis = []
@@ -128,6 +135,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
             if i.get_port('nodeType').get() == 'image':
                 lis.append(i)
         return lis
+
     @classmethod
     def get_standard_surfaces(cls, **kwargs):
         lis = []
@@ -136,6 +144,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
             if i.get_port('nodeType').get() == 'standard_surface':
                 lis.append(i)
         return lis
+
     @classmethod
     def pre_run_fnc(cls):
         _ = NodegraphAPI.GetAllNodesByType('NetworkMaterialEdit') or []
@@ -190,6 +199,7 @@ class AbsTextureReferences(object):
         "{extra}'{base}'%{argument}"
     ]
     EXPRESSION_PATTERN_TGT = '\'{file}\'%{argument}'
+
     def __init__(self, *args, **kwargs):
         self._raw = collections.OrderedDict()
         #
@@ -203,6 +213,7 @@ class AbsTextureReferences(object):
 
     def _get_obj_type_is_available_(self, *args, **kwargs):
         raise NotImplementedError()
+
     @classmethod
     def _get_real_file_path_(cls, port):
         ktn_port = port.ktn_port
@@ -221,6 +232,7 @@ class AbsTextureReferences(object):
                     )
                     return i_file_path_new
         return ktn_port.getValue(0)
+
     @classmethod
     def _set_real_file_path_(cls, port, file_path, remove_expression=False):
         file_path = str(file_path)
@@ -263,6 +275,7 @@ class AbsTextureReferences(object):
                 )
                 return True
         return False
+
     @classmethod
     def _get_expression_(cls, port):
         ktn_port = port.ktn_port
@@ -270,6 +283,7 @@ class AbsTextureReferences(object):
             e = ktn_port.getExpression()
             if e:
                 return e
+
     @classmethod
     def _set_real_file_path_by_atr_path_(cls, atr_path, file_path):
         atr_path_opt = bsc_core.DccAttrPathOpt(atr_path)
@@ -283,6 +297,7 @@ class AbsTextureReferences(object):
         port = obj.get_port(port_path)
         #
         cls._set_real_file_path_(port, file_path)
+
     @classmethod
     def _get_obj_cls_(cls, shader_type_name):
         if shader_type_name in cls.OBJ_CLS_DICT:
@@ -334,6 +349,7 @@ class AbsTextureReferences(object):
     def get_objs(self, exclude_paths=None, include_paths=None):
         self._set_customize_update_(exclude_paths=exclude_paths, include_paths=include_paths)
         return self._raw.values()
+
     @classmethod
     def repath_fnc(cls, obj, port_path, file_path_new, remove_expression=False):
         cls._set_real_file_path_(
@@ -349,11 +365,13 @@ class TextureReferences(AbsTextureReferences):
         'osl_window_box_s',
         'jiWindowBox_Arnold'
     ]
+
     def __init__(self, *args, **kwargs):
         super(TextureReferences, self).__init__(*args, **kwargs)
 
     def _get_obj_type_is_available_(self, obj_type_name):
         return obj_type_name in self.INCLUDE_TYPES
+
     @classmethod
     def _set_obj_reference_update_(cls, obj):
         ktn_obj_opt = ktn_core.NGObjOpt(bsc_core.DccPathDagOpt(obj.path).name)

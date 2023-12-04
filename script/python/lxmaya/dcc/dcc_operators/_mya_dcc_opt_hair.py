@@ -2,9 +2,9 @@
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 from lxmaya import ma_core
 
@@ -27,7 +27,7 @@ class XgenDescriptionOpt(utl_dcc_opt_abs.AbsObjOpt):
             self._obj.get_transform().get_name()
         )
         # replace pathsep
-        raw = raw.replace(self._obj.PATHSEP, unr_configure.Obj.PATHSEP)
+        raw = raw.replace(self._obj.PATHSEP, unr_core.UnrObj.PATHSEP)
         # strip path
         if lstrip is not None:
             if raw.startswith(lstrip):

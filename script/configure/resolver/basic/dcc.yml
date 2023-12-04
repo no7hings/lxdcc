@@ -34,6 +34,8 @@ dcc-data:
         #
         root_name: 'master'
         root: '/master'
+        camera_root: '/camera_grp'
+        camera_root_name: 'camera_grp'
     #
     maya:
         pathsep: '|'
@@ -41,6 +43,8 @@ dcc-data:
         #
         root_name: 'master'
         root: '/master'
+        camera_root: '/camera_grp'
+        camera_root_name: 'camera_grp'
     #
     houdini:
         pathsep: '/'
@@ -48,6 +52,8 @@ dcc-data:
         #
         root_name: 'master'
         root: '/master'
+        camera_root: '/camera_grp'
+        camera_root_name: 'camera_grp'
     #
     katana:
         pathsep: '/'
@@ -55,6 +61,8 @@ dcc-data:
         #
         root_name: 'master'
         root: '/master'
+        camera_root: '/camera_grp'
+        camera_root_name: 'camera_grp'
     #
     clarisse:
         pathsep: '/'
@@ -62,6 +70,8 @@ dcc-data:
         #
         root_name: 'master'
         root: '/master'
+        camera_root: '/camera_grp'
+        camera_root_name: 'camera_grp'
     #
     nuke:
         pathsep: '/'
@@ -69,3 +79,5 @@ dcc-data:
         #
         root_name: 'master'
         root: '/master'
+        camera_root: '/camera_grp'
+        camera_root_name: 'camera_grp'

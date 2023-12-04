@@ -18,11 +18,11 @@ class Setup(object):
 
     @classmethod
     def build_lua(cls):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         bsc_core.EnvExtraMtd.append_lua_path(
             '{}/?.lua'.format(
-                bsc_core.Resource.get(
+                bsc_core.ExtendResource.get(
                     'lua-scripts'
                 )
             )

@@ -304,8 +304,12 @@ asset-source-texture-tx-dir: <asset-source-texture-version-dir>/tx
 asset-source-set-dir: <asset-source-extend-dir>/set
 #       usd
 asset-source-set-usd-dir: <asset-source-set-dir>/usd/<version-name>
+#
 asset-source-asset-set-usd-file: <asset-source-set-usd-dir>/<asset-name>.usda
 asset-source-shot-set-usd-file: <asset-source-set-usd-dir>/<asset-shot-name>.usda
+#
+asset-source-components-set-usd-dir: <asset-source-set-dir>/components-usd/<version-name>
+asset-source-components-set-usd-file: <asset-source-components-set-usd-dir>/<asset-name>.usda
 #
 asset-source-component-usd-dir: <asset-source-set-usd-dir>
 # cache

@@ -10,7 +10,7 @@ def set_scene_new():
     # noinspection PyUnresolvedReferences
     from Katana import KatanaFile
 
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     file_path = args
 

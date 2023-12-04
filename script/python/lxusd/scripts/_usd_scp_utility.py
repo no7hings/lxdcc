@@ -3,9 +3,9 @@ import copy
 
 from lxutil import utl_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-from lxusd import usd_core
+import lxusd.core as usd_core
 
 
 class ShotUsdCombine(object):
@@ -37,7 +37,7 @@ class ShotUsdCombine(object):
         cs = prim_opt.get_children()
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(cs), label='usd combine') as l_p:
             for i_prim in cs:
-                l_p.set_update()
+                l_p.do_update()
                 #
                 i_prim_opt = usd_core.UsdPrimOpt(i_prim)
                 i_port = i_prim_opt.get_port('userProperties:pgOpIn:usd:opArgs:fileName')
@@ -92,7 +92,7 @@ class ShotUsdCombine(object):
 
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(list_), label='usd create') as l_p:
             for i in list_:
-                l_p.set_update()
+                l_p.do_update()
                 file_write_opt.set_obj_add(i)
 
         file_write_opt.set_save()

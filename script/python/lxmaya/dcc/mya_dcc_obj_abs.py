@@ -7,7 +7,7 @@ import maya.api.OpenMaya as om2
 
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_abstract
 
@@ -227,7 +227,7 @@ class AbsMyaPort(utl_abstract.AbsDccPort):
     def get_has_channels(self, alpha=False):
         return self.get_channel_names(alpha=alpha) != []
 
-    def get_channels_count(self, alpha=False):
+    def get_channel_count(self, alpha=False):
         return len(self.get_channel_names(alpha=alpha))
 
     def get_alpha_channel_name(self):

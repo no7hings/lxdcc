@@ -1,7 +1,7 @@
 # coding:utf-8
 import copy
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_configure
 
@@ -9,7 +9,7 @@ import lxresolver.commands as rsv_commands
 
 import lxwarp.shotgun.core as wrp_stg_core
 
-import lxresolver.methods as rsv_methods
+import lxresolver.scripts as rsv_scripts
 
 
 class StgScpTask(object):
@@ -27,7 +27,7 @@ class StgScpTask(object):
                 project=project
             )
             for entity in entities:
-                gp.set_update()
+                gp.do_update()
                 branch, tag = entity_key.split('/')
                 i_entity_kwargs = copy.copy(entity_kwargs)
                 if branch == 'asset':
@@ -60,7 +60,7 @@ class StgScpTask(object):
                             **i_task_kwargs
                         )
                         #
-                        rsv_methods.RsvPermissionMtd.set_entity_task_create(
+                        rsv_scripts.RsvPermissionMtd.set_entity_task_create(
                             **i_task_kwargs
                         )
                     #
@@ -101,7 +101,7 @@ class StgScpTask(object):
                     **i_task_kwargs
                 )
                 #
-                rsv_methods.RsvPermissionMtd.set_entity_task_create(
+                rsv_scripts.RsvPermissionMtd.set_entity_task_create(
                     **i_task_kwargs
                 )
         #

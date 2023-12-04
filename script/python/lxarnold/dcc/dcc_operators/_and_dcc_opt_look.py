@@ -1,9 +1,9 @@
 # coding:utf-8
 import collections
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class AbsLookOpt(object):
@@ -21,15 +21,15 @@ class ShapeLookOpt(AbsLookOpt):
     def __init__(self, *args):
         super(ShapeLookOpt, self).__init__(*args)
 
-        self._node_configure = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('arnold/node')
+        self._node_configure = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('arnold/node')
         )
-        self._node_configure.set_flatten()
+        self._node_configure.do_flatten()
 
-        self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
+        self._convert_configure = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('arnold/convert')
         )
-        self._convert_configure.set_flatten()
+        self._convert_configure.do_flatten()
 
     def get_material_assigns(self):
         material_assigns = collections.OrderedDict()

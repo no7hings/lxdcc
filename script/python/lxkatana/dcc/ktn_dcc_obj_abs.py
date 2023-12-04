@@ -1,18 +1,15 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-import NodegraphAPI
-# noinspection PyUnresolvedReferences
-from Katana import CacheManager
+from lxkatana.core.wrap import *
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
-from lxutil import utl_core, utl_abstract
+from lxutil import utl_abstract
 
 from lxkatana import ktn_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class AbsKtnPort(utl_abstract.AbsDccPort):
@@ -22,11 +19,11 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         super(AbsKtnPort, self).__init__(node, name, port_assign)
 
     def _get_ktn_port_(self):
-        if self.port_assign == unr_configure.PortAssign.VARIANTS:
+        if self.port_assign == unr_core.UnrPortAssign.VARIANTS:
             return NodegraphAPI.GetNode(self.obj.name).getParameter(self.port_path)
-        elif self.port_assign == unr_configure.PortAssign.INPUTS:
+        elif self.port_assign == unr_core.UnrPortAssign.INPUTS:
             return NodegraphAPI.GetNode(self.obj.name).getInputPort(self.port_path)
-        elif self.port_assign == unr_configure.PortAssign.OUTPUTS:
+        elif self.port_assign == unr_core.UnrPortAssign.OUTPUTS:
             return NodegraphAPI.GetNode(self.obj.name).getOutputPort(self.port_path)
         raise TypeError()
 
@@ -62,7 +59,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                 'port create',
                 'attribute="{}"'.format(self.path)
             )
-            if self.port_assign == unr_configure.PortAssign.VARIANTS:
+            if self.port_assign == unr_core.UnrPortAssign.VARIANTS:
                 if parent is not None:
                     parent_ktn_port = self.ktn_obj.getParameter(parent)
                 else:
@@ -72,9 +69,9 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
                     type_, value = args[:2]
                     if type_ == 'string':
                         parent_ktn_port.createChildString(self.port_name, str(value))
-            elif self.port_assign == unr_configure.PortAssign.INPUTS:
+            elif self.port_assign == unr_core.UnrPortAssign.INPUTS:
                 return self.ktn_obj.addInputPort(self.port_name)
-            elif self.port_assign == unr_configure.PortAssign.OUTPUTS:
+            elif self.port_assign == unr_core.UnrPortAssign.OUTPUTS:
                 return self.ktn_obj.addOutputPort(self.port_name)
 
     def set_attributes(self, attributes):
@@ -190,11 +187,11 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
         self._set_connect_(output_port, self, validation)
 
     def set_disconnect(self):
-        if self.port_assign == unr_configure.PortAssign.INPUTS:
+        if self.port_assign == unr_core.UnrPortAssign.INPUTS:
             source = self.get_source()
             if source is not None:
                 self._set_disconnect_(source, self)
-        elif self.port_assign == unr_configure.PortAssign.OUTPUTS:
+        elif self.port_assign == unr_core.UnrPortAssign.OUTPUTS:
             targets = self.get_targets()
             for i_target in targets:
                 self._set_disconnect_(self, i_target)
@@ -236,7 +233,7 @@ class AbsKtnPort(utl_abstract.AbsDccPort):
             port_path = self.PATHSEP.join([self.port_path, port_name])
             return self._set_port_dag_create_(port_path)
 
-    def set_update(self):
+    def do_update(self):
         self._get_ktn_port_()
 
 
@@ -260,7 +257,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
     @property
     def icon(self):
-        return bsc_core.RscIcon.get('application/katana')
+        return bsc_core.ResourceIcon.get('application/katana')
 
     @property
     def ktn_obj(self):
@@ -546,12 +543,12 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
         for s_ktn_obj, t_ktn_obj in ktn_connections:
             s_ktn_obj.disconnect(t_ktn_obj)
 
-    def get_properties(self, keys):
+    def get_as_dict(self, keys):
         dic = {}
-        for key in keys:
-            port = self.get_port(key)
+        for i_key in keys:
+            port = self.get_port(i_key)
             if port.get_is_exists() is True:
-                dic[key] = port.get()
+                dic[i_key] = port.get()
             else:
                 bsc_core.Log.trace_method_warning(
                     'property-get',
@@ -559,19 +556,19 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
                 )
         return dic
 
-    def set_properties(self, dic):
-        for k, v in dic.items():
-            port = self.get_port(k)
-            if port.get_is_exists() is True:
-                port.set(v)
+    def set_as_dict(self, dict_):
+        for k, v in dict_.items():
+            i_p = self.get_port(k)
+            if i_p.get_is_exists() is True:
+                i_p.set(v)
                 bsc_core.Log.trace_method_result(
                     'property-set',
-                    'port: "{}" >> "{}"'.format(port.path, v)
+                    'port: "{}" >> "{}"'.format(i_p.path, v)
                 )
             else:
                 bsc_core.Log.trace_method_warning(
                     'property-set',
-                    'port: "{}" is Non-exists'.format(port.path)
+                    'port: "{}" is Non-exists'.format(i_p.path)
                 )
 
     def get_input_ports(self):
@@ -615,7 +612,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
         return lis
 
     def get_attributes(self):
-        attributes = ctt_objects.Properties(self)
+        attributes = ctt_core.Properties(self)
         ports = self.get_leaf_ports()
         for port in ports:
             attributes.set(
@@ -654,7 +651,7 @@ class AbsKtnObj(utl_abstract.AbsDccObj):
 
 class AbsKtnObjs(utl_abstract.AbsDccObjs):
     def __init__(self, *args):
-        pass
+        super(AbsKtnObjs, self).__init__(*args)
 
     @classmethod
     def pre_run_fnc(cls):
@@ -696,7 +693,7 @@ class AbsKtnFileReferenceObj(
 
 class AbsSGKtnObj(utl_abstract.AbsDccObj):
     def __init__(self, path):
-        pass
+        super(AbsSGKtnObj, self).__init__(path)
 
     @property
     def type(self):

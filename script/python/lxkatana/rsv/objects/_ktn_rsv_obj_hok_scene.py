@@ -7,7 +7,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def execute_asset_scene_src_create(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -273,7 +273,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ktn_dcc_objects.Scene.save_file()
 
     def set_scene_src_link(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
         #
@@ -361,11 +361,11 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             ).set_run()
 
     def set_front_camera(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
-        from lxusd import usd_core
+        import lxusd.core as usd_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
@@ -381,7 +381,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if geometry_usd_var_file_path_hi:
             s.append_sublayer(geometry_usd_var_file_path_hi)
             #
-            file_properties = geometry_usd_var_file_rsv_unit.get_properties_by_result(
+            file_properties = geometry_usd_var_file_rsv_unit.generate_properties_by_result(
                 geometry_usd_var_file_path_hi
             )
             version_hi = file_properties.get('version')
@@ -397,7 +397,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )
         #
-        s.set_flatten()
+        s.do_flatten()
         #
         g = s.get_geometry_args('/master')
         #
@@ -425,11 +425,11 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def set_front_camera_for_assess(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
-        from lxusd import usd_core
+        import lxusd.core as usd_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
@@ -445,7 +445,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if geometry_usd_var_file_path_hi:
             s.append_sublayer(geometry_usd_var_file_path_hi)
             #
-            file_properties = geometry_usd_var_file_rsv_unit.get_properties_by_result(
+            file_properties = geometry_usd_var_file_rsv_unit.generate_properties_by_result(
                 geometry_usd_var_file_path_hi
             )
             version_hi = file_properties.get('version')
@@ -461,7 +461,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     u'file="{}" is non-exists'.format(geometry_usd_var_file_path_shape)
                 )
         #
-        s.set_flatten()
+        s.do_flatten()
         #
         g = s.get_geometry_args('/master')
         #

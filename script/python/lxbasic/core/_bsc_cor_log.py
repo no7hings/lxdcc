@@ -29,4 +29,4 @@ if __name__ == '__main__':
     c = 100
     with LogProcessContext.create_as_bar(maximum=c, label='test') as l_p:
         for _i in range(c):
-            l_p.set_update()
+            l_p.do_update()

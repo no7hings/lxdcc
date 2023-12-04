@@ -1,13 +1,9 @@
 # coding:utf-8
 import copy
 
-from lxbasic import bsc_core
-
-from lxutil import utl_core
+import lxbasic.core as bsc_core
 
 import lxresolver.commands as rsv_commands
-
-import lxresolver.methods as rsv_methods
 
 
 class RsvAssetTextureOpt(object):
@@ -85,13 +81,16 @@ class RsvAssetTextureOpt(object):
                 variant, version
             )
         )
+
+    # todo: update this method
     @classmethod
     def lock_directory(cls, directory_path):
-        bsc_core.StgSshOpt(
-            directory_path
-        ).set_just_read_only_for(
-            ['cg_group', 'coop_grp']
-        )
+        pass
+        # bsc_core.StgSshOpt(
+        #     directory_path
+        # ).set_just_read_only_for(
+        #     ['cg_group', 'coop_grp']
+        # )
 
     def set_current_variant(self, variant):
         self._variant = variant
@@ -127,7 +126,7 @@ class RsvAssetTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StorageMtd.get_is_writeable(i_result) is False:
+            if bsc_core.StorageMtd.get_is_writable(i_result) is False:
                 list_.append(i_variants['version'])
         return list_
 
@@ -138,7 +137,7 @@ class RsvAssetTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StorageMtd.get_is_writeable(i_result) is True:
+            if bsc_core.StorageMtd.get_is_writable(i_result) is True:
                 list_.append(i_variants['version'])
         return list_
 
@@ -159,13 +158,11 @@ class RsvAssetTextureOpt(object):
             i_p = rsv_project.get_pattern(
                 i_k
             )
-            i_check_p = i_p + '/{extra}'
+            i_check_p = i_p+'/{extra}'
             i_check_p_opt = bsc_core.PtnParseOpt(
                 i_check_p
             )
-            i_check_p_opt.set_update(
-                **dict(root=rsv_project.get('root'))
-            )
+            i_check_p_opt.update_variants(**dict(root=rsv_project.get('root')))
             check_pattern_opts.append(i_check_p_opt)
 
         set_ = set()
@@ -174,7 +171,7 @@ class RsvAssetTextureOpt(object):
         for i_file_path in file_paths:
             for i_check_p_opt in check_pattern_opts:
                 i_variants = i_check_p_opt.get_variants(i_file_path)
-                if i_variants is not None and 'project' not in i_variants:
+                if i_variants is not None and 'project' in i_variants:
                     i_directory_path = directory_pattern.format(**i_variants)
                     set_.add(i_directory_path)
                     break
@@ -185,12 +182,15 @@ class RsvAssetTextureOpt(object):
         directory_paths = self.get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writeable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writable(i) is True]
         if unlocked_directory_paths:
-            with bsc_core.LogProcessContext.create_as_bar(maximum=len(unlocked_directory_paths), label='workspace texture lock') as g_p:
+            with bsc_core.LogProcessContext.create_as_bar(
+                    maximum=len(unlocked_directory_paths),
+                    label='workspace texture lock'
+            ) as g_p:
                 for _i in unlocked_directory_paths:
                     self.lock_directory(_i)
-                    g_p.set_update()
+                    g_p.do_update()
 
     def set_all_directories_locked_with_dialog(self, dcc_objs):
         pass
@@ -200,7 +200,7 @@ class RsvAssetTextureOpt(object):
             self._work_texture_src_directory_rsv_unit,
             self._work_texture_tx_directory_rsv_unit
         ]:
-            i_properties = i_rsv_unit.get_properties_by_result(directory_path)
+            i_properties = i_rsv_unit.generate_properties_by_result(directory_path)
             if i_properties:
                 return i_properties.get_value()
 

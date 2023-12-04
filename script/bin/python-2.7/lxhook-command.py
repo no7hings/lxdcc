@@ -43,7 +43,7 @@ def __print_help():
 
 
 def __execute_with_option(option):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
     #
     bsc_core.Log.trace_method_result(
         KEY,
@@ -62,7 +62,7 @@ def __execute_with_option(option):
 
 # hook
 def __execute_hook(option):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
     #
     import lxbasic.extra.methods as bsc_etr_methods
     #
@@ -129,7 +129,7 @@ def __execute_hook(option):
 
 # option hook
 def __execute_option_hook(option):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     import lxsession.commands as ssn_commands
 

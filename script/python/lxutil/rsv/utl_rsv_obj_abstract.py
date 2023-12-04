@@ -148,7 +148,7 @@ class AbsRsvObjHookOpt(object):
         #
         import fnmatch
 
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         rsv_scene_properties = self._rsv_scene_properties
         #

@@ -53,7 +53,7 @@ class MtdBasic(object):
     REF_RE_PATTERN = r'[<](.*?)[>]'
     KEY_RE_PATTERN = r'[{](.*?)[}]'
     @classmethod
-    def _get_keys_by_parse_pattern_(cls, pattern):
+    def _pattern__get_variant_keys(cls, pattern):
         lis_0 = re.findall(re.compile(cls.KEY_RE_PATTERN, re.S), pattern)
         lis_1 = list(set(lis_0))
         lis_1.sort(key=lis_0.index)
@@ -61,7 +61,7 @@ class MtdBasic(object):
     @classmethod
     def _update_pattern_fnc_(cls, pattern, format_variant):
         if pattern is not None:
-            keys = cls._get_keys_by_parse_pattern_(pattern)
+            keys = cls._pattern__get_variant_keys(pattern)
             s = pattern
             if keys:
                 for key in keys:
@@ -153,13 +153,13 @@ class Matcher(MtdBasic):
         self._rsv_pattern = self._current_pattern = pattern
         self.set_variant_update(format_variant)
         #
-        self._keys = self._get_keys_by_parse_pattern_(self._rsv_pattern)
+        self._keys = self._pattern__get_variant_keys(self._rsv_pattern)
         self._results = []
         self._matches = []
     @classmethod
     def _get_glob_pattern_by_parse_pattern_(cls, pattern):
         if pattern is not None:
-            keys = cls._get_keys_by_parse_pattern_(pattern)
+            keys = cls._pattern__get_variant_keys(pattern)
             s = pattern
             if keys:
                 for key in keys:

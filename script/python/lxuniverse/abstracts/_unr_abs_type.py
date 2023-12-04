@@ -3,7 +3,7 @@ import six
 
 from lxuniverse.abstracts import _unr_abs_base
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 
 # type/def
@@ -255,64 +255,64 @@ class AbsType(AbsTypeBaseDef):
 
     # <type-constant>
     def get_is_constant(self):
-        return self.category.name == unr_configure.Category.CONSTANT
+        return self.category.name == unr_core.UnrCategory.CONSTANT
 
     def get_is_boolean(self):
         type_name = self.name
-        return unr_configure.Type.get_is_boolean(type_name)
+        return unr_core.UnrType.get_is_boolean(type_name)
 
     # <type-tuple>
     def get_is_color(self):
         type_name = self.name
-        return unr_configure.Type.get_is_color(type_name)
+        return unr_core.UnrType.get_is_color(type_name)
 
     def get_is_vector(self):
         type_name = self.name
-        return unr_configure.Type.get_is_vector(type_name)
+        return unr_core.UnrType.get_is_vector(type_name)
 
     def get_is_tuple(self):
         type_name = self.name
-        return unr_configure.Type.get_is_tuple(type_name)
+        return unr_core.UnrType.get_is_tuple(type_name)
 
     #
     def get_tuple_size(self):
         if self.get_is_array() is False:
             type_name = self.name
-            return unr_configure.Type.get_tuple_size(type_name)
+            return unr_core.UnrType.get_tuple_size(type_name)
         return -1
 
     # <type-matrix>
     def get_is_matrix(self):
         type_name = self.name
-        return unr_configure.Type.get_is_matrix(type_name)
+        return unr_core.UnrType.get_is_matrix(type_name)
 
     def get_channel_type(self):
         if self.get_is_array() is False:
             category_name = self.category.name
             if self.get_is_vector() or self.get_is_color():
-                channel_category_name = unr_configure.Category.CONSTANT
+                channel_category_name = unr_core.UnrCategory.CONSTANT
             elif self.get_is_matrix():
-                channel_category_name = unr_configure.Category.VECTOR
+                channel_category_name = unr_core.UnrCategory.VECTOR
             else:
                 return None
-            type_name = unr_configure.Type.get_channel_type_name(category_name)
+            type_name = unr_core.UnrType.get_channel_type_name(category_name)
             category = self.universe.get_category(channel_category_name)
             return category.generate_type(type_name)
 
     # <type-array>
     def get_is_array(self):
-        return self.category.name == unr_configure.Category.ARRAY
+        return self.category.name == unr_core.UnrCategory.ARRAY
 
     def get_element_type(self):
         if self.get_is_array():
             if self.get_is_color():
-                element_category_name = unr_configure.Category.COLOR
+                element_category_name = unr_core.UnrCategory.COLOR
             elif self.get_is_vector():
-                element_category_name = unr_configure.Category.VECTOR
+                element_category_name = unr_core.UnrCategory.VECTOR
             elif self.get_is_matrix():
-                element_category_name = unr_configure.Category.MATRIX
+                element_category_name = unr_core.UnrCategory.MATRIX
             else:
-                element_category_name = unr_configure.Category.CONSTANT
+                element_category_name = unr_core.UnrCategory.CONSTANT
             type_name = self.name
             category = self.universe.get_category(element_category_name)
             return category.generate_type(type_name)
@@ -359,20 +359,20 @@ class AbsTypePortQueryExtraDef(object):
             self._build_port_query_(k, v, raw_convert_method)
 
     def _build_port_query_(self, key, value, raw_convert_method=None):
-        port_path = key.replace('/', unr_configure.Port.PATHSEP)
+        port_path = key.replace('/', unr_core.UnrPort.PATHSEP)
         if isinstance(value, dict):
             type_path = value.get(
                 'type',
-                unr_configure.Type.CONSTANT_RAW_
-            ).replace('/', unr_configure.Type.PATHSEP)
+                unr_core.UnrType.CONSTANT_RAW_
+            ).replace('/', unr_core.UnrType.PATHSEP)
             port_assign = value.get(
                 'port_assign',
-                unr_configure.PortAssign.VARIANTS
+                unr_core.UnrPortAssign.VARIANTS
             )
             raw = value.get('raw')
         else:
-            port_assign = unr_configure.PortAssign.VARIANTS
-            type_path = unr_configure.Type.CONSTANT_RAW_
+            port_assign = unr_core.UnrPortAssign.VARIANTS
+            type_path = unr_core.UnrType.CONSTANT_RAW_
             raw = value
         #
         if raw_convert_method is not None:
@@ -415,51 +415,51 @@ class AbsTypePortQueryExtraDef(object):
 
     #
     def get_input_port_query(self, port_path):
-        port_assign = unr_configure.PortAssign.INPUTS
+        port_assign = unr_core.UnrPortAssign.INPUTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_query(port_token)
 
     def get_input_port_queries(self):
         format_dict = {
-            'port_assign': unr_configure.PortAssign.INPUTS,
-            'port_assign_pathsep': unr_configure.PortAssign.PATHSEP
+            'port_assign': unr_core.UnrPortAssign.INPUTS,
+            'port_assign_pathsep': unr_core.UnrPortAssign.PATHSEP
         }
         return self._port_query_stack.get_objects(
-            regex=unr_configure.Obj.PORTS_GAIN_REGEX.format(**format_dict)
+            regex=unr_core.UnrObj.PORTS_GAIN_REGEX.format(**format_dict)
         )
 
     def get_output_port_query(self, port_path):
-        port_assign = unr_configure.PortAssign.OUTPUTS
+        port_assign = unr_core.UnrPortAssign.OUTPUTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_query(port_token)
 
     def get_output_port_queries(self):
         format_dict = {
-            'port_assign': unr_configure.PortAssign.OUTPUTS,
-            'port_assign_pathsep': unr_configure.PortAssign.PATHSEP
+            'port_assign': unr_core.UnrPortAssign.OUTPUTS,
+            'port_assign_pathsep': unr_core.UnrPortAssign.PATHSEP
         }
         return self._port_query_stack.get_objects(
-            regex=unr_configure.Obj.PORTS_GAIN_REGEX.format(**format_dict)
+            regex=unr_core.UnrObj.PORTS_GAIN_REGEX.format(**format_dict)
         )
 
     def get_variant_port_query(self, port_path):
-        port_assign = unr_configure.PortAssign.VARIANTS
+        port_assign = unr_core.UnrPortAssign.VARIANTS
         port_token = self.OBJ_TOKEN._get_port_token_(port_assign, port_path)
         return self.get_port_query(port_token)
 
     # noinspection PyUnusedLocal
     def get_variant_port_queries(self, regex=None):
         format_dict = dict(
-            port_assign=unr_configure.PortAssign.VARIANTS,
-            port_assign_pathsep=unr_configure.PortAssign.PATHSEP,
+            port_assign=unr_core.UnrPortAssign.VARIANTS,
+            port_assign_pathsep=unr_core.UnrPortAssign.PATHSEP,
             regex_extra=regex
         )
         if regex is not None:
             return self._port_query_stack.get_objects(
-                regex=unr_configure.Obj.PORTS_GAIN_REGEX_EXTRA.format(**format_dict)
+                regex=unr_core.UnrObj.PORTS_GAIN_REGEX_EXTRA.format(**format_dict)
             )
         return self._port_query_stack.get_objects(
-            regex=unr_configure.Obj.PORTS_GAIN_REGEX.format(**format_dict)
+            regex=unr_core.UnrObj.PORTS_GAIN_REGEX.format(**format_dict)
         )
 
     def get_variant(self, port_path):
@@ -511,7 +511,7 @@ class AbsTypeObjExtraDef(object):
 
         obj = self.universe.get_obj(obj_path)
         if obj is not None:
-            if obj.type.name == unr_configure.ObjType.NULL:
+            if obj.type.name == unr_core.UnrObjType.NULL:
                 old_obj = obj
                 new_obj = self._create_obj_(obj_path)
                 self.universe._override_obj_(old_obj, new_obj)

@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxusd.warp import *
+from lxusd.core.wrap import *
 #
-from lxusd import usd_core
+import lxusd.core as usd_core
 #
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -54,7 +54,7 @@ class LookPropertiesUsdExporter(utl_fnc_obj_abs.AbsDccExporter):
                                     j_port_path, j_dcc_port.type, j_dcc_port.get()
                                 )
         #
-        self._usd_stage_opt.set_flatten()
+        self._usd_stage_opt.do_flatten()
         self._usd_stage_opt.export_to(
             self._file_path
         )

@@ -14,9 +14,9 @@ import parse
 
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 from lxutil import utl_configure
 
@@ -524,7 +524,7 @@ class MeshOpt(
             self._obj.get_transform().get_name()
         )
         # replace pathsep
-        raw = raw.replace(self._obj.PATHSEP, unr_configure.Obj.PATHSEP)
+        raw = raw.replace(self._obj.PATHSEP, unr_core.UnrObj.PATHSEP)
         # strip path
         if lstrip is not None:
             if raw.startswith(lstrip):

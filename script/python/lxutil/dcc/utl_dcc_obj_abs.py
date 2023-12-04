@@ -7,11 +7,9 @@ import glob
 
 import hashlib
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxuniverse.abstracts as unr_abstracts
-
-import lxutil.configures as utl_configures
 
 
 class AbsObjStgGuiExtraDef(object):
@@ -57,7 +55,7 @@ class AbsStgDirectory(
         )
 
     def get_icon(self):
-        return bsc_core.RscIcon.get('file/folder')
+        return bsc_core.ResourceIcon.get('file/folder')
 
     icon = property(get_icon)
 
@@ -160,10 +158,10 @@ class AbsStgFile(
 
     def get_icon(self):
         if self.ext:
-            _ = bsc_core.RscIcon.get('file/{}'.format(self.ext[1:]))
+            _ = bsc_core.ResourceIcon.get('file/{}'.format(self.ext[1:]))
             if _:
                 return _
-        return bsc_core.RscIcon.get('file/file')
+        return bsc_core.ResourceIcon.get('file/file')
 
     icon = property(get_icon)
 
@@ -587,7 +585,7 @@ class AbsStgFile(
         if self.get_is_exists() is True:
             if file_tgt.get_is_exists():
                 if replace is True:
-                    if bsc_core.StorageMtd.get_is_writeable(file_path_tgt) is True:
+                    if bsc_core.StorageMtd.get_is_writable(file_path_tgt) is True:
                         if bsc_core.StgPathLinkMtd.get_is_link(file_path_tgt) is True:
                             if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                                     file_path_src, file_path_tgt,
@@ -651,9 +649,9 @@ class AbsStgFile(
             file_path_tgt, replace
         )
 
-    def get_is_writeable(self):
+    def get_is_writable(self):
         for i in self.get_exists_unit_paths():
-            if bsc_core.StorageMtd.get_is_writeable(i) is False:
+            if bsc_core.StorageMtd.get_is_writable(i) is False:
                 return False
         return True
 
@@ -753,8 +751,8 @@ class AbsOsTexture(
     AbsStgFile,
     AbsOsTextureSeparateDef
 ):
-    TEXTURE_COLOR_SPACE_CONFIGURE = utl_configures.get_color_space_configure()
-    TEXTURE_ACES_COLOR_SPACE_CONFIGURE = utl_configures.get_aces_color_space_configure()
+    TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT = None
+    TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES = None
     #
     OS_FILE_CLS = None
     # sequence
@@ -766,9 +764,25 @@ class AbsOsTexture(
     EXR_EXT = '.exr'
     JPG_EXT = '.jpg'
 
+    @classmethod
+    def generate_color_space_configure_for_convert(cls):
+        if cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT is not None:
+            return cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT
+        import lxarnold.core as and_core
+        cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT = and_core.TextureColorSpaceConfigureForConvert()
+        return cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT
+
+    @classmethod
+    def generate_color_space_configure_for_aces(cls):
+        if cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES is not None:
+            return cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES
+        import lxarnold.core as and_core
+        cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES = and_core.TextureColorSpaceConfigureForAces()
+        return cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES
+
     def get_target_file_path_as_src(
-            self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False
-            ):
+        self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False
+    ):
         if self.get_exists_unit_paths():
             directory_args_dpt = self.get_directory_args_dpt_fnc(
                 self, target_extension
@@ -804,8 +818,8 @@ class AbsOsTexture(
                 return texture_path_dst_src, texture_path_dst_tgt
 
     def copy_unit_with_src(
-            self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False, replace=True
-            ):
+        self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False, replace=True
+    ):
         if self.get_is_exists_file():
             directory_args_dpt = self.get_directory_args_dpt_fnc(
                 self, target_extension
@@ -840,9 +854,9 @@ class AbsOsTexture(
                     )
 
     def copy_unit_as_base_link_with_src(
-            self, directory_path_bsc, directory_path_dst, scheme='separate', target_extension='.tx',
-            fix_name_blank=False, replace=True
-            ):
+        self, directory_path_bsc, directory_path_dst, scheme='separate', target_extension='.tx',
+        fix_name_blank=False, replace=True
+    ):
         if self.get_is_exists_file():
             directory_args_dpt = self.get_directory_args_dpt_fnc(
                 self, target_extension
@@ -891,10 +905,10 @@ class AbsOsTexture(
         if ext_any == ext_tgt:
             if search_directory_path:
                 name_base = os.path.basename(path_base)
-                path_base = u'{}/{}'.format(search_directory_path, name_base)
-            #
-            glob_pattern = u'{}.*'.format(path_base)
-            #
+                path_base = '{}/{}'.format(search_directory_path, name_base)
+
+            glob_pattern = '{}.*'.format(path_base)
+
             ext_src = cls._get_unit_name_base_same_ext_(
                 file_path_any, bsc_core.StgExtraMtd.get_paths_by_fnmatch_pattern(glob_pattern)
             )
@@ -924,8 +938,8 @@ class AbsOsTexture(
 
     @classmethod
     def _get_unit_format_convert_used_color_space_src_(cls, file_path_src):
-        return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-            cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
+        return cls.generate_color_space_configure_for_aces().to_aces_color_space(
+            cls.generate_color_space_configure_for_convert().get_color_space_src(file_path_src)
         )
 
     @classmethod
@@ -933,17 +947,17 @@ class AbsOsTexture(
         path_base, ext_any = os.path.splitext(file_path_src)
         #
         if ext_any.lower() == '.tx':
-            return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
+            return cls.generate_color_space_configure_for_aces().get_default_color_space()
         elif ext_any.lower() == '.exr':
             file_opt = bsc_core.StgFileOpt(file_path_src)
             if file_opt.get_is_match_name_pattern('*.z_disp.*.exr'):
-                return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                    cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
+                return cls.generate_color_space_configure_for_aces().to_aces_color_space(
+                    cls.generate_color_space_configure_for_convert().get_color_space_src(file_path_src)
                 )
-            return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
+            return cls.generate_color_space_configure_for_aces().get_default_color_space()
         # not "exr"
-        return cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-            cls.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path_src)
+        return cls.generate_color_space_configure_for_aces().to_aces_color_space(
+            cls.generate_color_space_configure_for_convert().get_color_space_src(file_path_src)
         )
 
     @classmethod
@@ -966,21 +980,20 @@ class AbsOsTexture(
     def _set_unit_tx_create_by_src_(cls, file_path_src, search_directory_path=None, block=False):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
-            from lxarnold import and_core
+            import lxarnold.core as and_core
 
-            #
             color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
             #
-            use_aces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_is_enable()
-            aces_color_spaces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_all_color_spaces()
-            aces_render_color_space = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
-            aces_file = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
+            use_aces = cls.generate_color_space_configure_for_aces().get_is_enable()
+            aces_color_spaces = cls.generate_color_space_configure_for_aces().get_all_color_spaces()
+            aces_render_color_space = cls.generate_color_space_configure_for_aces().get_default_color_space()
+            aces_file = cls.generate_color_space_configure_for_aces().get_ocio_file()
             if cls._get_unit_is_exists_as_tgt_ext_by_src_(
                     file_path_src,
                     ext_tgt=cls.TX_EXT,
                     search_directory_path=search_directory_path,
             ) is False:
-                return and_core.AndTextureOpt_(file_path_src).set_unit_tx_create(
+                return and_core.AndTextureOpt(file_path_src).set_unit_tx_create(
                     color_space=color_space_src,
                     use_aces=use_aces,
                     aces_file=aces_file,
@@ -995,21 +1008,20 @@ class AbsOsTexture(
     def _get_unit_tx_create_cmd_by_src_(cls, file_path_src, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
-            from lxarnold import and_core
+            import lxarnold.core as and_core
 
-            #
             color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
             #
-            use_aces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_is_enable()
-            aces_color_spaces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_all_color_spaces()
-            aces_render_color_space = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
-            aces_file = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
+            use_aces = cls.generate_color_space_configure_for_aces().get_is_enable()
+            aces_color_spaces = cls.generate_color_space_configure_for_aces().get_all_color_spaces()
+            aces_render_color_space = cls.generate_color_space_configure_for_aces().get_default_color_space()
+            aces_file = cls.generate_color_space_configure_for_aces().get_ocio_file()
             if cls._get_unit_is_exists_as_tgt_ext_by_src_(
                     file_path_src,
                     ext_tgt=cls.TX_EXT,
                     search_directory_path=search_directory_path,
             ) is False:
-                return and_core.AndTextureOpt_(file_path_src).get_unit_tx_create_cmd(
+                return and_core.AndTextureOpt(file_path_src).get_unit_tx_create_cmd(
                     color_space_src=color_space_src,
                     use_aces=use_aces,
                     aces_file=aces_file,
@@ -1022,16 +1034,15 @@ class AbsOsTexture(
     def _get_unit_tx_create_cmd_by_src_force_(cls, file_path_src, search_directory_path=None):
         path_base, ext_any = os.path.splitext(file_path_src)
         if ext_any != cls.TX_EXT:
-            from lxarnold import and_core
+            import lxarnold.core as and_core
 
-            #
             color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
             #
-            use_aces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_is_enable()
-            aces_color_spaces = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_all_color_spaces()
-            aces_render_color_space = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
-            aces_file = cls.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_ocio_file()
-            return and_core.AndTextureOpt_(file_path_src).get_unit_tx_create_cmd(
+            use_aces = cls.generate_color_space_configure_for_aces().get_is_enable()
+            aces_color_spaces = cls.generate_color_space_configure_for_aces().get_all_color_spaces()
+            aces_render_color_space = cls.generate_color_space_configure_for_aces().get_default_color_space()
+            aces_file = cls.generate_color_space_configure_for_aces().get_ocio_file()
+            return and_core.AndTextureOpt(file_path_src).get_unit_tx_create_cmd(
                 color_space_src=color_space_src,
                 use_aces=use_aces,
                 aces_file=aces_file,
@@ -1072,13 +1083,12 @@ class AbsOsTexture(
 
     @classmethod
     def _create_unit_exr_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
-        from lxarnold import and_core
+        import lxarnold.core as and_core
 
-        #
         color_space_src = cls._get_unit_format_convert_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
         #
-        cmd = and_core.AndTextureOpt_.get_create_exr_as_acescg_command(
+        cmd = and_core.AndTextureOpt.get_create_exr_as_acescg_command(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
@@ -1089,13 +1099,12 @@ class AbsOsTexture(
 
     @classmethod
     def _get_unit_exr_create_cmd_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
-        from lxarnold import and_core
+        import lxarnold.core as and_core
 
-        #
         color_space_src = cls._get_unit_format_convert_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
         #
-        cmd = and_core.AndTextureOpt_.get_create_exr_as_acescg_command(
+        cmd = and_core.AndTextureOpt.get_create_exr_as_acescg_command(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
@@ -1104,12 +1113,11 @@ class AbsOsTexture(
 
     @classmethod
     def _create_unit_tx_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
-        from lxarnold import and_core
+        import lxarnold.core as and_core
 
-        #
         color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
-        cmd = and_core.AndTextureOpt_.get_create_tx_as_acescg_command(
+        cmd = and_core.AndTextureOpt.get_create_tx_as_acescg_command(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
@@ -1118,12 +1126,11 @@ class AbsOsTexture(
 
     @classmethod
     def _get_unit_tx_create_cmd_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
-        from lxarnold import and_core
+        import lxarnold.core as and_core
 
-        #
         color_space_src = cls._get_unit_tx_create_used_color_space_src_(file_path_src)
         color_space_tgt = 'ACES - ACEScg'
-        cmd = and_core.AndTextureOpt_.get_create_tx_as_acescg_command(
+        cmd = and_core.AndTextureOpt.get_create_tx_as_acescg_command(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
@@ -1132,10 +1139,9 @@ class AbsOsTexture(
 
     @classmethod
     def _convert_unit_format_(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
-        from lxarnold import and_core
+        import lxarnold.core as and_core
 
-        #
-        cmd = and_core.AndTextureOpt_.get_create_exr_as_acescg_command(
+        cmd = and_core.AndTextureOpt.get_create_exr_as_acescg_command(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt
         )
@@ -1202,9 +1208,12 @@ class AbsOsTexture(
     def __init__(self, path):
         super(AbsOsTexture, self).__init__(path)
 
+        self.generate_color_space_configure_for_convert()
+        self.generate_color_space_configure_for_aces()
+
     @property
     def icon(self):
-        return bsc_core.RscIcon.get('file/image')
+        return bsc_core.ResourceIcon.get('file/image')
 
     def get_args_as_ext_tgt(self, ext_tgt):
         path_src, path_tgt = self._get_path_args_as_ext_tgt_(self.path, ext_tgt)
@@ -1396,8 +1405,8 @@ class AbsOsTexture(
         _ = self._get_exists_file_paths_(self._path)
         if _:
             file_path = _[0]
-            return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space(file_path)
+            return self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES.to_aces_color_space(
+                self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT.get_color_space(file_path)
             )
 
     def get_color_space_src(self):
@@ -1405,23 +1414,23 @@ class AbsOsTexture(
         if _:
             file_path = _[0]
             if self.get_ext_is_tx():
-                return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
+                return self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES.get_default_color_space()
             elif self.get_ext_is_exr():
-                return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.get_default_color_space()
-            return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path)
+                return self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES.get_default_color_space()
+            return self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES.to_aces_color_space(
+                self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT.get_color_space_src(file_path)
             )
 
     def get_best_color_space(self):
         _ = self._get_exists_file_paths_(self._path)
         if _:
             file_path = _[0]
-            return self.TEXTURE_ACES_COLOR_SPACE_CONFIGURE.to_aces_color_space(
-                self.TEXTURE_COLOR_SPACE_CONFIGURE.get_color_space_src(file_path)
+            return self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES.to_aces_color_space(
+                self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT.get_color_space_src(file_path)
             )
 
     def get_purpose(self):
-        return self.TEXTURE_COLOR_SPACE_CONFIGURE.get_purpose(self.path)
+        return self.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_CONVERT.get_purpose(self.path)
 
     #
     def get_thumbnail_file_path(self):

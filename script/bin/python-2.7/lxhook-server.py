@@ -44,7 +44,7 @@ def __print_help():
 
 
 def __execute_with_option(option):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
@@ -72,7 +72,7 @@ def set_cmd_run():
 
     import lxlog.core as log_core
 
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     import lxsession.core as ssn_core
 

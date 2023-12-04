@@ -1,13 +1,13 @@
 # coding:utf-8
-from lxusd.warp import *
+from lxusd.core.wrap import *
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
-from lxusd import usd_configure
+import lxusd.core as usd_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -56,12 +56,12 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         usd_root = self._usd_stage.GetPseudoRoot()
         if self._root is not None:
             dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
-                self._root, pathsep=usd_configure.Obj.PATHSEP
+                self._root, pathsep=usd_core.UsdNodes.PATHSEP
                 )
             if dag_path_comps:
                 dag_path_comps.reverse()
             for i in dag_path_comps:
-                if i != usd_configure.Obj.PATHSEP:
+                if i != usd_core.UsdNodes.PATHSEP:
                     usd_root = self._usd_stage.DefinePrim(i, '')
         #
         usd_root.GetReferences().AddReference(file_path, usd_root.GetPath())
@@ -79,14 +79,14 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         usd_location = self._usd_stage.GetPseudoRoot()
         if location is not None:
             dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
-                location, pathsep=usd_configure.Obj.PATHSEP
+                location, pathsep=usd_core.UsdNodes.PATHSEP
             )
             if dag_path_comps:
                 dag_path_comps.reverse()
             #
             for i in dag_path_comps:
-                if i != usd_configure.Obj.PATHSEP:
-                    usd_location = self._usd_stage.DefinePrim(i, usd_configure.ObjType.Xform)
+                if i != usd_core.UsdNodes.PATHSEP:
+                    usd_location = self._usd_stage.DefinePrim(i, usd_core.UsdNodeTypes.Xform)
         #
         reference_location = usd_location.GetPath()
         if location_source is not None:
@@ -102,11 +102,11 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
                 maximum=len([i for i in self._usd_stage.TraverseAll()]), label='build universe'
                 ) as l_p:
             for i_usd_prim in self._usd_stage.TraverseAll():
-                l_p.set_update()
+                l_p.do_update()
                 self.node_create_fnc(i_usd_prim)
 
     def node_create_fnc(self, usd_prim):
-        obj_category_name = unr_configure.ObjCategory.USD
+        obj_category_name = unr_core.UnrObjCategory.USD
         obj_type_name = usd_prim.GetTypeName()
         obj_path = usd_prim.GetPath().pathString
         #
@@ -118,8 +118,8 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         if utl_core.get_is_ui_mode() is True:
             import lxgui.qt.core as gui_qt_core
 
-            if obj_type_name == usd_configure.ObjType.Xform:
+            if obj_type_name == usd_core.UsdNodeTypes.Xform:
                 _obj.set_gui_attribute('icon', gui_qt_core.GuiQtIcon.generate_by_name('obj/group'))
-            elif obj_type_name == usd_configure.ObjType.Mesh:
+            elif obj_type_name == usd_core.UsdNodeTypes.Mesh:
                 _obj.set_gui_attribute('icon', gui_qt_core.GuiQtIcon.generate_by_name('obj/mesh'))
         return _obj

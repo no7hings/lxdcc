@@ -5,19 +5,17 @@ import os
 
 import glob
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxresolver.commands as rsv_commands
 
-import lxresolver.operators as rsv_operators
-
-from lxutil import utl_configure, utl_core
+from lxutil import utl_configure
 
 import lxutil.objects as utl_objects
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class AbsExporter(object):
@@ -74,7 +72,7 @@ class AbsDccImporter(object):
 class AbsFncDccMeshMatcher(object):
     FNC_DCC_MESH_CLS = None
     #
-    SRC_DCC_CACHE = ctt_objects.Content(value=dict())
+    SRC_DCC_CACHE = ctt_core.Content(value=dict())
 
     @classmethod
     def _set_geometry_cache_(cls, src_path, tgt_path):
@@ -109,13 +107,13 @@ class AbsFncDccMeshMatcher(object):
         self._src_data = src_data
         self._tgt_data = tgt_data
         #
-        self._src_paths = self._src_data.get_branch_keys('property.path')
+        self._src_paths = self._src_data.get_key_names_at('property.path')
         self._src_face_vertices_uuid = self._src_data.get('face-vertices.path.{}'.format(self._src_path))
         self._src_points_uuid = self._src_data.get('points.path.{}'.format(self._src_path))
         #
-        self._tgt_paths = self._tgt_data.get_branch_keys('property.path')
-        self._tgt_face_vertices_uuids = self._tgt_data.get_branch_keys('face-vertices.uuid')
-        self._tgt_points_uuids = self._tgt_data.get_branch_keys('points.uuid')
+        self._tgt_paths = self._tgt_data.get_key_names_at('property.path')
+        self._tgt_face_vertices_uuids = self._tgt_data.get_key_names_at('face-vertices.uuid')
+        self._tgt_points_uuids = self._tgt_data.get_key_names_at('points.uuid')
 
     def __get_path_exchanged_(self):
         tgt_path = self._src_path
@@ -451,7 +449,7 @@ class AbsFncDccGeometryComparer(object):
         self._dcc_scene_src = usd_dcc_objects.Scene()
         self._dcc_universe_src = self._dcc_scene_src.universe
         self._dcc_stage_opt_src = usd_dcc_operators.SceneOpt(self._dcc_scene_src.usd_stage, self.DCC_NAMESPACE)
-        self._dcc_comparer_data_src = ctt_objects.Content(
+        self._dcc_comparer_data_src = ctt_core.Content(
             value={}
         )
         #
@@ -466,7 +464,7 @@ class AbsFncDccGeometryComparer(object):
         self._dcc_scene_tgt = usd_dcc_objects.Scene()
         self._dcc_universe_tgt = self._dcc_scene_tgt.universe
         self._dcc_stage_opt_tgt = usd_dcc_operators.SceneOpt(self._dcc_scene_tgt.usd_stage, self.DCC_NAMESPACE)
-        self._dcc_comparer_data_tgt = ctt_objects.Content(
+        self._dcc_comparer_data_tgt = ctt_core.Content(
             value={}
         )
         #
@@ -536,6 +534,7 @@ class AbsFncDccGeometryComparer(object):
 
     #
     def repair_mesh(self, src_path, tgt_path, check_statuses):
+        # print src_path
         src_usd_prim = self._dcc_scene_src.usd_stage.GetPrimAtPath(src_path)
         if src_usd_prim.IsValid() is True:
             self.FNC_USD_MESH_REPAIRER_CLS(
@@ -561,7 +560,7 @@ class AbsFncDccGeometryComparer(object):
                 maximum=len(methods), label='execute geometry-comparer method'
             ) as g_p:
                 for method in methods:
-                    g_p.set_update()
+                    g_p.do_update()
                     method()
         #
         src_dcc_geometries = self._dcc_geometries_src
@@ -572,7 +571,7 @@ class AbsFncDccGeometryComparer(object):
                 maximum=len(src_dcc_geometries), label='gain geometry-comparer result'
             ) as g_p:
                 for i_src_geometry in src_dcc_geometries:
-                    g_p.set_update()
+                    g_p.do_update()
                     if i_src_geometry.type_name == 'Mesh':
                         i_src_mesh_path = i_src_geometry.path
                         #
@@ -602,7 +601,7 @@ class AbsFncDccGeometryComparer(object):
                 maximum=len(methods), label='execute geometry-comparer method'
             ) as g_p:
                 for method in methods:
-                    g_p.set_update()
+                    g_p.do_update()
                     method()
         #
         dcc_geometries_src = self._dcc_geometries_src
@@ -614,7 +613,7 @@ class AbsFncDccGeometryComparer(object):
                 maximum=len(dcc_geometries_src), label='gain geometry-comparer result'
             ) as g_p:
                 for i_src_geometry in dcc_geometries_src:
-                    g_p.set_update()
+                    g_p.do_update()
                     if i_src_geometry.type_name == 'Mesh':
                         i_src_mesh_path = i_src_geometry.path
                         #
@@ -798,7 +797,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
                             (i_path_src, i_path_tgt, i_check_statuses)
                         )
                     #
-                    g_p.set_update()
+                    g_p.do_update()
         # addition
         paths_src = [i.path for i in objs_src]
         paths_tgt = [i.path for i in objs_tgt]
@@ -826,7 +825,7 @@ class AbsUsdGeometryComparer(AbsFncOptionBase):
         if ms:
             with bsc_core.LogProcessContext.create(maximum=len(ms), label='execute geometry-comparer method') as g_p:
                 for i_method, i_args in ms:
-                    g_p.set_update()
+                    g_p.do_update()
                     i_method(*i_args)
         return self._comparer_results
 
@@ -874,7 +873,7 @@ class AbsFncRenderTextureExportDef(object):
             index_query = {}
             with bsc_core.LogProcessContext.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
                 for i_dcc_obj in dcc_objs:
-                    l_p.set_update()
+                    l_p.do_update()
                     # dpt to dst, file path can be is multiply
                     for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
                         if bsc_core.StgPathMtd.get_is_exists(j_texture_path_dpt) is False:
@@ -1013,7 +1012,7 @@ class AbsFncRenderTextureExportDef(object):
         index_query = {}
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(dcc_objs), label=cls.KEY) as l_p:
             for i_dcc_obj in dcc_objs:
-                l_p.set_update()
+                l_p.do_update()
                 # dpt to dst
                 for j_port_path, j_texture_path_dpt in i_dcc_obj.reference_raw.items():
                     # map path to current platform

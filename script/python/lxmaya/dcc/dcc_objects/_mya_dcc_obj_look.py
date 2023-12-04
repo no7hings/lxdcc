@@ -3,7 +3,7 @@ import fnmatch
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxmaya import ma_core
 

@@ -1,12 +1,9 @@
 # coding:utf-8
 import six
-# noinspection PyUnresolvedReferences
-from Katana import Configuration, RenderManager, ScenegraphManager, KatanaFile, FarmAPI, CacheManager, Nodes3DAPI, \
-    NodegraphAPI
-# noinspection PyUnresolvedReferences
-from UI4 import Manifest
 
-from lxbasic import bsc_core
+from lxkatana.core.wrap import *
+
+import lxbasic.core as bsc_core
 
 import lxutil.scripts as utl_scripts
 

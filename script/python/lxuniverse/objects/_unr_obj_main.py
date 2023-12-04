@@ -1,7 +1,7 @@
 # coding:utf-8
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -9,18 +9,18 @@ from lxuniverse.objects import _unr_obj_stack, _unr_obj_raw
 
 
 class ObjToken(unr_abstracts.AbsObjToken):
-    TYPE_PATHSEP = unr_configure.Type.PATHSEP
-    OBJ_PATHSEP = unr_configure.Obj.PATHSEP
+    TYPE_PATHSEP = unr_core.UnrType.PATHSEP
+    OBJ_PATHSEP = unr_core.UnrObj.PATHSEP
     #
-    PORT_PATHSEP = unr_configure.Port.PATHSEP
-    PORT_ASSIGN_PATHSEP = unr_configure.PortAssign.PATHSEP
+    PORT_PATHSEP = unr_core.UnrPort.PATHSEP
+    PORT_ASSIGN_PATHSEP = unr_core.UnrPortAssign.PATHSEP
 
     def __init__(self):
         super(ObjToken, self).__init__()
 
 
 class Type(unr_abstracts.AbsType):
-    PATHSEP = unr_configure.Type.PATHSEP
+    PATHSEP = unr_core.UnrType.PATHSEP
 
     def __init__(self, category, name):
         super(Type, self).__init__(category, name)
@@ -29,17 +29,17 @@ class Type(unr_abstracts.AbsType):
         if is_array:
             return _unr_obj_raw.Array
         #
-        if unr_configure.Type.get_is_color(type_name):
+        if unr_core.UnrType.get_is_color(type_name):
             return _unr_obj_raw.Color
-        elif unr_configure.Type.get_is_vector(type_name):
+        elif unr_core.UnrType.get_is_vector(type_name):
             return _unr_obj_raw.Vector
-        elif unr_configure.Type.get_is_matrix(type_name):
+        elif unr_core.UnrType.get_is_matrix(type_name):
             return _unr_obj_raw.Matrix
         return _unr_obj_raw.Constant
 
 
 class Category(unr_abstracts.AbsCategory):
-    PATHSEP = unr_configure.Category.PATHSEP
+    PATHSEP = unr_core.UnrCategory.PATHSEP
     #
     TYPE_CLS = Type
 
@@ -50,7 +50,7 @@ class Category(unr_abstracts.AbsCategory):
 class PortChannel(unr_abstracts.AbsPortChannel):
     OBJ_TOKEN = ObjToken
     #
-    PATHSEP = unr_configure.Port.PATHSEP
+    PATHSEP = unr_core.UnrPort.PATHSEP
 
     def __init__(self, parent, name):
         super(PortChannel, self).__init__(parent, name)
@@ -59,7 +59,7 @@ class PortChannel(unr_abstracts.AbsPortChannel):
 class PortElement(unr_abstracts.AbsPortElement):
     OBJ_TOKEN = ObjToken
     #
-    PATHSEP = unr_configure.Port.PATHSEP
+    PATHSEP = unr_core.UnrPort.PATHSEP
     #
     PORT_CHANNEL_STACK_CLS = _unr_obj_stack.PortChannelStack
     PORT_CHANNEL_CLS = PortChannel
@@ -71,7 +71,7 @@ class PortElement(unr_abstracts.AbsPortElement):
 class Port(unr_abstracts.AbsPort):
     OBJ_TOKEN = ObjToken
     #
-    PATHSEP = unr_configure.Port.PATHSEP
+    PATHSEP = unr_core.UnrPort.PATHSEP
     #
     PORT_ELEMENT_STACK_CLS = _unr_obj_stack.PortElementStack
     PORT_ELEMENT_CLS = PortElement
@@ -84,14 +84,14 @@ class Port(unr_abstracts.AbsPort):
 
 
 class Properties(unr_abstracts.AbsProperties):
-    PATHSEP = unr_configure.Properties.PATHSEP
+    PATHSEP = unr_core.UnrProperties.PATHSEP
 
     def __init__(self, obj, raw):
         super(Properties, self).__init__(obj, raw)
 
 
 class Attributes(unr_abstracts.AbsProperties):
-    PATHSEP = unr_configure.Properties.PATHSEP
+    PATHSEP = unr_core.UnrProperties.PATHSEP
 
     def __init__(self, obj, raw):
         super(Attributes, self).__init__(obj, raw)
@@ -110,12 +110,12 @@ class PortDagPath(unr_abstracts.AbsPortDagPath):
 class Obj(unr_abstracts.AbsObj):
     OBJ_TOKEN = ObjToken
     #
-    PATHSEP = unr_configure.Obj.PATHSEP
+    PATHSEP = unr_core.UnrObj.PATHSEP
     # port/def
     PORT_CLS = Port
     PORT_STACK_CLS = _unr_obj_stack.PrxPortStack
     #
-    PROPERTIES_CLS = ctt_objects.Properties
+    PROPERTIES_CLS = ctt_core.Properties
     ATTRIBUTES_CLS = Attributes
 
     def __init__(self, type_, path):
@@ -125,7 +125,7 @@ class Obj(unr_abstracts.AbsObj):
 class PortQuery(unr_abstracts.AbsPortQuery):
     OBJ_TOKEN = ObjToken
     #
-    PATHSEP = unr_configure.Port.PATHSEP
+    PATHSEP = unr_core.UnrPort.PATHSEP
 
     def __init__(self, obj_type, raw_type, port_path, port_assign, raw):
         super(PortQuery, self).__init__(obj_type, raw_type, port_path, port_assign, raw)
@@ -134,7 +134,7 @@ class PortQuery(unr_abstracts.AbsPortQuery):
 class ObjType(unr_abstracts.AbsObjType):
     OBJ_TOKEN = ObjToken
     # type/def
-    PATHSEP = unr_configure.ObjType.PATHSEP
+    PATHSEP = unr_core.UnrObjType.PATHSEP
     # obj_type/def
     DCC_NODE_CLS = Obj
     # port_query/def
@@ -148,7 +148,7 @@ class ObjType(unr_abstracts.AbsObjType):
 class ObjCategory(unr_abstracts.AbsObjCategory):
     OBJ_TOKEN = ObjToken
     #
-    PATHSEP = unr_configure.ObjCategory.PATHSEP
+    PATHSEP = unr_core.UnrObjCategory.PATHSEP
     #
     TYPE_CLS = ObjType
     #
@@ -162,9 +162,9 @@ class ObjCategory(unr_abstracts.AbsObjCategory):
 
 class ObjConnection(unr_abstracts.AbsObjConnection):
     OBJ_TOKEN = ObjToken
-    OBJ_PATHSEP = unr_configure.Obj.PATHSEP
-    PORT_PATHSEP = unr_configure.Port.PATHSEP
-    PORT_ASSIGN_PATHSEP = unr_configure.PortAssign.PATHSEP
+    OBJ_PATHSEP = unr_core.UnrObj.PATHSEP
+    PORT_PATHSEP = unr_core.UnrPort.PATHSEP
+    PORT_ASSIGN_PATHSEP = unr_core.UnrPortAssign.PATHSEP
 
     def __init__(self, universe, source_obj_path, source_port_path, target_obj_path, target_port_path):
         super(ObjConnection, self).__init__(
@@ -180,7 +180,7 @@ class ObjBind(unr_abstracts.AbsObjBind):
 
 
 class ObjUniverse(unr_abstracts.AbsObjUniverse):
-    ROOT = unr_configure.Obj.PATHSEP
+    ROOT = unr_core.UnrObj.PATHSEP
     #
     CATEGORY_STACK_CLS = _unr_obj_stack.CategoryStack
     CATEGORY_CLS = Category

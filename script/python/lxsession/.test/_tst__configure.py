@@ -1,6 +1,6 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-print bsc_core.RscConfigure.get_yaml('session/hook-engine')
+print bsc_core.ResourceContent.get_yaml('session/hook-engine')
 
-print bsc_core.RscConfigure.get_yaml('resolver/basic/app')
+print bsc_core.ResourceContent.get_yaml('resolver/basic/app')

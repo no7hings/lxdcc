@@ -1,22 +1,60 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
-
 import parse
+
+import time
 
 import six
 
 import os
 
+import collections
+
+import xmlrpclib
+
+import threading
+
+import re
+
+import fnmatch
+
+import functools
+
+import glob
+
+import shutil
+
+import json
+
+import subprocess
+
+import gzip
+
+import zipfile
+
+import uuid
+
 import lxlog.core as log_core
 
-from lxbasic.core import _bsc_cor_utility, _bsc_cor_raw, _bsc_cor_path, _bsc_cor_pattern, \
-    _bsc_cor_time, _bsc_cor_dict, _bsc_cor_environ, _bsc_cor_process, _bsc_cor_thread
+import lxcontent.core as ctt_core
+
+from ..core import \
+    _bsc_cor_base, \
+    _bsc_cor_raw, \
+    _bsc_cor_path, \
+    _bsc_cor_pattern, \
+    _bsc_cor_time, \
+    _bsc_cor_raw_for_dict, \
+    _bsc_cor_environ, \
+    _bsc_cor_process, \
+    _bsc_cor_thread
 
 
 class StgRpcMtd(object):
     RPC_SERVER = '10.10.206.117'
     RPC_PORT = 58888
     PATHSEP = '/'
+
+    KEY = 'rpc'
 
     @classmethod
     def get_client(cls, port_addition=0):
@@ -57,7 +95,7 @@ class StgRpcMtd(object):
                         )
                     )
                 #
-                if SystemMtd.get_is_linux():
+                if _bsc_cor_base.SystemMtd.get_is_linux():
                     os.system('ls {} > /dev/null'.format(p))
                 #
                 time.sleep(1)
@@ -93,7 +131,7 @@ class StgRpcMtd(object):
                         )
                     )
                 #
-                if SystemMtd.get_is_linux():
+                if _bsc_cor_base.SystemMtd.get_is_linux():
                     os.system('ls {} > /dev/null'.format(p))
                 #
                 time.sleep(1)
@@ -114,7 +152,7 @@ class StgRpcMtd(object):
             directory_path_tgt = os.path.dirname(file_path_tgt)
             if os.path.exists(directory_path_tgt) is False:
                 cls.create_directory(directory_path_tgt)
-            #
+
             timeout = 25
             cost_time = 0
             start_time = time.time()
@@ -130,7 +168,7 @@ class StgRpcMtd(object):
                             'path="{}" is timeout, cost time {}s'.format(file_path_tgt, cost_time)
                         )
                     )
-                if SystemMtd.get_is_linux():
+                if _bsc_cor_base.SystemMtd.get_is_linux():
                     os.system('ls {} > /dev/null'.format(p))
                 #
                 time.sleep(1)
@@ -147,7 +185,7 @@ class StgRpcMtd(object):
             #
             log_core.Log.trace_method_result(
                 key,
-                'path="{} >> {}"'.format(file_path_src, file_path_tgt)
+                'path="{} >> {}", cost time {}s'.format(file_path_src, file_path_tgt, cost_time)
             )
 
     @classmethod
@@ -157,7 +195,7 @@ class StgRpcMtd(object):
             clt = cls.get_client()
             clt.chmod(path, mode)
             #
-            if SystemMtd.get_is_linux():
+            if _bsc_cor_base.SystemMtd.get_is_linux():
                 p = os.path.dirname(path)
                 os.system('ls {} > /dev/null'.format(p))
             #
@@ -173,7 +211,7 @@ class StgRpcMtd(object):
             clt = cls.get_client()
             clt.chown(path, user, group)
             p = os.path.dirname(path)
-            if SystemMtd.get_is_linux():
+            if _bsc_cor_base.SystemMtd.get_is_linux():
                 os.system('ls {} > /dev/null'.format(p))
             log_core.Log.trace_method_result(
                 key,
@@ -261,9 +299,10 @@ class StgSshMtd(object):
                 b2 = c2*16+c1
                 b1 = b2^self.key
                 b[i] = b1
+            # noinspection PyBroadException
             try:
                 return b.decode("utf-8")
-            except:
+            except Exception:
                 return "failed"
 
     @classmethod
@@ -391,7 +430,7 @@ class StgSshMtd(object):
 class StgSshOpt(StgSshMtd):
     def __init__(self, path):
         self._path = path
-        self._nas_path = StorageMtd.set_map_to_nas(path)
+        self._nas_path = _bsc_cor_base.StorageMtd.set_map_to_nas(path)
 
     def remove_all_group(self):
         group_data = self._get_all_group_data_1_(self._nas_path)
@@ -465,9 +504,9 @@ class StgUserMtd(object):
 
     @classmethod
     def get_home(cls):
-        if SystemMtd.get_is_windows():
+        if _bsc_cor_base.SystemMtd.get_is_windows():
             return cls.get_windows_home()
-        elif SystemMtd.get_is_linux():
+        elif _bsc_cor_base.SystemMtd.get_is_linux():
             return cls.get_linux_home()
         else:
             raise SystemError()
@@ -487,75 +526,75 @@ class StgUserMtd(object):
 
     @classmethod
     def get_user_directory(cls):
-        if SystemMtd.get_is_windows():
+        if _bsc_cor_base.SystemMtd.get_is_windows():
             return cls.get_windows_user_directory()
-        elif SystemMtd.get_is_linux():
+        elif _bsc_cor_base.SystemMtd.get_is_linux():
             return cls.get_linux_user_directory()
         else:
             raise SystemError()
 
     @classmethod
     def get_user_temporary_directory(cls, create=False):
-        date_tag = TimeMtd.get_date_tag()
+        date_tag = _bsc_cor_base.TimeMtd.get_date_tag()
         _ = '{}/temporary/{}'.format(
             cls.get_user_directory(), date_tag
         )
         if create:
-            StorageMtd.create_directory(_)
+            _bsc_cor_base.StorageMtd.create_directory(_)
         return _
 
     @classmethod
     def get_user_debug_directory(cls, tag=None, create=False):
-        date_tag = TimeMtd.get_date_tag()
+        date_tag = _bsc_cor_base.TimeMtd.get_date_tag()
         _ = '{}/debug/{}'.format(
             cls.get_user_directory(), date_tag
         )
         if tag is not None:
             _ = '{}/{}'.format(_, tag)
         if create:
-            StorageMtd.create_directory(_)
+            _bsc_cor_base.StorageMtd.create_directory(_)
         return _
 
     @classmethod
     def get_user_batch_exception_directory(cls, tag, create=False):
-        date_tag = TimeMtd.get_date_tag()
+        date_tag = _bsc_cor_base.TimeMtd.get_date_tag()
         _ = '{}/batch-exception-log/{}'.format(
             cls.get_user_directory(), date_tag
         )
         if tag is not None:
             _ = '{}/{}'.format(_, tag)
         if create:
-            StorageMtd.create_directory(_)
+            _bsc_cor_base.StorageMtd.create_directory(_)
         return _
 
     @classmethod
     def get_user_log_directory(cls):
-        date_tag = TimeMtd.get_date_tag()
+        date_tag = _bsc_cor_base.TimeMtd.get_date_tag()
         return '{}/log/{}.log'.format(
             cls.get_user_directory(), date_tag
         )
 
     @classmethod
-    def get_user_history_file(cls):
+    def get_user_history_cache_file(cls):
         return '{}/history.yml'.format(
             cls.get_user_directory()
         )
 
     @classmethod
     def get_user_session_directory(cls, create=False):
-        date_tag = TimeMtd.get_date_tag()
+        date_tag = _bsc_cor_base.TimeMtd.get_date_tag()
         _ = '{}/.session/{}'.format(
             cls.get_user_directory(), date_tag
         )
         if create:
-            StorageMtd.create_directory(_)
+            _bsc_cor_base.StorageMtd.create_directory(_)
         return _
 
     @classmethod
     def get_user_session_file(cls, unique_id=None):
         directory_path = cls.get_user_session_directory()
         if unique_id is None:
-            unique_id = UuidMtd.generate_new()
+            unique_id = _bsc_cor_base.UuidMtd.generate_new()
         return '{}/{}.yml'.format(directory_path, unique_id)
 
 
@@ -563,9 +602,9 @@ class StgSystem(object):
     @classmethod
     def open_directory(cls, path):
         path = _bsc_cor_raw.auto_encode(path)
-        if SystemMtd.get_is_windows():
+        if _bsc_cor_base.SystemMtd.get_is_windows():
             cmd = 'explorer "{}"'.format(path.replace('/', '\\'))
-        elif SystemMtd.get_is_linux():
+        elif _bsc_cor_base.SystemMtd.get_is_linux():
             cmd = 'gio open "{}"'.format(path)
         else:
             raise SystemError()
@@ -580,9 +619,9 @@ class StgSystem(object):
 
     @classmethod
     def open_file(cls, path):
-        if SystemMtd.get_is_windows():
+        if _bsc_cor_base.SystemMtd.get_is_windows():
             cmd = 'explorer /select,"{}"'.format(path.replace('/', '\\'))
-        elif SystemMtd.get_is_linux():
+        elif _bsc_cor_base.SystemMtd.get_is_linux():
             cmd = 'nautilus "{}" --select'.format(path)
         else:
             raise SystemError()
@@ -621,7 +660,7 @@ class StgExtraMtd(object):
         _ = glob.glob(pattern) or []
         if _:
             # fix windows path
-            if platform.system() == 'Windows':
+            if _bsc_cor_base.SystemMtd.get_is_windows():
                 _ = map(lambda x: x.replace('\\', '/'), _)
             if len(_) > 1:
                 # sort by number
@@ -732,7 +771,7 @@ class StgDirectoryMtd(object):
 
     @classmethod
     def get_file_paths__(cls, directory_path, ext_includes=None):
-        if SystemMtd.get_is_linux():
+        if _bsc_cor_base.SystemMtd.get_is_linux():
             return cls._get_file_paths(directory_path, ext_includes)
         else:
             return cls.get_file_paths(directory_path, ext_includes)
@@ -786,7 +825,7 @@ class StgDirectoryMtd(object):
 
     @classmethod
     def get_all_file_paths__(cls, directory_path, ext_includes=None):
-        if SystemMtd.get_is_linux():
+        if _bsc_cor_base.SystemMtd.get_is_linux():
             return cls._get_all_file_paths(directory_path, ext_includes)
         else:
             return cls.get_all_file_paths(directory_path, ext_includes)
@@ -816,7 +855,7 @@ class StgDirectoryMtd(object):
 
     @classmethod
     def get_directory_paths__(cls, directory_path):
-        if SystemMtd.get_is_linux():
+        if _bsc_cor_base.SystemMtd.get_is_linux():
             return cls._get_directory_paths(directory_path)
         else:
             return cls.get_directory_paths(directory_path)
@@ -859,7 +898,7 @@ class StgDirectoryMtd(object):
 
     @classmethod
     def get_all_directory_paths__(cls, directory_path):
-        if SystemMtd.get_is_linux():
+        if _bsc_cor_base.SystemMtd.get_is_linux():
             return cls._get_all_directory_paths(directory_path)
         else:
             return cls.get_all_directory_paths(directory_path)
@@ -901,7 +940,7 @@ class StgDirectoryMtd(object):
                 if os.path.exists(i_tgt_dir_path) is False:
                     os.makedirs(i_tgt_dir_path)
                 #
-                i_thread = PyThread(
+                i_thread = _bsc_cor_base.PyThread(
                     copy_fnc_, i_src_file_path, i_tgt_file_path
                 )
                 threads.append(i_thread)
@@ -1047,7 +1086,7 @@ class StgDirectoryMultiplyMtd(object):
         return dic
 
 
-class StgPathMtd(StorageMtd):
+class StgPathMtd(_bsc_cor_base.StorageMtd):
     @classmethod
     def get_parent(cls, path):
         return _bsc_cor_path.DccPathDagMtd.get_dag_parent_path(
@@ -1060,7 +1099,7 @@ class StgPathOpt(object):
 
     def __init__(self, path, cleanup=True):
         if cleanup is True:
-            self._path = StorageMtd.clear_pathsep_to(path)
+            self._path = _bsc_cor_base.StorageMtd.clear_pathsep_to(path)
         else:
             self._path = path
         #
@@ -1109,10 +1148,10 @@ class StgPathOpt(object):
         return os.path.normcase(self._path)
 
     def get_is_windows(self):
-        return StorageMtd.get_path_is_windows(self.get_path())
+        return _bsc_cor_base.StorageMtd.get_path_is_windows(self.get_path())
 
     def get_is_linux(self):
-        return StorageMtd.get_path_is_linux(self.get_path())
+        return _bsc_cor_base.StorageMtd.get_path_is_linux(self.get_path())
 
     def get_is_exists(self):
         return os.path.exists(self.get_path())
@@ -1136,7 +1175,7 @@ class StgPathOpt(object):
         ).get_as_tag()
 
     def get_user(self):
-        return StorageMtd.get_user(self.get_path())
+        return _bsc_cor_base.StorageMtd.get_user(self.get_path())
 
     def get_access_timestamp(self):
         return os.stat(self._path).st_atime
@@ -1151,14 +1190,22 @@ class StgPathOpt(object):
     def get_is_readable(self):
         return os.access(self._path, os.R_OK)
 
-    def get_is_writeable(self):
+    def get_is_writable(self):
         return os.access(self._path, os.W_OK)
 
     def map_to_current(self):
-        self._path = StgBasePathMapper.map_to_current(self._path)
+        self._path = _bsc_cor_base.StgBasePathMapper.map_to_current(self._path)
+        return self._path
 
     def set_modify_time(self, timestamp):
-        os.utime(self.get_path(), (timestamp, timestamp))
+        # noinspection PyBroadException
+        try:
+            os.utime(self.get_path(), (timestamp, timestamp))
+        except Exception:
+            _bsc_cor_base.ExceptionMtd.set_print()
+            log_core.Log.trace_error(
+                'change modify time failed'
+            )
 
     def get_component_paths(self):
         return _bsc_cor_path.DccPathDagMtd.get_dag_component_paths(
@@ -1184,9 +1231,9 @@ class StgPathOpt(object):
         #
         _ = p.split(pathsep)
         if len(_) > 6:
-            if StorageMtd.get_path_is_windows(p):
+            if _bsc_cor_base.StorageMtd.get_path_is_windows(p):
                 return six.u('{0}{2}...{2}{1}'.format(pathsep.join(_[:3]), pathsep.join(_[-3:]), pathsep))
-            elif StorageMtd.get_path_is_linux(p):
+            elif _bsc_cor_base.StorageMtd.get_path_is_linux(p):
                 return six.u('{0}{2}...{2}{1}'.format(pathsep.join(_[:2]), pathsep.join(_[-3:]), pathsep))
             return p
         return p
@@ -1231,7 +1278,7 @@ class StgFileSearchOpt(object):
             _ = StgDirectoryMtd.get_file_paths__(directory_path)
 
         for i in _:
-            i_directory_path, i_name_base, i_ext = StorageMtd.get_file_args(i)
+            i_directory_path, i_name_base, i_ext = _bsc_cor_base.StorageMtd.get_file_args(i)
             if self._ignore_name_case is True:
                 i_name_base = i_name_base.lower()
             if self._ignore_ext_case is True:
@@ -1247,7 +1294,7 @@ class StgFileSearchOpt(object):
         self._set_key_sort_()
 
     def _set_key_sort_(self):
-        self._search_dict = _bsc_cor_dict.DictMtd.sort_string_key_to(self._search_dict)
+        self._search_dict = _bsc_cor_raw_for_dict.DictMtd.sort_string_key_to(self._search_dict)
 
     def get_result(self, file_path_src):
         name_src = os.path.basename(file_path_src)
@@ -1288,7 +1335,7 @@ class StgDirectoryOpt(StgPathOpt):
         return self.__class__(path)
 
     def set_create(self):
-        StorageMtd.create_directory(
+        _bsc_cor_base.StorageMtd.create_directory(
             self.path
         )
 
@@ -1357,11 +1404,11 @@ class StgDirectoryOptExtra(object):
 
     def set_open(self):
         if os.path.exists(self.path):
-            if SystemMtd.get_is_windows():
+            if _bsc_cor_base.SystemMtd.get_is_windows():
                 os.startfile(
                     self.path.replace(u'/', os.sep)
                 )
-            elif SystemMtd.get_is_linux():
+            elif _bsc_cor_base.SystemMtd.get_is_linux():
                 subprocess.Popen(
                     u'nautilus "{}" --select'.format(self.path),
                     shell=True
@@ -1376,7 +1423,7 @@ class StgDirectoryOptExtra(object):
         )
 
     def set_create(self):
-        StorageMtd.create_directory(
+        _bsc_cor_base.StorageMtd.create_directory(
             self._path
         )
 
@@ -1444,7 +1491,7 @@ class StgFileOpt(StgPathOpt):
                     return raw
             elif self.get_ext() in {'.yml'}:
                 with open(self.path) as y:
-                    raw = _bsc_cor_dict.CttYamlBase.load(y)
+                    raw = ctt_core.ContentYamlBase.load(y)
                     y.close()
                     return raw
             else:
@@ -1460,7 +1507,7 @@ class StgFileOpt(StgPathOpt):
             try:
                 os.makedirs(directory)
             except Exception:
-                pass
+                _bsc_cor_base.ExceptionMtd.set_print()
         if self.ext in {'.json'}:
             with open(self.path, 'w') as j:
                 json.dump(
@@ -1470,7 +1517,7 @@ class StgFileOpt(StgPathOpt):
                 )
         elif self.ext in {'.yml'}:
             with open(self.path, 'w') as y:
-                _bsc_cor_dict.CttYamlBase.dump(
+                ctt_core.ContentYamlBase.dump(
                     raw,
                     y,
                     indent=4,
@@ -1481,7 +1528,9 @@ class StgFileOpt(StgPathOpt):
                 f.write(raw)
         else:
             with open(self.path, 'w') as f:
-                f.write(raw.encode('utf-8'))
+                if isinstance(raw, six.text_type):
+                    raw = raw.encode('utf-8')
+                f.write(raw)
 
     def append(self, text):
         with open(self.path, 'a+') as f:
@@ -1490,7 +1539,7 @@ class StgFileOpt(StgPathOpt):
             f.close()
 
     def create_directory(self):
-        StorageMtd.create_directory(
+        _bsc_cor_base.StorageMtd.create_directory(
             self.get_directory_path()
         )
 
@@ -1503,7 +1552,7 @@ class StgFileOpt(StgPathOpt):
 
     def set_directory_repath_to_join_uuid(self, directory_path_tgt):
         directory_path_src = self.get_directory_path()
-        uuid_key = UuidMtd.generate_by_text(directory_path_src)
+        uuid_key = _bsc_cor_base.UuidMtd.generate_by_text(directory_path_src)
         return self.__class__(
             u'{}/{}/{}'.format(
                 directory_path_tgt, uuid_key, self.get_name()
@@ -1532,13 +1581,13 @@ class StgFileOpt(StgPathOpt):
                 # noinspection PyBroadException
                 try:
                     os.makedirs(directory_path_tgt)
-                except:
+                except Exception:
                     pass
             # noinspection PyBroadException
             try:
                 shutil.copy2(file_path_src, file_path_tgt)
-            except:
-                ExceptionMtd.set_print()
+            except Exception:
+                _bsc_cor_base.ExceptionMtd.set_print()
 
     def set_copy_to_directory(self, directory_path_tgt, replace=False):
         file_path_tgt = u'{}/{}'.format(
@@ -1583,7 +1632,7 @@ class StgGzipFileOpt(StgFileOpt):
                     fileobj=open(self.path, 'rb')
             ) as g:
                 if self.get_ext() in {'.yml'}:
-                    raw = _bsc_cor_dict.CttYamlBase.load(g)
+                    raw = ctt_core.ContentYamlBase.load(g)
                     g.close()
                     return raw
 
@@ -1598,7 +1647,7 @@ class StgGzipFileOpt(StgFileOpt):
                 fileobj=open(self.path, 'wb')
         ) as g:
             if self.get_ext() in ['.yml']:
-                _bsc_cor_dict.CttYamlBase.dump(
+                ctt_core.ContentYamlBase.dump(
                     raw,
                     g,
                     indent=4,
@@ -1666,12 +1715,12 @@ class StgTmpBaseMtd(object):
 
     @classmethod
     def get_user_directory(cls, tag):
-        return StgBasePathMapper.map_to_current(
+        return _bsc_cor_base.StgBasePathMapper.map_to_current(
             u'{root}/temporary/{tag}/{date_tag}-{user}'.format(
                 **dict(
                     root=cls.ROOT,
-                    date_tag=TimeMtd.get_date_tag(),
-                    user=SystemMtd.get_user_name(),
+                    date_tag=_bsc_cor_base.TimeMtd.get_date_tag(),
+                    user=_bsc_cor_base.SystemMtd.get_user_name(),
                     tag=tag
                 )
             )
@@ -1679,11 +1728,11 @@ class StgTmpBaseMtd(object):
 
     @classmethod
     def get_cache_directory(cls, tag):
-        return StgBasePathMapper.map_to_current(
+        return _bsc_cor_base.StgBasePathMapper.map_to_current(
             u'{root}/temporary/{tag}/{user}'.format(
                 **dict(
                     root=cls.ROOT,
-                    user=SystemMtd.get_user_name(),
+                    user=_bsc_cor_base.SystemMtd.get_user_name(),
                     tag=tag
                 )
             )
@@ -1698,7 +1747,7 @@ class StgTmpBaseMtd(object):
 class StgTmpThumbnailMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.generate_by_file(file_path)
+        return _bsc_cor_base.UuidMtd.generate_by_file(file_path)
 
     @classmethod
     def get_file_path(cls, file_path, ext='.jpg'):
@@ -1731,7 +1780,7 @@ class StgTmpThumbnailMtd(object):
 class StgTmpYamlMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.generate_by_file(file_path)
+        return _bsc_cor_base.UuidMtd.generate_by_file(file_path)
 
     @classmethod
     def get_file_path(cls, file_path, tag='untitled'):
@@ -1746,7 +1795,7 @@ class StgTmpYamlMtd(object):
 class StgTmpTextMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.generate_by_file(file_path)
+        return _bsc_cor_base.UuidMtd.generate_by_file(file_path)
 
     @classmethod
     def get_file_path(cls, file_path, tag='untitled'):
@@ -1761,7 +1810,7 @@ class StgTmpTextMtd(object):
 class StgTmpInfoMtd(object):
     @classmethod
     def get_key(cls, file_path):
-        return UuidMtd.generate_by_file(file_path)
+        return _bsc_cor_base.UuidMtd.generate_by_file(file_path)
 
     @classmethod
     def get_file_path(cls, file_path, tag='untitled'):
@@ -1933,7 +1982,7 @@ class StgPathPermissionBaseMtd(object):
         }
     )
     MAP_DICT = {
-        i: k for k, v in SCHEME_MAPPER[SystemMtd.get_platform()].items() for i in v
+        i: k for k, v in SCHEME_MAPPER[_bsc_cor_base.SystemMtd.get_platform()].items() for i in v
     }
     METHOD_DICT = dict(
         default=StgPathPermissionDefaultMtd,

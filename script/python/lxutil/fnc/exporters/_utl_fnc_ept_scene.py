@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -120,11 +120,11 @@ class DotXgenUsdaExporter(
         if maya_scene_file_path:
             xgen_collection_file_paths = self._get_xgen_collection_file_paths_(maya_scene_file_path)
             key = 'usda/asset-xgen'
-            t = rsc_core.RscJinjaConfigure.get_template(
+            t = rsc_core.ResourceJinja.get_template(
                 key
             )
 
-            c = rsc_core.RscJinjaConfigure.get_configure(
+            c = rsc_core.ResourceJinja.get_configure(
                 key
             )
             for i_xgen_collection_file_path in xgen_collection_file_paths:
@@ -148,7 +148,7 @@ class DotXgenUsdaExporter(
                     i_description_names
                 )
             #
-            c.set_flatten()
+            c.do_flatten()
             raw = t.render(
                 c.value
             )

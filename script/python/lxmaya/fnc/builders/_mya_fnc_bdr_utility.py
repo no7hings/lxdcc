@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -162,7 +162,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
             if rsv_task:
                 g_p = bsc_core.LogProcessContext(maximum=len(geometry_var_names))
                 for i_var_name in geometry_var_names:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     keyword = 'asset-geometry-usd-{}-file'.format(i_var_name)
                     model_geometry_usd_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
@@ -190,7 +190,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
             ):
         import lxmaya.fnc.importers as mya_fnc_importers
         #
-        from lxusd import usd_core
+        import lxusd.core as usd_core
 
         #
         if with_model_act_geometry_dyn is True:
@@ -251,7 +251,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
             if rsv_task:
                 g_p = bsc_core.LogProcessContext(maximum=len(geometry_var_names))
                 for i_var_name in geometry_var_names[:1]:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     keyword = 'asset-geometry-usd-{}-file'.format(i_var_name)
                     surface_geometry_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
@@ -286,7 +286,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
             if rsv_task:
                 g_p = bsc_core.LogProcessContext(maximum=len(geometry_var_names))
                 for i_var_name in geometry_var_names[:1]:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     keyword = 'asset-source-geometry-usd-{}-file'.format(i_var_name)
                     work_surface_geometry_hi_file = rsv_task.get_rsv_unit(keyword=keyword)
@@ -378,7 +378,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                 look_yml_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-look-yml-file')
                 look_yml_file_path = look_yml_file_rsv_unit.get_result(version='latest')
                 if look_yml_file_path:
-                    rsv_unit_properties = look_yml_file_rsv_unit.get_properties_by_result(look_yml_file_path)
+                    rsv_unit_properties = look_yml_file_rsv_unit.generate_properties_by_result(look_yml_file_path)
                     version = rsv_unit_properties.get('version')
                     mya_fnc_importers.FncLookYamlImporter(
                         option=dict(
@@ -405,17 +405,18 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
     @classmethod
     def _set_camera_build_by_abc_(cls, rsv_task, with_camera):
         import lxmaya.fnc.importers as mya_fnc_importers
-
         #
         if with_camera is True:
             if rsv_task is not None:
+                dcc_data = rsv_task.get_rsv_project().get_dcc_data(application=bsc_core.ApplicationMtd.get_current())
+                location = dcc_data.get('camera_root')
                 camera_main_abc_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-camera-main-abc-file')
                 camera_main_abc_file_path = camera_main_abc_file_rsv_unit.get_result(version='latest')
                 if camera_main_abc_file_path:
                     mya_fnc_importers.CameraAbcImporter(
                         option=dict(
                             file=camera_main_abc_file_path,
-                            location='/camera_grp'
+                            location=location
                         )
                     ).set_run()
 
@@ -442,7 +443,6 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         if save_scene is True:
             if rsv_asset is not None:
                 user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('builder')
-                # print user_directory_path
                 file_path = '{}/{}.ma'.format(
                     user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()])
                     )
@@ -573,7 +573,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                 maximum=len(method_args), label='execute geometry build method'
             ) as g_p:
                 for i_method, i_args in method_args:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_method(*i_args)
 
@@ -693,7 +693,7 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
     def build_model_dynamic_geometry_fnc(cls, rsv_task, space, property_names):
         if rsv_task:
             dyn_sub_root = '/dyn/master/hi'
-            from lxusd import usd_core
+            import lxusd.core as usd_core
 
             import lxmaya.fnc.importers as mya_fnc_importers
 
@@ -913,7 +913,7 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                 maximum=len(method_args), label='execute asset build method'
             ) as g_p:
                 for i_mtd, i_args in method_args:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_mtd(*i_args)
 

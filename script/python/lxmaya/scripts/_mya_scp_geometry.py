@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.cmds as cmds
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxuniverse.objects as unr_objects
 

@@ -24,7 +24,7 @@ class AbsProperties(object):
     def value(self):
         return self._value
 
-    def _get_all_keys_(self):
+    def get_all_keys(self):
         def _rcs_fnc(k_, v_):
             for _k, _v in v_.items():
                 if k_ is not None:
@@ -39,7 +39,7 @@ class AbsProperties(object):
         _rcs_fnc(None, self._value)
         return lis
 
-    def _get_leaf_keys_(self):
+    def get_all_leaf_keys(self):
         def _rcs_fnc(k_, v_):
             for _k, _v in v_.items():
                 if k_ is not None:
@@ -57,7 +57,7 @@ class AbsProperties(object):
         return lis
 
     def get_keys(self, regex=None):
-        _ = self._get_all_keys_()
+        _ = self.get_all_keys()
         if regex is not None:
             return fnmatch.filter(_, regex)
         return _
@@ -75,7 +75,7 @@ class AbsProperties(object):
                 return default_value
         return v
 
-    def get_branch_keys(self, key_path):
+    def get_key_names_at(self, key_path):
         value = self.get(key_path)
         if isinstance(value, dict):
             return value.keys()

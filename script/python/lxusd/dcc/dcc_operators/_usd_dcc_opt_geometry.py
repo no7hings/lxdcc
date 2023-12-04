@@ -1,13 +1,11 @@
 # coding:utf-8
-from lxusd.warp import *
+from lxusd.core.wrap import *
 
-from lxbasic import bsc_core
-
-from lxutil import utl_core
+import lxbasic.core as bsc_core
 
 from lxutil.dcc import utl_dcc_opt_abs
 
-from lxusd import usd_configure, usd_core
+import lxusd.core as usd_core
 
 
 class AbsUsdOptDef(object):
@@ -295,7 +293,7 @@ class MeshOpt(
         state = self.get_stage()
         for k, v in geometry_subsets.items():
             i_path = '{}/{}'.format(self.get_path(), k)
-            i_prim = state.DefinePrim(i_path, usd_configure.ObjType.GeometrySubset)
+            i_prim = state.DefinePrim(i_path, usd_core.UsdNodeTypes.GeometrySubset)
             i_fnc = UsdGeom.Subset(i_prim)
             i_element_type_atr = i_fnc.CreateElementTypeAttr()
             i_element_type_atr.Set(UsdGeom.Tokens.face)

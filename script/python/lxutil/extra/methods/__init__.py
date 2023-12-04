@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 def get_module(framework_scheme):

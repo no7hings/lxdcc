@@ -9,7 +9,7 @@ import copy
 
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxresource.core as rsc_core
 
@@ -21,7 +21,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
-from lxusd import usd_core
+import lxusd.core as usd_core
 
 import lxusd.fnc.exporters as usd_fnc_exporters
 
@@ -401,7 +401,7 @@ class DatabaseGeometryExport(object):
         if self._selected_path:
             with bsc_core.LogProcessContext.create(maximum=len(self._selected_path)) as gp:
                 for path in self._selected_path:
-                    gp.set_update()
+                    gp.do_update()
                     mesh = mya_dcc_objects.Mesh(path)
                     mesh_opt = mya_dcc_operators.MeshOpt(mesh)
                     if mesh_opt.get_shell_count() == 1:
@@ -668,7 +668,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                             i_geometry_usd_fnc, j_key, j_value
                                         )
                         #
-                        g_p.set_update()
+                        g_p.do_update()
                 #
                 usd_geometry_exporter.execute()
         else:
@@ -850,16 +850,16 @@ class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
         if export_args:
             payload_key = 'payload'
             payload_cfg_key = 'usda/geometry/{}'.format(payload_key)
-            payload_c = rsc_core.RscJinjaConfigure.get_configure(payload_cfg_key)
-            payload_t = rsc_core.RscJinjaConfigure.get_template(payload_cfg_key)
+            payload_c = rsc_core.ResourceJinja.get_configure(payload_cfg_key)
+            payload_t = rsc_core.ResourceJinja.get_template(payload_cfg_key)
             with bsc_core.LogProcessContext.create(maximum=len(export_args)) as g_p:
                 for i_branch_key, i_branch_data in export_args:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     if i_branch_data:
                         i_branch_cfg_key = 'usda/geometry/all/{}'.format(i_branch_key)
-                        i_branch_c = rsc_core.RscJinjaConfigure.get_configure(i_branch_cfg_key)
-                        i_branch_t = rsc_core.RscJinjaConfigure.get_template(i_branch_cfg_key)
+                        i_branch_c = rsc_core.ResourceJinja.get_configure(i_branch_cfg_key)
+                        i_branch_t = rsc_core.ResourceJinja.get_template(i_branch_cfg_key)
                         for j_leaf_option in i_branch_data:
                             i_branch_c.append_element('elements', j_leaf_option)
                             #

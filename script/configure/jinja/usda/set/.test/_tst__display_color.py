@@ -3,7 +3,7 @@ import lxresource.core as rsc_core
 
 key = 'usda/set/surface'
 
-c = rsc_core.RscJinjaConfigure.get_configure(key)
+c = rsc_core.ResourceJinja.get_configure(key)
 
 k = 'geo_extra'
 

@@ -1,11 +1,9 @@
 # coding:utf-8
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
-
-from lxutil import utl_core
+import lxcontent.core as ctt_core
 
 from lxutil.dcc import utl_dcc_opt_abs
 
@@ -32,7 +30,7 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                 file_path, 'mesh-comparer-{}'.format(self._namespace)
             )
             return self._get_mesh_data_content_(self._stage, file_path, yml_file_path)
-        return ctt_objects.Content(value={})
+        return ctt_core.Content(value={})
 
     @classmethod
     def _get_mesh_data_content_(cls, stage, file_path, yml_file_path):
@@ -43,14 +41,14 @@ class SceneOpt(utl_dcc_opt_abs.AbsMeshComparerDef):
                     'geometry-comparer data read',
                     'cache="{}", source="{}"'.format(yml_file_path, file_path)
                 )
-                return ctt_objects.Content(value=yml_file_path)
+                return ctt_core.Content(value=yml_file_path)
         #
-        content_0 = ctt_objects.Content(value={})
+        content_0 = ctt_core.Content(value={})
         c = len([i for i in stage.TraverseAll()])
         if c:
             with bsc_core.LogProcessContext.create(maximum=c, label='gain geometry-comparer data') as g_p:
                 for i_prim in stage.TraverseAll():
-                    g_p.set_update()
+                    g_p.do_update()
                     i_obj_type_name = i_prim.GetTypeName()
                     if i_obj_type_name == 'Mesh':
                         i_mesh_obj_opt = _usd_dcc_opt_geometry.MeshOpt(i_prim)

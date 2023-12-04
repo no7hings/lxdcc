@@ -1,25 +1,13 @@
 # coding:utf-8
-import os
-
 import six
-
-import platform
-
-import subprocess
 
 import fnmatch
 
-import shutil
+import lxbasic.core as bsc_core
 
-import json
+import lxcontent.core as ctt_core
 
-import collections
-
-from lxbasic import bsc_core
-
-import lxcontent.objects as ctt_objects
-
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 
 # stack
@@ -232,7 +220,7 @@ class AbsObjToken(object):
     @classmethod
     def _get_port_source_token_(cls, source_port_path):
         return cls._get_port_token_(
-            unr_configure.PortAssign.OUTPUTS, source_port_path
+            unr_core.UnrPortAssign.OUTPUTS, source_port_path
         )
 
     @classmethod
@@ -244,7 +232,7 @@ class AbsObjToken(object):
     @classmethod
     def _get_port_target_token_(cls, target_port_path):
         return cls._get_port_token_(
-            unr_configure.PortAssign.INPUTS, target_port_path
+            unr_core.UnrPortAssign.INPUTS, target_port_path
         )
 
     @classmethod
@@ -444,7 +432,7 @@ class AbsPortQuery(object):
 
     def __init__(self, obj, type_path, port_path, port_assign, raw):
         self._obj = obj
-        self._type = self.obj.universe._get_type_(type_path)
+        self._type = self.obj.universe._get_type(type_path)
         self._port_path = port_path
         self._port_assign = port_assign
         #
@@ -650,7 +638,7 @@ class AbsValue(object):
         }
 
     def to_properties(self):
-        p = ctt_objects.Properties(self)
+        p = ctt_core.Properties(self)
         p.set(
             'category', self.category_name
         )

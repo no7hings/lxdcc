@@ -21,7 +21,7 @@ class FncGeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
         super(FncGeometryComparer, self).__init__(*args)
 
     def update_target_fnc(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxkatana import ktn_core
 

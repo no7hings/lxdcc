@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class ImgFileOpt(object):
@@ -218,7 +218,7 @@ class StgTaskOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('sg_last_version')
 
     def set_last_stg_version(self, stg_version):
-        self._stg_obj_query.set_update('sg_last_version', stg_version)
+        self._stg_obj_query.set('sg_last_version', stg_version)
 
     def get_assign_stg_users(self):
         return self._stg_obj_query.get('task_assignees') or []
@@ -289,7 +289,7 @@ class StgVersionOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('description')
 
     def set_description(self, description):
-        self._stg_obj_query.set_update('description', description)
+        self._stg_obj_query.set('description', description)
 
     def set_folder(self, directory_path):
         directory_path_windows = bsc_core.StgPathMapper.map_to_windows(directory_path)
@@ -304,23 +304,23 @@ class StgVersionOpt(AbsStgObjOpt):
 
     def set_publish_directory(self, directory_path):
         directory_path_linux = bsc_core.StgPathMapper.map_to_linux(directory_path)
-        self._stg_obj_query.set_update('sg_published_path', directory_path_linux)
+        self._stg_obj_query.set('sg_published_path', directory_path_linux)
 
     def set_stg_folder(self, stg_folder):
-        self._stg_obj_query.set_update('sg_version_folder', stg_folder)
+        self._stg_obj_query.set('sg_version_folder', stg_folder)
 
     def get_stg_folder(self):
         return self._stg_obj_query.get('sg_version_folder')
 
     def set_stg_version_number(self, number):
-        self._stg_obj_query.set_update('sg_version_number', str(number))
+        self._stg_obj_query.set('sg_version_number', str(number))
 
     def get_stg_type(self):
         return self._stg_obj_query.get('sg_version_type')
 
     def set_stg_type(self, stg_type):
         if stg_type:
-            self._stg_obj_query.set_update('sg_version_type', stg_type)
+            self._stg_obj_query.set('sg_version_type', stg_type)
             bsc_core.Log.trace_method_result(
                 'stg-version set',
                 u'stg-type="{}"'.format(stg_type)
@@ -328,7 +328,7 @@ class StgVersionOpt(AbsStgObjOpt):
 
     def set_stg_user(self, stg_user):
         if stg_user:
-            self._stg_obj_query.set_update('user', stg_user)
+            self._stg_obj_query.set('user', stg_user)
             bsc_core.Log.trace_method_result(
                 'stg-version set',
                 u'user="{}"'.format(stg_user)
@@ -338,7 +338,7 @@ class StgVersionOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('user')
 
     def set_stg_status(self, stg_status):
-        self._stg_obj_query.set_update('sg_status_list', stg_status)
+        self._stg_obj_query.set('sg_status_list', stg_status)
         bsc_core.Log.trace_method_result(
             'stg-version set',
             u'stg-status="{}"'.format(stg_status)
@@ -348,7 +348,7 @@ class StgVersionOpt(AbsStgObjOpt):
         return self._stg_obj_query.get('sg_status_list')
 
     def set_stg_todo(self, stg_todo):
-        self._stg_obj_query.set_update('sg_todo', stg_todo)
+        self._stg_obj_query.set('sg_todo', stg_todo)
         bsc_core.Log.trace_method_result(
             'stg-version set',
             u'stg-todo="{}"'.format(stg_todo)

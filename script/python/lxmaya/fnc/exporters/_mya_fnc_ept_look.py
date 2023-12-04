@@ -16,13 +16,13 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 from lxmaya.modifiers import _mya_mdf_utility
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxutil.scripts as utl_scripts
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -137,7 +137,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         maximum=len(self._results), label='texture environ-map'
                         ) as l_p:
                     for i in self._results:
-                        l_p.set_update()
+                        l_p.do_update()
                         #
                         fr = utl_scripts.DotAssFileReader(i)
                         fr._set_file_paths_convert_()
@@ -185,7 +185,7 @@ class LookMtlxExporter(object):
             if obj.type == ma_configure.Util.MESH_TYPE:
                 mesh_dcc_path = obj.path
                 mesh_dcc_obj = mya_dcc_objects.Mesh(mesh_dcc_path)
-                key = mesh_dcc_path.replace(ma_configure.Util.OBJ_PATHSEP, unr_configure.Obj.PATHSEP)
+                key = mesh_dcc_path.replace(ma_configure.Util.OBJ_PATHSEP, unr_core.UnrObj.PATHSEP)
                 value = mesh_dcc_obj.get_display_smooth_iterations()
                 if value > 0:
                     self._mesh_subdivision_dict[key] = value
@@ -202,72 +202,9 @@ class LookMtlxExporter(object):
 
     @_mya_mdf_utility.set_undo_mark_mdf
     def set_run(self):
-        from lxarnold import and_configure
-        #
-        from lxar2mtx import ar2mtx_objects
-        #
-        import lxarnold.commands as ar_commands
-
-        #
-        self._set_cache_restore_()
-        #
-        self._get_meshes_subdivision_()
-        #
-        if self._use_exists_ass is False:
-            exporter = FncLookAssExporter(
-                option=dict(
-                    file=self._ass_file_path,
-                    location=self._root,
-                    texture_use_environ_map=True,
-                )
-            )
-            exporter.execute()
-        #
-        if os.path.isfile(self._ass_file_path) is True:
-            self._scene = ar_commands.set_scene_load_from_dot_ass(
-                file_path=self._ass_file_path,
-                path_lstrip=self._path_lstrip
-            )
-            self._universe = self._scene.universe
-            #
-            self._set_meshes_subdivision_()
-            # mesh
-            mesh_type = self._universe.get_obj_type(
-                and_configure.ObjType.LYNXI_MESH
-            )
-            meshes = mesh_type.get_objs() if mesh_type is not None else []
-            # curve
-            curve_type = self._universe.get_obj_type(
-                and_configure.ObjType.LYNXI_CURVE
-            )
-            curves = curve_type.get_objs() if curve_type is not None else []
-            # xgen
-            xgen_type = self._universe.get_obj_type(
-                and_configure.ObjType.LYNXI_XGEN_DESCRIPTION
-            )
-            xgens = xgen_type.get_objs() if xgen_type is not None else []
-            #
-            geometries = meshes+curves+xgens
-            if geometries:
-                mtx_file = ar2mtx_objects.File(self._file_path)
-                #
-                l_ = mtx_file.addLook(self._look)
-                for geometry in geometries:
-                    l_.addSrcGeometry(geometry.path)
-                #
-                mtx_file.save()
-                self._results.append(self._file_path)
-            else:
-                bsc_core.Log.trace_warning(
-                    'non-geometry(s) to exporter'
-                )
-        #
-        if self._results:
-            for i in self._results:
-                bsc_core.Log.trace_method_result(
-                    'look-mtlx-exporter',
-                    u'file="{}"'.format(i)
-                )
+        raise RuntimeError(
+            'this method is removed'
+        )
 
     def get_outputs(self):
         return self._results
@@ -315,10 +252,9 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def convert_arnold_visibilities_fnc(cls, mya_set):
-        from lxarnold import and_configure
+        import lxarnold.core as and_core
 
-        #
-        c = and_configure.Visibility.MAYA_VISIBILITY_DICT
+        c = and_core.AndVisibilities.MAYA_VISIBILITY_DICT
         cmd_obj_opt = ma_core.CmdObjOpt(mya_set.path)
         for k, v in c.items():
             cmd_obj_opt.create_customize_attribute(v, False)
@@ -430,9 +366,8 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def create_arnold_aovs_fnc(cls):
-        from lxarnold import and_configure
+        import lxarnold.core as and_core
 
-        #
         dic = {
             'transmission': {'type': 'rgb'},
             'opacity': {'type': 'rgb'}
@@ -445,7 +380,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
                     'aiAOV', name='aiAOV_{}'.format(k), skipSelect=True
                 )
                 cmds.setAttr('{}.name'.format(i_aov), k, type='string')
-                cmds.setAttr('{}.type'.format(i_aov), and_configure.Aov.get_index(v['type']))
+                cmds.setAttr('{}.type'.format(i_aov), and_core.AndAovs.get_index(v['type']))
                 lis.append(i_aov)
 
         cls.set_aovs_link_create(lis)
@@ -545,7 +480,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
-                l_p.set_update()
+                l_p.do_update()
                 #
                 mya_hide_set.set_element_remove(i_mya_mesh_path)
                 mya_show_set.add_element(i_mya_mesh_path)
@@ -590,7 +525,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         )
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(mya_mesh_paths), label='texture bake') as l_p:
             for i_mya_mesh_path in mya_mesh_paths:
-                l_p.set_update()
+                l_p.do_update()
                 #
                 i_mya_mesh = mya_dcc_objects.Mesh(i_mya_mesh_path)
                 #
@@ -701,7 +636,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     maximum=len(nodes), label='export look yaml at "{}"'.format(location)
             ) as g_p:
                 for i_node in nodes:
-                    g_p.set_update()
+                    g_p.do_update()
                     if i_node.type == 'mesh':
                         i_mesh = mya_dcc_objects.Mesh(i_node.path)
                         i_mesh_opt = mya_dcc_operators.MeshLookOpt(i_mesh)
@@ -750,7 +685,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def execute(self):
         file_path = self.get('file')
 
-        self._raw = ctt_objects.Content(
+        self._raw = ctt_core.Content(
             value=collections.OrderedDict()
         )
 
@@ -763,7 +698,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     maximum=len(locations), label='export look yaml'
             ) as g_p:
                 for i_location in locations:
-                    g_p.set_update()
+                    g_p.do_update()
                     self.update_by_location_fnc(i_location, pathsep)
 
         bsc_core.StgFileOpt(file_path).set_write(

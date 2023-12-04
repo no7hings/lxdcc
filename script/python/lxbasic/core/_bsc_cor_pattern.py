@@ -1,7 +1,28 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
+import glob
 
-from lxbasic.core import _bsc_cor_raw
+import re
+
+import fnmatch
+
+import parse
+
+from ..core import \
+    _bsc_cor_base, \
+    _bsc_cor_raw
+
+
+class PtnBase(object):
+    @classmethod
+    def glob_fnc(cls, p_str):
+        _ = glob.glob(
+            p_str
+        )
+        if _:
+            if _bsc_cor_base.SystemMtd.get_is_windows():
+                _ = map(lambda x: x.replace('\\', '/'), _)
+            return _
+        return []
 
 
 class PtnMultiplyFileMtd(object):
@@ -171,7 +192,7 @@ class PtnParseMtd(object):
             return variants[key]
 
     @classmethod
-    def set_update(cls, p, **kwargs):
+    def update_variants(cls, p, **kwargs):
         if p is not None:
             keys = cls.get_keys(p)
             variants = kwargs
@@ -201,8 +222,8 @@ class PtnParseMtd(object):
 
 
 class PtnFnmatch(object):
-    CACHE = dict()
-    CACHE_MAX = 100
+    FILTER_CACHE = dict()
+    FILTER_CACHE_MAXIMUM = 1000
 
     @classmethod
     def to_re_style(cls, pat):
@@ -245,13 +266,13 @@ class PtnFnmatch(object):
     def filter(cls, texts, p):
         list_ = []
         try:
-            re_pat = cls.CACHE[p]
+            re_pat = cls.FILTER_CACHE[p]
         except KeyError:
             res = fnmatch.translate(p)
-            if len(cls.CACHE) >= cls.CACHE_MAX:
-                cls.CACHE.clear()
-            cls.CACHE[p] = re_pat = re.compile(res, re.IGNORECASE)
-        #
+            if len(cls.FILTER_CACHE) >= cls.FILTER_CACHE_MAXIMUM:
+                cls.FILTER_CACHE.clear()
+            cls.FILTER_CACHE[p] = re_pat = re.compile(res, re.IGNORECASE)
+
         match = re_pat.match
         for i_text in texts:
             if match(i_text):
@@ -259,32 +280,19 @@ class PtnFnmatch(object):
         return list_
 
 
-class PtnBase(object):
-    @classmethod
-    def glob_fnc(cls, p_str):
-        _ = glob.glob(
-            p_str
-        )
-        if _:
-            if platform.system() == 'Windows':
-                _ = map(lambda x: x.replace('\\', '/'), _)
-            return _
-        return []
-
-
 class AbsPtnParseOpt(object):
-    def __init__(self, p, key_format=None):
+    def __init__(self, p, variants=None):
         self._pattern_origin = p
         self._variants = {}
         self._pattern = p
 
-        self._key_format = key_format or {}
+        self._variants_default = variants or {}
 
         self._fnmatch_pattern_origin = PtnParseMtd.get_as_fnmatch(
-            self._pattern_origin, self._key_format
+            self._pattern_origin, self._variants_default
         )
-        self._fnmatch_pattern = PtnParseMtd.get_as_fnmatch(
-            self._pattern, self._key_format
+        self._pattern_fnmatch = PtnParseMtd.get_as_fnmatch(
+            self._pattern, self._variants_default
         )
 
     def get_pattern(self):
@@ -294,7 +302,7 @@ class AbsPtnParseOpt(object):
 
     def get_fnmatch_pattern(self):
         return PtnParseMtd.get_as_fnmatch(
-            self._pattern, self._key_format
+            self._pattern, self._variants_default
         )
 
     fnmatch_pattern = property(get_fnmatch_pattern)
@@ -315,26 +323,33 @@ class AbsPtnParseOpt(object):
             if k in keys:
                 self._variants[k] = v
         #
-        self._pattern = PtnParseMtd.set_update(
-            self._pattern, **kwargs
-        )
-        self._fnmatch_pattern = PtnParseMtd.get_as_fnmatch(
-            self._pattern, self._key_format
+        self._pattern = PtnParseMtd.update_variants(self._pattern, **kwargs)
+        self._pattern_fnmatch = PtnParseMtd.get_as_fnmatch(
+            self._pattern, self._variants_default
         )
 
-    def set_update_to(self, **kwargs):
+    def update_variants(self, **kwargs):
+        keys = self.get_keys()
+        for k, v in kwargs.items():
+            if k in keys:
+                self._variants[k] = v
+        #
+        self._pattern = PtnParseMtd.update_variants(self._pattern, **kwargs)
+        self._pattern_fnmatch = PtnParseMtd.get_as_fnmatch(
+            self._pattern, self._variants_default
+        )
+
+    def update_variants_to(self, **kwargs):
         return self.__class__(
-            PtnParseMtd.set_update(
-                self._pattern, **kwargs
-            )
+            PtnParseMtd.update_variants(self._pattern, **kwargs)
         )
 
     def get_variants(self, result):
-        if SystemMtd.get_is_linux():
+        if _bsc_cor_base.SystemMtd.get_is_linux():
             i_p = parse.parse(
                 self._pattern, result, case_sensitive=True
             )
-        elif SystemMtd.get_is_windows():
+        elif _bsc_cor_base.SystemMtd.get_is_windows():
             i_p = parse.parse(
                 self._pattern, result, case_sensitive=False
             )
@@ -351,14 +366,14 @@ class AbsPtnParseOpt(object):
 
 
 class PtnParseOpt(AbsPtnParseOpt):
-    def __init__(self, p, key_format=None):
-        super(PtnParseOpt, self).__init__(p, key_format)
+    def __init__(self, p, variants=None):
+        super(PtnParseOpt, self).__init__(p, variants)
 
     def get_matches(self, sort=False):
         list_ = []
         paths = PtnBase.glob_fnc(
             PtnParseMtd.get_as_fnmatch(
-                self._pattern, self._key_format
+                self._pattern, self._variants_default
             )
         )
         if sort is True:
@@ -385,30 +400,30 @@ class PtnParseOpt(AbsPtnParseOpt):
 
     def get_is_matched(self, result):
         return not not fnmatch.filter(
-            [result], self._fnmatch_pattern
+            [result], self._pattern_fnmatch
         )
 
     def _get_exists_results_(self):
         return PtnBase.glob_fnc(
-            self._fnmatch_pattern
+            self._pattern_fnmatch
         )
 
     def get_exists_results(self, **kwargs):
-        p = self.set_update_to(**kwargs)
-        return PtnBase.glob_fnc(p._fnmatch_pattern)
+        p = self.update_variants_to(**kwargs)
+        return PtnBase.glob_fnc(p._pattern_fnmatch)
 
     def get_match_results(self, sort=False):
         paths = PtnBase.glob_fnc(
             PtnParseMtd.get_as_fnmatch(
-                self._pattern, self._key_format
+                self._pattern, self._variants_default
             )
         )
         if sort is True:
             paths = _bsc_cor_raw.RawTextsOpt(paths).sort_by_number()
         return paths
 
-    def set_key_format(self, key, value):
-        self._key_format[key] = value
+    def set_default_variants(self, key, value):
+        self._variants_default[key] = value
 
     def get_latest_version(self, version_key):
         ms = self.get_matches(sort=True)
@@ -432,8 +447,8 @@ class PtnParseOpt(AbsPtnParseOpt):
 
 
 class PtnDocParseOpt(AbsPtnParseOpt):
-    def __init__(self, p, key_format=None):
-        super(PtnDocParseOpt, self).__init__(p, key_format)
+    def __init__(self, p, variants=None):
+        super(PtnDocParseOpt, self).__init__(p, variants)
 
     def get_matched_lines(self, lines):
         return fnmatch.filter(

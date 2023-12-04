@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxutil.rsv import utl_rsv_obj_abstract
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 #
 from lxutil import utl_core
 
@@ -23,8 +23,9 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
+        camera_root = rsv_scene_properties.get('dcc.camera_root')
         #
-        location = '/camera_grp'
+        location = camera_root
         #
         mya_location = bsc_core.DccPathDagOpt(location).translate_to(
             pathsep=pathsep
@@ -39,7 +40,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 raise RuntimeError(
                     bsc_core.Log.trace_method_error(
                         key,
-                        u'workspace="{}" is not available'.format(workspace)
+                        'workspace="{}" is not available'.format(workspace)
                     )
                 )
             #
@@ -54,7 +55,7 @@ class RsvDccCameraHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_fnc_exporters.CameraAbcExport(
                 dict(
                     file=camera_main_abc_file_path,
-                    location='/camera_grp',
+                    location=location,
                     frame=frame_range,
                 )
             ).set_run()

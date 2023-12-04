@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil.rsv import utl_rsv_obj_abstract
 
@@ -41,7 +41,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         file_path = s.get_geometry_uv_map_usd_source_file()
         if file_path:
-            from lxusd import usd_core
+            import lxusd.core as usd_core
             usd_core.UsdBasic.copy_with_references_fnc(
                 file_path,
                 directory_path,
@@ -87,7 +87,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         file_path = s.get_geometry_uv_map_usd_file()
         if file_path:
-            from lxusd import usd_core
+            import lxusd.core as usd_core
             usd_core.UsdBasic.copy_with_references_fnc(
                 file_path,
                 directory_path,

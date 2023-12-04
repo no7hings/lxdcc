@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil.rsv import utl_rsv_obj_abstract
 
@@ -15,7 +15,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     #
     def set_texture_recycles(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -56,7 +56,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_maya_recycles(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -120,7 +120,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_xgen_recycles(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -164,7 +164,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_sp_recycles(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -202,7 +202,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
 
     def set_zb_recycles(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -244,7 +244,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_maya_xgen_repath(self):
         import lxutil.fnc.exporters as utl_fnc_exporters
 
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -445,7 +445,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
             with bsc_core.LogProcessContext.create(maximum=len(ms), label='execute workspace load method') as g_p:
                 for i_m, i_as in ms:
-                    g_p.set_update()
+                    g_p.do_update()
                     if i_as:
                         i_m(*i_as)
                     else:
@@ -484,7 +484,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import collections
 
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -515,11 +515,11 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         render_output_file_path_pattern = '{directory}/main/{camera}.{layer}.{light_pass}.{look_pass}.{quality}/{render_pass}.{frame}.exr'
 
         p = bsc_core.PtnParseOpt(render_output_file_path_pattern)
-        p.set_update(directory=render_output_directory_path)
+        p.update_variants(directory=render_output_directory_path)
 
         dict_ = collections.OrderedDict()
         for i_layer, i_render_pass in itertools.product(layers, render_passes):
-            i_p = p.set_update_to(
+            i_p = p.update_variants_to(
                 layer=i_layer, render_pass=i_render_pass
             )
             i_matchers = i_p.get_matches()

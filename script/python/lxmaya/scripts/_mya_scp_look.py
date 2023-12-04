@@ -1,9 +1,9 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-from lxarnold import and_configure
+import lxarnold.core as and_core
 
 from lxmaya import ma_core
 
@@ -14,15 +14,15 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 def set_look_shader_lib_workspace_create():
     import lxutil.dcc.dcc_operators as utl_dcc_operators
-    #
+
     root = mya_dcc_objects.Group(
         '|master|hi|base_higrp'
     )
     root.set_dag_components_create()
-    #
+
     mesh = mya_dcc_objects.Mesh('{}|box_hi|box_hiShape'.format(root.path))
     mesh.set_box_create(12)
-    #
+
     if mesh.get_is_exists() is True:
         mesh_opt = mya_dcc_operators.MeshLookOpt(mesh)
         surface_shaders = mya_dcc_objects.Nodes('aiStandardSurface').get_objs()
@@ -33,7 +33,7 @@ def set_look_shader_lib_workspace_create():
         if displacement_shaders:
             displacement_shader = displacement_shaders[-1]
             mesh_opt.set_displacement_shader(displacement_shader.path)
-    #
+
     utl_dcc_operators.DccTexturesOpt(
         mya_dcc_objects.TextureReferences(
             option=dict(
@@ -251,7 +251,7 @@ mya_scripts.ScpLibraryLook.create_user_datas()
             'normal': (get_texture_file_path_fnc_, 'normalCamera')
         }
 
-        c = ctt_objects.Content()
+        c = ctt_core.Content()
 
         bsc_core.StgDirectoryOpt(texture_directory_path).set_create()
 
@@ -308,7 +308,7 @@ mya_scripts.ScpLibraryLook.create_user_datas()
             'diffuse': (self.collection_texture_fnc, 'baseColor'),
         }
 
-        c = ctt_objects.Content()
+        c = ctt_core.Content()
 
         materials = self.get_all_materials()
         for seq, i_material in enumerate(materials):
@@ -344,7 +344,7 @@ mya_scripts.ScpLibraryLook('/geometries').split_meshes_by_subsets()
         mesh_paths = self._group.get_all_shape_paths(include_obj_type=['mesh'])
         for i_mesh_path in mesh_paths:
             i_shape_opt = ma_core.CmdShapeOpt(i_mesh_path)
-            i_shape_opt.assign_render_properties(and_configure.GeometryProperties.AdaptiveSubdivision)
+            i_shape_opt.assign_render_properties(and_core.AndGeometryProperties.AdaptiveSubdivision)
             i_mesh_opt = ma_core.Om2MeshOpt(i_mesh_path)
             i_render_properties = i_shape_opt.get_render_properties()
             i_subsets = i_shape_opt.get_subsets_by_material_assign()
@@ -363,7 +363,7 @@ mya_scripts.ScpLibraryLook('/geometries').split_meshes_by_subsets()
                         j_subset_shape_opt.assign_render_properties(i_render_properties)
                         j_subset_shape_opt.create_customize_attributes(customize_attributes)
                         #
-                        l_p.set_update()
+                        l_p.do_update()
                 #
                 i_shape_opt.delete_transform()
 

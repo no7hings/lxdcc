@@ -1,11 +1,11 @@
 # coding:utf-8
 import locale
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxbasic.extra.methods as bsc_etr_methods
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import lxresolver.commands as rsv_commands
 
@@ -69,13 +69,13 @@ class AbsHookExecutor(object):
             # "job_context" default is not discard
             deadline_job_context = ssn_ddl_configure.get('job_context')
             if deadline_job_context:
-                content_0 = deadline_configure.get_content(deadline_job_context)
+                content_0 = deadline_configure.get_as_content(deadline_job_context)
                 step = option_extra_variants.get('step')
                 if step:
-                    content_1 = content_0.get_content(step)
+                    content_1 = content_0.get_as_content(step)
 
                 else:
-                    content_1 = content_0.get_content('default')
+                    content_1 = content_0.get_as_content('default')
                 #
                 if content_1:
                     self._ddl_submiter.option.set('deadline.priority', content_1.get('priority'))
@@ -284,7 +284,7 @@ class AbsRsvProjectMethodHookExecutor(AbsHookExecutor):
             )
             if deadline_configure_file_path:
                 if bsc_core.StgPathMtd.get_is_exists(deadline_configure_file_path):
-                    deadline_configure = ctt_objects.Configure(value=deadline_configure_file_path)
+                    deadline_configure = ctt_core.Content(value=deadline_configure_file_path)
             job_name = session.get_ddl_job_name()
             return self._submit_deadline_job_(
                 session, job_name, rsv_properties.value, deadline_configure
@@ -318,7 +318,7 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
             )
             if deadline_configure_file_path:
                 if bsc_core.StgPathMtd.get_is_exists(deadline_configure_file_path):
-                    deadline_configure = ctt_objects.Configure(value=deadline_configure_file_path)
+                    deadline_configure = ctt_core.Content(value=deadline_configure_file_path)
             #
             job_name = session._get_rsv_task_version_(rsv_scene_properties)
             return self._submit_deadline_job_(

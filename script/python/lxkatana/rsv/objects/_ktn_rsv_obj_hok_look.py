@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil.rsv import utl_rsv_obj_abstract
 

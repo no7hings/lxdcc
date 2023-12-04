@@ -1,11 +1,7 @@
 # coding:utf-8
-import re
-# noinspection PyUnresolvedReferences
-from Katana import CacheManager, NodegraphAPI, KatanaFile
+import lxbasic.core as bsc_core
 
-from lxbasic import bsc_core
-
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxutil import utl_core
 
@@ -13,7 +9,7 @@ from lxutil.fnc import utl_fnc_obj_abs
 
 from lxutil.fnc.importers import utl_fnc_ipt_abs
 
-from lxarnold import and_configure
+import lxarnold.core as and_core
 
 import lxarnold.dcc.dcc_objects as and_dcc_objects
 
@@ -153,10 +149,10 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._pass_name = self.get('look_pass')
         self._material_root = self.get('material_root')
         #
-        self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
+        self._convert_configure = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('arnold/convert')
         )
-        self._convert_configure.set_flatten()
+        self._convert_configure.do_flatten()
         #
         self._with_properties = self.get('with_properties') or False
         self._with_visibilities = self.get('with_visibilities') or False
@@ -189,18 +185,18 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._ramp_dcc_objs = []
         #
         self._configure = self._workspace.set_configure_create(pass_name=pass_name)
-        self._configure.set_flatten()
+        self._configure.do_flatten()
         # geometry
-        mesh_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
+        mesh_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_MESH)
         mesh_and_objs = mesh_and_type.get_objs() if mesh_and_type is not None else []
-        curve_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
+        curve_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_CURVE)
         curve_and_objs = curve_and_type.get_objs() if curve_and_type is not None else []
-        xgen_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
+        xgen_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_XGEN_DESCRIPTION)
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
         and_geometries = mesh_and_objs+curve_and_objs+xgen_and_objs
         # material
-        # material_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
+        # material_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_MATERIAL)
         # and_materials = material_and_type.get_objs()
         #
         method_args = [
@@ -210,7 +206,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         if method_args:
             with bsc_core.LogProcessContext.create(maximum=len(method_args), label='execute look create method') as g_p:
                 for i_method, i_args in method_args:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_method(*i_args)
         #
@@ -244,7 +240,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             pass_name = self._pass_name
             with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
-                    g_p.set_update()
+                    g_p.do_update()
                     self.create_material_fnc(i_and_geometry, pass_name)
 
     def create_material_fnc(self, and_geometry, pass_name):
@@ -402,7 +398,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def create_ports_fnc(self, and_obj, dcc_obj):
         and_obj_type_name = and_obj.type.name
-        convert_and_obj_type_names = self._convert_configure.get_branch_keys(
+        convert_and_obj_type_names = self._convert_configure.get_key_names_at(
             'input-ports.to-katana'
         )
         for i_and_port in and_obj.get_input_ports():
@@ -410,7 +406,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 i_and_port_name = i_and_port.port_name
                 dcc_port_key = i_and_port_name
                 if and_obj_type_name in convert_and_obj_type_names:
-                    convert_and_port_names = self._convert_configure.get_branch_keys(
+                    convert_and_port_names = self._convert_configure.get_key_names_at(
                         'input-ports.to-katana.{}'.format(and_obj_type_name)
                     )
                     if i_and_port_name in convert_and_port_names:
@@ -458,7 +454,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             dcc_group.clear_children()
             with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
-                    g_p.set_update()
+                    g_p.do_update()
                     self.create_material_assign_fnc(i_and_geometry)
             #
             key = 'property_assign'
@@ -470,7 +466,7 @@ class LookAssImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             #
             with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create property-assign') as g_p:
                 for i_gmt_seq, i_and_geometry in enumerate(and_geometries):
-                    g_p.set_update()
+                    g_p.do_update()
                     self.create_geometry_properties_fnc(i_and_geometry)
 
     # assign

@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class Root(object):
@@ -28,7 +28,7 @@ class _AbsData(object):
 
     @classmethod
     def get_as_configure(cls, key):
-        return ctt_objects.Configure(
+        return ctt_core.Content(
             value=cls.get(key)
         )
 

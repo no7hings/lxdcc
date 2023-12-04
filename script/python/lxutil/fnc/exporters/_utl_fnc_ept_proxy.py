@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxresource.core as rsc_core
 
@@ -44,7 +44,7 @@ class DotXarcExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         file_path = option.get('file')
         #
-        j2_template = rsc_core.RscJinjaConfigure.get_template('xarc/proxy')
+        j2_template = rsc_core.ResourceJinja.get_template('xarc/proxy')
         raw = j2_template.render(
             **self._option
         )

@@ -5,11 +5,11 @@ key_name = 'auxiliary'
 
 key = 'usda/geometry/all/{}'.format(key_name)
 
-c = rsc_core.RscJinjaConfigure.get_configure(
+c = rsc_core.ResourceJinja.get_configure(
     key
 )
 
-t = rsc_core.RscJinjaConfigure.get_template(key)
+t = rsc_core.ResourceJinja.get_template(key)
 
 raw = t.render(
     **c.value

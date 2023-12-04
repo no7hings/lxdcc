@@ -2,27 +2,15 @@
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
-import copy
-
-import os
-
 from lxmaya import ma_configure
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
-
-import lxmaya.dcc.dcc_operators as mya_dcc_operators
-
-from lxmaya.fnc import mya_fnc_obj_core
-
-import lxusd.dcc.dcc_operators as usd_dcc_operators
-
-from lxusd import usd_configure, usd_core
 
 from lxutil import utl_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class CameraAbcImporter(
@@ -36,6 +24,7 @@ class CameraAbcImporter(
     )
     PLUG_NAME = 'AbcImport'
     OBJ_PATHSEP = ma_configure.Util.OBJ_PATHSEP
+
     def __init__(self, option=None):
         super(CameraAbcImporter, self).__init__(option)
 
@@ -81,7 +70,7 @@ class CameraAbcImporter(
                             j_camera.set_display_()
                     #
                     target_obj_path = '{}|{}'.format(
-                        mya_location,  bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(i_obj.name)
+                        mya_location, bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(i_obj.name)
                     )
                     obj_tgt = mya_dcc_objects.Node(target_obj_path)
                     if obj_tgt.get_is_exists() is True:

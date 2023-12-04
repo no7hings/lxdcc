@@ -1,11 +1,11 @@
 # coding:utf-8
 import re
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil.dcc import utl_dcc_opt_abs
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 
 class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
@@ -66,7 +66,7 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
         #     print source_obj.get_properties()
 
     def get_properties(self):
-        properties = ctt_objects.Properties(self)
+        properties = ctt_core.Properties(self)
         properties.set(
             'type', self.get_type_name(),
         )
@@ -83,7 +83,7 @@ class AndShaderOpt(utl_dcc_opt_abs.AbsObjOpt):
         return self._obj.get_port('parameters').get_children()
 
     def get_attributes(self):
-        attributes = ctt_objects.Properties(self)
+        attributes = ctt_core.Properties(self)
         ports = self.get_ports()
         for port in ports:
             enable_port = port.get_child('enable')

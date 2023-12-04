@@ -4,9 +4,9 @@ import maya.cmds as cmds
 
 import collections
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-from lxarnold import and_configure
+import lxarnold.core as and_core
 
 from lxmaya import ma_configure, ma_core
 
@@ -20,6 +20,7 @@ import lxmaya.modifiers as mya_modifiers
 class AbsLookOpt(object):
     def __init__(self, *args):
         self._obj = args[0]
+
     @property
     def obj(self):
         return self._obj
@@ -45,6 +46,7 @@ class AbsLookOpt(object):
             u'assign="{}" >> "{}"'.format(shape_path, value)
         )
 
+    # noinspection PyUnusedLocal
     def assign_materials(self, material_assigns, force=False):
         for key, value in material_assigns.items():
             if key == 'all':
@@ -62,6 +64,7 @@ class AbsLookOpt(object):
         shape_path = self._obj.path
         comp_path = '.'.join([shape_path, comp_name])
         self._assign_material_to_path_(comp_path, material_path)
+
     @classmethod
     def _assign_material_to_path_(cls, geometry_path, material_path):
         if cmds.objExists(material_path) is True:
@@ -94,6 +97,7 @@ class AbsLookOpt(object):
     def assign_render_visibilities(self, visibilities, renderer='arnold'):
         for key, value in visibilities.items():
             self._obj.get_port(key).set(value)
+
     @mya_modifiers.set_undo_mark_mdf
     def set_surface_shader(self, shader_path):
         shape_path = self._obj.path
@@ -108,7 +112,7 @@ class AbsLookOpt(object):
             if cmds.objExists(material_path) is False:
                 cmds.sets(renderable=1, noSurfaceShader=1, empty=1, n=material_path)
             #
-            cmds.connectAttr(shader_path + '.outColor', material_path + '.surfaceShader')
+            cmds.connectAttr(shader_path+'.outColor', material_path+'.surfaceShader')
             cmds.sets(shape_path, forceElement=material_path)
 
     def set_displacement_shader(self, shader_path):
@@ -124,7 +128,7 @@ class AbsLookOpt(object):
             if cmds.objExists(material_path) is False:
                 cmds.sets(renderable=1, noSurfaceShader=1, empty=1, n=material_path)
             #
-            cmds.connectAttr(shader_path + '.displacement', material_path + '.displacementShader')
+            cmds.connectAttr(shader_path+'.displacement', material_path+'.displacementShader')
             cmds.sets(shape_path, forceElement=material_path)
 
 
@@ -181,9 +185,9 @@ class MeshLookOpt(AbsLookOpt):
     def get_render_properties(self, renderer='arnold'):
         properties = collections.OrderedDict()
         if renderer == 'arnold':
-            for key in and_configure.GeometryProperties.AllKeys:
-                if key in and_configure.GeometryProperties.MayaMapper:
-                    dcc_port_path = and_configure.GeometryProperties.MayaMapper[key]
+            for key in and_core.AndGeometryProperties.AllKeys:
+                if key in and_core.AndGeometryProperties.MayaMapper:
+                    dcc_port_path = and_core.AndGeometryProperties.MayaMapper[key]
                     port = self._obj.get_port(dcc_port_path)
                     if port.get_is_exists() is True:
                         value = port.get()
@@ -197,32 +201,33 @@ class MeshLookOpt(AbsLookOpt):
     def assign_render_properties(self, properties, renderer='arnold'):
         if renderer == 'arnold':
             for key, value in properties.items():
-                if key in and_configure.GeometryProperties.MayaMapper:
-                    dcc_port_path = and_configure.GeometryProperties.MayaMapper[key]
+                if key in and_core.AndGeometryProperties.MayaMapper:
+                    dcc_port_path = and_core.AndGeometryProperties.MayaMapper[key]
                     self._obj.get_port(dcc_port_path).set(value)
 
     def get_render_visibilities(self, renderer='arnold'):
         visibilities = collections.OrderedDict()
         if renderer == 'arnold':
-            kwargs = {key: self._obj.get_port(v).get() for key, v in and_configure.Visibility.MAYA_VISIBILITY_DICT.items()}
-            value = and_configure.Visibility.get_visibility(**kwargs)
-            visibilities[and_configure.Visibility.VISIBILITY] = value
+            kwargs = {key: self._obj.get_port(v).get() for key, v in
+                      and_core.AndVisibilities.MAYA_VISIBILITY_DICT.items()}
+            value = and_core.AndVisibilities.get_visibility(**kwargs)
+            visibilities[and_core.AndVisibilities.VISIBILITY] = value
             #
-            value = self._obj.get_port(and_configure.Visibility.MAYA_AUTOBUMP_VISIBILITY).get()
-            visibilities[and_configure.Visibility.AUTOBUMP_VISIBILITY] = value
+            value = self._obj.get_port(and_core.AndVisibilities.MAYA_AUTOBUMP_VISIBILITY).get()
+            visibilities[and_core.AndVisibilities.AUTOBUMP_VISIBILITY] = value
         return visibilities
 
     def assign_render_visibilities(self, visibilities, renderer='arnold'):
         if renderer == 'arnold':
-            kwargs = and_configure.Visibility.get_visibility_as_dict(visibilities[and_configure.Visibility.VISIBILITY])
+            kwargs = and_core.AndVisibilities.get_visibility_as_dict(visibilities[and_core.AndVisibilities.VISIBILITY])
             for key, value in kwargs.items():
-                if key in and_configure.Visibility.MAYA_VISIBILITY_DICT:
-                    dcc_port_path = and_configure.Visibility.MAYA_VISIBILITY_DICT[key]
+                if key in and_core.AndVisibilities.MAYA_VISIBILITY_DICT:
+                    dcc_port_path = and_core.AndVisibilities.MAYA_VISIBILITY_DICT[key]
                     self._obj.get_port(dcc_port_path).set(value)
             #
-            port = self._obj.get_port(and_configure.Visibility.MAYA_AUTOBUMP_VISIBILITY)
+            port = self._obj.get_port(and_core.AndVisibilities.MAYA_AUTOBUMP_VISIBILITY)
             if port.get_is_exists() is True:
-                port.set(visibilities[and_configure.Visibility.AUTOBUMP_VISIBILITY])
+                port.set(visibilities[and_core.AndVisibilities.AUTOBUMP_VISIBILITY])
 
     def get_subsets_by_material_assign(self):
         """
@@ -289,9 +294,9 @@ class XgenDescriptionLookOpt(AbsLookOpt):
     def get_render_properties(self, renderer='arnold'):
         properties = collections.OrderedDict()
         if renderer == 'arnold':
-            for key in and_configure.HairProperty.ALL:
-                if key in and_configure.HairProperty.MAYA_XGEN_DESCRIPTION_DICT:
-                    value = and_configure.HairProperty.MAYA_XGEN_DESCRIPTION_DICT[key]
+            for key in and_core.AndHairProperties.ALL:
+                if key in and_core.AndHairProperties.MAYA_XGEN_DESCRIPTION_DICT:
+                    value = and_core.AndHairProperties.MAYA_XGEN_DESCRIPTION_DICT[key]
                     port = self._obj.get_port(value)
                     if port.get_is_exists() is True:
                         value = port.get()
@@ -305,8 +310,8 @@ class XgenDescriptionLookOpt(AbsLookOpt):
     def set_properties(self, properties, renderer='arnold'):
         if renderer == 'arnold':
             for key, value in properties.items():
-                if key in and_configure.HairProperty.MAYA_XGEN_DESCRIPTION_DICT:
-                    dcc_port_path = and_configure.HairProperty.MAYA_XGEN_DESCRIPTION_DICT[key]
+                if key in and_core.AndHairProperties.MAYA_XGEN_DESCRIPTION_DICT:
+                    dcc_port_path = and_core.AndHairProperties.MAYA_XGEN_DESCRIPTION_DICT[key]
                     port = self._obj.get_port(dcc_port_path)
                     if port.get_is_exists() is True:
                         port.set(value)
@@ -314,17 +319,17 @@ class XgenDescriptionLookOpt(AbsLookOpt):
     def get_render_visibilities(self, renderer='arnold'):
         visibilities = collections.OrderedDict()
         if renderer == 'arnold':
-            kwargs = {k: self._obj.get_port(v).get() for k, v in and_configure.Visibility.MAYA_VISIBILITY_DICT.items()}
-            value = and_configure.Visibility.get_visibility(**kwargs)
-            visibilities[and_configure.Visibility.VISIBILITY] = value
+            kwargs = {k: self._obj.get_port(v).get() for k, v in and_core.AndVisibilities.MAYA_VISIBILITY_DICT.items()}
+            value = and_core.AndVisibilities.get_visibility(**kwargs)
+            visibilities[and_core.AndVisibilities.VISIBILITY] = value
         return visibilities
 
     def assign_render_visibilities(self, visibilities, renderer='arnold'):
         if renderer == 'arnold':
-            kwargs = and_configure.Visibility.get_visibility_as_dict(visibilities[and_configure.Visibility.VISIBILITY])
+            kwargs = and_core.AndVisibilities.get_visibility_as_dict(visibilities[and_core.AndVisibilities.VISIBILITY])
             for key, value in kwargs.items():
-                if key in and_configure.Visibility.MAYA_VISIBILITY_DICT:
-                    dcc_port_path = and_configure.Visibility.MAYA_VISIBILITY_DICT[key]
+                if key in and_core.AndVisibilities.MAYA_VISIBILITY_DICT:
+                    dcc_port_path = and_core.AndVisibilities.MAYA_VISIBILITY_DICT[key]
                     self._obj.get_port(dcc_port_path).set(value)
 
 
@@ -339,6 +344,7 @@ class ObjsLookOpt(object):
         'osl_window_box',
         'osl_window_box_s'
     ]
+
     def __init__(self, objs):
         self._objs = objs
 
@@ -359,9 +365,10 @@ class ObjsLookOpt(object):
                 _obj_type_name = cmds.nodeType(_i)
                 if _obj_type_name in self.TEXTURE_REFERENCE_TYPE_NAMES:
                     lis.append(_i)
-                if not _i in keys:
+                if _i not in keys:
                     keys.append(_i)
                     rcs_fnc_(_i)
+
         #
         keys = []
         lis = []

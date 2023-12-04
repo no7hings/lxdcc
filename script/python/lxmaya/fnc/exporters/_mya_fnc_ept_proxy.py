@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_configure, utl_core
 

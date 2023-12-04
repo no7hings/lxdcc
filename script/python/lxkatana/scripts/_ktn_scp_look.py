@@ -5,23 +5,19 @@ import copy
 
 import fnmatch
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-from lxutil import utl_core
-# arnold
-from lxarnold import and_configure
+import lxarnold.core as and_core
 
 import lxarnold.dcc.dcc_objects as and_dcc_objects
 
 import lxarnold.dcc.dcc_operators as and_dcc_operators
-# katana
+
 from lxkatana import ktn_core
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-import lxkatana.dcc.dcc_operators as ktn_dcc_operators
 
 
 class ScpLookOutput(object):
@@ -80,7 +76,7 @@ ktn_scripts.ScpLookOutput(
         input_ports = self._dcc_node.get_input_ports()
         for i_input_port in input_ports:
             i_port_path = i_input_port.get_name()
-            if not i_port_path in ['orig']:
+            if i_port_path not in ['orig']:
                 lis.append(i_port_path)
         return lis
 
@@ -117,12 +113,56 @@ ktn_scripts.ScpLookOutput(
                         )
         return list_
 
+    def get_all_dcc_materials(self):
+        list_ = []
+        query_dict = ktn_dcc_objects.Materials.get_nmc_material_dict()
+        dcc_objs = self.get_all_look_pass_source_nodes()
+        for i_dcc_obj in dcc_objs:
+            i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_descendant_paths_at('/root/materials')
+            for j_material_sg_path in i_material_sg_paths:
+                if j_material_sg_path in query_dict:
+                    j_material = query_dict[j_material_sg_path]
+                    if j_material not in list_:
+                        list_.append(
+                            j_material
+                        )
+        return list_
+
     def get_all_dcc_geometry_shaders_by_location(self, location):
         list_ = []
         dcc_objs = self.get_all_dcc_geometry_materials_by_location(location)
         for i_dcc_obj in dcc_objs:
-            i_dcc_nodes = [ktn_dcc_objects.Node(i.getName()) for i in
-                           ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()]
+            i_dcc_nodes = [
+                ktn_dcc_objects.Node(i.getName()) for i in ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()
+            ]
+            list_.extend(
+                i_dcc_nodes
+            )
+        return list_
+
+    def get_all_dcc_shaders(self):
+        """
+        # coding:utf-8
+        import lxkatana
+
+        lxkatana.set_reload()
+
+        from lxkatana import ktn_core
+
+        import lxkatana.scripts as ktn_scripts
+
+        opt = ktn_core.NGObjOpt('lok_spc__LFB')
+
+        s = ktn_scripts.ScpLookOutput(opt)
+
+        print s.get_all_dcc_shaders()
+        """
+        list_ = []
+        dcc_objs = self.get_all_dcc_materials()
+        for i_dcc_obj in dcc_objs:
+            i_dcc_nodes = [
+                ktn_dcc_objects.Node(i.getName()) for i in ktn_core.NGObjOpt(i_dcc_obj.ktn_obj).get_all_source_objs()
+            ]
             list_.extend(
                 i_dcc_nodes
             )
@@ -345,10 +385,10 @@ class ScpLookAssImport(object):
             bsc_core.StgFileOpt(self._file_path).get_modify_timestamp()
             ).get_as_tag_36()
 
-        self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
+        self._convert_configure = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('arnold/convert')
         )
-        self._convert_configure.set_flatten()
+        self._convert_configure.do_flatten()
 
         self._shader_includes = []
 
@@ -382,11 +422,11 @@ class ScpLookAssImport(object):
             self._and_universe = obj_scene.universe
             ScpLookAssImport.CACHE[key] = self._and_universe
         # geometry
-        mesh_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
+        mesh_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_MESH)
         mesh_and_objs = mesh_and_type.get_objs() if mesh_and_type is not None else []
-        curve_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
+        curve_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_CURVE)
         curve_and_objs = curve_and_type.get_objs() if curve_and_type is not None else []
-        xgen_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
+        xgen_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_XGEN_DESCRIPTION)
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
         self._and_geometries = mesh_and_objs+curve_and_objs+xgen_and_objs
@@ -398,7 +438,7 @@ class ScpLookAssImport(object):
             look_pass_name = self._look_pass_name
             with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material') as g_p:
                 for i_and_geometry in and_geometries:
-                    g_p.set_update()
+                    g_p.do_update()
                     self._create_network_material_(material_group_opt, i_and_geometry, look_pass_name)
 
             self._build_ramp_()
@@ -605,7 +645,7 @@ class ScpLookAssImport(object):
 
     def _create_shader_parameters_(self, and_obj, dcc_obj):
         and_obj_type_name = and_obj.type.name
-        convert_and_obj_type_names = self._convert_configure.get_branch_keys(
+        convert_and_obj_type_names = self._convert_configure.get_key_names_at(
             'input-ports.to-katana'
         )
         for i_and_port in and_obj.get_input_ports():
@@ -613,7 +653,7 @@ class ScpLookAssImport(object):
                 i_and_port_name = i_and_port.port_name
                 dcc_port_key = i_and_port_name
                 if and_obj_type_name in convert_and_obj_type_names:
-                    convert_and_port_names = self._convert_configure.get_branch_keys(
+                    convert_and_port_names = self._convert_configure.get_key_names_at(
                         'input-ports.to-katana.{}'.format(and_obj_type_name)
                     )
                     if i_and_port_name in convert_and_port_names:
@@ -656,7 +696,7 @@ class ScpLookAssImport(object):
             look_pass_name = self._look_pass_name
             with bsc_core.LogProcessContext.create(maximum=len(and_geometries), label='create material-assign') as g_p:
                 for i_and_geometry in and_geometries:
-                    g_p.set_update()
+                    g_p.do_update()
                     self._create_material_assign_(material_assign_group_opt, i_and_geometry, look_pass_name)
 
     # assign
@@ -703,7 +743,7 @@ class ScpLookAssImport(object):
                     maximum=len(and_geometries), label='create geometry properties-assign'
             ) as g_p:
                 for i_and_geometry in and_geometries:
-                    g_p.set_update()
+                    g_p.do_update()
                     self._create_geometry_properties_assign_(
                         geometry_properties_assign_group_opt, i_and_geometry, look_pass_name
                         )

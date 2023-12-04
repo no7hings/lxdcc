@@ -1,5 +1,5 @@
 # coding:utf-8
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 d = {
     'option': {
@@ -10,9 +10,9 @@ d = {
     'x': '=(<option.x> + 2)*5'
 }
 
-c = ctt_objects.Configure(None, d)
+c = ctt_core.Content(None, d)
 c.set('asset_name', 'cc')
-c.set_flatten()
+c.do_flatten()
 
 print c.get('root')
 print c.get('x')

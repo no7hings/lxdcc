@@ -14,8 +14,6 @@ if __name__ == '__main__':
     # print RscConfigure.get_yaml('session/deadline/rsv-task-submiter')
     # print RscConfigure.get_yaml('katana/node-graph/asset-texture-resource')
     #
-    # print RscConfigure.get_yaml('colorspace/aces-color')
-    #
     # print RscConfigure.get_yaml('arnold/node')
     # print RscConfigure.get_yaml('arnold/convert')
     #

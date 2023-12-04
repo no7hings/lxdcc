@@ -14,7 +14,7 @@
 
 import fnmatch
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 print bsc_core.PtnFnmatch.to_re_style('A')
 print bsc_core.PtnFnmatch.to_re_style('A*')

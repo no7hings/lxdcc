@@ -3,13 +3,13 @@ import six
 
 
 def get_menu_content_by_hooks(hooks):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
-    import lxcontent.objects as ctt_objects
+    import lxcontent.core as ctt_core
 
     from lxsession.commands import _ssn_cmd_hook
 
-    d_ = ctt_objects.Dict()
+    d_ = ctt_core.Dict()
     for i_hook in hooks:
         if isinstance(i_hook, six.string_types):
             i_hook_key = i_hook
@@ -82,13 +82,13 @@ def get_menu_content_by_hooks(hooks):
 
 
 def get_menu_content_by_hook_options(hook_options):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     from lxsession.commands import _ssn_cmd_hook
 
-    import lxcontent.objects as ctt_objects
+    import lxcontent.core as ctt_core
 
-    d_ = ctt_objects.Dict()
+    d_ = ctt_core.Dict()
     for i_hook_option in hook_options:
         i_hook_args = _ssn_cmd_hook.get_option_hook_args(i_hook_option)
         if i_hook_args:
@@ -158,13 +158,13 @@ def get_menu_content_by_hook_options(hook_options):
 
 
 def get_menu_content_by_hook_options_(hook_options):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     from lxsession.commands import _ssn_cmd_hook
 
-    import lxcontent.objects as ctt_objects
+    import lxcontent.core as ctt_core
 
-    d_ = ctt_objects.Dict()
+    d_ = ctt_core.Dict()
     for i_key in hook_options:
         if isinstance(i_key, six.string_types):
             i_hook_option = i_key
@@ -180,7 +180,7 @@ def get_menu_content_by_hook_options_(hook_options):
             i_session, i_execute_fnc = i_hook_args
             if i_session.get_is_loadable() is True:
                 i_hook_option_opt = i_session.option_opt
-                i_hook_option_opt.set_update(i_extra_kwargs)
+                i_hook_option_opt.update_from(i_extra_kwargs)
                 i_gui_configure = i_session.gui_configure
                 i_gui_parent_path = '/'
                 #

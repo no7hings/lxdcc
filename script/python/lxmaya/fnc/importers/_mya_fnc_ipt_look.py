@@ -3,8 +3,6 @@ import collections
 # noinspection PyUnresolvedReferences
 from maya import cmds
 
-from lxutil import utl_core
-
 import lxmaya.modifiers as mya_modifiers
 
 from lxmaya import ma_configure, ma_core
@@ -13,19 +11,19 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
 from lxutil.fnc.importers import utl_fnc_ipt_abs
 
-from lxarnold import and_configure
+import lxarnold.core as and_core
 
 import lxarnold.dcc.dcc_objects as and_dcc_objects
 
 import lxarnold.dcc.dcc_operators as and_dcc_operators
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 class AssImportFnc(object):
@@ -35,23 +33,23 @@ class AssImportFnc(object):
         self._with_assign = with_assign
         self._assign_selection_enable = assign_selection_enable
         #
-        self._convert_configure = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml('arnold/convert')
+        self._convert_configure = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('arnold/convert')
         )
-        self._convert_configure.set_flatten()
+        self._convert_configure.do_flatten()
 
     def execute(self):
         # geometry
-        mesh_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MESH)
+        mesh_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_MESH)
         mesh_and_objs = mesh_and_type.get_objs() if mesh_and_type is not None else []
-        curve_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_CURVE)
+        curve_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_CURVE)
         curve_and_objs = curve_and_type.get_objs() if curve_and_type is not None else []
-        xgen_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_XGEN_DESCRIPTION)
+        xgen_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_XGEN_DESCRIPTION)
         xgen_and_objs = xgen_and_type.get_objs() if xgen_and_type is not None else []
         #
         geometry_and_objs = mesh_and_objs+curve_and_objs+xgen_and_objs
         # material
-        material_and_type = self._and_universe.get_obj_type(and_configure.ObjType.LYNXI_MATERIAL)
+        material_and_type = self._and_universe.get_obj_type(and_core.AndNodeTypes.LYNXI_MATERIAL)
         if material_and_type is not None:
             material_and_objs = material_and_type.get_objs()
             #
@@ -64,7 +62,7 @@ class AssImportFnc(object):
                     maximum=len(method_args), label='execute look create method'
                 ) as g_p:
                     for i_method, i_args, i_enable in method_args:
-                        g_p.set_update()
+                        g_p.do_update()
                         if i_enable is True:
                             i_method(*i_args)
         else:
@@ -79,7 +77,7 @@ class AssImportFnc(object):
         if material_and_objs:
             with bsc_core.LogProcessContext.create(maximum=len(material_and_objs), label='create material') as g_p:
                 for material_seq, material_and_obj in enumerate(material_and_objs):
-                    g_p.set_update()
+                    g_p.do_update()
                     self.create_material_fnc(material_and_obj)
 
     #
@@ -186,11 +184,11 @@ class AssImportFnc(object):
         else:
             target_dcc_port_path = bsc_core.RawStrUnderlineOpt(target_and_port_path).to_camelcase()
         #
-        and_obj_type_names = self._convert_configure.get_branch_keys(
+        and_obj_type_names = self._convert_configure.get_key_names_at(
             'input-ports.to-maya'
         )
         if target_and_obj_type_name in and_obj_type_names:
-            and_port_names = self._convert_configure.get_branch_keys(
+            and_port_names = self._convert_configure.get_key_names_at(
                 'input-ports.to-maya.{}'.format(target_and_obj_type_name)
             )
             if target_and_port_path in and_port_names:
@@ -291,7 +289,7 @@ class AssImportFnc(object):
 
     def create_ports_fnc(self, and_obj, dcc_obj):
         and_obj_type_name = and_obj.type.name
-        and_obj_type_names = self._convert_configure.get_branch_keys(
+        and_obj_type_names = self._convert_configure.get_key_names_at(
             'input-ports.to-maya'
         )
         for and_port in and_obj.get_input_ports():
@@ -301,7 +299,7 @@ class AssImportFnc(object):
                 dcc_port_name = bsc_core.RawStrUnderlineOpt(and_port_name).to_camelcase()
                 #
                 if and_obj_type_name in and_obj_type_names:
-                    and_port_names = self._convert_configure.get_branch_keys(
+                    and_port_names = self._convert_configure.get_key_names_at(
                         'input-ports.to-maya.{}'.format(and_obj_type_name)
                     )
                     if and_port_name in and_port_names:
@@ -335,7 +333,7 @@ class AssImportFnc(object):
         if geometry_and_objs:
             with bsc_core.LogProcessContext.create(maximum=len(geometry_and_objs), label='create assign') as g_p:
                 for geometry_seq, geometry_and_obj in enumerate(geometry_and_objs):
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     geometry_and_obj_path = geometry_and_obj.path
                     geometry_dcc_dag_path = bsc_core.DccPathDagOpt(geometry_and_obj_path).translate_to(
@@ -401,7 +399,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
         self._look_pass_name = self.get('look_pass')
         self._auto_rename_node = self.get('auto_rename_node')
         #
-        roots = self._raw.get_branch_keys('root')
+        roots = self._raw.get_key_names_at('root')
         for i_root in roots:
             self.create_node_fnc(
                 'root', i_root, i_root, customize=True
@@ -418,14 +416,14 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
             maximum=len(method_args), label='execute look yaml import method'
         ) as g_p:
             for i_method, i_args in method_args:
-                g_p.set_update()
+                g_p.do_update()
                 if i_args:
                     i_method(*i_args)
                 else:
                     i_method()
 
     def create_materials_fnc(self):
-        materials = self._raw.get_branch_keys('material')
+        materials = self._raw.get_key_names_at('material')
         for i_material in materials:
             if self._auto_rename_node is True:
                 type_name = self._raw.get(
@@ -444,7 +442,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
             )
 
     def create_nodes_fnc(self):
-        nodes = self._raw.get_branch_keys('node-graph')
+        nodes = self._raw.get_key_names_at('node-graph')
         for i_node in nodes:
             if self._auto_rename_node is True:
                 type_name = self._raw.get(
@@ -464,14 +462,14 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
 
     def create_transforms_fnc(self):
         # transforms
-        transforms = self._raw.get_branch_keys('transform')
+        transforms = self._raw.get_key_names_at('transform')
         for i_transform in transforms:
             self.create_node_fnc(
                 'transform', i_transform, i_transform, definition=True
             )
 
     def create_geometries_fnc(self):
-        geometries = self._raw.get_branch_keys('geometry')
+        geometries = self._raw.get_key_names_at('geometry')
         for i_geometry in geometries:
             self.create_node_fnc(
                 'geometry', i_geometry, i_geometry, assigns=True

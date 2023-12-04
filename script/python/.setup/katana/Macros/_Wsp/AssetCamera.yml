@@ -51,17 +51,32 @@ main:
             tool_tip: '...'
             lock: True
 
-        parameters/abc/enable:
-            widget: boolean
-            value: False
+        # setting
+        parameters/setting/scheme:
+            widget: capsule_string
+            value: ['default', 'abc']
+            default: 'default'
             tool_tip: '...'
 
-        parameters/abc/file:
+        parameters/setting/add_to_camera_list:
+            widget: boolean
+            value: True
+            tool_tip: '...'
+
+        parameters/setting/abc:
+            widget: group
+            expand: True
+            tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../scheme', conditionalVisValue: 'abc'
+            }
+
+        parameters/setting/abc/file:
             widget: enumerate
             value: ['None']
             tool_tip: '...'
 
-        parameters/abc/tools:
+        parameters/setting/abc/tools:
             widget: buttons
             value:
                 - {
@@ -74,38 +89,31 @@ main:
                 }
             tool_tip: '...'
 
-        parameters/abc/element:
-            widget: enumerate
-            value: ['full_body', 'upper_body', 'upper_body_35', 'upper_body_50', 'close_up']
-            default: 'full_body'
-            tool_tip: '...'
-
-        parameters/abc/shape:
-            widget: path
-            value: ''
-            expression:
-                |-
-                {
-                    'full_body': '{}/abc/cam_fullbody/cam_fullbodyShape'.format(option.location),
-                    'upper_body': '{}/abc/cam_upperbody/cam_upperbodyShape'.format(option.location),
-                    'upper_body_35': '{}/abc/cam_upperbody35/cam_upperbody35Shape'.format(option.location),
-                    'upper_body_50': '{}/abc/cam_upperbody50/cam_upperbody50Shape'.format(option.location),
-                    'close_up': '{}/abc/cam_closeUp/cam_closeUpShape'.format(option.location),
-                }[str(parameters.abc.element)]
-            tool_tip: '...'
-            lock: True
-
-        parameters/abc/frame:
+        parameters/setting/abc/frame:
             widget: integer
             value: 4
             tool_tip: '...'
-        # setting
-        parameters/setting/add_to_camera_list:
-            widget: boolean
-            value: True
+
+        parameters/setting/abc/element:
+            widget: enumerate
+            value: ['None']
+            default: 'None'
             tool_tip: '...'
 
-        parameters/setting/fov:
+        parameters/setting/abc/refresh:
+            widget: button
+            value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpWspAssetCamera(node).refresh_abc()'
+            tool_tip: '...'
+
+        parameters/setting/default:
+            widget: group
+            expand: True
+            tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../scheme', conditionalVisValue: 'default'
+            }
+
+        parameters/setting/default/fov:
             widget: float
             value: 35
             tool_tip: '...'
@@ -169,7 +177,6 @@ main:
     #
     expand_groups:
         - 'parameters'
-        - 'parameters/abc'
         - 'parameters/setting'
 #
 node:
@@ -206,7 +213,8 @@ node:
         #
         expressions:
             name: 'getParent().option.default'
-            fov: 'getParent().parameters.setting.fov'
+            fov: 'getParent().parameters.setting.default.fov'
+            includeInCameraList: 'getParent().parameters.setting.add_to_camera_list'
     #   abc
     abc:
         tag: 'ABC'
@@ -220,12 +228,12 @@ node:
             timing/holdTime: 4
         #
         expressions:
-            abcAsset: 'getParent().parameters.abc.file'
+            abcAsset: 'getParent().parameters.setting.abc.file'
             name:
                 |-
                 '{}/abc'.format(getParent().option.location)
             #
-            timing/holdTime: 'getParent().parameters.abc.frame'
+            timing/holdTime: 'getParent().parameters.setting.abc.frame'
     #
     abc_transform:
         type: TransformEdit
@@ -234,7 +242,7 @@ node:
         output: '<.path>.out'
         #
         expressions:
-            path: 'getParent().parameters.abc.shape'
+            path: 'getParent().parameters.setting.abc.element'
         #
         connections:
             # camera
@@ -271,7 +279,7 @@ node:
         #
         expressions:
             CEL: 'getParent().option.default'
-            user/option/from: 'getParent().parameters.abc.shape'
+            user/option/from: 'getParent().parameters.setting.abc.element'
         #
         connections:
             - '<..copy_merge.output>'
@@ -287,7 +295,9 @@ node:
             - 'on'
         #
         expressions:
-            in: '1 if getParent().parameters.abc.enable else 0'
+            in:
+                |-
+                1 if getParent().parameters.setting.scheme == 'abc' else 0
         #
         connections:
             # off

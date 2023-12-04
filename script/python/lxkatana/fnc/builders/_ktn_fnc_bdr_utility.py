@@ -1,7 +1,7 @@
 # coding:utf-8
 import types
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -63,7 +63,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         if method_args:
             g_p = bsc_core.LogProcessContext(maximum=len(method_args))
             for i_enable, i_method, i_option in method_args:
-                g_p.set_update()
+                g_p.do_update()
                 #
                 if isinstance(i_method, types.MethodType):
                     i_option += '&project={}&asset={}'.format(project, asset)

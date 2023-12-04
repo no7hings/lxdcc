@@ -7,7 +7,7 @@ import fnmatch
 
 import collections
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -71,72 +71,11 @@ class DccTexturesOpt(object):
         return tx_create_queue, tx_repath_queue
 
     #
-    def set_tx_create(self, use_deferred=False, force=False):
-        tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
-            self._objs, force=force
-        )
-        #
-        return self._get_tx_create_process_(tx_create_queue, use_deferred)
-
-    #
     def set_tx_repath(self, check_exists=True):
         tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
             self._objs, check_exists=check_exists
         )
         return self._set_repath_queue_run_(tx_repath_queue)
-
-    #
-    def set_tx_create_and_repath_use_thread(self, use_deferred=False, force=False):
-        objs = self._objs
-        #
-        tx_create_queue = []
-        repath_queue = []
-        #
-        if objs:
-            for obj in objs:
-                for j_port_path, j_file_path in obj.reference_raw.items():
-                    i_texture = utl_dcc_objects.OsTexture(j_file_path)
-                    if i_texture.get_ext_is_tx() is True:
-                        i_texture_orig = i_texture.get_tx_orig()
-                        i_texture_tx = i_texture
-                    else:
-                        i_texture_tx = i_texture.get_as_tx()
-                        #
-                        i_port = obj.get_port(j_port_path)
-                        repath_queue.append(
-                            (i_port, (i_texture, i_texture_tx))
-                        )
-                        i_texture_orig = i_texture
-                    #
-                    if force is True:
-                        i_texture_tx.set_delete()
-                    #
-                    if i_texture_orig is not None:
-                        if i_texture_orig not in tx_create_queue:
-                            tx_create_queue.append(i_texture_orig)
-                    else:
-                        bsc_core.Log.trace_method_warning(
-                            'texture-tx create',
-                            u'file="{}" orig is non-exists'.format(j_file_path)
-                        )
-        #
-        method_args = [
-            ('tx-create', self._get_tx_create_process_, (tx_create_queue, use_deferred)),
-            ('repath', self._set_repath_queue_run_, (repath_queue,))
-        ]
-        results_dict = {}
-        if method_args:
-            g_p = bsc_core.LogProcessContext(
-                maximum=len(method_args)
-            )
-            for key, method, args in method_args:
-                g_p.set_update()
-                process = method(*args)
-                results_dict[key] = process
-            #
-            g_p.set_stop()
-        #
-        return results_dict
 
     def set_tx_create_and_repath(self, force=False, check_exists=True):
         tx_create_queue, tx_repath_queue = self._get_tx_action_queue_(
@@ -150,7 +89,7 @@ class DccTexturesOpt(object):
         if queue:
             with bsc_core.LogProcessContext.create(maximum=len(queue), label='texture-tx create') as l_p:
                 for i_texture_src in queue:
-                    l_p.set_update()
+                    l_p.do_update()
                     if i_texture_src.get_is_exists_as_tx() is False:
                         i_texture_tiles = i_texture_src.get_exists_units()
                         if i_texture_tiles:
@@ -164,42 +103,6 @@ class DccTexturesOpt(object):
                                         'texture-tx create',
                                         u'file="{}"'.format(j_texture_tile.path)
                                     )
-
-    @classmethod
-    def _get_tx_create_process_(cls, queue, use_deferred):
-        lis = []
-        bsc_core.Log.trace_method_result(
-            'texture-tx process create',
-            'start'
-        )
-        if queue:
-            g_p = bsc_core.LogProcessContext(
-                maximum=len(queue)
-            )
-            #
-            for i_texture in queue:
-                g_p.set_update()
-                if i_texture.get_is_exists_as_tx() is False:
-                    i_texture_tiles = i_texture.get_exists_units()
-                    if i_texture_tiles:
-                        for j_texture_tile in i_texture_tiles:
-                            lis.append(j_texture_tile.path)
-            #
-            g_p.set_stop()
-        #
-        process = TextureTxMainProcess(lis)
-        process.PROCESS_COUNT = 0
-        process.set_name('texture-tx create')
-        if use_deferred is True:
-            pass
-        else:
-            process.set_start()
-        #
-        bsc_core.Log.trace_method_result(
-            'texture-tx process create',
-            'complete'
-        )
-        return process
 
     @classmethod
     def _get_jpg_action_queue_(cls, objs, force=False, check_exists=True):
@@ -241,70 +144,11 @@ class DccTexturesOpt(object):
                         )
         return jpg_create_queue, jpg_repath_queue
 
-    def set_jpg_create(self, use_deferred=False, force=False):
-        jpg_create_queue, jpg_repath_queue = self._get_jpg_action_queue_(
-            self._objs, force=force
-        )
-        return self._get_jpg_create_process_(jpg_create_queue, use_deferred)
-
     def set_jpg_repath(self, check_exists=True):
         jpg_create_queue, jpg_repath_queue = self._get_jpg_action_queue_(
             self._objs, check_exists=check_exists
         )
         return self._set_repath_queue_run_(jpg_repath_queue)
-
-    def set_jpg_create_and_repath_use_thread(self, use_deferred=False, force=False):
-        objs = self._objs
-        #
-        jpg_create_queue = []
-        repath_queue = []
-        #
-        ext_tgt = '.jpg'
-        #
-        if objs:
-            for obj in objs:
-                for j_port_path, j_file_path in obj.reference_raw.items():
-                    i_texture = utl_dcc_objects.OsTexture(j_file_path)
-                    if i_texture.get_ext_is(ext_tgt) is True:
-                        i_tgt_ext_texture_orig = i_texture.get_orig_as_tgt_ext(ext_tgt)
-                        i_tgt_ext_texture = i_texture
-                    else:
-                        i_tgt_ext_texture = i_texture.get_as_tgt_ext(ext_tgt)
-                        #
-                        i_port = obj.get_port(j_port_path)
-                        repath_queue.append(
-                            (i_port, (i_texture, i_tgt_ext_texture))
-                        )
-                        i_tgt_ext_texture_orig = i_texture
-                    #
-                    if force is True:
-                        i_tgt_ext_texture.set_delete()
-                    #
-                    if i_tgt_ext_texture_orig is not None:
-                        jpg_create_queue.append(i_tgt_ext_texture_orig)
-                    else:
-                        bsc_core.Log.trace_method_warning(
-                            'texture-tx create',
-                            u'file="{}" orig is non-exists'.format(j_file_path)
-                        )
-        #
-        method_args = [
-            ('jpg-create', self._get_jpg_create_process_, (jpg_create_queue, use_deferred)),
-            ('repath', self._set_repath_queue_run_, (repath_queue,))
-        ]
-        results_dict = {}
-        if method_args:
-            g_p = bsc_core.LogProcessContext(
-                maximum=len(method_args)
-            )
-            for key, method, args in method_args:
-                g_p.set_update()
-                process = method(*args)
-                results_dict[key] = process
-            #
-            g_p.set_stop()
-        #
-        return results_dict
 
     def set_jpg_create_and_repath(self, force=False):
         jpg_create_queue, jpg_repath_queue = self._get_jpg_action_queue_(
@@ -318,7 +162,7 @@ class DccTexturesOpt(object):
         if queue:
             with bsc_core.LogProcessContext.create(maximum=len(queue), label='texture-jpg create') as l_p:
                 for i_texture in queue:
-                    l_p.set_update()
+                    l_p.do_update()
                     if i_texture.get_is_exists_as_tx() is False:
                         i_texture_tiles = i_texture.get_exists_units()
                         if i_texture_tiles:
@@ -326,43 +170,6 @@ class DccTexturesOpt(object):
                                 utl_dcc_objects.OsTexture._set_unit_jpg_create_(
                                     j_texture_tile.path, block=True
                                 )
-
-    @classmethod
-    def _get_jpg_create_process_(cls, queue, use_deferred):
-        lis = []
-        bsc_core.Log.trace_method_result(
-            'texture-jpg-process create',
-            'start'
-        )
-        if queue:
-            ext_tgt = '.jpg'
-            g_p = bsc_core.LogProcessContext(
-                maximum=len(queue)
-            )
-            #
-            for i_texture in queue:
-                g_p.set_update()
-                if i_texture.get_is_exists_as_tgt_ext(ext_tgt) is False:
-                    i_texture_tiles = i_texture.get_exists_units()
-                    if i_texture_tiles:
-                        for j_texture_tile in i_texture_tiles:
-                            lis.append(j_texture_tile.path)
-            #
-            g_p.set_stop()
-        #
-        process = TextureJpgMainProcess(lis)
-        process.PROCESS_COUNT = 0
-        process.set_name('texture-jpg-create')
-        if use_deferred is True:
-            pass
-        else:
-            process.set_start()
-        #
-        bsc_core.Log.trace_method_result(
-            'texture-jpg-process create',
-            'complete'
-        )
-        return process
 
     @classmethod
     def _set_copy_queue_run_(cls, queue):
@@ -375,7 +182,7 @@ class DccTexturesOpt(object):
                 maximum=len(queue)
             )
             for i_src_stg_file, i_tgt_stg_file in queue:
-                g_p.set_update()
+                g_p.do_update()
                 i_src_stg_file.set_copy_to_file(
                     i_tgt_stg_file.path
                 )
@@ -395,7 +202,7 @@ class DccTexturesOpt(object):
         if queue:
             with bsc_core.LogProcessContext.create(maximum=len(queue), label='texture repath') as g_p:
                 for i_port, i_args in queue:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     if isinstance(i_args, (tuple, list)):
                         check_file_obj, tgt_stg_file = i_args
@@ -422,7 +229,7 @@ class DccTexturesOpt(object):
             'complete'
         )
 
-    @utl_core.DccModifier.debug_trace
+    @bsc_core.Modifiers.run_as_ignore
     def _set_repath_post_run_(self):
 
         if bsc_core.ApplicationMtd.get_is_maya():
@@ -495,7 +302,7 @@ class DccTexturesOpt(object):
                 maximum=len(objs)
             )
             for i_obj in objs:
-                g_p.set_update()
+                g_p.do_update()
                 for j_port_path, j_file_path in i_obj.reference_raw.items():
                     i_texture = utl_dcc_objects.OsTexture(j_file_path)
                     #
@@ -559,7 +366,7 @@ class DccTexturesOpt(object):
                 maximum=len(dcc_objs)
             )
             for i_dcc_obj in dcc_objs:
-                g_p.set_update()
+                g_p.do_update()
                 for j_port_path, j_texture_path_tgt in i_dcc_obj.reference_raw.items():
                     j_texture_src = utl_dcc_objects.OsTexture(j_texture_path_tgt)
                     j_result = search_opt.get_result(j_texture_src.path)
@@ -618,7 +425,7 @@ class DccTexturesOpt(object):
                 maximum=len(method_args)
             )
             for method, args in method_args:
-                g_p.set_update()
+                g_p.do_update()
                 method(*args)
             #
             g_p.set_stop()
@@ -652,7 +459,7 @@ class DccTexturesOpt(object):
         if dcc_nodes:
             with bsc_core.LogProcessContext.create(maximum=len(dcc_nodes), label='switch color-space auto') as g_p:
                 for i_dcc_node in dcc_nodes:
-                    g_p.set_update()
+                    g_p.do_update()
                     stg_files = i_dcc_node.get_file_objs()
                     if stg_files:
                         for stg_file in stg_files:
@@ -718,97 +525,3 @@ class DccTexturesOpt(object):
                     j_port = i_obj.get_port(j_port_path)
                     #
                     self._set_port_repath_(j_port, tgt_stg_texture)
-
-
-class TextureTxSubProcess(utl_abstracts.AbsProcess):
-    LOGGER = bsc_core.Log
-
-    #
-    def __init__(self, file_path):
-        super(TextureTxSubProcess, self).__init__()
-        self._file_path = file_path
-        self._f = utl_dcc_objects.OsTexture(self._file_path)
-
-    def _set_sub_process_create_fnc_(self):
-        pre_count = TextureTxMainProcess.PROCESS_COUNT
-        maximum = TextureTxMainProcess.PROCESS_COUNT_MAXIMUM
-        if pre_count < maximum:
-            result = self._f._set_unit_tx_create_by_src_(
-                self._file_path
-            )
-            TextureTxMainProcess.PROCESS_COUNT = pre_count+1
-        else:
-            result = None
-        return result
-
-    def _set_finished_fnc_run_(self):
-        pre_count = TextureTxMainProcess.PROCESS_COUNT
-        TextureTxMainProcess.PROCESS_COUNT = pre_count-1
-
-
-class TextureTxMainProcess(utl_abstracts.AbsProcess):
-    LOGGER = bsc_core.Log
-    #
-    PROCESS_COUNT = 0
-    PROCESS_COUNT_MAXIMUM = 2
-    ELEMENT_PROCESS_CLS = TextureTxSubProcess
-
-    def __init__(self, file_paths):
-        super(TextureTxMainProcess, self).__init__()
-        self._file_paths = list(set(file_paths))
-        for i in self._file_paths:
-            i_e = self.ELEMENT_PROCESS_CLS(i)
-            i_e.set_name(i)
-            self.add_element(i_e)
-
-    def _set_sub_process_create_fnc_(self):
-        return True
-
-    def _set_finished_fnc_run_(self):
-        return True
-
-
-class TextureJpgSubProcess(utl_abstracts.AbsProcess):
-    LOGGER = bsc_core.Log
-
-    #
-    def __init__(self, file_path):
-        super(TextureJpgSubProcess, self).__init__()
-        self._file_path = file_path
-        self._f = utl_dcc_objects.OsTexture(self._file_path)
-
-    def _set_sub_process_create_fnc_(self):
-        pre_count = TextureJpgMainProcess.PROCESS_COUNT
-        maximum = TextureJpgMainProcess.PROCESS_COUNT_MAXIMUM
-        if pre_count < maximum:
-            result = self._f._set_unit_jpg_create_(self._file_path)
-            TextureJpgMainProcess.PROCESS_COUNT = pre_count+1
-        else:
-            result = None
-        return result
-
-    def _set_finished_fnc_run_(self):
-        pre_count = TextureJpgMainProcess.PROCESS_COUNT
-        TextureJpgMainProcess.PROCESS_COUNT = pre_count-1
-
-
-class TextureJpgMainProcess(utl_abstracts.AbsProcess):
-    LOGGER = bsc_core.Log
-    #
-    PROCESS_COUNT = 0
-    PROCESS_COUNT_MAXIMUM = 2
-    ELEMENT_PROCESS_CLS = TextureJpgSubProcess
-
-    def __init__(self, file_paths):
-        super(TextureJpgMainProcess, self).__init__()
-        self._file_paths = list(set(file_paths))
-        for i in self._file_paths:
-            i_e = self.ELEMENT_PROCESS_CLS(i)
-            i_e.set_name(i)
-            self.add_element(i_e)
-
-    def _set_sub_process_create_fnc_(self):
-        return True
-
-    def _set_finished_fnc_run_(self):
-        return True

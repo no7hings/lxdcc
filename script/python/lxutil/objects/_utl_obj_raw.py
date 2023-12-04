@@ -5,7 +5,7 @@ import fnmatch
 
 import parse
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -13,7 +13,7 @@ import lxresource.core as rsc_core
 
 import lxutil.abstracts as utl_abstracts
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import copy
 
@@ -23,10 +23,10 @@ import os
 class _Pattern(object):
     def __init__(self, pattern):
         self._pattern = pattern
-        self._fnmatch_pattern = self._get_fnmatch_pattern_(self._pattern)
+        self._pattern_fnmatch = self.to_fnmatch_pattern(self._pattern)
 
     @classmethod
-    def _get_fnmatch_pattern_(cls, variant):
+    def to_fnmatch_pattern(cls, variant):
         if variant is not None:
             re_pattern = re.compile(r'[{](.*?)[}]', re.S)
             #
@@ -44,7 +44,7 @@ class _Pattern(object):
 
     @property
     def pattern(self):
-        return self._fnmatch_pattern
+        return self._pattern_fnmatch
 
 
 class DotAssReader(utl_abstracts.AbsFileReader):
@@ -321,7 +321,7 @@ class DotXgenFileReader(utl_abstracts.AbsFileReader):
         )
 
     def get_description_properties(self):
-        d = ctt_objects.Dict()
+        d = ctt_core.Dict()
         bsc_core.Log.trace_method_result(
             'file parse is started', 'file="{}"'.format(
                 self._file_path
@@ -439,7 +439,7 @@ class DotMaFileReader(utl_abstracts.AbsFileReader):
                     if port_raw is not None:
                         port_variant = port_raw
                         port_name, port_type, port_raw = port_variant['port_name'], port_variant['port_type'], \
-                        port_variant['port_raw']
+                            port_variant['port_raw']
                         dic[port_name] = port_type, port_raw
                 else:
                     print 'error: line [{}...] is to large({})'.format(p_line[:50], p_line_size)
@@ -576,7 +576,7 @@ class DotMaFileReader(utl_abstracts.AbsFileReader):
 class DotMtlxFileReader(utl_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLS = ctt_objects.Properties
+    PROPERTIES_CLS = ctt_core.Properties
 
     def __init__(self, file_path):
         super(DotMtlxFileReader, self).__init__(file_path)
@@ -635,7 +635,7 @@ class DotMtlxFileReader(utl_abstracts.AbsFileReader):
 class DotOslFileReader(utl_abstracts.AbsFileReader):
     SEP = '\n'
     LINE_MATCHER_CLS = _Pattern
-    PROPERTIES_CLS = ctt_objects.Properties
+    PROPERTIES_CLS = ctt_core.Properties
 
     def __init__(self, file_path):
         super(DotOslFileReader, self).__init__(file_path)
@@ -703,7 +703,7 @@ class DotUsdaFile(object):
     def _set_write_(cls, key, file_path, option):
         directory_path = os.path.dirname(file_path)
         #
-        j2_template = rsc_core.RscJinjaConfigure.get_template('usda/{}'.format(key))
+        j2_template = rsc_core.ResourceJinja.get_template('usda/{}'.format(key))
         kwargs = copy.copy(cls.OPTION)
         #
         cls._set_option_update_(option, directory_path)
@@ -720,7 +720,7 @@ class DotUsdaFile(object):
 
     def set_surface_look_write(
             self, look_root_name, look_pass_name, look_pass_names, look_file_path, look_properties_file_dict
-            ):
+    ):
         self._set_write_(
             key='surface-look',
             file_path=self._file_path,

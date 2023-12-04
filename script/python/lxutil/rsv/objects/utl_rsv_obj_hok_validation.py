@@ -10,14 +10,14 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     @classmethod
     def dcc_texture_check_fnc(cls, validation_checker, check_group, dcc_objs):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
         check_dict = {}
         with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='check texture') as g_p:
             for i_obj in dcc_objs:
-                g_p.set_update()
+                g_p.do_update()
                 #
                 file_paths_0 = []
                 file_paths_1 = []
@@ -118,7 +118,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
 
     def dcc_texture_space_check_fnc(self, validation_checker, check_group, location, dcc_objs):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -137,18 +137,14 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 i_k
             )
             i_check_p = i_p+'/{extra}'
-            i_check_p_opt = bsc_core.PtnParseOpt(
-                i_check_p
-            )
-            i_check_p_opt.set_update(
-                **dict(root=rsv_project.get('root'))
-            )
+            i_check_p_opt = bsc_core.PtnParseOpt(i_check_p)
+            i_check_p_opt.update_variants(**dict(root=rsv_project.get('root')))
             check_pattern_opts.append(i_check_p_opt)
 
         check_dict = {}
         with bsc_core.LogProcessContext.create(maximum=len(dcc_objs), label='check texture space') as g_p:
             for i_obj in dcc_objs:
-                g_p.set_update()
+                g_p.do_update()
                 #
                 i_file_paths_0 = []
                 i_file_paths_1 = []
@@ -191,7 +187,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writeable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writable(i) is True]
         if unlocked_directory_paths:
             validation_checker.register_node_directories_result(
                 location,
@@ -203,7 +199,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     @classmethod
     def maya_check_location_fnc(cls, validation_checker, check_group, location, pathsep, ignore_check=False):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
@@ -257,7 +253,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         def yes_fnc_():
             mya_dcc_objects.Scene.save_file()
 
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         from lxutil import utl_core
 
@@ -294,7 +290,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
-                    parent=gui_qt_core.GuiQtDcc.get_active_window()
+                    parent=gui_qt_core.GuiQtDcc.get_qt_active_window()
                 )
                 #
                 if not w.get_result():
@@ -307,7 +303,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
 
     def execute_maya_geometry_check(self, validation_checker):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -333,7 +329,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if geometry_paths:
             with bsc_core.LogProcessContext.create(maximum=len(geometry_paths), label='check geometry') as g_p:
                 for seq, i_geometry_path in enumerate(geometry_paths):
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_mesh = mya_dcc_objects.Mesh(i_geometry_path)
                     i_mesh_opt = mya_dcc_operators.MeshOpt(i_mesh)
@@ -379,7 +375,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             )
 
     def execute_maya_geometry_topology_check(self, validation_checker):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         from lxutil import utl_configure
         #
@@ -459,7 +455,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
 
     def execute_maya_look_check(self, validation_checker):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -487,7 +483,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if geometry_paths:
                 with bsc_core.LogProcessContext.create(maximum=len(geometry_paths), label='check look') as g_p:
                     for i_geometry_path in geometry_paths:
-                        g_p.set_update()
+                        g_p.do_update()
                         #
                         i_geometry = mya_dcc_objects.Mesh(i_geometry_path)
                         look_obj_opt = mya_dcc_operators.MeshLookOpt(i_geometry)
@@ -519,7 +515,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             with bsc_core.LogProcessContext.create(maximum=len(geometry_paths), label='check look') as g_p:
                 for i_geometry_path in geometry_paths:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_geometry = mya_dcc_objects.Mesh(i_geometry_path)
                     look_obj_opt = mya_dcc_operators.XgenDescriptionLookOpt(i_geometry)
@@ -669,7 +665,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     status=utl_core.DccDialog.ValidationStatus.Warning,
                     #
-                    parent=gui_qt_core.GuiQtDcc.get_active_window()
+                    parent=gui_qt_core.GuiQtDcc.get_qt_active_window()
                 )
                 #
                 if not w.get_result():
@@ -683,15 +679,14 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     #
     def execute_katana_geometry_check(self, validation_checker):
-        from lxusd import usd_configure, usd_core
-        #
+        import lxusd.core as usd_core
+
         from lxkatana import ktn_core
-        #
+
         import lxkatana.scripts as ktn_scripts
 
-        #
         check_group = 'Geometry Check'
-        #
+
         w_s = ktn_core.WorkspaceSetting()
         opt = w_s.get_current_look_output_opt_force()
         if opt is None:
@@ -721,7 +716,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             s = usd_core.UsdStageOpt(scene_usd_file_path)
             for i_usd_prim in s.usd_instance.TraverseAll():
                 i_usd_prim_type_name = i_usd_prim.GetTypeName()
-                if i_usd_prim_type_name == usd_configure.ObjType.Mesh:
+                if i_usd_prim_type_name == usd_core.UsdNodeTypes.Mesh:
                     i_mesh_opt = usd_core.UsdGeometryMeshOpt(i_usd_prim)
                     i_uv_map_names = i_mesh_opt.get_uv_map_names()
                     i_mesh_location = '{}/{}'.format(geometry_location, i_mesh_opt.get_path())

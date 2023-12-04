@@ -3,7 +3,12 @@ import fnmatch
 
 import lxlog.core as log_core
 
-from lxbasic.core import _bsc_cor_utility, _bsc_cor_raw, _bsc_cor_storage, _bsc_cor_pattern, _bsc_cor_process
+from ..core import \
+    _bsc_cor_base, \
+    _bsc_cor_raw, \
+    _bsc_cor_storage, \
+    _bsc_cor_pattern, \
+    _bsc_cor_process
 
 
 class PkgContextNew(object):
@@ -33,10 +38,10 @@ class PkgContextNew(object):
 
     @classmethod
     def get_bin_source(cls):
-        return cls.BIN_SOURCE[_bsc_cor_utility.PlatformMtd.get_current()]
+        return cls.BIN_SOURCE[_bsc_cor_base.PlatformMtd.get_current()]
 
     def __init__(self, *args):
-        self._platform = _bsc_cor_utility.PlatformMtd.get_current()
+        self._platform = _bsc_cor_base.PlatformMtd.get_current()
         self._bin_source = self.get_bin_source()
         if args:
             self._args = args[0]
@@ -44,7 +49,7 @@ class PkgContextNew(object):
             self._args = None
 
         self._variants = dict(
-            home=_bsc_cor_utility.SystemMtd.get_home_directory(),
+            home=_bsc_cor_base.SystemMtd.get_home_directory(),
             platfrom=self._platform,
         )
 
@@ -56,7 +61,7 @@ class PkgContextNew(object):
             i_p_opt = _bsc_cor_pattern.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 list_.append(i_results[0])
@@ -68,7 +73,7 @@ class PkgContextNew(object):
             i_p_opt = _bsc_cor_pattern.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 list_.append(i_results[0])
@@ -80,7 +85,7 @@ class PkgContextNew(object):
             i_p_opt = _bsc_cor_pattern.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 list_.append(i_results[0])
@@ -88,7 +93,12 @@ class PkgContextNew(object):
 
     def get_resolved_packages_data(self):
         if self._args:
-            results = _bsc_cor_process.SubProcessMtd.execute_as_block('{} {} -v'.format(self._bin_source, self._args))
+            results = _bsc_cor_process.SubProcessMtd.execute_as_block(
+                '{} {} -v'.format(self._bin_source, self._args)
+            )
+            if not results:
+                return self._args.split(' ')
+
             package_start_index = None
             package_end_index = None
             index_maximum = len(results)-1
@@ -124,6 +134,8 @@ class PkgContextNew(object):
         return version
 
     def _get_replace_package(self, package, use_beta=False):
+        if '@' not in package:
+            return None
         package_name, package_version = package.split('@')
         package_virtual_version = self._get_virtual_version(package_version)
         package_data = {}
@@ -134,14 +146,14 @@ class PkgContextNew(object):
             package_roots += pre_release_package_roots
         package_file_patterns = self._get_package_file_patterns()
         for i_index, i_package_root in enumerate(package_roots):
-            if _bsc_cor_storage.StorageMtd.get_is_exists(i_package_root):
+            if _bsc_cor_base.StorageMtd.get_is_exists(i_package_root):
                 i_variants = dict(
                     root=i_package_root,
                     package_name=package_name
                 )
                 for j_p in package_file_patterns:
                     j_p_opt = _bsc_cor_pattern.PtnParseOpt(j_p)
-                    j_p_opt.set_update(**i_variants)
+                    j_p_opt.update_variants(**i_variants)
                     j_results = j_p_opt.get_exists_results()
                     if j_results:
                         for k_package_file in j_results:
@@ -177,14 +189,14 @@ class PkgContextNew(object):
             package_file_patterns = self._get_package_file_patterns()
             #
             for i_index, i_package_root in enumerate(package_roots):
-                if _bsc_cor_storage.StorageMtd.get_is_exists(i_package_root):
+                if _bsc_cor_base.StorageMtd.get_is_exists(i_package_root):
                     i_variants = dict(
                         root=i_package_root,
                         package_name=package_name
                     )
                     for j_p in package_file_patterns:
                         j_p_opt = _bsc_cor_pattern.PtnParseOpt(j_p)
-                        j_p_opt.set_update(**i_variants)
+                        j_p_opt.update_variants(**i_variants)
                         j_results = j_p_opt.get_exists_results()
                         if j_results:
                             for k_package_file in j_results:
@@ -253,9 +265,9 @@ class PkgContextNew(object):
     def convert_args_execute(cls, args_execute=None):
         if isinstance(args_execute, (set, tuple, list)):
             # replace first argument to "--join-cmd", etc. "-- maya", "-c maya" to "--join-cmd maya"
-            if _bsc_cor_utility.SystemMtd.get_is_linux():
+            if _bsc_cor_base.SystemMtd.get_is_linux():
                 j_key = '--join-cmd'
-            elif _bsc_cor_utility.SystemMtd.get_is_windows():
+            elif _bsc_cor_base.SystemMtd.get_is_windows():
                 j_key = '&&'
             else:
                 raise SystemError()
@@ -269,12 +281,7 @@ class PkgContextNew(object):
 
     def get_command(self, args_execute=None, packages_extend=None, use_beta=False):
         if isinstance(args_execute, (set, tuple, list)):
-            # replace first argument to "--join-cmd", etc. "-- maya", "-c maya" to "--join-cmd maya"
-            args_execute = [
-                '--join-cmd' if x_seq == 0 and y_seq == 0 and y in ['--', '-c'] else y
-                for x_seq, x in enumerate(args_execute)
-                for y_seq, y in enumerate(x.split(' '))
-            ]
+            args_execute = self.convert_args_execute(args_execute)
         #
         args = self.get_args(packages_extend, use_beta)
         if args:

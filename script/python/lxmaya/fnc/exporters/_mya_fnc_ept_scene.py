@@ -4,11 +4,11 @@ from maya import cmds
 
 import collections
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -375,7 +375,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def __init__(self, option):
         super(CameraYamlExporter, self).__init__(option)
         #
-        self._raw = ctt_objects.Content(
+        self._raw = ctt_core.Content(
             value=collections.OrderedDict()
         )
 

@@ -1,8 +1,4 @@
 # coding:utf-8
-# from ._bsc_cor_utility import *
-
-from lxbasic.core import _bsc_cor_utility
-
 import sys
 
 import six
@@ -15,8 +11,6 @@ import copy
 
 import subprocess
 
-import fnmatch
-
 import re
 
 import threading
@@ -25,7 +19,9 @@ import functools
 
 import lxlog.core as log_core
 
-from lxbasic.core import _bsc_cor_environ
+from lxbasic.core import \
+    _bsc_cor_base, \
+    _bsc_cor_environ
 
 
 class SubProcessMtd(object):
@@ -38,7 +34,21 @@ class SubProcessMtd(object):
     #
     ENVIRON_MARK = copy.copy(os.environ)
 
-    #
+    @classmethod
+    def cmd_cleanup(cls, cmd):
+        if platform.system() == 'Windows':
+            parts = re.split(r'(".*?"|&&)', cmd)
+            for i in range(0, len(parts), 2):
+                parts[i] = re.sub(r'&', '^&', parts[i])
+            return ''.join(parts)
+        elif platform.system() == 'Linux':
+            parts = re.split(r'(".*?"|&&)', cmd)
+            for i in range(0, len(parts), 2):
+                parts[i] = re.sub(r'&', r'\&', parts[i])
+            return ''.join(parts)
+        else:
+            raise RuntimeError()
+
     @classmethod
     def get_environs(cls, **kwargs):
         environs_extend = kwargs.get('environs_extend', {})
@@ -104,6 +114,111 @@ class SubProcessMtd(object):
             if re.search(i_p, cmd) is not None:
                 return True
         return False
+
+    @classmethod
+    def windows_error_trace(cls, text):
+        text = text.decode('gbk')
+        sys.stderr.write(text.encode('utf-8'))
+
+    @classmethod
+    def windows_trace(cls, text):
+        text = text.decode('gbk')
+        sys.stdout.write(text.encode('utf-8'))
+
+    @classmethod
+    def linux_error_trace(cls, text):
+        text = text.decode('utf-8')
+        text = text.replace(u'\u2018', "'").replace(u'\u2019', "'")
+        sys.stderr.write(text.encode('utf-8'))
+
+    @classmethod
+    def linux_trace(cls, text):
+        text = text.decode('utf-8')
+        text = text.replace(u'\u2018', "'").replace(u'\u2019', "'")
+        sys.stdout.write(text.encode('utf-8'))
+
+    @classmethod
+    def execute_as_trace(cls, cmd, **kwargs):
+        if platform.system() == 'Windows':
+            trace_fnc = cls.windows_trace
+        elif platform.system() == 'Linux':
+            trace_fnc = cls.linux_trace
+        else:
+            raise RuntimeError()
+
+        print cmd
+
+        clear_environ = kwargs.get('clear_environ', False)
+        if clear_environ == 'auto':
+            clear_environ = cls.check_command_clear_environ(cmd)
+        #
+        if clear_environ is True:
+            s_p = subprocess.Popen(
+                cmd,
+                shell=True,
+                # close_fds=True,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                startupinfo=cls.NO_WINDOW,
+                env=dict()
+            )
+        else:
+            environs_extend = kwargs.get('environs_extend', {})
+            if environs_extend:
+                environs = cls.get_environs(**kwargs)
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                    env=environs
+                )
+            else:
+                s_p = subprocess.Popen(
+                    cmd,
+                    shell=True,
+                    # close_fds=True,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    startupinfo=cls.NO_WINDOW,
+                )
+
+        while True:
+            return_line = s_p.stdout.readline()
+            if return_line == '' and s_p.poll() is not None:
+                break
+            trace_fnc(return_line)
+
+        retcode = s_p.poll()
+        if retcode:
+            raise subprocess.CalledProcessError(retcode, cmd)
+
+        s_p.stdout.close()
+
+    @classmethod
+    def execute(cls, cmd):
+        s_p = subprocess.Popen(
+            cmd,
+            shell=True,
+            # close_fds=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            startupinfo=cls.NO_WINDOW,
+        )
+        #
+        output, unused_err = s_p.communicate()
+        if s_p.returncode != 0:
+            for i in output.decode('utf-8').splitlines():
+                sys.stderr.write(i+'\n')
+            raise subprocess.CalledProcessError(s_p.returncode, cmd)
+        s_p.wait()
+        return output.decode('utf-8').splitlines()
 
     @classmethod
     def execute_with_result_in_windows(cls, cmd, **kwargs):
@@ -234,9 +349,9 @@ class SubProcessMtd(object):
 
     @classmethod
     def execute_with_result(cls, cmd, **kwargs):
-        if _bsc_cor_utility.SystemMtd.get_is_windows():
+        if _bsc_cor_base.SystemMtd.get_is_windows():
             cls.execute_with_result_in_windows(cmd, **kwargs)
-        elif _bsc_cor_utility.SystemMtd.get_is_linux():
+        elif _bsc_cor_base.SystemMtd.get_is_linux():
             cls.execute_with_result_in_linux(cmd, **kwargs)
 
     @classmethod
@@ -316,91 +431,6 @@ class SubProcessMtd(object):
         return output.decode('utf-8').splitlines()
 
     @classmethod
-    def generator(cls, cmd, **kwargs):
-        clear_environ = kwargs.get('clear_environ', False)
-        if clear_environ == 'auto':
-            clear_environ = cls.check_command_clear_environ(cmd)
-
-        if clear_environ is True:
-            s_p = subprocess.Popen(
-                cmd,
-                shell=True,
-                # close_fds=True,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                startupinfo=cls.NO_WINDOW,
-                env=dict()
-            )
-        else:
-            environs_extend = kwargs.get('environs_extend', {})
-            if environs_extend:
-                environs = cls.get_environs(**kwargs)
-                s_p = subprocess.Popen(
-                    cmd,
-                    shell=True,
-                    # close_fds=True,
-                    universal_newlines=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    startupinfo=cls.NO_WINDOW,
-                    env=environs
-                )
-            else:
-                s_p = subprocess.Popen(
-                    cmd,
-                    shell=True,
-                    # close_fds=True,
-                    universal_newlines=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    startupinfo=cls.NO_WINDOW,
-                )
-        return s_p
-
-    @classmethod
-    def execute(cls, cmd):
-        s_p = subprocess.Popen(
-            cmd,
-            shell=True,
-            # close_fds=True,
-            universal_newlines=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            startupinfo=cls.NO_WINDOW,
-        )
-        #
-        output, unused_err = s_p.communicate()
-        #
-        if s_p.returncode != 0:
-            for i in output.decode('utf-8').splitlines():
-                sys.stderr.write(i+'\n')
-            raise subprocess.CalledProcessError(s_p.returncode, cmd)
-        s_p.wait()
-        return output.decode('utf-8').splitlines()
-
-    @classmethod
-    def execute_(cls, cmd):
-        s_p = subprocess.Popen(
-            cmd,
-            shell=True,
-            # close_fds=True,
-            universal_newlines=True,
-            stdout=subprocess.STDOUT,
-            stderr=subprocess.STDOUT,
-            startupinfo=cls.NO_WINDOW,
-        )
-        #
-        output, unused_err = s_p.communicate()
-        #
-        if s_p.returncode != 0:
-            for i in output.decode('utf-8').splitlines():
-                sys.stderr.write(i+'\n')
-            raise subprocess.CalledProcessError(s_p.returncode, cmd)
-        s_p.wait()
-        return output.decode('utf-8').splitlines()
-
-    @classmethod
     def execute_use_thread(cls, cmd):
         t_0 = threading.Thread(
             target=functools.partial(
@@ -409,14 +439,5 @@ class SubProcessMtd(object):
             )
         )
         t_0.start()
-
-
-if __name__ == '__main__':
-    pass
-    # text = '/job/PLE/support/wrappers/paper-bin --j'
-    # p = r'(.*)/paper-bin\s(.*)'
-    # m = re.search(p, text)
-    # print m.group(1)
-    # print m.group(2)
 
 

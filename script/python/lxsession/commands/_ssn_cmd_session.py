@@ -10,7 +10,7 @@ def set_session_option_hooks_execute_by_deadline(session):
     """
     from lxsession.commands import _ssn_cmd_hook
     #
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
 
     #
     def run_branch_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
@@ -40,7 +40,7 @@ def set_session_option_hooks_execute_by_deadline(session):
             )
         )
         #
-        _hook_option_opt.set_update(
+        _hook_option_opt.update_from(
             hook_option_override_
         )
         # add main-key to dependencies
@@ -81,7 +81,7 @@ def set_session_option_hooks_execute_by_deadline(session):
             label='option-hooks execute by deadline',
     ) as g_p:
         for i_args in option_hook_keys:
-            g_p.set_update()
+            g_p.do_update()
             if isinstance(i_args, six.string_types):
                 i_sub_key = i_args
                 run_branch_fnc_(

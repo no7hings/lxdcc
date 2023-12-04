@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxmaya import ma_core
 
@@ -12,12 +12,12 @@ class ScpCbkEnvironment(object):
     KEY = 'workspace environment build'
 
     def __init__(self):
-        self._cfg = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml(
+        self._cfg = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml(
                 'katana/script/scene'
             )
         )
-        self._cfg.set_flatten()
+        self._cfg.do_flatten()
 
     @classmethod
     def save(cls, data):

@@ -1,25 +1,19 @@
 # coding:utf-8
 import copy
 
-import fnmatch
-
 import threading
-
-import os
-
-import subprocess
 
 import functools
 
-from lxbasic import bsc_core
+import lxcontent.core as ctt_core
 
-from lxresolver import rsv_configure
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxresolver.core as rsv_core
 
 
 class AbsRsvAppDef(object):
-    Applications = rsv_configure.Applications
+    Applications = rsv_core.RsvApplications
     CACHE = dict()
     BIN = None
 
@@ -80,7 +74,7 @@ class AbsRsvAppDef(object):
             i_p_opt = bsc_core.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 list_.append(i_results[0])
@@ -92,7 +86,7 @@ class AbsRsvAppDef(object):
             i_p_opt = bsc_core.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 list_.append(i_results[0])
@@ -104,7 +98,7 @@ class AbsRsvAppDef(object):
             i_p_opt = bsc_core.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 list_.append(i_results[0])
@@ -125,7 +119,7 @@ class AbsRsvAppDef(object):
             i_p_opt = bsc_core.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**self._variants)
+            i_p_opt.update_variants(**self._variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 i_results = bsc_core.RawTextsMtd.sort_by_number(i_results)
@@ -142,7 +136,7 @@ class AbsRsvAppDef(object):
             i_p_opt = bsc_core.PtnParseOpt(
                 i_p
             )
-            i_p_opt.set_update(**variants)
+            i_p_opt.update_variants(**variants)
             i_results = i_p_opt.get_exists_results()
             if i_results:
                 i_results = bsc_core.RawTextsMtd.sort_by_number(i_results)
@@ -229,8 +223,8 @@ class AbsRsvAppDefault(AbsRsvAppDef):
                     **dict(project=self._project, application=self._application)
                 )
             )
-            configure = ctt_objects.Configure(value=configure_file_path)
-            keys = configure.get_leaf_keys()
+            configure = ctt_core.Content(value=configure_file_path)
+            keys = configure.get_all_leaf_keys()
             for i_key in keys:
                 i_args = configure.get(i_key)
                 list_.extend(i_args)
@@ -262,7 +256,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
 
     def __init__(self, *args, **kwargs):
         super(AbsRsvAppNew, self).__init__(*args, **kwargs)
-        self._bin_source = bsc_core.StgBasePathMapper.map_to_current(self.BIN_SOURCE)
+        self._bin_source = bsc_core.PkgContextNew.get_bin_source()
 
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:
@@ -301,11 +295,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
 
     def get_command(self, args_execute=None, args_extend=None, packages_extend=None):
         if isinstance(args_execute, (set, tuple, list)):
-            args_execute = [
-                '--join-cmd' if x_seq == 0 and y_seq == 0 and y in ['--', '-c'] else y
-                for x_seq, x in enumerate(args_execute)
-                for y_seq, y in enumerate(x.split(' '))
-            ]
+            args_execute = bsc_core.PkgContextNew.convert_args_execute(args_execute)
         #
         args = self.get_args(packages_extend)
         if args:

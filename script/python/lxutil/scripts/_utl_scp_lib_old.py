@@ -7,13 +7,13 @@ import os
 
 import parse
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 #
 from lxutil import utl_configure
 #
 import lxresolver.commands as rsv_commands
 #
-import lxresolver.methods as rsv_methods
+import lxresolver.scripts as rsv_scripts
 
 import lxwarp.shotgun.core as wrp_stg_core
 
@@ -51,7 +51,7 @@ class ScpAssetBatcher(object):
         if self._assets_tgt:
             with bsc_core.LogProcessContext.create(maximum=len(self._assets_tgt), label='execute batch') as g_p:
                 for i_asset_tgt in self._assets_tgt:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_rsv_asset_tgt = self._resolver.get_rsv_resource(
                         project=self._project_tgt,
@@ -270,7 +270,7 @@ class AbsScpLibSystemDef(object):
         i_rsv_tasks_tgt = i_rsv_asset_tgt.get_rsv_tasks()
         for j_rsv_task_tgt in i_rsv_tasks_tgt:
             j_task_kwargs = j_rsv_task_tgt.properties.value
-            rsv_methods.RsvPermissionMtd.set_create(
+            rsv_scripts.RsvPermissionMtd.set_create(
                 **j_task_kwargs
             )
 

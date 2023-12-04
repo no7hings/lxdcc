@@ -183,7 +183,7 @@ def __print_help():
 
 
 def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
     #
     import lxbasic.extra.methods as bsc_etr_methods
     #

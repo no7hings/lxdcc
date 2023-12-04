@@ -19,7 +19,7 @@ def set_reload(modules=None):
                 'lxusd',
                 'lxutil', 'lxgui',
                 'lxshotgun',
-                'lxclarisse', 'lxtool_clarisse',
+                'lxclarisse',
             ]
         )
     p.set_reload()

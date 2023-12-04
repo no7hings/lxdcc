@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 

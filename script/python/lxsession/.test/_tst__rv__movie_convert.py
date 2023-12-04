@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxsession.commands as ssn_commands
 
@@ -35,7 +35,7 @@ for i_f in [
             )
         )
         #
-        j_option_opt.set_update(
+        j_option_opt.update_from(
             j_script_option
         )
         #

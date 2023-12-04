@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxutil.rsv import utl_rsv_obj_abstract
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 
@@ -28,10 +28,11 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         step = rsv_scene_properties.get('step')
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
+        camera_root = rsv_scene_properties.get('dcc.camera_root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
         #
         if step in ['cam']:
-            location = '/camera_grp'
+            location = camera_root
         else:
             location = root
         #
@@ -99,6 +100,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
+        camera_root = rsv_scene_properties.get('dcc.camera_root')
         #
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = 'asset-maya-scene-src-file'
@@ -121,7 +123,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             scene_src_file = utl_dcc_objects.OsFile(scene_src_file_path)
             if scene_src_file.get_is_exists() is True:
                 mya_dcc_objects.Scene.open_file(scene_src_file_path)
-                camera_location = '/camera_grp'
+                camera_location = camera_root
                 mya_camera_location = bsc_core.DccPathDagOpt(camera_location).translate_to(pathsep).to_string()
                 mya_camera_group = mya_dcc_objects.Group(mya_camera_location)
                 if mya_camera_group.get_is_exists() is True:

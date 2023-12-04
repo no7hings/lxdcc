@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 p = "L:\FTP\qihe\to_diezhi\shl\20210511\1x\shengbei\shengbei"
 print repr(p)

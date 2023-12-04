@@ -1,15 +1,21 @@
 # coding:utf-8
-from ._ktn_cor_utility import *
-
 import re
 
 import fnmatch
 
 import sys
 
-from lxbasic import bsc_core
+import six
 
-import lxcontent.objects as ctt_objects
+import time
+
+import lxbasic.core as bsc_core
+
+import lxcontent.core as ctt_core
+
+from .wrap import *
+
+from ..core import _ktn_cor_base
 
 
 # katana scene graph operator
@@ -37,6 +43,7 @@ class KtnObjOpt(object):
         if port is not None:
             return port.getValue()
 
+    # noinspection PyUnusedLocal
     def get(self, key, use_global=False):
         p = self.get_port(key, use_global=False)
         if p is not None:
@@ -60,7 +67,7 @@ class KtnObjOpt(object):
                     print _i_p
                     print dir(_i_p)
 
-        ps = ctt_objects.Properties(self)
+        ps = ctt_core.Properties(self)
         tvl = self._traversal
         if tvl.valid():
             attrs = tvl.getLocationData().getAttrs()
@@ -122,7 +129,7 @@ class KtnStageOpt(object):
     def generate_mesh_opt(self, obj_path):
         return KtnMeshOpt(self, obj_path)
 
-    def get_descendant_paths_at(self, location):
+    def get_all_descendant_paths_at(self, location):
         list_ = []
         tvl = self._get_traversal_(location)
         while tvl.valid():
@@ -1127,7 +1134,7 @@ class NGObjOpt(object):
         rcs_fnc_(self._ktn_obj, name, start_depth, start_index)
         return branch_leaf_names_dict, leaf_branch_names_dict, size_dict, graph_dict
 
-    @Modifier.undo_run
+    @_ktn_cor_base.Modifier.undo_run
     def gui_layout_shader_graph(
             self, scheme=(
             NGLayoutOpt.Orientation.Horizontal, NGLayoutOpt.Direction.RightToLeft, NGLayoutOpt.Direction.TopToBottom),
@@ -1150,7 +1157,7 @@ class NGObjOpt(object):
             )
         ).run()
 
-    @Modifier.undo_run
+    @_ktn_cor_base.Modifier.undo_run
     def gui_layout_node_graph(
             self, scheme=(
             NGLayoutOpt.Orientation.Vertical, NGLayoutOpt.Direction.LeftToRight, NGLayoutOpt.Direction.BottomToTop),
@@ -1584,7 +1591,7 @@ class NGObjOpt(object):
         self._ktn_obj.setAttributes(atr)
 
     def move_to_view_center(self):
-        GuiNodeGraphOpt().move_node_to_view_center(
+        _ktn_cor_base.GuiNodeGraphOpt().move_node_to_view_center(
             self._ktn_obj
         )
 
@@ -2512,7 +2519,7 @@ class NGNmeOpt(object):
             mod = sys.modules[cls.__module__]
             status = mod.UpdateStatus
             #
-            if get_is_ui_mode() is False:
+            if _ktn_cor_base.KtnUtil.get_is_ui_mode() is False:
                 print('update "NetworkMaterialEdit" "{}" events is ignored'.format(self._ktn_obj.getName()))
                 self._ktn_obj.__dict__['_NetworkMaterialEditNode__queuedNodeGraphEvents'] = []
             #
@@ -2569,7 +2576,7 @@ class NGNmeOpt(object):
                 status = UpdateStatus.Failed
             elif upstreamMaterial.getHash() != ktn_obj._NetworkMaterialEditNode__lastUpstreamMaterialHash:
                 ktn_obj._NetworkMaterialEditNode__clearContents()
-                if get_is_ui_mode() is True:
+                if _ktn_cor_base.KtnUtil.get_is_ui_mode() is True:
                     populated = ktn_obj._NetworkMaterialEditNode__populateFromInputMaterial(
                         upstreamMaterial, materialAttr
                         )
@@ -2582,7 +2589,7 @@ class NGNmeOpt(object):
             else:
                 ktn_obj._NetworkMaterialEditNode__lastUpstreamMaterialHash = materialAttr and upstreamMaterial and upstreamMaterial.getHash()
             #
-            if get_is_ui_mode() is True:
+            if _ktn_cor_base.KtnUtil.get_is_ui_mode() is True:
                 ktn_obj._NetworkMaterialEditNode__notifyUpdated()
             return status
 
@@ -2779,11 +2786,11 @@ class NGMacro(object):
         if _ is None:
             self._ktn_obj.addOutputPort(port_path)
 
-    @Modifier.undo_debug_run
+    @_ktn_cor_base.Modifier.undo_debug_run
     def create_by_configure_file(self, file_path, clear_start=None):
         NGObjOpt(self._ktn_obj).clear_ports(clear_start)
         #
-        configure = ctt_objects.Configure(value=file_path)
+        configure = ctt_core.Content(value=file_path)
         input_ports = configure.get('input_ports') or []
         #
         NGObjOpt(self._ktn_obj).set_color(
@@ -2802,14 +2809,14 @@ class NGMacro(object):
             k = k.replace('/', '.')
             NGObjOpt(self._ktn_obj).create_port_by_data(k, v)
 
-    @Modifier.undo_debug_run
+    @_ktn_cor_base.Modifier.undo_debug_run
     def set_create_to_op_script_by_configure_file(self, file_path, paths=None):
         if paths is not None:
             ktn_op_scripts = [NodegraphAPI.GetNode(i) for i in paths]
         else:
             ktn_op_scripts = NGObjOpt(self._ktn_obj).get_children(include_type_names=['OpScript'])
         for i_ktn_op_script in ktn_op_scripts:
-            configure = ctt_objects.Configure(value=file_path)
+            configure = ctt_core.Content(value=file_path)
             parameters = configure.get('parameters') or {}
             NGObjOpt(i_ktn_op_script).clear_ports('user')
             for k, v in parameters.items():
@@ -2823,7 +2830,7 @@ class NGMacro(object):
     def set_sub_op_script_create_by_configure_file(self, file_path, key, paths):
         ktn_op_scripts = [NodegraphAPI.GetNode(i) for i in paths]
         for i_ktn_op_script in ktn_op_scripts:
-            configure = ctt_objects.Configure(value=file_path)
+            configure = ctt_core.Content(value=file_path)
             parameters = configure.get('op_script.{}.parameters'.format(key)) or {}
             NGObjOpt(i_ktn_op_script).clear_ports('user')
             for k, v in parameters.items():

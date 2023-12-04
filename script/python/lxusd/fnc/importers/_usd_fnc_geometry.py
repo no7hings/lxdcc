@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxusd.warp import *
+from lxusd.core.wrap import *
 
 from lxusd.fnc import usd_fnc_abstract
 

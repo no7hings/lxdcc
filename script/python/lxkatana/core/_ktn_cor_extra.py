@@ -1,17 +1,19 @@
 # coding:utf-8
-from ._ktn_cor_utility import *
+from .wrap import *
 
 import fnmatch
 
-import sys
+import threading
 
-from lxbasic import bsc_core
+import collections
 
-import lxcontent.objects as ctt_objects
+import lxbasic.core as bsc_core
+
+import lxcontent.core as ctt_core
 
 from lxutil import utl_core
 
-from lxkatana.core import _ktn_cor_node
+from lxkatana.core import _ktn_cor_base, _ktn_cor_node
 
 
 class EventOpt(object):
@@ -87,6 +89,7 @@ class EventMtd(object):
     def get_all_event_types(cls):
         pass
 
+    # noinspection PyUnusedLocal
     @classmethod
     def set_port_value(cls, *args, **kwargs):
         event_type, event_id = args
@@ -104,6 +107,7 @@ class EventMtd(object):
                 elif fnmatch.filter([ktn_port_opt.path], '*.parameters.ramp_Colors.value.*'):
                     cls.set_arnold_ramp_write(ktn_obj_opt)
 
+    # noinspection PyUnusedLocal
     @classmethod
     def set_port_connect(cls, *args, **kwargs):
         event_type, event_id = args
@@ -117,6 +121,7 @@ class EventMtd(object):
                 if shader_type_name in ['ramp_rgb', 'ramp_float']:
                     cls.set_arnold_ramp_read(ktn_obj_opt)
 
+    # noinspection PyUnusedLocal
     @classmethod
     def set_port_disconnect(cls, *args, **kwargs):
         event_type, event_id = args
@@ -130,6 +135,7 @@ class EventMtd(object):
                 if shader_type_name in ['ramp_rgb', 'ramp_float']:
                     cls.set_arnold_ramp_read(ktn_obj_opt)
 
+    # noinspection PyUnusedLocal
     @classmethod
     def set_node_create(cls, *args, **kwargs):
         event_type, event_id = args
@@ -142,6 +148,7 @@ class EventMtd(object):
             #
             cls._set_arnold_obj_name_update_(ktn_obj_opt)
 
+    # noinspection PyUnusedLocal
     @classmethod
     def set_node_edit(cls, *args, **kwargs):
         event_type, event_id = args
@@ -163,7 +170,7 @@ class EventMtd(object):
     @classmethod
     def _set_arnold_ramp_write_(cls, ktn_obj_opt):
         # noinspection PyUnresolvedReferences
-        key = sys._getframe().f_code.co_name
+        # key = sys._getframe().f_code.co_name
         # Utils.UndoStack.OpenGroup(key)
         #
         ramp_value_dict = {}
@@ -207,7 +214,7 @@ class EventMtd(object):
     @classmethod
     def _set_arnold_ramp_read_(cls, ktn_obj_opt):
         # noinspection PyUnresolvedReferences
-        key = sys._getframe().f_code.co_name
+        # key = sys._getframe().f_code.co_name
         # Utils.UndoStack.OpenGroup(key)
         #
         ramp_value_port = ktn_obj_opt.get_port('lx_ramp_value')
@@ -225,10 +232,10 @@ class EventMtd(object):
     @classmethod
     def _set_arnold_obj_name_update_(cls, ktn_obj_opt):
         # noinspection PyUnresolvedReferences
-        key = sys._getframe().f_code.co_name
+        # key = sys._getframe().f_code.co_name
         # Utils.UndoStack.OpenGroup(key)
         #
-        shader_obj_name = ktn_obj_opt.get_port_raw('name')
+        # shader_obj_name = ktn_obj_opt.get_port_raw('name')
         obj_name = ktn_obj_opt.name
         ktn_obj = ktn_obj_opt.ktn_obj
         if ktn_obj.isRenameAllowed() is True:
@@ -256,11 +263,14 @@ class EventMtd(object):
 class ArnoldEventMtd(object):
     DIRECTORY_KEY = 'user.extra.texture_directory'
     DIRECTORY_VALUE = '/texture_directory'
+
+    # noinspection PyUnusedLocal
     @classmethod
     def on_material_create(cls, *args, **kwargs):
         if kwargs['nodeType'] == 'NetworkMaterialCreate':
             node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
             cls._create_material_(node_opt)
+
     @classmethod
     def _create_material_(cls, node_opt):
         """
@@ -310,12 +320,15 @@ class ArnoldEventMtd(object):
                 )
 
         connect_fnc_()
+
+    # noinspection PyUnusedLocal
     @classmethod
     def on_image_create(cls, *args, **kwargs):
         if kwargs['nodeType'] == 'ArnoldShadingNode':
             node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
             if node_opt.get('nodeType') in ['image']:
                 cls._create_image_(node_opt)
+
     @classmethod
     def _create_image_(cls, node_opt):
         """
@@ -414,7 +427,7 @@ class CallbackMtd(object):
     @classmethod
     def set_scene_load(cls, *args, **kwargs):
         # {'filename': '/data/f/event_test.katana', 'objectHash': None}
-        file_path = kwargs['filename']
+        # file_path = kwargs['filename']
         _ = NodegraphAPI.GetAllNodesByType('ArnoldShadingNode') or []
 
         for ktn_obj in _:
@@ -436,6 +449,7 @@ class CallbackMtd(object):
             callback_opt = CallbackOpt(function=function, callback_type=callback_type)
             callback_opt.append()
 
+    # noinspection PyUnusedLocal
     @classmethod
     def add_callbacks(cls, data):
         for function, callback_type in data:
@@ -528,12 +542,12 @@ class VariablesSetting(object):
 
 class WorkspaceSetting(object):
     def __init__(self):
-        self._cfg = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml(
+        self._cfg = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml(
                 'katana/script/scene'
             )
         )
-        self._cfg.set_flatten()
+        self._cfg.do_flatten()
         self._obj_opt = _ktn_cor_node.NGObjOpt(NodegraphAPI.GetNode('rootNode'))
 
     def setup(self):
@@ -595,11 +609,13 @@ class WorkspaceSetting(object):
             self._obj_opt.create_ports_by_data(
                 self._cfg.get('main.look.ports')
             )
+
     @classmethod
     def get_look_output_nodes(cls):
         return _ktn_cor_node.NGObjsMtd.find_nodes(
             type_name='LookFileBake', ignore_bypassed=True
         )
+
     @classmethod
     def get_look_output_node_opts(cls):
         return [
@@ -625,13 +641,14 @@ class WorkspaceSetting(object):
                 return _ktn_cor_node.NGObjOpt(_)
 
     def update_current_look_output_with_dialog(self):
-        if get_is_ui_mode():
+        if _ktn_cor_base.KtnUtil.get_is_ui_mode():
             opts = self.get_look_output_node_opts()
             if opts:
                 if len(opts) > 1:
                     def yes_fnc_():
                         _n = o.get('dcc.node')
                         self.set_current_look_output(_n)
+
                     #
                     w = utl_core.DccDialog.create(
                         'Workspace Setting',
@@ -673,10 +690,11 @@ class WorkspaceSetting(object):
             opts = self.get_look_output_node_opts()
             if opts:
                 if len(opts) > 1:
-                    if get_is_ui_mode():
+                    if _ktn_cor_base.KtnUtil.get_is_ui_mode():
                         def yes_fnc_():
                             _n = o.get('dcc.node')
                             self.set_current_look_output(_n)
+
                         #
                         w = utl_core.DccDialog.create(
                             'Workspace Setting',
@@ -730,6 +748,7 @@ ktn_core.LayoutNodeHotKey().register()
 
     def press_fnc(self, *args, **kwargs):
         pass
+
     @classmethod
     def _release_fnc_(cls, ktn_gui):
         ss = NodegraphAPI.GetAllSelectedNodes()

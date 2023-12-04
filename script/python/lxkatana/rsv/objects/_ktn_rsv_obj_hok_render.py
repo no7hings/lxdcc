@@ -9,7 +9,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_katana_render_create(self):
         import collections
         #
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         from lxutil import utl_core
         #
@@ -65,7 +65,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         render_ddl_job_ids = []
         with bsc_core.LogProcessContext.create(maximum=len(combinations), label='cmb-render-create') as l_p:
             for i_seq, i_variants in enumerate(combinations):
-                l_p.set_update()
+                l_p.do_update()
                 #
                 i_key_extend = '-'.join(
                     i_variants.values()

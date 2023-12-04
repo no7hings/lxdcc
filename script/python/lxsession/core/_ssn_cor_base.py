@@ -1,9 +1,9 @@
 # coding:utf-8
 import fnmatch
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 import lxsession.configure as ssn_configure
 
@@ -12,14 +12,11 @@ class SsnHookMtd(object):
     @classmethod
     def set_cmd_run(cls, cmd):
         import urllib
-        #
-        from lxbasic import bsc_core
 
-        #
         unique_id = bsc_core.UuidMtd.generate_new()
-        #
+
         hook_yml_file_path = bsc_core.StgUserMtd.get_user_session_file(unique_id=unique_id)
-        #
+
         bsc_core.StgFileOpt(hook_yml_file_path).set_write(
             dict(
                 user=bsc_core.SystemMtd.get_user_name(),
@@ -27,7 +24,7 @@ class SsnHookMtd(object):
                 cmd=cmd,
             )
         )
-        #
+
         urllib.urlopen(
             'http://{host}:{port}/cmd-run?uuid={uuid}'.format(
                 **dict(
@@ -40,18 +37,27 @@ class SsnHookMtd(object):
 
 
 class SsnHookEngineMtd(object):
-    CONFIGURE = ctt_objects.Configure(
-        value=bsc_core.RscConfigure.get_yaml('session/hook-engine')
-    )
-    CONFIGURE.set_flatten()
+    CONTENT = None
+
+    @classmethod
+    def __generate_content(cls):
+        if cls.CONTENT is not None:
+            return cls.CONTENT
+        cls.CONTENT = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml('session/hook-engine')
+        )
+        cls.CONTENT.do_flatten()
+        return cls.CONTENT
 
     @classmethod
     def get_all(cls):
-        return cls.CONFIGURE.get_branch_keys('command') or []
+        c = cls.__generate_content()
+        return c.get_key_names_at('command') or []
 
     @classmethod
     def get_command(cls, hook_engine, **kwargs):
-        _ = cls.CONFIGURE.get(
+        c = cls.__generate_content()
+        _ = c.get(
             'command.{}'.format(hook_engine)
         )
         return _.format(**kwargs)
@@ -62,30 +68,30 @@ class SsnHookFileMtd(object):
 
     @classmethod
     def get_python(cls, key, search_paths=None):
-        return bsc_core.Resource.get(
+        return bsc_core.ExtendResource.get(
             '{}/{}.py'.format(cls.BRANCH, key), search_paths
         )
 
     @classmethod
     def get_shell(cls, key, search_paths=None):
         if bsc_core.PlatformMtd.get_is_linux():
-            return bsc_core.Resource.get(
+            return bsc_core.ExtendResource.get(
                 '{}/{}.sh'.format(cls.BRANCH, key), search_paths
             )
         elif bsc_core.PlatformMtd.get_is_windows():
-            return bsc_core.Resource.get(
+            return bsc_core.ExtendResource.get(
                 '{}/{}.bat'.format(cls.BRANCH, key), search_paths
             )
 
     @classmethod
     def get_yaml(cls, key, search_paths=None):
-        return bsc_core.Resource.get(
+        return bsc_core.ExtendResource.get(
             '{}/{}.yml'.format(cls.BRANCH, key), search_paths
         )
 
     @classmethod
     def get_command(cls, key):
-        return bsc_core.Resource.get(
+        return bsc_core.ExtendResource.get(
             '{}/{}.yml'.format(cls.BRANCH, key)
         )
 

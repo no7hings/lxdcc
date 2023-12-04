@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxusd.warp import *
+from lxusd.core.wrap import *
 
 
 class Usd2Usda(object):

@@ -1,7 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
-
-from lxutil import utl_core
+import lxbasic.core as bsc_core
 
 from lxutil.scripts import _utl_scp_video
 
@@ -81,7 +79,7 @@ class ScpGeneralPublish(object):
             version = self._version_properties.get('version')
             with self._window.gui_progressing(maximum=len(file_paths), label='export scene') as g_p:
                 for i_index, i_file_path in enumerate(file_paths):
-                    g_p.set_update()
+                    g_p.do_update()
                     i_file_opt = bsc_core.StgFileOpt(i_file_path)
                     if i_file_opt.get_is_file():
                         i_ext = i_file_opt.get_ext()
@@ -141,7 +139,7 @@ class ScpGeneralPublish(object):
             )
             with self._window.gui_progressing(maximum=len(file_paths), label='export image') as g_p:
                 for i_index, i_file_path in enumerate(file_paths):
-                    g_p.set_update()
+                    g_p.do_update()
                     i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_unit_paths(i_file_path)
                     for j_file_path in i_file_tile_paths:
                         j_file_opt = bsc_core.StgFileOpt(j_file_path)
@@ -201,7 +199,7 @@ class ScpGeneralPublish(object):
             option=option_opt.to_string()
         )
 
-    @utl_core.DccModifier.debug_run
+    @bsc_core.Modifiers.run_with_exception_catch
     def execute(self):
         fncs = [
             self.pre_fnc,
@@ -213,7 +211,7 @@ class ScpGeneralPublish(object):
         ]
         with self._window.gui_progressing(maximum=len(fncs), label='execute publish process') as g_p:
             for i_fnc in fncs:
-                g_p.set_update()
+                g_p.do_update()
                 i_fnc()
         #
         self._window.show_message(
@@ -302,7 +300,7 @@ class ScpAssetSurfacePublish(object):
             option=option_opt.to_string()
         )
 
-    @utl_core.DccModifier.debug_run
+    @bsc_core.Modifiers.run_with_exception_catch
     def execute(self):
         fncs = [
             self.collection_review_fnc,
@@ -311,7 +309,7 @@ class ScpAssetSurfacePublish(object):
         ]
         with self._window.gui_progressing(maximum=len(fncs), label='execute publish process') as g_p:
             for i_fnc in fncs:
-                g_p.set_update()
+                g_p.do_update()
                 i_fnc()
         #
         self._window.show_message(

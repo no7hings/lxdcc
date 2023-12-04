@@ -27,14 +27,14 @@ class MayaProcess(object):
 class PythonProcess(object):
     @classmethod
     def generate_command(cls, option):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         c = bsc_core.PkgContextNew(
             ' '.join(['lxdcc', 'usd'])
         ).get_command(
             args_execute=[
                 r'-- lxdcc-python {process_file} "{option}"'.format(
-                    process_file=bsc_core.Resource.get('python-process/usd-script.py'), option=option
+                    process_file=bsc_core.ExtendResource.get('python-process/usd-script.py'), option=option
                 )
             ],
         )

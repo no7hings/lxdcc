@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxdatabase.objects as dtb_objects
 
@@ -19,8 +19,8 @@ class ScpResourcesAddForSurface(object):
         category_group_opt = cs[-2]
         category_group = category_group_opt.get_name()
         dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-            bsc_core.RscConfigure.get_yaml('database/library/resource-basic'),
-            bsc_core.RscConfigure.get_yaml('database/library/resource-{}'.format(category_group))
+            bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
+            bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(category_group))
         )
         #
         dtb_opt.get_type_force(type_dtb_path)
@@ -33,7 +33,7 @@ class ScpResourcesAddForSurface(object):
         )
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(all_file_path), label='add resource') as l_p:
             for i_file_path in all_file_path:
-                l_p.set_update()
+                l_p.do_update()
                 self.add_texture(
                     dtb_opt, i_file_path, category_group, [type_dtb_path], file_name_pattern, resource_name_pattern, texture_type_tag
                 )
@@ -46,7 +46,7 @@ class ScpResourcesAddForSurface(object):
         var = file_name_p_opt.get_variants(file_opt.get_name_base())
         if var:
             resource_name_p_opt = bsc_core.PtnParseOpt(resource_name_pattern)
-            resource_name_p_opt.set_update(**var)
+            resource_name_p_opt.update_variants(**var)
             if not resource_name_p_opt.get_keys():
                 resource_name = resource_name_p_opt.get_value()
                 resource_name = bsc_core.RawTextMtd.clear_up_to(resource_name).strip().lower()
@@ -125,21 +125,21 @@ class ScpResourcesAddForSurface(object):
     @classmethod
     def stg_create_resource(cls, dtb_opt, pattern_kwargs):
         p_opt = dtb_opt.get_pattern_opt('resource-dir')
-        stg_path = p_opt.set_update_to(**pattern_kwargs).get_value()
+        stg_path = p_opt.update_variants_to(**pattern_kwargs).get_value()
         path_opt = bsc_core.StgDirectoryOpt(stg_path)
         path_opt.set_create()
         return stg_path
     @classmethod
     def stg_create_version(cls, dtb_opt, pattern_kwargs):
         p_opt = dtb_opt.get_pattern_opt('version-dir')
-        stg_path = p_opt.set_update_to(**pattern_kwargs).get_value()
+        stg_path = p_opt.update_variants_to(**pattern_kwargs).get_value()
         path_opt = bsc_core.StgDirectoryOpt(stg_path)
         path_opt.set_create()
         return stg_path
     @classmethod
     def stg_copy_texture(cls, dtb_opt, file_path, pattern_kwargs, keyword):
         p_opt = dtb_opt.get_pattern_opt(keyword)
-        stg_path = p_opt.set_update_to(**pattern_kwargs).get_value()
+        stg_path = p_opt.update_variants_to(**pattern_kwargs).get_value()
         bsc_core.StgFileOpt(file_path).set_copy_to_file(
             stg_path
         )
@@ -148,7 +148,7 @@ class ScpResourcesAddForSurface(object):
     def stg_create_preview(cls, dtb_opt, file_path, pattern_kwargs):
         preview_file_path_ = bsc_core.ImgFileOpt(file_path).get_thumbnail(width=256, ext='.png')
         preview_file_p_opt = dtb_opt.get_pattern_opt('image-preview-png-file')
-        preview_file_path = preview_file_p_opt.set_update_to(**pattern_kwargs).get_value()
+        preview_file_path = preview_file_p_opt.update_variants_to(**pattern_kwargs).get_value()
         bsc_core.StgFileOpt(preview_file_path_).set_copy_to_file(
             preview_file_path
         )
@@ -161,7 +161,7 @@ class ScpResourcesAddForSurface(object):
             i_kind = i_v['kind']
             i_keyword = i_v['keyword']
             i_pattern_opt = dtb_opt.get_pattern_opt(i_keyword)
-            i_storage_stg_path = i_pattern_opt.set_update_to(**pattern_kwargs).get_value()
+            i_storage_stg_path = i_pattern_opt.update_variants_to(**pattern_kwargs).get_value()
             if i_storage_stg_path.startswith(version_stg_path):
                 i_storage_dtb_path = '{}/{}'.format(version_dtb_path, i_k)
                 i_is_create, i_dtb_storage = dtb_opt.create_storage(

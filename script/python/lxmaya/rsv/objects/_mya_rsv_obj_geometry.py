@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxutil.rsv import utl_rsv_obj_abstract
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 #
 from lxutil import utl_core
 
@@ -155,7 +155,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             location_names = ['hi', 'shape', 'hair', 'aux']
             with bsc_core.LogProcessContext.create(maximum=len(location_names), label='export geometry in location') as g_p:
                 for i_location_name in location_names:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     i_geometry_abc_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
                         keyword=keyword
@@ -231,7 +231,7 @@ class RsvDccGeometryExtraHookOpt(
                     maximum=len(location_names), label='export geometry-extra in location'
                     ) as g_p:
                 for i_location_name in location_names:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     if start_frame is not None and end_frame is not None:
                         pass
@@ -305,7 +305,7 @@ class RsvDccShotGeometryHookOpt(
                         cls._set_usd_export_(
                             root, i_location, i_file_path, start_frame, end_frame
                         )
-                    l_p.set_update()
+                    l_p.do_update()
         else:
             raise RuntimeError(
                 bsc_core.Log.trace_method_error(

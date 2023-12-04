@@ -2,9 +2,9 @@
 import functools
 import multiprocessing
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-from lxusd import usd_core
+import lxusd.core as usd_core
 
 from lxutil import utl_core
 
@@ -47,7 +47,7 @@ class ScpInstance(object):
                 i_points_opt.set_widths([5.0]*len(i_points))
                 i_points_opt.set_display_colors_as_vertex(i_colors)
 
-                g_p.set_update()
+                g_p.do_update()
 
         cache_usd_opt.export_to(cache_usd_file_path)
 
@@ -134,7 +134,7 @@ class ScpInstance(object):
                 i_matched_point_opt.set_widths([5.0]*len(i_points))
                 color_dict[i_instance_opt.get_path()] = usd_core.UsdBase.to_point_array(i_colors)
 
-                g_p.set_update()
+                g_p.do_update()
 
         bsc_core.StgFileOpt(cache_json_file_path).set_write(
             color_dict

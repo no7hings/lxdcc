@@ -1,7 +1,7 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxkatana import ktn_core
 
@@ -10,12 +10,12 @@ class ScpCbkEnvironment(object):
     KEY = 'workspace environment build'
 
     def __init__(self):
-        self._cfg = ctt_objects.Configure(
-            value=bsc_core.RscConfigure.get_yaml(
+        self._cfg = ctt_core.Content(
+            value=bsc_core.ResourceContent.get_yaml(
                 'katana/script/scene'
             )
         )
-        self._cfg.set_flatten()
+        self._cfg.do_flatten()
 
     @classmethod
     def save(cls, data):
@@ -38,6 +38,7 @@ class ScpCbkEnvironment(object):
                 'register: key="{}", value="{}"'.format(i_env_key, i_env_value)
             )
 
+    # noinspection PyMethodMayBeStatic
     def add_from_resolver(self, *args, **kwargs):
         if 'filename' in kwargs:
             f = kwargs['filename']
@@ -48,6 +49,7 @@ class ScpCbkEnvironment(object):
 
         return rsv_scripts.ScpEnvironment.get_data(f)
 
+    # noinspection PyMethodMayBeStatic
     def add_from_work_environment(self, *args, **kwargs):
         import lxshotgun.scripts as stg_scripts
 
@@ -56,6 +58,7 @@ class ScpCbkEnvironment(object):
         )
         return stg_scripts.ScpEnvironment.get_data(task_id)
 
+    # noinspection PyUnusedLocal
     def add_from_scene(self, *args, **kwargs):
         workspace_setting = ktn_core.WorkspaceSetting()
         data = workspace_setting.get_env_data()

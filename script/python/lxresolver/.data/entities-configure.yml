@@ -1,5 +1,0 @@
-entities:
-    asset:
-        names:
-            workspace: publish
-            branch: asset

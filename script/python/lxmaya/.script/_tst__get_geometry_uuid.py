@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
 

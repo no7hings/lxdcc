@@ -11,7 +11,7 @@ def set_undo_mark_mdf(method):
             _method = method(*args, **kwargs)
             return _method
         except Exception:
-            from lxbasic import bsc_core
+            import lxbasic.core as bsc_core
             bsc_core.LogException.trace()
             raise
         #

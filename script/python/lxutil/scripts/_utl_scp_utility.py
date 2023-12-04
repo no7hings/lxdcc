@@ -2,10 +2,10 @@
 
 
 def set_scene_mesh_info_match(file_path_0, file_path_1):
-    import lxcontent.objects as ctt_objects
+    import lxcontent.core as ctt_core
     #
-    f_0 = ctt_objects.Configure(value=file_path_0)
-    f_1 = ctt_objects.Configure(value=file_path_1)
+    f_0 = ctt_core.Content(value=file_path_0)
+    f_1 = ctt_core.Content(value=file_path_1)
     #
     keys = ['face-vertices', 'point']
     for key in keys:

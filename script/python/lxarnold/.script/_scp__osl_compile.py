@@ -1,7 +1,7 @@
 # coding:utf-8
 from lxutil import utl_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 

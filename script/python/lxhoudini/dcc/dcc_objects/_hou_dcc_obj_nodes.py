@@ -5,7 +5,7 @@ import re
 # noinspection PyUnresolvedReferences
 import hou
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core
 

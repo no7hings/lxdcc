@@ -15,7 +15,7 @@ import platform
 
 import getpass
 
-import lxlog.bridge as log_bridge
+from ..core import _log_cor_bridge
 
 
 class LogBase(object):
@@ -201,8 +201,8 @@ class Log(object):
             sys.stdout.write(
                 log+'\n'
             )
-            if log_bridge.BRG_FNC_LOG_GUI_TRACE_ENABLE is True:
-                log_bridge.BRG_FNC_LOG_GUI_TRACE_RESULT(log)
+            if _log_cor_bridge.BRG_FNC_LOG_GUI_TRACE_ENABLE is True:
+                _log_cor_bridge.BRG_FNC_LOG_GUI_TRACE_RESULT(log)
             return log
 
     @classmethod
@@ -213,8 +213,8 @@ class Log(object):
             sys.stdout.write(
                 log+'\n'
             )
-            if log_bridge.BRG_FNC_LOG_GUI_TRACE_ENABLE is True:
-                log_bridge.BRG_FNC_LOG_GUI_TRACE_WARNING(log)
+            if _log_cor_bridge.BRG_FNC_LOG_GUI_TRACE_ENABLE is True:
+                _log_cor_bridge.BRG_FNC_LOG_GUI_TRACE_WARNING(log)
             return log
 
     @classmethod
@@ -225,8 +225,8 @@ class Log(object):
             sys.stderr.write(
                 log+'\n'
             )
-            if log_bridge.BRG_FNC_LOG_GUI_TRACE_ENABLE is True:
-                log_bridge.BRG_FNC_LOG_GUI_TRACE_ERROR(log)
+            if _log_cor_bridge.BRG_FNC_LOG_GUI_TRACE_ENABLE is True:
+                _log_cor_bridge.BRG_FNC_LOG_GUI_TRACE_ERROR(log)
             return log
 
     @classmethod
@@ -423,15 +423,15 @@ class LogProcessContext(object):
             self.__label,
             'process is started, total is {}'.format(self.__maximum)
         )
-        if log_bridge.BRG_FNC_LOG_GUI_PROCESS_ENABLE is True:
-            if isinstance(log_bridge.BRG_FNC_LOG_GUI_PROCESS_CREATE, (types.FunctionType, types.MethodType)):
-                self.__gui_ps = log_bridge.BRG_FNC_LOG_GUI_PROCESS_CREATE(maximum, label=label)
+        if _log_cor_bridge.BRG_FNC_LOG_GUI_PROCESS_ENABLE is True:
+            if isinstance(_log_cor_bridge.BRG_FNC_LOG_GUI_PROCESS_CREATE, (types.FunctionType, types.MethodType)):
+                self.__gui_ps = _log_cor_bridge.BRG_FNC_LOG_GUI_PROCESS_CREATE(maximum, label=label)
             else:
                 raise RuntimeError()
         else:
             self.__gui_ps = []
 
-    def set_update(self, *args, **kwargs):
+    def do_update(self, *args, **kwargs):
         self.__update_trace(*args, **kwargs)
         self.__update_gui(*args, **kwargs)
 
@@ -469,7 +469,7 @@ class LogProcessContext(object):
     def __update_gui(self, *args, **kwargs):
         if self.__gui_ps:
             for i_p in self.__gui_ps:
-                i_p.set_update(*args, **kwargs)
+                i_p.do_update(*args, **kwargs)
 
     @classmethod
     def __get_progress_bar_string(cls, percent):
@@ -533,9 +533,9 @@ class LogException(object):
 
     @staticmethod
     def __gui_trace():
-        if log_bridge.BRG_FNC_LOG_GUI_EXCEPTION_ENABLE is True:
-            if isinstance(log_bridge.BRG_FNC_LOG_GUI_EXCEPTION_TRACE, (types.FunctionType, types.MethodType)):
-                log_bridge.BRG_FNC_LOG_GUI_EXCEPTION_TRACE()
+        if _log_cor_bridge.BRG_FNC_LOG_GUI_EXCEPTION_ENABLE is True:
+            if isinstance(_log_cor_bridge.BRG_FNC_LOG_GUI_EXCEPTION_TRACE, (types.FunctionType, types.MethodType)):
+                _log_cor_bridge.BRG_FNC_LOG_GUI_EXCEPTION_TRACE()
 
     @classmethod
     def trace(cls):

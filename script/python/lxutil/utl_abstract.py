@@ -5,9 +5,9 @@ import os
 
 import fnmatch
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxuniverse.abstracts as unr_abstracts
 
@@ -154,7 +154,7 @@ class AbsDccPort(AbsDccObjDef):
 
     @property
     def icon(self):
-        return bsc_core.RscIcon.get('attribute')
+        return bsc_core.ResourceIcon.get('attribute')
 
     @property
     def node(self):
@@ -514,7 +514,7 @@ class AbsDccObj(
         raise NotImplementedError()
 
     # attribute ****************************************************************************************************** #
-    def get_port(self, port_path, port_assign=unr_configure.PortAssign.VARIANTS):
+    def get_port(self, port_path, port_assign=unr_core.UnrPortAssign.VARIANTS):
         if self.PORT_CLS is not None:
             return self.PORT_CLS(
                 self,
@@ -531,13 +531,13 @@ class AbsDccObj(
     def get_input_port(self, port_path):
         return self.get_port(
             port_path,
-            port_assign=unr_configure.PortAssign.INPUTS
+            port_assign=unr_core.UnrPortAssign.INPUTS
         )
 
     def get_output_port(self, port_path):
         return self.get_port(
             port_path,
-            port_assign=unr_configure.PortAssign.OUTPUTS
+            port_assign=unr_core.UnrPortAssign.OUTPUTS
         )
 
     def get_ports(self):
@@ -759,12 +759,12 @@ class AbsDccObjs(object):
 class AbsSetup(object):
     def __init__(self, root):
         self._root = root
-        self.__variants = dict(
+        self._variants = dict(
             root=self._root
         )
 
     def _path_process_(self, path):
-        _ = path.format(**self.__variants)
+        _ = path.format(**self._variants)
         if os.path.exists(_):
             return _
 

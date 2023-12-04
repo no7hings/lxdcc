@@ -1,9 +1,18 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
-
 import os
 
-from lxbasic.core import _bsc_cor_raw, _bsc_cor_time, _bsc_cor_process, _bsc_cor_storage, _bsc_cor_execute
+import parse
+
+import subprocess
+
+from ..core import \
+    _bsc_cor_configure, \
+    _bsc_cor_base, \
+    _bsc_cor_raw, \
+    _bsc_cor_time, \
+    _bsc_cor_process, \
+    _bsc_cor_storage, \
+    _bsc_cor_execute
 
 
 class ImgFileOpt(object):
@@ -694,7 +703,7 @@ class ImgFileOiioOpt(object):
     }
 
     @classmethod
-    def _get_info_(cls, file_path):
+    def _get_info(cls, file_path):
         cmd_args = [
             _bsc_cor_execute.Executes.oiiotool(),
             '--info:verbose=1 "{}"'.format(file_path),
@@ -719,7 +728,7 @@ class ImgFileOiioOpt(object):
     def __init__(self, file_path):
         if os.path.isfile(file_path):
             self._file_path = file_path
-            self._info = self._get_info_(self._file_path)
+            self._info = self._get_info(self._file_path)
         else:
             raise OSError()
 
@@ -752,9 +761,9 @@ class ImgFileOiioOpt(object):
 
     def convert_to(self, output_file_path):
         if os.path.exists(self.path):
-            if SystemMtd.get_is_windows():
+            if _bsc_cor_base.SystemMtd.get_is_windows():
                 pass
-            elif SystemMtd.get_is_linux():
+            elif _bsc_cor_base.SystemMtd.get_is_linux():
                 if os.path.exists(output_file_path) is False:
                     subprocess.Popen(
                         'ffmpeg -framerate 1 -i "{}" -c:v libx264 -r 30 -pix_fmt yuv420p "{}"'.format(
@@ -787,6 +796,5 @@ class ImgTextureOiioOpt(ImgFileOiioOpt):
 
     def get_color_space(self):
         if self.get_is_srgb():
-            return bsc_configure.ColorSpace.SRGB
-        else:
-            return bsc_configure.ColorSpace.LINEAR
+            return _bsc_cor_configure.BscColorSpaces.SRGB
+        return _bsc_cor_configure.BscColorSpaces.LINEAR

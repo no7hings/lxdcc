@@ -1,7 +1,7 @@
 # coding:utf-8
 import copy
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxutil.abstracts as utl_abstracts
 

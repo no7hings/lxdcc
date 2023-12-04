@@ -1,13 +1,4 @@
 # coding:utf-8
-import lxutil.dcc.dcc_objects as utl_dcc_objects
-
-import lxmaya.dcc.dcc_objects as ma_dcc_objects
-
-import lxmaya.modifiers as ma_modifiers
-
-from lxarnold import and_core
-
-from lxutil import utl_core
 
 
 def set_texture_tiles_repair():

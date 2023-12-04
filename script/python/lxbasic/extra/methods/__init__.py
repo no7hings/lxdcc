@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 
 def get_module(framework_scheme):

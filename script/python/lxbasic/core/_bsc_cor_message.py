@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxlog.core as log_core
 
-from lxbasic.core import _bsc_cor_raw
+from ..core import _bsc_cor_raw
 
 
 class MsgBaseMtd(object):

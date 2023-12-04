@@ -1,10 +1,10 @@
 # coding:utf-8
 import lxresource.core as rsc_core
 
-Resource = rsc_core.Resource
+ExtendResource = rsc_core.ExtendResource
 
-RscIcon = rsc_core.RscIcon
+ResourceIcon = rsc_core.ResourceIcon
 
 
 if __name__ == '__main__':
-    print Resource.get('fonts/Arial.ttf')
+    print ExtendResource.get('fonts/Arial.ttf')

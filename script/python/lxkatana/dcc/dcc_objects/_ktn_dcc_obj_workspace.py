@@ -3,15 +3,11 @@ import fnmatch
 
 import re
 
-import types
-# noinspection PyUnresolvedReferences
-from Katana import CacheManager, NodegraphAPI
+from lxkatana.core.wrap import *
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
-
-from lxutil import utl_core
+import lxcontent.core as ctt_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -21,12 +17,10 @@ from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node, _k
 
 from lxkatana.dcc.dcc_operators import _ktn_dcc_opt_look
 
-from lxresolver import rsv_configure
-
 
 # todo: remove this method
 class AssetWorkspace(object):
-    CONFIGURE_FILE_PATH = bsc_core.RscConfigure.get_yaml('katana/workspace/asset-default-v1')
+    CONFIGURE_FILE_PATH = bsc_core.ResourceContent.get_yaml('katana/workspace/asset-default-v1')
     GEOMETRY_TYPES = [
         'subdmesh',
         'renderer procedural',
@@ -45,7 +39,7 @@ class AssetWorkspace(object):
             self._default_configure.set('option.x', x)
             self._default_configure.set('option.y', y-h/2)
         #
-        self._default_configure.set_flatten()
+        self._default_configure.do_flatten()
 
         self._material_group_hash_stack = {}
         self._material_hash_stack = {}
@@ -60,11 +54,11 @@ class AssetWorkspace(object):
             return self._look_configure_dict[pass_name]
         else:
             configure = self.set_configure_create(pass_name)
-            configure.set_flatten()
+            configure.do_flatten()
             return configure
 
     def set_configure_create(self, pass_name='default'):
-        configure = ctt_objects.Configure(value=self.CONFIGURE_FILE_PATH)
+        configure = ctt_core.Content(value=self.CONFIGURE_FILE_PATH)
         configure.set('option.look_pass', pass_name)
         self._look_configure_dict[pass_name] = configure
         return configure
@@ -256,7 +250,7 @@ class AssetWorkspace(object):
             w = configure.get('option.w')
             offset_x = w*pass_count*2
             configure.set('option.offset_x', offset_x)
-            configure.set_flatten()
+            configure.do_flatten()
             self._set_workspace_create_by_configure_(configure)
             bsc_core.Log.trace_method_result(
                 'look-pass add',
@@ -279,7 +273,7 @@ class AssetWorkspace(object):
         ]
         with bsc_core.LogProcessContext.create(maximum=len(method_args), label='create workspace') as g_p:
             for i_method in method_args:
-                g_p.set_update()
+                g_p.do_update()
                 i_method(configure, workspace_keys)
 
     @classmethod
@@ -287,7 +281,7 @@ class AssetWorkspace(object):
         pass_name = configure.get('option.look_pass')
         with bsc_core.LogProcessContext.create(maximum=len(workspace_keys), label='crate workspace node') as g_p:
             for i_key in workspace_keys:
-                g_p.set_update()
+                g_p.do_update()
                 for j_sub_key in ['main', 'backdrop', 'dot']:
                     cls._set_workspace_node_create_(configure, i_key, j_sub_key, pass_name)
 
@@ -340,7 +334,7 @@ class AssetWorkspace(object):
         pass_name = configure.get('option.look_pass')
         with bsc_core.LogProcessContext.create(maximum=len(workspace_keys), label='crate workspace connection') as g_p:
             for key in workspace_keys:
-                g_p.set_update()
+                g_p.do_update()
                 for sub_key in ['main', 'node_graph', 'dot']:
                     cls._set_workspace_connections_create_(configure, key, sub_key, pass_name)
 
@@ -359,7 +353,7 @@ class AssetWorkspace(object):
         pass_name = configure.get('option.look_pass')
         with bsc_core.LogProcessContext.create(maximum=len(workspace_keys), label='crate workspace node-graph') as g_p:
             for key in workspace_keys:
-                g_p.set_update()
+                g_p.do_update()
                 cls._set_workspace_node_graph_create_(configure, key, pass_name)
 
     @classmethod
@@ -1025,7 +1019,7 @@ class AssetWorkspace(object):
         dcc_node = _ktn_dcc_obj_node.Node(node_obj_path)
         source_connections = dcc_node.get_source_connections()
         target_connections = dcc_node.get_target_connections()
-        properties = dcc_node.get_properties(
+        dict_ = dcc_node.get_as_dict(
             [
                 'user.render_quality',
                 'user.Layer_Name',
@@ -1057,7 +1051,7 @@ class AssetWorkspace(object):
             target_ktn_port = i.target.ktn_port
             source_ktn_port.connect(target_ktn_port)
         #
-        dcc_node.set_properties(properties)
+        dcc_node.set_as_dict(dict_)
         return dcc_node
 
     def get_geometry_usd_model_hi_file_path(self):
@@ -1087,16 +1081,7 @@ class AssetWorkspace(object):
             return _
 
     def get_geometry_usd_check_raw(self):
-        dic = {}
-        workspace_configure = self.get_configure()
-        set_usd_configure = ctt_objects.Configure(value=rsv_configure.Data.GEOMETRY_USD_CONFIGURE_PATH)
-        for element_label in set_usd_configure.get_branch_keys('elements'):
-            asset_root = workspace_configure.get('option.asset_root')
-            atr_path = '{}.userProperties.geometry__{}'.format(asset_root, element_label)
-            _ = self._get_stage_port_raw_(atr_path)
-            if _:
-                dic[element_label] = _
-        return dic
+        raise RuntimeError('this method is removed')
 
     def get_asset_usd_check_raw(self):
         obj = _ktn_dcc_obj_node.Node('asset_geometries')
@@ -1205,7 +1190,7 @@ class AssetWorkspace(object):
             _y = int(index/d)
             r, g, b = self.get_look_pass_color(pass_name)
             x, y = x+_x*w, y+h+_y*h/2
-            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            node_attributes = configure.get_as_content('node.{}.main.attributes'.format(key))
             if node_attributes:
                 node_attributes.set('x', x)
                 node_attributes.set('y', y)
@@ -1256,7 +1241,7 @@ class AssetWorkspace(object):
         is_create = False
         if dcc_node is not None:
             is_create = True
-            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            node_attributes = configure.get_as_content('node.{}.main.attributes'.format(key))
             if node_attributes:
                 dcc_node.ktn_obj.setAttributes(node_attributes.value)
         return is_create, dcc_obj
@@ -1324,9 +1309,9 @@ class AssetWorkspace(object):
             dcc_obj.name
         )
         if is_create is True:
-            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            node_attributes = configure.get_as_content('node.{}.main.attributes'.format(key))
             if node_attributes:
-                node_attributes.set_update(ktn_obj.getAttributes())
+                node_attributes.update_from(ktn_obj.getAttributes())
                 r, g, b = self.get_look_pass_color(pass_name)
                 node_attributes.set('ns_colorr', r)
                 node_attributes.set('ns_colorg', g)
@@ -1372,9 +1357,9 @@ class AssetWorkspace(object):
             dcc_properties.name
         )
         if is_create is True:
-            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            node_attributes = configure.get_as_content('node.{}.main.attributes'.format(key))
             if node_attributes:
-                node_attributes.set_update(ktn_properties.getAttributes())
+                node_attributes.update_from(ktn_properties.getAttributes())
                 r, g, b = self.get_look_pass_color(pass_name)
                 node_attributes.set('ns_colorr', r)
                 node_attributes.set('ns_colorg', g)
@@ -1433,9 +1418,9 @@ class AssetWorkspace(object):
             dcc_properties.name
         )
         if is_create is True:
-            node_attributes = configure.get_content('node.{}.main.attributes'.format(key))
+            node_attributes = configure.get_as_content('node.{}.main.attributes'.format(key))
             if node_attributes:
-                node_attributes.set_update(ktn_properties.getAttributes())
+                node_attributes.update_from(ktn_properties.getAttributes())
                 r, g, b = self.get_look_pass_color(pass_name)
                 node_attributes.set('ns_colorr', r)
                 node_attributes.set('ns_colorg', g)

@@ -1,9 +1,9 @@
 # coding:utf-8
 import fnmatch
 
-from ._bsc_cor_utility import *
+import re
 
-from lxbasic.core import _bsc_cor_raw
+from ..core import _bsc_cor_raw
 
 
 class DccPathDagMtd(object):

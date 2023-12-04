@@ -3,9 +3,9 @@ import six
 
 import collections
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 from lxuniverse.abstracts import _unr_abs_base
 
@@ -31,9 +31,9 @@ class AbsObjUniverseBaseDef(object):
     OBJ_BIND_STACK_CLS = None
     OBJ_BIND_CLS = None
     #
-    Category = unr_configure.Category
-    Type = unr_configure.Type
-    PortAssign = unr_configure.PortAssign
+    Category = unr_core.UnrCategory
+    Type = unr_core.UnrType
+    PortAssign = unr_core.UnrPortAssign
 
     #
     def _init_obj_universe_base_def_(self):
@@ -52,15 +52,15 @@ class AbsObjUniverseBaseDef(object):
         #
         self._custom_raw = {}
         #
-        for obj_category_name in unr_configure.ObjCategory.ALL:
+        for obj_category_name in unr_core.UnrObjCategory.ALL:
             obj_category = self.generate_obj_category(obj_category_name)
-            obj_category._build_port_queries_(unr_configure.ObjCategory.PORT_QUERY_RAW)
+            obj_category._build_port_queries_(unr_core.UnrObjCategory.PORT_QUERY_RAW)
         #
-        for obj_category_name, obj_type_name in unr_configure.ObjType.ALL:
+        for obj_category_name, obj_type_name in unr_core.UnrObjType.ALL:
             obj_type = self.generate_obj_type(obj_category_name, obj_type_name)
-            obj_type._build_port_queries_(unr_configure.ObjType.PORT_QUERY_RAW)
+            obj_type._build_port_queries_(unr_core.UnrObjType.PORT_QUERY_RAW)
         #
-        root_type = self.get_obj_type(unr_configure.ObjType.ROOT)
+        root_type = self.get_obj_type(unr_core.UnrObjType.ROOT)
         root_type.create_obj(root_type.obj_pathsep)
 
     def set_gui_attribute(self, key, value):
@@ -92,7 +92,7 @@ class AbsObjUniverseBaseDef(object):
         category = self.generate_category(category_name)
         return category.generate_type(type_name)
 
-    def _get_type_(self, type_path):
+    def _get_type(self, type_path):
         stack = self._type_stack
         if stack.get_object_exists(type_path) is True:
             return stack.get_object(type_path)
@@ -199,7 +199,7 @@ class AbsObjUniverseBaseDef(object):
         :return: list[instance(<obj>), ...]
         """
         if regex is not None:
-            obj_pathsep = unr_configure.Obj.PATHSEP
+            obj_pathsep = unr_core.UnrObj.PATHSEP
             obj_category_name = '*'
             obj_type_name = '*'
             if regex.startswith(obj_pathsep):
@@ -218,7 +218,7 @@ class AbsObjUniverseBaseDef(object):
         :param obj_string: str(<obj-path>) or str(<obj-name>)
         :return: instance(<obj>) or None
         """
-        obj_pathsep = unr_configure.Obj.PATHSEP
+        obj_pathsep = unr_core.UnrObj.PATHSEP
         if obj_string.startswith(obj_pathsep):
             obj_path = obj_string
             return self._obj_stack_test.get_object(obj_path)
@@ -233,7 +233,7 @@ class AbsObjUniverseBaseDef(object):
         :param obj_string: str(<obj-path>) or str(<obj-name>)
         :return: bool
         """
-        obj_pathsep = unr_configure.Obj.PATHSEP
+        obj_pathsep = unr_core.UnrObj.PATHSEP
         if obj_string.startswith(obj_pathsep):
             obj_path = obj_string
             return self._obj_stack_test.get_object_exists(obj_path)
@@ -285,7 +285,7 @@ class AbsObjUniverseBaseDef(object):
         pass
 
     def get_as_dict(self):
-        content = ctt_objects.Content()
+        content = ctt_core.Content()
         for i_obj in self.get_objs():
             i_key = i_obj.path
             #
@@ -315,7 +315,7 @@ class AbsObjUniverseBaseDef(object):
             return [i for i in self.get_objs() if not i.get_target_connections()]
 
     def to_properties(self):
-        p = ctt_objects.Properties(self)
+        p = ctt_core.Properties(self)
         for i_obj in self.get_objs():
             p.set(
                 i_obj.path, i_obj.to_properties().get_value()

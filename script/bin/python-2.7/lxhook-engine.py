@@ -52,7 +52,7 @@ def __print_help():
 
 
 def __execute_with_option(option):
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     #
@@ -68,7 +68,7 @@ def __execute_option_hook(hook_option):
     """
     import lxlog.core as log_core
 
-    from lxbasic import bsc_core
+    import lxbasic.core as bsc_core
     #
     import lxbasic.extra.methods as bsc_etr_methods
     #

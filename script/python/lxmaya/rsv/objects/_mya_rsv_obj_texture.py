@@ -7,7 +7,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def execute_asset_render_texture_export(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         import lxmaya.fnc.exporters as mya_fnc_exporters
         #
@@ -59,7 +59,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).execute()
 
     def execute_preview_texture_export(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
         #
         import lxmaya.fnc.exporters as mya_fnc_exporters
         #

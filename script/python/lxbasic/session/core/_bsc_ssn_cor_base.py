@@ -1,11 +1,7 @@
 # coding:utf-8
-import subprocess
-
 import functools
 
 import fnmatch
-
-import lxbasic.configure as bsc_configure
 
 import lxbasic.core as bsc_core
 
@@ -18,10 +14,10 @@ class AbsSsnConfigureBaseDef(object):
         raise NotImplementedError()
 
     def _init_configure_base_def_(self):
-        self._basic_configure = self.configure.get_content(
+        self._basic_configure = self.configure.get_as_content(
             'option'
         )
-        self._gui_configure = self.configure.get_content(
+        self._gui_configure = self.configure.get_as_content(
             'option.gui'
         )
 
@@ -77,8 +73,8 @@ class AbsSsnGener(
     AbsSsnConfigureBaseDef,
     AbsSsnEnvironmentBaseDef,
 ):
-    Platform = bsc_configure.Platform
-    Application = bsc_configure.Application
+    Platform = bsc_core.BscPlatform
+    Application = bsc_core.BscApplication
 
     def __init__(self, *args, **kwargs):
         if 'type' in kwargs:
@@ -109,7 +105,7 @@ class AbsSsnGener(
         else:
             self._variants = {}
         #
-        self._configure.set_flatten()
+        self._configure.do_flatten()
         #
         self._user = bsc_core.SystemMtd.get_user_name()
         self._host = bsc_core.SystemMtd.get_host()
@@ -168,7 +164,7 @@ class AbsSsnGener(
     configure = property(get_configure)
 
     def reload_configure(self):
-        self._configure.set_reload()
+        self._configure.reload()
 
     #
     def get_platform(self):
@@ -257,21 +253,20 @@ class AbsSsnGener(
         )
         session = kwargs['session']
         if bsc_core.PlatformMtd.get_is_linux():
-            # cmds = ['bash', '-l', '-c', file_path]
             cmds = [
-                'gnome-terminal', '-t', '"{}"'.format(session.gui_configure.get('name')),
+                'gnome-terminal',
+                '-t "{}-{}"'.format(
+                    session.get_name(), bsc_core.SystemMtd.get_time_tag()
+                ),
                 '-e "bash -l {}"'.format(file_path)
             ]
-
-            bsc_core.SubProcessMtd.execute(
+            bsc_core.SubProcessMtd.execute_as_trace(
                 ' '.join(cmds)
             )
         elif bsc_core.PlatformMtd.get_is_windows():
             cmds = ['start', 'cmd', '/k', file_path]
-            subprocess.Popen(
-                cmds,
-                shell=True,
-                # env=dict()
+            bsc_core.SubProcessMtd.execute_as_trace(
+                ' '.join(cmds)
             )
         bsc_core.Log.trace_method_result(
             'option-hook', 'complete for: "{}"'.format(
@@ -283,13 +278,19 @@ class AbsSsnGener(
     def execute_shell_script_use_terminal(cmd, **kwargs):
         session = kwargs['session']
         if bsc_core.PlatformMtd.get_is_linux():
-            cmds = ['gnome-terminal', '-t', session.gui_configure.get('name'), '--', 'bash', '-l', '-c', cmd]
-            bsc_core.SubProcessMtd.execute(
+            cmds = [
+                'gnome-terminal',
+                '-t "{}-{}"'.format(
+                    session.get_name(), bsc_core.SystemMtd.get_time_tag()
+                ),
+                '--', 'bash', '-l', '-c', cmd
+            ]
+            bsc_core.SubProcessMtd.execute_as_trace(
                 ' '.join(cmds)
             )
         elif bsc_core.PlatformMtd.get_is_windows():
             cmds = ['start', 'cmd', '/k', cmd]
-            bsc_core.SubProcessMtd.execute(
+            bsc_core.SubProcessMtd.execute_as_trace(
                 ' '.join(cmds)
             )
 
@@ -373,8 +374,8 @@ class AbsSsnGener(
         pass
 
     def set_reload(self):
-        self._configure.set_reload()
-        self._configure.set_flatten()
+        self._configure.reload()
+        self._configure.do_flatten()
 
     def get_engine(self):
         return self._configure.get(

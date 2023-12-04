@@ -12,24 +12,26 @@ class ColorSpaceMtd(object):
         [-0.130076824208823, 1.140735774822504, -0.010559801677511],
         [-0.023964072927574, -0.128975508299318, 1.153014018916862]
     ]
+
     @classmethod
     def srgb_to_accescg(cls, rgb):
         matrix = cls.SRGB_TO_ACCESCG_MATRIX
         v_out = [
-            matrix[0][0] * rgb[0] + matrix[0][1] * rgb[1] + matrix[0][2] * rgb[2],
-            matrix[1][0] * rgb[0] + matrix[1][1] * rgb[1] + matrix[1][2] * rgb[2],
-            matrix[2][0] * rgb[0] + matrix[2][1] * rgb[1] + matrix[2][2] * rgb[2]
+            matrix[0][0]*rgb[0]+matrix[0][1]*rgb[1]+matrix[0][2]*rgb[2],
+            matrix[1][0]*rgb[0]+matrix[1][1]*rgb[1]+matrix[1][2]*rgb[2],
+            matrix[2][0]*rgb[0]+matrix[2][1]*rgb[1]+matrix[2][2]*rgb[2]
         ]
         if len(rgb) > 3:
             v_out += rgb[3::]
         return v_out
+
     @classmethod
     def accescg_to_srgb(cls, rgb):
         matrix = cls.ACCESCG_TO_SRGB_MATRIX
         v_out = [
-            matrix[0][0] * rgb[0] + matrix[0][1] * rgb[1] + matrix[0][2] * rgb[2],
-            matrix[1][0] * rgb[0] + matrix[1][1] * rgb[1] + matrix[1][2] * rgb[2],
-            matrix[2][0] * rgb[0] + matrix[2][1] * rgb[1] + matrix[2][2] * rgb[2]
+            matrix[0][0]*rgb[0]+matrix[0][1]*rgb[1]+matrix[0][2]*rgb[2],
+            matrix[1][0]*rgb[0]+matrix[1][1]*rgb[1]+matrix[1][2]*rgb[2],
+            matrix[2][0]*rgb[0]+matrix[2][1]*rgb[1]+matrix[2][2]*rgb[2]
         ]
         if len(rgb) > 3:
             v_out += rgb[3::]

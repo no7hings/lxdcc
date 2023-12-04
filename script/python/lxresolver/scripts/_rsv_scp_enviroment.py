@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxresolver.commands as rsv_commands
 
@@ -9,10 +9,11 @@ class ScpEnvironment(object):
 import lxresolver.scripts as rsv_scripts
 print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/td_test/user/work.dongchangbao/katana/scenes/surface/td_test.srf.surface.v000_002.katana')
     """
+
     @classmethod
     def register_from_scene(cls, file_path):
         resolver = rsv_commands.get_resolver()
-        keys = resolver.VariantTypes.All
+        keys = resolver.VariantTypes.Constructs
         #
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
             file_path
@@ -33,11 +34,12 @@ print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/
             bsc_core.EnvironMtd.set(
                 i_env_key, i_env_value
             )
+
     @classmethod
     def get_data(cls, file_path):
         if file_path:
             resolver = rsv_commands.get_resolver()
-            keys = resolver.VariantTypes.All
+            keys = resolver.VariantTypes.Constructs
             #
             rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
                 file_path
@@ -60,11 +62,12 @@ print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/
                     )
                 return True, data
         return False, None
+
     @classmethod
     def get_as_dict(cls):
         dict_ = {}
         resolver = rsv_commands.get_resolver()
-        keys = resolver.VariantTypes.All
+        keys = resolver.VariantTypes.Constructs
         for i_key in keys:
             i_env_key = 'PG_{}'.format(i_key.upper())
             i_env_value = bsc_core.EnvironMtd.get(i_env_key)

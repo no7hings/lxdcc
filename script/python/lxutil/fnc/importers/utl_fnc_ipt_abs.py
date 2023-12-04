@@ -1,9 +1,7 @@
 # coding:utf-8
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
-
-from lxutil import utl_core
+import lxcontent.core as ctt_core
 #
 from lxutil.fnc import utl_fnc_obj_abs
 
@@ -31,7 +29,7 @@ class AbsDccLookYamlImporter(utl_fnc_obj_abs.AbsFncOptionBase):
             self._time_tag = bsc_core.TimestampOpt(
                 bsc_core.StgFileOpt(file_path).get_modify_timestamp()
                 ).get_as_tag_36()
-            self._raw = ctt_objects.Content(
+            self._raw = ctt_core.Content(
                 value=self.get('file')
             )
         else:

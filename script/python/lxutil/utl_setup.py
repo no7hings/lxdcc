@@ -1,7 +1,7 @@
 # coding:utf-8
 import os
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxutil import utl_configure
 
@@ -268,7 +268,7 @@ class HoudiniSetupCreator(object):
         self._menu_bar = HoudiniXmlMainMenuBar()
         #
         configure_file_path = utl_configure.MainData.get_configure_file('houdini/menu/main')
-        configure = ctt_objects.Configure(value=configure_file_path)
+        configure = ctt_core.Content(value=configure_file_path)
         create_menu_fnc_(configure, 0)
         #
         main_menu_xml_file = '{}/MainMenuCommon.xml'.format(self._file_path)

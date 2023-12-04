@@ -2,10 +2,10 @@
 import six
 
 import types
-# noinspection PyUnresolvedReferences
-from Katana import Configuration, NodegraphAPI, KatanaFile
 
-from lxbasic import bsc_core
+from lxkatana.core.wrap import *
+
+import lxbasic.core as bsc_core
 
 from lxkatana import ktn_configure, ktn_core
 
@@ -13,7 +13,7 @@ from lxutil import utl_core
 
 from lxutil.dcc import utl_dcc_obj_abs
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxuniverse.objects as unv_objects
 
@@ -28,9 +28,11 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         _ = NodegraphAPI.GetProjectFile()
         if isinstance(_, six.string_types):
             return _.replace('\\', '/')
+
     @classmethod
     def set_file_path(cls, file_path):
         pass
+
     @classmethod
     def open_file(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
@@ -43,6 +45,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             'katana-file open',
             u'file="{}" is completed'.format(file_path)
         )
+
     @classmethod
     def save_file(cls):
         file_path = cls.get_current_file_path()
@@ -58,6 +61,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             )
         else:
             pass
+
     @classmethod
     def save_to_file(cls, file_path):
         file_obj = utl_dcc_objects.OsFile(file_path)
@@ -71,6 +75,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             'katana-file save-to',
             u'file="{}" is completed'.format(file_path)
         )
+
     @classmethod
     def set_file_export_to(cls, file_path):
         # cls.save_file()
@@ -79,18 +84,23 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         src_file_obj.set_copy_to_file(
             file_path, replace=True
         )
+
     @classmethod
     def get_scene_is_dirty(cls):
         return KatanaFile.IsFileDirty()
+
     @classmethod
     def new_file(cls):
         return KatanaFile.New()
+
     @classmethod
     def set_current_frame(cls, frame):
         NodegraphAPI.GetRootNode().getParameter('currentTime').setValue(frame, 0)
+
     @classmethod
     def get_current_frame(cls):
         return NodegraphAPI.GetRootNode().getParameter('currentTime').getValue(0)
+
     @classmethod
     def get_frame_range(cls, frame=None):
         if isinstance(frame, (tuple, list)):
@@ -100,6 +110,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         else:
             star_frame = end_frame = cls.get_current_frame()
         return star_frame, end_frame
+
     @classmethod
     def set_frame_range(cls, *args):
         if len(args) == 2:
@@ -113,6 +124,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         NodegraphAPI.GetRootNode().getParameter('workingInTime').setValue(star_frame, 0)
         NodegraphAPI.GetRootNode().getParameter('outTime').setValue(end_frame, 0)
         NodegraphAPI.GetRootNode().getParameter('workingOutTime').setValue(end_frame, 0)
+
     @classmethod
     def get_objs_by_type(cls, obj_type_name):
         if isinstance(obj_type_name, six.string_types):
@@ -128,9 +140,11 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             for ktn_node in _:
                 lis.append(ktn_node)
         return lis
+
     #
     FILE_CLS = utl_dcc_objects.OsFile
     UNIVERSE_CLS = unv_objects.ObjUniverse
+
     def __init__(self, *args, **kwargs):
         super(Scene, self).__init__(*args, **kwargs)
 
@@ -146,7 +160,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             tvl.next()
 
     def _create_obj_(self, obj_type_name, obj_path):
-        obj_category_name = unr_configure.ObjCategory.LYNXI
+        obj_category_name = unr_core.UnrObjCategory.LYNXI
         #
         obj_category = self.universe.generate_obj_category(obj_category_name)
         obj_type = obj_category.generate_type(obj_type_name)
@@ -157,14 +171,17 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 'icon', gui_qt_core.GuiQtKatana.generate_qt_icon_by_name(obj_type_name)
             )
         return _obj
+
     @classmethod
     def set_file_open_with_dialog(cls, file_path):
         def yes_fnc_():
             cls.save_file()
             cls.open_file(file_path)
+
         #
         def no_fnc_():
             cls.open_file(file_path)
+
         #
         w = utl_core.DccDialog.create(
             label='Save',
@@ -183,11 +200,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         result = w.get_result()
         if result is True:
             pass
+
     @classmethod
     def new_file_with_dialog(cls, file_path, post_method=None):
         def pos_method_run_fnc_():
             if isinstance(post_method, (types.FunctionType, types.MethodType)):
                 post_method(file_path)
+
         #
         def yes_fnc_():
             cls.save_file()
@@ -200,6 +219,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             pos_method_run_fnc_()
             #
             cls.save_to_file(file_path)
+
         #
         def no_fnc_():
             cls.new_file()
@@ -210,6 +230,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             pos_method_run_fnc_()
             #
             cls.save_to_file(file_path)
+
         #
         if cls.get_scene_is_dirty() is True:
             w = utl_core.DccDialog.create(
@@ -227,13 +248,16 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             )
         else:
             no_fnc_()
+
     @classmethod
     def save_file_with_dialog(cls):
         def yes_fnc_():
             cls.save_file()
+
         #
         def no_fnc_():
             pass
+
         #
         if cls.get_scene_is_dirty():
             w = utl_core.DccDialog.create(
@@ -256,6 +280,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
             result = w.get_result()
             if result is True:
                 pass
+
     @classmethod
     def import_from_file(cls, file_path):
         KatanaFile.Import(file_path)
@@ -274,6 +299,7 @@ class Selection(object):
                     self._node_graph_ktn_objs.append(node_graph_ktn_obj)
             elif i.startswith('/root'):
                 self._scene_graph_obj_paths.append(str(i))
+
     @classmethod
     def get_selected_paths(cls, include=None):
         return [i.getName() for i in NodegraphAPI.GetAllSelectedNodes() or []]
@@ -300,6 +326,7 @@ class Selection(object):
             ktn_core.KtnSGSelectionOpt(
                 self._scene_graph_obj_paths
             ).select_all()
+
     @classmethod
     def set_clear(cls):
         NodegraphAPI.SetAllSelectedNodes([])

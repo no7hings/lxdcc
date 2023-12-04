@@ -5,12 +5,11 @@ import collections
 
 import six
 
-from lxbasic import bsc_core
+from lxkatana.core.wrap import *
 
-# noinspection PyUnresolvedReferences
-from Katana import Utils, NodegraphAPI, CacheManager, RenderManager
+import lxbasic.core as bsc_core
 
-import lxcontent.objects as ctt_objects
+import lxcontent.core as ctt_core
 
 from lxkatana import ktn_core
 
@@ -18,7 +17,7 @@ from lxkatana import ktn_core
 class ScpMacro(object):
     def __init__(self, file_path):
         self._file_path = file_path
-        self._cfg = ctt_objects.Configure(value=self._file_path)
+        self._cfg = ctt_core.Content(value=self._file_path)
         self._cfg.set('option.unique_name', bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100).lower())
         #
         color_hsv = self._cfg.get('option.color_hsv')
@@ -77,7 +76,7 @@ class ScpMacro(object):
                 'option.color.b', b
             )
         #
-        self._cfg.set_flatten()
+        self._cfg.do_flatten()
 
     # @ktn_core.Modifier.undo_debug_run
     def build(self):
@@ -89,7 +88,7 @@ class ScpMacro(object):
         self.add_nodes()
 
     def build_main(self):
-        data = self._cfg.get_content('main')
+        data = self._cfg.get_as_content('main')
         ktn_obj, is_create = self._build_node_(data)
         self._obj_opt = ktn_core.NGObjOpt(ktn_obj)
         if is_create is False:
@@ -125,9 +124,9 @@ class ScpMacro(object):
     def build_nodes(self):
         if self._cfg.get_key_is_exists('node') is False:
             return
-        c = self._cfg.get_content('node')
+        c = self._cfg.get_as_content('node')
         for i_key in c.get_top_keys():
-            i_data = c.get_content(i_key)
+            i_data = c.get_as_content(i_key)
             self._build_node_(i_data)
 
     @classmethod
@@ -300,9 +299,9 @@ class ScpMacro(object):
     def update_records(self):
         if self._cfg.get_key_is_exists('record_update') is False:
             return
-        c = self._cfg.get_content('record_update')
+        c = self._cfg.get_as_content('record_update')
         for i_key in c.get_top_keys():
-            i_data = c.get_content(i_key)
+            i_data = c.get_as_content(i_key)
             self._update_record_(i_key, i_data)
 
     def _update_record_(self, key, data, extend_kwargs=None):
@@ -344,9 +343,9 @@ class ScpMacro(object):
     def add_nodes(self):
         if self._cfg.get_key_is_exists('node_add') is False:
             return
-        c = self._cfg.get_content('node_add')
+        c = self._cfg.get_as_content('node_add')
         for i_key in c.get_top_keys():
-            i_data = c.get_content(i_key)
+            i_data = c.get_as_content(i_key)
             self._build_node_(i_data, extend_kwargs=self._extend_kwargs)
 
     def gui_layout(self):
@@ -379,6 +378,7 @@ class ScpMacro(object):
                 **var_dict
             )
             macro_file_opt.set_copy_to_file(bck_file_path)
+
         self._obj_opt.save_as_macro(
             macro_file_path
         )
@@ -460,7 +460,7 @@ class AbsWsp(object):
 
     def load_preset(self):
         key = self._obj_opt.get('preset.name')
-        c = ctt_objects.Content(value=self.PRESET_DICT)
+        c = ctt_core.Content(value=self.PRESET_DICT)
         self._obj_opt.set_parameters_by_data(
             c.get('{}.parameters'.format(key)) or {}
         )
@@ -741,7 +741,7 @@ class ScpWspAssetGeometry(AbsWsp):
             rsv_asset = rsv_project.get_rsv_resource(
                 asset=rsv_scene_properties.get('asset')
             )
-            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._get_asset_usd_latest_file_path_(
+            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._get_asset_usd_latest_file_path(
                 rsv_asset,
                 rsv_scene_properties
             )
@@ -749,16 +749,16 @@ class ScpWspAssetGeometry(AbsWsp):
                 self._obj_opt.set(
                     'parameters.usd.file', asset_set_usd_file_path
                 )
-                #
+
                 self._obj_opt.set('parameters.usd.enable', 1)
-                #
+
                 bsc_core.Log.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
-                #
+
                 self.load_usd_variant()
-                #
+
                 ktn_core.CacheManager.flush()
         else:
             contents.append(
@@ -793,7 +793,7 @@ class ScpWspAssetGeometry(AbsWsp):
             rsv_asset = rsv_project.get_rsv_resource(
                 asset=rsv_scene_properties.get('asset')
             )
-            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._set_asset_usd_file_create_(
+            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._create_asset_usd_file(
                 rsv_asset,
                 rsv_scene_properties
             )
@@ -801,27 +801,94 @@ class ScpWspAssetGeometry(AbsWsp):
                 self._obj_opt.set(
                     'parameters.usd.file', asset_set_usd_file_path
                 )
-                #
+
                 self._obj_opt.set('parameters.usd.enable', 1)
-                #
+
                 bsc_core.Log.trace_method_result(
                     'set usd create for asset',
                     'file="{}"'.format(asset_set_usd_file_path)
                 )
-                #
+
                 self.load_usd_variant()
-                #
+
                 ktn_core.CacheManager.flush()
         else:
             contents.append(
                 u'file={} is not not available'.format(f)
             )
-        #
+
         ScpMacro.set_warning_show(
-            'camera load', contents
+            'asset load', contents
         )
 
-    def _load_usd_variant_fnc_(self, file_key, variant_group_key, mode='main'):
+    def _clear_all_components(self):
+        variant_dict_pre = {}
+        p = 'parameters.usd_variant.asset_version_main.component'
+        if self._obj_opt.get_port_is_exists(p):
+            c = 10
+            keys_p = '{}.keys'.format(p)
+            self._obj_opt.set_capsule_strings(
+                keys_p, ['None']
+            )
+            self._obj_opt.set(
+                keys_p, 'None'
+            )
+            for i_index in range(c):
+                i_variant_key_p = '{}.key_{}'.format(p, i_index)
+                i_variant_value_p = '{}.value_{}'.format(p, i_index)
+                i_variant_key = self._obj_opt.get(i_variant_key_p)
+                if i_variant_key:
+                    i_variant_value_pre = self._obj_opt.get(i_variant_value_p)
+                    variant_dict_pre[i_variant_key] = i_variant_value_pre
+                self._obj_opt.set(
+                    i_variant_key_p, ''
+                )
+                self._obj_opt.set_enumerate_strings(
+                    i_variant_value_p, ['None']
+                )
+                self._obj_opt.set(
+                    i_variant_value_p, 'None'
+                )
+        return variant_dict_pre
+
+    def _load_all_components(self, variant_dict):
+        p = 'parameters.usd_variant.asset_version_main.component'
+        prefix = 'mod_var_'
+        if self._obj_opt.get_port_is_exists(p):
+            variant_dict_pre = self._clear_all_components()
+
+            condition_keys = []
+            condition_capsule_data = []
+            for i_index, (i_k, i_v) in enumerate(variant_dict.items()):
+                i_condition_key = 'variant_{}'.format(i_index)
+                condition_capsule_data.append(
+                    (i_condition_key, bsc_core.RawStrUnderlineOpt(i_k[len(prefix):]).to_prettify())
+                )
+                condition_keys.append(i_condition_key)
+
+                i_variant_key_p = '{}.key_{}'.format(p, i_index)
+                i_variant_value_p = '{}.value_{}'.format(p, i_index)
+
+                self._obj_opt.set(
+                    i_variant_key_p, i_k
+                )
+                i_default = i_v['default']
+                i_values = i_v['values']
+                self._obj_opt.set_enumerate_strings(
+                    i_variant_value_p, i_values
+                )
+                self._obj_opt.set(
+                    i_variant_value_p, i_default
+                )
+
+            self._obj_opt.set_capsule_data(
+                '{}.keys'.format(p), condition_capsule_data
+            )
+            self._obj_opt.set(
+                '{}.keys'.format(p), ', '.join(condition_keys)
+            )
+
+    def _load_usd_variant_fnc(self, file_key, variant_group_key, mode='main'):
         import lxusd.rsv.objects as usd_rsv_objects
 
         contents = []
@@ -829,10 +896,10 @@ class ScpWspAssetGeometry(AbsWsp):
         f = self._obj_opt.get(file_key)
 
         if f:
-            usd_variant_dict = usd_rsv_objects.RsvUsdAssetSet.get_variant_dict(
+            asset_variant_dict = usd_rsv_objects.RsvUsdAssetSet.generate_asset_variant_dict(
                 f, mode=mode
             )
-            if usd_variant_dict:
+            if asset_variant_dict:
                 if mode == 'main':
                     self._obj_opt.set(
                         '{}.asset_version_main.enable'.format(variant_group_key), 1
@@ -848,13 +915,20 @@ class ScpWspAssetGeometry(AbsWsp):
                         '{}.asset_version_override.enable'.format(variant_group_key), 1
                     )
 
-                for i_k, i_v in usd_variant_dict.iteritems():
+                for i_k, i_v in asset_variant_dict.iteritems():
                     for j_k, j_v in i_v.items():
                         i_p = '{}.{}.{}'.format(variant_group_key, i_k, j_k)
                         j_default = j_v['default']
                         j_values = j_v['values']
                         self._obj_opt.set_enumerate_strings(i_p, j_values)
                         self._obj_opt.set(i_p, j_default)
+                # maybe node is old style, did not have this parameters
+                if self._obj_opt.get_port_is_exists('{}.asset_version_main.component'.format(variant_group_key)) is True:
+                    asset_component_variant_dict = usd_rsv_objects.RsvUsdAssetSet.generate_asset_components_variant_dict(
+                        f
+                    )
+                    if asset_component_variant_dict:
+                        self._load_all_components(asset_component_variant_dict)
             else:
                 contents.append(
                     u'file={} is not not available'.format(f)
@@ -864,13 +938,13 @@ class ScpWspAssetGeometry(AbsWsp):
                 u'file={} is not not available'.format(f)
             )
         ScpMacro.set_warning_show(
-            'camera load', contents
+            'asset load', contents
         )
 
     @ktn_core.Modifier.undo_run
     def load_usd_variant(self):
         mode = self._obj_opt.get('parameters.usd_variant.mode')
-        self._load_usd_variant_fnc_(
+        self._load_usd_variant_fnc(
             'parameters.usd.file', 'parameters.usd_variant', mode=mode
         )
 
@@ -878,9 +952,8 @@ class ScpWspAssetGeometry(AbsWsp):
         pass
 
     def translate_to_center(self, above_axis_y=False):
-        from lxusd import usd_core
+        import lxusd.core as usd_core
 
-        #
         file_path = self._obj_opt.get('usd.file')
         if file_path:
             root = '/master'
@@ -903,15 +976,21 @@ class ScpWspAssetGeometry(AbsWsp):
                     'parameters.extra.translate.offset', [-c_x, -c_y, -c_z]
                 )
 
+    def layout_all_components(self):
+        pass
+
+    def layout_visible_components(self):
+        pass
+
 
 class ScpWspGeometry(AbsWsp):
-    CFG_YAML = bsc_core.RscConfigure.get_yaml(
+    CFG_YAML = bsc_core.ResourceContent.get_yaml(
         'katana/script/macro/geometry'
     )
 
     def __init__(self, *args, **kwargs):
         super(ScpWspGeometry, self).__init__(*args, **kwargs)
-        self._cfg = ctt_objects.Configure(value=self.CFG_YAML)
+        self._cfg = ctt_core.Content(value=self.CFG_YAML)
         self.PRESET_DICT = self._cfg.get('preset')
 
 
@@ -946,6 +1025,31 @@ class ScpWspGeometrySpace(AbsWsp):
         ScpWspVariantRegister(node_name).register_variable()
 
 
+class ScpWspUtilityCamera(AbsWsp):
+    def __init__(self, *args, **kwargs):
+        super(ScpWspUtilityCamera, self).__init__(*args, **kwargs)
+
+    def refresh_abc(self):
+        sg_opt = ktn_core.KtnStageOpt(
+            self._obj_opt.ktn_obj
+        )
+        location = self._obj_opt.get('option.location')
+        element = self._obj_opt.get('parameters.setting.abc.element')
+        _ = sg_opt.get_all_paths_at(
+            '{}/abc'.format(location), include_types=['camera']
+        )
+        if _:
+            self._obj_opt.set_enumerate_strings(
+                'parameters.setting.abc.element', _
+            )
+            if element in _:
+                self._obj_opt.set('parameters.setting.abc.element', element)
+        else:
+            self._obj_opt.set_enumerate_strings(
+                'parameters.setting.abc.element', ['None']
+            )
+
+
 # camera
 class ScpWspAssetCamera(AbsWsp):
     def __init__(self, *args, **kwargs):
@@ -958,12 +1062,6 @@ class ScpWspAssetCamera(AbsWsp):
         import lxresolver.commands as rsv_commands
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
-
-        #
-        self._obj_opt.set(
-            'parameters.abc.enable',
-            0
-        )
         #
         contents = []
         #
@@ -983,17 +1081,12 @@ class ScpWspAssetCamera(AbsWsp):
                     )
                     file_paths = rsv_unit.get_result(version='all')
                     if file_paths:
-                        self._obj_opt.set(
-                            'parameters.abc.enable',
-                            1
-                        )
-                        #
                         self._obj_opt.set_enumerate_strings(
-                            'parameters.abc.file',
+                            'parameters.setting.abc.file',
                             file_paths
                         )
                         self._obj_opt.set(
-                            'parameters.abc.file',
+                            'parameters.setting.abc.file',
                             file_paths[-1]
                         )
                 else:
@@ -1012,6 +1105,26 @@ class ScpWspAssetCamera(AbsWsp):
         ScpMacro.set_warning_show(
             'camera load', contents
         )
+
+    def refresh_abc(self):
+        sg_opt = ktn_core.KtnStageOpt(
+            self._obj_opt.ktn_obj
+        )
+        location = self._obj_opt.get('option.location')
+        element = self._obj_opt.get('parameters.setting.abc.element')
+        _ = sg_opt.get_all_paths_at(
+            '{}/abc'.format(location), include_types=['camera']
+        )
+        if _:
+            self._obj_opt.set_enumerate_strings(
+                'parameters.setting.abc.element', _
+            )
+            if element in _:
+                self._obj_opt.set('parameters.setting.abc.element', element)
+        else:
+            self._obj_opt.set_enumerate_strings(
+                'parameters.setting.abc.element', ['None']
+            )
 
 
 class ScpWspCamera(AbsWsp):
@@ -1319,13 +1432,13 @@ class ScpWspAssetLightRig(AbsWsp):
 
 
 class ScpWspWorkspace(AbsWsp):
-    CFG_YAML = bsc_core.RscConfigure.get_yaml(
+    CFG_YAML = bsc_core.ResourceContent.get_yaml(
         'katana/script/macro/workspace'
     )
 
     def __init__(self, *args, **kwargs):
         super(ScpWspWorkspace, self).__init__(*args, **kwargs)
-        self._cfg = ctt_objects.Configure(value=self.CFG_YAML)
+        self._cfg = ctt_core.Content(value=self.CFG_YAML)
 
         self._cfg.set(
             'option.path', self._obj_opt.get_path(),
@@ -1348,7 +1461,7 @@ class ScpWspWorkspace(AbsWsp):
         self._cfg.set(
             'option.position.y', y
         )
-        self._cfg.set_flatten()
+        self._cfg.do_flatten()
 
         self.PRESET_DICT = self._cfg.get('preset')
 
@@ -1380,10 +1493,10 @@ class ScpWspWorkspace(AbsWsp):
                 i_scheme = self._obj_opt.get('workspace.spaces.{}'.format(i_key))
                 i_cfg_key = 'build.{}.{}'.format(i_key, i_scheme)
                 if self._cfg.get_key_is_exists(i_cfg_key):
-                    i_data = self._cfg.get_content(i_cfg_key)
+                    i_data = self._cfg.get_as_content(i_cfg_key)
                     i_record = self.get_record('{}.space'.format(i_key))
                     if not i_record:
-                        i_main_data = i_data.get_content('main')
+                        i_main_data = i_data.get_as_content('main')
                         i_obj_opt = self._build_main_(i_key, i_main_data)
                         i_node_data = i_data.get('node') or {}
                         self._build_nodes_(i_node_data)
@@ -1425,7 +1538,7 @@ class ScpWspWorkspace(AbsWsp):
         for i_index, i_key in enumerate(valid_keys):
             i_scheme = self._obj_opt.get('workspace.spaces.{}'.format(i_key))
             i_cfg_key = 'build.{}.{}'.format(i_key, i_scheme)
-            i_data = self._cfg.get_content(i_cfg_key)
+            i_data = self._cfg.get_as_content(i_cfg_key)
             main_post_connections = i_data.get('main.post_connections')
             if main_post_connections:
                 connections.extend(main_post_connections)
@@ -1551,9 +1664,7 @@ class ScpAssetAssExport(AbsWsp):
 
     @ktn_core.Modifier.undo_run
     def set_guess(self):
-        from lxbasic import bsc_core
-
-        from lxusd import usd_core
+        import lxusd.core as usd_core
 
         from lxkatana import ktn_core
 
@@ -1673,7 +1784,7 @@ class ScpAssetAssExport(AbsWsp):
                             views=[camera_path],
                             settings=rss
                         )
-                        l_p.set_update()
+                        l_p.do_update()
                         bsc_core.Log.trace_method_result(
                             'ass sequence export',
                             'look-pass="{}", frame="{}"'.format(look_pass_name, i_frame)
@@ -1709,13 +1820,6 @@ class ScpInstanceColorMap(object):
         return self._obj_opt.get('parameters.op.grow')
 
     def generate_grow_cache(self):
-        """
-import lxkatana.scripts as ktn_scripts
-
-ktn_scripts.ScpInstanceColorMap(
-    NodegraphAPI.GetNode('instance_color_map')
-).generate_grow_cache()
-        """
         self._obj_opt.set('parameters.grow.preview', False)
         force = bool(self._obj_opt.get('parameters.grow.force'))
         print force
@@ -1748,13 +1852,6 @@ ktn_scripts.ScpInstanceColorMap(
             )
 
     def generate_instance_cache(self):
-        """
-import lxkatana.scripts as ktn_scripts
-
-ktn_scripts.ScpInstanceColorMap(
-    NodegraphAPI.GetNode('instance_color_map')
-).generate_instance_cache()
-        """
         self._obj_opt.set('parameters.instance.preview', False)
         force = bool(self._obj_opt.get('parameters.instance.force'))
 

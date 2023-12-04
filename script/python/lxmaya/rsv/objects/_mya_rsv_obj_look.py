@@ -7,7 +7,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccLookHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_look_ass_export(self, force=False, texture_use_environ_map=True):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 
@@ -93,7 +93,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
 
     def execute_asset_look_yml_export(self):
-        from lxbasic import bsc_core
+        import lxbasic.core as bsc_core
 
         from lxutil import utl_core
 

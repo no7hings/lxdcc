@@ -1,7 +1,12 @@
 # coding:utf-8
-from ._bsc_cor_utility import *
+import collections
 
-from lxbasic.core import _bsc_cor_process, _bsc_cor_storage, _bsc_cor_execute
+import parse
+
+from ..core import \
+    _bsc_cor_process, \
+    _bsc_cor_storage, \
+    _bsc_cor_execute
 
 
 class OslFileMtd(object):

@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxusd import usd_core
+import lxusd.core as usd_core
 
 
 class VertexColorBaker(object):

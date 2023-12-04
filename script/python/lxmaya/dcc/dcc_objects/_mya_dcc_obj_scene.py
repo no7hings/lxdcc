@@ -9,17 +9,19 @@ from maya import cmds, mel
 
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
-import lxuniverse.configure as unr_configure
+import lxuniverse.core as unr_core
 
 import lxuniverse.objects as unv_objects
 
-from lxutil import utl_core, utl_abstract
+from lxutil import utl_abstract
 
 from lxutil.dcc import utl_dcc_obj_abs
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
+
+import lxgui.core as gui_core
 
 from lxmaya import ma_configure, ma_core
 
@@ -46,7 +48,7 @@ class Namespace(
 
     @property
     def icon(self):
-        return bsc_core.RscIcon.get('name')
+        return bsc_core.ResourceIcon.get('name')
 
     @property
     def name(self):
@@ -320,7 +322,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
 
         #
         if cls.get_scene_is_dirty() is True:
-            w = utl_core.DccDialog.create(
+            w = gui_core.GuiDialog.create(
                 label='New',
                 content=u'Scene has been modified, Do you want to save changed to "{}"'.format(
                     cls.get_current_file_path()
@@ -545,7 +547,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                     self._create_obj_(i_obj)
 
     def _create_obj_(self, mya_obj):
-        obj_category_name = unr_configure.ObjCategory.MAYA
+        obj_category_name = unr_core.UnrObjCategory.MAYA
         obj_type_name = mya_obj.type
         mya_obj_path = mya_obj.path
         mya_dag_path = bsc_core.DccPathDagOpt(mya_obj_path)
@@ -565,7 +567,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
 
     # clear
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unused_scripts_clear(cls):
         for i in cmds.scriptJob(listJobs=1):
             for k in ['leukocyte.antivirus()']:
@@ -584,12 +586,12 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 cmds.delete(i)
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unused_shaders_clear(cls):
         mel.eval('MLdeleteUnused;')
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unused_windows_clear(cls, exclude_window_names=None):
         for panel in cmds.getPanel(visiblePanels=1) or []:
             if cmds.panel(panel, query=1, exists=1):
@@ -602,13 +604,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                     )
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unknown_plug_ins_clear(cls):
         _ = cmds.unknownPlugin(query=1, list=1) or []
         if _:
             with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unknown-plug') as g_p:
                 for i in _:
-                    g_p.set_update()
+                    g_p.do_update()
                     cmds.unknownPlugin(i, remove=1)
                     log_core.Log.trace_method_result(
                         'unknown-plug-in-clear',
@@ -616,7 +618,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                     )
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unused_namespaces_clear(cls):
         def get_obj_parent_path_fnc_(path_):
             parent = cmds.listRelatives(path_, parent=1, fullPath=1)
@@ -684,13 +686,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         fnc_1_()
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unknown_nodes_clear(cls):
         _ = cmds.ls(type='unknown', long=1) or []
         if _:
             with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unknown-node') as g_p:
                 for i in _:
-                    g_p.set_update()
+                    g_p.do_update()
                     if cmds.objExists(i) is True:
                         if cmds.referenceQuery(i, isNodeReferenced=1) is False:
                             cmds.lockNode(i, lock=0)
@@ -701,7 +703,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                             )
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unload_references_clear(cls):
         for reference_node in cmds.ls(type='reference'):
             # noinspection PyBroadException
@@ -719,13 +721,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                 )
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unused_names_clear(cls):
         _ = cmds.ls('pasted__*', long=1) or []
         if _:
             with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unused-name') as g_p:
                 for i in _:
-                    g_p.set_update()
+                    g_p.do_update()
                     if cmds.objExists(i) is True:
                         if cmds.referenceQuery(i, isNodeReferenced=1) is False:
                             name = i.split('|')[-1]
@@ -735,13 +737,13 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
                             )
 
     @classmethod
-    @utl_core.DccModifier.ignore_run
+    @bsc_core.Modifiers.run_with_result_trace
     def set_unused_display_layers_clear(cls):
         _ = cmds.ls(type='displayLayer', long=1) or []
         if _:
             with bsc_core.LogProcessContext.create(maximum=len(_), label='clean unknown-plug') as g_p:
                 for i in _:
-                    g_p.set_update()
+                    g_p.do_update()
                     #
                     if i in ['defaultLayer']:
                         continue

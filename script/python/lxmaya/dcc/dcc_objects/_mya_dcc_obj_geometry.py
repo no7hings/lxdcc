@@ -4,7 +4,7 @@ import maya.cmds as cmds
 # noinspection PyUnresolvedReferences,PyPep8Naming
 import maya.api.OpenMaya as om2
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core, utl_abstract
 

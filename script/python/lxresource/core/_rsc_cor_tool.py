@@ -3,12 +3,12 @@ import platform
 
 import lxlog.core as log_core
 
-from lxresource.core import _rsc_cor_base
+import lxcontent.core as ctt_core
 
-import lxcontent.objects as ctt_objects
+from ..core import _rsc_cor_base
 
 
-class RscTool(_rsc_cor_base.Resource):
+class ResourceTool(_rsc_cor_base.AbsResource):
     CACHE = {}
     ENVIRON_KEY = 'PAPER_EXTEND_TOOLS'
 
@@ -34,30 +34,30 @@ class RscTool(_rsc_cor_base.Resource):
             )
 
 
-class RscDesktopTool(object):
+class ResourceDesktopTool(object):
     BRANCH = 'desktop'
 
     @classmethod
     def get_yaml(cls, key):
-        return RscTool.get_yaml('{}/{}'.format(cls.BRANCH, key))
+        return ResourceTool.get_yaml('{}/{}'.format(cls.BRANCH, key))
 
     @classmethod
     def get_python(cls, key):
-        return RscTool.get_python('{}/{}'.format(cls.BRANCH, key))
+        return ResourceTool.get_python('{}/{}'.format(cls.BRANCH, key))
 
     @classmethod
     def get_shell(cls, key):
-        return RscTool.get_shell('{}/{}'.format(cls.BRANCH, key))
+        return ResourceTool.get_shell('{}/{}'.format(cls.BRANCH, key))
 
     @classmethod
     def find_all_tool_keys_at(cls, group_name):
-        return RscTool.find_all_file_keys_at(
+        return ResourceTool.find_all_file_keys_at(
             cls.BRANCH, group_name, ext_includes={'.yml'}
         )
 
     @classmethod
     def find_all_page_keys_at(cls, group_name):
-        return RscTool.find_all_directory_keys_at(
+        return ResourceTool.find_all_directory_keys_at(
             cls.BRANCH, group_name
         )
 
@@ -65,7 +65,7 @@ class RscDesktopTool(object):
     def get_args(cls, key):
         yaml_file_path = cls.get_yaml(key)
         if yaml_file_path:
-            configure = ctt_objects.Configure(value=yaml_file_path)
+            configure = ctt_core.Content(value=yaml_file_path)
             type_ = configure.get('option.type')
             if type_:
                 python_file_path = cls.get_python(key)
@@ -82,7 +82,7 @@ class RscDesktopTool(object):
         return None
 
 
-class RscDccTool(RscDesktopTool):
+class ResourceDccTool(ResourceDesktopTool):
     BRANCH = 'dcc'
 
 
@@ -90,6 +90,6 @@ if __name__ == '__main__':
     pass
     # print RscTool.get_yaml('desktop/Share/quixel_python')
     # print RscDesktopTool.get_yaml('Share/quixel_python')
-    print RscDesktopTool.find_all_tool_keys_at('Studio')
-    print RscDesktopTool.find_all_page_keys_at('User')
+    print ResourceDesktopTool.find_all_tool_keys_at('Studio')
+    print ResourceDesktopTool.find_all_page_keys_at('User')
     # print RscDesktopTool.get_args('Share/quixel_python')

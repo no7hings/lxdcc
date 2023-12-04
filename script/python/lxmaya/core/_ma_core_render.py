@@ -45,7 +45,6 @@ class Option(object):
                 j_type_name = cmds.getAttr(j_atr, type=1)
                 if j_value is None:
                     continue
-                print j_atr, j_value
                 if j_type_name == 'string':
                     cmds.setAttr(j_atr, j_value, type='string')
                 else:

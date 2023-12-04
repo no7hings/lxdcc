@@ -7,7 +7,7 @@ import hou
 
 import types
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 from lxutil import utl_core, utl_abstract
 
@@ -45,7 +45,7 @@ class Scene(utl_abstract.AbsDccScene):
 
     @property
     def icon(self):
-        return bsc_core.RscIcon.get('file/hip')
+        return bsc_core.ResourceIcon.get('file/hip')
 
     @classmethod
     def get_houdini_absolutely_path_with_path(cls, path):

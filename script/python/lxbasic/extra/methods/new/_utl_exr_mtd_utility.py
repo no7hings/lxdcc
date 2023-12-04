@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxlog.core as log_core
 
-from lxbasic import bsc_core
+import lxbasic.core as bsc_core
 
 import lxbasic.extra.abstracts as bsc_etr_abstracts
 
@@ -113,7 +113,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         platform = bsc_core.SystemMtd.get_platform()
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['application-configure-file'][platform]
-        cfg_file_path = bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
+        cfg_file_path = bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
         data = bsc_core.StgFileOpt(cfg_file_path).set_read()
         if data:
             for i_app, i_data in data.items():
@@ -138,14 +138,14 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         platform = bsc_core.SystemMtd.get_platform()
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['application-configure-file'][platform]
-        return bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
+        return bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
 
     @classmethod
     def get_deadline_configure_file(cls, rsv_project):
         platform = bsc_core.SystemMtd.get_platform()
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['deadline-configure-file'][platform]
-        return bsc_core.PtnParseMtd.set_update(cfg_file_path, project=rsv_project.get_name())
+        return bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
 
     @classmethod
     def send_mail(cls, *args, **kwargs):

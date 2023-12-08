@@ -5,16 +5,17 @@ from Katana import Callbacks
 
 
 class Setup(object):
+    KEY = 'katana setup'
+
     @classmethod
     def build_menu(cls):
-        from lxkatana import ktn_core
+        import lxlog.core as log_core
 
-        if ktn_core.get_is_ui_mode():
-            sys.stdout.write('lx-katana menu-setup is started\n')
-            from lxkatana import ktn_setup
+        import lxkatana.core as ktn_core
 
-            ktn_setup.KatanaMenuSetup().set_setup()
-            sys.stdout.write('lx-katana menu-setup is completed\n')
+        if ktn_core.KtnUtil.get_is_ui_mode():
+            with log_core.LogContext.create(cls.KEY, 'register menu'):
+                ktn_core.KatanaMenuSetup().set_setup()
 
     @classmethod
     def build_lua(cls):
@@ -30,46 +31,60 @@ class Setup(object):
 
     @classmethod
     def build_workspace(cls):
-        from lxkatana import ktn_setup
+        import lxlog.core as log_core
 
-        sys.stdout.write('lx-katana workspace-setup is started\n')
-        ktn_setup.KatanaWorkspaceSetup().set_setup()
-        sys.stdout.write('lx-katana workspace-setup  is completed\n')
+        import lxkatana.core as ktn_core
+
+        with log_core.LogContext.create(cls.KEY, 'register workspace'):
+            ktn_core.KatanaWorkspaceSetup().set_setup()
 
     @classmethod
     def build_hot_key(cls):
-        from lxkatana import ktn_core
+        import lxlog.core as log_core
 
-        if ktn_core.get_is_ui_mode():
-            sys.stdout.write('lx-katana hot-key-setup is started\n')
-            ktn_core.LayoutNodeHotKey().register()
-            sys.stdout.write('lx-katana hot-key-setup  is completed\n')
+        import lxkatana.core as ktn_core
+
+        if ktn_core.KtnUtil.get_is_ui_mode():
+            with log_core.LogContext.create(cls.KEY, 'register hot key'):
+                ktn_core.HotKeyForNodeGraphLayout().register()
+                ktn_core.HotKeyForNodeGraphPaste().register()
 
     @classmethod
     def set_run(cls, *args, **kwargs):
-        sys.stdout.write('lx-katana setup is started\n')
-        cls.build_menu()
-        cls.build_lua()
-        cls.build_hot_key()
-        cls.build_workspace()
-        sys.stdout.write('lx-katana setup is completed\n')
+        import lxlog.core as log_core
+
+        with log_core.LogContext.create(cls.KEY, 'all'):
+            cls.build_menu()
+            cls.build_lua()
+            cls.build_hot_key()
+            cls.build_workspace()
 
 
 class ArnoldSetup(object):
+    KEY = 'arnold setup'
+
     @classmethod
     def set_events_register(cls):
-        from lxkatana import ktn_core
+        import lxlog.core as log_core
 
-        ss = [
-            (ktn_core.ArnoldEventMtd.on_material_create, ktn_core.EventOpt.EventType.NodeCreate),
-            (ktn_core.ArnoldEventMtd.on_image_create, ktn_core.EventOpt.EventType.NodeCreate),
-        ]
-        #
-        for handler, event_type in ss:
-            event_opt = ktn_core.EventOpt(
-                handler=handler, event_type=event_type
-            )
-            event_opt.register()
+        import lxkatana.core as ktn_core
+
+        import lxkatana.scripts as ktn_scripts
+
+        with log_core.LogContext.create(cls.KEY, 'register event'):
+
+            ss = [
+                (ktn_scripts.ScpEventForArnold.on_material_create, ktn_core.EventOpt.EventType.NodeCreate),
+                (ktn_scripts.ScpEventForArnold.on_node_group_create, ktn_core.EventOpt.EventType.NodeCreate),
+                (ktn_scripts.ScpEventForArnold.on_shader_create, ktn_core.EventOpt.EventType.NodeCreate),
+                (ktn_scripts.ScpEventForArnold.on_image_create, ktn_core.EventOpt.EventType.NodeCreate),
+            ]
+            #
+            for handler, event_type in ss:
+                event_opt = ktn_core.EventOpt(
+                    handler=handler, event_type=event_type
+                )
+                event_opt.register()
 
     @classmethod
     def set_callbacks_register(cls):
@@ -77,10 +92,11 @@ class ArnoldSetup(object):
 
     @classmethod
     def set_run(cls, *args, **kwargs):
-        sys.stdout.write('lx-arnold setup is started\n')
-        cls.set_events_register()
-        cls.set_callbacks_register()
-        sys.stdout.write('lx-arnold setup is completed\n')
+        import lxlog.core as log_core
+
+        with log_core.LogContext.create(cls.KEY, 'all'):
+            cls.set_events_register()
+            cls.set_callbacks_register()
 
 
 Callbacks.addCallback(

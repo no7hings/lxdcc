@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxsession.abstracts as ssn_abstracts
 
-import lxwarp.deadline.core as ddl_core
+import lxwrap.deadline.core as ddl_core
 
 
 class HookExecutor(ssn_abstracts.AbsHookExecutor):

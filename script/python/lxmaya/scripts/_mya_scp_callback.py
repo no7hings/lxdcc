@@ -9,7 +9,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 
 class ScpCbkEnvironment(object):
-    KEY = 'workspace environment build'
+    KEY = 'workspace environment'
 
     def __init__(self):
         self._cfg = ctt_core.Content(

@@ -216,7 +216,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def execute_shotgun_file_export(self):
-        import lxwarp.shotgun.core as wrp_stg_core
+        import lxwrap.shotgun.core as wrp_stg_core
 
         rsv_scene_properties = self._rsv_scene_properties
 
@@ -244,7 +244,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def set_dependency_export(self):
-        import lxwarp.shotgun.core as wrp_stg_core
+        import lxwrap.shotgun.core as wrp_stg_core
 
         import lxresolver.commands as rsv_commands
 

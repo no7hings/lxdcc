@@ -2,17 +2,16 @@
 import collections
 
 import copy
+
 import os.path
 
 import parse
-# noinspection PyUnresolvedReferences
-import NodegraphAPI
 
-from lxutil import utl_core
+from lxkatana.core.wrap import *
 
 import lxbasic.core as bsc_core
 
-from lxkatana import ktn_configure, ktn_core
+import lxkatana.core as ktn_core
 
 from lxkatana.dcc import ktn_dcc_obj_abs
 
@@ -108,7 +107,7 @@ class Materials(ktn_dcc_obj_abs.AbsKtnObjs):
                 # noinspection PyBroadException
                 try:
                     ktn_core.NGNmeOpt(i_ktn_obj).set_contents_update()
-                except:
+                except Exception:
                     bsc_core.ExceptionMtd.set_print()
                     #
                     bsc_core.Log.trace_error(
@@ -153,7 +152,7 @@ class AndShaders(ktn_dcc_obj_abs.AbsKtnObjs):
                 # noinspection PyBroadException
                 try:
                     ktn_core.NGNmeOpt(i_ktn_obj).set_contents_update()
-                except:
+                except Exception:
                     bsc_core.ExceptionMtd.set_print()
                     #
                     bsc_core.Log.trace_error(
@@ -171,7 +170,7 @@ class AbsTextureReferences(object):
         #
         'custom': _ktn_dcc_obj_node.FileReference,
     }
-    PORT_PATHSEP = ktn_configure.Util.PORT_PATHSEP
+    PORT_PATHSEP = ktn_core.KtnUtil.PORT_PATHSEP
     OPTION = dict(
         with_reference=True
     )

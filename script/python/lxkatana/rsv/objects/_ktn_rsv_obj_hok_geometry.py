@@ -9,7 +9,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
     def set_asset_geometry_usd_export(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
         #
@@ -54,7 +54,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
 
     def set_asset_geometry_uv_map_usd_export(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
         #

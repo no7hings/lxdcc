@@ -2456,7 +2456,7 @@ class AbsRsvProject(
             i_rsv_matcher = self._project__generate_main_rsv_matcher(
                 i_kwargs_over
             )
-            print(i_kwargs_over)
+
             i_matches = i_rsv_matcher.get_matches()
             for j_match in i_matches:
                 j_result, j_variants = j_match
@@ -2939,7 +2939,7 @@ class AbsRsvProject(
                 for j_workspace_key in self.WorkspaceKeys.All:
                     if j_workspace_key in search_pattern:
                         j_pattern = search_pattern[j_workspace_key]
-                        if '{ext}' not in j_pattern:
+                        if '{format}' not in j_pattern:
                             j_pattern_extra = '{}/{{extra}}'.format(j_pattern)
                         else:
                             j_pattern_extra = j_pattern
@@ -2968,7 +2968,7 @@ class AbsRsvProject(
                 for j_workspace_key in self.WorkspaceKeys.All:
                     if j_workspace_key in search_pattern:
                         j_pattern = search_pattern[j_workspace_key]
-                        if '{ext}' not in j_pattern:
+                        if '{format}' not in j_pattern:
                             j_pattern_extra = '{}/{{extra}}'.format(j_pattern)
                         else:
                             j_pattern_extra = j_pattern

@@ -39,7 +39,7 @@ var-name: '{var}'
 lod-level: '{lod}'
 xgen-name: '{xgen}'
 texture-name: '{texture}'
-ext-name: '{ext}'
+format-name: '{format}'
 app-name: '{app}'
 #   variables
 camera: '{camera}'

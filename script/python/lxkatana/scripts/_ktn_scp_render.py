@@ -3,7 +3,7 @@ import copy
 
 import lxbasic.core as bsc_core
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 

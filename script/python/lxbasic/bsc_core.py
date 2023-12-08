@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # print RscConfigure.get_yaml('storage/path-mapper')
     # print RscConfigure.get_yaml('session/deadline/submiter')
     # print RscConfigure.get_yaml('session/deadline/rsv-task-submiter')
-    # print RscConfigure.get_yaml('katana/node-graph/asset-texture-resource')
+    # print RscConfigure.get_yaml('katana/node-graph/texture')
     #
     # print RscConfigure.get_yaml('arnold/node')
     # print RscConfigure.get_yaml('arnold/convert')

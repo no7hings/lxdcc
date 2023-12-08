@@ -11,7 +11,7 @@ import lxcontent.core as ctt_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_utility, _ktn_dcc_obj_node, _ktn_dcc_obj_nodes
 

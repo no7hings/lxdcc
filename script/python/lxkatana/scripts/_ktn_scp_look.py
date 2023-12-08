@@ -15,7 +15,7 @@ import lxarnold.dcc.dcc_objects as and_dcc_objects
 
 import lxarnold.dcc.dcc_operators as and_dcc_operators
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -27,7 +27,7 @@ import lxkatana
 
 lxkatana.set_reload()
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.scripts as ktn_scripts
 
@@ -147,7 +147,7 @@ ktn_scripts.ScpLookOutput(
 
         lxkatana.set_reload()
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
 
@@ -491,7 +491,7 @@ class ScpLookAssImport(object):
             network_material_path = self._get_node_path_(
                 material_group_path, material_name, look_pass_name, tag='MTL_NTW'
             )
-            ktn_obj, is_create = ktn_core.NGObjOpt._get_group_child_create_args_(
+            ktn_obj, is_create = ktn_core.NGObjOpt._generate_group_child_create_args(
                 network_material_path, 'Material_Wsp'
             )
             if is_create is True:
@@ -506,7 +506,7 @@ class ScpLookAssImport(object):
         sg_material_path = self._get_node_path_(
             self._material_root_location, material_name, look_pass_name, tag='MTL'
         )
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_material_node_graph_create_args_(
+        ktn_obj, is_create = ktn_core.NGObjOpt._generate_material_node_graph_create_args(
             material_path, 'NetworkMaterial'
         )
         if is_create is True:
@@ -537,7 +537,7 @@ class ScpLookAssImport(object):
                     i_shader_path = self._get_node_path_(
                         network_material_path, i_and_shader.name, look_pass_name, tag='SDR'
                         )
-                    i_ktn_obj, i_is_create = ktn_core.NGObjOpt._get_material_node_graph_create_args_(
+                    i_ktn_obj, i_is_create = ktn_core.NGObjOpt._generate_material_node_graph_create_args(
                         i_shader_path, 'ArnoldShadingNode', i_shader_type_name
                     )
                     #
@@ -547,7 +547,7 @@ class ScpLookAssImport(object):
                     #
                     self._create_shader_parameters_(i_and_shader, i_dcc_shader)
                     #
-                    ktn_core.NGObjOpt._create_connections_by_data_(
+                    ktn_core.NGObjOpt._create_connections_by_data(
                         [
                             '{}.out'.format(i_dcc_shader.get_path()),
                             '{}.{}'.format(dcc_material.get_path(), convert_dict.get(i_and_bind_name)),
@@ -716,7 +716,7 @@ class ScpLookAssImport(object):
                 self._material_root_location, material_name, look_pass_name, tag='MTL'
             )
             #
-            ktn_obj, is_create = ktn_core.NGObjOpt._get_group_child_create_args_(
+            ktn_obj, is_create = ktn_core.NGObjOpt._generate_group_child_create_args(
                 material_assign_path, 'MaterialAssign_Wsp'
             )
             obj_opt = ktn_core.NGObjOpt(ktn_obj)
@@ -760,7 +760,7 @@ class ScpLookAssImport(object):
             geometry_properties_assign_group_path, hash_name, look_pass_name, tag='GPA'
         )
         #
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_group_child_create_args_(
+        ktn_obj, is_create = ktn_core.NGObjOpt._generate_group_child_create_args(
             geometry_properties_assign_path, 'GeometryPropertiesAssign_Wsp'
         )
         obj_opt = ktn_core.NGObjOpt(ktn_obj)
@@ -862,7 +862,7 @@ class ScpLookMaterialImport(object):
 import lxkatana
 lxkatana.set_reload()
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.scripts as ktn_scripts
 

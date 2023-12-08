@@ -15,7 +15,7 @@ import lxresolver.commands as rsv_commands
 #
 import lxresolver.scripts as rsv_scripts
 
-import lxwarp.shotgun.core as wrp_stg_core
+import lxwrap.shotgun.core as wrp_stg_core
 
 import lxshotgun.scripts as stg_scripts
 #

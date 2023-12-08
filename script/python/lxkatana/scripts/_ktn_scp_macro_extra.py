@@ -11,7 +11,7 @@ import lxbasic.core as bsc_core
 
 import lxcontent.core as ctt_core
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 
 class ScpMacro(object):
@@ -134,7 +134,7 @@ class ScpMacro(object):
         type_name = data['type']
         path = data['path']
         force_update = data.get('force_update', False)
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_node_create_args_(path, type_name)
+        ktn_obj, is_create = ktn_core.NGObjOpt._generate_node_create_args(path, type_name)
         obj_opt = ktn_core.NGObjOpt(ktn_obj)
         if is_create is True or force_update is True:
             if (not type_name.endswith('_Wsp')) and (not type_name.endswith('_Wsp_Usr')):
@@ -191,14 +191,14 @@ class ScpMacro(object):
                 extend_kwargs=extend_kwargs
             )
             #
-            ktn_core.NGObjOpt._create_connections_by_data_(
+            ktn_core.NGObjOpt._create_connections_by_data(
                 data.get('connections') or [],
                 extend_kwargs=extend_kwargs
             )
 
-            ktn_core.NGObjOpt._create_connections_by_data_(
+            ktn_core.NGObjOpt._create_connections_by_data(
                 data.get('force_connections') or [],
-                extend_kwargs=extend_kwargs, create_target=True
+                extend_kwargs=extend_kwargs, auto_create_target=True
             )
             base_type_name = data.get('base_type', None)
             #
@@ -241,7 +241,7 @@ class ScpMacro(object):
     def _build_node_child_(cls, data, extend_kwargs=None):
         type_name = data['type']
         path = data['path']
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_group_child_create_args_(path, type_name)
+        ktn_obj, is_create = ktn_core.NGObjOpt._generate_group_child_create_args(path, type_name)
         if is_create is True:
             obj_opt = ktn_core.NGObjOpt(ktn_obj)
             #
@@ -272,7 +272,7 @@ class ScpMacro(object):
         type_name = data['type']
         shader_type_name = data.get('shader_type')
         path = data['path']
-        ktn_obj, is_create = ktn_core.NGObjOpt._get_material_node_graph_create_args_(path, type_name, shader_type_name)
+        ktn_obj, is_create = ktn_core.NGObjOpt._generate_material_node_graph_create_args(path, type_name, shader_type_name)
         if is_create is True:
             obj_opt = ktn_core.NGObjOpt(ktn_obj)
             #
@@ -291,7 +291,7 @@ class ScpMacro(object):
                 data.get('expressions') or {},
                 extend_kwargs=extend_kwargs
             )
-            ktn_core.NGObjOpt._create_connections_by_data_(
+            ktn_core.NGObjOpt._create_connections_by_data(
                 data.get('connections') or [],
                 extend_kwargs=extend_kwargs
             )
@@ -332,7 +332,7 @@ class ScpMacro(object):
             extend_kwargs=extend_kwargs
         )
         #
-        ktn_core.NGObjOpt._create_connections_by_data_(
+        ktn_core.NGObjOpt._create_connections_by_data(
             data.get('connections') or []
         )
         #
@@ -388,11 +388,11 @@ class ScpMacro(object):
     def set_warning_show(cls, label, contents):
         from lxutil import utl_core
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         if contents:
-            if ktn_core.get_is_ui_mode():
+            if ktn_core.KtnUtil.get_is_ui_mode():
                 utl_core.DccDialog.create(
                     label,
                     content=u'\n'.join(contents),
@@ -538,7 +538,7 @@ class ScpWspVariantSet(AbsWsp):
             'parameters.key', ['None']
         )
         node_names = self._obj_opt.get_all_source_objs_(
-            inner=True, include_type_names=['VariableSwitch'],
+            inner=True, type_includes=['VariableSwitch'],
             skip_base_type_names=['SuperTool']
         )
         list_ = []
@@ -561,7 +561,7 @@ class ScpWspVariantSet(AbsWsp):
         )
         if key != 'None':
             node_names = self._obj_opt.get_all_source_objs_(
-                inner=True, include_type_names=['VariableSwitch'],
+                inner=True, type_includes=['VariableSwitch'],
                 skip_base_type_names=['SuperTool']
             )
             #
@@ -616,7 +616,7 @@ class ScpWspVariantResolve(AbsWsp):
     def resolve_all_variants(self):
         variant_dict_pre = self.clear_all_variants()
         node_names = self._obj_opt.get_all_source_objs_(
-            inner=True, include_type_names=['VariableSwitch'],
+            inner=True, type_includes=['VariableSwitch'],
             skip_base_type_names=['SuperTool']
         )
         if node_names:
@@ -662,7 +662,7 @@ class ScpWspVariantResolve(AbsWsp):
     def get_variants(self):
         dict_ = collections.OrderedDict()
         node_names = self._obj_opt.get_all_source_objs_(
-            inner=True, include_type_names=['VariableSwitch'],
+            inner=True, type_includes=['VariableSwitch'],
             skip_base_type_names=['SuperTool']
         )
         if node_names:
@@ -718,7 +718,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
     @ktn_core.Modifier.undo_run
     def load_latest_usd(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -741,7 +741,7 @@ class ScpWspAssetGeometry(AbsWsp):
             rsv_asset = rsv_project.get_rsv_resource(
                 asset=rsv_scene_properties.get('asset')
             )
-            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._get_asset_usd_latest_file_path(
+            asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._generate_asset_usd_file_path_as_latest(
                 rsv_asset,
                 rsv_scene_properties
             )
@@ -770,7 +770,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
     @ktn_core.Modifier.undo_run
     def create_new_usd(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -856,7 +856,6 @@ class ScpWspAssetGeometry(AbsWsp):
         prefix = 'mod_var_'
         if self._obj_opt.get_port_is_exists(p):
             variant_dict_pre = self._clear_all_components()
-
             condition_keys = []
             condition_capsule_data = []
             for i_index, (i_k, i_v) in enumerate(variant_dict.items()):
@@ -929,6 +928,8 @@ class ScpWspAssetGeometry(AbsWsp):
                     )
                     if asset_component_variant_dict:
                         self._load_all_components(asset_component_variant_dict)
+                    else:
+                        self._clear_all_components()
             else:
                 contents.append(
                     u'file={} is not not available'.format(f)
@@ -937,6 +938,7 @@ class ScpWspAssetGeometry(AbsWsp):
             contents.append(
                 u'file={} is not not available'.format(f)
             )
+
         ScpMacro.set_warning_show(
             'asset load', contents
         )
@@ -1543,7 +1545,7 @@ class ScpWspWorkspace(AbsWsp):
             if main_post_connections:
                 connections.extend(main_post_connections)
 
-        ktn_core.NGObjOpt._create_connections_by_data_(connections, extend_kwargs=self._record_dict)
+        ktn_core.NGObjOpt._create_connections_by_data(connections, extend_kwargs=self._record_dict)
 
         # self._create_nodes_()
 
@@ -1666,7 +1668,7 @@ class ScpAssetAssExport(AbsWsp):
     def set_guess(self):
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxresolver.commands as rsv_commands
 
@@ -1736,7 +1738,7 @@ class ScpAssetAssExport(AbsWsp):
 
         from lxutil import utl_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         #
@@ -1755,7 +1757,7 @@ class ScpAssetAssExport(AbsWsp):
         rss.interactiveOutputs = True
         rss.interactiveMode = True
         #
-        if not ktn_core.get_is_ui_mode():
+        if not ktn_core.KtnUtil.get_is_ui_mode():
             Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
         #
         if mode == 'static':

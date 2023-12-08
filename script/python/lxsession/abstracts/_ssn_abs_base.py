@@ -41,7 +41,7 @@ class AbsSsnShotgunBaseDef(object):
         pass
 
     def get_shotgun_connector(self):
-        import lxwarp.shotgun.core as wrp_stg_core
+        import lxwrap.shotgun.core as wrp_stg_core
 
         return wrp_stg_core.StgConnector()
 

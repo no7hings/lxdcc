@@ -63,7 +63,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         import lxutil.rsv.objects as utl_rsv_objects
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
         #

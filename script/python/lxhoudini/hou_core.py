@@ -35,6 +35,7 @@ class HoudiniBasic(object):
             include_arg = None
         rcs_fnc(lis, node, include_arg)
         return lis
+
     @classmethod
     def get_all_inputs(cls, path, include=None):
         def add_fnc(lis_, node_, include_arg_):
@@ -53,6 +54,7 @@ class HoudiniBasic(object):
                 for _obj in _input_nodes:
                     if _obj is not None:
                         rcs_fnc(lis_, _obj, include_arg_)
+
         lis = []
         paths = []
 
@@ -69,6 +71,7 @@ class HoudiniBasic(object):
             include_arg = None
         rcs_fnc(lis, node, include_arg)
         return lis
+
     @classmethod
     def get_ancestors(cls, path, include=None):
         def add_fnc(lis_, node_, include_arg_):
@@ -99,6 +102,7 @@ class HoudiniBasic(object):
             include_arg = None
         rcs_fnc(lis, node, include_arg)
         return lis
+
     @classmethod
     def get_geo_is_visible(cls, path):
         if isinstance(path, six.string_types):
@@ -120,12 +124,15 @@ class HoudiniBasic(object):
 class HouObj(object):
     def __init__(self):
         pass
+
     @classmethod
     def get_geos(cls):
         return hou.nodeType('Object/geo').instances()
+
     @classmethod
     def get_displayed_geos(cls):
         return [i for i in cls.get_geos() if HoudiniBasic.get_geo_is_visible(i) is True]
+
     @classmethod
     def get_render_nodes(cls):
         lis = []
@@ -135,12 +142,14 @@ class HouObj(object):
             if render_node is not None:
                 lis.append(render_node)
         return lis
+
     @classmethod
     def get_geometries(cls):
         lis = []
         for node in cls.get_render_nodes():
             lis.append(node.geometry())
         return lis
+
     @classmethod
     def get_shops(cls):
         def add_fnc_(node_):
@@ -168,12 +177,14 @@ class HouObj(object):
                     for material in materials:
                         add_fnc_(material)
                 else:
-                    material = hou.parm(geo.path() + '/shop_materialpath').evalAsNode()
+                    material = hou.parm(geo.path()+'/shop_materialpath').evalAsNode()
                     add_fnc_(material)
         return lis
+
     @classmethod
     def get_instances(cls):
         return hou.nodeType('Object/instance').instances()
+
     @classmethod
     def get_displayed_instances(cls):
         return [i for i in cls.get_instances() if HoudiniBasic.get_geo_is_visible(i) is True]
@@ -235,7 +246,7 @@ class HouGeos(object):
                     for material in materials:
                         add_fnc_(material)
                 else:
-                    material = hou.parm(geo.path() + '/shop_materialpath').evalAsNode()
+                    material = hou.parm(geo.path()+'/shop_materialpath').evalAsNode()
                     add_fnc_(material)
         return lis
 

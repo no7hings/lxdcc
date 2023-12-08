@@ -31,7 +31,7 @@ class AbsSsnRsvApplication(object):
 
     @classmethod
     def get_stg_connector(cls):
-        import lxwarp.shotgun.core as wrp_stg_core
+        import lxwrap.shotgun.core as wrp_stg_core
 
         return wrp_stg_core.StgConnector()
 

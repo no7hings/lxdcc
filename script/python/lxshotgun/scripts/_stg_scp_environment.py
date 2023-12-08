@@ -6,7 +6,7 @@ class ScpEnvironment(object):
     @classmethod
     def get_data(cls, task_id):
         if task_id:
-            import lxwarp.shotgun.core as wrp_stg_core
+            import lxwrap.shotgun.core as wrp_stg_core
 
             import lxresolver.commands as rsv_commands
 

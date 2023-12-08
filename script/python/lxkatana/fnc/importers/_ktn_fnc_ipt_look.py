@@ -15,7 +15,7 @@ import lxarnold.dcc.dcc_objects as and_dcc_objects
 
 import lxarnold.dcc.dcc_operators as and_dcc_operators
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 

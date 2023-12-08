@@ -133,7 +133,8 @@ class TrdCommandPool(threading.Thread):
 
             results = []
             for i_return_dict in return_dicts:
-                results.extend(i_return_dict['results'])
+                if 'results' in i_return_dict:
+                    results.extend(i_return_dict['results'])
 
             self.__set_status_update(status)
             if status == self.Status.Completed:

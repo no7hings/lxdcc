@@ -7,7 +7,7 @@ import lxuniverse.core as unr_core
 
 from lxutil import utl_abstract
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxcontent.core as ctt_core
 

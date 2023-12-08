@@ -9,7 +9,7 @@ import six
 
 import lxbasic.core as bsc_core
 
-import lxwarp.shotgun.core as wrp_stg_core
+import lxwrap.shotgun.core as wrp_stg_core
 
 import lxresolver.commands as rsv_commands
 

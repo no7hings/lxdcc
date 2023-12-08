@@ -4,7 +4,7 @@ import NodegraphAPI
 
 import re
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 
 class LookAssignsReplace(object):

@@ -3,7 +3,7 @@ import lxkatana
 
 lxkatana.set_reload()
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 f = '/data/e/myworkspace/td/lynxi/script/python/.setup/katana/Macros/lx_cameras.yml'
 

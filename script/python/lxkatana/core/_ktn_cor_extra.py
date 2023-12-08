@@ -1,9 +1,5 @@
 # coding:utf-8
-from .wrap import *
-
 import fnmatch
-
-import threading
 
 import collections
 
@@ -11,12 +7,18 @@ import lxbasic.core as bsc_core
 
 import lxcontent.core as ctt_core
 
-from lxutil import utl_core
+import lxgui.core as gui_core
 
-from lxkatana.core import _ktn_cor_base, _ktn_cor_node
+from .wrap import *
+
+from ..core import \
+    _ktn_cor_base, \
+    _ktn_cor_node
 
 
 class EventOpt(object):
+    KEY = 'event'
+
     class EventType(object):
         NodeCreate = 'node_create'
 
@@ -26,7 +28,7 @@ class EventOpt(object):
         self._event_type = event_type
 
     def register(self):
-        self.set_unregister()
+        self.deregister()
         #
         Utils.EventModule.RegisterEventHandler(
             handler=self._handler,
@@ -35,19 +37,19 @@ class EventOpt(object):
         )
         #
         bsc_core.Log.trace_method_result(
-            'event register',
-            'event-type="{}"'.format(self._event_type)
+            self.KEY,
+            'register for "{}"'.format(self._event_type)
         )
 
-    def set_unregister(self):
+    def deregister(self):
         if self.get_is_register() is True:
             Utils.EventModule.UnregisterEventHandler(
                 handler=self._handler,
                 eventType=self._event_type
             )
             bsc_core.Log.trace_method_result(
-                'event deregister',
-                'event-type="{}"'.format(self._event_type)
+                self.KEY,
+                'deregister for "{}"'.format(self._event_type)
             )
 
     def get_is_register(self):
@@ -58,29 +60,30 @@ class EventOpt(object):
 
 
 class CallbackOpt(object):
+    KEY = 'callback'
+
     def __init__(self, function, callback_type):
         self._function = function
         self._callback_type = callback_type
 
     def append(self):
+        bsc_core.Log.trace_method_result(
+            self.KEY,
+            'register for "{}"'.format(self._callback_type)
+        )
         Callbacks.addCallback(
             callbackType=self._callback_type,
             callbackFcn=self._function
         )
-        #
-        bsc_core.Log.trace_method_result(
-            'callback register',
-            'callback-type="{}"'.format(self._callback_type)
-        )
 
-    def set_delete(self):
+    def deregister(self):
+        bsc_core.Log.trace_method_result(
+            self.KEY,
+            'deregister for "{}"'.format(self._callback_type)
+        )
         Callbacks.delCallback(
             callbackType=self._callback_type,
             callbackFcn=self._function
-        )
-        bsc_core.Log.trace_method_result(
-            'callback deregister',
-            'callback-type="{}"'.format(self._callback_type)
         )
 
 
@@ -258,169 +261,6 @@ class EventMtd(object):
         for handler, event_type in ss:
             event_opt = EventOpt(handler=handler, event_type=event_type)
             event_opt.register()
-
-
-class ArnoldEventMtd(object):
-    DIRECTORY_KEY = 'user.extra.texture_directory'
-    DIRECTORY_VALUE = '/texture_directory'
-
-    # noinspection PyUnusedLocal
-    @classmethod
-    def on_material_create(cls, *args, **kwargs):
-        if kwargs['nodeType'] == 'NetworkMaterialCreate':
-            node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
-            cls._create_material_(node_opt)
-
-    @classmethod
-    def _create_material_(cls, node_opt):
-        """
-        # coding:utf-8
-        import lxkatana
-
-        lxkatana.set_reload()
-
-        from lxkatana import ktn_core
-
-        ktn_core.ArnoldEventMtd._create_material_(
-            ktn_core.NGObjOpt(
-                NodegraphAPI.GetNode('NetworkMaterialCreate')
-            )
-        )
-        :param node_opt:
-        :return:
-        """
-
-        def connect_fnc_():
-            _key = cls.DIRECTORY_KEY
-            # ignore when expression is enable
-            if node_opt.get_is_expression(_key) is True:
-                return False
-            # ignore when value is changed
-            if node_opt.get(_key) != cls.DIRECTORY_VALUE:
-                return False
-            # ignore parent is non-exists
-            _parent_opt = node_opt.get_parent_opt()
-            if not _parent_opt:
-                return False
-            # ignore parent has not directory
-            if not _parent_opt.get_port(_key):
-                return False
-            #
-            node_opt.set_expression(_key, 'getParent().{}'.format(_key))
-            return True
-
-        #
-        p_ns = [
-            (cls.DIRECTORY_KEY, dict(widget='file', value=cls.DIRECTORY_VALUE)),
-        ]
-        for i_p_n, i_p_r in p_ns:
-            if node_opt.get_port(i_p_n) is None:
-                _ktn_cor_node.NGObjOpt(node_opt.ktn_obj).create_port_by_data(
-                    i_p_n, i_p_r
-                )
-
-        connect_fnc_()
-
-    # noinspection PyUnusedLocal
-    @classmethod
-    def on_image_create(cls, *args, **kwargs):
-        if kwargs['nodeType'] == 'ArnoldShadingNode':
-            node_opt = _ktn_cor_node.NGObjOpt(kwargs['node'])
-            if node_opt.get('nodeType') in ['image']:
-                cls._create_image_(node_opt)
-
-    @classmethod
-    def _create_image_(cls, node_opt):
-        """
-        # coding:utf-8
-        import lxkatana
-
-        lxkatana.set_reload()
-
-        from lxkatana import ktn_core
-
-        ktn_core.ArnoldEventMtd._create_image_(
-            ktn_core.NGObjOpt(
-                NodegraphAPI.GetNode('image')
-            )
-        )
-        :param node_opt:
-        :return:
-        """
-
-        def connect_fnc_():
-            _key = cls.DIRECTORY_KEY
-            _parent_opt = node_opt.get_parent_opt()
-            if _parent_opt:
-                # ignore when expression is enable
-                if node_opt.get_is_expression(_key) is True:
-                    return False
-                if node_opt.get(_key) != cls.DIRECTORY_VALUE:
-                    return False
-                #
-                _parent_type = _parent_opt.get_type()
-                if _parent_type == 'NetworkMaterialCreate':
-                    if not _parent_opt.get(_key):
-                        return False
-                    #
-                    node_opt.set_expression(
-                        _key, 'getParent().{}'.format(_key)
-                    )
-                    return True
-                elif _parent_type == 'ShadingGroup':
-                    ___parent_opt = _parent_opt.get_parent_opt()
-                    if ___parent_opt.get_type() == 'NetworkMaterialCreate':
-                        if not ___parent_opt.get(_key):
-                            return False
-                        #
-                        node_opt.set_expression(
-                            _key, 'getParent().getParent().{}'.format(_key)
-                        )
-                        return True
-
-        def post_connect_fnc_():
-            _key = cls.DIRECTORY_KEY
-            #
-            if not node_opt.get(cls.DIRECTORY_KEY):
-                return False
-            #
-            if not node_opt.get('parameters.filename.value'):
-                node_opt.set(
-                    'parameters.filename.enable', 1
-                )
-                node_opt.set_expression(
-                    'parameters.filename.value', '{}+\'/tx\'+\'/texture_name.<udim>.tx\''.format(_key)
-                )
-                #
-                node_opt.set(
-                    'parameters.ignore_missing_textures.enable', 1
-                )
-                node_opt.set(
-                    'parameters.ignore_missing_textures.value', 1
-                )
-            #
-            node_opt.set_attributes(
-                dict(
-                    ns_colorr=0.3199999928474426,
-                    ns_colorg=0.07999999821186066,
-                    ns_colorb=0.3199999928474426
-                )
-            )
-
-        #
-        p_ns = [
-            (cls.DIRECTORY_KEY, dict(widget='file', value=cls.DIRECTORY_VALUE)),
-        ]
-        for i_p_n, i_p_r in p_ns:
-            if node_opt.get_port(i_p_n) is None:
-                _ktn_cor_node.NGObjOpt(node_opt.ktn_obj).create_port_by_data(
-                    i_p_n, i_p_r
-                )
-        #
-        connect_fnc_()
-        #
-        timer = threading.Timer(1, post_connect_fnc_)
-        timer.start()
 
 
 class CallbackMtd(object):
@@ -650,14 +490,14 @@ class WorkspaceSetting(object):
                         self.set_current_look_output(_n)
 
                     #
-                    w = utl_core.DccDialog.create(
+                    w = gui_core.GuiDialog.create(
                         'Workspace Setting',
                         content=(
                             'More then one "LookFileBake" in scene:\n'
                             '   1, choose one use as current\n'
                             '   2, press "Confirm" to continue'
                         ),
-                        status=utl_core.DccDialog.ValidationStatus.Warning,
+                        status=gui_core.GuiDialog.ValidationStatus.Warning,
                         options_configure=self._cfg.get('main.look.dialog_options'),
                         #
                         yes_method=yes_fnc_,
@@ -696,14 +536,14 @@ class WorkspaceSetting(object):
                             self.set_current_look_output(_n)
 
                         #
-                        w = utl_core.DccDialog.create(
+                        w = gui_core.GuiDialog.create(
                             'Workspace Setting',
                             content=(
                                 'More then one "LookFileBake" in scene:\n'
                                 '   1, choose one use as current\n'
                                 '   2, press "Confirm" to continue'
                             ),
-                            status=utl_core.DccDialog.ValidationStatus.Warning,
+                            status=gui_core.GuiDialog.ValidationStatus.Warning,
                             options_configure=self._cfg.get('main.look.dialog_options'),
                             #
                             yes_method=yes_fnc_,
@@ -727,46 +567,3 @@ class WorkspaceSetting(object):
                         return opts[0]
                 else:
                     return opts[0]
-
-
-class LayoutNodeHotKey(object):
-    """
-# coding:utf-8
-import lxkatana
-lxkatana.set_reload()
-
-from lxkatana import ktn_core
-
-ktn_core.LayoutNodeHotKey().register()
-    """
-    NAME = 'Layout Node'
-    ID = 'F4331532-D52B-11ED-8C7C-2CFDA1C062BB'
-    HOT_KEY = 'Alt+L'
-
-    def __init__(self):
-        self._ktn_gui = App.Tabs.FindTopTab('Node Graph')
-
-    def press_fnc(self, *args, **kwargs):
-        pass
-
-    @classmethod
-    def _release_fnc_(cls, ktn_gui):
-        ss = NodegraphAPI.GetAllSelectedNodes()
-        if ss:
-            group = ktn_gui.getEnteredGroupNode()
-            if group.getType() in {'NetworkMaterialCreate', 'ShadingGroup'}:
-                ss_ = [i_s for i_s in ss if i_s.getParent() == group]
-                _ktn_cor_node.NGGuiLayout(
-                    ss_
-                ).layout_shader_graph(
-                    size=(320, 320)
-                )
-
-    def release_fnc(self, *args, **kwargs):
-        ktn_gui = args[0]
-        self._release_fnc_(ktn_gui)
-
-    def register(self):
-        self._ktn_gui.registerKeyboardShortcut(
-            self.ID, self.NAME, self.HOT_KEY, self.press_fnc, self.release_fnc
-        )

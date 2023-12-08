@@ -88,7 +88,7 @@ class DDlMonitor(object):
     def set_create(cls, label, job_id, parent=None):
         import lxgui.proxy.widgets as prx_widgets
 
-        import lxwarp.deadline.core as ddl_core
+        import lxwrap.deadline.core as ddl_core
 
         w = prx_widgets.PrxMonitorWindow(parent=parent)
         w.set_window_title(
@@ -874,12 +874,12 @@ class KatanaLauncher(object):
         )
 
     def new_file(self, file_path):
-        from lxkatana import ktn_configure
+        from lxkatana.core import _ktn_cor_configure
 
         create_args = [
             '-c'
-            '"katana --script={} \"set_scene_new\" \"{}\""'.format(
-                ktn_configure.Data.SCRIPT_FILE, file_path
+            '"katana --script={}/process.py \"new_scene\" \"{}\""'.format(
+                _ktn_cor_configure.KtnBase.DATA_ROOT, file_path
             )
         ]
         cmd = ' '.join(create_args)
@@ -1086,8 +1086,8 @@ def get_is_ui_mode():
         from lxmaya import ma_core
         return ma_core.get_is_ui_mode()
     elif bsc_core.ApplicationMtd.get_is_katana():
-        from lxkatana import ktn_core
-        return ktn_core.get_is_ui_mode()
+        import lxkatana.core as ktn_core
+        return ktn_core.KtnUtil.get_is_ui_mode()
     return False
 
 

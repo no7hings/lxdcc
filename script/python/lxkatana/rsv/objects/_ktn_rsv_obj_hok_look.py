@@ -13,7 +13,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.fnc.exporters as ktn_fnc_exporters
 
@@ -84,7 +84,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def set_asset_look_klf_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
         #

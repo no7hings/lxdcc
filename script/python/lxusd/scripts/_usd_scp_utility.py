@@ -65,10 +65,10 @@ class ShotUsdCombine(object):
                     i_list = i_yaml_file_opt.set_read()
                     list_.extend([i_path + j for j in i_list])
                 else:
-                    i_file_path_ = bsc_core.StgFileMultiplyMtd.convert_to(
-                        i_file_path, ['*.####.{ext}']
+                    i_file_path_ = bsc_core.StgFileMtdForMultiply.convert_to(
+                        i_file_path, ['*.####.{format}']
                     )
-                    i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_unit_paths(
+                    i_file_tile_paths = bsc_core.StgFileMtdForMultiply.get_exists_unit_paths(
                         i_file_path_
                     )
                     i_list = []

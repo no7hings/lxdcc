@@ -1,5 +1,5 @@
 # coding:utf-8
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 

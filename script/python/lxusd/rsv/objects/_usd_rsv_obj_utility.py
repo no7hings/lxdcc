@@ -80,7 +80,7 @@ class RsvUsdAssetSetCreator(object):
 
     @classmethod
     def _get_shot_asset_cache(cls, rsv_asset, rsv_shot):
-        file_path = cls._get_shot_set_dress_file_path(rsv_shot)
+        file_path = cls._generate_shot_set_dress_usd_file_path_as_latest(rsv_shot)
         if file_path:
             yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'shot-asset/{}'.format(rsv_asset.name))
             file_opt = bsc_core.StgFileOpt(yml_file_path)
@@ -99,7 +99,7 @@ class RsvUsdAssetSetCreator(object):
 
         dict_ = collections.OrderedDict()
 
-        shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path(rsv_shot)
+        shot_set_dress_usd_file_path = cls._generate_shot_set_dress_usd_file_path_as_latest(rsv_shot)
         #
         # noinspection PyBroadException
         try:
@@ -189,14 +189,14 @@ class RsvUsdAssetSetCreator(object):
     def _get_shot_frame_range(cls, rsv_shot):
         import lxusd.core as usd_core
 
-        shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path(rsv_shot)
+        shot_set_dress_usd_file_path = cls._generate_shot_set_dress_usd_file_path_as_latest(rsv_shot)
         if shot_set_dress_usd_file_path:
             return usd_core.UsdStageOpt(
                 shot_set_dress_usd_file_path
             ).get_frame_range()
 
     @classmethod
-    def _get_asset_set_dress_file_path(cls, rsv_asset):
+    def _generate_asset_set_dress_usd_file_path_as_latest(cls, rsv_asset):
         rsv_asset_set_task = rsv_asset.get_rsv_task(
             step='set', task='registry'
         )
@@ -209,7 +209,7 @@ class RsvUsdAssetSetCreator(object):
             )
 
     @classmethod
-    def _get_shot_set_dress_file_path(cls, rsv_shot):
+    def _generate_shot_set_dress_usd_file_path_as_latest(cls, rsv_shot):
         rsv_shot_set_task = rsv_shot.get_rsv_task(
             step='set', task='registry'
         )
@@ -222,25 +222,31 @@ class RsvUsdAssetSetCreator(object):
             )
 
     @classmethod
-    def _get_asset_usd_file_path(cls, rsv_asset, rsv_scene_properties):
+    def _generate_asset_usd_file_path_as_new(cls, rsv_asset, rsv_scene_properties):
         if rsv_scene_properties:
             resolver = rsv_commands.get_resolver()
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
-            if workspace in [rsv_scene_properties.get('workspaces.source'),
-                             rsv_scene_properties.get('workspaces.user')]:
+            if workspace in {
+                rsv_scene_properties.get('workspaces.source'),
+                rsv_scene_properties.get('workspaces.user')
+            }:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-asset-set-usd-file'
                 )
                 # debug for usd update error, auto update version
                 usd_file_path = usd_file_rsv_unit.get_result(version='new')
-            elif workspace in [rsv_scene_properties.get('workspaces.release')]:
+            elif workspace in {
+                rsv_scene_properties.get('workspaces.release')
+            }:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-asset-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
-            elif workspace in [rsv_scene_properties.get('workspaces.temporary')]:
+            elif workspace in {
+                rsv_scene_properties.get('workspaces.temporary')
+            }:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-temporary-asset-set-usd-file'
                 )
@@ -255,25 +261,30 @@ class RsvUsdAssetSetCreator(object):
         return usd_file_path
 
     @classmethod
-    def _get_asset_usd_latest_file_path(cls, rsv_asset, rsv_scene_properties):
+    def _generate_asset_usd_file_path_as_latest(cls, rsv_asset, rsv_scene_properties):
         if rsv_scene_properties:
             resolver = rsv_commands.get_resolver()
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
-            if workspace in [rsv_scene_properties.get('workspaces.source'),
-                             rsv_scene_properties.get('workspaces.user')]:
+            if workspace in {
+                rsv_scene_properties.get('workspaces.source'),
+                rsv_scene_properties.get('workspaces.user')
+            }:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-source-asset-set-usd-file'
                 )
-                #
                 usd_file_path = usd_file_rsv_unit.get_result(version='latest')
-            elif workspace in [rsv_scene_properties.get('workspaces.release')]:
+            elif workspace in {
+                rsv_scene_properties.get('workspaces.release')
+            }:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-asset-set-usd-file'
                 )
                 usd_file_path = usd_file_rsv_unit.get_result(version=version)
-            elif workspace in [rsv_scene_properties.get('workspaces.temporary')]:
+            elif workspace in {
+                rsv_scene_properties.get('workspaces.temporary')
+            }:
                 usd_file_rsv_unit = rsv_task.get_rsv_unit(
                     keyword='asset-temporary-asset-set-usd-file'
                 )
@@ -288,7 +299,7 @@ class RsvUsdAssetSetCreator(object):
         return usd_file_path
 
     @classmethod
-    def _get_asset_shot_usd_file_path(cls, rsv_asset, rsv_shot, rsv_scene_properties):
+    def _generate_asset_shot_usd_file_path_as_new(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         usd_file_path = None
         if rsv_scene_properties:
             resolver = rsv_commands.get_resolver()
@@ -341,12 +352,12 @@ class RsvUsdAssetSetCreator(object):
 
     @classmethod
     def _get_asset_usd_set_dress_variant_dict(cls, rsv_asst):
-        usd_file_path = cls._get_asset_set_dress_file_path(rsv_asst)
+        usd_file_path = cls._generate_asset_set_dress_usd_file_path_as_latest(rsv_asst)
         return cls._get_usd_file_variant_dict(usd_file_path)
 
     @classmethod
     def _get_asset_usd_set_dress_variant_cache(cls, rsv_asset):
-        file_path = cls._get_asset_set_dress_file_path(rsv_asset)
+        file_path = cls._generate_asset_set_dress_usd_file_path_as_latest(rsv_asset)
         if file_path:
             yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'asset-versions/{}'.format(rsv_asset.name))
             file_opt = bsc_core.StgFileOpt(yml_file_path)
@@ -363,7 +374,7 @@ class RsvUsdAssetSetCreator(object):
 
     @classmethod
     def _get_shot_usd_set_dress_variant_dict(cls, rsv_shot):
-        usd_file_path = cls._get_shot_set_dress_file_path(rsv_shot)
+        usd_file_path = cls._generate_shot_set_dress_usd_file_path_as_latest(rsv_shot)
         return cls._get_usd_file_variant_dict(usd_file_path)
 
     @classmethod
@@ -411,7 +422,7 @@ class RsvUsdAssetSetCreator(object):
         usd_stage_opt = usd_core.UsdStageOpt(asset_usd_file_path)
         usd_prim_opt = usd_core.UsdPrimOpt(usd_stage_opt.get_obj('/master'))
         usd_variant_dict = usd_prim_opt.get_variant_dict()
-        asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path(rsv_asset)
+        asset_set_dress_usd_file_path = cls._generate_asset_set_dress_usd_file_path_as_latest(rsv_asset)
         if asset_set_dress_usd_file_path:
             variants_mapper = cls.VARIANTS_MAPPER
         else:
@@ -502,7 +513,6 @@ class RsvUsdAssetSetCreator(object):
     def _update_asset_component_variants(cls, configure, rsv_asset):
         rsv_tasks = rsv_asset.get_rsv_tasks(task='mod_var_*')
         if rsv_tasks:
-            print rsv_tasks
             for i_rsv_task in rsv_tasks:
                 i_key = i_rsv_task.get_name()
                 configure.set(
@@ -580,49 +590,18 @@ class RsvUsdAssetSetCreator(object):
 
     @classmethod
     def _create_asset_usd_file(cls, rsv_asset, rsv_scene_properties):
-        asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path(rsv_asset)
-
-        usd_file_path = cls._get_asset_usd_file_path(
+        usd_file_path = cls._generate_asset_usd_file_path_as_new(
             rsv_asset,
             rsv_scene_properties
         )
-        key = 'usda/asset-set-v002'
-
-        t = rsc_core.ResourceJinja.get_template(
-            key
-        )
-
-        c = rsc_core.ResourceJinja.get_configure(
-            key
-        )
-
-        c.set('file', usd_file_path)
-        c.set('asset.project', rsv_asset.get('project'))
-        c.set('asset.role', rsv_asset.get('role'))
-        c.set('asset.name', rsv_asset.get('asset'))
-        #
-        c.set('asset.set_file', asset_set_dress_usd_file_path)
-
-        cls._update_asset_all_variants(
-            c, rsv_asset, rsv_scene_properties
-        )
-
-        c.do_flatten()
-        #
-        new_raw = t.render(
-            c.value
-        )
-        #
-        bsc_core.StgFileOpt(
-            usd_file_path
-        ).set_write(
-            new_raw
+        cls._create_asset_usd_file_fnc(
+            usd_file_path, rsv_asset, rsv_scene_properties
         )
         return usd_file_path
 
     @classmethod
     def _create_asset_usd_file_fnc(cls, usd_file_path, rsv_asset, rsv_scene_properties):
-        asset_set_dress_usd_file_path = cls._get_asset_set_dress_file_path(rsv_asset)
+        asset_set_dress_usd_file_path = cls._generate_asset_set_dress_usd_file_path_as_latest(rsv_asset)
 
         key = 'usda/asset-set-v003'
 
@@ -663,9 +642,9 @@ class RsvUsdAssetSetCreator(object):
     def _create_asset_shot_usd_file(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         import lxusd.core as usd_core
 
-        shot_set_dress_usd_file_path = cls._get_shot_set_dress_file_path(rsv_shot)
+        shot_set_dress_usd_file_path = cls._generate_shot_set_dress_usd_file_path_as_latest(rsv_shot)
         if shot_set_dress_usd_file_path:
-            asset_shot_set_usd_file_path = cls._get_asset_shot_usd_file_path(
+            asset_shot_set_usd_file_path = cls._generate_asset_shot_usd_file_path_as_new(
                 rsv_asset, rsv_shot,
                 rsv_scene_properties
             )

@@ -86,7 +86,7 @@ class AbsContent(object):
                 else:
                     self.__value = self.VALUE_DEFAULT
             else:
-                raise OSError(
+                raise IOError(
                     'file is not found: "{}"'.format(value)
                 )
 
@@ -362,6 +362,9 @@ class AbsContent(object):
         return self.__class__(
             self.__key, copy.deepcopy(self.__value, memo)
         )
+
+    def items(self):
+        return self.__value.items()
 
 
 class Content(AbsContent):

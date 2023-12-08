@@ -140,7 +140,7 @@ class ScpGeneralPublish(object):
             with self._window.gui_progressing(maximum=len(file_paths), label='export image') as g_p:
                 for i_index, i_file_path in enumerate(file_paths):
                     g_p.do_update()
-                    i_file_tile_paths = bsc_core.StgFileMultiplyMtd.get_exists_unit_paths(i_file_path)
+                    i_file_tile_paths = bsc_core.StgFileMtdForMultiply.get_exists_unit_paths(i_file_path)
                     for j_file_path in i_file_tile_paths:
                         j_file_opt = bsc_core.StgFileOpt(j_file_path)
                         j_file_path_tgt = '{}/{}'.format(
@@ -294,7 +294,7 @@ class ScpAssetSurfacePublish(object):
 
         if bsc_core.ApplicationMtd.get_is_katana():
             import lxkatana.core as ktn_core
-            option_opt.set('katana_version', ktn_core.get_katana_version())
+            option_opt.set('katana_version', ktn_core.KtnUtil.get_katana_version())
 
         ssn_commands.set_option_hook_execute_by_deadline(
             option=option_opt.to_string()

@@ -7,7 +7,7 @@ from lxutil import utl_configure
 
 import lxresolver.commands as rsv_commands
 
-import lxwarp.shotgun.core as wrp_stg_core
+import lxwrap.shotgun.core as wrp_stg_core
 
 import lxresolver.scripts as rsv_scripts
 

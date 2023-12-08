@@ -1,12 +1,9 @@
 # coding:utf-8
-# noinspection PyUnresolvedReferences
-import NodegraphAPI
-
 import lxbasic.core as bsc_core
 
 import lxcontent.core as ctt_core
 
-from lxkatana import ktn_configure, ktn_core
+import lxkatana.core as ktn_core
 
 from lxkatana.dcc import ktn_dcc_obj_abs
 
@@ -19,7 +16,7 @@ class Port(ktn_dcc_obj_abs.AbsKtnPort):
 
 
 class Connection(ktn_dcc_obj_abs.AbsKtnObjConnection):
-    PORT_PATHSEP = ktn_configure.Util.PORT_PATHSEP
+    PORT_PATHSEP = ktn_core.KtnUtil.PORT_PATHSEP
 
     def __init__(self, source, target):
         super(Connection, self).__init__(source, target)

@@ -13,6 +13,8 @@ from ._ktn_scp_render import *
 
 from ._ktn_scp_callback import *
 
+from ._ktn_scp_event import *
+
 from ._ktn_scp_workspace import *
 
 

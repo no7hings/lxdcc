@@ -37,8 +37,8 @@ class ScpResourcesAddByQuixel(object):
     #
     ALL_CATEGORY_GROUPS = TEXTURE_CATEGORY_GROUPS+ASSET_CATEGORY_GROUPS
     #
-    TEXTURE_PATTERN = '{texture_key}_{texture_size_tag}K_{texture_type_tag}.{ext}'
-    TEXTURE_LOD_PATTERN = '{texture_key}_{texture_size_tag}K_{texture_type_tag}_LOD{lod_level}.{ext}'
+    TEXTURE_PATTERN = '{texture_key}_{texture_size_tag}K_{texture_type_tag}.{format}'
+    TEXTURE_LOD_PATTERN = '{texture_key}_{texture_size_tag}K_{texture_type_tag}_LOD{lod_level}.{format}'
     #
     TEXTURE_EXTRA_KEYS = [
         'Atlas',
@@ -48,7 +48,7 @@ class ScpResourcesAddByQuixel(object):
     TEXTURE_EXTRA_PATTERN = TEXTURE_PATTERN
     TEXTURE_EXTRA_LOD_PATTERN = TEXTURE_LOD_PATTERN
     #
-    GEOMETRY_LOD_PATTERN = '{geometry_key}_LOD{lod_level}.{ext}'
+    GEOMETRY_LOD_PATTERN = '{geometry_key}_LOD{lod_level}.{format}'
     GEOMETRY_VAR_KEY = 'Var{var_index}'
     GEOMETRY_VAR_PATTERN = ''
     GEOMETRY_VAR_LOD_PATTERN = '{key_extra}_LOD{lod_level}.{format}'
@@ -352,8 +352,8 @@ class ScpResourcesAddByQuixel(object):
     # texture
     @classmethod
     def stg_and_dtb_add_textures_fnc(
-            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
-            ):
+        cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+    ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-texture-dir')
         #
         quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
@@ -409,9 +409,9 @@ class ScpResourcesAddByQuixel(object):
 
     @classmethod
     def stg_and_dtb_add_any_texture_fnc(
-            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, keyword,
-            is_lod
-            ):
+        cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, keyword,
+        is_lod
+    ):
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
         pattern_kwargs_src = copy.copy(pattern_kwargs)
         variants_src = pattern_opt_src.get_variants(file_path_src)
@@ -439,8 +439,8 @@ class ScpResourcesAddByQuixel(object):
 
     @classmethod
     def dtb_create_any_texture_fnc(
-            cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, texture_type_tag, keyword
-            ):
+        cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, texture_type_tag, keyword
+    ):
         key = 'texture_{}_file'.format(texture_type_tag)
         # texture
         file_dtb_path = '{}/{}'.format(version_dtb_path, key)
@@ -482,8 +482,8 @@ class ScpResourcesAddByQuixel(object):
     # texture extra
     @classmethod
     def stg_and_dtb_add_textures_extra_fnc(
-            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
-            ):
+        cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+    ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-texture-dir')
         #
         quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
@@ -521,9 +521,9 @@ class ScpResourcesAddByQuixel(object):
 
     @classmethod
     def stg_and_dtb_add_any_texture_extra_fnc(
-            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src,
-            key_extra, keyword
-            ):
+        cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src,
+        key_extra, keyword
+    ):
         key_extra = key_extra.lower()
         #
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
@@ -553,8 +553,8 @@ class ScpResourcesAddByQuixel(object):
 
     @classmethod
     def dtb_create_any_texture_extra_fnc(
-            cls, dtb_opt, resource_dtb_path, version_dtb_path, texture_type_tag, file_stg_path, key_extra, keyword
-            ):
+        cls, dtb_opt, resource_dtb_path, version_dtb_path, texture_type_tag, file_stg_path, key_extra, keyword
+    ):
         key = '{}/texture_{}_file'.format(key_extra, texture_type_tag)
         # file
         file_dtb_path = '{}/{}'.format(version_dtb_path, key)
@@ -596,8 +596,8 @@ class ScpResourcesAddByQuixel(object):
     # geometry
     @classmethod
     def stg_and_dtb_add_geometries_fnc(
-            cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
-            ):
+        cls, dtb_opt, pattern_kwargs, resource_dtb_path, version_dtb_path, directory_path_src
+    ):
         quixel_directory_p_opt_tgt = dtb_opt.get_pattern_opt('quixel-geometry-dir')
         #
         quixel_directory_path_tgt = quixel_directory_p_opt_tgt.update_variants_to(**pattern_kwargs).get_value()
@@ -641,9 +641,9 @@ class ScpResourcesAddByQuixel(object):
 
     @classmethod
     def stg_and_dtb_add_any_geometry_fnc(
-            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, ext,
-            keyword, is_lod
-            ):
+        cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src, file_format,
+        keyword, is_lod
+    ):
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
         pattern_kwargs_src = copy.copy(pattern_kwargs)
         variants_src = pattern_opt_src.get_variants(file_path_src)
@@ -661,12 +661,12 @@ class ScpResourcesAddByQuixel(object):
                 dtb_opt,
                 resource_dtb_path, version_dtb_path,
                 file_stg_path,
-                ext, keyword
+                file_format, keyword
             )
 
     @classmethod
-    def dtb_create_any_geometry_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, ext, keyword):
-        key = 'geometry_{}_file'.format(ext)
+    def dtb_create_any_geometry_fnc(cls, dtb_opt, resource_dtb_path, version_dtb_path, file_stg_path, file_format, keyword):
+        key = 'geometry_{}_file'.format(file_format)
         # file
         file_dtb_path = '{}/{}'.format(version_dtb_path, key)
         dtb_opt.create_storage(
@@ -687,7 +687,7 @@ class ScpResourcesAddByQuixel(object):
             file_dtb_path, 'version', version_dtb_path, kind=dtb_opt.Kinds.File
         )
         # file format
-        texture_type_tag_dtb_path = '/geometry/{}'.format(ext)
+        texture_type_tag_dtb_path = '/geometry/{}'.format(file_format)
         dtb_opt.create_tag_assign(
             resource_dtb_path, texture_type_tag_dtb_path, kind=dtb_opt.Kinds.ResourceFileTag
         )
@@ -763,9 +763,9 @@ class ScpResourcesAddByQuixel(object):
 
     @classmethod
     def stg_and_dtb_add_any_geometry_var_fnc(
-            cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src,
-            var_index, ext, keyword, is_var, is_lod
-            ):
+        cls, dtb_opt, pattern_kwargs, pattern_opt_src, resource_dtb_path, version_dtb_path, file_path_src,
+        var_index, file_format, keyword, is_var, is_lod
+    ):
         pattern_opt_tgt = dtb_opt.get_pattern_opt(keyword)
         #
         pattern_kwargs_src = copy.copy(pattern_kwargs)
@@ -786,7 +786,7 @@ class ScpResourcesAddByQuixel(object):
                 dtb_opt,
                 resource_dtb_path, version_dtb_path,
                 file_stg_path,
-                ext, keyword
+                file_format, keyword
             )
 
 
@@ -822,9 +822,3 @@ if __name__ == '__main__':
     # scp.add_resources_from(
     #     '/l/temp/zeqi/lib/atlas'
     # )
-
-    # scp = ScpTextureResourceData(
-    #     '/l/resource/library/texture/all/surface/concrete_damaged_pkngj0/v0001/texture/acescg/tx'
-    # )
-    #
-    # print scp.get_data()

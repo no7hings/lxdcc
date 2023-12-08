@@ -13,6 +13,8 @@ import lxdatabase.core as dtb_core
 
 import lxcontent.core as ctt_core
 
+import lxwrap.texture.core as txr_core
+
 
 class DtbBaseOpt(object):
     PATHSEP = '/'
@@ -813,9 +815,10 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
 
 
 class DtbNodeOpt(object):
-    def __init__(self, dtb_opt, dtb_entity):
+    def __init__(self, dtb_opt, dtb_entity, new_connection=False):
         self._dtb_opt = dtb_opt
         self._dtb_entity = dtb_entity
+        self._new_connection = new_connection
 
     def get(self, key):
         return self._dtb_opt.get_entity(
@@ -824,7 +827,7 @@ class DtbNodeOpt(object):
                 ('node', 'is', self._dtb_entity.path),
                 ('port', 'is', key),
             ],
-            new_connection=False
+            new_connection=self._new_connection
         ).value
 
     def get_as_node(self, key):
@@ -833,7 +836,7 @@ class DtbNodeOpt(object):
             filters=[
                 ('path', 'is', self.get(key)),
             ],
-            new_connection=False
+            new_connection=self._new_connection
         )
 
 
@@ -896,25 +899,34 @@ class DtbVersionOpt(object):
             return path
         return bsc_core.ExtendResource.get('asset/library/preview-material.usda')
 
+    @classmethod
+    def _get_texture_args(cls, directory_path):
+        directory_opt = bsc_core.StgDirectoryOpt(directory_path)
+        texture_paths = directory_opt.get_file_paths(ext_includes=['.jpg'])
+        if texture_paths:
+            texture_path = texture_paths[0]
+            m = txr_core.TxrMethodForBuild.generate_instance()
+            return m.get_texture_args(texture_path)
+
     def get_texture_preview_assigns(self):
-        dict_ = {}
-        for i_key in bsc_core.BscTextureTypes.All:
-            i_dtb_path = '{}/texture_{}_file'.format(self._dtb_version.path, i_key)
-            i_file_path = self._dtb_opt.get_property(
-                i_dtb_path, 'location'
-            )
-            if i_file_path is not None:
-                i_file_opt = bsc_core.StgFileOpt(i_file_path)
-                if i_file_opt.get_ext() == '.exr':
-                    i_file_opt = i_file_opt.set_ext_repath_to('.jpg')
-                #
-                if i_file_opt.get_is_file() is True:
-                    # map to usd key
-                    if i_key in bsc_core.BscTextureTypes.UsdPreviewMapper:
-                        i_key = bsc_core.BscTextureTypes.UsdPreviewMapper[i_key]
-                    #
-                    dict_[i_key] = i_file_opt.get_path()
-        return dict_
+        storage_dtb_path = '{}/{}'.format(self._dtb_version.path, 'texture_original_src_directory')
+        dtb_storage = self._dtb_opt.get_entity(
+            entity_type=self._dtb_opt.EntityTypes.Storage,
+            filters=[
+                ('path', 'is', storage_dtb_path)
+            ]
+        )
+        dtb_storage_opt = DtbNodeOpt(self._dtb_opt, dtb_storage, new_connection=True)
+        directory_stg_path = dtb_storage_opt.get('location')
+        texture_args = self._get_texture_args(directory_stg_path)
+        if texture_args:
+            texture_name, texture_data = texture_args
+            if texture_data:
+                dict_ = {}
+                for k, v in texture_data.items():
+                    dict_[k] = v[0]
+                return dict_
+        return {}
 
     def get_scene_maya_file(self):
         p = self._dtb_opt.get_pattern(keyword='scene-maya-file')

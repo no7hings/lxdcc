@@ -9,7 +9,7 @@ import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
 import lxmaya.fnc.exporters as mya_fnc_exporter
 
-import lxwarp.shotgun.core as wrp_stg_core
+import lxwrap.shotgun.core as wrp_stg_core
 
 f = mya_dcc_objects.Scene.get_current_file_path()
 

@@ -219,7 +219,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         return dcc_location
 
     def execute_shotgun_check(self, validation_checker):
-        import lxwarp.shotgun.core as wrp_stg_core
+        import lxwrap.shotgun.core as wrp_stg_core
 
         check_group = 'Shotgun Check'
 
@@ -617,7 +617,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         from lxutil import utl_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -648,7 +648,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             root_location = '/assets'
             location = '{}{}'.format(geometry_location, root_location)
         #
-        if ktn_core.get_is_ui_mode() is True:
+        if ktn_core.KtnUtil.get_is_ui_mode() is True:
             file_path = ktn_dcc_objects.Scene.get_current_file_path()
             if ktn_dcc_objects.Scene.get_scene_is_dirty():
                 w = utl_core.DccDialog.create(
@@ -681,7 +681,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def execute_katana_geometry_check(self, validation_checker):
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
 
@@ -750,7 +750,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def execute_katana_geometry_topology_check(self, validation_checker):
         from lxutil import utl_configure
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
@@ -854,7 +854,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
 
     def execute_katana_look_check(self, validation_checker):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
 
@@ -887,7 +887,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
 
     def execute_katana_texture_check(self, validation_checker):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -919,7 +919,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             self.dcc_texture_check_fnc(validation_checker, check_group, dcc_objs)
 
     def execute_katana_texture_workspace_check(self, validation_checker):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 

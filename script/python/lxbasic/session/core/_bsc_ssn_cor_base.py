@@ -127,6 +127,7 @@ class AbsSsnGener(
         self._hook_shell_file_path = None
 
         self._gui_widget = None
+        self._prx_window = None
 
         self._init_environment_base_def_()
         self._init_configure_base_def_()
@@ -303,6 +304,12 @@ class AbsSsnGener(
 
     def set_gui(self, widget):
         self._gui_widget = widget
+
+    def set_prx_window(self, prx_window):
+        self._prx_window = prx_window
+
+    def get_prx_window(self):
+        return self._prx_window
 
     def gui_execute_shell_script(self, cmd):
         if self._gui_widget is not None:

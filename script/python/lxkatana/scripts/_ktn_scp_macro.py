@@ -11,11 +11,11 @@ class _MacroMtd(object):
     def set_warning_show(cls, label, contents):
         from lxutil import utl_core
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         if contents:
-            if ktn_core.get_is_ui_mode():
+            if ktn_core.KtnUtil.get_is_ui_mode():
                 utl_core.DccDialog.create(
                     label,
                     content=u'\n'.join(contents),
@@ -37,7 +37,7 @@ class LxCameraAlembic(object):
         self._ktn_obj = ktn_obj
 
     def set_reset(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -60,7 +60,7 @@ class LxCameraAlembic(object):
         # adjustScreenWindow=Adjust width to match resolution
         import lxresolver.commands as rsv_commands
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -109,7 +109,7 @@ class LxRenderSettings(object):
     def set_render_output(self):
         import lxresolver.commands as rsv_commands
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -167,7 +167,7 @@ class LxAsset(object):
         self._ktn_obj = ktn_obj
 
     def set_reset(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -191,7 +191,7 @@ class LxAsset(object):
         #
         import lxresolver.commands as rsv_commands
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -224,7 +224,7 @@ class LxAsset(object):
                 self.__set_rsv_asset_shots_(rsv_asset)
 
         if content is not None:
-            if ktn_core.get_is_ui_mode():
+            if ktn_core.KtnUtil.get_is_ui_mode():
                 utl_core.DccDialog.create(
                     'Shot Asset Loader',
                     content=content,
@@ -275,7 +275,7 @@ class LxAsset(object):
                 return rsv_asset
 
     def _get_rsv_shot_auto_(self, rsv_asset):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxusd.rsv.objects as usd_rsv_objects
 
@@ -290,7 +290,7 @@ class LxAsset(object):
             return rsv_shots[0]
 
     def __set_rsv_asset_(self, rsv_asset):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
@@ -299,7 +299,7 @@ class LxAsset(object):
         )
 
     def __set_rsv_asset_shots_(self, rsv_asset):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxusd.rsv.objects as usd_rsv_objects
 
@@ -312,7 +312,7 @@ class LxAsset(object):
             )
 
     def __set_asset_usd_create_(self, rsv_asset):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -356,7 +356,7 @@ class LxAsset(object):
         CacheManager.flush()
 
     def __set_asset_shot_usd_create_(self, rsv_asset, rsv_shot):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -427,7 +427,7 @@ class LxAsset(object):
         CacheManager.flush()
 
     def __set_asset_info_update_(self, rsv_task):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -436,7 +436,7 @@ class LxAsset(object):
             obj_opt.set('lynxi_properties.{}'.format(k), v)
 
     def __set_usd_variant_by_dict_(self, dict_):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -453,7 +453,7 @@ class LxAsset(object):
             )
 
     def set_create(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -472,7 +472,7 @@ class LxAsset(object):
     def __set_asset_create_(self):
         from lxutil import utl_core
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         content = None
@@ -492,7 +492,7 @@ class LxAsset(object):
             self.__set_asset_usd_create_(rsv_asset)
         #
         if content is not None:
-            if ktn_core.get_is_ui_mode():
+            if ktn_core.KtnUtil.get_is_ui_mode():
                 utl_core.DccDialog.create(
                     'Shot Asset Loader',
                     content=content,
@@ -506,7 +506,7 @@ class LxAsset(object):
     def __set_asset_shot_create_(self):
         from lxutil import utl_core
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxusd.rsv.objects as usd_rsv_objects
 
@@ -533,7 +533,7 @@ class LxAsset(object):
                 rsv_shot = self._get_rsv_shot_auto_(rsv_asset)
 
             if rsv_asset and rsv_shot:
-                shot_set_dress_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._get_shot_set_dress_file_path(
+                shot_set_dress_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._generate_shot_set_dress_usd_file_path_as_latest(
                     rsv_shot
                 )
                 if shot_set_dress_usd_file_path:
@@ -547,7 +547,7 @@ class LxAsset(object):
                 content = u'asset="{}" shot(s) is non-exists'.format(rsv_asset.path)
         #
         if content is not None:
-            if ktn_core.get_is_ui_mode():
+            if ktn_core.KtnUtil.get_is_ui_mode():
                 utl_core.DccDialog.create(
                     'Shot Asset Loader',
                     content=content,
@@ -561,7 +561,7 @@ class LxAsset(object):
     def set_translate_to_center(self):
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -643,7 +643,7 @@ class LxAssetAss(object):
     def set_guess(self):
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxresolver.commands as rsv_commands
 
@@ -711,7 +711,7 @@ class LxAssetAss(object):
     def set_ass_export(self):
         from lxutil import utl_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         #
@@ -728,7 +728,7 @@ class LxAssetAss(object):
         rss.interactiveOutputs = True
         rss.interactiveMode = True
         #
-        if not ktn_core.get_is_ui_mode():
+        if not ktn_core.KtnUtil.get_is_ui_mode():
             Manifest.Nodes2DAPI.CreateExternalRenderListener(15900)
         #
         if scheme == 'static':
@@ -769,7 +769,7 @@ class LxGeometrySettings(object):
         self._ktn_obj = ktn_obj
 
     def set_reset(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
@@ -783,7 +783,7 @@ class LxGeometrySettings(object):
     def set_usd_guess(self):
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         contents = []
 
@@ -838,14 +838,14 @@ class LxGeometrySettings(object):
         )
 
     def _get_usd_file_path_(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
         return stage_opt.get('/root/world/geo.info.usdOpArgs.fileName')
 
     def set_create(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
@@ -873,7 +873,7 @@ class LxGeometrySettings(object):
         )
 
     def _set_override_usd_create_(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxusd.scripts as us_scripts
 
@@ -894,7 +894,7 @@ class LxCamera(object):
         self._ktn_obj = ktn_obj
 
     def set_reset(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -913,7 +913,7 @@ class LxCamera(object):
         #
         import lxresolver.commands as rsv_commands
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -974,7 +974,7 @@ class LxCamera(object):
         )
 
     def set_variable_register(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         camera_scheme = ktn_core.NGObjOpt(self._ktn_obj).get_port_raw(
@@ -1007,7 +1007,7 @@ class LxCamera(object):
 
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
@@ -1062,7 +1062,7 @@ class LxCamera(object):
     def set_front_fill_to_all(self):
         import lxusd.core as usd_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
@@ -1147,7 +1147,7 @@ class LxRenderer(object):
     def _set_create_(self):
         import collections
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         variants_dic = collections.OrderedDict()
@@ -1213,12 +1213,12 @@ class LxRenderer(object):
             )
 
     def _set_clear_(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         [ktn_core.NGObjOpt(i).set_delete() for i in ktn_core.NGObjOpt(self._ktn_obj).get_children()]
 
     def set_refresh(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         variants = ktn_core.VariablesSetting().get_variants()
 
@@ -1261,19 +1261,19 @@ class LxVariant(object):
         self._ktn_obj = ktn_obj
 
     def _get_key_(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         return ktn_core.NGObjOpt(self._ktn_obj).get_port_raw('variableName')
 
     @classmethod
     def _get_values_(cls, ktn_obj):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         ktn_port = ktn_core.NGObjOpt(ktn_obj).get_port('patterns')
         return [ktn_core.NGPortOpt(i).get() for i in ktn_core.NGObjOpt(ktn_port).get_children()]
 
     def set_variable_register(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         key = self._get_key_()
         values = self._get_values_(self._ktn_obj)
@@ -1287,7 +1287,7 @@ class LxVariantChoose(object):
         self._ktn_obj = ktn_obj
 
     def _set_value_update_(self, values):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -1301,7 +1301,7 @@ class LxVariantChoose(object):
             )
 
     def set_variable_value_load(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -1335,7 +1335,7 @@ class LxWorkspace(object):
         self._ktn_obj = ktn_obj
 
     def set_workspace_create(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         import lxkatana.fnc.creators as ktn_fnc_creators
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
@@ -1359,7 +1359,7 @@ class LxLight(object):
         #
         import lxresolver.commands as rsv_commands
         #
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -1392,7 +1392,7 @@ class LxLight(object):
             self.__set_rsv_asset_(rsv_asset)
 
     def __set_rsv_asset_(self, rsv_asset):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
@@ -1404,7 +1404,7 @@ class LxLight(object):
         pass
 
     def set_refresh_light_rig(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxshotgun.rsv.scripts as stg_rsv_scripts
 
@@ -1452,7 +1452,7 @@ class LxLight(object):
         )
 
     def set_load_light_rig(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
         asset = obj_opt.get('lights.light_rig.name')
@@ -1460,7 +1460,7 @@ class LxLight(object):
         self._set_load_from_asset_light_rig_(asset)
 
     def _set_load_from_asset_light_rig_(self, light_rig_asset):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         contents = []
 
@@ -1506,11 +1506,11 @@ class LxLight(object):
         )
 
     def set_live_groups_update(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
-        children = obj_opt.get_children(include_type_names=['LiveGroup'])
+        children = obj_opt.get_children(type_includes=['LiveGroup'])
 
         for i in children:
             i.reloadFromSource()

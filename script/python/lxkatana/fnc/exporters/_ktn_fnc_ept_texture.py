@@ -28,7 +28,7 @@ class FncRenderTextureExporter(
         self._location = self.get('location')
 
     def execute(self):
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.scripts as ktn_scripts
         #

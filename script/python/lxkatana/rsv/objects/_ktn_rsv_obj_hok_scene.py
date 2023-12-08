@@ -12,6 +12,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxkatana.scripts as ktn_scripts
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -52,6 +53,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     def execute_asset_scene_export(self):
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -94,15 +96,17 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
         return scene_src_file_path
+
     # for render
     def set_asset_scene_create(self):
         import fnmatch
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
         import lxkatana.fnc.creators as ktn_fnc_creators
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -276,6 +280,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxbasic.core as bsc_core
         #
         import lxutil.dcc.dcc_objects as utl_dcc_objects
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -368,6 +373,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxusd.core as usd_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
         #
         s = usd_core.UsdStageOpt()
         geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
@@ -432,6 +438,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxusd.core as usd_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+
         #
         s = usd_core.UsdStageOpt()
         geometry_usd_var_file_rsv_unit = self._rsv_task.get_rsv_unit(
@@ -487,9 +494,9 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         width, height = int(w*50*multipy), int(h*50*multipy)
         #
-        p = float(height) / float(width)
+        p = float(height)/float(width)
         width = max(min(width, 4096), 512)
-        height = int(p * width)
+        height = int(p*width)
         #
         dcc_camera.set(
             'cameras.front.render_resolution', '{}x{}'.format(width, height)

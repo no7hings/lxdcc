@@ -9,6 +9,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 class ScpTextureCreate(object):
     def __init__(self):
         pass
+
     @staticmethod
     def setup():
         # arnold
@@ -25,6 +26,7 @@ class ScpTextureCreate(object):
         bsc_core.EnvironMtd.set(
             'OCIO', '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
         )
+
     @classmethod
     def to_exr_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
         bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
@@ -52,6 +54,7 @@ class ScpTextureCreate(object):
                 # kwargs
                 use_update_mode=use_update_mode
             )
+
     @classmethod
     def to_exr_as_acescg(cls, file_path_src, file_path_tgt, use_update_mode=True):
         utl_dcc_objects.OsTexture._create_unit_exr_as_acescg_(
@@ -59,6 +62,7 @@ class ScpTextureCreate(object):
             file_path_tgt,
             use_update_mode=use_update_mode
         )
+
     #
     @classmethod
     def get_exr_create_data_by_directory(cls, directory_path_src, formats=None):
@@ -75,9 +79,12 @@ class ScpTextureCreate(object):
         for i_index, i_file_path_src in enumerate(file_paths_src):
             list_.append(i_file_path_src)
         return list_
+
     #
     @classmethod
-    def get_exr_create_cmds_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
+    def get_exr_create_cmds_by_directory_as_acescg(
+            cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True
+            ):
         list_ = []
         bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
         #
@@ -98,6 +105,7 @@ class ScpTextureCreate(object):
                 cls.get_exr_create_cmd_as_acescg(i_file_path_src, i_file_path_tgt, use_update_mode=use_update_mode)
             )
         return list_
+
     @classmethod
     def get_exr_create_cmd_as_acescg(cls, file_path_src, file_path_tgt, use_update_mode=True):
         return utl_dcc_objects.OsTexture._get_unit_exr_create_cmd_as_acescg_(
@@ -105,6 +113,7 @@ class ScpTextureCreate(object):
             file_path_tgt,
             use_update_mode=use_update_mode
         )
+
     # tx
     @classmethod
     def to_tx_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
@@ -133,6 +142,7 @@ class ScpTextureCreate(object):
                 # kwargs
                 use_update_mode=use_update_mode
             )
+
     @classmethod
     def to_tx_as_acescg(cls, file_path_src, file_path_tgt, use_update_mode=True):
         utl_dcc_objects.OsTexture._create_unit_tx_as_acescg_(
@@ -140,8 +150,11 @@ class ScpTextureCreate(object):
             file_path_tgt,
             use_update_mode=use_update_mode
         )
+
     @classmethod
-    def get_tx_create_cmds_by_directory_as_acescg(cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True):
+    def get_tx_create_cmds_by_directory_as_acescg(
+            cls, directory_path_src, directory_path_tgt, formats=None, use_update_mode=True
+            ):
         list_ = []
         bsc_core.StgDirectoryOptExtra(directory_path_tgt).set_create()
         #
@@ -163,6 +176,7 @@ class ScpTextureCreate(object):
                 cls.get_tx_create_cmd_as_acescg(i_file_path_src, i_file_path_tgt, use_update_mode=use_update_mode)
             )
         return list_
+
     @classmethod
     def get_tx_create_cmd_as_acescg(cls, file_path_src, file_path_tgt, use_update_mode=True):
         return utl_dcc_objects.OsTexture._get_unit_tx_create_cmd_as_acescg_(
@@ -197,5 +211,3 @@ if __name__ == '__main__':
     #     '/l/resource/library/texture/all/surface/rough_concrete_sbqkmjp0/v0001/texture/acescg/src/rough_concrete_sbqkmjp0.albedo.exr',
     #     '/l/resource/library/texture/all/surface/rough_concrete_sbqkmjp0/v0001/texture/acescg/tx/rough_concrete_sbqkmjp0.albedo.tx',
     # )
-
-

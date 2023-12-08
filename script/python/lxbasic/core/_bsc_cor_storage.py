@@ -962,7 +962,46 @@ class StgDirectoryMtd(object):
         )
 
 
-class StgFileMultiplyMtd(object):
+class StgDirectoryMtdForMultiply(object):
+    @classmethod
+    def get_all_multiply_file_dict(cls, directory_path, name_pattern):
+        dic = collections.OrderedDict()
+        _ = StgDirectoryMtd.get_all_file_paths__(directory_path)
+        for i_file_path in _:
+            i_opt = StgFileOpt(i_file_path)
+            i_number_args = StgFileMtdForMultiply.get_number_args(
+                i_opt.name, name_pattern
+            )
+            if i_number_args:
+                i_pattern, i_numbers = i_number_args
+                if len(i_numbers) == 1:
+                    i_relative_path_dir_path = StgDirectoryMtd.get_file_relative_path(
+                        directory_path, i_opt.directory_path
+                    )
+                    i_key = '{}/{}'.format(
+                        i_relative_path_dir_path, i_pattern
+                    )
+                    dic.setdefault(
+                        i_key, []
+                    ).append(i_numbers[0])
+        return dic
+
+
+class StgFileMtd(object):
+    @classmethod
+    def get_directory(cls, file_path):
+        return os.path.dirname(file_path)
+
+    @classmethod
+    def get_is_exists(cls, file_path):
+        return os.path.isfile(file_path)
+
+    @classmethod
+    def get_ext(cls, file_path):
+        return os.path.splitext(file_path)[-1]
+
+
+class StgFileMtdForMultiply(object):
     """
     methods using for multiply file
     etc. "/tmp/image.1001.exr" convert to "/tmp/image.####.exr"
@@ -972,22 +1011,25 @@ class StgFileMultiplyMtd(object):
     CACHE = dict()
 
     @classmethod
-    def get_match_args(cls, file_name, name_pattern):
+    def get_number_args(cls, file_name, name_pattern):
         new_file_name = file_name
         args = _bsc_cor_pattern.PtnMultiplyFileMtd.get_args(
             name_pattern
         )
-        re_pattern = _bsc_cor_pattern.PtnMultiplyFileMtd.to_re_style(name_pattern)
-        numbers = re.findall(re_pattern, file_name)
-        if numbers:
-            if len(args) > 1:
-                numbers = numbers[0]
-            #
-            for i, (i_key, i_count) in enumerate(args):
-                new_file_name = new_file_name.replace(
-                    numbers[i], i_key, 1
-                )
-            return new_file_name, map(int, numbers)
+        if args:
+            re_pattern = _bsc_cor_pattern.PtnMultiplyFileMtd.to_re_style(name_pattern)
+            results = re.findall(re_pattern, file_name)
+            if results:
+                if len(args) > 1:
+                    numbers = results[0]
+                else:
+                    numbers = results
+                #
+                for i, (i_key, i_count) in enumerate(args):
+                    new_file_name = new_file_name.replace(
+                        numbers[i], i_key, 1
+                    )
+                return new_file_name, map(int, numbers)
 
     @classmethod
     def merge_to(cls, file_paths, name_patterns):
@@ -1004,21 +1046,20 @@ class StgFileMultiplyMtd(object):
         use for convert "/tmp/image.1001.exr" to "/tmp/image.####.exr"
         :param file_path:
         :param name_patterns: list[str, ...]
-        etc. *.####.{ext}, ext like "exr", "jpg"
+        etc. *.####.{format}, ext like "exr", "jpg"
         :return:
         """
         file_opt = StgFileOpt(file_path)
         for i_name_pattern in name_patterns:
             i_name_pattern = i_name_pattern.format(
-                **dict(ext=file_opt.ext[1:])
+                **dict(format=file_opt.get_format())
             )
             if _bsc_cor_pattern.PtnMultiplyFileMtd.get_is_valid(i_name_pattern):
-                i_match_args = StgFileMultiplyMtd.get_match_args(
+                i_number_args = StgFileMtdForMultiply.get_number_args(
                     file_opt.name, i_name_pattern
                 )
-                if i_match_args:
-                    i_file_name, _ = i_match_args
-                    #
+                if i_number_args:
+                    i_file_name, _ = i_number_args
                     i_file_path = '{}/{}'.format(file_opt.directory_path, i_file_name)
                     return i_file_path
         return file_path
@@ -1059,31 +1100,6 @@ class StgFileMultiplyMtd(object):
     @classmethod
     def get_is_exists(cls, file_path):
         return not not cls.get_exists_unit_paths(file_path)
-
-
-class StgDirectoryMultiplyMtd(object):
-    @classmethod
-    def get_all_multiply_file_dict(cls, directory_path, name_pattern):
-        dic = collections.OrderedDict()
-        _ = StgDirectoryMtd.get_all_file_paths__(directory_path)
-        for i_file_path in _:
-            i_opt = StgFileOpt(i_file_path)
-            i_match_args = StgFileMultiplyMtd.get_match_args(
-                i_opt.name, name_pattern
-            )
-            if i_match_args:
-                i_pattern, i_numbers = i_match_args
-                if len(i_numbers) == 1:
-                    i_relative_path_dir_path = StgDirectoryMtd.get_file_relative_path(
-                        directory_path, i_opt.directory_path
-                    )
-                    i_key = '{}/{}'.format(
-                        i_relative_path_dir_path, i_pattern
-                    )
-                    dic.setdefault(
-                        i_key, []
-                    ).append(i_numbers[0])
-        return dic
 
 
 class StgPathMtd(_bsc_cor_base.StorageMtd):
@@ -1392,6 +1408,9 @@ class StgDirectoryOpt(StgPathOpt):
                     i_file_path_tgt, replace=replace
                 )
 
+    def get_is_exists(self):
+        return self.get_is_directory()
+
 
 class StgDirectoryOptExtra(object):
     def __init__(self, directory_path):
@@ -1426,12 +1445,6 @@ class StgDirectoryOptExtra(object):
         _bsc_cor_base.StorageMtd.create_directory(
             self._path
         )
-
-
-class StgFileMtd(object):
-    @classmethod
-    def get_directory(cls, file_path):
-        return os.path.dirname(file_path)
 
 
 class StgFileOpt(StgPathOpt):
@@ -1618,6 +1631,13 @@ class StgFileOpt(StgPathOpt):
         size = self.get_size()
         size_tag = _bsc_cor_raw.RawIntegerOpt(int(size)).set_encode_to_36()
         return '{}{}'.format(time_tag, size_tag)
+
+    @classmethod
+    def new_file_fnc(cls):
+        pass
+
+    def get_is_exists(self):
+        return self.get_is_file()
 
 
 # compress

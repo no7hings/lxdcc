@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxbasic.core as bsc_core
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 from lxkatana.dcc.dcc_objects import _ktn_dcc_obj_node
 

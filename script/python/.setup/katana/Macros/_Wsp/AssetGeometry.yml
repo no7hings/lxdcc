@@ -488,6 +488,7 @@ main:
         - 'parameters/usd'
         - 'parameters/usd_variant'
         - 'parameters/usd_variant/asset_version_main'
+        - 'parameters/usd_variant/asset_version_main/component'
         - 'parameters/setting'
 #
 node:

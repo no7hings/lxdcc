@@ -7,7 +7,7 @@ from lxkatana.core.wrap import *
 
 import lxbasic.core as bsc_core
 
-from lxkatana import ktn_configure, ktn_core
+import lxkatana.core as ktn_core
 
 from lxutil import utl_core
 
@@ -166,7 +166,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
         obj_type = obj_category.generate_type(obj_type_name)
         _obj = obj_type.create_obj(obj_path)
         #
-        if ktn_core.get_is_ui_mode() is True:
+        if ktn_core.KtnUtil.get_is_ui_mode() is True:
             _obj.set_gui_attribute(
                 'icon', gui_qt_core.GuiQtKatana.generate_qt_icon_by_name(obj_type_name)
             )
@@ -289,7 +289,7 @@ class Scene(utl_dcc_obj_abs.AbsObjScene):
 class Selection(object):
     def __init__(self, *args):
         self._obj_paths = args[0]
-        pathsep = ktn_configure.Util.OBJ_PATHSEP
+        pathsep = ktn_core.KtnUtil.OBJ_PATHSEP
         self._node_graph_ktn_objs = []
         self._scene_graph_obj_paths = []
         for i in self._obj_paths:

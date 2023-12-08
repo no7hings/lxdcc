@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxbasic.core as bsc_core
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 
 class ScpWorkspaceCreate(object):
@@ -11,7 +11,7 @@ import lxkatana
 
 lxkatana.set_reload()
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 import lxkatana.scripts as ktn_scripts
 
@@ -82,7 +82,7 @@ ktn_scripts.ScpWorkspaceCreate.new()
             bsc_core.Log.ENABLE = True
 
         #
-        ktn_obj, i_create = ktn_core.NGObjOpt._get_node_create_args_(
+        ktn_obj, i_create = ktn_core.NGObjOpt._generate_node_create_args(
             '/rootNode/workspace', 'Workspace_Wsp'
         )
         if i_create is True:

@@ -186,14 +186,14 @@ patterns:
     texture-dir: '<.version-dir>/texture'
     texture-original-dir: '<.texture-dir>/original'
     texture-original-src-dir: '<.texture-original-dir>/src'
-    texture-original-src-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.{ext}'
-    texture-original-src-lod-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.lod_{lod_level.zfill(2)}.{ext}'
+    texture-original-src-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.{format}'
+    texture-original-src-lod-file: '<.texture-original-src-dir>/{resource}.{texture_type_tag}.lod_{lod_level.zfill(2)}.{format}'
     #
-    texture-original-extra-src-file: '<.texture-original-src-dir>/{resource}.{key_extra}.{texture_type_tag}.{ext}'
+    texture-original-extra-src-file: '<.texture-original-src-dir>/{resource}.{key_extra}.{texture_type_tag}.{format}'
     #
     texture-acescg-dir: '<.texture-dir>/acescg'
     texture-acescg-src-dir: '<.texture-acescg-dir>/src'
-    texture-acescg-src-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.{ext}'
+    texture-acescg-src-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.{format}'
     texture-acescg-src-exr-file: '<.texture-acescg-src-dir>/{resource}.{texture_type_tag}.exr'
     texture-acescg-tx-dir: '<.texture-acescg-dir>/tx'
     texture-acescg-tx-file: '<.texture-acescg-tx-dir>/{resource}.{texture_type_tag}.tx'

@@ -17,8 +17,13 @@ print RscConfigure.get_yaml('database/library/resource-basic')
 
     @classmethod
     def get_as_content(cls, key):
-        return ctt_core.Content(
-            value=cls.get_yaml(key)
+        f = cls.get_yaml(key)
+        if f:
+            return ctt_core.Content(
+                value=cls.get_yaml(key)
+            )
+        raise IOError(
+            'content is not found: "{}"'.format(key)
         )
 
     @classmethod

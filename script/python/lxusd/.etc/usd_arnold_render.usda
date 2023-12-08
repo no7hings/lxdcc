@@ -52,7 +52,7 @@ def "materials"
         {
             uniform token info:id = "arnold:standard_surface"
             color3f inputs:base_color = (0.8, 0.8, 0.8)
-            color3f inputs:base_color.connect = </materials/mtl_arnold/txr_albedo.outputs:out>
+            color3f inputs:base_color.connect = </materials/mtl_arnold/txr_diffuse_color.outputs:out>
             float inputs:diffuse_roughness = 1
             string inputs:name = "sdr_surface"
             vector3f inputs:normal = (0, 0, 0)
@@ -60,40 +60,40 @@ def "materials"
             color3f inputs:opacity = (1, 1, 1)
             color3f inputs:opacity.connect = </materials/mtl_arnold/txr_opacity.outputs:out>
             float inputs:specular_roughness = 0.2
-            float inputs:specular_roughness.connect = </materials/mtl_arnold/txr_roughness.outputs:r>
+            float inputs:specular_roughness.connect = </materials/mtl_arnold/txr_specular_roughness.outputs:r>
             token outputs:surface
         }
 
-        def Shader "txr_albedo"
+        def Shader "txr_diffuse_color"
         {
             uniform token info:id = "arnold:image"
             string inputs:color_space = ""
             asset inputs:filename = @/production/library/resource/all/3d_asset/thai_beach_rocks_ueopcguga/v0001/texture/acescg/tx/thai_beach_rocks_ueopcguga.albedo.tx@
             bool inputs:ignore_missing_textures = 1
             color4f inputs:missing_texture_color = (0, 0, 0, 1)
-            string inputs:name = "txr_albedo"
+            string inputs:name = "txr_diffuse_color"
             color4f outputs:out
         }
 
-        def Shader "txr_roughness"
+        def Shader "txr_specular_roughness"
         {
             uniform token info:id = "arnold:image"
             string inputs:color_space = ""
             asset inputs:filename = @/production/library/resource/all/3d_asset/thai_beach_rocks_ueopcguga/v0001/texture/acescg/tx/thai_beach_rocks_ueopcguga.roughness.tx@
             bool inputs:ignore_missing_textures = 1
             color4f inputs:missing_texture_color = (0, 0, 0, 1)
-            string inputs:name = "txr_roughness"
+            string inputs:name = "txr_specular_roughness"
             float outputs:r
         }
 
-        def Shader "txr_ao"
+        def Shader "txr_ambocc"
         {
             uniform token info:id = "arnold:image"
             string inputs:color_space = ""
             asset inputs:filename = @@
             bool inputs:ignore_missing_textures = 1
             color4f inputs:missing_texture_color = (1, 1, 1, 1)
-            string inputs:name = "txr_ao"
+            string inputs:name = "txr_ambocc"
             float outputs:r
         }
 

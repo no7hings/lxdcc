@@ -35,10 +35,15 @@ class ScpResourcesAddForSurface(object):
             for i_file_path in all_file_path:
                 l_p.do_update()
                 self.add_texture(
-                    dtb_opt, i_file_path, category_group, [type_dtb_path], file_name_pattern, resource_name_pattern, texture_type_tag
+                    dtb_opt, i_file_path, category_group, [type_dtb_path], file_name_pattern, resource_name_pattern,
+                    texture_type_tag
                 )
+
     @classmethod
-    def add_texture(cls, dtb_opt, file_path, category_group, type_dtb_paths, file_name_pattern, resource_name_pattern, texture_type_tag):
+    def add_texture(
+            cls, dtb_opt, file_path, category_group, type_dtb_paths, file_name_pattern, resource_name_pattern,
+            texture_type_tag
+            ):
         file_opt = bsc_core.StgFileOpt(file_path)
         file_name_p_opt = bsc_core.PtnParseOpt(
             file_name_pattern
@@ -58,16 +63,23 @@ class ScpResourcesAddForSurface(object):
                     resource=resource_name,
                     version=version_name,
                     texture_type_tag=texture_type_tag,
-                    ext=file_opt.get_format()
+                    format=file_opt.get_format()
                 )
-                cls.create_resource_and_version(dtb_opt, file_path, resource_dtb_path, version_dtb_path, texture_type_tag, pattern_kwargs
+                cls.create_resource_and_version(
+                    dtb_opt, file_path, resource_dtb_path, version_dtb_path, texture_type_tag, pattern_kwargs
                 )
-                cls.dtb_assign_resource_types_fnc(dtb_opt, resource_dtb_path, type_dtb_paths)
+                cls.dtb_assign_resource_types_fnc(
+                    dtb_opt, resource_dtb_path, type_dtb_paths
+                )
+
     @classmethod
     def dtb_create_type(cls, dtb_opt, type_dtb_path):
         return dtb_opt.get_type_force(type_dtb_path)
+
     @classmethod
-    def create_resource_and_version(cls, dtb_opt, file_path, resource_dtb_path, version_dtb_path, texture_type_tag, pattern_kwargs):
+    def create_resource_and_version(
+            cls, dtb_opt, file_path, resource_dtb_path, version_dtb_path, texture_type_tag, pattern_kwargs
+            ):
         is_create, dtb_resource = dtb_opt.create_resource(resource_dtb_path)
         if is_create is True:
             resource_stg_path = cls.stg_create_resource(dtb_opt, pattern_kwargs)
@@ -116,12 +128,14 @@ class ScpResourcesAddForSurface(object):
             dtb_opt.create_property(
                 file_dtb_path, 'version', version_dtb_path, kind=dtb_opt.Kinds.File
             )
+
     @classmethod
     def dtb_assign_resource_types_fnc(cls, dtb_opt, resource_dtb_path, type_dtb_paths):
         for i_type_dtb_path in type_dtb_paths:
             dtb_opt.create_type_assign(
                 resource_dtb_path, i_type_dtb_path, kind=dtb_opt.Kinds.ResourceType
             )
+
     @classmethod
     def stg_create_resource(cls, dtb_opt, pattern_kwargs):
         p_opt = dtb_opt.get_pattern_opt('resource-dir')
@@ -129,6 +143,7 @@ class ScpResourcesAddForSurface(object):
         path_opt = bsc_core.StgDirectoryOpt(stg_path)
         path_opt.set_create()
         return stg_path
+
     @classmethod
     def stg_create_version(cls, dtb_opt, pattern_kwargs):
         p_opt = dtb_opt.get_pattern_opt('version-dir')
@@ -136,6 +151,7 @@ class ScpResourcesAddForSurface(object):
         path_opt = bsc_core.StgDirectoryOpt(stg_path)
         path_opt.set_create()
         return stg_path
+
     @classmethod
     def stg_copy_texture(cls, dtb_opt, file_path, pattern_kwargs, keyword):
         p_opt = dtb_opt.get_pattern_opt(keyword)
@@ -144,6 +160,7 @@ class ScpResourcesAddForSurface(object):
             stg_path
         )
         return stg_path
+
     @classmethod
     def stg_create_preview(cls, dtb_opt, file_path, pattern_kwargs):
         preview_file_path_ = bsc_core.ImgFileOpt(file_path).get_thumbnail(width=256, ext='.png')
@@ -153,6 +170,7 @@ class ScpResourcesAddForSurface(object):
             preview_file_path
         )
         return preview_file_path
+
     @classmethod
     def dtb_create_storage_fnc(cls, dtb_opt, version_dtb_path, version_stg_path, pattern_kwargs):
         dtb_cfg_opt = dtb_opt.get_database_configure_opt()

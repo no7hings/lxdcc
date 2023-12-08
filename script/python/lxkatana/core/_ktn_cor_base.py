@@ -3,28 +3,14 @@ import six
 
 import os
 
-import fnmatch
-
-import sys
-
-import collections
-
-import threading
-#
-import time
-
 from .wrap import *
 
 
-def get_is_ui_mode():
-    return Configuration.get('KATANA_UI_MODE') == '1'
-
-
-def get_katana_version():
-    return os.environ['KATANA_VERSION']
-
-
 class KtnUtil(object):
+    OBJ_PATHSEP = '/'
+
+    PORT_PATHSEP = '.'
+
     @staticmethod
     def get_is_ui_mode():
         return Configuration.get('KATANA_UI_MODE') == '1'
@@ -92,6 +78,13 @@ class GuiNodeGraphOpt(GuiNodeGraphBase):
             tab.prepareFloatingLayerWithPasteBounds(nodes)
             tab.enableFloatingLayer()
 
+    @classmethod
+    def drop_nodes(cls, nodes):
+        if nodes:
+            tab = App.Tabs.FindTopTab('Node Graph')
+            tab.prepareFloatingLayerWithPasteBounds(nodes)
+            tab.enableFloatingLayer()
+
 
 class GuiNodeGraphTabOpt(GuiNodeGraphBase):
     LAYOUT_NODE_KEY = 'F4331532-D52B-11ED-8C7C-2CFDA1C062BB'
@@ -153,7 +146,7 @@ class Modifier(object):
                 _fnc = fnc(*args, **kwargs)
                 return _fnc
             except Exception:
-                if get_is_ui_mode() is True:
+                if KtnUtil.get_is_ui_mode() is True:
                     import lxbasic.core as bsc_core
                     bsc_core.LogException.trace()
                 else:

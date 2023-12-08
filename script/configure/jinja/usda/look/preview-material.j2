@@ -40,12 +40,12 @@ def Scope "looks"
             uniform token info:id = "UsdPreviewSurface"
             token outputs:surface
             token outputs:displacement
-            color3f inputs:diffuseColor.connect = </looks/{{ i_material }}/txr_diffuse.outputs:rgb>
+            color3f inputs:diffuseColor.connect = </looks/{{ i_material }}/txr_diffuse_color.outputs:rgb>
             color3f inputs:emissiveColor = (0.0, 0.0, 0.0)
             int inputs:useSpecularWorkflow = 0
             color3f inputs:specularColor = (1.0, 1.0, 1.0)
             float inputs:metallic = 0.0
-            float inputs:roughness.connect = </looks/{{ i_material }}/txr_roughness.outputs:r>
+            float inputs:roughness.connect = </looks/{{ i_material }}/txr_specular_roughness.outputs:r>
             float inputs:clearcoat = 0.0
             float inputs:clearcoatRoughness = 0.01
             float inputs:opacity = 1.0
@@ -56,7 +56,7 @@ def Scope "looks"
             float inputs:occlusion = 1.0
         }
 
-        def Shader "txr_diffuse"
+        def Shader "txr_diffuse_color"
         {
             uniform token info:id = "UsdUVTexture"
             asset inputs:file = @{{ i_textures.diffuse }}@
@@ -70,7 +70,7 @@ def Scope "looks"
             float3 outputs:rgb
         }
 
-        def Shader "txr_roughness"
+        def Shader "txr_specular_roughness"
         {
             uniform token info:id = "UsdUVTexture"
             asset inputs:file = @{{ i_textures.roughness }}@

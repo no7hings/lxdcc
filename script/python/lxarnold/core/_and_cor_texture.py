@@ -1,132 +1,13 @@
 # coding:utf-8
 import os
 
-import lxresource.core as rsc_core
-
-import lxcontent.core as ctt_core
-
 import lxbasic.core as bsc_core
+
+import lxwrap.texture.core as txr_core
 
 from .wrap import *
 
 from ..core import _and_cor_base
-
-
-class _AbsCfg(object):
-    def __init__(self, configure):
-        self._configure = configure
-        self._build()
-
-    def _build(self):
-        raise NotImplementedError()
-
-    def __str__(self):
-        return self._configure.__str__()
-
-
-class TextureColorSpaceConfigureForConvert(_AbsCfg):
-    CONTENT = None
-
-    @classmethod
-    def __generate_content(cls):
-        if cls.CONTENT is not None:
-            return cls.CONTENT
-        cls.CONTENT = ctt_core.Content(
-            value=rsc_core.ResourceContent.get_yaml('texture/color-space/convert')
-        )
-        cls.CONTENT.do_flatten()
-        return cls.CONTENT
-
-    def __init__(self):
-        super(TextureColorSpaceConfigureForConvert, self).__init__(
-            self.__generate_content()
-        )
-
-    def _build(self):
-        self._keys = []
-        self._color_space_dict = {}
-        self._purpose_dict = {}
-        purposes = self._configure.get_key_names_at('tx')
-        for i_purpose in purposes:
-            i_name_patterns = self._configure.get('tx.{}.name-patterns'.format(i_purpose))
-            i_color_space = self._configure.get('tx.{}.color-space'.format(i_purpose))
-            for i_name_pattern in i_name_patterns:
-                self._color_space_dict[i_name_pattern] = i_color_space
-                self._purpose_dict[i_name_pattern] = i_purpose
-
-    def get_name_patterns(self):
-        return self._color_space_dict.keys()
-
-    @classmethod
-    def get_color_space(cls, file_path):
-        import lxarnold.core as and_core
-
-        return and_core.AndTextureOpt(file_path).get_color_space()
-
-    def get_color_space_src(self, file_path):
-        import lxarnold.core as and_core
-
-        file_opt = bsc_core.StgFileOpt(file_path)
-        _ = 'auto'
-        # check is match configure, when not use "auto"
-        for i_name_pattern in self.get_name_patterns():
-            if file_opt.get_is_match_name_pattern(i_name_pattern) is True:
-                _ = self._color_space_dict[i_name_pattern]
-                break
-        #
-        if _ == 'auto':
-            return and_core.AndTextureOpt(file_path).get_color_space()
-        return _
-
-    def get_purpose(self, file_path):
-        file_opt = bsc_core.StgFileOpt(file_path)
-        for i_name_pattern in self.get_name_patterns():
-            if file_opt.get_is_match_name_pattern(i_name_pattern) is True:
-                return self._purpose_dict[i_name_pattern]
-        return 'unknown'
-
-
-class TextureColorSpaceConfigureForAces(_AbsCfg):
-    CONTENT = None
-
-    @classmethod
-    def __generate_content(cls):
-        if cls.CONTENT is not None:
-            return cls.CONTENT
-        cls.CONTENT = ctt_core.Content(
-            value=rsc_core.ResourceContent.get_yaml('texture/color-space/aces')
-        )
-        cls.CONTENT.do_flatten()
-        return cls.CONTENT
-
-    def __init__(self):
-        super(TextureColorSpaceConfigureForAces, self).__init__(
-            self.__generate_content()
-        )
-
-    @classmethod
-    def get_is_enable(cls):
-        return bsc_core.EnvironMtd.get('OCIO') is not None
-
-    def _build(self):
-        self._convert_dict = self._configure.get('aces.convert')
-
-    def get_all_color_spaces(self):
-        return self._configure.get('aces.color-spaces')
-
-    def get_default_color_space(self):
-        return self._configure.get('aces.default-color-space')
-
-    def get_ocio_file(self):
-        _ = bsc_core.EnvironMtd.get('OCIO')
-        if _ is not None:
-            return _
-        return self._configure.get('aces.file')
-
-    def to_aces_color_space(self, color_space):
-        if self.get_is_enable() is True:
-            return self._convert_dict[color_space]
-        return color_space
 
 
 class AndImageOpt(object):
@@ -284,24 +165,22 @@ class AndTextureOpt(AndImageOpt):
     """
     #
     TX_EXT = '.tx'
-    TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES = None
 
     def __init__(self, *args, **kwargs):
         super(AndTextureOpt, self).__init__(*args, **kwargs)
 
-        self.generate_color_space_configure_for_aces()
+    @classmethod
+    def get_method_for_color_space_as_aces(cls):
+        return txr_core.TxrMethodForColorSpaceAsAces.generate_instance()
 
     @classmethod
-    def generate_color_space_configure_for_aces(cls):
-        if cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES is not None:
-            return cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES
-        cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES = TextureColorSpaceConfigureForAces()
-        return cls.TEXTURE_COLOR_SPACE_CONFIGURE_FOR_ACES
+    def get_method_for_color_space_as_tx_convert(cls):
+        return txr_core.TxrMethodForColorSpaceAsTxConvert.generate_instance()
 
     def get_is_srgb(self):
         return (
-                self._info['bit'] <= 16
-                and self._info['type'] in (ai.AI_TYPE_BYTE, ai.AI_TYPE_INT, ai.AI_TYPE_UINT)
+            self._info['bit'] <= 16
+            and self._info['type'] in (ai.AI_TYPE_BYTE, ai.AI_TYPE_INT, ai.AI_TYPE_UINT)
         )
 
     def get_is_linear(self):
@@ -310,10 +189,9 @@ class AndTextureOpt(AndImageOpt):
     def get_color_space(self):
         if self.get_is_srgb():
             return bsc_core.BscColorSpaces.SRGB
-        else:
-            return bsc_core.BscColorSpaces.LINEAR
+        return bsc_core.BscColorSpaces.LINEAR
 
-    def get_path_as_tx(self, search_directory_path=None):
+    def generate_path_as_tx(self, search_directory_path=None):
         file_path_src = self._file_path
         #
         name = os.path.basename(file_path_src)
@@ -323,11 +201,11 @@ class AndTextureOpt(AndImageOpt):
             return '{}/{}{}'.format(search_directory_path, name_base, self.TX_EXT)
         return '{}/{}{}'.format(directory_path, name_base, self.TX_EXT)
 
-    def set_unit_tx_create(
+    def create_unit_tx(
         self, color_space, use_aces, aces_file, aces_color_spaces, aces_render_color_space,
         search_directory_path=None, block=False
     ):
-        cmd = self.get_unit_tx_create_cmd(
+        cmd = self.generate_unit_tx_create_command(
             color_space,
             use_aces,
             aces_file,
@@ -346,7 +224,7 @@ class AndTextureOpt(AndImageOpt):
                 cmd
             )
 
-    def get_unit_tx_create_cmd(
+    def generate_unit_tx_create_command(
         self, color_space_src, use_aces, aces_file, aces_color_spaces, aces_render_color_space,
         search_directory_path=None
     ):
@@ -370,17 +248,17 @@ class AndTextureOpt(AndImageOpt):
                     ]
             else:
                 raise TypeError(
-                    u'file="{}", aces color-space="{}" is not available'.format(
+                    'file="{}", aces color-space="{}" is not available'.format(
                         file_path_src, color_space_src
                     )
                 )
         #
         if search_directory_path:
-            file_path_src_tgt = self.get_path_as_tx(
+            file_path_src_tgt = self.generate_path_as_tx(
                 search_directory_path
             )
             cmd_args += [
-                u'-o "{}"'.format(file_path_src_tgt)
+                '-o "{}"'.format(file_path_src_tgt)
             ]
         # etc. jpg to exr
         if self.get_is_srgb() and self.get_is_8_bit():
@@ -391,20 +269,20 @@ class AndTextureOpt(AndImageOpt):
             ]
         #
         cmd_args += [
-            u'"{}"'.format(file_path_src)
+            '"{}"'.format(file_path_src)
         ]
         #
         return ' '.join(cmd_args)
 
     @classmethod
-    def get_format_convert_as_aces_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
+    def generate_format_convert_as_aces_command(cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt):
         option = dict(
             file_src=bsc_core.auto_encode(file_path_src),
             file_tgt=bsc_core.auto_encode(file_path_tgt),
             color_space_src=color_space_src,
             color_space_tgt=color_space_tgt,
             format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
-            aces_file=cls.generate_color_space_configure_for_aces().get_ocio_file()
+            aces_file=cls.get_method_for_color_space_as_aces().get_ocio_file()
         )
 
         cmd_args = [
@@ -432,7 +310,7 @@ class AndTextureOpt(AndImageOpt):
         return cmd
 
     @classmethod
-    def get_create_exr_as_acescg_command(
+    def generate_create_exr_as_acescg_command(
         cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt, use_update_mode=True
     ):
         option = dict(
@@ -441,7 +319,7 @@ class AndTextureOpt(AndImageOpt):
             color_space_src=color_space_src,
             color_space_tgt=color_space_tgt,
             format_tgt=os.path.splitext(file_path_tgt)[-1][1:],
-            aces_file=cls.generate_color_space_configure_for_aces().get_ocio_file()
+            aces_file=cls.get_method_for_color_space_as_aces().get_ocio_file()
         )
         cmd_args = [
             'maketx',
@@ -462,7 +340,7 @@ class AndTextureOpt(AndImageOpt):
         if color_space_src != color_space_tgt:
             cmd_args += [
                 '--colorengine ocio',
-                '--colorconfig "{}"'.format(cls.generate_color_space_configure_for_aces().get_ocio_file()),
+                '--colorconfig "{}"'.format(cls.get_method_for_color_space_as_aces().get_ocio_file()),
                 '--colorconvert "{color_space_src}" "{color_space_tgt}"',
             ]
         # format args, etc. jpg to exr
@@ -481,7 +359,7 @@ class AndTextureOpt(AndImageOpt):
 
     # noinspection PyUnusedLocal
     @classmethod
-    def get_create_tx_as_acescg_command(
+    def generate_create_tx_as_acescg_command(
         cls, file_path_src, file_path_tgt, color_space_src, color_space_tgt, use_update_mode=True
     ):
         cmd_args = [
@@ -496,16 +374,16 @@ class AndTextureOpt(AndImageOpt):
         ]
         # color space args
         if color_space_src != color_space_tgt:
-            aces_color_spaces = cls.generate_color_space_configure_for_aces().get_all_color_spaces()
+            aces_color_spaces = cls.get_method_for_color_space_as_aces().get_all_color_spaces()
             if color_space_src in aces_color_spaces:
                 cmd_args += [
                     '--colorengine ocio',
-                    '--colorconfig "{}"'.format(cls.generate_color_space_configure_for_aces().get_ocio_file()),
+                    '--colorconfig "{}"'.format(cls.get_method_for_color_space_as_aces().get_ocio_file()),
                     '--colorconvert "{}" "{}"'.format(color_space_src, color_space_tgt),
                 ]
             else:
                 raise TypeError(
-                    u'file="{}", aces color-space="{}" is not available'.format(
+                    'file: "{}", aces color-space: "{}" is not available'.format(
                         file_path_src, color_space_src
                     )
                 )

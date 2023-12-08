@@ -3,11 +3,11 @@ import lxbasic.core as bsc_core
 
 import lxcontent.core as ctt_core
 
-from lxkatana import ktn_core
+import lxkatana.core as ktn_core
 
 
 class ScpCbkEnvironment(object):
-    KEY = 'workspace environment build'
+    KEY = 'workspace environment'
 
     def __init__(self):
         self._cfg = ctt_core.Content(
@@ -72,7 +72,7 @@ class ScpCbkEnvironment(object):
 
     @ktn_core.Modifier.undo_run
     def execute(self, *args, **kwargs):
-        if ktn_core.get_is_ui_mode():
+        if ktn_core.KtnUtil.get_is_ui_mode():
             fncs = [
                 self.add_from_resolver,
                 self.add_from_work_environment,

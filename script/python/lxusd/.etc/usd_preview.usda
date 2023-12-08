@@ -113,16 +113,16 @@ def Material "mtl_preview"
         uniform token info:id = "UsdPreviewSurface"
         float inputs:clearcoat = 0
         float inputs:clearcoatRoughness = 0
-        color3f inputs:diffuseColor.connect = </mtl_preview/txr_albedo.outputs:rgb>
+        color3f inputs:diffuseColor.connect = </mtl_preview/txr_diffuse_color.outputs:rgb>
         float inputs:displacement.connect = </mtl_preview/txr_displacement.outputs:r>
         color3f inputs:emissiveColor = (0, 0, 0)
         float inputs:ior = 1.5
         float inputs:metallic = 0
         normal3f inputs:normal.connect = </mtl_preview/txr_normal.outputs:rgb>
-        float inputs:occlusion.connect = </mtl_preview/txr_ao.outputs:r>
+        float inputs:occlusion.connect = </mtl_preview/txr_ambocc.outputs:r>
         float inputs:opacity.connect = </mtl_preview/txr_opacity.outputs:r>
         float inputs:opacityThreshold = 0.1
-        float inputs:roughness.connect = </mtl_preview/txr_roughness.outputs:r>
+        float inputs:roughness.connect = </mtl_preview/txr_specular_roughness.outputs:r>
         color3f inputs:specularColor = (0, 0, 0)
         int inputs:useSpecularWorkflow = 0
         token outputs:displacement
@@ -146,7 +146,7 @@ def Material "mtl_preview"
         float2 outputs:result
     }
 
-    def Shader "txr_albedo"
+    def Shader "txr_diffuse_color"
     {
         uniform token info:id = "UsdUVTexture"
         float3 inputs:fallback = (0.18, 0.18, 0.18)
@@ -159,7 +159,7 @@ def Material "mtl_preview"
         float3 outputs:rgb
     }
 
-    def Shader "txr_roughness"
+    def Shader "txr_specular_roughness"
     {
         uniform token info:id = "UsdUVTexture"
         float inputs:fallback = 0.5
@@ -171,7 +171,7 @@ def Material "mtl_preview"
         float outputs:r
     }
 
-    def Shader "txr_ao"
+    def Shader "txr_ambocc"
     {
         uniform token info:id = "UsdUVTexture"
         float inputs:fallback = 1

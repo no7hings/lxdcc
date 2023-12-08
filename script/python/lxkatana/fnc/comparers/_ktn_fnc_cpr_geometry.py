@@ -23,7 +23,7 @@ class FncGeometryComparer(utl_fnc_obj_abs.AbsFncDccGeometryComparer):
     def update_target_fnc(self):
         import lxbasic.core as bsc_core
 
-        from lxkatana import ktn_core
+        import lxkatana.core as ktn_core
 
         import lxusd.dcc.dcc_objects as usd_dcc_objects
         #

@@ -41,7 +41,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def get_task_environs_extend(cls, project, resource, task):
-        import lxwarp.shotgun.core as wrp_stg_core
+        import lxwrap.shotgun.core as wrp_stg_core
 
         c = wrp_stg_core.StgConnector()
         task_id = c.find_task_id(
@@ -63,7 +63,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_task_environs_extend_(cls, **kwargs):
         if 'project' in kwargs:
-            import lxwarp.shotgun.core as wrp_stg_core
+            import lxwrap.shotgun.core as wrp_stg_core
             c = wrp_stg_core.StgConnector()
             stg_task = c.find_stg_task(**kwargs)
             if stg_task:

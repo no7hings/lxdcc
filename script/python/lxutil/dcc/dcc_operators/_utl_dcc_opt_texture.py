@@ -211,9 +211,9 @@ class DccTexturesOpt(object):
                     #
                     if check_file_obj.get_exists_units() or force is True:
                         self._set_port_repath_(i_port, tgt_stg_file)
-                        color_space = tgt_stg_file.get_color_space_src()
+                        color_space_input = tgt_stg_file.get_tx_color_space_input()
                         if tgt_stg_file.get_exists_units() is True:
-                            i_port.obj.set_color_space(color_space)
+                            i_port.obj.set_color_space(color_space_input)
                     else:
                         bsc_core.Log.trace_method_warning(
                             'texture repath',
@@ -464,8 +464,8 @@ class DccTexturesOpt(object):
                     if stg_files:
                         for stg_file in stg_files:
                             if stg_file.get_is_exists() is True:
-                                color_space = stg_file.get_color_space_src()
-                                i_dcc_node.set_color_space(color_space)
+                                color_space_input = stg_file.get_tx_color_space_input()
+                                i_dcc_node.set_color_space(color_space_input)
 
     def set_tx_repath_to_orig(self):
         objs = self._objs

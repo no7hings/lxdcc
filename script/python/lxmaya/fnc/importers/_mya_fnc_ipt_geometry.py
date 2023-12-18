@@ -106,7 +106,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def create_root_fnc(cls, path, type_name):
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         mya_dag_path = path_opt.translate_to(cls.OBJ_PATHSEP)
         mya_obj = mya_dcc_objects.Transform(mya_dag_path.path)
         if mya_obj.get_is_exists() is False:
@@ -116,7 +116,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def create_path_fnc(cls, path):
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         paths = path_opt.get_component_paths()
         if paths:
             paths.reverse()
@@ -126,7 +126,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def create_transform_fnc(cls, path, matrix=None):
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         mya_dag_path = path_opt.translate_to(cls.OBJ_PATHSEP)
         mya_obj = mya_dcc_objects.Transform(mya_dag_path.path)
         if mya_obj.get_is_exists() is False:
@@ -138,7 +138,7 @@ class FncGeometryUsdImporter(utl_fnc_obj_abs.AbsFncOptionBase):
     @classmethod
     def create_mesh_uv_map_fnc(cls, prim, uv_map_face_vertices_contrast=True):
         obj_path = prim.GetPath().pathString
-        usd_dag_path = bsc_core.DccPathDagOpt(obj_path)
+        usd_dag_path = bsc_core.PthNodeOpt(obj_path)
         mya_dag_path = usd_dag_path.translate_to(cls.OBJ_PATHSEP)
         #
         mya_obj_path = mya_dag_path.path
@@ -308,7 +308,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
         namespace_temporary = 'alembic_import_{}'.format(utl_core.System.get_time_tag())
         file_path = self.get('file')
         location = self.get('location')
-        root = bsc_core.DccPathDagOpt(location).translate_to(
+        root = bsc_core.PthNodeOpt(location).translate_to(
             self.OBJ_PATHSEP
         ).path
         group = mya_dcc_objects.Group(root)
@@ -344,7 +344,7 @@ class FncGeometryAbcImporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     obj.set_visible(False)
                 #
                 target_obj_path = '{}|{}'.format(
-                    root, bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(obj.name)
+                    root, bsc_core.PthNodeMtd.get_dag_name_with_namespace_clear(obj.name)
                 )
                 if cmds.objExists(target_obj_path) is False:
                     obj.parent_to_path(root)
@@ -401,7 +401,7 @@ class FncGeometryXgenImporter(
 
         #
         group = mya_dcc_objects.Group(
-            bsc_core.DccPathDagOpt(xgen_location).translate_to('|').get_value()
+            bsc_core.PthNodeOpt(xgen_location).translate_to('|').get_value()
         )
         group.set_dag_components_create()
         #
@@ -427,7 +427,7 @@ class FncGeometryXgenImporter(
                 value=i_xgen_collection_data_directory,
             )
             for i_xgen_guide in mya_dcc_objects.Group(
-                    bsc_core.DccPathDagOpt(xgen_location).translate_to('|').value
+                    bsc_core.PthNodeOpt(xgen_location).translate_to('|').value
             ).get_all_paths(include_obj_type=['xgmSplineGuide']):
                 mya_dcc_objects.Node(i_xgen_guide).set('width', .01)
             #
@@ -473,7 +473,7 @@ class DatabaseGeometryImporter(object):
                 mesh_opt = mya_dcc_operators.MeshOpt(mesh)
                 if mesh_opt.get_shell_count() == 1:
                     key = mesh_opt.get_face_vertices_as_uuid()
-                    uv_maps = bsc_core.DtbGeometryUvMapFileMtd.get_value(key)
+                    uv_maps = bsc_core.DccCacheFileMtdForGeometryUv.get_value(key)
                     mesh_opt.assign_uv_maps(uv_maps, clear=True)
             #
             g_p.set_stop()
@@ -548,7 +548,7 @@ mya_fnc_importers.FncGeometryImporterNew(
 
     def get_locations_fnc(self, locations):
         list_ = []
-        m = bsc_core.DccPathMapOpt(
+        m = bsc_core.PthNodeMapOpt(
             collections.OrderedDict(self.get('path_mapper'))
         )
         for i_tgt in locations:

@@ -9,6 +9,6 @@ class SsnRsvApplication(utl_ssn_abstracts.AbsSsnRsvApplication):
         super(SsnRsvApplication, self).__init__()
 
     def _get_any_scene_file_path_(self):
-        return bsc_core.EnvironMtd.get(
+        return bsc_core.EnvBaseMtd.get(
             'RSV_SCENE_FILE'
         )

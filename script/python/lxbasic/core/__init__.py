@@ -1,58 +1,52 @@
 # coding:utf-8
-from ._bsc_cor_configure import *
+from .configure import *
 
-from ._bsc_cor_base import *
+from .base import *
 
-from ._bsc_cor_python import *
+from .thread import *
 
-from ._bsc_cor_raw import *
+from .python import *
 
-from ._bsc_cor_path import *
+from .raw import *
 
-from ._bsc_cor_pattern import *
+from .raw_for_dict import *
 
-from ._bsc_cor_argument import *
+from .path import *
 
-from ._bsc_cor_time import *
+from .pattern import *
 
-from ._bsc_cor_log import *
+from .argument import *
 
-from ._bsc_cor_modifier import *
+from .time_ import *
 
-from ._bsc_cor_environ import *
+from .log import *
 
-from ._bsc_cor_process import *
+from .modifier import *
 
-from ._bsc_cor_execute import *
+from .environ import *
 
-from ._bsc_cor_raw_for_dict import *
+from .process import *
 
-from ._bsc_cor_thread import *
+from .execute import *
 
-from ._bsc_cor_storage import *
+from .storage import *
 
-from ._bsc_cor_storage_mapper import *
+from .storage_mapper import *
 
-from ._bsc_cor_content import *
+from .resource import *
 
-from ._bsc_cor_resource import *
+from .message import *
 
-from ._bsc_cor_message import *
+from .image import *
 
-from ._bsc_cor_database import *
+from .video import *
 
-from ._bsc_cor_image import *
+from .osl import *
 
-from ._bsc_cor_video import *
+from .color_space import *
 
-from ._bsc_cor_osl import *
+from .url import *
 
-from ._bsc_cor_color_space import *
+from .package import *
 
-from ._bsc_cor_url import *
-
-from ._bsc_cor_package import *
-
-
-
-
+from .dcc import *

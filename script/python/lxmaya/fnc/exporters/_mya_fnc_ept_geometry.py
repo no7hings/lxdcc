@@ -7,7 +7,7 @@ import os
 
 import copy
 
-import lxlog.core as log_core
+import lxbasic.log as bsc_log
 
 import lxbasic.core as bsc_core
 
@@ -113,7 +113,7 @@ class GeometryAbcExporter(object):
                 _ = list(raw)
             else:
                 raise TypeError()
-            return map(lambda x: bsc_core.DccPathDagOpt(x).translate_to('|').to_string(), _)
+            return map(lambda x: bsc_core.PthNodeOpt(x).translate_to('|').to_string(), _)
         return []
 
     @classmethod
@@ -232,7 +232,7 @@ class GeometryAbcExporter(object):
         j = self._get_j_(js)
         if j:
             self._results = self._set_cmd_run_(j)
-            log_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'alembic export',
                 'file="{}"'.format(file_.path)
             )
@@ -331,7 +331,7 @@ class GeometryUsdExporter(object):
         #
         if self._results:
             for i in self._results:
-                log_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'maya-usd-exporter',
                     u'file="{}"'.format(i)
                 )
@@ -366,7 +366,7 @@ class GeometryUsdExporter1(object):
         # noinspection PyUnresolvedReferences
         from papyUsd.maya import MayaUsdExport
 
-        root = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(self._root, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP)
+        root = bsc_core.PthNodeMtd.get_dag_pathsep_replace(self._root, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP)
         s_r = root
         r = '|'.join(s_r.split('|')[:-1])
         MayaUsdExport.MayaUsdExport().subTree(r, s_r, self._file_path)
@@ -374,7 +374,7 @@ class GeometryUsdExporter1(object):
         self._results = [self._file_path]
         if self._results:
             for i in self._results:
-                log_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'maya-usd-exporter',
                     u'file="{}"'.format(i)
                 )
@@ -407,12 +407,12 @@ class DatabaseGeometryExport(object):
                     if mesh_opt.get_shell_count() == 1:
                         uv_maps = mesh_opt.get_uv_maps()
                         key = mesh_opt.get_face_vertices_as_uuid()
-                        if bsc_core.DtbGeometryUvMapFileMtd.set_value(
+                        if bsc_core.DccCacheFileMtdForGeometryUv.set_value(
                                 key=key,
                                 value=uv_maps,
                                 force=self._option['force']
                         ) is True:
-                            log_core.Log.trace_method_result(
+                            bsc_log.Log.trace_method_result(
                                 '{}'.format(self.__class__.__name__),
                                 'obj="{}"'.format(mesh.path)
                             )
@@ -437,7 +437,7 @@ class CameraAbcExport(utl_fnc_obj_abs.AbsFncOptionBase):
         super(CameraAbcExport, self).__init__(option)
         option = self.get_option()
         location = option.get('location')
-        g = mya_dcc_objects.Group(bsc_core.DccPathDagOpt(location).translate_to('|').to_string())
+        g = mya_dcc_objects.Group(bsc_core.PthNodeOpt(location).translate_to('|').to_string())
         self._camera_shape_paths = g.get_all_shape_paths(include_obj_type='camera')
         self._camera_transform_paths = map(lambda x: mya_dcc_objects.Shape(x).transform.path, self._camera_shape_paths)
 
@@ -519,7 +519,7 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         if location.startswith('|'):
             location = location.replace('|', '/')
         #
-        root_dag_path = bsc_core.DccPathDagOpt(location)
+        root_dag_path = bsc_core.PthNodeOpt(location)
         root_mya_dag_path = root_dag_path.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )
@@ -544,16 +544,16 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         i_mya_api_type_name = i_mya_obj.get_api_type_name()
                         i_mya_obj_path = i_mya_obj.get_path()
                         #
-                        i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
+                        i_usd_obj_path = bsc_core.PthNodeMtd.get_dag_pathsep_replace(
                             i_mya_obj_path, pathsep_src=ma_configure.Util.OBJ_PATHSEP
                         )
-                        i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
+                        i_usd_obj_path = bsc_core.PthNodeMtd.get_dag_path_lstrip(i_usd_obj_path, usd_root_lstrip)
 
                         i_rgb = None
                         if auto_plant_display_color is True:
-                            i_rgb = bsc_core.DccPathDagOpt(i_usd_obj_path).get_plant_rgb(maximum=1.0)
+                            i_rgb = bsc_core.PthNodeOpt(i_usd_obj_path).get_plant_rgb(maximum=1.0)
                         elif auto_display_color is True:
-                            i_rgb = bsc_core.DccPathDagOpt(i_usd_obj_path).get_rgb(maximum=1.0)
+                            i_rgb = bsc_core.PthNodeOpt(i_usd_obj_path).get_rgb(maximum=1.0)
                         elif with_display_color is True:
                             i_rgb = display_color
                         # clean namespace
@@ -563,10 +563,10 @@ class FncGeometryUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                                 'obj="{}" has namespace'.format(i_usd_obj_path)
                             )
                         #
-                        i_usd_obj_path = bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
+                        i_usd_obj_path = bsc_core.PthNodeMtd.get_dag_path_with_namespace_clear(
                             i_usd_obj_path
                         )
-                        i_usd_obj_path = bsc_core.DccPathDagMtd.cleanup_dag_path(
+                        i_usd_obj_path = bsc_core.PthNodeMtd.cleanup_dag_path(
                             i_usd_obj_path
                         )
                         if i_mya_api_type_name in ma_configure.ApiTypes.Transforms:
@@ -730,7 +730,7 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         return '{}/{}.usd'.format(
             user_directory_path,
             bsc_core.TimestampOpt(
-                bsc_core.TimeMtd.get_timestamp()
+                bsc_core.SysBaseMtd.get_timestamp()
             ).get_as_tag_36()
         )
 
@@ -754,7 +754,7 @@ class GeometryUvMapUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         post_deletes = []
         if subdiv_dict:
             for k, v in subdiv_dict.items():
-                i_obj_path = bsc_core.DccPathDagOpt(
+                i_obj_path = bsc_core.PthNodeOpt(
                     k
                 ).translate_to('|')
                 # i_results = self._set_subdiv_(
@@ -831,7 +831,7 @@ class FncGeometryUsdExporterNew(utl_fnc_obj_abs.AbsFncOptionBase):
             i_branch_data = []
             i_leaf_locations = self.get('{}_locations'.format(i_branch_key))
             for j_leaf_location in i_leaf_locations:
-                j_leaf_location_opt_cur = bsc_core.DccPathDagOpt(j_leaf_location).translate_to(
+                j_leaf_location_opt_cur = bsc_core.PthNodeOpt(j_leaf_location).translate_to(
                     pathsep
                 )
                 j_leaf_location_cur = j_leaf_location_opt_cur.get_value()

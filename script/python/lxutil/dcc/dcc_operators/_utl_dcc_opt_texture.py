@@ -229,10 +229,10 @@ class DccTexturesOpt(object):
             'complete'
         )
 
-    @bsc_core.Modifiers.run_as_ignore
+    @bsc_core.MdfBaseMtd.run_as_ignore
     def _set_repath_post_run_(self):
 
-        if bsc_core.ApplicationMtd.get_is_maya():
+        if bsc_core.SysApplicationMtd.get_is_maya():
             import lxmaya.commands as mya_commands
 
             #

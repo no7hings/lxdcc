@@ -13,7 +13,7 @@ import lxuniverse.abstracts as unr_abstracts
 
 import lxarnold.core as and_core
 
-from lxutil.objects import _utl_obj_raw
+import lxbasic.dcc.core as bsc_dcc_core
 
 
 class AbsDotAssDef(object):
@@ -55,7 +55,7 @@ class AbsDotMtlxDef(object):
         self._root = root
         self._path_lstrip = path_lstrip
         #
-        dot_mtlx_file_reader = _utl_obj_raw.DotMtlxFileReader(file_path)
+        dot_mtlx_file_reader = bsc_dcc_core.DotMtlxFileReaderOld(file_path)
         geometries_properties = dot_mtlx_file_reader.get_geometries_properties()
         self._set_geometry_objs_build_(geometries_properties, root=self._root)
 
@@ -94,10 +94,10 @@ class AbsObjScene(
         self._shader_name_dict = {}
         self._index_dict = {}
         #
-        self._platform = bsc_core.PlatformMtd.get_current()
+        self._platform = bsc_core.SysPlatformMtd.get_current()
 
         self._node_configure = ctt_core.Content(
-            value=bsc_core.ResourceContent.get_yaml('arnold/node')
+            value=bsc_core.ResourceConfigure.get_yaml('arnold/node')
         )
         self._node_configure.do_flatten()
 
@@ -365,10 +365,10 @@ class AbsObjScene(
     def _set_dcc_geometry_create_(self, obj_type_args, obj_path_args):
         dcc_obj_type = self.universe.generate_obj_type(*obj_type_args)
         # clear namespace per component for path args
-        obj_path_args = [bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(i) for i in obj_path_args]
+        obj_path_args = [bsc_core.PthNodeMtd.get_dag_name_with_namespace_clear(i) for i in obj_path_args]
         # path lstrip
-        obj_path = bsc_core.DccPathDagMtd.get_dag_path(obj_path_args)
-        obj_path = bsc_core.DccPathDagMtd.get_dag_path_lstrip(obj_path, self._path_lstrip)
+        obj_path = bsc_core.PthNodeMtd.get_dag_path(obj_path_args)
+        obj_path = bsc_core.PthNodeMtd.get_dag_path_lstrip(obj_path, self._path_lstrip)
         if self._path_mapper_opt is not None:
             obj_path = self._path_mapper_opt.get(obj_path)
         dcc_obj = dcc_obj_type.create_obj(obj_path)
@@ -592,7 +592,7 @@ class AbsObjScene(
         self.restore_all()
         #
         if path_mapper is not None:
-            self._path_mapper_opt = bsc_core.DccPathMapOpt(path_mapper)
+            self._path_mapper_opt = bsc_core.PthNodeMapOpt(path_mapper)
         #
         file_path = file_obj.path
 

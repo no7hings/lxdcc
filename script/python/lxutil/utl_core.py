@@ -5,7 +5,7 @@ from lxutil.core import *
 if __name__ == '__main__':
     print ctt_objects.Content(
         value=bsc_core.StgFileOpt(
-            bsc_core.ResourceContent.get_yaml('storage/path-mapper')
+            bsc_core.ResourceConfigure.get_yaml('storage/path-mapper')
         ).set_read()
     )
     print(

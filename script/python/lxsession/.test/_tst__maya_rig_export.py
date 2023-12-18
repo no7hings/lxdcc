@@ -3,7 +3,7 @@ import lxbasic.core as bsc_core
 
 import lxsession.commands as ssn_commands
 
-user = bsc_core.SystemMtd.get_user_name()
+user = bsc_core.SysBaseMtd.get_user_name()
 
 for i_file_path in [
     # '/l/prod/cgm/work/assets/chr/ext_andy/rig/rigging/maya/scenes/ext_andy.rig.rigging.v001.ma',
@@ -32,7 +32,7 @@ for i_file_path in [
             description='td_test',
             movie_file='/l/prod/cgm/publish/assets/chr/bl_xiz_f/rig/rigging/bl_xiz_f.rig.rigging.v014/review/bl_xiz_f.rig.rigging.v014.mov',
             #
-            user=bsc_core.SystemMtd.get_user_name(),
+            user=bsc_core.SysBaseMtd.get_user_name(),
             #
             td_enable=True,
             # rez_beta=True,

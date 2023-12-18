@@ -1,10 +1,10 @@
 # coding:utf-8
-from ._rsc_cor_base import *
+from .base import *
 
-from ._rsc_cor_gui import *
+from .gui import *
 
-from ._rsc_cor_hook import *
+from .hook import *
 
-from ._rsc_cor_tool import *
+from .tool import *
 
-from ._rsc_cor_content import *
+from .configure import *

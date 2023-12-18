@@ -19,7 +19,7 @@ class AbsRsvAppOpt(object):
             'sub-process',
             'command=`{}` is started'.format(cmd.decode('utf-8'))
         )
-        bsc_core.SubProcessMtd.execute_with_result(
+        bsc_core.PrcBaseMtd.execute_with_result(
             cmd, **sub_progress_kwargs
         )
         bsc_core.Log.trace_method_result(

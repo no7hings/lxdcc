@@ -12,7 +12,7 @@ import fnmatch
 
 import parse
 
-import lxlog.core as log_core
+import lxbasic.log as bsc_log
 
 import lxbasic.core as bsc_core
 
@@ -58,7 +58,7 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
     def set_create(self, matrix=None):
         if self.obj.get_is_exists() is False:
             path = self.obj.get_path()
-            path_opt = bsc_core.DccPathDagOpt(path)
+            path_opt = bsc_core.PthNodeOpt(path)
             parent_path = path_opt.get_parent_path()
             name = path_opt.get_name()
             if parent_path != ma_configure.Util.OBJ_PATHSEP:
@@ -69,7 +69,7 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
                     )
                     om2_obj.setName(name)
                     #
-                    log_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'transform-obj-create',
                         'obj="{}"'.format(self.obj.path)
                     )
@@ -80,7 +80,7 @@ class TransformOpt(utl_dcc_opt_abs.AbsObjOpt):
                 #
                 om2_obj.setName(name)
                 #
-                log_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'transform-obj-create',
                     'obj="{}"'.format(self.obj.path)
                 )
@@ -135,7 +135,7 @@ class MeshOpt(
                 #
                 _om2_obj = ma_core.Om2Method._get_om2_mesh_fnc_(shape_path)
                 #
-                log_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'mesh-obj-create',
                     u'obj="{}"'.format(shape_path)
                 )
@@ -401,7 +401,7 @@ class MeshOpt(
         uv_map_names = self.get_uv_map_names()
         if uv_map_name not in uv_map_names:
             om2_obj.createUVSet(uv_map_name)
-            log_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'uv-map-create',
                 u'uv-map-name="{}"'.format(uv_map_name)
             )
@@ -417,13 +417,13 @@ class MeshOpt(
                 om2_obj.setUVs(u_coords, v_coords, uv_map_name)
                 om2_obj.assignUVs(uv_face_vertex_counts, uv_face_vertex_indices, uv_map_name)
                 #
-                log_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'mesh uv-map assign',
                     u'obj="{}"; uv-map-name="{}"'.format(self.obj.path, uv_map_name)
                 )
         except Exception:
             bsc_core.ExceptionMtd.set_print()
-            log_core.Log.trace_method_error(
+            bsc_log.Log.trace_method_error(
                 'mesh uv-map assign',
                 'obj="{}"'.format(self.obj.path)
             )

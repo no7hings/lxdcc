@@ -45,12 +45,12 @@ class Utils(object):
         return [i for i in _ if not cmds.referenceQuery(i, isNodeReferenced=1)]
     @classmethod
     def get_name_with_namespace_clear(cls, name):
-        return bsc_core.DccPathDagMtd.get_dag_name_with_namespace_clear(
+        return bsc_core.PthNodeMtd.get_dag_name_with_namespace_clear(
             name, ma_configure.Util.NAMESPACE_PATHSEP
         )
     @classmethod
     def get_path_with_namespace_clear(cls, path):
-        return bsc_core.DccPathDagMtd.get_dag_path_with_namespace_clear(
+        return bsc_core.PthNodeMtd.get_dag_path_with_namespace_clear(
             path, ma_configure.Util.OBJ_PATHSEP, ma_configure.Util.NAMESPACE_PATHSEP
         )
 

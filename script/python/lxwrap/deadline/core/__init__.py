@@ -1,11 +1,11 @@
 # coding:utf-8
-from ._ddl_cor_configure import *
+from .configure import *
 
-from ._ddl_cor_base import *
+from .base import *
 
-from ._ddl_cor_extra import *
+from .method import *
 
-from ._ddl_cor_execute import *
+from .execute import *
 
 
 

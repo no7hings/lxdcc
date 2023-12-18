@@ -209,8 +209,8 @@ class AbsRsvObjHookOpt(object):
         return list_
 
     def get_asset_model_act_frame_range(self):
-        import lxutil.scripts as utl_scripts
-        #
+        import lxbasic.dcc.core as bsc_dcc_core
+
         rsv_asset = self._rsv_task.get_rsv_resource()
         model_act_rsv_task = rsv_asset.get_rsv_task(
             step='mod',
@@ -221,7 +221,7 @@ class AbsRsvObjHookOpt(object):
             cmp_usd_file_rsv_unit = model_act_rsv_task.get_rsv_unit(keyword=keyword)
             cmp_usd_file_path = cmp_usd_file_rsv_unit.get_exists_result(version='latest')
             if cmp_usd_file_path:
-                return utl_scripts.DotUsdaFileReader(cmp_usd_file_path).get_frame_range()
+                return bsc_dcc_core.DotUsdaFileReader(cmp_usd_file_path).get_frame_range()
 
     def get_asset_model_act_cmp_usd_file(self):
         rsv_asset = self._rsv_task.get_rsv_resource()

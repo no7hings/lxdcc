@@ -102,8 +102,8 @@ class ScpResourcesAddByQuixel(object):
 
         if category_group in self.ALL_CATEGORY_GROUPS:
             dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-                bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
-                bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(category_group))
+                bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
+                bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(category_group))
             )
             # resource
             resource_directory_path_tgt = self.stg_create_resource_directory_tgt_fnc(
@@ -467,7 +467,7 @@ class ScpResourcesAddByQuixel(object):
             resource_dtb_path, texture_type_tag_dtb_path, kind=dtb_opt.Kinds.ResourceFileTag
         )
         # texture size tag
-        texture_size = bsc_core.ImgFileOiioOpt(file_stg_path).get_size()
+        texture_size = bsc_core.ImgOiioOpt(file_stg_path).get_size()
         texture_size_tag = '{}x{}'.format(*texture_size)
         texture_size_tag_dtb_path = '/resolution/{}'.format(texture_size_tag)
         dtb_opt.create_tag_assign(
@@ -581,7 +581,7 @@ class ScpResourcesAddByQuixel(object):
             resource_dtb_path, texture_type_tag_dtb_path, kind=dtb_opt.Kinds.ResourceFileTag
         )
         # texture size tag
-        texture_size = bsc_core.ImgFileOiioOpt(file_stg_path).get_size()
+        texture_size = bsc_core.ImgOiioOpt(file_stg_path).get_size()
         texture_size_tag = '{}x{}'.format(*texture_size)
         texture_size_tag_dtb_path = '/resolution/{}'.format(texture_size_tag)
         dtb_opt.create_tag_assign(

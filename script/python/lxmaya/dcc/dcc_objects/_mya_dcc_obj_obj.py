@@ -3,7 +3,7 @@ import fnmatch
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
-import lxlog.core as log_core
+import lxbasic.log as bsc_log
 
 from lxmaya.dcc import mya_dcc_obj_abs
 
@@ -95,7 +95,7 @@ class Reference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
 
     def set_replace(self, file_path):
         cmds.file(file_path, loadReference=self.name)
-        log_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'reference replace',
             u'file="{}"'.format(file_path)
         )
@@ -177,7 +177,7 @@ class TextureReference(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
         if self.get_color_space() != color_space:
             self.get_port('ignoreColorSpaceFileRules').set(True)
             self.get_port('colorSpace').set(color_space)
-            log_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'color-space switch',
                 'obj="{}", color-space="{}"'.format(self.path, color_space)
             )
@@ -204,7 +204,7 @@ class Set(mya_dcc_obj_abs.AbsMyaObj):
 
     def add_element(self, path):
         cmds.sets(path, addElement=self.path, edit=1)
-        log_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'set-element-add',
             'connection="{}" >> "{}"'.format(path, self.path)
         )
@@ -217,7 +217,7 @@ class Set(mya_dcc_obj_abs.AbsMyaObj):
 
     def set_element_remove(self, path):
         cmds.sets(path, remove=self.path, edit=1)
-        log_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'set-element-remove',
             'connection="{}" >> "{}"'.format(path, self.path)
         )

@@ -191,7 +191,7 @@ class DtbBaseOpt(object):
                         data['name'] = ''
                     else:
                         #
-                        path_opt = bsc_core.DccPathDagOpt(path)
+                        path_opt = bsc_core.PthNodeOpt(path)
                         group = path_opt.get_parent_path()
                         data['group'] = group
                         name = path_opt.get_name()
@@ -265,9 +265,9 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         self._dtb_cfg_opt.do_flatten()
 
         self._dtb_pattern_kwargs = {}
-        if bsc_core.SystemMtd.get_is_linux():
+        if bsc_core.SysBaseMtd.get_is_linux():
             self._dtb_stg_root = self._dtb_cfg_opt.get('option.variants.root-linux')
-        elif bsc_core.SystemMtd.get_is_windows():
+        elif bsc_core.SysBaseMtd.get_is_windows():
             self._dtb_stg_root = self._dtb_cfg_opt.get('option.variants.root-windows')
         else:
             raise NotImplementedError()
@@ -349,7 +349,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         for i_path, i_kwargs in entities.items():
             i_entity_type = i_kwargs['entity_type']
             i_options = i_kwargs.get('options') or {}
-            i_path_opt = bsc_core.DccPathDagOpt(i_path)
+            i_path_opt = bsc_core.PthNodeOpt(i_path)
             i_name = i_path_opt.name
 
             if 'gui_name' in i_kwargs:
@@ -406,7 +406,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         )
 
     def create_category_group(self, path):
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         if not self.get_entity(
                 entity_type=self.EntityTypes.CategoryRoot,
                 filters=[
@@ -437,7 +437,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         )
 
     def create_category(self, path):
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         if not self.get_entity(
                 entity_type=self.EntityTypes.CategoryGroup,
                 filters=[
@@ -485,7 +485,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         )
 
     def create_type(self, path):
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         if not self.get_entity(
                 entity_type=self.EntityTypes.Category,
                 filters=[
@@ -567,7 +567,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
             self.create_category,
             self.create_type,
         ]
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         components = path_opt.get_components()
         components.reverse()
         results = []
@@ -604,7 +604,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         if _:
             return False, _
         #
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         name = path_opt.get_name()
         gui_name = bsc_core.RawStrUnderlineOpt(name).to_prettify()
         options = dict(kind=self.Kinds.Resource, gui_icon_name='database/object')
@@ -648,7 +648,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         if _:
             return False, _
         #
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         name = path_opt.get_name()
         gui_name = name
         options = dict(kind=self.Kinds.Version, gui_icon_name='database/object')
@@ -703,7 +703,7 @@ class DtbResourceLibraryOpt(DtbBaseOpt):
         if _:
             return False, _
         #
-        path_opt = bsc_core.DccPathDagOpt(path)
+        path_opt = bsc_core.PthNodeOpt(path)
         name = path_opt.get_name()
         gui_name = name
         options = dict(kind=kind, gui_icon_name='database/object')
@@ -958,8 +958,8 @@ if __name__ == '__main__':
         '3d_plant_proxy',
     ]:
         dtb_opt_ = DtbResourceLibraryOpt(
-            bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
-            bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(_i_key)),
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(_i_key)),
         )
         #
         dtb_opt_.setup_entity_categories()

@@ -34,7 +34,7 @@ class AssImportFnc(object):
         self._assign_selection_enable = assign_selection_enable
         #
         self._convert_configure = ctt_core.Content(
-            value=bsc_core.ResourceContent.get_yaml('arnold/convert')
+            value=bsc_core.ResourceConfigure.get_yaml('arnold/convert')
         )
         self._convert_configure.do_flatten()
 
@@ -336,7 +336,7 @@ class AssImportFnc(object):
                     g_p.do_update()
                     #
                     geometry_and_obj_path = geometry_and_obj.path
-                    geometry_dcc_dag_path = bsc_core.DccPathDagOpt(geometry_and_obj_path).translate_to(
+                    geometry_dcc_dag_path = bsc_core.PthNodeOpt(geometry_and_obj_path).translate_to(
                         ma_configure.Util.OBJ_PATHSEP
                     )
                     geometry_dcc_obj = mya_dcc_objects.Geometry(geometry_dcc_dag_path.path)
@@ -477,10 +477,10 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
 
     def create_connections_fnc(self):
         for atr_path_src, atr_path_tgt in self._connections:
-            obj_path_src, port_path_src = bsc_core.DccAttrPathOpt(atr_path_src).to_args()
+            obj_path_src, port_path_src = bsc_core.PthAttributeOpt(atr_path_src).to_args()
             if obj_path_src in self._name_dict:
                 obj_path_src = self._name_dict[obj_path_src]
-            atr_path_src = bsc_core.DccAttrPathMtd.get_atr_path(obj_path_src, port_path_src)
+            atr_path_src = bsc_core.PthAttributeMtd.get_atr_path(obj_path_src, port_path_src)
             ma_core.CmdPortOpt._set_connection_create_(atr_path_src, atr_path_tgt)
 
     def create_node_fnc(
@@ -559,7 +559,7 @@ class FncLookYamlImporter(utl_fnc_ipt_abs.AbsDccLookYamlImporter):
                         try:
                             if type_name == 'file':
                                 if port_path == 'fileTextureName':
-                                    value = bsc_core.StgBasePathMapper.map_to_current(value)
+                                    value = bsc_core.StgBasePathMapMtd.map_to_current(value)
                             #
                             port.set(value)
                         except Exception:

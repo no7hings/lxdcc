@@ -279,7 +279,7 @@ class AbsFileReferences(object):
         cls._set_file_value_repair_(obj)
 
     @classmethod
-    @bsc_core.Modifiers.run_as_ignore
+    @bsc_core.MdfBaseMtd.run_as_ignore
     def _set_file_value_repair_(cls, obj):
         if obj.type_name == 'file':
             port = obj.get_port('fileTextureName')

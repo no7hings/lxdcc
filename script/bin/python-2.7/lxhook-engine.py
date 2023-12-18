@@ -66,7 +66,7 @@ def __execute_option_hook(hook_option):
     :param hook_option:
     :return:
     """
-    import lxlog.core as log_core
+    import lxbasic.log as bsc_log
 
     import lxbasic.core as bsc_core
     #
@@ -90,7 +90,7 @@ def __execute_option_hook(hook_option):
     # check engine is in configure
     if hook_engine not in all_hook_engines:
         raise RuntimeError(
-            log_core.Log.trace_method_error(
+            bsc_log.Log.trace_method_error(
                 'hook-run',
                 'engine="{}" is not available'.format(hook_engine)
             )
@@ -98,7 +98,7 @@ def __execute_option_hook(hook_option):
     #
     rez_beta = option_opt.get('rez_beta') or False
     if rez_beta is True:
-        bsc_core.EnvironMtd.set(
+        bsc_core.EnvBaseMtd.set(
             'REZ_BETA', '1'
         )
     #
@@ -142,7 +142,7 @@ def __execute_option_hook(hook_option):
     # add extend environs
     environs_extend = {}
     #
-    _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
+    _ = bsc_core.EnvBaseMtd.get('PAPER_EXTEND_RESOURCES')
     if _:
         environs_extend['PAPER_EXTEND_RESOURCES'] = _
     #

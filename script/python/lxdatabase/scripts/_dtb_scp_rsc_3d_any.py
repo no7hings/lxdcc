@@ -73,7 +73,7 @@ class ScpResourcesAddFor3dPlant(object):
 
     @classmethod
     def stg_copy_preview(cls, dtb_opt, file_path_src, pattern_kwargs, replace=False):
-        file_path_png_src = bsc_core.ImgFileOpt(file_path_src).get_thumbnail(width=256, ext='.png')
+        file_path_png_src = bsc_core.ImgOiioOptForThumbnail(file_path_src).generate_thumbnail(width=256, ext='.png')
         file_path_opt = dtb_opt.get_pattern_opt('image-preview-png-file')
         file_path = file_path_opt.update_variants_to(**pattern_kwargs).get_value()
         bsc_core.StgFileOpt(file_path_png_src).set_copy_to_file(
@@ -132,13 +132,13 @@ class ScpResourcesAddFor3dPlant(object):
                 raise RuntimeError()
 
     def add_3d_from(self, directory_path_src, type_dtb_path):
-        type_opt = bsc_core.DccPathDagOpt(type_dtb_path)
+        type_opt = bsc_core.PthNodeOpt(type_dtb_path)
         cs = type_opt.get_components()
         category_group_opt = cs[-2]
         category_group = category_group_opt.get_name()
         dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-            bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
-            bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(category_group))
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(category_group))
         )
         #
         variants = {'directory': directory_path_src}

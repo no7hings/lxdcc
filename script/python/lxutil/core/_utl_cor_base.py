@@ -48,7 +48,7 @@ class SubProcessRunner(object):
             'sub-process',
             'start for: `{}`'.format(cmd)
         )
-        bsc_core.SubProcessMtd.execute_with_result(
+        bsc_core.PrcBaseMtd.execute_with_result(
             cmd, **sub_progress_kwargs
         )
         bsc_core.Log.trace_method_result(
@@ -62,7 +62,7 @@ class SubProcessRunner(object):
             'sub-process',
             'execute for: `{}`'.format(cmd)
         )
-        return bsc_core.SubProcessMtd.set_run(
+        return bsc_core.PrcBaseMtd.set_run(
             cmd
         )
 
@@ -158,15 +158,15 @@ class CommandMonitor(object):
 class System(object):
     @classmethod
     def get_user_name(cls):
-        return bsc_core.SystemMtd.get_user_name()
+        return bsc_core.SysBaseMtd.get_user_name()
 
     @classmethod
     def get_time(cls):
-        return bsc_core.SystemMtd.get_time()
+        return bsc_core.SysBaseMtd.get_time()
 
     @classmethod
     def get_time_tag(cls):
-        return bsc_core.TimeMtd.get_time_tag()
+        return bsc_core.SysBaseMtd.get_time_tag()
 
 
 class Environ(object):
@@ -245,7 +245,7 @@ class File(object):
 
 class AppLauncher(object):
     # TODO fix 9.9.9
-    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SystemMtd.get_home_directory())
+    LOCAL_ROOT = '{}/packages/pglauncher/9.9.99'.format(bsc_core.SysBaseMtd.get_home_directory())
     SERVER_ROOT = '/l/packages/pg/prod/pglauncher/9.9.9'
     #
     PROJECT_CONFIGURE_DIRECTORY_PATTERN = '{root}/{project}_config'
@@ -951,11 +951,11 @@ class DccModifier(object):
                 fnc.__module__,
                 fnc.__name__,
                 time.strftime(
-                    bsc_core.TimeMtd.TIME_FORMAT,
+                    bsc_core.SysBaseMtd.TIME_FORMAT,
                     time.localtime(start_timestamp)
                 )
             )
-            bsc_core.SystemMtd.trace(message)
+            bsc_core.SysBaseMtd.trace(message)
 
             _result = fnc(*args, **kwargs)
 
@@ -964,12 +964,12 @@ class DccModifier(object):
                 fnc.__module__,
                 fnc.__name__,
                 time.strftime(
-                    bsc_core.TimeMtd.TIME_FORMAT,
+                    bsc_core.SysBaseMtd.TIME_FORMAT,
                     time.localtime(end_timestamp)
                 ),
                 (end_timestamp-start_timestamp)
             )
-            bsc_core.SystemMtd.trace(message)
+            bsc_core.SysBaseMtd.trace(message)
             return _result
 
         return fnc_
@@ -1082,10 +1082,10 @@ class DccModifier(object):
 
 
 def get_is_ui_mode():
-    if bsc_core.ApplicationMtd.get_is_maya():
+    if bsc_core.SysApplicationMtd.get_is_maya():
         from lxmaya import ma_core
         return ma_core.get_is_ui_mode()
-    elif bsc_core.ApplicationMtd.get_is_katana():
+    elif bsc_core.SysApplicationMtd.get_is_katana():
         import lxkatana.core as ktn_core
         return ktn_core.KtnUtil.get_is_ui_mode()
     return False

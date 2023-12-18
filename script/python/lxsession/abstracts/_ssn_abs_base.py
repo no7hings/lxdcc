@@ -61,7 +61,7 @@ class AbsSsnRsvUnitDef(object):
             self._rsv_unit = rsv_obj.get_rsv_unit(
                 keyword=self._rsv_keyword
             )
-            self._rsv_unit_extend_variants['artist'] = bsc_core.SystemMtd.get_user_name()
+            self._rsv_unit_extend_variants['artist'] = bsc_core.SysBaseMtd.get_user_name()
 
     @property
     def rsv_task(self):
@@ -348,7 +348,7 @@ class AbsSsnOptionMethod(
         option_opt = self.get_option_opt()
         for i_key in self.STD_KEYS:
             if option_opt.get(i_key) is None:
-                option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
+                option_opt.set(i_key, bsc_core.SysBaseMtd.get(i_key))
 
     def get_batch_file_path(self):
         option_opt = self.get_option_opt()
@@ -357,7 +357,7 @@ class AbsSsnOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StorageMtd.get_is_exists(file_path) is False:
+        if bsc_core.StgBaseMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),
@@ -731,7 +731,7 @@ class AbsSsnRsvTaskOptionMethod(
         option_opt = self.get_option_opt()
         for i_key in self.STD_KEYS:
             if option_opt.get(i_key) is None:
-                option_opt.set(i_key, bsc_core.SystemMtd.get(i_key))
+                option_opt.set(i_key, bsc_core.SysBaseMtd.get(i_key))
 
     def __completion_option_by_rsv_scene_properties_(self):
         if self._rsv_scene_properties is not None:
@@ -758,7 +758,7 @@ class AbsSsnRsvTaskOptionMethod(
             user=option_opt.get('user'),
             time_tag=option_opt.get('time_tag'),
         )
-        if bsc_core.StorageMtd.get_is_exists(file_path) is False:
+        if bsc_core.StgBaseMtd.get_is_exists(file_path) is False:
             raw = dict(
                 user=option_opt.get('user'),
                 time_tag=option_opt.get('time_tag'),

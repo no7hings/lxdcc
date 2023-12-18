@@ -3,9 +3,9 @@ import lxbasic.core as bsc_core
 
 import lxsession.commands as ssn_commands
 
-user = bsc_core.SystemMtd.get_user_name()
+user = bsc_core.SysBaseMtd.get_user_name()
 
-time_tag = bsc_core.TimeMtd.get_time_tag()
+time_tag = bsc_core.SysBaseMtd.get_time_tag()
 
 for i_f in [
     # '/l/prod/xkt/publish/assets/chr/jiguang/srf/srf_anishading/jiguang.srf.srf_anishading.v006/scene/jiguang.ma',

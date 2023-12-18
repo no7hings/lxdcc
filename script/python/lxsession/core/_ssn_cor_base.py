@@ -19,8 +19,8 @@ class SsnHookMtd(object):
 
         bsc_core.StgFileOpt(hook_yml_file_path).set_write(
             dict(
-                user=bsc_core.SystemMtd.get_user_name(),
-                tiame=bsc_core.TimeMtd.get_time(),
+                user=bsc_core.SysBaseMtd.get_user_name(),
+                tiame=bsc_core.SysBaseMtd.get_time(),
                 cmd=cmd,
             )
         )
@@ -44,7 +44,7 @@ class SsnHookEngineMtd(object):
         if cls.CONTENT is not None:
             return cls.CONTENT
         cls.CONTENT = ctt_core.Content(
-            value=bsc_core.ResourceContent.get_yaml('session/hook-engine')
+            value=bsc_core.ResourceConfigure.get_yaml('session/hook-engine')
         )
         cls.CONTENT.do_flatten()
         return cls.CONTENT
@@ -74,11 +74,11 @@ class SsnHookFileMtd(object):
 
     @classmethod
     def get_shell(cls, key, search_paths=None):
-        if bsc_core.PlatformMtd.get_is_linux():
+        if bsc_core.SysPlatformMtd.get_is_linux():
             return bsc_core.ExtendResource.get(
                 '{}/{}.sh'.format(cls.BRANCH, key), search_paths
             )
-        elif bsc_core.PlatformMtd.get_is_windows():
+        elif bsc_core.SysPlatformMtd.get_is_windows():
             return bsc_core.ExtendResource.get(
                 '{}/{}.bat'.format(cls.BRANCH, key), search_paths
             )
@@ -133,7 +133,7 @@ class SsnHookFileMtd(object):
 
     @classmethod
     def get_extra_file(cls, key):
-        directory_path = bsc_core.EnvironMtd.get_session_root()
+        directory_path = bsc_core.EnvBaseMtd.get_session_root()
         region = bsc_core.StgTmpBaseMtd.get_save_region(key)
         return '{}/.session/extra/{}/{}{}'.format(
             directory_path, region, key, '.yml'
@@ -165,7 +165,7 @@ class SsnHookServerMtd(object):
 
     @classmethod
     def get_file_path(cls, **kwargs):
-        directory_path = bsc_core.EnvironMtd.get_session_root()
+        directory_path = bsc_core.EnvBaseMtd.get_session_root()
         key = cls.get_key(**kwargs)
         region = bsc_core.StgTmpBaseMtd.get_save_region(key)
         return '{}/.session/option-hook/{}/{}{}'.format(

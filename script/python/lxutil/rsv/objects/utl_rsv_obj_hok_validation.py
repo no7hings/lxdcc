@@ -52,10 +52,10 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             if bsc_core.RawTextOpt(j_file_path).get_is_contain_space() is True:
                                 j_check_results[4] = False
                             # todo, need then?
-                            # if bsc_core.SystemMtd.get_is_linux():
+                            # if bsc_core.SysBaseMtd.get_is_linux():
                             #     if not j_texture.path.startswith('/l'):
                             #         j_check_results[5] = False
-                            # elif bsc_core.SystemMtd.get_is_windows():
+                            # elif bsc_core.SysBaseMtd.get_is_windows():
                             #     if not j_texture.path.lower().startswith('l:'):
                             #         j_check_results[5] = False
                     #
@@ -187,7 +187,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StgBaseMtd.get_is_writable(i) is True]
         if unlocked_directory_paths:
             validation_checker.register_node_directories_result(
                 location,
@@ -204,7 +204,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import lxmaya.dcc.dcc_objects as mya_dcc_objects
 
         #
-        dcc_location = bsc_core.DccPathDagOpt(location).translate_to(pathsep).to_string()
+        dcc_location = bsc_core.PthNodeOpt(location).translate_to(pathsep).to_string()
         dcc_group = mya_dcc_objects.Node(dcc_location)
         if dcc_group.get_is_exists() is False:
             if ignore_check is False:
@@ -269,7 +269,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root_location = self._rsv_scene_properties.get('dcc.root')
         pathsep = self._rsv_scene_properties.get('dcc.pathsep')
         #
-        dcc_root_location_cur = bsc_core.DccPathDagOpt(root_location).translate_to(pathsep).to_string()
+        dcc_root_location_cur = bsc_core.PthNodeOpt(root_location).translate_to(pathsep).to_string()
         if not dcc_root_location_cur:
             return False
         #
@@ -435,7 +435,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ]
         results = fnc_geometry_comparer.get_results()
         for i_src_gmt_path, i_tgt_gmt_path, i_description in results:
-            i_dcc_path = bsc_core.DccPathDagOpt(i_src_gmt_path).translate_to(pathsep).to_string()
+            i_dcc_path = bsc_core.PthNodeOpt(i_src_gmt_path).translate_to(pathsep).to_string()
             for j_e in warning_es:
                 if j_e in i_description:
                     validation_checker.register_node_result(

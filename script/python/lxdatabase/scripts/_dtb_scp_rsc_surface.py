@@ -14,13 +14,13 @@ class ScpResourcesAddForSurface(object):
         pass
 
     def add_texture_from(self, directory_path_src, type_dtb_path, texture_type_tag):
-        type_opt = bsc_core.DccPathDagOpt(type_dtb_path)
+        type_opt = bsc_core.PthNodeOpt(type_dtb_path)
         cs = type_opt.get_components()
         category_group_opt = cs[-2]
         category_group = category_group_opt.get_name()
         dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-            bsc_core.ResourceContent.get_yaml('database/library/resource-basic'),
-            bsc_core.ResourceContent.get_yaml('database/library/resource-{}'.format(category_group))
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(category_group))
         )
         #
         dtb_opt.get_type_force(type_dtb_path)
@@ -163,7 +163,7 @@ class ScpResourcesAddForSurface(object):
 
     @classmethod
     def stg_create_preview(cls, dtb_opt, file_path, pattern_kwargs):
-        preview_file_path_ = bsc_core.ImgFileOpt(file_path).get_thumbnail(width=256, ext='.png')
+        preview_file_path_ = bsc_core.ImgOiioOptForThumbnail(file_path).generate_thumbnail(width=256, ext='.png')
         preview_file_p_opt = dtb_opt.get_pattern_opt('image-preview-png-file')
         preview_file_path = preview_file_p_opt.update_variants_to(**pattern_kwargs).get_value()
         bsc_core.StgFileOpt(preview_file_path_).set_copy_to_file(
@@ -210,4 +210,4 @@ if __name__ == '__main__':
         type_dtb_path='/texture/imperfection/stain',
         texture_type_tag='roughness'
     )
-    # print bsc_core.ImgFileOpt('/l/temp/zeqi/tex/82 Stain Imperfection seamless pack 1-vol3/82 Stain Imperfection seamless pack 1-vol3/Stain Imperfection seamless 01-png.png').get_thumbnail(ext='.png')
+    # print bsc_core.ImgOiioOptForThumbnail('/l/temp/zeqi/tex/82 Stain Imperfection seamless pack 1-vol3/82 Stain Imperfection seamless pack 1-vol3/Stain Imperfection seamless 01-png.png').generate_thumbnail(ext='.png')

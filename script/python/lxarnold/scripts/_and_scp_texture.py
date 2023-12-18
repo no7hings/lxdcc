@@ -23,7 +23,7 @@ class ScpTextureCreate(object):
             'LD_LIBRARY_PATH', '/l/packages/pg/prod/maya/2019.2/platform-linux/Application/lib'
         )
         # ocio
-        bsc_core.EnvironMtd.set(
+        bsc_core.EnvBaseMtd.set(
             'OCIO', '/l/packages/pg/third_party/ocio/aces/1.2/config.ocio'
         )
 
@@ -38,7 +38,7 @@ class ScpTextureCreate(object):
         file_paths_src = directory_opt_src.get_all_file_paths(
             ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
-        file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
+        file_paths_src = bsc_core.StgBaseMtd.deduplication_files_by_formats(
             file_paths_src, formats
         )
         # bsc_core.FncThread()
@@ -73,7 +73,7 @@ class ScpTextureCreate(object):
         file_paths_src = directory_opt_src.get_all_file_paths(
             ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
-        file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
+        file_paths_src = bsc_core.StgBaseMtd.deduplication_files_by_formats(
             file_paths_src, formats
         )
         for i_index, i_file_path_src in enumerate(file_paths_src):
@@ -95,7 +95,7 @@ class ScpTextureCreate(object):
         file_paths_src = directory_opt_src.get_all_file_paths(
             ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
-        file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
+        file_paths_src = bsc_core.StgBaseMtd.deduplication_files_by_formats(
             file_paths_src, formats
         )
         for i_index, i_file_path_src in enumerate(file_paths_src):
@@ -126,7 +126,7 @@ class ScpTextureCreate(object):
         file_paths_src = directory_opt_src.get_all_file_paths(
             ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
-        file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
+        file_paths_src = bsc_core.StgBaseMtd.deduplication_files_by_formats(
             file_paths_src, formats
         )
         #
@@ -165,7 +165,7 @@ class ScpTextureCreate(object):
         file_paths_src = directory_opt_src.get_all_file_paths(
             ext_includes=map(lambda x: '.{}'.format(x), formats)
         )
-        file_paths_src = bsc_core.StorageMtd.deduplication_files_by_formats(
+        file_paths_src = bsc_core.StgBaseMtd.deduplication_files_by_formats(
             file_paths_src, formats
         )
         #

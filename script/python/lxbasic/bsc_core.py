@@ -1,4 +1,7 @@
 # coding:utf-8
+"""
+this module is for the old call
+"""
 from lxbasic.core import *
 
 
@@ -63,14 +66,14 @@ if __name__ == '__main__':
     # StgPathPermissionMtd.create_directory(
     #     '/production/library/resource', 777
     # )
-    # print ImgFileOpt(
+    # print ImgOiioOptForThumbnail(
     #     '/production/library/resource/all/atlas/sword_fern_pjvef2/v0001/image/preview.png'
-    # ).get_thumbnail(ext='.png')
+    # ).generate_thumbnail(ext='.png')
 
     # print Resource.get(
     #     'asset/library/geometry_sphere.usda'
     # )
-    # print SystemMtd.get_environment()
+    # print SysBaseMtd.get_environment()
     # StgRarFileOpt(
     #     '/l/temp/zeqi/tex/test/DirtWipes 016.rar'
     # ).extract_all_elements_to(
@@ -83,18 +86,6 @@ if __name__ == '__main__':
     # ]:
     #     print RawTextMtd.clear_up_to(i)
     #     print i, RawTextMtd.split_any_to(i)
-
-    # p = '/production/library/resource/all/imperfection/{resource_name}/v001/texture/original/src/{resource_name}.mask.jpg'
-    # p_o = PtnParseOpt(p)
-    # for i in p_o.get_matches():
-    #     i_f_src = i['result']
-    #     i_f_o_src = StgFileOpt(i_f_src)
-    #     i_n = i_f_o_src.get_name().replace('mask', 'roughness')
-    #     i_f_tgt = '{}/{}'.format(i_f_o_src.get_directory_path(), i_n)
-    #     ImgFileOpt.r_to_rgb(
-    #         i_f_src,
-    #         i_f_tgt
-    #     )
 
     # print [RawTextOpt(str(i)).to_rgb_(maximum=1) for i in range(898)]
 
@@ -132,21 +123,21 @@ if __name__ == '__main__':
     #
     # print cmd
     #
-    # SubProcessMtd.execute_with_result(
+    # PrcBaseMtd.execute_with_result(
     #     cmd
     # )
 
     # cmd = FfmpegMtd.test(
     #     input='/l/temp/td/dongchangbao/render_test/render/test/cam_head.white.mov'
     # )
-    # SubProcessMtd.execute_with_result(
+    # PrcBaseMtd.execute_with_result(
     #     cmd
     # )
     #
     # cmd = FfmpegMtd.test(
     #     input='/l/temp/td/dongchangbao/render_test/upper_body.mov'
     # )
-    # SubProcessMtd.execute_with_result(
+    # PrcBaseMtd.execute_with_result(
     #     cmd
     # )
 
@@ -158,7 +149,7 @@ if __name__ == '__main__':
     #     output='/l/temp/td/dongchangbao/render_test/render/test/cam_full_body.mov',
     # )
     # print cmd
-    # SubProcessMtd.execute_with_result(
+    # PrcBaseMtd.execute_with_result(
     #     cmd
     # )
 
@@ -186,7 +177,7 @@ if __name__ == '__main__':
     #
     # t_p.start_all()
 
-    # c_c = RgbRange(count=10000)
+    # c_c = RawRgbRange(count=10000)
     # print c_c.get_rgb(1)
     # print StgTextureOpt(
     #     '/data/e/workspace/lynxi/test/maya/vertex-color/test.<udim>.jpg'

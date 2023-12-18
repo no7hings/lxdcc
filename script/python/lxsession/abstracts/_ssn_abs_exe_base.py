@@ -29,7 +29,7 @@ class AbsHookExecutor(object):
 
         name = session.get_type()
         return self._submit_deadline_job_(
-            session, name, dict(platform=bsc_core.SystemMtd.get_platform())
+            session, name, dict(platform=bsc_core.SysBaseMtd.get_platform())
         )
 
     def _submit_deadline_job_(self, session, name, option_extra_variants, deadline_configure=None):
@@ -174,7 +174,7 @@ class AbsHookExecutor(object):
                 'Group', 'td'
             )
             self._ddl_submiter.job_info.set(
-                'Whitelist', bsc_core.SystemMtd.get_host()
+                'Whitelist', bsc_core.SysBaseMtd.get_host()
             )
         # when "localhost" is discard, override deadline pool and group options
         localhost_enable = hook_option_opt.get('localhost_enable') or False
@@ -189,7 +189,7 @@ class AbsHookExecutor(object):
                 'Group', 'artist'
             )
             self._ddl_submiter.job_info.set(
-                'Whitelist', bsc_core.SystemMtd.get_host()
+                'Whitelist', bsc_core.SysBaseMtd.get_host()
             )
         #
         exists_ddl_job_id = session.set_ddl_job_id_find(hook_option)
@@ -219,18 +219,18 @@ class AbsHookExecutor(object):
         #
         environs_extend = {}
         #
-        _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
+        _ = bsc_core.EnvBaseMtd.get('PAPER_EXTEND_RESOURCES')
         if _:
             environs_extend['PAPER_EXTEND_RESOURCES'] = _
         #
         cmd = self.get_shell_command()
         #
         if block is True:
-            bsc_core.SubProcessMtd.execute_with_result(
+            bsc_core.PrcBaseMtd.execute_with_result(
                 cmd, environs_extend=environs_extend
             )
         else:
-            bsc_core.SubProcessMtd.set_run_with_result_use_thread(
+            bsc_core.PrcBaseMtd.set_run_with_result_use_thread(
                 cmd, environs_extend=environs_extend
             )
 

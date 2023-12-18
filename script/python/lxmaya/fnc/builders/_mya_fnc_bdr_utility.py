@@ -15,8 +15,8 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 
 class GeometryAlembicBlender(object):
     def __init__(self, src_root, tgt_root):
-        self._src_root = bsc_core.DccPathDagOpt(src_root).translate_to('|').to_string()
-        self._tgt_root = bsc_core.DccPathDagOpt(tgt_root).translate_to('|').to_string()
+        self._src_root = bsc_core.PthNodeOpt(src_root).translate_to('|').to_string()
+        self._tgt_root = bsc_core.PthNodeOpt(tgt_root).translate_to('|').to_string()
 
     def __set_meshes_blend_(self):
         self._set_meshes_connect_(
@@ -230,7 +230,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
                             )
                     #
                     ma_core.CmdObjOpt(
-                        bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
+                        bsc_core.PthNodeOpt(root).translate_to('|').to_string()
                     ).create_customize_attributes(customize_attributes)
 
     @classmethod
@@ -408,7 +408,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         if with_camera is True:
             if rsv_task is not None:
-                dcc_data = rsv_task.get_rsv_project().get_dcc_data(application=bsc_core.ApplicationMtd.get_current())
+                dcc_data = rsv_task.get_rsv_project().get_dcc_data(application=bsc_core.SysApplicationMtd.get_current())
                 location = dcc_data.get('camera_root')
                 camera_main_abc_file_rsv_unit = rsv_task.get_rsv_unit(keyword='asset-camera-main-abc-file')
                 camera_main_abc_file_path = camera_main_abc_file_rsv_unit.get_result(version='latest')
@@ -444,7 +444,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
             if rsv_asset is not None:
                 user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('builder')
                 file_path = '{}/{}.ma'.format(
-                    user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.TimeMtd.get_time_tag()])
+                    user_directory_path, '-'.join(rsv_asset.path.split('/')[1:]+[bsc_core.SysBaseMtd.get_time_tag()])
                     )
 
                 mya_dcc_objects.Scene.save_to_file(file_path)
@@ -736,7 +736,7 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
                         )
                 #
                 ma_core.CmdObjOpt(
-                    bsc_core.DccPathDagOpt(root).translate_to('|').to_string()
+                    bsc_core.PthNodeOpt(root).translate_to('|').to_string()
                 ).create_customize_attributes(customize_attributes)
 
     @classmethod

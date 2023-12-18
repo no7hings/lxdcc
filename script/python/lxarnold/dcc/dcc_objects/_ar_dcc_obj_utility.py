@@ -17,5 +17,6 @@ class Scene(and_obj_abstract.AbsObjScene):
     #
     FILE_CLS = utl_dcc_objects.OsFile
     UNIVERSE_CLS = unv_objects.ObjUniverse
+
     def __init__(self, option=None):
         super(Scene, self).__init__(option=option)

@@ -301,10 +301,10 @@ class AbsDccObjSourceDef(object):
         connection_raw = self._get_source_connection_raw_(*args, **kwargs)
         pathsep = self.CONNECTION_CLS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
-            source_obj_path, source_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
+            source_obj_path, source_port_path = bsc_core.PthAttributeMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
             )
-            target_obj_path, target_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
+            target_obj_path, target_port_path = bsc_core.PthAttributeMtd.set_atr_path_split(
                 target_atr_path, pathsep=pathsep
             )
             source = source_obj_cls(source_obj_path).get_port(source_port_path)
@@ -404,10 +404,10 @@ class AbsDccObjTargetDef(object):
         connection_raw = self._get_target_connection_raw_(*args, **kwargs)
         pathsep = self.CONNECTION_CLS.PORT_PATHSEP
         for source_atr_path, target_atr_path in connection_raw:
-            source_obj_path, source_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
+            source_obj_path, source_port_path = bsc_core.PthAttributeMtd.set_atr_path_split(
                 source_atr_path, pathsep=pathsep
             )
-            target_obj_path, target_port_path = bsc_core.DccAttrPathMtd.set_atr_path_split(
+            target_obj_path, target_port_path = bsc_core.PthAttributeMtd.set_atr_path_split(
                 target_atr_path, pathsep=pathsep
             )
             source = self.__class__(source_obj_path).get_port(source_port_path)
@@ -808,9 +808,9 @@ class AbsSetup(object):
                     )
 
     def add_libraries(self, *args):
-        if bsc_core.PlatformMtd.get_is_windows():
+        if bsc_core.SysPlatformMtd.get_is_windows():
             [self.add_environ_fnc('PATH', i) for i in map(self._path_process_, args)]
-        elif bsc_core.PlatformMtd.get_is_linux():
+        elif bsc_core.SysPlatformMtd.get_is_linux():
             [self.add_environ_fnc('LD_LIBRARY_PATH', i) for i in map(self._path_process_, args)]
 
     def add_bin_fnc(self, *args):

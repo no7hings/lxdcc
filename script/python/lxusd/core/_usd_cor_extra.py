@@ -15,7 +15,7 @@ import lxuniverse.core as unr_core
 
 from .wrap import *
 
-from ..core import _usd_cor_configure
+from ..core import _usd_cor_configure as usd_cor_configure
 
 
 class UsdBasic(object):
@@ -50,17 +50,17 @@ class UsdStageOpt(UsdBasic):
             elif isinstance(args[0], six.string_types):
                 file_path = args[0]
                 if os.path.isfile(file_path) is True:
-                    bsc_core.Log.trace_method_result(
-                        self.KEY, 'open file is started: "{}"'.format(
-                            file_path
-                        )
-                    )
+                    # bsc_core.Log.trace_method_result(
+                    #     self.KEY, 'open file is started: "{}"'.format(
+                    #         file_path
+                    #     )
+                    # )
                     stage = self._open_file_(file_path)
-                    bsc_core.Log.trace_method_result(
-                        self.KEY, 'open file is completed: "{}"'.format(
-                            file_path
-                        )
-                    )
+                    # bsc_core.Log.trace_method_result(
+                    #     self.KEY, 'open file is completed: "{}"'.format(
+                    #         file_path
+                    #     )
+                    # )
                 else:
                     raise OSError()
             else:
@@ -155,7 +155,7 @@ class UsdStageOpt(UsdBasic):
             return _
 
     def create_obj(self, path_text, type_name=''):
-        path_opt = bsc_core.DccPathDagOpt(path_text)
+        path_opt = bsc_core.PthNodeOpt(path_text)
         paths = path_opt.get_component_paths()
         paths.reverse()
         for i_path in paths:
@@ -172,7 +172,7 @@ class UsdStageOpt(UsdBasic):
     def copy_dag_from(self, usd_prim):
         usd_stage = usd_prim.GetStage()
         path_text = usd_prim.GetPath().pathString
-        path_opt = bsc_core.DccPathDagOpt(path_text)
+        path_opt = bsc_core.PthNodeOpt(path_text)
         paths = path_opt.get_component_paths()
         paths.reverse()
         for i_path in paths:
@@ -203,18 +203,18 @@ class UsdStageOpt(UsdBasic):
         )
 
     def set_root_create(self, root, override=False):
-        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
-            root, pathsep=_usd_cor_configure.UsdNodes.PATHSEP
+        dag_path_comps = bsc_core.PthNodeMtd.get_dag_component_paths(
+            root, pathsep=usd_cor_configure.UsdNodes.PATHSEP
         )
         if dag_path_comps:
             dag_path_comps.reverse()
         #
         for i_path in dag_path_comps:
-            if i_path != _usd_cor_configure.UsdNodes.PATHSEP:
+            if i_path != usd_cor_configure.UsdNodes.PATHSEP:
                 if override is True:
                     self.set_obj_create_as_override(i_path)
                 else:
-                    self._usd_stage.DefinePrim(i_path, _usd_cor_configure.UsdNodeTypes.Xform)
+                    self._usd_stage.DefinePrim(i_path, usd_cor_configure.UsdNodeTypes.Xform)
         #
         default_prim_path = self._usd_stage.GetPrimAtPath(dag_path_comps[-1])
         self._usd_stage.SetDefaultPrim(default_prim_path)
@@ -225,9 +225,9 @@ class UsdStageOpt(UsdBasic):
             i_usd_prim_opt = UsdPrimOpt(i_usd_prim)
             list_.append(i_usd_prim_opt.get_path())
         #
-        path_opt = bsc_core.DccPathDagOpt(regex)
+        path_opt = bsc_core.PthNodeOpt(regex)
         #
-        child_paths = bsc_core.DccPathDagMtd.find_dag_child_paths(
+        child_paths = bsc_core.PthNodeMtd.find_dag_child_paths(
             path_opt.get_parent_path(), list_
         )
         #
@@ -371,13 +371,22 @@ class UsdStageOpt(UsdBasic):
             usd_prim = self._usd_stage.GetDefaultPrim()
         return b_box_cache.ComputeWorldBound(usd_prim)
 
-    def get_geometry_args(self, location=None, use_int_size=False):
+    def generate_geometry_args(self, location=None, use_int_size=False):
         if self.get_obj_is_exists(location) is True:
             b_box = self.get_bounding_box(location)
             r = b_box.GetRange()
-            return bsc_core.RawBBoxMtd.get_geometry_args(
+            return bsc_core.RawBBoxMtd.generate_geometry_args(
                 r.GetMin(), r.GetMax(), use_int_size
             )
+
+    def generate_bbox_args(self, location=None, use_int_size=False):
+        if self.get_obj_is_exists(location) is True:
+            b_box = self.get_bounding_box(location)
+            r = b_box.GetRange()
+            return r.GetMin(), r.GetMax()
+
+    def generate_bbox(self):
+        pass
 
     def get_radius(self, pivot):
         b_box_cache = UsdGeom.BBoxCache(
@@ -395,7 +404,7 @@ class UsdStageOpt(UsdBasic):
             if i_usd_prim.IsValid():
                 i_b_box = b_box_cache.ComputeWorldBound(i_usd_prim)
                 if i_usd_prim.GetTypeName() in [
-                    _usd_cor_configure.UsdNodeTypes.Mesh
+                    usd_cor_configure.UsdNodeTypes.Mesh
                 ]:
                     i_range = i_b_box.GetRange()
                     i_radius = bsc_core.RawBBoxMtd.get_radius(
@@ -443,15 +452,15 @@ class UsdStageOpt(UsdBasic):
     def load_by_location_fnc(self, file_path, location_source, location_target):
         usd_location = self._usd_stage.GetPseudoRoot()
         #
-        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
-            location_target, pathsep=_usd_cor_configure.UsdNodes.PATHSEP
+        dag_path_comps = bsc_core.PthNodeMtd.get_dag_component_paths(
+            location_target, pathsep=usd_cor_configure.UsdNodes.PATHSEP
         )
         if dag_path_comps:
             dag_path_comps.reverse()
         #
         for i in dag_path_comps:
-            if i != _usd_cor_configure.UsdNodes.PATHSEP:
-                usd_location = self._usd_stage.DefinePrim(i, _usd_cor_configure.UsdNodeTypes.Xform)
+            if i != usd_cor_configure.UsdNodes.PATHSEP:
+                usd_location = self._usd_stage.DefinePrim(i, usd_cor_configure.UsdNodeTypes.Xform)
         #
         usd_location.GetReferences().AddReference(file_path, location_source)
 
@@ -496,21 +505,21 @@ class UsdFileWriteOpt(object):
         self._usd_stage = Usd.Stage.CreateInMemory()
 
     def set_location_add(self, location):
-        dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
-            location, pathsep=_usd_cor_configure.UsdNodes.PATHSEP
+        dag_path_comps = bsc_core.PthNodeMtd.get_dag_component_paths(
+            location, pathsep=usd_cor_configure.UsdNodes.PATHSEP
         )
         if dag_path_comps:
             dag_path_comps.reverse()
         #
         for i in dag_path_comps:
-            if i != _usd_cor_configure.UsdNodes.PATHSEP:
+            if i != usd_cor_configure.UsdNodes.PATHSEP:
                 self.set_obj_add(i)
         #
         default_prim_path = self._usd_stage.GetPrimAtPath(dag_path_comps[1])
         self._usd_stage.SetDefaultPrim(default_prim_path)
 
     def set_obj_add(self, path):
-        self._usd_stage.DefinePrim(path, _usd_cor_configure.UsdNodeTypes.Xform)
+        self._usd_stage.DefinePrim(path, usd_cor_configure.UsdNodeTypes.Xform)
 
     def set_save(self):
         file_opt = bsc_core.StgFileOpt(self._file_path)
@@ -713,7 +722,7 @@ class UsdPrimOpt(object):
         else:
             raise TypeError()
         #
-        usd_type = _usd_cor_configure.UsdTypes.MAPPER[dcc_type_name]
+        usd_type = usd_cor_configure.UsdTypes.MAPPER[dcc_type_name]
         p = usd_fnc.CreatePrimvar(
             key,
             usd_type
@@ -804,8 +813,8 @@ class UsdDataMapper(object):
 
     def to_usd_args(self):
         key = self._dcc_type.category.name, self._dcc_type.name
-        if key in _usd_cor_configure.UsdTypes.MAPPER:
-            usd_type = _usd_cor_configure.UsdTypes.MAPPER[key]
+        if key in usd_cor_configure.UsdTypes.MAPPER:
+            usd_type = usd_cor_configure.UsdTypes.MAPPER[key]
             return usd_type, None
         return None, None
 
@@ -896,8 +905,8 @@ class UsdGeometryOpt(UsdPrimOpt):
     def create_customize_port_(self, port_path, type_path, dcc_value):
         category_name, type_name = type_path.split(unr_core.UnrType.PATHSEP)
         key = category_name, type_name
-        if key in _usd_cor_configure.UsdTypes.MAPPER:
-            usd_type = _usd_cor_configure.UsdTypes.MAPPER[key]
+        if key in usd_cor_configure.UsdTypes.MAPPER:
+            usd_type = usd_cor_configure.UsdTypes.MAPPER[key]
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 usd_type
@@ -907,8 +916,8 @@ class UsdGeometryOpt(UsdPrimOpt):
     def create_customize_port_as_face_color(self, port_path, type_path, usd_value):
         category_name, type_name = type_path.split(unr_core.UnrType.PATHSEP)
         key = category_name, type_name
-        if key in _usd_cor_configure.UsdTypes.MAPPER:
-            usd_type = _usd_cor_configure.UsdTypes.MAPPER[key]
+        if key in usd_cor_configure.UsdTypes.MAPPER:
+            usd_type = usd_cor_configure.UsdTypes.MAPPER[key]
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 usd_type,
@@ -1462,9 +1471,7 @@ class UsdMeshOpt(UsdGeometryOpt):
 
     def get_colors_fom_shell(self, offset=0, seed=0):
         vertex_counts, vertex_indices = self.get_face_vertices()
-        face_to_shell_dict = bsc_core.MeshFaceShellMtd.get_shell_dict_from_face_vertices(
-            vertex_counts, vertex_indices
-        )
+        face_to_shell_dict = bsc_core.DccMeshFaceShellOpt(vertex_counts, vertex_indices).generate()
         max_shell_index = max(face_to_shell_dict.values())
         choice_colors = bsc_core.RawColorMtd.get_choice_colors(
             count=max_shell_index+1, maximum=1.0, offset=offset, seed=seed

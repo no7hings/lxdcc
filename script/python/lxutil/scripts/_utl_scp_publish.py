@@ -157,7 +157,7 @@ class ScpGeneralPublish(object):
         file_path = self.get_scene_src_file_path()
         #
         extra_data = dict(
-            user=bsc_core.SystemMtd.get_user_name(),
+            user=bsc_core.SysBaseMtd.get_user_name(),
             #
             version_type=self._options['version_type'],
             version_status='pub',
@@ -199,7 +199,7 @@ class ScpGeneralPublish(object):
             option=option_opt.to_string()
         )
 
-    @bsc_core.Modifiers.run_with_exception_catch
+    @bsc_core.MdfBaseMtd.run_with_exception_catch
     def execute(self):
         fncs = [
             self.pre_fnc,
@@ -244,7 +244,7 @@ class ScpAssetSurfacePublish(object):
         version_type = self._options['version_type']
         scene_file_path = self._scene_file_path
 
-        user = bsc_core.SystemMtd.get_user_name()
+        user = bsc_core.SysBaseMtd.get_user_name()
 
         extra_data = dict(
             user=user,
@@ -292,7 +292,7 @@ class ScpAssetSurfacePublish(object):
             )
         )
 
-        if bsc_core.ApplicationMtd.get_is_katana():
+        if bsc_core.SysApplicationMtd.get_is_katana():
             import lxkatana.core as ktn_core
             option_opt.set('katana_version', ktn_core.KtnUtil.get_katana_version())
 
@@ -300,7 +300,7 @@ class ScpAssetSurfacePublish(object):
             option=option_opt.to_string()
         )
 
-    @bsc_core.Modifiers.run_with_exception_catch
+    @bsc_core.MdfBaseMtd.run_with_exception_catch
     def execute(self):
         fncs = [
             self.collection_review_fnc,

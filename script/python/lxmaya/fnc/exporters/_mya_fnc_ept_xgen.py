@@ -7,8 +7,6 @@ from lxutil.fnc import utl_fnc_obj_abs
 
 from lxmaya import ma_configure
 
-import lxutil.objects as utl_objects
-
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 import lxutil.fnc.exporters as utl_fcn_exporters
@@ -36,7 +34,7 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         super(XgenExporter, self).__init__(option)
     @classmethod
     def _set_grow_mesh_abc_export_(cls, directory_path, location):
-        mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').to_string()
+        mya_location = bsc_core.PthNodeOpt(location).translate_to('|').to_string()
         group = mya_dcc_objects.Group(mya_location)
         xgen_collection_obj_paths = group.get_all_shape_paths(include_obj_type=[ma_configure.Util.XGEN_PALETTE])
         for i_xgen_collection_obj_path in xgen_collection_obj_paths:
@@ -59,7 +57,7 @@ class XgenExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                 ).set_run()
     @classmethod
     def _set_xgen_collection_export_(cls, xgen_project_directory_path, xgen_collection_directory_path, location):
-        mya_location = bsc_core.DccPathDagOpt(location).translate_to('|').to_string()
+        mya_location = bsc_core.PthNodeOpt(location).translate_to('|').to_string()
         group = mya_dcc_objects.Group(mya_location)
         xgen_collection_obj_paths = group.get_all_shape_paths(include_obj_type=[ma_configure.Util.XGEN_PALETTE])
         for i_xgen_collection_obj_path in xgen_collection_obj_paths:
@@ -118,7 +116,7 @@ class XgenUsdExporter(utl_fnc_obj_abs.AbsFncOptionBase):
     def set_run(self):
         option_opt = self.get_option()
         location = option_opt.get('location')
-        location_dag_opt = bsc_core.DccPathDagOpt(location)
+        location_dag_opt = bsc_core.PthNodeOpt(location)
         mya_location_obj_path = location_dag_opt.translate_to(
             pathsep=ma_configure.Util.OBJ_PATHSEP
         )

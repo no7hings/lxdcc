@@ -572,7 +572,7 @@ class Om2MeshOpt(object):
         """
         bsc_core.Log.debug('start create transform')
         transform = cmds.createNode('transform', name=name, skipSelect=1)
-        transform_name = bsc_core.DccPathDagMtd.get_dag_name(transform, '|')
+        transform_name = bsc_core.PthNodeMtd.get_dag_name(transform, '|')
         bsc_core.Log.debug('start create mesh')
         om2_fnc = om2.MFnMesh()
         face_vertex_counts, face_vertex_indices = face_vertices
@@ -756,9 +756,7 @@ class Om2MeshOpt(object):
 
     def get_face_shell_ids(self):
         counts, indices = self.get_face_vertices()
-        return bsc_core.MeshFaceShellMtd.get_shell_dict_from_face_vertices(
-            counts, indices
-        )
+        return bsc_core.DccMeshFaceShellOpt(counts, indices).generate()
 
     def assign_uv_map(self, uv_map_name, uv_map):
         om2_fnc = self._om2_obj_fnc
@@ -1987,7 +1985,7 @@ class CmdPortOpt(object):
             sourceFromDestination=1
         )
         if _:
-            a = bsc_core.DccAttrPathOpt(_)
+            a = bsc_core.PthAttributeOpt(_)
             obj_path = a.obj_path
             if CmdObjOpt._get_is_exists_(obj_path) is True:
                 port_path = a.port_path
@@ -2440,12 +2438,12 @@ class CmdShapeOpt(CmdObjOpt):
         super(CmdShapeOpt, self).__init__(path)
 
     def get_transform_name(self):
-        return bsc_core.DccPathDagMtd.get_dag_parent_name(
+        return bsc_core.PthNodeMtd.get_dag_parent_name(
             self.get_path(), self.PATHSEP
         )
 
     def get_transform_path(self):
-        return bsc_core.DccPathDagMtd.get_dag_parent_path(
+        return bsc_core.PthNodeMtd.get_dag_parent_path(
             self.get_path(), self.PATHSEP
         )
 
@@ -2675,7 +2673,7 @@ class CmdMeshesOpt(object):
     def get_bounding_box(self):
         return cmds.polyEvaluate(self._mesh_paths, boundingBox=1)
 
-    def get_geometry_args(self):
+    def generate_geometry_args(self):
         b_box = self.get_bounding_box()
         x_0, y_0, z_0 = b_box[0][0], b_box[1][0], b_box[2][0]
         x_1, y_1, z_1 = b_box[0][1], b_box[1][1], b_box[2][1]

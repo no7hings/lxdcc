@@ -3,7 +3,7 @@ import lxbasic.core as bsc_core
 
 import lxsession.commands as ssn_commands
 
-user = bsc_core.SystemMtd.get_user_name()
+user = bsc_core.SysBaseMtd.get_user_name()
 
 for i_file in [
     # '/l/prod/cgm/work/assets/chr/ext_andy/mod/modeling/maya/scenes/ext_andy.mod.modeling.v001.ma',
@@ -25,7 +25,7 @@ for i_file in [
             option_hook_key='rsv-task-batchers/asset/maya/model-export',
             #
             file=i_file,
-            user=bsc_core.SystemMtd.get_user_name(),
+            user=bsc_core.SysBaseMtd.get_user_name(),
             #
             # td_enable=True,
             rez_beta=True,

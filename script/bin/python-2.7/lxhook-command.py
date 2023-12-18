@@ -113,7 +113,7 @@ def __execute_hook(option):
         )
         # extend resource paths
         environs_extend = {}
-        _ = bsc_core.EnvironMtd.get('PAPER_EXTEND_RESOURCES')
+        _ = bsc_core.EnvBaseMtd.get('PAPER_EXTEND_RESOURCES')
         if _:
             environs_extend['PAPER_EXTEND_RESOURCES'] = (_, 'prepend')
         #
@@ -122,7 +122,7 @@ def __execute_hook(option):
             for k, v in hook_environs_extend:
                 environs_extend[k] = v
         # run command by subprocess
-        bsc_core.SubProcessMtd.execute_with_result_use_thread(
+        bsc_core.PrcBaseMtd.execute_with_result_use_thread(
             opt_cmd, environs_extend=environs_extend
         )
 

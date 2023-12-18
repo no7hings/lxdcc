@@ -9,6 +9,7 @@ import lxcontent.core as ctt_core
 class AbsLookOpt(object):
     def __init__(self, *args):
         self._obj = args[0]
+
     @property
     def obj(self):
         return self._obj
@@ -22,12 +23,12 @@ class ShapeLookOpt(AbsLookOpt):
         super(ShapeLookOpt, self).__init__(*args)
 
         self._node_configure = ctt_core.Content(
-            value=bsc_core.ResourceContent.get_yaml('arnold/node')
+            value=bsc_core.ResourceConfigure.get_yaml('arnold/node')
         )
         self._node_configure.do_flatten()
 
         self._convert_configure = ctt_core.Content(
-            value=bsc_core.ResourceContent.get_yaml('arnold/convert')
+            value=bsc_core.ResourceConfigure.get_yaml('arnold/convert')
         )
         self._convert_configure.do_flatten()
 

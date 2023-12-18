@@ -3,9 +3,9 @@ import lxbasic.core as bsc_core
 
 import lxsession.commands as ssn_commands
 
-user = bsc_core.SystemMtd.get_user_name()
+user = bsc_core.SysBaseMtd.get_user_name()
 
-# time_tag = bsc_core.TimeMtd.get_time_tag()
+# time_tag = bsc_core.SysBaseMtd.get_time_tag()
 
 time_tag = '2022_0124_1916_14_184314'
 
@@ -22,7 +22,7 @@ for i_f in [
                 option_hook_key=j_option_hook_key,
                 #
                 file=i_f,
-                user=bsc_core.SystemMtd.get_user_name(),
+                user=bsc_core.SysBaseMtd.get_user_name(),
                 #
                 td_enable=True,
                 # rez_beta=True,

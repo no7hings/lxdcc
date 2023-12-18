@@ -1,5 +1,5 @@
 # coding:utf-8
-import lxlog.core as log_core
+import lxbasic.log as bsc_log
 
 import lxbasic.core as bsc_core
 
@@ -105,12 +105,12 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         cmd = 'rez-env sublime_text -- sublime_text "{}"'.format(
             file_path
         )
-        bsc_core.SubProcessMtd.set_run(cmd)
+        bsc_core.PrcBaseMtd.set_run(cmd)
 
     @classmethod
     def get_app_execute_mapper(cls, rsv_project):
         dict_ = {}
-        platform = bsc_core.SystemMtd.get_platform()
+        platform = bsc_core.SysBaseMtd.get_platform()
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['application-configure-file'][platform]
         cfg_file_path = bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
@@ -135,14 +135,14 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def get_application_configure_file(cls, rsv_project):
-        platform = bsc_core.SystemMtd.get_platform()
+        platform = bsc_core.SysBaseMtd.get_platform()
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['application-configure-file'][platform]
         return bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
 
     @classmethod
     def get_deadline_configure_file(cls, rsv_project):
-        platform = bsc_core.SystemMtd.get_platform()
+        platform = bsc_core.SysBaseMtd.get_platform()
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['deadline-configure-file'][platform]
         return bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
@@ -202,7 +202,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                 title=kwargs['subject'],
                 message=kwargs.get('content') or '',
             )
-        log_core.Log.trace_method_warning(
+        bsc_log.Log.trace_method_warning(
             'send messages failed', 'module "cosmos" is not found'
         )
         return False
@@ -220,7 +220,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
                 file_type=kwargs['keyword'],
                 depend_file_paths=[kwargs['result']],
             )
-        log_core.Log.trace_method_warning(
+        bsc_log.Log.trace_method_warning(
             'register dependency failed', 'module "cosmos" is not found'
         )
         return False

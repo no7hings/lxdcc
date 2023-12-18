@@ -560,7 +560,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
             i_v['image_background'] = i_f_tgt
             i_f_opt_tgt.create_directory()
-            bsc_core.ImgOiioMtd.set_create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
+            bsc_core.ImgOiioMtd.create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
             bsc_core.Log.trace_method_result(
                 'image background create',
                 u'file="{}"'.format(
@@ -577,7 +577,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_resize = i_v['image_resize']
             i_background = i_v['image_background']
             i_f_opt_tgt.create_directory()
-            bsc_core.ImgOiioMtd.set_over_by(i_resize, i_background, i_f_tgt, (0, 0))
+            bsc_core.ImgOiioMtd.over_by(i_resize, i_background, i_f_tgt, (0, 0))
             bsc_core.Log.trace_method_result(
                 'image background add',
                 u'file="{}"'.format(
@@ -594,7 +594,7 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_base = i_v['image_base']
             i_foreground = i_v['image_foreground']
             i_f_opt_tgt.create_directory()
-            bsc_core.ImgOiioMtd.set_over_by(i_foreground, i_base, i_f_tgt, (0, 0))
+            bsc_core.ImgOiioMtd.over_by(i_foreground, i_base, i_f_tgt, (0, 0))
             bsc_core.Log.trace_method_result(
                 'image foreground add',
                 u'file="{}"'.format(

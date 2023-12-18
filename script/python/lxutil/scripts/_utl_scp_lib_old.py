@@ -37,8 +37,8 @@ class ScpAssetBatcher(object):
         #
         self._option = option
         #
-        self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.TimeMtd.get_time_tag()
+        self._user = bsc_core.SysBaseMtd.get_user_name()
+        self._time_tag = bsc_core.SysBaseMtd.get_time_tag()
         #
         self._td_enable = True
         #
@@ -298,7 +298,7 @@ class AbsScpLibShotgunDef(object):
                 i_stg_asset_query_tgt = stg_connector.get_stg_resource_query(
                     project=project, asset=asset
                 )
-                i_thumbnail_file_path = bsc_core.VdoFileOpt(i_move_file_path).get_thumbnail(block=True)
+                i_thumbnail_file_path = bsc_core.VdoFileOpt(i_move_file_path).generate_thumbnail(block=True)
                 if i_thumbnail_file_path:
                     i_stg_asset_query_tgt.set_upload(
                         'image', i_thumbnail_file_path
@@ -351,8 +351,8 @@ class ScpAssetPusher(AbsScpLib):
         #
         self._project_tgt = 'lib'
         #
-        self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.TimeMtd.get_time_tag()
+        self._user = bsc_core.SysBaseMtd.get_user_name()
+        self._time_tag = bsc_core.SysBaseMtd.get_time_tag()
         #
         self._option = option
         #
@@ -380,8 +380,8 @@ class ScpAssetPusher(AbsScpLib):
             with_file_copy = self._option.get('with_file_copy') or False
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
-            user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
-            time_tag = self._option.get('time_tag') or bsc_core.TimeMtd.get_time_tag()
+            user = self._option.get('user') or bsc_core.SysBaseMtd.get_user_name()
+            time_tag = self._option.get('time_tag') or bsc_core.SysBaseMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = self._get_lib_asset_(
@@ -430,8 +430,8 @@ class ScpAssetPuller(AbsScpLib):
         #
         self._project_tgt = project
         #
-        self._user = bsc_core.SystemMtd.get_user_name()
-        self._time_tag = bsc_core.TimeMtd.get_time_tag()
+        self._user = bsc_core.SysBaseMtd.get_user_name()
+        self._time_tag = bsc_core.SysBaseMtd.get_time_tag()
         #
         self._option = option
         #
@@ -455,8 +455,8 @@ class ScpAssetPuller(AbsScpLib):
             with_file_copy = self._option.get('with_file_copy') or False
             with_surface_publish = self._option.get('with_surface_publish') or False
             #
-            user = self._option.get('user') or bsc_core.SystemMtd.get_user_name()
-            time_tag = self._option.get('time_tag') or bsc_core.TimeMtd.get_time_tag()
+            user = self._option.get('user') or bsc_core.SysBaseMtd.get_user_name()
+            time_tag = self._option.get('time_tag') or bsc_core.SysBaseMtd.get_time_tag()
             #
             i_role_tgt = i_rsv_asset_src.get('role')
             i_asset_tgt = i_asset_src

@@ -16,6 +16,10 @@ class RsvAssetTextureOpt(object):
 
         self._version = None
 
+        self._work_texture_directory_rsv_unit = self._rsv_task.get_rsv_unit(
+            keyword='asset-source-texture-dir'
+        )
+
         self._work_texture_version_directory_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='asset-source-texture-version-dir'
         )
@@ -24,6 +28,18 @@ class RsvAssetTextureOpt(object):
         )
         self._work_texture_tx_directory_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='asset-source-texture-tx-dir'
+        )
+
+    def get_root_at(self, variant):
+        return self._work_texture_directory_rsv_unit.get_result(
+            version='latest',
+            variants_extend=dict(variant=variant)
+        )
+
+    def get_all_directories_at(self, variant):
+        return self._work_texture_version_directory_rsv_unit.get_result(
+            version='all',
+            variants_extend=dict(variant=variant)
         )
 
     def get_directory_path_at(self, variant, version):
@@ -70,11 +86,11 @@ class RsvAssetTextureOpt(object):
             )
         )
 
-    def set_version_lock_at(self, variant, version):
+    def lock_version_at(self, variant, version):
         directory_path = self.get_directory_path_at(variant, version)
-        #
+
         bsc_core.StgPathPermissionMtd.lock(directory_path)
-        #
+
         bsc_core.Log.trace_method_result(
             'version lock',
             'variant="{}", version="{}"'.format(
@@ -126,7 +142,7 @@ class RsvAssetTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StorageMtd.get_is_writable(i_result) is False:
+            if bsc_core.StgBaseMtd.get_is_writable(i_result) is False:
                 list_.append(i_variants['version'])
         return list_
 
@@ -137,7 +153,7 @@ class RsvAssetTextureOpt(object):
         list_ = []
         for i in matches:
             i_result, i_variants = i
-            if bsc_core.StorageMtd.get_is_writable(i_result) is True:
+            if bsc_core.StgBaseMtd.get_is_writable(i_result) is True:
                 list_.append(i_variants['version'])
         return list_
 
@@ -182,7 +198,7 @@ class RsvAssetTextureOpt(object):
         directory_paths = self.get_all_directories(
             dcc_objs
         )
-        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StorageMtd.get_is_writable(i) is True]
+        unlocked_directory_paths = [i for i in directory_paths if bsc_core.StgBaseMtd.get_is_writable(i) is True]
         if unlocked_directory_paths:
             with bsc_core.LogProcessContext.create_as_bar(
                     maximum=len(unlocked_directory_paths),

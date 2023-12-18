@@ -8,6 +8,8 @@ import collections
 
 import glob
 
+import lxbasic.dcc.core as bsc_dcc_core
+
 from lxmaya import ma_configure, ma_core
 
 import lxmaya.dcc.dcc_objects as mya_dcc_objects
@@ -17,8 +19,6 @@ import lxmaya.dcc.dcc_operators as mya_dcc_operators
 from lxmaya.modifiers import _mya_mdf_utility
 
 import lxuniverse.core as unr_core
-
-import lxutil.scripts as utl_scripts
 
 import lxbasic.core as bsc_core
 
@@ -48,7 +48,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._camera = self.get('camera')
         self._texture_use_environ_map = self.get('texture_use_environ_map')
         #
-        self._root = bsc_core.DccPathDagMtd.get_dag_pathsep_replace(
+        self._root = bsc_core.PthNodeMtd.get_dag_pathsep_replace(
             self._location, pathsep_tgt=ma_configure.Util.OBJ_PATHSEP
         )
         #
@@ -139,7 +139,7 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     for i in self._results:
                         l_p.do_update()
                         #
-                        fr = utl_scripts.DotAssFileReader(i)
+                        fr = bsc_dcc_core.DotAssFileReader(i)
                         fr._set_file_paths_convert_()
             #
             bsc_core.Log.trace_method_result(
@@ -457,7 +457,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
             # debug, render a black texture when "castsShadows" is "False"
             mya_show_set.get_port('castsShadows').set(True)
         #
-        mya_location_path = bsc_core.DccPathDagOpt(location_path).translate_to('|').get_value()
+        mya_location_path = bsc_core.PthNodeOpt(location_path).translate_to('|').get_value()
         #
         mya_group = mya_dcc_objects.Group(mya_location_path)
         mya_mesh_paths = mya_group.get_all_shape_paths(
@@ -518,7 +518,7 @@ class TextureBaker(utl_fnc_obj_abs.AbsFncOptionBase):
         directory = utl_dcc_objects.StgDirectory(directory_path)
 
         mya_group = mya_dcc_objects.Group(
-            bsc_core.DccPathDagOpt(location_path).translate_to('|').get_value()
+            bsc_core.PthNodeOpt(location_path).translate_to('|').get_value()
         )
         mya_mesh_paths = mya_group.get_all_shape_paths(
             include_obj_type=['mesh']
@@ -628,7 +628,7 @@ class FncLookYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         return dic
 
     def update_by_location_fnc(self, location, pathsep):
-        location_cur = bsc_core.DccPathDagOpt(location).translate_to(pathsep).get_value()
+        location_cur = bsc_core.PthNodeOpt(location).translate_to(pathsep).get_value()
         group = mya_dcc_objects.Group(location_cur)
         nodes = group.get_descendants()
         if nodes:

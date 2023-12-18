@@ -3,7 +3,7 @@ import lxbasic.core as bsc_core
 
 import lxsession.commands as ssn_commands
 
-user = bsc_core.SystemMtd.get_user_name()
+user = bsc_core.SysBaseMtd.get_user_name()
 
 time_tag = '2022_0127_1333_36_757069'
 

@@ -7,7 +7,7 @@ import lxresource.core as rsc_core
 
 from lxutil.fnc import utl_fnc_obj_abs
 
-import lxutil.objects as utl_objects
+import lxbasic.dcc.core as bsc_dcc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -23,19 +23,14 @@ class DotMaSceneInfoExporter(utl_fnc_obj_abs.AbsExporter):
 
     def set_run(self):
         import os
-        #
-        import lxutil.scripts as utl_scripts
-        #
-        import lxutil.dcc.dcc_objects as utl_dcc_objects
 
-        #
         file_path = self._option.get('file_path')
         root = self._option.get('root')
-        #
+
         base, ext = os.path.splitext(file_path)
-        r = utl_scripts.DotMaFileReader(file_path)
+        r = bsc_dcc_core.DotMaFileReader(file_path)
         _info = r.get_mesh_info(root=root)
-        #
+
         utl_dcc_objects.OsYamlFile('{}.info.yml'.format(base)).set_write(_info)
 
 
@@ -115,7 +110,7 @@ class DotXgenUsdaExporter(
         option_opt = self.get_option()
         file_path = option_opt.get('file')
         location = option_opt.get('location')
-        location_dag_opt = bsc_core.DccPathDagOpt(location)
+        location_dag_opt = bsc_core.PthNodeOpt(location)
         maya_scene_file_path = option_opt.get('maya_scene_file')
         if maya_scene_file_path:
             xgen_collection_file_paths = self._get_xgen_collection_file_paths_(maya_scene_file_path)
@@ -131,7 +126,7 @@ class DotXgenUsdaExporter(
                 i_xgen_collection_name = self._get_xgen_collection_name_(
                     i_xgen_collection_file_path
                 )
-                i_dot_xgen_file_reader = utl_objects.DotXgenFileReader(
+                i_dot_xgen_file_reader = bsc_dcc_core.DotXgenFileReader(
                     i_xgen_collection_file_path
                 )
                 i_xgen_description_properties = i_dot_xgen_file_reader.get_description_properties()
@@ -139,7 +134,7 @@ class DotXgenUsdaExporter(
                 #
                 c.set(
                     'asset.xgen.collections.{}.file'.format(i_xgen_collection_name),
-                    bsc_core.StorageMtd.get_file_realpath(
+                    bsc_core.StgBaseMtd.get_file_realpath(
                         file_path, i_xgen_collection_file_path
                     )
                 )

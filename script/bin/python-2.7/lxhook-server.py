@@ -70,7 +70,7 @@ def set_cmd_run():
 
     from flask import request
 
-    import lxlog.core as log_core
+    import lxbasic.log as bsc_log
 
     import lxbasic.core as bsc_core
 
@@ -87,19 +87,19 @@ def set_cmd_run():
             if raw:
                 cmd = raw.get('cmd')
                 if cmd:
-                    log_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'hook run',
                         'key="{}"'.format(unique_id)
                     )
                     t = threading.Thread(
                         target=functools.partial(
-                            bsc_core.SubProcessMtd.set_run, cmd=cmd
+                            bsc_core.PrcBaseMtd.set_run, cmd=cmd
                         )
                     )
                     #
                     t.start()
         else:
-            log_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 'hook run',
                 'key="{}" is non-exists'.format(hook_yml_file_path)
             )

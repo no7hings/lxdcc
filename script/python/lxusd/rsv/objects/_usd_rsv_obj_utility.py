@@ -86,7 +86,7 @@ class RsvUsdAssetSetCreator(object):
             file_opt = bsc_core.StgFileOpt(yml_file_path)
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
-            if bsc_core.SystemMtd.get_is_linux():
+            if bsc_core.SysBaseMtd.get_is_linux():
                 dict_ = cls._get_shot_asset_dict(rsv_asset, rsv_shot)
                 file_opt.set_write(dict_)
                 return dict_
@@ -364,7 +364,7 @@ class RsvUsdAssetSetCreator(object):
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
             else:
-                if bsc_core.SystemMtd.get_is_linux():
+                if bsc_core.SysBaseMtd.get_is_linux():
                     dict_ = cls._get_asset_usd_set_dress_variant_dict(rsv_asset)
                     file_opt.set_write(dict_)
                     return dict_
@@ -888,7 +888,7 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
         self._renderable_c = self._dcc_data.get_as_content('renderable')
 
         self._location_mapper = {
-            bsc_core.DccPathDagOpt(i).get_name(): i for i in self._renderable_c.get_all_leaf_values() if i
+            bsc_core.PthNodeOpt(i).get_name(): i for i in self._renderable_c.get_all_leaf_values() if i
         }
 
     def create_element_geometry_uv_map_over_at(self, directory_path, var_name):
@@ -1164,8 +1164,8 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             ).set_run()
 
     def create_set_asset_component_usd(self):
-        import lxutil.scripts as utl_scripts
-        #
+        import lxbasic.dcc.core as bsc_dcc_core
+
         import lxutil.extra.methods as utl_etr_methods
 
         #
@@ -1242,7 +1242,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                 else:
                     if i_replace is True:
-                        i_start_frame, i_end_frame = utl_scripts.DotUsdaFileReader(
+                        i_start_frame, i_end_frame = bsc_dcc_core.DotUsdaFileReader(
                             i_usda_file_path
                         ).get_frame_range()
                         c.set('start_frame', i_start_frame)

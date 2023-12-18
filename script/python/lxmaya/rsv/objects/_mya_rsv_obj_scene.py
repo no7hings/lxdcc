@@ -36,7 +36,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             location = root
         #
-        mya_location = bsc_core.DccPathDagOpt(location).translate_to(
+        mya_location = bsc_core.PthNodeOpt(location).translate_to(
             pathsep=pathsep
         ).to_string()
         mya_group = mya_dcc_objects.Group(
@@ -79,7 +79,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         version = self._rsv_scene_properties.get('version')
         root = self._rsv_scene_properties.get('dcc.root')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
+        mya_root_dag_opt = bsc_core.PthNodeOpt(root).translate_to(
             pathsep='|'
         )
         mya_root = mya_dcc_objects.Group(
@@ -110,7 +110,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         orig_file_path = '/l/resource/td/asset/maya/asset-camera.ma'
-        orig_file_path = bsc_core.StgBasePathMapper.map_to_current(orig_file_path)
+        orig_file_path = bsc_core.StgBasePathMapMtd.map_to_current(orig_file_path)
 
         scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
@@ -124,7 +124,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if scene_src_file.get_is_exists() is True:
                 mya_dcc_objects.Scene.open_file(scene_src_file_path)
                 camera_location = camera_root
-                mya_camera_location = bsc_core.DccPathDagOpt(camera_location).translate_to(pathsep).to_string()
+                mya_camera_location = bsc_core.PthNodeOpt(camera_location).translate_to(pathsep).to_string()
                 mya_camera_group = mya_dcc_objects.Group(mya_camera_location)
                 if mya_camera_group.get_is_exists() is True:
                     mya_fnc_builders.AssetBuilder(
@@ -136,7 +136,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             render_resolution=(2048, 2048),
                         )
                     ).set_run()
-                    mya_root = bsc_core.DccPathDagOpt(root).translate_to(pathsep).to_string()
+                    mya_root = bsc_core.PthNodeOpt(root).translate_to(pathsep).to_string()
                     mya_group = mya_dcc_objects.Group(mya_root)
                     if mya_group.get_is_exists() is True:
                         mya_dcc_objects.Scene.set_current_frame(4)
@@ -191,7 +191,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
-        mya_root = bsc_core.DccPathDagOpt(root).translate_to(pathsep).to_string()
+        mya_root = bsc_core.PthNodeOpt(root).translate_to(pathsep).to_string()
 
         mya_fnc_exporters.PreviewExporter(
             file_path=preview_mov_file_path,
@@ -341,7 +341,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = self._rsv_scene_properties.get('dcc.root')
         pathsep = self._rsv_scene_properties.get('dcc.pathsep')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
+        mya_root_dag_opt = bsc_core.PthNodeOpt(root).translate_to(
             pathsep=pathsep
         )
         mya_group = mya_dcc_objects.Group(
@@ -411,7 +411,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = rsv_scene_properties.get('dcc.root')
         pathsep = rsv_scene_properties.get('dcc.pathsep')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
+        mya_root_dag_opt = bsc_core.PthNodeOpt(root).translate_to(
             pathsep=pathsep
         )
         mya_group = mya_dcc_objects.Group(
@@ -457,7 +457,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         root = self._rsv_scene_properties.get('dcc.root')
         pathsep = self._rsv_scene_properties.get('dcc.pathsep')
 
-        mya_root_dag_opt = bsc_core.DccPathDagOpt(root).translate_to(
+        mya_root_dag_opt = bsc_core.PthNodeOpt(root).translate_to(
             pathsep=pathsep
         )
         mya_group = mya_dcc_objects.Group(

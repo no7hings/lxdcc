@@ -55,7 +55,7 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         #
         usd_root = self._usd_stage.GetPseudoRoot()
         if self._root is not None:
-            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
+            dag_path_comps = bsc_core.PthNodeMtd.get_dag_component_paths(
                 self._root, pathsep=usd_core.UsdNodes.PATHSEP
                 )
             if dag_path_comps:
@@ -78,7 +78,7 @@ class AbsUsdObjScene(unr_abstracts.AbsObjScene):
         self._usd_stage = Usd.Stage.CreateInMemory()
         usd_location = self._usd_stage.GetPseudoRoot()
         if location is not None:
-            dag_path_comps = bsc_core.DccPathDagMtd.get_dag_component_paths(
+            dag_path_comps = bsc_core.PthNodeMtd.get_dag_component_paths(
                 location, pathsep=usd_core.UsdNodes.PATHSEP
             )
             if dag_path_comps:

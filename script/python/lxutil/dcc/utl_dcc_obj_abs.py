@@ -63,7 +63,7 @@ class AbsStgDirectory(
 
     def set_create(self):
         if self.get_is_exists() is False:
-            bsc_core.StorageMtd.create_directory(self.path)
+            bsc_core.StgBaseMtd.create_directory(self.path)
             bsc_core.Log.trace_method_result(
                 'directory create',
                 u'directory-path="{}"'.format(self.path)
@@ -381,7 +381,7 @@ class AbsStgFile(
         return [self.__class__(i) for i in self.get_exists_unit_paths()]
 
     def get_permissions(self, *args, **kwargs):
-        return [bsc_core.StorageMtd.get_permission(i) for i in self.get_exists_unit_paths()]
+        return [bsc_core.StgBaseMtd.get_permission(i) for i in self.get_exists_unit_paths()]
 
     def get_modify_timestamp(self, *args, **kwargs):
         exists_file_paths = self.get_exists_unit_paths(*args, **kwargs)
@@ -587,7 +587,7 @@ class AbsStgFile(
         if self.get_is_exists() is True:
             if file_tgt.get_is_exists():
                 if replace is True:
-                    if bsc_core.StorageMtd.get_is_writable(file_path_tgt) is True:
+                    if bsc_core.StgBaseMtd.get_is_writable(file_path_tgt) is True:
                         if bsc_core.StgPathLinkMtd.get_is_link(file_path_tgt) is True:
                             if bsc_core.StgPathLinkMtd.get_is_link_source_to(
                                     file_path_src, file_path_tgt,
@@ -653,13 +653,13 @@ class AbsStgFile(
 
     def get_is_writable(self):
         for i in self.get_exists_unit_paths():
-            if bsc_core.StorageMtd.get_is_writable(i) is False:
+            if bsc_core.StgBaseMtd.get_is_writable(i) is False:
                 return False
         return True
 
     def get_is_readable(self):
         for i in self.get_exists_unit_paths():
-            if bsc_core.StorageMtd.get_is_readable(i) is False:
+            if bsc_core.StgBaseMtd.get_is_readable(i) is False:
                 return False
         return True
 
@@ -1055,9 +1055,8 @@ class AbsOsTexture(
                 )
             # other use oiio
             else:
-                return bsc_core.ImgFileOpt(
-                    file_path_src
-                ).get_create_cmd_as_ext_tgt(
+                return bsc_core.ImgOiioMtd.generate_create_cmd_as_ext_tgt(
+                    file_path_src,
                     ext_tgt,
                     search_directory_path,
                     width
@@ -1068,7 +1067,7 @@ class AbsOsTexture(
         path_base, ext_any = os.path.splitext(file_path)
         if ext_any != cls.JPG_EXT:
             if cls._get_unit_is_exists_as_ext_tgt_(file_path, ext_tgt=cls.JPG_EXT) is False:
-                return bsc_core.ImgFileOpt(file_path).get_jpg(width=2048, block=block)
+                return bsc_core.ImgOiioOptForThumbnail(file_path).generate_as_jpg(width=2048, block=block)
         return True
 
     @classmethod
@@ -1083,7 +1082,7 @@ class AbsOsTexture(
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
         )
-        bsc_core.SubProcessMtd.execute_with_result(
+        bsc_core.PrcBaseMtd.execute_with_result(
             cmd
         )
 
@@ -1112,7 +1111,7 @@ class AbsOsTexture(
             color_space_src=color_space_src, color_space_tgt=color_space_tgt,
             use_update_mode=use_update_mode
         )
-        bsc_core.SubProcessMtd.execute_with_result(cmd)
+        bsc_core.PrcBaseMtd.execute_with_result(cmd)
 
     @classmethod
     def _get_unit_tx_create_cmd_as_acescg_(cls, file_path_src, file_path_tgt, use_update_mode=True):
@@ -1135,7 +1134,7 @@ class AbsOsTexture(
             file_path_src=file_path_src, file_path_tgt=file_path_tgt,
             color_space_src=color_space_src, color_space_tgt=color_space_tgt
         )
-        bsc_core.SubProcessMtd.execute_with_result(cmd)
+        bsc_core.PrcBaseMtd.execute_with_result(cmd)
 
     # find path source use multipy path
     @classmethod
@@ -1430,18 +1429,18 @@ class AbsOsTexture(
         _ = self._get_exists_file_paths_(self._path)
         if _:
             file_path = _[0]
-            return bsc_core.ImgFileOpt(
+            return bsc_core.ImgOiioOptForThumbnail(
                 file_path
-            ).get_thumbnail()
+            ).generate_thumbnail()
 
-    def get_thumbnail_create_args(self):
+    def generate_thumbnail_create_args(self):
         pass
 
     def convert_to_acescg(self, file_path_tgt):
         pass
 
     def get_info(self):
-        return bsc_core.ImgFileOiioOpt(self.path).info
+        return bsc_core.ImgOiioOpt(self.path).info
 
 
 class AbsObjScene(unr_abstracts.AbsObjScene):

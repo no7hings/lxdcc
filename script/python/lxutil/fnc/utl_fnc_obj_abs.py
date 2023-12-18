@@ -11,7 +11,7 @@ import lxresolver.commands as rsv_commands
 
 from lxutil import utl_configure
 
-import lxutil.objects as utl_objects
+import lxbasic.dcc.core as bsc_dcc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -46,7 +46,7 @@ class AbsDccExporter(object):
         #
         self._root = root
         if root is not None:
-            self._root_dat_opt = bsc_core.DccPathDagOpt(root)
+            self._root_dat_opt = bsc_core.PthNodeOpt(root)
         else:
             self._root_dat_opt = None
         #
@@ -404,7 +404,7 @@ class AbsFncDccGeometryComparer(object):
         self._location = location
         self._location_source = location_source
         #
-        self._cache_directory = bsc_core.EnvironMtd.get_temporary_root()
+        self._cache_directory = bsc_core.EnvBaseMtd.get_temporary_root()
         self._resolver = rsv_commands.get_resolver()
         #
         self._rsv_scene_properties = self._resolver.get_rsv_scene_properties_by_any_scene_file_path(
@@ -722,7 +722,7 @@ class AbsDotXgenDef(object):
             cls, xgen_collection_file_path, xgen_project_directory_path, xgen_collection_directory_path,
             xgen_collection_name
             ):
-        dot_xgen_file_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
+        dot_xgen_file_reader = bsc_dcc_core.DotXgenFileReader(xgen_collection_file_path)
         dot_xgen_file_reader.set_project_directory_repath(xgen_project_directory_path)
         dot_xgen_file_reader.set_collection_directory_repath(
             xgen_collection_directory_path, xgen_collection_name
@@ -732,7 +732,7 @@ class AbsDotXgenDef(object):
 
     @classmethod
     def _set_xgen_collection_file_repair_(cls, xgen_collection_file_path):
-        i_dot_xgen_reader = utl_objects.DotXgenFileReader(xgen_collection_file_path)
+        i_dot_xgen_reader = bsc_dcc_core.DotXgenFileReader(xgen_collection_file_path)
         i_dot_xgen_reader.set_repair()
         i_dot_xgen_reader.set_save()
 

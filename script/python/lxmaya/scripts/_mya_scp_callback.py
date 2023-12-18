@@ -13,7 +13,7 @@ class ScpCbkEnvironment(object):
 
     def __init__(self):
         self._cfg = ctt_core.Content(
-            value=bsc_core.ResourceContent.get_yaml(
+            value=bsc_core.ResourceConfigure.get_yaml(
                 'katana/script/scene'
             )
         )
@@ -26,7 +26,7 @@ class ScpCbkEnvironment(object):
     @classmethod
     def register(cls, data):
         for i_index, (i_key, i_env_key, i_env_value) in enumerate(data):
-            bsc_core.EnvironMtd.set(
+            bsc_core.EnvBaseMtd.set(
                 i_env_key, i_env_value
             )
             bsc_core.Log.trace_method_result(
@@ -47,7 +47,7 @@ class ScpCbkEnvironment(object):
     def add_from_work_environment(self, *args, **kwargs):
         import lxshotgun.scripts as stg_scripts
 
-        task_id = bsc_core.EnvironMtd.get(
+        task_id = bsc_core.EnvBaseMtd.get(
             'PAPER_TASK_ID'
         )
         return stg_scripts.ScpEnvironment.get_data(task_id)

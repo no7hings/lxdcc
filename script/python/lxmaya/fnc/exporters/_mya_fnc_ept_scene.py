@@ -54,7 +54,7 @@ class FncSceneExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         )
         _selected_paths = []
         if location:
-            root_dag_opt = bsc_core.DccPathDagOpt(location)
+            root_dag_opt = bsc_core.PthNodeOpt(location)
             root_mya_dag_opt = root_dag_opt.translate_to(
                 ma_configure.Util.OBJ_PATHSEP
             )
@@ -381,7 +381,7 @@ class CameraYamlExporter(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def _set_camera_create_(cls, root, persp_view):
-        dcc_root_dag_path = bsc_core.DccPathDagOpt(root)
+        dcc_root_dag_path = bsc_core.PthNodeOpt(root)
         mya_root_dag_path = dcc_root_dag_path.translate_to(
             pathsep='|'
         )

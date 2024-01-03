@@ -55,7 +55,7 @@ class AbsDotMtlxDef(object):
         self._root = root
         self._path_lstrip = path_lstrip
         #
-        dot_mtlx_file_reader = bsc_dcc_core.DotMtlxFileReaderOld(file_path)
+        dot_mtlx_file_reader = bsc_dcc_core.DotMtlxOptOld(file_path)
         geometries_properties = dot_mtlx_file_reader.get_geometries_properties()
         self._set_geometry_objs_build_(geometries_properties, root=self._root)
 

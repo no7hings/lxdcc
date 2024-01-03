@@ -21,13 +21,13 @@ class ScpRenderLayer(object):
         self._variant.pop(self.VERSION_KEY)
 
     @classmethod
-    def _to_render_layer_(cls, opt_opt):
+    def _to_render_layer(cls, opt_opt):
         parent_opt = opt_opt.get_parent_opt()
         if parent_opt.get('type') == 'RenderLayer_Wsp':
             return parent_opt
 
     @classmethod
-    def _get_real_version_(cls, version, pattern_opt, version_key):
+    def _parse_version(cls, version, pattern_opt, version_key):
         if version == 'new':
             return pattern_opt.get_new_version(version_key=version_key)
         elif version == 'latest':
@@ -44,7 +44,7 @@ class ScpRenderLayer(object):
             directory_p_opt.update_variants(**self._variant)
             #
             if render_version_mode == 'default':
-                version = self._get_real_version_(default_render_version, directory_p_opt, self.VERSION_KEY)
+                version = self._parse_version(default_render_version, directory_p_opt, self.VERSION_KEY)
             elif render_version_mode == 'new':
                 version = directory_p_opt.get_new_version(version_key=self.VERSION_KEY)
             elif render_version_mode == 'latest':
@@ -112,7 +112,7 @@ class ScpRenderBuild(object):
         self._hook_option_opt = self._session.option_opt
 
     @classmethod
-    def _get_real_version_(cls, version, pattern_opt, version_key):
+    def _parse_version(cls, version, pattern_opt, version_key):
         if version == 'new':
             return pattern_opt.get_new_version(version_key=version_key)
         elif version == 'latest':
@@ -148,7 +148,7 @@ class ScpRenderBuild(object):
                 #
                 i_version_kwargs = {}
                 if i_render_version_mode == 'default':
-                    i_version = self._get_real_version_(default_render_version, i_directory_p_opt, version_key)
+                    i_version = self._parse_version(default_render_version, i_directory_p_opt, version_key)
                 elif i_render_version_mode == 'new':
                     i_version = i_directory_p_opt.get_new_version(version_key=version_key)
                 elif i_render_version_mode == 'latest':
@@ -192,7 +192,7 @@ class ScpRenderBuild(object):
                 )
 
     @classmethod
-    def _to_render_layer_(cls, opt_opt):
+    def _to_render_layer(cls, opt_opt):
         parent_opt = opt_opt.get_parent_opt()
         if parent_opt.get('type') == 'RenderLayer_Wsp':
             return parent_opt
@@ -230,15 +230,15 @@ class ScpRenderBuild(object):
 
         ktn_dcc_objects.Scene.save_file()
 
-    def build_render_job(self):
+    def build_render_jobs(self):
         render_file_path = self._hook_option_opt.get('render_file')
         ktn_dcc_objects.Scene.open_file(render_file_path)
-        self._build_render_job_(
+        self._build_render_jobs(
             hook_option_opt=self._hook_option_opt
         )
 
     @classmethod
-    def _build_render_job_(cls, hook_option_opt):
+    def _build_render_jobs(cls, hook_option_opt):
         import lxsession.commands as ssn_commands
 
         auto_convert_mov = hook_option_opt.get_as_boolean('auto_convert_mov')
@@ -265,7 +265,7 @@ class ScpRenderBuild(object):
                 l_p.do_update()
                 if ktn_core.NGObjOpt._get_is_exists_(i_render_node) is True:
                     i_render_node_opt = ktn_core.NGObjOpt(i_render_node)
-                    i_render_layer_opt = cls._to_render_layer_(i_render_node_opt)
+                    i_render_layer_opt = cls._to_render_layer(i_render_node_opt)
                     if i_render_layer_opt is not None:
                         i_render_frames_mode = i_render_layer_opt.get('parameters.render.frames.mode')
                         if i_render_frames_mode == 'default':
@@ -291,7 +291,12 @@ class ScpRenderBuild(object):
                     #
                     i_render_output_directory_path = bsc_core.StgFileOpt(
                         i_render_output_image_file_path
-                        ).get_directory_path()
+                    ).get_directory_path()
+                    i_render_output_directory_opt = bsc_core.StgDirectoryOpt(
+                        i_render_output_directory_path
+                    )
+                    i_render_layer_name = i_render_output_directory_opt.get_name()
+                    i_render_layer_name = i_render_layer_name.replace('.', '/')
                     i_video_directory_path = bsc_core.PthNodeOpt(i_render_output_directory_path).get_parent_path()
                     # etc.
                     i_video_file_name = bsc_core.PthNodeOpt(i_render_output_directory_path).get_name()
@@ -319,6 +324,7 @@ class ScpRenderBuild(object):
                             render_frames=i_render_frames,
                             #
                             option_hook_key_extend=[i_render_node, 'image'],
+                            option_hook_key_over=[i_render_layer_name, 'image'],
                             #
                             dependencies=[option_hook_key],
                         )
@@ -350,6 +356,7 @@ class ScpRenderBuild(object):
                                 end_frame=i_render_frames[-1],
                                 #
                                 option_hook_key_extend=[i_render_node, 'movie'],
+                                option_hook_key_over=[i_render_layer_name, 'movie'],
                                 #
                                 dependencies=[option_hook_key],
                                 #
@@ -368,4 +375,4 @@ class ScpRenderBuild(object):
     def execute(self):
         self.copy_file()
         self.pre_process()
-        self.build_render_job()
+        self.build_render_jobs()

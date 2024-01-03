@@ -57,14 +57,14 @@ main:
             value: False
             tool_tip: '...'
 
-        user/setting/location:
-            widget: path
-            value: '/root/world/geo/master/hi'
+        user/setting/spacing:
+            widget: float
+            value: 0.0
             tool_tip: '...'
 
-        user/setting/node_type:
-            widget: string
-            value: 'group'
+        user/setting/move_to_floor:
+            widget: boolean
+            value: False
             tool_tip: '...'
 
         user/cache/json:
@@ -75,11 +75,6 @@ main:
         user/cache/generate:
             widget: button
             value: 'import lxkatana.scripts as ktn_scripts; ktn_scripts.ScpComponentLayout(node).generate_cache()'
-            tool_tip: '...'
-
-        user/option/root:
-            widget: path
-            value: '/root/world/geo/master'
             tool_tip: '...'
 
     port_hints:
@@ -107,7 +102,6 @@ main:
                 if data == nil then return end
                 local value = data[key]
                 if value == nil then return end
-                print(value)
                 Interface.SetAttr(
                     'xform.parentInverse.matrix.indexedValue', 
                     DoubleAttribute(
@@ -138,10 +132,11 @@ main:
                         value[3]
                     )
                 )
+                local ks = pystring.split(key, '/')
                 Interface.SetAttr(
                     'viewer.default.annotation.text', 
                     StringAttribute(
-                        key
+                        ks[#ks]
                     )
                 )
             end
@@ -149,21 +144,10 @@ main:
             function main()
                 if (Interface.GetOpArg('user.enable'):getValue() == 1) then
                     local path_cur = Interface.GetInputLocationPath()
-                    local location = Interface.GetOpArg('user.setting.location'):getValue()
-                    if not pystring.startswith(path_cur, location) then return end
                     local json_file_path = Interface.GetOpArg('user.cache.json'):getValue()
                     local data = read_json(json_file_path)
-                    local key = pystring.replace(path_cur, location, '')
-                    assign(key, data)
+                    assign(path_cur, data)
                 end
             end
             
             main()
-
-    expressions:
-        CEL:
-            |-
-            '(({}/*{{attr("type") == "{}"}}))'.format(
-                self.getNode().getParameter("user.setting.location").getValue(0),
-                self.getNode().getParameter("user.setting.node_type").getValue(0)
-            )

@@ -114,6 +114,13 @@ class KtnMeshOpt(KtnObjOpt):
     def get_face_vertices(self):
         pass
 
+    def compute_bbox_args(self):
+        points = self.get_points()
+        if points:
+            xs, ys, zs = zip(*points)
+            return (min(xs), min(ys), min(zs)), (max(xs), max(ys), max(zs))
+        return (0, 0, 0), (0, 0, 0)
+
 
 class KtnStageOpt(object):
     OBJ_PATHSEP = '/'
@@ -137,6 +144,8 @@ class KtnStageOpt(object):
         #
         self._transaction.setClientOp(self._client, Nodes3DAPI.GetOp(self._transaction, self._ktn_obj))
         self._runtime.commit(self._transaction)
+        #
+        self.__bbox_cache = dict()
 
     def _get_traversal_(self, location):
         return FnGeolib.Util.Traversal(
@@ -159,7 +168,7 @@ class KtnStageOpt(object):
     def generate_mesh_opt(self, obj_path):
         return KtnMeshOpt(self, obj_path)
 
-    def get_all_descendant_paths_at(self, location):
+    def get_descendant_paths_at(self, location):
         list_ = []
         tvl = self._get_traversal_(location)
         while tvl.valid():
@@ -189,7 +198,7 @@ class KtnStageOpt(object):
     def get(self, key):
         return self.get_port_raw(key)
 
-    def get_all_paths_at(self, location, include_types=None, exclude_types=None):
+    def get_all_paths_at(self, location, type_includes=None, type_excludes=None):
         list_ = []
         tvl = self._get_traversal_(
             location
@@ -213,21 +222,21 @@ class KtnStageOpt(object):
             # call next in here
             tvl.next()
             # include filter
-            if isinstance(include_types, (tuple, list)):
+            if isinstance(type_includes, (tuple, list)):
                 i_type_name = i_attrs.getChildByName('type').getValue()
-                if i_type_name not in include_types:
+                if i_type_name not in type_includes:
                     continue
             # exclude filter
-            if isinstance(exclude_types, (tuple, list)):
+            if isinstance(type_excludes, (tuple, list)):
                 i_attrs = tvl.getLocationData().getAttrs()
                 i_type_name = i_attrs.getChildByName('type').getValue()
-                if i_type_name in exclude_types:
+                if i_type_name in type_excludes:
                     continue
             #
             list_.append(i_path)
         return list_
 
-    def get_all_port_raws_at(self, location, port_path, include_types=None, exclude_types=None):
+    def get_all_port_raws_at(self, location, port_path, type_includes=None, type_excludes=None):
         list_ = []
         tvl = self._get_traversal_(
             location
@@ -250,15 +259,15 @@ class KtnStageOpt(object):
             # call next in here
             tvl.next()
             # include filter
-            if isinstance(include_types, (tuple, list)):
+            if isinstance(type_includes, (tuple, list)):
                 i_type_name = i_attrs.getChildByName('type').getValue()
-                if i_type_name not in include_types:
+                if i_type_name not in type_includes:
                     continue
             # exclude filter
-            if isinstance(exclude_types, (tuple, list)):
+            if isinstance(type_excludes, (tuple, list)):
                 i_attrs = tvl.getLocationData().getAttrs()
                 i_type_name = i_attrs.getChildByName('type').getValue()
-                if i_type_name in exclude_types:
+                if i_type_name in type_excludes:
                     continue
             #
             i_attr = i_attrs.getChildByName(port_path)
@@ -270,14 +279,14 @@ class KtnStageOpt(object):
         list__.sort(key=list_.index)
         return list__
 
-    def get_all_paths_at_as_dynamic(self, frame_range, location, include_types=None, exclude_types=None):
+    def get_all_paths_at_as_dynamic(self, frame_range, location, type_includes=None, type_excludes=None):
         start_frame, end_frame = frame_range
         if start_frame == end_frame:
             NGObjOpt(
                 NodegraphAPI.GetRootNode()
             ).set('currentTime', start_frame)
             return self.get_all_paths_at(
-                location, include_types, exclude_types
+                location, type_includes, type_excludes
             )
         else:
             list_ = []
@@ -287,13 +296,40 @@ class KtnStageOpt(object):
                 ).set('currentTime', i_frame)
                 #
                 i_paths = self.get_all_paths_at(
-                    location, include_types, exclude_types
+                    location, type_includes, type_excludes
                 )
                 list_.extend(i_paths)
             #
             list__ = list(set(list_))
             list__.sort(key=list_.index)
             return list__
+
+    def compute_bbox_args(self, location):
+        # cache compute result
+        if location in self.__bbox_cache:
+            return self.__bbox_cache[location]
+
+        mesh_paths = self.get_all_paths_at(location, type_includes=['subdmesh', 'polymesh'])
+        if mesh_paths:
+            points = []
+            for i_path in mesh_paths:
+                i_bbox_args = KtnMeshOpt(self, i_path).compute_bbox_args()
+                points.extend(i_bbox_args)
+
+            if points:
+                xs, ys, zs = zip(*points)
+                b = (min(xs), min(ys), min(zs)), (max(xs), max(ys), max(zs))
+                self.__bbox_cache[location] = b
+                return b
+        b = (0, 0, 0), (0, 0, 0)
+        self.__bbox_cache[location] = b
+        return b
+
+    def compute_geometry_args(self, location, use_int_size=False):
+        bbox_args = self.compute_bbox_args(location)
+        return bsc_core.RawBBoxMtd.compute_geometry_args(
+            bbox_args[0], bbox_args[1], use_int_size
+        )
 
     def __str__(self):
         return '{}(node="{}")'.format(

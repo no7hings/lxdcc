@@ -371,21 +371,21 @@ class UsdStageOpt(UsdBasic):
             usd_prim = self._usd_stage.GetDefaultPrim()
         return b_box_cache.ComputeWorldBound(usd_prim)
 
-    def generate_geometry_args(self, location=None, use_int_size=False):
+    def compute_geometry_args(self, location=None, use_int_size=False):
         if self.get_obj_is_exists(location) is True:
             b_box = self.get_bounding_box(location)
             r = b_box.GetRange()
-            return bsc_core.RawBBoxMtd.generate_geometry_args(
+            return bsc_core.RawBBoxMtd.compute_geometry_args(
                 r.GetMin(), r.GetMax(), use_int_size
             )
 
-    def generate_bbox_args(self, location=None, use_int_size=False):
+    def compute_bbox_args(self, location=None, use_int_size=False):
         if self.get_obj_is_exists(location) is True:
             b_box = self.get_bounding_box(location)
             r = b_box.GetRange()
             return r.GetMin(), r.GetMax()
 
-    def generate_bbox(self):
+    def compute_bbox(self):
         pass
 
     def get_radius(self, pivot):
@@ -654,7 +654,7 @@ class UsdPrimOpt(object):
     def delete(self):
         self._usd_prim.GetStage().RemovePrim(self._usd_prim.GetPath())
 
-    def get_descendants(self, include_types=None):
+    def get_descendants(self, type_includes=None):
         def rcs_fnc_(p_):
             _children = p_.GetChildren()
             for _i in _children:
@@ -663,8 +663,8 @@ class UsdPrimOpt(object):
 
         list_ = []
         rcs_fnc_(self._usd_prim)
-        if isinstance(include_types, list):
-            return [i for i in list_ if i.GetTypeName() in include_types]
+        if isinstance(type_includes, list):
+            return [i for i in list_ if i.GetTypeName() in type_includes]
         return list_
 
     def find_descendants(self, includes):

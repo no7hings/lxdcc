@@ -136,10 +136,7 @@ class ScpResourcesAddFor3dPlant(object):
         cs = type_opt.get_components()
         category_group_opt = cs[-2]
         category_group = category_group_opt.get_name()
-        dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-            bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
-            bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(category_group))
-        )
+        dtb_opt = dtb_objects.DtbResourceLibraryOpt.generate(category_group)
         #
         variants = {'directory': directory_path_src}
         #

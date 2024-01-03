@@ -18,18 +18,8 @@ node:
     node_group:
         type: 'ShadingGroup'
         path: '<..material_group.path>/<option.texture_name>__<option.time_tag>_NOD_GRP'
-        # todo: input create dynamic?
+        # dynamic create for texture input, there are builtin ports
         input_ports:
-            # geometry
-            #   normal
-#            - 'inputs.geometry.normal_invert_x'
-#            - 'inputs.geometry.normal_invert_y'
-#            - 'inputs.geometry.normal_invert_z'
-#            - 'inputs.geometry.normal_strength'
-#            #   bump
-#            #   displacement
-#            - 'inputs.geometry.displacement_zero'
-#            - 'inputs.geometry.displacement_strength'
             # texture
             #   basic
             - 'inputs.basic.mode'
@@ -301,7 +291,7 @@ node:
             attribute: '<...key>'
         #
         shader_hints:
-            default: '{"page": "basic", "label": "mode", "dstPage": "<option.unique_name>.basic", "dstName": "<option.unique_name>__basic_mode", "options__order": ["use uv map", "use triplaner"], "widget": "mapper", "options": {"use uv map": 0.0, "use triplaner": 1.0}}'
+            default: '{"page": "basic", "label": "mode", "dstPage": "<option.unique_name>.basic", "dstName": "<option.unique_name>__basic_mode", "options__order": ["default", "use uv map", "use triplaner"], "widget": "mapper", "options": {"default": 0.0, "use uv map": 1.0, "use triplaner": 2.0}}'
         #
         connections:
             - '<..node_group.path>.inputs.basic.mode'
@@ -569,11 +559,14 @@ arnold_texture:
                     - '<node.arnold_texture_basic_mode.path>.out'
                     - '<.path>.index'
                     #
-                    - '<..uv_map.path>.out'
+                    - '<..image.path>.out'
                     - '<.path>.input0'
                     #
-                    - '<..triplanar.path>.out'
+                    - '<..uv_map.path>.out'
                     - '<.path>.input1'
+                    #
+                    - '<..triplanar.path>.out'
+                    - '<.path>.input2'
             #
             output_dot:
                 type: Dot
@@ -1705,6 +1698,35 @@ arnold_texture:
             # connection to shader
             - '<node.node_group.path>.outputs.<.group>.diffuse_and_ambocc'
             - '<node.arnold_surface_shader.path>.<.shader_attribute>'
+    #   mask, default is (0.0, 0.0, 0.0, 1.0)
+    mask:
+        group: 'other'
+        tag: 'mask'
+        shader_attribute: ''
+        #
+        node_graph:
+            image:
+                $: '....base_node.node_graph.image'
+                #
+                shader_parameters:
+                    filename: '{texture}'
+                    ignore_missing_textures: True
+                    missing_texture_color: [0.0, 0.0, 0.0, 1.0]
+            #
+            image_dot: '$...base_node.node_graph.image_dot'
+            # use uv-map transform
+            uv_map: '$...base_node.node_graph.uv_map'
+            # use tri-planar when no uv-map
+            triplanar: '$...base_node.node_graph.triplanar'
+            #
+            mode_switch: '$...base_node.node_graph.mode_switch'
+            #
+            output_dot: '$...base_node.node_graph.output_dot'
+        #
+        connections:
+            # connection to node_group
+            - '<.node_graph.output_dot.path>.output'
+            - '<node.node_group.path>.outputs.<.group>.<.tag>'
 #   usd
 usd_texture:
     base_node:

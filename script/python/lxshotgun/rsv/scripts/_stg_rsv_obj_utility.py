@@ -9,16 +9,16 @@ import six
 
 import lxbasic.core as bsc_core
 
-import lxwrap.shotgun.core as wrp_stg_core
+import lxbasic.shotgun.core as bsc_stg_core
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 
 class RsvStgProjectOpt(object):
     def __init__(self, rsv_project):
-        self._resolver = rsv_commands.get_resolver()
+        self._resolver = rsv_core.RsvBase.generate_root()
         self._rsv_project = rsv_project
-        self._stg_connector = wrp_stg_core.StgConnector()
+        self._stg_connector = bsc_stg_core.StgConnector()
 
     def get_default_light_rig_rsv_asset(self):
         properties = self._rsv_project.properties
@@ -81,7 +81,7 @@ class RsvStgProjectOpt(object):
 class RsvStgTaskOpt(object):
     def __init__(self, rsv_task):
         self._rsv_task = rsv_task
-        self._stg_connector = wrp_stg_core.StgConnector()
+        self._stg_connector = bsc_stg_core.StgConnector()
 
     def get_version_name(self, version):
         p = self._rsv_task.properties
@@ -160,7 +160,7 @@ class RsvStgTaskOpt(object):
         stg_task_query = self._stg_connector.get_stg_task_query(
             **stg_version_kwargs
         )
-        stg_task_opt = wrp_stg_core.StgTaskOpt(stg_task_query)
+        stg_task_opt = bsc_stg_core.StgTaskOpt(stg_task_query)
         #
         stg_version_query = self._stg_connector.get_stg_version_query(
             **stg_version_kwargs
@@ -175,7 +175,7 @@ class RsvStgTaskOpt(object):
         # task set last version
         stg_task_opt.set_last_stg_version(stg_version_query.stg_obj)
         # version
-        stg_version_opt = wrp_stg_core.StgVersionOpt(stg_version_query)
+        stg_version_opt = bsc_stg_core.StgVersionOpt(stg_version_query)
         #
         version_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='{}-release-version-dir'.format(branch)

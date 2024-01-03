@@ -3,7 +3,6 @@ from flask import Flask
 
 from flask import request
 
-from lxresolver import commands
 
 app = Flask(__name__)
 
@@ -12,9 +11,10 @@ app = Flask(__name__)
 def resolver():
     result = ''
     kwargs = request.args
+    import lxresolver.core as rsv_core
     if 'file' in kwargs:
         k = kwargs['file']
-        r = commands.get_resolver()
+        r = rsv_core.RsvBase.generate_root()
     return result
 
 

@@ -2,7 +2,7 @@
 # noinspection PyUnresolvedReferences
 import maya.cmds as cmds
 
-import lxutil.commands as utl_cmds
+import lxbasic.dcc.core as bsc_dcc_core
 
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
@@ -23,7 +23,7 @@ class AndMaterialx(mya_dcc_obj_abs.AbsMyaFileReferenceObj):
             lis.append(
                 self._set_file_create_(file_plf_path, port_dcc_path)
             )
-            mtx_reader = utl_cmds.MaterialxReader(file_plf_path)
+            mtx_reader = bsc_dcc_core.DotMtlxOpt(file_plf_path)
             for i in mtx_reader.texture_paths:
                 lis.append(
                     self._set_file_create_(i)

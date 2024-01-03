@@ -891,7 +891,7 @@ class RawStrUnderlineOpt(object):
 
 class RawBBoxMtd(object):
     @classmethod
-    def generate_geometry_args(cls, p_0, p_1, use_int_size=False):
+    def compute_geometry_args(cls, p_0, p_1, use_int_size=False):
         x, y, z = p_0
         x_1, y_1, z_1 = p_1
         c_x, c_y, c_z = x+(x_1-x)/2, y+(y_1-y)/2, z+(z_1-z)/2

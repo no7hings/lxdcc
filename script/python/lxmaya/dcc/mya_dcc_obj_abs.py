@@ -577,20 +577,20 @@ class AbsMyaObj(
     def set_history_clear(self):
         cmds.delete(self.path, constructionHistory=1)
 
-    def get_source_node_paths(self, include_types=None):
-        if include_types:
+    def get_source_node_paths(self, type_includes=None):
+        if type_includes:
             lis = []
-            for node_type in include_types:
+            for node_type in type_includes:
                 _ = cmds.listConnections(self.path, destination=0, source=1, type=node_type) or []
                 for i in _:
                     lis.append(i)
             return lis
         return cmds.listConnections(self.path, destination=0, source=1) or []
 
-    def get_target_node_paths(self, include_types=None):
-        if include_types:
+    def get_target_node_paths(self, type_includes=None):
+        if type_includes:
             lis = []
-            for node_type in include_types:
+            for node_type in type_includes:
                 _ = cmds.listConnections(self.path, destination=1, source=0, type=node_type) or []
                 for i in _:
                     lis.append(i)

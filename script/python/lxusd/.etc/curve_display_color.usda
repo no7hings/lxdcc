@@ -22,9 +22,8 @@ def Xform "group1"
         def BasisCurves "curveShape5"
         {
             uniform token basis = "catmullRom"
-            int[] curveVertexCounts = [2]
-            point3f[] points = [(4, 0, 0), (6, 0, 0)]
-            color3f[] primvars:displayColor = [(0.51268667, 0.3816, 0.53)]
+            int[] curveVertexCounts = [4]
+            point3f[] points = [(4, 0, 0), (4, 0, 0), (6, 0, 0), (6, 0, 0)]
             uniform token type = "cubic"
             float[] widths = [0.003]
         }

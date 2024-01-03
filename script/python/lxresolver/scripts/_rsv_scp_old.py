@@ -5,11 +5,10 @@ import lxbasic.core as bsc_core
 class RsvPermissionMtd(bsc_core.StgSshMtd):
     @classmethod
     def set_entity_task_create(cls, **kwargs):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
-        #
-        r = rsv_commands.get_resolver()
-        #
+        r = rsv_core.RsvBase.generate_root()
+
         task_directory_paths = r.get_rsv_resource_task_directory_paths(**kwargs)
         for i_task_directory_path in task_directory_paths:
             bsc_core.StgBaseMtd.create_directory(i_task_directory_path)
@@ -17,7 +16,7 @@ class RsvPermissionMtd(bsc_core.StgSshMtd):
                 'directory create',
                 'directory="{}"'.format(i_task_directory_path)
             )
-        #
+
         step_directory_paths = r.get_rsv_resource_step_directory_paths(**kwargs)
         for i_step_directory_path in step_directory_paths:
             i_group_name = '{}_grp'.format(kwargs['step'])
@@ -35,10 +34,10 @@ class RsvPermissionMtd(bsc_core.StgSshMtd):
 
     @classmethod
     def set_create(cls, **kwargs):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
-        r = rsv_commands.get_resolver()
+        r = rsv_core.RsvBase.generate_root()
         #
         step_directory_paths = r.get_rsv_resource_step_directory_paths(**kwargs)
         for i_step_directory_path in step_directory_paths:

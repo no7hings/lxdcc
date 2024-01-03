@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxbasic.core as bsc_core
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 
 class ScpEnvironment(object):
@@ -12,7 +12,7 @@ print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/
 
     @classmethod
     def register_from_scene(cls, file_path):
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         keys = resolver.VariantTypes.Constructs
         #
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
@@ -38,7 +38,7 @@ print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/
     @classmethod
     def get_data(cls, file_path):
         if file_path:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             keys = resolver.VariantTypes.Constructs
             #
             rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
@@ -66,7 +66,7 @@ print rsv_scripts.ScpEnvironment.get_data('/production/shows/nsa_dev/assets/chr/
     @classmethod
     def get_as_dict(cls):
         dict_ = {}
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         keys = resolver.VariantTypes.Constructs
         for i_key in keys:
             i_env_key = 'PG_{}'.format(i_key.upper())

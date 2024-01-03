@@ -5,6 +5,8 @@ import re
 
 from ..core import raw as bsc_cor_raw
 
+from ..core import pattern as bsc_cor_pattern
+
 
 class PthNodeMtd(object):
     @classmethod
@@ -168,6 +170,20 @@ class PthNodeMtd(object):
         return re.sub(
             ur'[^\u4e00-\u9fa5a-zA-Z0-9{}]'.format(pathsep), '_', path
         )
+
+    @classmethod
+    def to_leaf_paths(cls, paths):
+        list_ = []
+        for i_path in paths:
+            i_is_leaf = True
+            for j_path in paths:
+                j_r = re.match(r'({})/(.*)'.format(i_path), j_path)
+                if j_r:
+                    i_is_leaf = False
+                    break
+            if i_is_leaf is True:
+                list_.append(i_path)
+        return list_
 
 
 class PthNodeOpt(object):

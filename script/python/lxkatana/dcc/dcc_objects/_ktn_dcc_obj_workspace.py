@@ -101,7 +101,7 @@ class AssetWorkspace(object):
         dcc_objs = self.get_all_pass_source_obj()
         for i_dcc_obj in dcc_objs:
             i_material_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_paths_at(
-                '/root/materials', include_types=['material']
+                '/root/materials', type_includes=['material']
             )
             for j_material_path in i_material_paths:
                 if j_material_path in query_dict:
@@ -127,7 +127,7 @@ class AssetWorkspace(object):
         for i_pass_name, i_dcc_obj in _:
             i_s_opt = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj)
             i_geometry_paths = i_s_opt.get_all_paths_at(
-                location, include_types=self.GEOMETRY_TYPES
+                location, type_includes=self.GEOMETRY_TYPES
             )
             for j_path in i_geometry_paths:
                 j_obj_opt = ktn_core.KtnObjOpt(i_s_opt, j_path)
@@ -144,7 +144,7 @@ class AssetWorkspace(object):
         dcc_objs = self.get_all_pass_source_obj()
         for i_dcc_obj in dcc_objs:
             i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
-                location, 'materialAssign', include_types=self.GEOMETRY_TYPES
+                location, 'materialAssign', type_includes=self.GEOMETRY_TYPES
             )
             for j_material_sg_path in i_material_sg_paths:
                 if j_material_sg_path in query_dict:

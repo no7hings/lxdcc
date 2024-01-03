@@ -166,8 +166,10 @@ class CEL(object):
         self._cel = cel
 
     def parse(self):
-        return Widgets.CollectAndSelectInScenegraph(
-            self._cel, ''
-        ).collectAndSelect(
-            False, self._ktn_obj
-        )
+        if self._cel:
+            return Widgets.CollectAndSelectInScenegraph(
+                self._cel, ''
+            ).collectAndSelect(
+                select=False, node=self._ktn_obj
+            )
+        return []

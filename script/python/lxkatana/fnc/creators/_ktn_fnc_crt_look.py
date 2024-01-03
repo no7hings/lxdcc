@@ -20,12 +20,12 @@ class LookWorkspaceCreator(utl_fnc_obj_abs.AbsFncOptionBase):
 
     @classmethod
     def _get_rsv_asset_auto_(cls):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         file_path = ktn_dcc_objects.Scene.get_current_file_path()
         #
         if file_path:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_resource()

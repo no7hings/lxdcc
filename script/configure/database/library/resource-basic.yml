@@ -202,6 +202,17 @@ patterns:
     #
     texture-json-dir: '<.texture-dir>/json'
     texture-json-search-file: '<.texture-json-dir>/{resource}.search.json'
+    # hdri
+    hdri-dir: '<.version-dir>/hdri'
+    hdri-original-dir: '<.hdri-dir>/original'
+    hdri-original-src-dir: '<.hdri-original-dir>/src'
+    hdri-original-src-file: '<.hdri-original-src-dir>/{resource}.{format}'
+    hdri-acescg-tx-dir: '<.hdri-acescg-dir>/tx'
+    hdri-acescg-tx-file: '<.hdri-acescg-tx-dir>/{resource}.tx'
+    #
+    hdri-acescg-dir: '<.hdri-dir>/acescg'
+    hdri-acescg-src-dir: '<.hdri-acescg-dir>/src'
+    hdri-acescg-src-file: '<.hdri-acescg-src-dir>/{resource}.{format}'
     # geometry
     geometry-dir: '<.version-dir>/geometry'
     geometry-fbx-dir: '<.geometry-dir>/fbx'
@@ -247,6 +258,18 @@ storages:
     texture_source_directory:
         kind: directory
         keyword: 'texture-source-dir'
+    # hdri
+    hdri_original_src_directory:
+        kind: directory
+        keyword: 'hdri-original-src-dir'
+
+    hdri_acescg_src_directory:
+        kind: directory
+        keyword: 'hdri-acescg-src-dir'
+
+    hdri_acescg_tx_directory:
+        kind: directory
+        keyword: 'hdri-acescg-tx-dir'
     # geometry
     geometry_fbx_directory:
         kind: directory
@@ -282,4 +305,5 @@ category_groups:
     - '/3d_plant'
     - '/3d_plant_proxy'
     - '/3d_proxy'
+    - '/hdri'
     - '/test'

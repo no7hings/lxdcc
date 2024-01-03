@@ -3,12 +3,12 @@ import copy
 
 import lxbasic.core as bsc_core
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 
 class RsvAssetTextureOpt(object):
     def __init__(self, rsv_task):
-        self._resolver = rsv_commands.get_resolver()
+        self._resolver = rsv_core.RsvBase.generate_root()
 
         self._rsv_task = rsv_task
 
@@ -230,7 +230,7 @@ class RsvAssetTextureOpt(object):
 
 class RsvAssetBuildOpt(object):
     def __init__(self, rsv_resource):
-        self._resolver = rsv_commands.get_resolver()
+        self._resolver = rsv_core.RsvBase.generate_root()
 
         self._rsv_resource = rsv_resource
         self._rsv_project = self._rsv_resource.get_rsv_project()

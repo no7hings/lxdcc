@@ -7,9 +7,9 @@ from ..core import raw as bsc_cor_raw
 
 
 class TimeExtraMtd(object):
-    TIME_FORMAT = u'%Y-%m-%d %H:%M:%S'
-    TIME_TAG_FORMAT = u'%Y_%m%d_%H%M_%S_%f'
-    DATA_TAG_FORMAT = u'%Y_%m%d'
+    TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+    TIME_TAG_FORMAT = '%Y_%m%d_%H%M_%S_%f'
+    DATA_TAG_FORMAT = '%Y_%m%d'
 
     @classmethod
     def get_time_tag_36(cls, multiply=1):

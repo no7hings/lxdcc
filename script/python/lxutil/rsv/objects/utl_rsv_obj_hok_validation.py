@@ -219,7 +219,7 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         return dcc_location
 
     def execute_shotgun_check(self, validation_checker):
-        import lxwrap.shotgun.core as wrp_stg_core
+        import lxbasic.shotgun.core as bsc_stg_core
 
         check_group = 'Shotgun Check'
 
@@ -228,10 +228,10 @@ class RsvDccValidationHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         location = '{}{}'.format(geometry_location, root_location)
 
-        stg_connector = wrp_stg_core.StgConnector()
+        stg_connector = bsc_stg_core.StgConnector()
         sgt_task_query = stg_connector.get_stg_task_query(**self._rsv_scene_properties.value)
         if sgt_task_query is not None:
-            stg_task_opt = wrp_stg_core.StgTaskOpt(sgt_task_query)
+            stg_task_opt = bsc_stg_core.StgTaskOpt(sgt_task_query)
             status = stg_task_opt.get_stg_status()
             if status in ['omt', 'hld']:
                 validation_checker.register_node_result(

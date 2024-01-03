@@ -54,14 +54,9 @@ main:
             tool_tip: '...'
             lock: True
 
-        parameters/live_group/placeholder:
+        parameters/setting/skydome_light/image:
             widget: file
-            value: '/l/resource/td/asset/live-group/asset-standard.livegroup'
-            tool_tip: '...'
-
-        parameters/setting/fill_light/image:
-            widget: file
-            value: '/l/resource/srf/std_lgt_rig/hdr/WinterForest_Ref_ACES_fix11_fill.exr'
+            value: '/l/resource/srf/std_lgt_rig/hdr/WinterForest_Ref_ACES_fix11_fill.tx'
             tool_tip: '...'
 
         parameters/setting/ground/enable:
@@ -77,13 +72,16 @@ main:
         parameters/setting/background/mode:
             widget: capsule_string
             value: ['color', 'image']
-            default: 'color'
+            default: 'image'
             tool_tip: '...'
 
         parameters/setting/background/color:
             widget: color3
             value: [0.18, 0.18, 0.18]
             tool_tip: '...'
+            visible_condition_hint: {
+                conditionalVisOp: 'equalTo', conditionalVisPath: '../mode', conditionalVisValue: 'color'
+            }
         # option
         option/variant_key:
             widget: string
@@ -115,9 +113,9 @@ main:
             tool_tip: '...'
             lock: True
 
-        option/elements/fill_light:
+        option/elements/skydome_light:
             widget: path
-            value: '/root/world/lgt/gaffer/rig/skydomeLight'
+            value: '/root/world/lgt/gaffer/rig/skydome_light'
             tool_tip: '...'
 
         option/elements/background:
@@ -139,7 +137,7 @@ main:
     expand_groups:
         - 'parameters'
         - 'parameters/setting'
-        - 'parameters/setting/fill_light'
+        - 'parameters/setting/skydome_light'
         - 'parameters/setting/ground'
         - 'parameters/setting/background'
 #
@@ -184,19 +182,6 @@ node:
             # join other
             - '<..join_other_dot.output>'
             - '<.path>.join_other'
-    #
-    live_group:
-        type: 'LiveGroup'
-        path: '<main.path>/<option.type_abr>__<..key>'
-        input: '<.path>.i0'
-        output: '<.path>.o0'
-        #
-        expressions:
-            source: 'getParent().live_group.placeholder'
-        #
-        connections:
-            - '<..upstream_merge.output>'
-            - '<.input>'
     # variant properties opt
     variant_properties_opt:
         tag: 'VPO'
@@ -222,7 +207,7 @@ node:
             user/data_4/i1: 'getParent().option.default'
             #
             user/data_5/i1: 'getParent().getNodeName()'
-            user/data_6/i1: 'getParent().parameters.live_group.placeholder'
+            user/data_6/i1: 'getParent().parameters.setting.skydome_light.image'
         #
         connections:
             # output

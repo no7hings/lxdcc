@@ -2673,7 +2673,7 @@ class CmdMeshesOpt(object):
     def get_bounding_box(self):
         return cmds.polyEvaluate(self._mesh_paths, boundingBox=1)
 
-    def generate_geometry_args(self):
+    def compute_geometry_args(self):
         b_box = self.get_bounding_box()
         x_0, y_0, z_0 = b_box[0][0], b_box[1][0], b_box[2][0]
         x_1, y_1, z_1 = b_box[0][1], b_box[1][1], b_box[2][1]

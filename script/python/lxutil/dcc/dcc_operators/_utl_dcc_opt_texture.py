@@ -9,10 +9,6 @@ import collections
 
 import lxbasic.core as bsc_core
 
-from lxutil import utl_core
-
-import lxutil.abstracts as utl_abstracts
-
 import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 import multiprocessing

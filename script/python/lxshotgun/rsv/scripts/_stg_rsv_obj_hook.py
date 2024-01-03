@@ -216,11 +216,11 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def execute_shotgun_file_export(self):
-        import lxwrap.shotgun.core as wrp_stg_core
+        import lxbasic.shotgun.core as bsc_stg_core
 
         rsv_scene_properties = self._rsv_scene_properties
 
-        stg_connector = wrp_stg_core.StgConnector()
+        stg_connector = bsc_stg_core.StgConnector()
 
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
@@ -244,19 +244,19 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def set_dependency_export(self):
-        import lxwrap.shotgun.core as wrp_stg_core
+        import lxbasic.shotgun.core as bsc_stg_core
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
-        stg_connector = wrp_stg_core.StgConnector()
+        stg_connector = bsc_stg_core.StgConnector()
         #
         stg_version_query = stg_connector.get_stg_version_query(
             **self._rsv_scene_properties.value
         )
         #
-        stg_version_opt = wrp_stg_core.StgVersionOpt(stg_version_query)
+        stg_version_opt = bsc_stg_core.StgVersionOpt(stg_version_query)
 
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         project = self._rsv_scene_properties.get('project')
         branch = self._rsv_scene_properties.get('branch')

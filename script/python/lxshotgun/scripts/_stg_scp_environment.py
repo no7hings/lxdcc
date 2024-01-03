@@ -1,19 +1,18 @@
 # coding:utf-8
-import lxbasic.core as bsc_core
 
 
 class ScpEnvironment(object):
     @classmethod
     def get_data(cls, task_id):
         if task_id:
-            import lxwrap.shotgun.core as wrp_stg_core
+            import lxbasic.shotgun.core as bsc_stg_core
 
-            import lxresolver.commands as rsv_commands
+            import lxresolver.core as rsv_core
 
             data = []
 
-            resolver = rsv_commands.get_resolver()
-            c = wrp_stg_core.StgConnector()
+            resolver = rsv_core.RsvBase.generate_root()
+            c = bsc_stg_core.StgConnector()
             dict_ = c.get_data_from_task_id(task_id)
             keys = resolver.VariantTypes.Constructs
             for i_key in keys:

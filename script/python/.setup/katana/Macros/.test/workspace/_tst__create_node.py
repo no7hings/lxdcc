@@ -19,6 +19,12 @@ for i in [
     '_Opt/UserData',
     '_Opt/LookProperties',
     '_Opt/ColorCheckerAttachFit',
+    '_Opt/PropertyAssign',
+    '_Opt/PropertyColorChoice',
+    '_Opt/PropertySet',
+    '_Opt/ColorMapAssign',
+    '_Opt/PropertyAssign',
+    '_Opt/ComponentLayout',
     #
     '_Wsp/VariantRegister',
     #

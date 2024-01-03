@@ -72,11 +72,11 @@ def __execute_option_hook(hook_option):
     #
     import lxbasic.extra.methods as bsc_etr_methods
     #
-    import lxresolver.commands as rsv_commands
+    import lxresolver.core as rsv_core
     #
     import lxsession.core as ssn_core
     #
-    resolver = rsv_commands.get_resolver()
+    resolver = rsv_core.RsvBase.generate_root()
     #
     all_hook_engines = ssn_core.SsnHookEngineMtd.get_all()
     option_opt = bsc_core.ArgDictStringOpt(hook_option)

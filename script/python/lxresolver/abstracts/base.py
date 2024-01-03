@@ -1410,7 +1410,7 @@ class AbsRsvConfigureExtraDef(AbsRsvBaseDef):
         # use url
         if 'url' in kwargs:
             url = kwargs['url']
-            dict_ = rsv_core.RsvUtil._get_parameter_by_url_(url)
+            dict_ = rsv_core.RsvBase.parse_url(url)
         elif 'file' in kwargs:
             dict_ = kwargs
             k = kwargs['file']
@@ -1912,10 +1912,10 @@ class AbsRsvProject(
             variants_override
         )
 
-    def get_resolver(self):
+    def get_rsv_root(self):
         return self._rsv_root
 
-    resolver = property(get_resolver)
+    rsv_root = property(get_rsv_root)
 
     def get_pathsep(self):
         return self.PATHSEP

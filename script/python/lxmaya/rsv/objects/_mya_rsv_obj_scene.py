@@ -709,7 +709,7 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     @classmethod
     def get_shot_asset_dict(cls):
         dict_ = {}
-        r = cls.get_resolver()
+        r = cls.generate_resolver()
         reference_raw = mya_dcc_objects.References().get_reference_raw()
         for i_obj, i_namespace, i_file_path in reference_raw:
             i_rsv_task = r.get_rsv_task_by_any_file_path(

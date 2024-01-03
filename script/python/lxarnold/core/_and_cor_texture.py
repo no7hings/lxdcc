@@ -3,7 +3,7 @@ import os
 
 import lxbasic.core as bsc_core
 
-import lxwrap.texture.core as txr_core
+import lxbasic.texture.core as bsc_txr_core
 
 from .wrap import *
 
@@ -171,11 +171,11 @@ class AndTextureOpt(AndImageOpt):
 
     @classmethod
     def get_method_for_color_space_as_aces(cls):
-        return txr_core.TxrMethodForColorSpaceAsAces.generate_instance()
+        return bsc_txr_core.TxrMethodForColorSpaceAsAces.generate_instance()
 
     @classmethod
     def get_method_for_color_space_as_tx_convert(cls):
-        return txr_core.TxrMethodForColorSpaceAsTxConvert.generate_instance()
+        return bsc_txr_core.TxrMethodForColorSpaceAsTxConvert.generate_instance()
 
     def get_is_srgb(self):
         return (

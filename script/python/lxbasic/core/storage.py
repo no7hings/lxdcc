@@ -625,6 +625,14 @@ class StgSystem(object):
         t_0.start()
 
     @classmethod
+    def open_directory_force(cls, path):
+        path = bsc_cor_raw.auto_encode(path)
+        if os.path.exists(path) is False:
+            path = StgExtraMtd.get_exists_component(path)
+
+        cls.open_directory(path)
+
+    @classmethod
     def open_file(cls, path):
         if bsc_cor_base.SysBaseMtd.get_is_windows():
             cmd = 'explorer /select,"{}"'.format(path.replace('/', '\\'))
@@ -762,16 +770,24 @@ class StgDirectoryMtd(object):
         import scandir
 
         list_ = []
+        # make sure is a directory
         if os.path.isdir(directory_path):
-            for i in scandir.scandir(directory_path):
-                if i.is_file():
-                    i_path = i.path
-                    if isinstance(ext_includes, (tuple, list)):
-                        i_base, i_ext = os.path.splitext(i_path)
-                        if i_ext not in ext_includes:
-                            continue
-                    #
-                    list_.append(i_path)
+            if StgPathMtd.get_is_readable(directory_path) is True:
+                for i in scandir.scandir(directory_path):
+                    if i.is_file():
+                        i_path = i.path
+                        if isinstance(ext_includes, (tuple, list)):
+                            i_base, i_ext = os.path.splitext(i_path)
+                            if i_ext not in ext_includes:
+                                continue
+                        #
+                        list_.append(i_path)
+            else:
+                bsc_log.Log.trace_error(
+                    'unreadable directory: "{}"'.format(
+                        directory_path
+                    )
+                )
         if list_:
             list_.sort()
         return list_
@@ -809,17 +825,24 @@ class StgDirectoryMtd(object):
     @classmethod
     def _get_all_file_paths(cls, directory_path, ext_includes=None):
         def rcs_fnc_(path_):
-            for _i in scandir.scandir(path_):
-                _i_path = _i.path
-                if _i.is_file():
-                    if isinstance(ext_includes, (tuple, list)):
-                        _i_base, _i_ext = os.path.splitext(_i_path)
-                        if _i_ext not in ext_includes:
-                            continue
-                    #
-                    list_.append(_i_path)
-                elif _i.is_dir():
-                    rcs_fnc_(_i_path)
+            if StgPathMtd.get_is_readable(path_) is True:
+                for _i in scandir.scandir(path_):
+                    _i_path = _i.path
+                    if _i.is_file():
+                        if isinstance(ext_includes, (tuple, list)):
+                            _i_base, _i_ext = os.path.splitext(_i_path)
+                            if _i_ext not in ext_includes:
+                                continue
+                        #
+                        list_.append(_i_path)
+                    elif _i.is_dir():
+                        rcs_fnc_(_i_path)
+            else:
+                bsc_log.Log.trace_error(
+                    'unreadable directory: "{}"'.format(
+                        path_
+                    )
+                )
 
         import scandir
 
@@ -855,9 +878,16 @@ class StgDirectoryMtd(object):
 
         list_ = []
         if os.path.isdir(directory_path):
-            for i in scandir.scandir(directory_path):
-                if i.is_dir():
-                    list_.append(i.path)
+            if StgPathMtd.get_is_readable(directory_path) is True:
+                for i in scandir.scandir(directory_path):
+                    if i.is_dir():
+                        list_.append(i.path)
+            else:
+                bsc_log.Log.trace_error(
+                    'unreadable directory: "{}"'.format(
+                        directory_path
+                    )
+                )
         return list_
 
     @classmethod
@@ -886,12 +916,19 @@ class StgDirectoryMtd(object):
 
     @classmethod
     def _get_all_directory_paths(cls, directory_path):
-        def rcs_fnc_(d_):
-            for _i in scandir.scandir(d_):
-                if _i.is_dir():
-                    _i_path = _i.path
-                    list_.append(_i_path)
-                    rcs_fnc_(_i_path)
+        def rcs_fnc_(path_):
+            if StgPathMtd.get_is_readable(path_) is True:
+                for _i in scandir.scandir(path_):
+                    if _i.is_dir():
+                        _i_path = _i.path
+                        list_.append(_i_path)
+                        rcs_fnc_(_i_path)
+            else:
+                bsc_log.Log.trace_error(
+                    'unreadable directory: "{}"'.format(
+                        path_
+                    )
+                )
 
         # noinspection PyUnresolvedReferences
         import scandir
@@ -1786,7 +1823,7 @@ class StgTmpThumbnailMtd(object):
         )
 
     @classmethod
-    def get_qt_file_path_(cls, file_path, width=128, ext='.jpg'):
+    def generate_for_qt_resize(cls, file_path, width=128, ext='.jpg'):
         directory_path = bsc_cor_environ.EnvBaseMtd.get_temporary_root()
         key = cls.get_key(file_path)
         region = StgTmpBaseMtd.get_save_region(key)

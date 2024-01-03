@@ -9,7 +9,7 @@ import lxcontent.core as ctt_core
 
 import lxkatana.core as ktn_core
 
-import lxwrap.texture.core as txr_core
+import lxbasic.texture.core as bsc_txr_core
 
 
 class ScpTextureBuildCommand(object):
@@ -605,10 +605,10 @@ class ScpTextureBuildForPaste(object):
 
         self._scheme = scheme
         self._command = None
-        m = txr_core.TxrMethodForBuild.generate_instance()
-        texture_args = m.get_texture_args(texture_path)
-        if texture_args:
-            texture_name, texture_data = texture_args
+        m = bsc_txr_core.TxrMethodForBuild.generate_instance()
+        all_texture_args = m.generate_all_texture_args(texture_path)
+        if all_texture_args:
+            texture_name, texture_data = all_texture_args
             texture_assign = {}
             for k, v in texture_data.items():
                 texture_assign[k] = v[0]
@@ -702,4 +702,31 @@ class ScpTextureBuildForPaste(object):
             if layout_path is not None:
                 timer = threading.Timer(.25, post_fnc_)
                 timer.start()
+
+    @classmethod
+    def create_one(cls, obj_opt, texture_path):
+        m = bsc_txr_core.TxrMethodForBuild.generate_instance()
+        texture_arg = m.generate_one_texture_args(texture_path)
+        if texture_arg:
+            texture_name, texture_type, texture_path_ = texture_arg
+
+            print texture_name, texture_type, texture_path_
+
+            type_name = obj_opt.get_type_name()
+            time_tag = bsc_core.TimeExtraMtd.get_time_tag_36_(multiply=100)
+
+            node_path = '{}/{}_{}__image__{}'.format(obj_opt.get_path(), texture_name, texture_type, time_tag)
+
+            ktn_obj, is_create = ktn_core.NGObjOpt._generate_shader_create_args(
+                node_path, 'ArnoldShadingNode', 'image'
+            )
+            if is_create is True:
+                obj_opt = ktn_core.NGObjOpt(ktn_obj)
+                obj_opt.set_shader_parameters_by_data(
+                    {'filename': texture_path_}
+                )
+                ktn_core.GuiNodeGraphOpt.drop_nodes(
+                    [ktn_obj]
+                )
+
 

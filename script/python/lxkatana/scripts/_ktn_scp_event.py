@@ -355,22 +355,33 @@ class ScpTextureBuilder(object):
                     file_path = text
 
         if file_path is not None:
-            if self._obj_opt.get_is(['NetworkMaterialCreate']):
+            if self._obj_opt.get_is({'NetworkMaterialCreate'}):
                 w = gui_core.GuiDialogAsBubbleChoose.create(
-                    ['material', 'shader', 'group'],
+                    ['material', 'shader', 'group', 'image'],
                     'create texture in material group, choose a scheme to continue'
                 )
                 scheme = w.get_result()
 
                 if scheme is not None:
                     import lxkatana.scripts as ktn_scripts
+                    if scheme == 'image':
+                        ktn_scripts.ScpTextureBuildForPaste.create_one(self._obj_opt, file_path)
+                    else:
+                        ktn_scripts.ScpTextureBuildForPaste(
+                            self._obj_opt, scheme, file_path
+                        ).accept()
+            elif self._obj_opt.get_is({'ShadingGroup'}):
+                w = gui_core.GuiDialogAsBubbleChoose.create(
+                    ['group', 'image'],
+                    'create texture in material group, choose a scheme to continue'
+                )
+                scheme = w.get_result()
 
-                    ktn_scripts.ScpTextureBuildForPaste(
-                        self._obj_opt, scheme, file_path
-                    ).accept()
-            elif self._obj_opt.get_is(['ShadingGroup']):
-                import lxkatana.scripts as ktn_scripts
-
-                ktn_scripts.ScpTextureBuildForPaste(
-                    self._obj_opt, None, file_path
-                ).accept()
+                if scheme is not None:
+                    import lxkatana.scripts as ktn_scripts
+                    if scheme == 'image':
+                        ktn_scripts.ScpTextureBuildForPaste.create_one(self._obj_opt, file_path)
+                    else:
+                        ktn_scripts.ScpTextureBuildForPaste(
+                            self._obj_opt, scheme, file_path
+                        ).accept()

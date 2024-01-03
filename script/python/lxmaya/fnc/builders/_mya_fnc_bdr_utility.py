@@ -456,7 +456,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         )
 
     def set_run(self):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
         with_model_geometry = self.get('with_model_geometry')
@@ -492,7 +492,7 @@ class AssetBuilder(utl_fnc_obj_abs.AbsFncOptionBase):
         project = self.get('project')
         asset = self.get('asset')
         #
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_project = resolver.get_rsv_project(project=project)
         #
         rsv_asset = rsv_project.get_rsv_resource(asset=asset)
@@ -619,13 +619,13 @@ class FncAssetBuilderNew(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def __init__(self, option=None):
         super(FncAssetBuilderNew, self).__init__(option)
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
         project = self.get('project')
         asset = self.get('asset')
         #
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_project = resolver.get_rsv_project(project=project)
         #
         self._rsv_asset = rsv_project.get_rsv_resource(asset=asset)

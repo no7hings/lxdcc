@@ -405,7 +405,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         s.do_flatten()
         #
-        g = s.generate_geometry_args('/master')
+        g = s.compute_geometry_args('/master')
         #
         (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
         #
@@ -470,7 +470,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         s.do_flatten()
         #
-        g = s.generate_geometry_args('/master')
+        g = s.compute_geometry_args('/master')
         #
         (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
         #

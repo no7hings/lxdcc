@@ -11,7 +11,7 @@ import lxbasic.core as bsc_core
 
 import lxuniverse.abstracts as unr_abstracts
 
-import lxwrap.texture.core as txr_core
+import lxbasic.texture.core as bsc_txr_core
 
 
 class AbsObjStgGuiExtraDef(object):
@@ -765,11 +765,11 @@ class AbsOsTexture(
 
     @classmethod
     def get_method_for_color_space_as_tx_convert(cls):
-        return txr_core.TxrMethodForColorSpaceAsTxConvert.generate_instance()
+        return bsc_txr_core.TxrMethodForColorSpaceAsTxConvert.generate_instance()
 
     @classmethod
     def get_method_for_color_space_as_aces(cls):
-        return txr_core.TxrMethodForColorSpaceAsAces.generate_instance()
+        return bsc_txr_core.TxrMethodForColorSpaceAsAces.generate_instance()
 
     def get_target_file_path_as_src(
         self, directory_path_dst, scheme='separate', target_extension='.tx', fix_name_blank=False
@@ -940,7 +940,7 @@ class AbsOsTexture(
             return cls.get_method_for_color_space_as_aces().get_default_color_space()
         elif ext_any.lower() == '.exr':
             file_opt = bsc_core.StgFileOpt(file_path_src)
-            if file_opt.get_is_match_name_pattern('*.z_disp.*.exr'):
+            if file_opt.get_is_match_name_pattern('*.z_disp.*.exr') or file_opt.get_is_match_name_pattern('*.hdr.exr'):
                 return cls.get_method_for_color_space_as_aces().to_aces_color_space(
                     cls.get_method_for_color_space_as_tx_convert().get_tx_color_space_input(file_path_src)
                 )

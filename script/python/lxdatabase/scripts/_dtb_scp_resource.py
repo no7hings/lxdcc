@@ -53,6 +53,8 @@ class ScpResourcesAddByQuixel(object):
     GEOMETRY_VAR_PATTERN = ''
     GEOMETRY_VAR_LOD_PATTERN = '{key_extra}_LOD{lod_level}.{format}'
 
+    KEY = 'add to quixel'
+
     def __init__(self):
         self._resource_dict = dict()
 
@@ -68,8 +70,36 @@ class ScpResourcesAddByQuixel(object):
         with bsc_core.LogProcessContext.create_as_bar(maximum=len(json_files), label='add resource') as l_p:
             for i_json_file_path in json_files:
                 l_p.do_update()
-                #
                 self.add_resource_by_any_json(i_json_file_path)
+
+    @classmethod
+    def _check_resource_exists(cls, file_path):
+        quixel_json_file_opt = bsc_core.StgFileOpt(file_path)
+        json_content = ctt_core.Content(
+            value=file_path
+        )
+
+        # break when category group is not found
+        category_group = json_content.get('semanticTags.asset_type')
+        if category_group is None:
+            bsc_core.Log.trace_method_error(cls.KEY, 'file: {} is not available'.format(file_path))
+            return None
+
+        category_group = bsc_core.RawTextMtd.clear_up_to(category_group).strip().lower()
+
+        resource_id = quixel_json_file_opt.name_base
+        resource_key = bsc_core.RawTextMtd.clear_up_to(json_content.get('name').strip()).lower()
+
+        resource_name = '{}_{}'.format(resource_key, resource_id)
+
+        resource_dtb_path = '/{}/{}'.format(category_group, resource_name)
+        if category_group in cls.ALL_CATEGORY_GROUPS:
+            dtb_opt = dtb_objects.DtbResourceLibraryOpt.generate(category_group)
+            dtb_resource = dtb_opt.get_resource(resource_dtb_path)
+            if dtb_resource:
+                return True
+
+        return False
 
     def add_resource_by_any_json(self, file_path):
         bsc_core.Log.trace_method_result(
@@ -82,7 +112,11 @@ class ScpResourcesAddByQuixel(object):
         )
         directory_path_src = quixel_json_file_opt.directory_path
 
+        # break when category group is not found
         category_group = json_content.get('semanticTags.asset_type')
+        if category_group is None:
+            return
+
         category_group = bsc_core.RawTextMtd.clear_up_to(category_group).strip().lower()
 
         resource_id = quixel_json_file_opt.name_base
@@ -101,10 +135,7 @@ class ScpResourcesAddByQuixel(object):
         )
 
         if category_group in self.ALL_CATEGORY_GROUPS:
-            dtb_opt = dtb_objects.DtbResourceLibraryOpt(
-                bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
-                bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(category_group))
-            )
+            dtb_opt = dtb_objects.DtbResourceLibraryOpt.generate(category_group)
             # resource
             resource_directory_path_tgt = self.stg_create_resource_directory_tgt_fnc(
                 dtb_opt,

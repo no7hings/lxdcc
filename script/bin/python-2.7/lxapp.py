@@ -64,8 +64,8 @@ def __guess_by_kwargs(opt_string):
 
     # find resolver project
     import lxbasic.extra.methods as bsc_etr_methods
-    import lxresolver.commands as rsv_commands
-    resolver = rsv_commands.get_resolver()
+    import lxresolver.core as rsv_core
+    resolver = rsv_core.RsvBase.generate_root()
     rsv_project = resolver.get_rsv_project(project=project)
     if not rsv_project:
         return
@@ -128,8 +128,8 @@ def __guess_by_args(args):
     app_arg = '.'.join(_[1:])
     # guess resolver project
     import lxbasic.extra.methods as bsc_etr_methods
-    import lxresolver.commands as rsv_commands
-    resolver = rsv_commands.get_resolver()
+    import lxresolver.core as rsv_core
+    resolver = rsv_core.RsvBase.generate_root()
     rsv_project = resolver.get_rsv_project(project=project)
     if not rsv_project:
         return
@@ -187,7 +187,7 @@ def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
     #
     import lxbasic.extra.methods as bsc_etr_methods
     #
-    import lxresolver.commands as rsv_commands
+    import lxresolver.core as rsv_core
     #
     option_opt = bsc_core.ArgDictStringOpt(option)
     # find project
@@ -195,7 +195,7 @@ def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
     if not project:
         return
     # find resolver project
-    resolver = rsv_commands.get_resolver()
+    resolver = rsv_core.RsvBase.generate_root()
     rsv_project = resolver.get_rsv_project(project=project)
     if not rsv_project:
         return

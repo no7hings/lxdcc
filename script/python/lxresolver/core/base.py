@@ -1,21 +1,10 @@
 # coding:utf-8
-import os
-
 import collections
-
-import fnmatch
 
 import parse
 
-import re
-
-import glob
-
-import platform
 
 import lxbasic.core as bsc_core
-
-import six
 
 
 class RsvConfigure(object):
@@ -56,12 +45,14 @@ class RsvConfigure(object):
         return list_
 
 
-class RsvUtil(object):
+class RsvBase(object):
 
     URL_PATTERN = 'url://resolver?{parameters}'
 
+    RSV_ROOT = None
+
     @classmethod
-    def _get_parameter_by_url_(cls, url):
+    def parse_url(cls, url):
         dic = {}
         p = parse.parse(
             cls.URL_PATTERN, url, case_sensitive=True
@@ -78,8 +69,18 @@ class RsvUtil(object):
                 keyword = '{}-file'.format(k)
                 dic['keyword'] = keyword
         else:
-            raise TypeError(u'url: "{}" is Non-available')
+            raise TypeError('url: "{}" is not available')
         return dic
+
+    @classmethod
+    def generate_root(cls):
+        if cls.RSV_ROOT is not None:
+            return cls.RSV_ROOT
+
+        import lxresolver.objects as rsv_objects
+        rsv_root = rsv_objects.RsvRoot()
+        cls.RSV_ROOT = rsv_root
+        return cls.RSV_ROOT
 
 
 if __name__ == '__main__':

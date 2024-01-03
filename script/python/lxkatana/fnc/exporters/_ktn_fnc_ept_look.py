@@ -133,8 +133,8 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                         'file="{}"'.format(i_output_file_path)
                     )
                     if self.get('texture_use_environ_map') is True:
-                        fr = bsc_dcc_core.DotAssFileReader(i_output_file_path)
-                        fr._set_file_paths_convert_()
+                        fr = bsc_dcc_core.DotAssOpt(i_output_file_path)
+                        fr.do_file_path_convert_to_env()
                         #
                         bsc_core.Log.trace_method_result(
                             'katana-ass-sequence-export',
@@ -158,8 +158,8 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     'file="{}"'.format(output_file_path)
                 )
                 if self.get('texture_use_environ_map') is True:
-                    fr = bsc_dcc_core.DotAssFileReader(output_file_path)
-                    fr._set_file_paths_convert_()
+                    fr = bsc_dcc_core.DotAssOpt(output_file_path)
+                    fr.do_file_path_convert_to_env()
                     #
                     bsc_core.Log.trace_method_result(
                         'katana-ass-export',

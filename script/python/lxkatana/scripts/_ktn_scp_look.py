@@ -102,7 +102,7 @@ ktn_scripts.ScpLookOutput(
         dcc_objs = self.get_all_look_pass_source_nodes()
         for i_dcc_obj in dcc_objs:
             i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_port_raws_at(
-                location, 'materialAssign', include_types=self.GEOMETRY_TYPES
+                location, 'materialAssign', type_includes=self.GEOMETRY_TYPES
             )
             for j_material_sg_path in i_material_sg_paths:
                 if j_material_sg_path in query_dict:
@@ -118,7 +118,7 @@ ktn_scripts.ScpLookOutput(
         query_dict = ktn_dcc_objects.Materials.get_nmc_material_dict()
         dcc_objs = self.get_all_look_pass_source_nodes()
         for i_dcc_obj in dcc_objs:
-            i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_all_descendant_paths_at('/root/materials')
+            i_material_sg_paths = ktn_core.KtnStageOpt(i_dcc_obj.ktn_obj).get_descendant_paths_at('/root/materials')
             for j_material_sg_path in i_material_sg_paths:
                 if j_material_sg_path in query_dict:
                     j_material = query_dict[j_material_sg_path]
@@ -185,7 +185,7 @@ ktn_scripts.ScpLookOutput(
         for i_pass_name, i_dcc_obj in _:
             i_s_opt = ktn_core.KtnStageOpt(i_dcc_obj.get_name())
             i_geometry_paths = i_s_opt.get_all_paths_at(
-                location, include_types=self.GEOMETRY_TYPES
+                location, type_includes=self.GEOMETRY_TYPES
             )
             for j_path in i_geometry_paths:
                 j_obj_opt = ktn_core.KtnObjOpt(i_s_opt, j_path)

@@ -2,13 +2,11 @@
 # noinspection PyUnresolvedReferences
 import hou
 
-from lxutil import commands
+import lxbasic.dcc.core as bsc_dcc_core
 
 from .. import hou_dcc_obj_abs
 
 from ...dcc.dcc_objects import _hou_dcc_obj_os
-
-import lxutil.commands as utl_cmds
 
 
 class Port(hou_dcc_obj_abs.AbsHouPort):
@@ -110,7 +108,7 @@ class AndMaterialx(hou_dcc_obj_abs.AbsHouFileReferenceObj):
         if ports:
             port = ports[0]
             file_path = port.get()
-            return commands.MaterialxReader(file_path).geometry_paths
+            return bsc_dcc_core.DotMtlxOpt(file_path).geometry_paths
         return []
 
     def get_texture_paths(self):
@@ -118,7 +116,7 @@ class AndMaterialx(hou_dcc_obj_abs.AbsHouFileReferenceObj):
         if ports:
             port = ports[0]
             file_path = port.get()
-            return commands.MaterialxReader(file_path).texture_paths
+            return bsc_dcc_core.DotMtlxOpt(file_path).texture_paths
         return []
 
     def get_textures(self):
@@ -130,7 +128,7 @@ class AndMaterialx(hou_dcc_obj_abs.AbsHouFileReferenceObj):
             lis.append(
                 self._set_file_create_(file_plf_path, port_dcc_path)
             )
-            mtx_reader = utl_cmds.MaterialxReader(file_plf_path)
+            mtx_reader = bsc_dcc_core.DotMtlxOpt(file_plf_path)
             for i in mtx_reader.texture_paths:
                 lis.append(
                     self._set_file_create_(i)

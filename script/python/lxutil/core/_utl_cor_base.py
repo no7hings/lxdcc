@@ -88,7 +88,7 @@ class DDlMonitor(object):
     def set_create(cls, label, job_id, parent=None):
         import lxgui.proxy.widgets as prx_widgets
 
-        import lxwrap.deadline.core as ddl_core
+        import lxbasic.deadline.core as bsc_ddl_core
 
         w = prx_widgets.PrxMonitorWindow(parent=parent)
         w.set_window_title(
@@ -97,7 +97,7 @@ class DDlMonitor(object):
             )
         )
         button = w.get_status_button()
-        j_m = ddl_core.DdlJobMonitor(job_id)
+        j_m = bsc_ddl_core.DdlJobMonitor(job_id)
         button.set_statuses(j_m.get_task_statuses())
         button.set_initialization(j_m.get_task_count())
         j_m.logging.connect_to(w.set_logging)

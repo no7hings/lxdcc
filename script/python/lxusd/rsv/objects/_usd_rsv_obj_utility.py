@@ -13,7 +13,7 @@ import lxutil.dcc.dcc_objects as utl_dcc_objects
 
 from lxutil.fnc import utl_fnc_obj_abs
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 from lxutil.rsv import utl_rsv_obj_abstract
 
@@ -161,7 +161,7 @@ class RsvUsdAssetSetCreator(object):
     def _get_rsv_asset_shots(cls, rsv_asset):
         lis = []
         #
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         rsv_shots = resolver.get_rsv_resources(
             project=rsv_asset.get('project'), branch='shot'
@@ -224,7 +224,7 @@ class RsvUsdAssetSetCreator(object):
     @classmethod
     def _generate_asset_usd_file_path_as_new(cls, rsv_asset, rsv_scene_properties):
         if rsv_scene_properties:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
@@ -263,7 +263,7 @@ class RsvUsdAssetSetCreator(object):
     @classmethod
     def _generate_asset_usd_file_path_as_latest(cls, rsv_asset, rsv_scene_properties):
         if rsv_scene_properties:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
@@ -302,7 +302,7 @@ class RsvUsdAssetSetCreator(object):
     def _generate_asset_shot_usd_file_path_as_new(cls, rsv_asset, rsv_shot, rsv_scene_properties):
         usd_file_path = None
         if rsv_scene_properties:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
             workspace = rsv_scene_properties.get('workspace')
             version = rsv_scene_properties.get('version')
@@ -700,7 +700,7 @@ class RsvUsdAssetSetCreator(object):
 class RsvUsdAssetSet(object):
     @classmethod
     def generate_asset_variant_dict(cls, usd_file_path, mode='main'):
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_project = resolver.get_rsv_project_by_any_file_path(usd_file_path)
         if rsv_project is None:
             return {}
@@ -1242,7 +1242,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
                 else:
                     if i_replace is True:
-                        i_start_frame, i_end_frame = bsc_dcc_core.DotUsdaFileReader(
+                        i_start_frame, i_end_frame = bsc_dcc_core.DotUsdaOpt(
                             i_usda_file_path
                         ).get_frame_range()
                         c.set('start_frame', i_start_frame)

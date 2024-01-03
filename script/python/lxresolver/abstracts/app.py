@@ -9,7 +9,7 @@ import lxcontent.core as ctt_core
 
 import lxbasic.core as bsc_core
 
-import lxresolver.core as rsv_core
+from .. import core as rsv_core
 
 
 class AbsRsvAppDef(object):

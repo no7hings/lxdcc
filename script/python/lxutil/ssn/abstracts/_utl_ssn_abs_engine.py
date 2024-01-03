@@ -3,12 +3,12 @@ import lxbasic.core as bsc_core
 
 import lxutil.fnc.exporters as utl_fnc_exporters
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 
 class AbsSsnRsvApplication(object):
     def __init__(self):
-        self._resolver = rsv_commands.get_resolver()
+        self._resolver = rsv_core.RsvBase.generate_root()
         self._any_scene_file_path = self._get_any_scene_file_path_()
 
     def _get_any_scene_file_path_(self):
@@ -31,9 +31,9 @@ class AbsSsnRsvApplication(object):
 
     @classmethod
     def get_stg_connector(cls):
-        import lxwrap.shotgun.core as wrp_stg_core
+        import lxbasic.shotgun.core as bsc_stg_core
 
-        return wrp_stg_core.StgConnector()
+        return bsc_stg_core.StgConnector()
 
     def get_release_scene_src_file(self, version_scheme='match', ext_extras=None):
         """

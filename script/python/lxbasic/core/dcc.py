@@ -267,9 +267,29 @@ class RectLayoutOpt(object):
         def _init_rect_(self, x, y, w, h):
             self.x, self.y, self.w, self.h = x, y, w, h
 
+            self.__spacing = 0
+
+        @property
+        def spacing(self):
+            return self.__spacing
+
+        @spacing.setter
+        def spacing(self, v):
+            self.__spacing = v
+
         @property
         def args(self):
             return self.x, self.y, self.w, self.h
+
+        @property
+        def exact_args(self):
+            return self.x, self.y, self.w-self.__spacing, self.h-self.__spacing
+
+        @property
+        def exact_rect(self):
+            return self.__class__(
+                self.x, self.y, self.w-self.__spacing, self.h-self.__spacing
+            )
 
         @property
         def top_left(self):
@@ -321,34 +341,6 @@ class RectLayoutOpt(object):
 
         def get_is_valid(self):
             return None not in [self.w, self.h]
-
-    class Rect(AbsRect):
-        def __init__(self, x, y, w, h, index=0):
-            self._init_rect_(x, y, w, h)
-            self.__index = index
-
-            self.__space = None
-
-        def set_space(self, space):
-            self.__space = space
-
-        @property
-        def index(self):
-            return self.__index
-
-        @property
-        def space(self):
-            return self.__space
-
-        def __str__(self):
-            return '{}(x={}, y={}, w={}, h={}, index={})'.format(
-                self.__class__.__name__,
-                self.x, self.y, self.w, self.h,
-                self.index
-            )
-
-        def __repr__(self):
-            return self.__str__()
 
     class AreaRect(AbsRect):
         def __init__(self, layout, direction, x, y, w, h):
@@ -408,11 +400,11 @@ class RectLayoutOpt(object):
                     c_r = rect.top_right
                     #
                     self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                        area=self, direction=self.__direction.swap(),
                         x=c_r.x, y=c_r.y, w=space_rect_pre.w-rect.w, h=rect.h,
-                        area=self,
-                        direction=self.__direction.swap(),
                         parent=None
                     )
+                    # self.__space_rect_cur.spacing = self.spacing
                     self.next_by_space(self.__space_rect_cur, 'layout start')
             # align h
             elif self.w is None:
@@ -425,17 +417,18 @@ class RectLayoutOpt(object):
                     rect.top_left = self.top_left
                     # update fill rect
                     self.__area_fill_rect = RectLayoutOpt.Rect(x=self.x, y=self.y, w=0, h=0)
+                    # self.__area_fill_rect.spacing = self.spacing
                     self.__area_fill_rect.update_range(rect.bottom_right)
                     # try next
                     space_rect_pre = self
                     c_r = rect.bottom_left
                     # find second rect
                     self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                        area=self, direction=self.__direction.swap(),
                         x=c_r.x, y=c_r.y, w=rect.w, h=space_rect_pre.h-rect.h,
-                        area=self,
-                        direction=self.__direction.swap(),
                         parent=None,
                     )
+                    # self.__space_rect_cur.spacing = self.spacing
                     self.next_by_space(self.__space_rect_cur, 'layout start')
 
         def next_by_space_and_rect(self, space_rect, rect, scheme=None):
@@ -451,11 +444,11 @@ class RectLayoutOpt(object):
                 if piece is None:
                     if self.__direction.is_align_w():
                         self.__piece_rect_cur = RectLayoutOpt.SpaceRect(
+                            area=self, direction=self.__direction.swap(),
                             x=rect.x, y=rect.y, w=rect.w, h=self.h,
-                            area=self,
-                            direction=self.__direction.swap(),
                             parent=None
                         )
+                        # self.__piece_rect_cur.spacing = self.spacing
                         if c_r.x >= c_a.x and c_r.y >= c_a.y:
                             self.next_area()
                         else:
@@ -464,19 +457,19 @@ class RectLayoutOpt(object):
                             else:
                                 c_r_0 = rect.bottom_left
                                 self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                                    area=self, direction=self.__piece_rect_cur.direction,
                                     x=c_r_0.x, y=c_r_0.y, w=rect.w, h=c_a.y-c_r_0.y,
-                                    area=self,
-                                    direction=self.__piece_rect_cur.direction,
                                     parent=self.__piece_rect_cur
                                 )
+                                # self.__space_rect_cur.spacing = self.spacing
                                 self.next_by_space(self.__space_rect_cur, 'new piece')
                     elif self.__direction.is_align_h():
                         self.__piece_rect_cur = RectLayoutOpt.SpaceRect(
+                            area=self, direction=self.__direction.swap(),
                             x=rect.x, y=rect.y, w=self.w, h=rect.h,
-                            area=self,
-                            direction=self.__direction.swap(),
                             parent=None
                         )
+                        # self.__piece_rect_cur.spacing = self.spacing
                         if c_r.x >= c_a.x and c_r.y >= c_a.y:
                             self.next_area()
                         else:
@@ -485,11 +478,11 @@ class RectLayoutOpt(object):
                             else:
                                 c_r_0 = rect.top_right
                                 self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                                    area=self, direction=self.__piece_rect_cur.direction.swap(),
                                     x=c_r_0.x, y=c_r_0.y, w=c_a.x-c_r.x, h=rect.h,
-                                    area=self,
-                                    direction=self.__piece_rect_cur.direction.swap(),
                                     parent=self.__piece_rect_cur
                                 )
+                                # self.__space_rect_cur.spacing = self.spacing
                                 self.next_by_space(self.__space_rect_cur, 'new piece')
                 else:
                     c_p = piece.bottom_right
@@ -499,11 +492,11 @@ class RectLayoutOpt(object):
                         else:
                             c_r_0 = rect.bottom_left
                             self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                                area=self, direction=piece.direction,
                                 x=c_r_0.x, y=c_r_0.y, w=piece.w, h=c_a.y-c_r_0.y,
-                                area=self,
-                                direction=piece.direction,
                                 parent=piece
                             )
+                            # self.__space_rect_cur.spacing = self.spacing
                             self.next_by_space(self.__space_rect_cur, 'new space')
                     elif self.__direction.is_align_h():
                         if c_r.x >= c_p.x and c_r.y >= c_p.y:
@@ -511,11 +504,11 @@ class RectLayoutOpt(object):
                         else:
                             c_r_0 = rect.top_right
                             self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                                area=self, direction=piece.direction,
                                 x=c_r_0.x, y=c_r_0.y, w=c_a.x-c_r_0.x, h=piece.h,
-                                area=self,
-                                direction=piece.direction,
                                 parent=piece
                             )
+                            # self.__space_rect_cur.spacing = self.spacing
                             self.next_by_space(self.__space_rect_cur, 'new space')
 
         def next_area(self):
@@ -526,19 +519,19 @@ class RectLayoutOpt(object):
             c_f = self.__area_fill_rect.bottom_right
             if self.__direction.is_align_w():
                 self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                    area=self, direction=self.__direction.swap(),
                     x=c_f.x, y=self.y, w=c_a.x-c_f.x, h=self.h,
-                    area=self,
-                    direction=self.__direction.swap(),
                     parent=None
                 )
+                # self.__space_rect_cur.spacing = self.spacing
                 self.next_by_space(self.__space_rect_cur, 'next piece')
             elif self.__direction.is_align_h():
                 self.__space_rect_cur = RectLayoutOpt.SpaceRect(
+                    area=self, direction=self.__direction.swap(),
                     x=self.x, y=c_f.y, w=self.w, h=c_a.y-c_f.y,
-                    area=self,
-                    direction=self.__direction.swap(),
                     parent=None
                 )
+                # self.__space_rect_cur.spacing = self.spacing
                 self.next_by_space(self.__space_rect_cur, 'next piece')
 
         def next_by_space(self, space_rect, scheme=None):
@@ -566,7 +559,7 @@ class RectLayoutOpt(object):
             return self.__direction
 
     class SpaceRect(AbsRect):
-        def __init__(self, x, y, w, h, area, direction, parent):
+        def __init__(self, area, direction, x, y, w, h, parent=None):
             self._init_rect_(x, y, w, h)
             self.__area = area
             self.__direction = direction
@@ -611,19 +604,51 @@ class RectLayoutOpt(object):
             elif self.__direction.is_align_h():
                 self.w = rect.w
 
-    def __init__(self, xywh_array):
+    class Rect(AbsRect):
+        def __init__(self, x, y, w, h, index=0):
+            self._init_rect_(x, y, w, h)
+            self.__index = index
+
+            self.__space = None
+
+        def set_space(self, space):
+            self.__space = space
+
+        @property
+        def index(self):
+            return self.__index
+
+        @property
+        def space(self):
+            return self.__space
+
+        def __str__(self):
+            return '{}(x={}, y={}, w={}, h={}, index={})'.format(
+                self.__class__.__name__,
+                self.x, self.y, self.w, self.h,
+                self.index
+            )
+
+        def __repr__(self):
+            return self.__str__()
+
+    def __init__(self, xywh_array, spacing=0):
         """
         rect_arg: ((x, y), (w, h))
         """
         self.__x, self.__y = 0, 0
+
+        self.__spacing = spacing
         self.__rects = []
         self.__w_dict = {}
         self.__h_dict = {}
         for i_index, (i_x, i_y, i_w, i_h) in enumerate(xywh_array):
-            i_rect = self.Rect(i_x, i_y, i_w, i_h, i_index)
+            i_w_, i_h_ = i_w+spacing, i_h+spacing
+            i_rect = self.Rect(i_x, i_y, i_w_, i_h_, i_index)
+            i_rect.spacing = spacing
             self.__rects.append(i_rect)
-            self.__w_dict.setdefault(i_w, []).append(i_rect)
-            self.__h_dict.setdefault(i_h, []).append(i_rect)
+            self.__w_dict.setdefault(i_w_, []).append(i_rect)
+            self.__h_dict.setdefault(i_h_, []).append(i_rect)
 
         self.__rects_layout = []
 
@@ -678,6 +703,10 @@ class RectLayoutOpt(object):
                 return rect
 
     @property
+    def spacing(self):
+        return self.__spacing
+
+    @property
     def area_rect(self):
         return self.__area_rect_cur
 
@@ -685,9 +714,11 @@ class RectLayoutOpt(object):
     def layout_rect(self):
         if self.__area_rect_cur is not None:
             c_r = self.__area_rect_cur.bottom_right
-            return self.Rect(
+            rect = self.Rect(
                 self.__x, self.__y, c_r.x-self.__x, c_r.y-self.__y
             )
+            rect.spacing = self.spacing
+            return rect
 
     def take_one_as_w_maximum(self):
         if self.__w_dict:
@@ -835,6 +866,7 @@ class RectLayoutOpt(object):
                             direction=self.Directions.AlignW,
                             x=c_r.x, y=c_r.y, w=rect.w, h=None
                         )
+                        # self.__area_rect_cur.spacing = self.spacing
                         self.__area_rect_cur.start()
                 # use height
                 else:
@@ -850,6 +882,7 @@ class RectLayoutOpt(object):
                             direction=self.Directions.AlignH,
                             x=c_r.x, y=c_r.y, w=None, h=rect.h
                         )
+                        # self.__area_rect_cur.spacing = self.spacing
                         self.__area_rect_cur.start()
             # swap area
             else:
@@ -863,6 +896,7 @@ class RectLayoutOpt(object):
                         direction=self.Directions.AlignH,
                         x=c_a.x, y=self.__y, w=None, h=c_a.y-self.__y
                     )
+                    # self.__area_rect_cur.spacing = self.spacing
                     self.__area_rect_cur.start()
                 elif self.__area_rect_cur.direction.is_align_h():
                     area_rect_pre = self.__area_rect_cur
@@ -874,4 +908,5 @@ class RectLayoutOpt(object):
                         direction=self.Directions.AlignW,
                         x=self.__x, y=c_a.y, w=c_a.x-self.__x, h=None
                     )
+                    # self.__area_rect_cur.spacing = self.spacing
                     self.__area_rect_cur.start()

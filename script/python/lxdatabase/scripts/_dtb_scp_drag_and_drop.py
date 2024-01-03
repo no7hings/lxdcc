@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxbasic.core as bsc_core
 
-import lxwrap.texture.core as txr_core
+import lxbasic.texture.core as bsc_txr_core
 
 
 class ScpTextureResourceData(object):
@@ -20,8 +20,8 @@ class ScpTextureResourceData(object):
         texture_paths = directory_opt.get_file_paths(ext_includes=['.tx'])
         if texture_paths:
             texture_path = texture_paths[0]
-            m = txr_core.TxrMethodForBuild.generate_instance()
-            texture_args = m.get_texture_args(texture_path)
+            m = bsc_txr_core.TxrMethodForBuild.generate_instance()
+            texture_args = m.generate_all_texture_args(texture_path)
             if texture_args:
                 texture_name, texture_data = texture_args
                 dict_ = {}

@@ -1,0 +1,13 @@
+option:
+    entities:
+        # resource type
+        /:
+            entity_type: 'category_root'
+            options: {kind: 'resource-category-root', gui_icon_name: 'database/all'}
+    #
+    variants:
+        root-windows: 'z:/library/resource'
+        root-linux: '/production/library/resource'
+#
+database:
+    file: '{root}/.database/sqlite-hdri.db'

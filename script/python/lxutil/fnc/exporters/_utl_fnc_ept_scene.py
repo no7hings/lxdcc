@@ -28,7 +28,7 @@ class DotMaSceneInfoExporter(utl_fnc_obj_abs.AbsExporter):
         root = self._option.get('root')
 
         base, ext = os.path.splitext(file_path)
-        r = bsc_dcc_core.DotMaFileReader(file_path)
+        r = bsc_dcc_core.DotMaOpt(file_path)
         _info = r.get_mesh_info(root=root)
 
         utl_dcc_objects.OsYamlFile('{}.info.yml'.format(base)).set_write(_info)
@@ -126,7 +126,7 @@ class DotXgenUsdaExporter(
                 i_xgen_collection_name = self._get_xgen_collection_name_(
                     i_xgen_collection_file_path
                 )
-                i_dot_xgen_file_reader = bsc_dcc_core.DotXgenFileReader(
+                i_dot_xgen_file_reader = bsc_dcc_core.DotXgenOpt(
                     i_xgen_collection_file_path
                 )
                 i_xgen_description_properties = i_dot_xgen_file_reader.get_description_properties()

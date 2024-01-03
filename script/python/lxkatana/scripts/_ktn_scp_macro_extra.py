@@ -427,7 +427,7 @@ class AbsWsp(object):
 
     @classmethod
     def get_rsv_asset(cls):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -435,7 +435,7 @@ class AbsWsp(object):
         f = ktn_dcc_objects.Scene.get_current_file_path()
         #
         if f:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
             if rsv_task is not None:
                 rsv_asset = rsv_task.get_rsv_resource()
@@ -443,12 +443,12 @@ class AbsWsp(object):
 
     @classmethod
     def _get_rsv_resource_(cls, branch, rsv_asset_path):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
         _ = rsv_asset_path.split('/')
         project, _, resource = _[1:]
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         kwargs = {
             'project': project,
             branch: resource
@@ -724,7 +724,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
         import lxusd.rsv.objects as usd_rsv_objects
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         contents = []
 
@@ -732,7 +732,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
         self._obj_opt.set('parameters.usd.enable', 0)
 
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(f)
         if rsv_scene_properties:
             rsv_project = resolver.get_rsv_project(
@@ -776,7 +776,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
         import lxusd.rsv.objects as usd_rsv_objects
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         contents = []
 
@@ -784,7 +784,7 @@ class ScpWspAssetGeometry(AbsWsp):
 
         self._obj_opt.set('parameters.usd.enable', 0)
 
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(f)
         if rsv_scene_properties:
             rsv_project = resolver.get_rsv_project(
@@ -967,7 +967,7 @@ class ScpWspAssetGeometry(AbsWsp):
                 file_path
             )
             [s_opt.set_active_at(i, True) for i in sub_locations]
-            g = s_opt.generate_geometry_args(root)
+            g = s_opt.compute_geometry_args(root)
             (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
             if above_axis_y is True:
                 self._obj_opt.set(
@@ -990,69 +990,69 @@ class ScpComponentLayout(AbsWsp):
         super(ScpComponentLayout, self).__init__(*args, **kwargs)
 
     def generate_cache(self):
-        import lxusd.core as usd_core
+        force = True
 
-        p_root = 'userProperties.usd.variants.asset.component'
+        file_paths = ['test']
+        cache_file_name = bsc_core.UuidMtd.generate_by_files(file_paths)
+        cache_json_directory_path = bsc_core.StgTmpBaseMtd.get_cache_directory('json-cache')
+        cache_json_file_path = '{}/{}.json'.format(cache_json_directory_path, bsc_core.UuidMtd.generate_new())
 
-        root = self._obj_opt.get('user.option.root')
-        stage_opt = ktn_core.KtnStageOpt(self._obj_opt.ktn_obj)
+        if bsc_core.StgFileOpt(cache_json_file_path).get_is_exists() is False or force is True:
+            paths = ktn_core.CEL(
+                self._ktn_obj, self._obj_opt.get('CEL')
+            ).parse()
+            paths_leaf = bsc_core.PthNodeMtd.to_leaf_paths(paths)
+            if paths_leaf:
+                keys = []
+                bboxes = []
+                points = []
+                xywh_array = []
+                colors = []
+                c_o = bsc_core.RawColorChoiceOpt()
 
-        keys = []
-        file_dict = collections.OrderedDict()
-        if stage_opt.get_obj_exists(root) is True:
-            obj_opt = stage_opt.generate_obj_opt(root)
-            port_names = obj_opt.get_port_child_names(p_root)
-            for i_p_name in port_names:
-                if i_p_name.endswith('_component_main'):
-                    i_key = '/{}'.format(i_p_name[:-len('_component_main')])
-                    i_file_path = obj_opt.get('{}.{}.file'.format(p_root, i_p_name))
-                    if i_file_path:
-                        file_dict[i_key] = i_file_path
+                stage_opt = ktn_core.KtnStageOpt(self._ktn_obj)
 
-        force = False
+                spacing = self._obj_opt.get('user.setting.spacing')
 
-        bboxes = []
-        centers = []
-        xywh_array = []
-        colors = []
-        c_o = bsc_core.RawColorChoiceOpt()
-        if file_dict:
-            file_paths = file_dict.values()
-            cache_file_name = bsc_core.UuidMtd.generate_by_files(file_paths)
-            cache_json_directory_path = bsc_core.StgTmpBaseMtd.get_cache_directory('json-cache')
-            cache_json_file_path = '{}/{}.json'.format(cache_json_directory_path, cache_file_name)
-            if bsc_core.StgFileOpt(cache_json_file_path).get_is_exists() is False or force is True:
-                for i_key, i_file_path in file_dict.items():
-                    i_usd_stage_opt = usd_core.UsdStageOpt(i_file_path)
-                    if i_usd_stage_opt.get_obj_is_exists('/master') is True:
-                        i_g = i_usd_stage_opt.generate_geometry_args('/master')
-                        i_b = i_usd_stage_opt.generate_bbox_args('/master')
-                        (i_x, i_y, i_z), _, (i_w, i_h, i_d) = i_g
-                        (i_b_x_0, i_b_y_0, i_b_z_0), (i_b_x_1, i_b_y_1, i_b_z_1) = i_b
-                        keys.append(i_key)
-                        bboxes.append((i_b_x_0, i_b_x_1, i_b_y_0, i_b_y_1, i_b_z_0, i_b_z_1))
-                        centers.append((i_x, i_y, i_z))
-                        xywh_array.append((0, 0, i_w, i_d))
-                        i_rgb = c_o.generate(maximum=1.0)
-                        colors.append(i_rgb)
+                move_to_floor = self._obj_opt.get('user.setting.move_to_floor')
+
+                for i_path in paths_leaf:
+                    i_g = stage_opt.compute_geometry_args(i_path)
+                    (i_x, i_y, i_z), _, (i_w, i_h, i_d) = i_g
+                    i_b = stage_opt.compute_bbox_args(i_path)
+                    (i_b_x_0, i_b_y_0, i_b_z_0), (i_b_x_1, i_b_y_1, i_b_z_1) = i_b
+                    keys.append(i_path)
+                    bboxes.append((i_b_x_0, i_b_x_1, i_b_y_0, i_b_y_1, i_b_z_0, i_b_z_1))
+                    points.append((i_x, i_y, i_z))
+                    xywh_array.append((0, 0, i_w, i_d))
+                    i_rgb = c_o.generate(maximum=1.0)
+                    colors.append(i_rgb)
 
                 if xywh_array:
                     dict_ = {}
-                    l_opt = bsc_core.RectLayoutOpt(xywh_array)
+                    l_opt = bsc_core.RectLayoutOpt(xywh_array, spacing=spacing)
                     rects = l_opt.generate()
-                    center = l_opt.layout_rect.center
+                    layout_rect = l_opt.layout_rect
+                    layout_rect_exact = layout_rect.exact_rect
+                    center = layout_rect_exact.center
                     for i_rect in rects:
                         i_index = i_rect.index
                         i_key = keys[i_index]
                         i_bbox = bboxes[i_index]
-                        i_center = centers[i_index]
-                        i_c_x, i_c_y, i_c_z = i_center
+                        i_point = points[i_index]
+                        i_c_x, i_c_y, i_c_z = i_point
                         i_rgb = colors[i_index]
-                        dict_[i_key] = [(i_rect.x-i_c_x-center.x, 0, i_rect.y-i_c_z-center.y), i_bbox, i_rgb]
+                        i_x, i_y, i_z = i_rect.x-i_c_x-center.x, 0, i_rect.y-i_c_z-center.y
+                        if move_to_floor:
+                            i_y = -i_c_y
+
+                        dict_[i_key] = [(i_x, i_y, i_z), i_bbox, i_rgb]
 
                     bsc_core.StgFileOpt(cache_json_file_path).set_write(dict_)
 
             self._obj_opt.set('user.cache.json', cache_json_file_path)
+
+            CacheManager.flush()
 
 
 class ScpWspGeometry(AbsWsp):
@@ -1108,7 +1108,7 @@ class ScpWspUtilityCamera(AbsWsp):
         location = self._obj_opt.get('option.location')
         element = self._obj_opt.get('parameters.setting.abc.element')
         _ = sg_opt.get_all_paths_at(
-            '{}/abc'.format(location), include_types=['camera']
+            '{}/abc'.format(location), type_includes=['camera']
         )
         if _:
             self._obj_opt.set_enumerate_strings(
@@ -1131,7 +1131,7 @@ class ScpWspAssetCamera(AbsWsp):
         self.load_all_abc()
 
     def load_all_abc(self):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
         #
@@ -1139,7 +1139,7 @@ class ScpWspAssetCamera(AbsWsp):
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
             if rsv_task is not None:
                 rsv_entity = rsv_task.get_rsv_resource()
@@ -1185,7 +1185,7 @@ class ScpWspAssetCamera(AbsWsp):
         location = self._obj_opt.get('option.location')
         element = self._obj_opt.get('parameters.setting.abc.element')
         _ = sg_opt.get_all_paths_at(
-            '{}/abc'.format(location), include_types=['camera']
+            '{}/abc'.format(location), type_includes=['camera']
         )
         if _:
             self._obj_opt.set_enumerate_strings(
@@ -1277,13 +1277,13 @@ class AbsSpcWspLookGroup(AbsWsp):
 
     @ktn_core.Modifier.undo_run
     def load_latest_ass_file(self):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         import lxresolver.scripts as rsv_scripts
 
         env_data = rsv_scripts.ScpEnvironment.get_as_dict()
 
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
 
         rsv_task = resolver.get_rsv_task(
             **env_data
@@ -1398,7 +1398,7 @@ class ScpWspAssetLightRig(AbsWsp):
     def _get_light_args_(cls, project):
         import lxbasic.extra.methods as bsc_etr_methods
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         import lxshotgun.rsv.scripts as stg_rsv_scripts
 
@@ -1407,7 +1407,7 @@ class ScpWspAssetLightRig(AbsWsp):
         elif project == 'default':
             project = 'cgm'
         #
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         rsv_project = resolver.get_rsv_project(project=project)
         if rsv_project is None:
@@ -1441,7 +1441,7 @@ class ScpWspAssetLightRig(AbsWsp):
                 )
 
     def _get_live_group_results_(self):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         name = self._obj_opt.get('parameters.resource.name')
         if name == 'None':
@@ -1449,7 +1449,7 @@ class ScpWspAssetLightRig(AbsWsp):
         #
         project, asset = name.split('/')[1:]
         #
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         rsv_project = resolver.get_rsv_project(project=project)
         if rsv_project is None:
@@ -1740,7 +1740,7 @@ class ScpAssetAssExport(AbsWsp):
 
         import lxkatana.core as ktn_core
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -1749,7 +1749,7 @@ class ScpAssetAssExport(AbsWsp):
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
         any_scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
@@ -1896,7 +1896,6 @@ class ScpInstanceColorMap(object):
     def generate_grow_cache(self):
         self._obj_opt.set('parameters.grow.preview', False)
         force = bool(self._obj_opt.get('parameters.grow.force'))
-        print force
 
         grow_usd_file_path = self.get_grow_usd_file_path()
         image_file_path = self.get_grow_image_file_path()

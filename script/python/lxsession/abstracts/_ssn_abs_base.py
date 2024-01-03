@@ -7,7 +7,7 @@ import lxcontent.core as ctt_core
 
 import lxsession.core as ssn_core
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 import lxdatabase.objects as dtb_objects
 
@@ -41,9 +41,9 @@ class AbsSsnShotgunBaseDef(object):
         pass
 
     def get_shotgun_connector(self):
-        import lxwrap.shotgun.core as wrp_stg_core
+        import lxbasic.shotgun.core as bsc_stg_core
 
-        return wrp_stg_core.StgConnector()
+        return bsc_stg_core.StgConnector()
 
     shotgun_connector = property(get_shotgun_connector)
 
@@ -172,7 +172,7 @@ class AbsSsnOptionExecuteDef(object):
     def get_ddl_configure(self):
         return self._ddl_configure
 
-    def set_ddl_dependent_job_ids_find(self, *args, **kwargs):
+    def find_dependent_ddl_job_ids(self, *args, **kwargs):
         pass
 
     def get_executor(self):
@@ -369,7 +369,7 @@ class AbsSsnOptionMethod(
             )
         return file_path
 
-    def set_ddl_dependent_job_ids_find(self, hook_option):
+    def find_dependent_ddl_job_ids(self, hook_option):
         lis = []
         hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
@@ -392,7 +392,7 @@ class AbsSsnOptionMethod(
                 lis.append(i_ddl_job_id)
         return lis
 
-    def set_ddl_job_id_find(self, hook_option):
+    def find_ddl_job_id(self, hook_option):
         hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
@@ -411,7 +411,7 @@ class AbsSsnOptionMethod(
             'deadline.{}.job_id'.format(key)
         )
 
-    def set_ddl_result_update(self, hook_option, ddl_job_id):
+    def update_ddl_result(self, hook_option, ddl_job_id):
         hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
@@ -441,7 +441,7 @@ class AbsSsnOptionMethod(
 
 class AbsSsnRsvDef(object):
     def _set_rsv_def_init_(self):
-        self._resolver = rsv_commands.get_resolver()
+        self._resolver = rsv_core.RsvBase.generate_root()
 
     def get_resolver(self):
         return self._resolver
@@ -693,15 +693,19 @@ class AbsSsnRsvTaskOptionMethod(
     AbsSsnOptionMethod,
     AbsSsnRsvDef
 ):
+    @property
+    def resolver(self):
+        raise NotImplementedError()
+
     def __init__(self, *args, **kwargs):
         super(AbsSsnRsvTaskOptionMethod, self).__init__(*args, **kwargs)
         self._set_rsv_def_init_()
-        #
+
         self._rsv_scene_properties = None
         self._rsv_task = None
-        #
+
         option_opt = self.get_option_opt()
-        #
+
         self._batch_file_path = option_opt.pop('batch_file')
         self._file_path = option_opt.get('file')
         if self._batch_file_path:
@@ -719,7 +723,7 @@ class AbsSsnRsvTaskOptionMethod(
                 self._rsv_task = self.resolver.get_rsv_task_by_any_file_path(
                     self._file_path
                 )
-        #
+
         self.__completion_option_by_rsv_scene_properties_()
         #
         # print self.get_option_opt()
@@ -770,7 +774,7 @@ class AbsSsnRsvTaskOptionMethod(
             )
         return file_path
 
-    def set_ddl_result_update(self, hook_option, ddl_job_id):
+    def update_ddl_result(self, hook_option, ddl_job_id):
         hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
@@ -794,7 +798,7 @@ class AbsSsnRsvTaskOptionMethod(
             f
         )
 
-    def set_ddl_job_id_find(self, hook_option):
+    def find_ddl_job_id(self, hook_option):
         hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option
         )
@@ -831,7 +835,7 @@ class AbsSsnRsvTaskOptionMethod(
             lis.append(i_option_hook_key)
         return lis
 
-    def set_ddl_dependent_job_ids_find(self, hook_option):
+    def find_dependent_ddl_job_ids(self, hook_option):
         lis = []
         hook_option_opt = bsc_core.ArgDictStringOpt(
             hook_option

@@ -58,7 +58,7 @@ class LxCameraAlembic(object):
 
     def set_file_load(self):
         # adjustScreenWindow=Adjust width to match resolution
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.core as ktn_core
         #
@@ -69,7 +69,7 @@ class LxCameraAlembic(object):
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
             if rsv_task:
                 rsv_entity = rsv_task.get_rsv_resource()
@@ -107,7 +107,7 @@ class LxRenderSettings(object):
         pass
 
     def set_render_output(self):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.core as ktn_core
         #
@@ -118,7 +118,7 @@ class LxRenderSettings(object):
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(
                 f
             )
@@ -189,7 +189,7 @@ class LxAsset(object):
     def set_guess(self):
         from lxutil import utl_core
         #
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.core as ktn_core
         #
@@ -203,7 +203,7 @@ class LxAsset(object):
         scheme = obj_opt.get('options.scheme')
         #
         rsv_asset = None
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:
@@ -237,12 +237,12 @@ class LxAsset(object):
 
     @classmethod
     def _get_rsv_asset_(cls, rsv_asset_path):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
         _ = rsv_asset_path.split('/')
         project, role, asset = _[1:]
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         return resolver.get_rsv_resource(
             project=project,
             asset=asset
@@ -250,17 +250,17 @@ class LxAsset(object):
 
     @classmethod
     def _get_rsv_shot_(cls, rsv_shot_path):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
         _ = rsv_shot_path.split('/')
         project, sequence, shot = _[1:]
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         return resolver.get_rsv_resource(project=project, shot=shot)
 
     @classmethod
     def _get_rsv_asset_auto_(cls):
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -268,7 +268,7 @@ class LxAsset(object):
         any_scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
         #
         if any_scene_file_path:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(any_scene_file_path)
             if rsv_task:
                 rsv_asset = rsv_task.get_rsv_resource()
@@ -318,13 +318,13 @@ class LxAsset(object):
 
         import lxusd.rsv.objects as usd_rsv_objects
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
         any_scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
 
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
             asset_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._create_asset_usd_file(
@@ -362,14 +362,14 @@ class LxAsset(object):
 
         import lxusd.rsv.objects as usd_rsv_objects
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         #
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
         any_scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
 
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
             asset_shot_set_usd_file_path = usd_rsv_objects.RsvUsdAssetSetCreator._create_asset_shot_usd_file(
@@ -577,7 +577,7 @@ class LxAsset(object):
                 file_path
             )
             [s_opt.set_active_at(i, True) for i in sub_locations]
-            g = s_opt.generate_geometry_args(root)
+            g = s_opt.compute_geometry_args(root)
             (x, y, z), (c_x, c_y, c_z), (w, h, d) = g
             if obj_opt.get('extra.transformation.translate_above_axis_y'):
                 obj_opt.set(
@@ -645,7 +645,7 @@ class LxAssetAss(object):
 
         import lxkatana.core as ktn_core
 
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
 
         import lxkatana.dcc.dcc_objects as ktn_dcc_objects
 
@@ -654,7 +654,7 @@ class LxAssetAss(object):
         obj_opt = ktn_core.NGObjOpt(self._ktn_obj)
 
         any_scene_file_path = ktn_dcc_objects.Scene.get_current_file_path()
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(any_scene_file_path)
         if rsv_scene_properties:
             rsv_task = resolver.get_rsv_task(**rsv_scene_properties.value)
@@ -913,7 +913,7 @@ class LxCamera(object):
     def set_load(self):
         from lxutil import utl_core
         #
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.core as ktn_core
         #
@@ -931,7 +931,7 @@ class LxCamera(object):
         #
         f = ktn_dcc_objects.Scene.get_current_file_path()
         if f:
-            resolver = rsv_commands.get_resolver()
+            resolver = rsv_core.RsvBase.generate_root()
             rsv_task = resolver.get_rsv_task_by_any_file_path(f)
             if rsv_task is not None:
                 rsv_entity = rsv_task.get_rsv_resource()
@@ -1032,7 +1032,7 @@ class LxCamera(object):
                 file_path
             )
             [s_opt.set_active_at(i, True) for i in sub_locations]
-            g = s_opt.generate_geometry_args(root)
+            g = s_opt.compute_geometry_args(root)
             if translate_offset:
                 x_o, y_o, z_o = translate_offset
             else:
@@ -1087,7 +1087,7 @@ class LxCamera(object):
                 file_path
             )
             [s_opt.set_active_at(i, True) for i in sub_locations]
-            g = s_opt.generate_geometry_args(root)
+            g = s_opt.compute_geometry_args(root)
             if pivot:
                 x_o, y_o, z_o = pivot
             else:
@@ -1359,7 +1359,7 @@ class LxLight(object):
     def set_guess(self):
         from lxutil import utl_core
         #
-        import lxresolver.commands as rsv_commands
+        import lxresolver.core as rsv_core
         #
         import lxkatana.core as ktn_core
         #
@@ -1373,7 +1373,7 @@ class LxLight(object):
         scheme = obj_opt.get('options.scheme')
         #
         rsv_asset = None
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         rsv_asset_path = obj_opt.get_port_raw('options.asset')
         if rsv_asset_path:

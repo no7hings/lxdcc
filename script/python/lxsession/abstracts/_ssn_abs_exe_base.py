@@ -7,7 +7,7 @@ import lxbasic.extra.methods as bsc_etr_methods
 
 import lxcontent.core as ctt_core
 
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 
 class AbsHookExecutor(object):
@@ -35,7 +35,7 @@ class AbsHookExecutor(object):
     def _submit_deadline_job_(self, session, name, option_extra_variants, deadline_configure=None):
         hook_option_opt = session.get_option_opt()
         hook_option = session.get_option()
-        option_hook_key = hook_option_opt.get('option_hook_key')
+        submit_key = hook_option_opt.get('option_hook_key')
         #
         ssn_ddl_configure = session.get_ddl_configure()
         #
@@ -118,12 +118,18 @@ class AbsHookExecutor(object):
         if deadline_priority is not None:
             self._ddl_submiter.job_info.set('Priority', int(deadline_priority))
         #
-        option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
-        if option_hook_key_extend:
-            keys = [option_hook_key]
-            keys.extend(option_hook_key_extend)
-            option_hook_key = '/'.join(keys)
-            self._ddl_submiter.option.set('hook', option_hook_key)
+        option_hook_key_over = hook_option_opt.get('option_hook_key_over', as_array=True)
+        if option_hook_key_over:
+            keys = option_hook_key_over
+            submit_key = '/'.join(keys)
+            self._ddl_submiter.option.set('hook', submit_key)
+        else:
+            option_hook_key_extend = hook_option_opt.get('option_hook_key_extend', as_array=True)
+            if option_hook_key_extend:
+                keys = [submit_key]
+                keys.extend(option_hook_key_extend)
+                submit_key = '/'.join(keys)
+                self._ddl_submiter.option.set('hook', submit_key)
         #
         self._ddl_submiter.job_info.set(
             'Comment', hook_option
@@ -137,7 +143,7 @@ class AbsHookExecutor(object):
             ddl_command
         )
         #
-        hook_dependent_ddl_job_ids = session.set_ddl_dependent_job_ids_find(hook_option)
+        hook_dependent_ddl_job_ids = session.find_dependent_ddl_job_ids(hook_option)
         if isinstance(hook_dependent_ddl_job_ids, (tuple, list)):
             self._ddl_submiter.job_info.set('JobDependencies', ','.join(hook_dependent_ddl_job_ids))
             self._ddl_submiter.job_info.set('ResumeOnCompleteDependencies', True)
@@ -192,12 +198,12 @@ class AbsHookExecutor(object):
                 'Whitelist', bsc_core.SysBaseMtd.get_host()
             )
         #
-        exists_ddl_job_id = session.set_ddl_job_id_find(hook_option)
+        exists_ddl_job_id = session.find_ddl_job_id(hook_option)
         if exists_ddl_job_id:
             session._ddl_job_id = exists_ddl_job_id
             bsc_core.Log.trace_method_warning(
                 'option-hook execute by deadline', 'option-hook="{}", job-id="{}" is exists'.format(
-                    option_hook_key, exists_ddl_job_id
+                    submit_key, exists_ddl_job_id
                 )
             )
         else:
@@ -205,12 +211,12 @@ class AbsHookExecutor(object):
             if ddl_job_id is not None:
                 session._ddl_job_id = ddl_job_id
                 #
-                session.set_ddl_result_update(
+                session.update_ddl_result(
                     hook_option, ddl_job_id
                 )
                 bsc_core.Log.trace_method_result(
                     'option-hook execute by deadline', 'option-hook="{}", job-id="{}"'.format(
-                        option_hook_key, ddl_job_id
+                        submit_key, ddl_job_id
                     )
                 )
         return self._ddl_submiter.get_job_result()
@@ -301,7 +307,7 @@ class AbsRsvTaskMethodHookExecutor(AbsHookExecutor):
 
     def execute_with_deadline(self):
         session = self.get_session()
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         #
         hook_option_opt = session.get_option_opt()
         #

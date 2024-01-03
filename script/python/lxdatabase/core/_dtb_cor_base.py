@@ -85,11 +85,10 @@ class AbsDtbSqlBaseOpt(object):
         'list': 'blob',
         'timestamp': 'timestamp'
     }
-    #
+
     DEBUGGER_ENABLE = False
     DEBUGGER_PRINT_MAXIMUM = 200
 
-    #
     def __init__(self, database, connection):
         self._dtb = database
         self._cnt = connection

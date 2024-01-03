@@ -139,8 +139,8 @@ class FncLookAssExporter(utl_fnc_obj_abs.AbsFncOptionBase):
                     for i in self._results:
                         l_p.do_update()
                         #
-                        fr = bsc_dcc_core.DotAssFileReader(i)
-                        fr._set_file_paths_convert_()
+                        fr = bsc_dcc_core.DotAssOpt(i)
+                        fr.do_file_path_convert_to_env()
             #
             bsc_core.Log.trace_method_result(
                 'ass export',

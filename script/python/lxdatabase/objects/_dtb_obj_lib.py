@@ -13,7 +13,7 @@ import lxdatabase.core as dtb_core
 
 import lxcontent.core as ctt_core
 
-import lxwrap.texture.core as txr_core
+import lxbasic.texture.core as bsc_txr_core
 
 
 class DtbBaseOpt(object):
@@ -250,6 +250,19 @@ class DtbBaseOpt(object):
 
 
 class DtbResourceLibraryOpt(DtbBaseOpt):
+    CACHE = dict()
+
+    @classmethod
+    def generate(cls, category_group):
+        if category_group in cls.CACHE:
+            return cls.CACHE[category_group]
+        opt = cls(
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
+            bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(category_group))
+        )
+        cls.CACHE[category_group] = opt
+        return opt
+
     def __init__(self, configure_file, configure_file_extend=None, disable_new_connection=False):
         self._dtb_cfg_file_path = configure_file
         self._dtb_cfg_file_path_extend = configure_file_extend
@@ -855,6 +868,8 @@ class DtbVersionOpt(object):
         version_stg_path = self._dtb_opt.get_property(
             self._dtb_version.path, 'location'
         )
+        # map to current platform
+        version_stg_path = bsc_core.StgPathMapper.map_to_current(version_stg_path)
         self._variants = p_o.get_variants(version_stg_path)
 
     def get_variants(self):
@@ -905,8 +920,8 @@ class DtbVersionOpt(object):
         texture_paths = directory_opt.get_file_paths(ext_includes=['.jpg'])
         if texture_paths:
             texture_path = texture_paths[0]
-            m = txr_core.TxrMethodForBuild.generate_instance()
-            return m.get_texture_args(texture_path)
+            m = bsc_txr_core.TxrMethodForBuild.generate_instance()
+            return m.generate_all_texture_args(texture_path)
 
     def get_texture_preview_assigns(self):
         storage_dtb_path = '{}/{}'.format(self._dtb_version.path, 'texture_original_src_directory')
@@ -955,12 +970,10 @@ if __name__ == '__main__':
         # 'texture'
         # 'test'
         # '3d_proxy',
-        '3d_plant_proxy',
+        # '3d_plant_proxy',
+        'hdri'
     ]:
-        dtb_opt_ = DtbResourceLibraryOpt(
-            bsc_core.ResourceConfigure.get_yaml('database/library/resource-basic'),
-            bsc_core.ResourceConfigure.get_yaml('database/library/resource-{}'.format(_i_key)),
-        )
+        dtb_opt_ = DtbResourceLibraryOpt.generate(_i_key)
         #
         dtb_opt_.setup_entity_categories()
         dtb_opt_.setup_entities()

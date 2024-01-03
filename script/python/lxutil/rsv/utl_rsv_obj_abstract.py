@@ -1,18 +1,19 @@
 # coding:utf-8
-import lxresolver.commands as rsv_commands
+import lxresolver.core as rsv_core
 
 
 class AbsRsvObjHookOpt(object):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         self._rsv_scene_properties = rsv_scene_properties
-        self._resolver = rsv_commands.get_resolver()
+        self._resolver = rsv_core.RsvBase.generate_root()
         self._rsv_task = self._resolver.get_rsv_task(
             **self._rsv_scene_properties.value
         )
         self._hook_option_opt = hook_option_opt
+
     @classmethod
-    def get_resolver(cls):
-        return rsv_commands.get_resolver()
+    def generate_resolver(cls):
+        return rsv_core.RsvBase.generate_root()
 
     def get_asset_katana_render_file(self):
         rsv_scene_properties = self._rsv_scene_properties
@@ -106,9 +107,10 @@ class AbsRsvObjHookOpt(object):
         return review_mov_file_rsv_unit.get_exists_result(
             version=version
         )
+
     @classmethod
     def get_dcc_args(cls, any_scene_file_path, application):
-        resolver = rsv_commands.get_resolver()
+        resolver = rsv_core.RsvBase.generate_root()
         rsv_scene_properties = resolver.get_rsv_scene_properties_by_any_scene_file_path(
             any_scene_file_path
         )
@@ -149,6 +151,7 @@ class AbsRsvObjHookOpt(object):
         import fnmatch
 
         import lxbasic.core as bsc_core
+
         #
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -221,7 +224,7 @@ class AbsRsvObjHookOpt(object):
             cmp_usd_file_rsv_unit = model_act_rsv_task.get_rsv_unit(keyword=keyword)
             cmp_usd_file_path = cmp_usd_file_rsv_unit.get_exists_result(version='latest')
             if cmp_usd_file_path:
-                return bsc_dcc_core.DotUsdaFileReader(cmp_usd_file_path).get_frame_range()
+                return bsc_dcc_core.DotUsdaOpt(cmp_usd_file_path).get_frame_range()
 
     def get_asset_model_act_cmp_usd_file(self):
         rsv_asset = self._rsv_task.get_rsv_resource()

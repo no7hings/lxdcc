@@ -1168,7 +1168,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def create_set_asset_component_usd(self):
         import lxbasic.dcc.core as bsc_dcc_core
 
-        import lxutil.extra.methods as utl_etr_methods
+        import lxbasic.extra.methods as utl_etr_methods
 
         #
         rsv_scene_properties = self._rsv_scene_properties

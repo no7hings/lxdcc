@@ -19,9 +19,9 @@ import functools
 
 import lxbasic.log as bsc_log
 
-from ..core import base as bsc_cor_base
+from . import base as bsc_cor_base
 
-from ..core import environ as bsc_cor_environ
+from . import environ as bsc_cor_environ
 
 
 class PrcBaseMtd(object):
@@ -437,5 +437,3 @@ class PrcBaseMtd(object):
             )
         )
         t_0.start()
-
-

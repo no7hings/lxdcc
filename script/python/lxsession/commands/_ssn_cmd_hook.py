@@ -1,13 +1,11 @@
 # coding:utf-8
 import functools
 
-import types
-
 
 def get_hook_args(key, search_paths=None):
-    import lxbasic.core as bsc_core
+    import lxbasic.storage as bsc_storage
 
-    import lxbasic.session.core as bsc_ssn_core
+    import lxbasic.session as bsc_session
 
     import lxsession.core as ssn_core
 
@@ -15,7 +13,7 @@ def get_hook_args(key, search_paths=None):
 
     yaml_file_path = ssn_core.SsnHookFileMtd.get_yaml(key, search_paths)
     if yaml_file_path:
-        yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
+        yaml_file_opt = bsc_storage.StgFileOpt(yaml_file_path)
         configure = ctt_core.Content(value=yaml_file_opt.path)
         type_name = configure.get('option.type')
         if type_name in {
@@ -27,7 +25,7 @@ def get_hook_args(key, search_paths=None):
             'dcc-tool-panel', 'dcc-menu',
             'rsv-tool-panel', 'rsv-loader', 'rsv-publisher'
         }:
-            session = bsc_ssn_core.GenerSession(
+            session = bsc_session.GenerSession(
                 type=type_name,
                 hook=key,
                 configure=configure
@@ -35,7 +33,7 @@ def get_hook_args(key, search_paths=None):
         elif type_name in {
             'python-command', 'shell-command'
         }:
-            session = bsc_ssn_core.CommandSession(
+            session = bsc_session.CommandSession(
                 type=type_name,
                 hook=key,
                 configure=configure
@@ -56,15 +54,15 @@ def get_hook_args(key, search_paths=None):
 
 
 def set_hook_execute(key):
-    import lxbasic.core as bsc_core
-    #
+    import lxbasic.log as bsc_log
+
     hook_args = get_hook_args(key)
     if hook_args is not None:
         session, execute_fnc = hook_args
         execute_fnc()
         return session
     else:
-        bsc_core.Log.trace_method_warning(
+        bsc_log.Log.trace_method_warning(
             'hook execute',
             'hook_key="{}" is not found'.format(key)
         )
@@ -76,9 +74,13 @@ def get_option_hook_args(option, search_paths=None):
             python_file_path, session=session
         )
 
+    import lxbasic.log as bsc_log
+
     import lxbasic.core as bsc_core
 
-    import lxbasic.session.core as bsc_ssn_core
+    import lxbasic.storage as bsc_storage
+
+    import lxbasic.session as bsc_session
 
     import lxcontent.core as ctt_core
 
@@ -93,8 +95,8 @@ def get_option_hook_args(option, search_paths=None):
     yaml_file_path = ssn_core.SsnOptionHookFileMtd.get_yaml(option_hook_key, search_paths)
     if yaml_file_path:
         python_file_path = ssn_core.SsnOptionHookFileMtd.get_python(option_hook_key, search_paths)
-        python_file_opt = bsc_core.StgFileOpt(python_file_path)
-        yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
+        python_file_opt = bsc_storage.StgFileOpt(python_file_path)
+        yaml_file_opt = bsc_storage.StgFileOpt(yaml_file_path)
         if python_file_opt.get_is_exists() is True and yaml_file_opt.get_is_exists() is True:
             configure = ctt_core.Content(value=yaml_file_opt.path)
             type_name = configure.get('option.type')
@@ -104,7 +106,7 @@ def get_option_hook_args(option, search_paths=None):
                 'action',
                 'launcher'
             }:
-                session = bsc_ssn_core.OptionGenerSession(
+                session = bsc_session.OptionGenerSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,
@@ -118,7 +120,7 @@ def get_option_hook_args(option, search_paths=None):
                     option=option_opt.to_string()
                 )
             elif type_name == 'launcher':
-                session = bsc_ssn_core.OptionGenerSession(
+                session = bsc_session.OptionGenerSession(
                     type=type_name,
                     hook=option_hook_key,
                     configure=configure,
@@ -174,7 +176,7 @@ def get_option_hook_args(option, search_paths=None):
             return session, execute_fnc
     else:
         raise RuntimeError(
-            bsc_core.Log.trace_method_error(
+            bsc_log.Log.trace_method_error(
                 'option-hook gain',
                 'option-hook key="{}" configue (.yml) is not found'.format(option_hook_key)
             )
@@ -183,6 +185,8 @@ def get_option_hook_args(option, search_paths=None):
 
 def get_option_hook_configure(option):
     import lxbasic.core as bsc_core
+
+    import lxbasic.storage as bsc_storage
 
     import lxcontent.core as ctt_core
 
@@ -194,7 +198,7 @@ def get_option_hook_configure(option):
 
     yaml_file_path = ssn_core.SsnOptionHookFileMtd.get_yaml(option_hook_key)
     if yaml_file_path:
-        yaml_file_opt = bsc_core.StgFileOpt(yaml_file_path)
+        yaml_file_opt = bsc_storage.StgFileOpt(yaml_file_path)
         if yaml_file_opt.get_is_exists() is True:
             return ctt_core.Content(value=yaml_file_opt.path)
 

@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxutil.ssn.abstracts as utl_ssn_abstracts
 
-import lxmaya.dcc.dcc_objects as mya_dcc_objects
+import lxmaya.dcc.objects as mya_dcc_objects
 
 
 class SsnRsvApplication(utl_ssn_abstracts.AbsSsnRsvApplication):

@@ -110,7 +110,7 @@ class PyModule(object):
         return lis
 
     def get_is_package(self):
-        return not '.' in self.name
+        return '.' not in self.name
 
     def set_reload(self):
         if self.module is not None:
@@ -290,7 +290,7 @@ class PyReloader(object):
             i_module_name, i_required_module_name = i
             i_module_node_name = i_module_name.replace('.', '_')
             i_module_node_text = '{}["{}"]\n'.format(i_module_node_name, i_module_name)
-            if not i_module_node_text in list_:
+            if i_module_node_text not in list_:
                 list_.append(i_module_node_text)
             #
             i_required_module_node_name = i_required_module_name.replace('.', '_')
@@ -299,7 +299,7 @@ class PyReloader(object):
                 i_required_module_node_text = '{}(("{}"))\n'.format(i_required_module_node_name, i_required_module_name)
             else:
                 i_required_module_node_text = '{}["{}"]\n'.format(i_required_module_node_name, i_required_module_name)
-            if not i_required_module_node_text in list_:
+            if i_required_module_node_text not in list_:
                 list_.append(i_required_module_node_text)
 
             list_.append('{0} --> {1}\n'.format(i_module_node_name, i_required_module_node_name))

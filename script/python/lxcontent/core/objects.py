@@ -11,7 +11,7 @@ import collections
 
 import json
 
-from ..core import base as ctt_core_base
+from . import base as ctt_core_base
 
 
 # operate for dict, value must be dict or file.

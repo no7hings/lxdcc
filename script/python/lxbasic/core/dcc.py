@@ -1,59 +1,6 @@
 # coding:utf-8
 import math
 
-from ..core import base as bsc_cor_base
-
-from ..core import environ as bsc_cor_environ
-
-from ..core import storage as bsc_cor_storage
-
-
-class DccCacheFileMtd(object):
-    @classmethod
-    def _to_file_path(cls, key, category):
-        directory_path = bsc_cor_environ.EnvBaseMtd.get_database_path()
-        region = bsc_cor_storage.StgTmpBaseMtd.get_save_region(key)
-        return '{}/{}/{}/{}'.format(directory_path, category, region, key)
-
-    @classmethod
-    def get_key(cls, data):
-        return bsc_cor_base.HashMtd.get_hash_value(
-            data, as_unique_id=True
-        )
-
-    @classmethod
-    def get_value(cls, key, category):
-        file_path = cls._to_file_path(key, category)
-        gzip_file = bsc_cor_storage.StgGzipFileOpt(file_path, '.yml')
-        if gzip_file.get_is_exists() is True:
-            return gzip_file.set_read()
-
-    @classmethod
-    def set_value(cls, key, value, force, category):
-        file_path = cls._to_file_path(key, category)
-        gzip_file = bsc_cor_storage.StgGzipFileOpt(file_path, '.yml')
-        if gzip_file.get_is_exists() is False or force is True:
-            gzip_file.set_write(value)
-            return True
-
-
-class DccCacheFileMtdForGeometryUv(object):
-    @classmethod
-    def get_value(cls, key):
-        return DccCacheFileMtd.get_value(
-            key,
-            category='geometry/uv-map'
-        )
-
-    @classmethod
-    def set_value(cls, key, value, force):
-        return DccCacheFileMtd.set_value(
-            key,
-            value,
-            force,
-            category='geometry/uv-map'
-        )
-
 
 class DccMeshFaceVertexIndicesOpt(object):
     # print DccMeshFaceVertexIndicesOpt(
@@ -431,6 +378,7 @@ class RectLayoutOpt(object):
                     # self.__space_rect_cur.spacing = self.spacing
                     self.next_by_space(self.__space_rect_cur, 'layout start')
 
+        # noinspection PyUnusedLocal
         def next_by_space_and_rect(self, space_rect, rect, scheme=None):
             if self.__space_rect_cur is not None:
                 # layout rect

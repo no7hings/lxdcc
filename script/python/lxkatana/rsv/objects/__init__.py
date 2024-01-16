@@ -1,13 +1,13 @@
 # coding:utf-8
-from ._ktn_rsv_obj_hok_geometry import *
+from .geometry import *
 
-from ._ktn_rsv_obj_hok_texture import *
+from .texture import *
 
-from ._ktn_rsv_obj_hok_scene import *
+from .scene import *
 
-from ._ktn_rsv_obj_hok_look import *
+from .look import *
 
-from ._ktn_rsv_obj_hok_render import *
+from .render import *
 
 
 

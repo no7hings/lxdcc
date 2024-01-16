@@ -5,15 +5,18 @@ class ScpEnvironment(object):
     @classmethod
     def get_data(cls, task_id):
         if task_id:
-            import lxbasic.shotgun.core as bsc_stg_core
+            import lxbasic.shotgun as bsc_shotgun
 
             import lxresolver.core as rsv_core
 
             data = []
 
             resolver = rsv_core.RsvBase.generate_root()
-            c = bsc_stg_core.StgConnector()
-            dict_ = c.get_data_from_task_id(task_id)
+            stg_connection = bsc_shotgun.StgConnector()
+            if stg_connection.get_is_valid() is False:
+                return False, None
+
+            dict_ = stg_connection.get_data_from_task_id(task_id)
             keys = resolver.VariantTypes.Constructs
             for i_key in keys:
                 i_env_key = 'PG_{}'.format(i_key.upper())

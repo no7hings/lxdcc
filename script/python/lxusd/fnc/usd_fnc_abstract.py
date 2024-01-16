@@ -1,6 +1,8 @@
 # coding:utf-8
 from lxusd.core.wrap import *
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
 import lxusd.core as usd_core
@@ -27,7 +29,7 @@ class AbsUsdScene(object):
                 if i != usd_core.UsdNodes.PATHSEP:
                     usd_root = stage.DefinePrim(i, '')
         #
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'usd-reference-add',
             u'file="{}"'.format(file_path)
         )

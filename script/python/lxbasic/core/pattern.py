@@ -7,9 +7,9 @@ import fnmatch
 
 import parse
 
-from ..core import base as bsc_cor_base
+from . import base as bsc_cor_base
 
-from ..core import raw as bsc_cor_raw
+from . import raw as bsc_cor_raw
 
 
 class PtnBaseMtd(object):

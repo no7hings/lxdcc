@@ -16,6 +16,17 @@ class _AbsSocketConnect(object):
         Script = 0
         Statement = 1
 
+    def get_status(self):
+        return self._status
+
+    status = property(get_status)
+
+    def _init_socket_base_(self):
+        self._status = self.Status.Error
+
+    def get_is_valid(self):
+        return self.get_status() == self.Status.Ok
+
 
 class SocketConnectForMaya(_AbsSocketConnect):
     HOST = 'localhost'
@@ -35,7 +46,7 @@ class SocketConnectForMaya(_AbsSocketConnect):
     def __init__(self, port=None):
         self.__host = self.HOST
         self.__port = port or self.PORT
-        self.__status = self.Status.Error
+        self._init_socket_base_()
         # noinspection PyBroadException
         try:
             self.connect(self.__host, self.__port)
@@ -55,30 +66,31 @@ class SocketConnectForMaya(_AbsSocketConnect):
             return
 
     def close(self):
-        if self.__status == self.Status.Ok:
+        if self._status == self.Status.Ok:
             self._socket.close()
 
     def connect(self, host, port):
         self.close()
-        self.__status = self.Status.Error
+        self._status = self.Status.Error
         try:
             self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._socket.connect((host, port))
             print("Connected to Maya")
-        except:
+        except Exception:
             raise ValueError('Failed to connect to '+host+':'+str(port))
-        self.__status = self.Status.Ok
+        self._status = self.Status.Ok
 
     def run(self, script):
-        if self.__status != self.Status.Ok:
+        if self._status != self.Status.Ok:
             print("Not connected to Maya")
         self.__send(script, self.Mode.Script)
 
     def evaluate(self, statement):
         return self.__send(statement, self.Mode.Statement)
 
+    # noinspection PyUnusedLocal
     def __send(self, command, mode):
-        if self.__status != self.Status.Ok:
+        if self._status != self.Status.Ok:
             # http_post(url, data)
             # time.sleep(1)
             # sys.exit()
@@ -108,10 +120,15 @@ class SocketConnectForClarisse(_AbsSocketConnect):
         if ix.application.get_command_port() != port:
             ix.application.set_command_port(port)
 
+    def get_status(self):
+        return self._status
+
+    status = property(get_status)
+
     def __init__(self, port=None):
         self.__host = self.HOST
         self.__port = port or self.PORT
-        self.__status = self.Status.Error
+        self._init_socket_base_()
         # noinspection PyBroadException
         try:
             self.connect(self.__host, self.__port)
@@ -132,16 +149,16 @@ class SocketConnectForClarisse(_AbsSocketConnect):
 
     def connect(self, host, port):
         self.close()
-        self.__status = self.Status.Error
+        self._status = self.Status.Error
         try:
             self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._socket.connect((host, port))
         except Exception:
             raise ValueError('Failed to connect to '+host+':'+str(port))
-        self.__status = self.Status.Ok
+        self._status = self.Status.Ok
 
     def run(self, script):
-        if self.__status != self.Status.Ok:
+        if self._status != self.Status.Ok:
             print("Not connected to Clarisse")
         self.__send(script, self.Mode.Script)
 
@@ -149,11 +166,12 @@ class SocketConnectForClarisse(_AbsSocketConnect):
         return self.__send(statement, self.Mode.Statement)
 
     def close(self):
-        if self.__status == self.Status.Ok:
+        if self._status == self.Status.Ok:
             self._socket.close()
 
+    # noinspection PyUnusedLocal
     def __send(self, command, mode):
-        if self.__status != self.Status.Ok:
+        if self._status != self.Status.Ok:
             # http_post(url, data)
             # time.sleep(1)
             # sys.exit()

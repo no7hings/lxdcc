@@ -76,6 +76,18 @@ class UsdShaderOpt(object):
             _ = self._usd_fnc.CreateInput(key, Sdf.ValueTypeNames.Float)
         _.Set(value)
 
+    def set_as_rgb(self, key, value):
+        _ = self._usd_fnc.GetInput(key)
+        if _ is None:
+            _ = self._usd_fnc.CreateInput(key, Sdf.ValueTypeNames.Color3f)
+        _.Set(value)
+
+    def disconnect_input_at(self, key):
+        _ = self._usd_fnc.GetInput(key)
+        if _ is not None:
+            if _.HasConnectedSource() is True:
+                _.DisconnectSource()
+
     def set_as_float3(self, key, value):
         _ = self._usd_fnc.GetInput(key)
         if _ is None:
@@ -129,6 +141,12 @@ class UsdXformOpt(object):
     def set_matrix(self, matrix):
         op = self._usd_fnc.MakeMatrixXform()
         op.Set(Gf.Matrix4d(matrix))
+
+    def set_visible(self, boolean):
+        if boolean is True:
+            self._usd_fnc.MakeVisible()
+        else:
+            self._usd_fnc.MakeInvisible()
 
 
 class UsdArnoldGeometryPropertiesOpt(object):

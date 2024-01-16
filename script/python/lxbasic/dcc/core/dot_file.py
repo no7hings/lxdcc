@@ -17,7 +17,9 @@ import os
 
 import lxcontent.core as ctt_core
 
-import lxbasic.core as bsc_core
+import lxbasic.log as bsc_log
+
+import lxbasic.storage as bsc_storage
 
 
 class _Uuid(object):
@@ -161,7 +163,7 @@ class DotXgenOpt(_AbsDotFile):
 
     def _generate_node_args(self):
         list_ = []
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'file parse is started', 'file="{}"'.format(
                 self._file_path
             )
@@ -177,7 +179,7 @@ class DotXgenOpt(_AbsDotFile):
             if p:
                 variant = p.named
                 list_.append((i_line, variant))
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'file parse is completed', 'file="{}"'.format(
                 self._file_path
             )
@@ -227,7 +229,7 @@ class DotXgenOpt(_AbsDotFile):
     def set_repair(self):
         list_ = []
         project_directory_path = self.get_project_directory_path()
-        project_directory_path = bsc_core.StgPathOpt(
+        project_directory_path = bsc_storage.StgPathOpt(
             project_directory_path
         ).get_path()
         _ = self.get_file_paths()
@@ -245,7 +247,7 @@ class DotXgenOpt(_AbsDotFile):
                         list_.append(
                             (i_line_index, i_new_line)
                         )
-                        bsc_core.Log.trace_method_result(
+                        bsc_log.Log.trace_method_result(
                             'xgen collection directory repair',
                             'directory="{}" >> "{}"'.format(
                                 i_raw, i_new_raw
@@ -265,29 +267,29 @@ class DotXgenOpt(_AbsDotFile):
                 j_port_type, j_port_raw = i_port_dict['xgProjectPath']
                 return j_port_raw
 
-    def repath_collection_directory_to(self, xgen_collection_directory_path, xgen_collection_name):
+    def repath_collection_directory_to(self, xgen_collection_directory_path_tgt, xgen_collection_name):
         _ = self.get_file_paths()
         list_ = []
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'xgen collection directory repath is started',
             'directory="{}"'.format(
-                xgen_collection_directory_path
+                xgen_collection_directory_path_tgt
             )
         )
         for i in _:
             i_port_name = i['port_name']
             if i_port_name == 'xgDataPath':
                 i_raw = i['port_raw']
-                i_raw = bsc_core.StgPathOpt(
+                i_raw = bsc_storage.StgPathOpt(
                     i_raw
                 ).get_path()
                 #
                 i_obj_type = i['obj_type']
                 i_obj_name = i['obj_name']
                 if i_obj_type == 'Description':
-                    i_new_raw = '{}/{}/'.format(xgen_collection_directory_path, xgen_collection_name)
+                    i_new_raw = '{}/{}/'.format(xgen_collection_directory_path_tgt, xgen_collection_name)
                 else:
-                    i_new_raw = '{}/{}'.format(xgen_collection_directory_path, xgen_collection_name)
+                    i_new_raw = '{}/{}'.format(xgen_collection_directory_path_tgt, xgen_collection_name)
                 #
                 if i_raw != i_new_raw:
                     i_line_index = i['line_index']
@@ -297,13 +299,13 @@ class DotXgenOpt(_AbsDotFile):
                     list_.append(
                         (i_line_index, i_new_line)
                     )
-                    bsc_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'xgen collection directory repath',
                         'obj="{}"'.format(
                             i_obj_name
                         )
                     )
-                    bsc_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'xgen collection directory repath',
                         'directory="{}" >> "{}"'.format(
                             i_raw, i_new_raw
@@ -313,33 +315,33 @@ class DotXgenOpt(_AbsDotFile):
         for i_line_index, i_line in list_:
             self.lines[i_line_index] = i_line
         #
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'xgen collection directory repath is completed',
             'directory="{}"'.format(
-                xgen_collection_directory_path
+                xgen_collection_directory_path_tgt
             )
         )
 
-    def repath_project_directory_to(self, xgen_project_directory_path):
+    def repath_project_directory_to(self, xgen_project_directory_path_tgt):
         _ = self.get_file_paths()
         list_ = []
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'xgen project directory repath is started',
             'directory="{}"'.format(
-                xgen_project_directory_path
+                xgen_project_directory_path_tgt
             )
         )
         for i in _:
             i_port_name = i['port_name']
             if i_port_name == 'xgProjectPath':
                 i_raw = i['port_raw']
-                i_raw = bsc_core.StgPathOpt(
+                i_raw = bsc_storage.StgPathOpt(
                     i_raw
                 ).get_path()
                 #
                 i_obj_name = i['obj_name']
                 #
-                i_new_raw = xgen_project_directory_path
+                i_new_raw = xgen_project_directory_path_tgt
                 #
                 if i_raw != i_new_raw:
                     i_line_index = i['line_index']
@@ -348,13 +350,13 @@ class DotXgenOpt(_AbsDotFile):
                     list_.append(
                         (i_line_index, i_new_line)
                     )
-                    bsc_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'xgen project directory repath',
                         'obj="{}"'.format(
                             i_obj_name
                         )
                     )
-                    bsc_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'xgen project directory repath',
                         'directory="{}" >> "{}"'.format(
                             i_raw, i_new_raw
@@ -364,16 +366,16 @@ class DotXgenOpt(_AbsDotFile):
         for i_line_index, i_line in list_:
             self.lines[i_line_index] = i_line
         #
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'xgen project directory repath is completed',
             'directory="{}"'.format(
-                xgen_project_directory_path
+                xgen_project_directory_path_tgt
             )
         )
 
     def get_description_properties(self):
         d = ctt_core.Dict()
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'file parse is started', 'file="{}"'.format(
                 self._file_path
             )
@@ -416,7 +418,7 @@ class DotXgenOpt(_AbsDotFile):
         pass
 
     def set_save(self):
-        bsc_core.StgFileOpt(self.file_path).set_write(
+        bsc_storage.StgFileOpt(self.file_path).set_write(
             ''.join(self.lines)
         )
 
@@ -648,10 +650,8 @@ class DotMtlxOptOld(_AbsDotFile):
             lines=self.lines
         )
 
+    # noinspection PyUnusedLocal
     def _get_property_set_raw_(self, property_set_name):
-        def get_property_fnc_():
-            pass
-
         matches = self._generate_match_args(
             pattern='{l}<propertyset name="%s">{r}'%property_set_name,
             lines=self._lines
@@ -669,6 +669,7 @@ class DotMtlxOptOld(_AbsDotFile):
     def get_material_assign_raws(self):
         return self._get_material_assign_matches()
 
+    # noinspection PyNoneFunctionAssignment,PyUnusedLocal
     def get_geometries_properties(self):
         list_ = []
         material_assign_raws = self._get_material_assign_matches()
@@ -701,15 +702,6 @@ class DotOslOptOld(_AbsDotFile):
             lines=self.lines
         )
         print _
-
-    def _get_shader_lines_(self):
-        index = 0
-        p_index = index+2
-        is_end = False
-        p_maximum = 10000
-        c = 0
-        while is_end is False:
-            pass
 
     def get_port_args(self):
         print self._generate_match_args(
@@ -1121,6 +1113,7 @@ class DotMaOpt(_AbsDotFile):
                 variants = p.named
                 return variants['unique_id']
 
+    # noinspection PyUnusedLocal
     def _get_obj_port_lines_(self, obj_properties):
         line = obj_properties['line']
         dict_ = collections.OrderedDict()
@@ -1134,6 +1127,7 @@ class DotMaOpt(_AbsDotFile):
         end_index = self._lines.index(next_line)
         return self._lines[start_index+2:end_index]
 
+    # noinspection PyUnusedLocal
     def _get_obj_ports_(self, obj_path, obj_properties):
         dict_ = collections.OrderedDict()
         lines = self._get_obj_port_lines_(obj_properties)
@@ -1205,7 +1199,7 @@ class DotMaOpt(_AbsDotFile):
                     mesh_dict = collections.OrderedDict()
                     dict_['mesh'] = mesh_dict
 
-                    with bsc_core.LogProcessContext.create(maximum, 'mesh-info-read') as l_p:
+                    with bsc_log.LogProcessContext.create(maximum, 'mesh-info-read') as l_p:
                         for seq, (obj_path, obj_properties) in enumerate(mesh_objs.items()):
                             l_p.do_update()
                             #
@@ -1283,7 +1277,7 @@ class DotMaOpt(_AbsDotFile):
                         variants = p.named
                         file_path = variants.get('file_path')
                         if auto_convert is True:
-                            file_path = bsc_core.StgPathMapper.map_to_current(file_path)
+                            file_path = bsc_storage.StgPathMapper.map_to_current(file_path)
                         list_.append(file_path)
                         break
         return list_
@@ -1314,7 +1308,7 @@ class DotAssOpt(_AbsDotFile):
                         i_variants = i_p.named
                         i_file_path = i_variants['file_path']
 
-                        i_file_path_new = bsc_core.StgEnvPathMapper.map_to_env(
+                        i_file_path_new = bsc_storage.StgEnvPathMapper.map_to_env(
                             i_file_path, pattern='[KEY]'
                         )
                         #
@@ -1328,12 +1322,12 @@ class DotAssOpt(_AbsDotFile):
         for i_line, i_new_line, i_file_path, i_file_path_new in replace_lis:
             index = self._lines.index(i_line)
             self._lines[index] = i_new_line
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'dot-ass path-convert',
                 'file="{}" >> "{}"'.format(i_file_path, i_file_path_new)
             )
 
-        bsc_core.StgFileOpt(self._file_path).set_write(''.join(self._lines))
+        bsc_storage.StgFileOpt(self._file_path).set_write(''.join(self._lines))
 
     def get_is_from_maya(self):
         if self._lines:
@@ -1390,11 +1384,3 @@ class DotUsdaOpt(_AbsDotFile):
             if p_1:
                 end_frame = int(p_1['value'])
         return start_frame, end_frame
-
-
-if __name__ == '__main__':
-    d = DotUsdaOpt(
-        '/l/prod/cgm/publish/assets/flg/xiangzhang_tree_g/mod/mod_dynamic/xiangzhang_tree_g.mod.mod_dynamic.v001/cache/usd/xiangzhang_tree_g.usda'
-    )
-
-    print d.get_frame_range()

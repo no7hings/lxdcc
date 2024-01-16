@@ -53,12 +53,12 @@ def __execute_with_option(option):
 
 
 def __start_server():
-    import lxsession.configure as ssn_configure
-    #
+    import lxsession.core as ssn_core
+
     app.run(
         host="0.0.0.0",
         debug=1,
-        port=ssn_configure.Hook.PORT
+        port=ssn_core.SsnUtil.PORT
     )
 
 
@@ -74,6 +74,8 @@ def set_cmd_run():
 
     import lxbasic.core as bsc_core
 
+    import lxbasic.storage as bsc_storage
+
     import lxsession.core as ssn_core
 
     kwargs = request.args
@@ -81,7 +83,7 @@ def set_cmd_run():
     unique_id = kwargs.get('uuid')
     if unique_id:
         hook_yml_file_path = ssn_core.SsnHookServerMtd.get_file_path(unique_id=unique_id)
-        hook_yml_file = bsc_core.StgFileOpt(hook_yml_file_path)
+        hook_yml_file = bsc_storage.StgFileOpt(hook_yml_file_path)
         if hook_yml_file.get_is_exists() is True:
             raw = hook_yml_file.set_read()
             if raw:

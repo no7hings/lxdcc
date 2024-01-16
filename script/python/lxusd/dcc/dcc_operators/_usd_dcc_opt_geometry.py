@@ -1,9 +1,11 @@
 # coding:utf-8
 from lxusd.core.wrap import *
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
-from lxutil.dcc import utl_dcc_opt_abs
+import lxbasic.dcc.abstracts as bsc_dcc_abstracts
 
 import lxusd.core as usd_core
 
@@ -63,11 +65,11 @@ class TransformOpt(AbsUsdOptDef):
 
 class MeshOpt(
     AbsUsdOptDef,
-    utl_dcc_opt_abs.AbsMeshOptDef
+    bsc_dcc_abstracts.AbsMeshOptDef
 ):
     def __init__(self, *args, **kwargs):
         super(MeshOpt, self).__init__(*args, **kwargs)
-        self._set_mesh_opt_def_init_()
+        self._init_mesh_opt_def_()
 
     def get_usd_mesh(self):
         return UsdGeom.Mesh(self.prim)
@@ -216,7 +218,7 @@ class MeshOpt(
                     i_uv_map_name
                 )
                 if i_uv_map_name != i_uv_map_name_new:
-                    bsc_core.Log.trace_method_warning(
+                    bsc_log.Log.trace_method_warning(
                         'usd uv-map set',
                         u'uv-map="{1}" in "{0}" is not available, auto convert to "{2}"'.format(
                             self.path,
@@ -319,11 +321,11 @@ class MeshOpt(
 
 class NurbsCurveOpt(
     AbsUsdOptDef,
-    utl_dcc_opt_abs.AbsCurveOptDef
+    bsc_dcc_abstracts.AbsCurveOptDef
 ):
     def __init__(self, *args, **kwargs):
         super(NurbsCurveOpt, self).__init__(*args, **kwargs)
-        self._set_curve_opt_def_init_()
+        self._init_curve_opt_def_()
 
     def get_usd_fnc(self):
         return UsdGeom.NurbsCurves(self.prim)
@@ -410,11 +412,11 @@ class NurbsCurveOpt(
 
 class BasisCurveOpt(
     AbsUsdOptDef,
-    utl_dcc_opt_abs.AbsCurveOptDef
+    bsc_dcc_abstracts.AbsCurveOptDef
 ):
     def __init__(self, *args, **kwargs):
         super(BasisCurveOpt, self).__init__(*args, **kwargs)
-        self._set_curve_opt_def_init_()
+        self._init_curve_opt_def_()
 
     def get_usd_fnc(self):
         return UsdGeom.BasisCurves(self.prim)

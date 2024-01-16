@@ -1,7 +1,7 @@
 # coding:utf-8
-import lxbasic.core as bsc_core
+import lxbasic.storage as bsc_storage
 
-import lxutil.fnc.exporters as utl_fnc_exporters
+import lxbasic.fnc.objects as bsc_fnc_objects
 
 import lxresolver.core as rsv_core
 
@@ -31,9 +31,9 @@ class AbsSsnRsvApplication(object):
 
     @classmethod
     def get_stg_connector(cls):
-        import lxbasic.shotgun.core as bsc_stg_core
+        import lxbasic.shotgun as bsc_shotgun
 
-        return bsc_stg_core.StgConnector()
+        return bsc_shotgun.StgConnector()
 
     def get_release_scene_src_file(self, version_scheme='match', ext_extras=None):
         """
@@ -94,28 +94,28 @@ class AbsSsnRsvApplication(object):
                 workspace_key=workspace_key_cdt
             )
             #
-            scene_src_file_opt_src = bsc_core.StgFileOpt(scene_src_file_path_src)
+            scene_src_file_opt_src = bsc_storage.StgFileOpt(scene_src_file_path_src)
             if scene_src_file_opt_src.get_is_exists() is True:
-                scene_src_file_opt_tgt = bsc_core.StgFileOpt(scene_src_file_path_tgt)
+                scene_src_file_opt_tgt = bsc_storage.StgFileOpt(scene_src_file_path_tgt)
                 if scene_src_file_opt_tgt.get_is_exists() is False:
                     # copy scene file
-                    bsc_core.StgPathPermissionMtd.copy_to_file(
+                    bsc_storage.StgPathPermissionMtd.copy_to_file(
                         scene_src_file_path_src, scene_src_file_path_tgt
                     )
                     # when is '.ma', collection xgen
                     if application == 'maya':
-                        utl_fnc_exporters.DotMaExporter(
+                        bsc_fnc_objects.FncExporterForDotMa(
                             option=dict(
                                 file_path_src=scene_src_file_path_src,
                                 file_path_tgt=scene_src_file_path_tgt
                             )
-                        ).set_run()
+                        ).execute()
                     #
                     if ext_extras:
                         for i_ext in ext_extras:
                             i_src = '{}.{}'.format(scene_src_file_opt_src.path_base, i_ext)
                             i_tgt = '{}.{}'.format(scene_src_file_opt_tgt.path_base, i_ext)
-                            bsc_core.StgPathPermissionMtd.copy_to_file(
+                            bsc_storage.StgPathPermissionMtd.copy_to_file(
                                 i_src, i_tgt
                             )
                     return scene_src_file_path_tgt
@@ -185,24 +185,24 @@ class AbsSsnRsvApplication(object):
                 workspace_key=workspace_key_cdt
             )
             #
-            scene_src_file_opt_src = bsc_core.StgFileOpt(scene_src_file_path_src)
+            scene_src_file_opt_src = bsc_storage.StgFileOpt(scene_src_file_path_src)
             if scene_src_file_opt_src.get_is_exists() is True:
-                scene_src_file_opt_tgt = bsc_core.StgFileOpt(scene_src_file_path_tgt)
+                scene_src_file_opt_tgt = bsc_storage.StgFileOpt(scene_src_file_path_tgt)
                 if scene_src_file_opt_tgt.get_is_exists() is False:
-                    scene_src_file_opt_src.set_copy_to_file(scene_src_file_path_tgt)
+                    scene_src_file_opt_src.copy_to_file(scene_src_file_path_tgt)
                     if application == 'maya':
-                        utl_fnc_exporters.DotMaExporter(
+                        bsc_fnc_objects.FncExporterForDotMa(
                             option=dict(
                                 file_path_src=scene_src_file_path_src,
                                 file_path_tgt=scene_src_file_path_tgt
                             )
-                        ).set_run()
+                        ).execute()
                     #
                     if ext_extras:
                         for i_ext in ext_extras:
                             i_src = '{}.{}'.format(scene_src_file_opt_src.path_base, i_ext)
                             i_tgt = '{}.{}'.format(scene_src_file_opt_tgt.path_base, i_ext)
-                            bsc_core.StgFileOpt(i_src).set_copy_to_file(i_tgt)
+                            bsc_storage.StgFileOpt(i_src).copy_to_file(i_tgt)
                     return scene_src_file_path_tgt
                 else:
                     return scene_src_file_path_tgt

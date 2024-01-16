@@ -1,13 +1,13 @@
 # coding:utf-8
 import lxcontent.core as ctt_core
+# universe
+from .. import core as unr_core
 
-import lxuniverse.core as unr_core
+from .. import abstracts as unr_abstracts
 
-import lxuniverse.abstracts as unr_abstracts
+from . import stack as unr_obj_stack
 
-from lxuniverse.objects import stack as unr_obj_stack
-
-from lxuniverse.objects import raw as unr_obj_raw
+from . import raw as unr_obj_raw
 
 
 class ObjToken(unr_abstracts.AbsObjToken):
@@ -114,7 +114,7 @@ class Obj(unr_abstracts.AbsObj):
     #
     PATHSEP = unr_core.UnrObj.PATHSEP
     # port/def
-    PORT_CLS = Port
+    DCC_PORT_CLS = Port
     PORT_STACK_CLS = unr_obj_stack.PrxPortStack
     #
     PROPERTIES_CLS = ctt_core.Properties

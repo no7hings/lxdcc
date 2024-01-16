@@ -1,9 +1,9 @@
 # coding:utf-8
 import lxuniverse.objects as unv_objects
 
-import lxresolver.abstracts as rsv_abstracts
-
 import lxcontent.core as ctt_core
+# resolver
+from .. import abstracts as rsv_abstracts
 
 from ..objects import stack as rsv_obj_stack
 

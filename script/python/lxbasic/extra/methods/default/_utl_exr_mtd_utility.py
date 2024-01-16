@@ -1,6 +1,4 @@
 # coding:utf-8
-import six
-
 import lxbasic.core as bsc_core
 
 import lxbasic.extra.abstracts as bsc_etr_abstracts

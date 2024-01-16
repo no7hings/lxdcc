@@ -1,5 +1,6 @@
 # coding:utf-8
-import lxuniverse.abstracts as unr_abstracts
+# universe
+from .. import abstracts as unr_abstracts
 
 
 # category

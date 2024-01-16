@@ -1,13 +1,13 @@
 # coding:utf-8
 from lxutil.rsv import utl_rsv_obj_abstract
 
-import lxbasic.core as bsc_core
-#
-from lxutil import utl_core
+import lxbasic.log as bsc_log
 
-import lxmaya.dcc.dcc_objects as mya_dcc_objects
-#
-import lxmaya.fnc.exporters as mya_fnc_exporters
+import lxbasic.core as bsc_core
+
+import lxmaya.dcc.objects as mya_dcc_objects
+
+import lxmaya.fnc.objects as mya_fnc_objects
 
 
 class UsdCmdBasic(object):
@@ -21,7 +21,7 @@ class UsdCmdBasic(object):
         )
         # args "meshuv, curve, verbose"
         cmd_str += u' {} 1 0 0'
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'usd export',
             u'file="{}", location="{}", frames="{}-{}" is started'.format(
                 file_path, location, start_frame, end_frame
@@ -30,7 +30,7 @@ class UsdCmdBasic(object):
         #
         mel.eval(cmd_str)
         #
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'usd export',
             u'file="{}", location="{}", frames="{}-{}" is completed'.format(
                 file_path, location, start_frame, end_frame
@@ -42,7 +42,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccGeometryHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_geometry_usd_export(self, version_scheme='match'):
+    def do_export_asset_geometry_usd(self, version_scheme='match'):
         """
         :param version_scheme:
         :return:
@@ -77,7 +77,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             rsv_unit = self._rsv_task.get_rsv_unit(keyword=keyword)
             file_path = rsv_unit.get_result(version=version)
 
-            mya_fnc_exporters.FncGeometryUsdExporterNew(
+            mya_fnc_objects.FncExporterForGeometryUsdNew(
                 option=dict(
                     file=file_path,
                     renderable_locations=[
@@ -95,7 +95,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         else:
             raise RuntimeError()
 
-    def set_asset_geometry_uv_map_usd_export(self, version_scheme='match'):
+    def do_export_asset_geometry_uv_map_usd(self, version_scheme='match'):
         import lxusd.rsv.objects as usd_rsv_objects
 
         #
@@ -153,7 +153,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with bsc_core.LogProcessContext.create(maximum=len(location_names), label='export geometry in location') as g_p:
+            with bsc_log.LogProcessContext.create(maximum=len(location_names), label='export geometry in location') as g_p:
                 for i_location_name in location_names:
                     g_p.do_update()
                     #
@@ -172,7 +172,7 @@ class RsvDccGeometryHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     #
                     sub_root_mya_obj = mya_dcc_objects.Group(i_mya_sub_root_dag_path.path)
                     if sub_root_mya_obj.get_is_exists() is True:
-                        mya_fnc_exporters.GeometryAbcExporter(
+                        mya_fnc_objects.FncExporterForGeometryAbc(
                             file_path=i_geometry_usd_abc_file_path,
                             root=i_location,
                             attribute_prefix=['pg'],
@@ -189,7 +189,7 @@ class RsvDccGeometryExtraHookOpt(
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccGeometryExtraHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_geometry_usd_export(self, version_scheme='match'):
+    def do_export_asset_geometry_usd(self, version_scheme='match'):
         """
         :param version_scheme:
         :return:
@@ -227,7 +227,7 @@ class RsvDccGeometryExtraHookOpt(
             # location_names = [i.name for i in dcc_root.get_children()]
             # use white list
             location_names = ['hi', 'shape', 'hair', 'aux']
-            with bsc_core.LogProcessContext.create(
+            with bsc_log.LogProcessContext.create(
                     maximum=len(location_names), label='export geometry-extra in location'
                     ) as g_p:
                 for i_location_name in location_names:
@@ -297,7 +297,7 @@ class RsvDccShotGeometryHookOpt(
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if shot_asset in reference_dict:
             namespace, root, obj = reference_dict[shot_asset]
-            with bsc_core.LogProcessContext.create_as_bar(maximum=len(location_names), label='usd export') as l_p:
+            with bsc_log.LogProcessContext.create_as_bar(maximum=len(location_names), label='usd export') as l_p:
                 for i_location_name in location_names:
                     i_location = '{}|{}:{}'.format(root, namespace, i_location_name)
                     if mya_dcc_objects.Node(i_location).get_is_exists() is True:
@@ -308,7 +308,7 @@ class RsvDccShotGeometryHookOpt(
                     l_p.do_update()
         else:
             raise RuntimeError(
-                bsc_core.Log.trace_method_error(
+                bsc_log.Log.trace_method_error(
                     'usd export',
                     'namespace="{}" is non-exists'.format(shot_asset)
                 )
@@ -357,9 +357,9 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # noinspection PyUnresolvedReferences
         from pgmaya import exporters
 
-        with bsc_core.LogContext.create(
+        with bsc_log.LogContext.create(
                 'xgen export',
-                u'directory="{}", root="{}", frames="{}-{}"'.format(
+                'directory="{}", root="{}", frames="{}-{}"'.format(
                     directory_path, root, start_frame, end_frame
                 )
         ):
@@ -380,7 +380,7 @@ class RsvDccShotHairHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             cls._set_xgen_export_(root, directory_path, start_frame, end_frame)
         else:
             raise RuntimeError(
-                bsc_core.Log.trace_method_error(
+                bsc_log.Log.trace_method_error(
                     'usd export',
                     'namespace="{}" is non-exists'.format(shot_asset)
                 )

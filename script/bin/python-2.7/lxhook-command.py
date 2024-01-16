@@ -43,13 +43,15 @@ def __print_help():
 
 
 def __execute_with_option(option):
+    import lxbasic.log as bsc_log
+
     import lxbasic.core as bsc_core
-    #
-    bsc_core.Log.trace_method_result(
+
+    bsc_log.Log.trace_method_result(
         KEY,
         'execute from: {}'.format(__file__)
     )
-    #
+
     option_opt = bsc_core.ArgDictStringOpt(option)
     option_hook_key = option_opt.get('option_hook_key')
     if option_hook_key:
@@ -62,14 +64,16 @@ def __execute_with_option(option):
 
 # hook
 def __execute_hook(option):
+    import lxbasic.log as bsc_log
+
     import lxbasic.core as bsc_core
-    #
+
     import lxbasic.extra.methods as bsc_etr_methods
-    #
+
     import lxsession.commands as ssn_commands
-    #
+
     option_opt = bsc_core.ArgDictStringOpt(option)
-    #
+
     hook_key = option_opt.get('hook_key')
     hook_args = ssn_commands.get_hook_args(hook_key)
     if hook_args:
@@ -79,7 +83,7 @@ def __execute_hook(option):
         # extend package from base
         framework_packages_extend = bsc_etr_methods.EtrBase.get_base_packages_extend()
         if framework_packages_extend:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 KEY,
                 'extend packages from framework: {}'.format(', '.join(framework_packages_extend))
             )
@@ -89,7 +93,7 @@ def __execute_hook(option):
         # extend package from builtin
         builtin_package_extend = bsc_etr_methods.EtrBase.get_builtin_packages_extend()
         if builtin_package_extend:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 KEY,
                 'extend packages from builtin: {}'.format(', '.join(builtin_package_extend))
             )
@@ -99,7 +103,7 @@ def __execute_hook(option):
         # extend packages from session
         hook_packages_extend = session.get_packages_extend()
         if hook_packages_extend:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 KEY,
                 'extend packages from session: {}'.format(', '.join(hook_packages_extend))
             )

@@ -13,17 +13,21 @@ class Setup(object):
 
         import lxkatana.core as ktn_core
 
+        import lxkatana.startup as ktn_startup
+
         if ktn_core.KtnUtil.get_is_ui_mode():
             with bsc_log.LogContext.create(cls.KEY, 'register menu'):
-                ktn_core.KatanaMenuSetup().set_setup()
+                ktn_startup.KatanaMenuSetup().set_setup()
 
     @classmethod
     def build_lua(cls):
+        import lxresource as bsc_resource
+
         import lxbasic.core as bsc_core
 
         bsc_core.EnvExtraMtd.append_lua_path(
             '{}/?.lua'.format(
-                bsc_core.ExtendResource.get(
+                bsc_resource.ExtendResource.get(
                     'lua-scripts'
                 )
             )
@@ -33,10 +37,10 @@ class Setup(object):
     def build_workspace(cls):
         import lxbasic.log as bsc_log
 
-        import lxkatana.core as ktn_core
+        import lxkatana.startup as ktn_startup
 
         with bsc_log.LogContext.create(cls.KEY, 'register workspace'):
-            ktn_core.KatanaWorkspaceSetup().set_setup()
+            ktn_startup.KatanaWorkspaceSetup().set_setup()
 
     @classmethod
     def build_hot_key(cls):

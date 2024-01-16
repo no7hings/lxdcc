@@ -142,6 +142,22 @@ node:
         connections:
             - '<..upstream_merge.output>'
             - '<.input>'
+    #
+    light_background_rotate_y_opt:
+        tag: 'PPS'
+        type: PropertySet_Opt
+        name: '<option.type_abr>__<.tag>'
+        path: '<main.path>/<.name>'
+        input: '<.path>.i0'
+        output: '<.path>.out'
+        parameters:
+            CEL: '/root/materials/light/mtl_background_image'
+            user/setting/attribute: 'material.nodes.sdr_lgt_bkg_image_rotate*.parameters.input1.i1'
+            user/setting/value: '/root/world/lgt/gaffer.xform.group.rotateY.i0'
+        #
+        connections:
+            - '<..rotate_opt.output>'
+            - '<.input>'
 
     # variant properties opt
     variant_properties_opt:
@@ -179,7 +195,7 @@ node:
             user/data_5/i1: 'getNode("<node.rotate_opt.name>").user.parameters.frame_offset'
         #
         connections:
-            - '<..rotate_opt.output>'
+            - '<..light_background_rotate_y_opt.output>'
             - '<.input>'
             # output
             - '<.output>'

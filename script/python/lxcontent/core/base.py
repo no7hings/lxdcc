@@ -86,6 +86,10 @@ class ContentUtil(object):
                 # etc. "<a>"
                 else:
                     _v_ks_1 = re.findall(re.compile(cls.PATTERN_KEYWORD, re.S), _value_unfold)
+                    # break when "\n" in key
+                    for _i in _v_ks_1:
+                        if '\n' in _i:
+                            return value_
                     if _v_ks_1:
                         for _i_v_k_1 in set(_v_ks_1):
                             # etc. <a | b>, value=a or b

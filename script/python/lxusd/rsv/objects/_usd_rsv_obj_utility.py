@@ -3,15 +3,19 @@ import six
 
 import collections
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
 
 import lxcontent.core as ctt_core
 
-import lxresource.core as rsc_core
+import lxresource as bsc_resource
 
-import lxutil.dcc.dcc_objects as utl_dcc_objects
+import lxbasic.dcc.objects as bsc_dcc_objects
 
-from lxutil.fnc import utl_fnc_obj_abs
+import lxbasic.fnc.abstracts as bsc_fnc_abstracts
 
 import lxresolver.core as rsv_core
 
@@ -82,8 +86,8 @@ class RsvUsdAssetSetCreator(object):
     def _get_shot_asset_cache(cls, rsv_asset, rsv_shot):
         file_path = cls._generate_shot_set_dress_usd_file_path_as_latest(rsv_shot)
         if file_path:
-            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'shot-asset/{}'.format(rsv_asset.name))
-            file_opt = bsc_core.StgFileOpt(yml_file_path)
+            yml_file_path = bsc_storage.StgTmpYamlMtd.get_file_path(file_path, 'shot-asset/{}'.format(rsv_asset.name))
+            file_opt = bsc_storage.StgFileOpt(yml_file_path)
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
             if bsc_core.SysBaseMtd.get_is_linux():
@@ -117,7 +121,7 @@ class RsvUsdAssetSetCreator(object):
                 i_shot_asset = i_location.split('/')[-1]
                 dict_[i_shot_asset] = i_location
         except:
-            bsc_core.Log.trace_method_error(
+            bsc_log.Log.trace_method_error(
                 'shot-asset resolver',
                 'file="{}" is error'.format(shot_set_dress_usd_file_path)
             )
@@ -255,7 +259,7 @@ class RsvUsdAssetSetCreator(object):
                 raise RuntimeError()
         else:
             usd_file_path = '{}{}.usda'.format(
-                bsc_core.StgUserMtd.get_user_temporary_directory(),
+                bsc_storage.StgUserMtd.get_user_temporary_directory(),
                 rsv_asset.path
             )
         return usd_file_path
@@ -293,7 +297,7 @@ class RsvUsdAssetSetCreator(object):
                 raise RuntimeError()
         else:
             usd_file_path = '{}{}.usda'.format(
-                bsc_core.StgUserMtd.get_user_temporary_directory(),
+                bsc_storage.StgUserMtd.get_user_temporary_directory(),
                 rsv_asset.path
             )
         return usd_file_path
@@ -345,7 +349,7 @@ class RsvUsdAssetSetCreator(object):
                 )
         else:
             usd_file_path = '{}{}.usda'.format(
-                bsc_core.StgUserMtd.get_user_temporary_directory(),
+                bsc_storage.StgUserMtd.get_user_temporary_directory(),
                 rsv_asset.path
             )
         return usd_file_path
@@ -359,8 +363,8 @@ class RsvUsdAssetSetCreator(object):
     def _get_asset_usd_set_dress_variant_cache(cls, rsv_asset):
         file_path = cls._generate_asset_set_dress_usd_file_path_as_latest(rsv_asset)
         if file_path:
-            yml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(file_path, 'asset-versions/{}'.format(rsv_asset.name))
-            file_opt = bsc_core.StgFileOpt(yml_file_path)
+            yml_file_path = bsc_storage.StgTmpYamlMtd.get_file_path(file_path, 'asset-versions/{}'.format(rsv_asset.name))
+            file_opt = bsc_storage.StgFileOpt(yml_file_path)
             if file_opt.get_is_exists() is True:
                 return file_opt.set_read()
             else:
@@ -605,11 +609,11 @@ class RsvUsdAssetSetCreator(object):
 
         key = 'usda/asset-set-v003'
 
-        t = rsc_core.ResourceJinja.get_template(
+        t = bsc_resource.RscExtendJinja.get_template(
             key
         )
 
-        c = rsc_core.ResourceJinja.get_configure(
+        c = bsc_resource.RscExtendJinja.get_configure(
             key
         )
 
@@ -631,7 +635,7 @@ class RsvUsdAssetSetCreator(object):
         )
         # print new_raw
         #
-        bsc_core.StgFileOpt(
+        bsc_storage.StgFileOpt(
             usd_file_path
         ).set_write(
             new_raw
@@ -654,11 +658,11 @@ class RsvUsdAssetSetCreator(object):
 
             key = 'usda/shot-asset-set-v002'
 
-            t = rsc_core.ResourceJinja.get_template(
+            t = bsc_resource.RscExtendJinja.get_template(
                 key
             )
 
-            c = rsc_core.ResourceJinja.get_configure(
+            c = bsc_resource.RscExtendJinja.get_configure(
                 key
             )
             c.set('file', asset_shot_set_usd_file_path)
@@ -684,7 +688,7 @@ class RsvUsdAssetSetCreator(object):
                 c.value
             )
 
-            bsc_core.StgFileOpt(
+            bsc_storage.StgFileOpt(
                 asset_shot_set_usd_file_path
             ).set_write(
                 raw
@@ -865,7 +869,7 @@ class RsvUsdShotSetCreator(object):
         return paths
 
 
-class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
+class RsvTaskOverrideUsdCreator(bsc_fnc_abstracts.AbsFncOptionBase):
     OPTION = dict(
         var_names=['hi'],
         root='/master'
@@ -899,8 +903,8 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         file_path = '{}/geo/{}.usd'.format(directory_path, var_name)
         file_path_over = '{}/geo/{}.uv_map.usd'.format(directory_path, var_name)
-        if bsc_core.StgFileOpt(file_path).get_is_exists() is True:
-            if bsc_core.StgFileOpt(file_path_over).get_is_exists() is False:
+        if bsc_storage.StgFileOpt(file_path).get_is_exists() is True:
+            if bsc_storage.StgFileOpt(file_path_over).get_is_exists() is False:
                 usd_fnc_exporters.GeometryUvMapExporter(
                     file_path=file_path_over,
                     root=root,
@@ -913,8 +917,8 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
 
     def create_geometry_uv_map_at(self, file_path):
         key = 'uv_map'
-        if bsc_core.StgFileOpt(file_path).get_is_exists() is False:
-            directory_path = bsc_core.StgFileOpt(file_path).get_directory_path()
+        if bsc_storage.StgFileOpt(file_path).get_is_exists() is False:
+            directory_path = bsc_storage.StgFileOpt(file_path).get_directory_path()
             elements = []
             for i_var in self.VAR_NAMES:
                 i_location = self._location_mapper[i_var]
@@ -929,11 +933,11 @@ class RsvTaskOverrideUsdCreator(utl_fnc_obj_abs.AbsFncOptionBase):
                     )
             #
             if elements:
-                i_c = rsc_core.ResourceJinja.get_configure('usda/geometry/all/{}'.format(key))
-                i_t = rsc_core.ResourceJinja.get_template('usda/geometry/all/{}'.format(key))
+                i_c = bsc_resource.RscExtendJinja.get_configure('usda/geometry/all/{}'.format(key))
+                i_t = bsc_resource.RscExtendJinja.get_template('usda/geometry/all/{}'.format(key))
                 i_c.set('elements', elements)
                 i_raw = i_t.render(**i_c.get_value())
-                bsc_core.StgFileOpt(
+                bsc_storage.StgFileOpt(
                     file_path
                 ).set_write(i_raw)
 
@@ -986,7 +990,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         )
         key = 'usda/set/shot-asset'
-        c = rsc_core.ResourceJinja.get_configure(key)
+        c = bsc_resource.RscExtendJinja.get_configure(key)
         c.update_from(
             self._rsv_scene_properties.value
         )
@@ -1001,7 +1005,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         usda_dict = c.get('usdas')
         #
         for k, v in usda_dict.items():
-            t = rsc_core.ResourceJinja.get_template(
+            t = bsc_resource.RscExtendJinja.get_template(
                 '{}/{}'.format(key, k)
             )
             i_raw = t.render(
@@ -1010,9 +1014,9 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             i_usda_file_path = u'{}/{}'.format(
                 component_usd_directory_path, v
             )
-            i_file = utl_dcc_objects.OsFile(i_usda_file_path)
+            i_file = bsc_dcc_objects.StgFile(i_usda_file_path)
             if i_file.get_is_exists() is False:
-                utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                bsc_dcc_objects.StgFile(i_usda_file_path).set_write(
                     i_raw
                 )
 
@@ -1059,7 +1063,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_geometry_usd_var_file_path:
                 s.append_sublayer(i_geometry_usd_var_file_path)
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'look property create',
                     'variant="{}" is not found'.format(i_var_name)
                 )
@@ -1089,8 +1093,6 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).set_run()
 
     def create_set_asset_display_color_usd(self):
-        from lxutil import utl_core
-
         import lxusd.core as usd_core
 
         import lxusd.fnc.exporters as usd_fnc_exporter
@@ -1130,7 +1132,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             if i_geometry_usd_var_file_path:
                 s.append_sublayer(i_geometry_usd_var_file_path)
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'geometry display-color create',
                     'file="{}" is not found'.format(i_geometry_usd_var_file_path)
                 )
@@ -1203,7 +1205,7 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if step in step_mapper:
             key = step_mapper[step]
             #
-            c = rsc_core.ResourceJinja.get_configure(key)
+            c = bsc_resource.RscExtendJinja.get_configure(key)
             #
             c.update_from(
                 self._rsv_scene_properties.value
@@ -1228,16 +1230,16 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 else:
                     raise RuntimeError()
 
-                t = rsc_core.ResourceJinja.get_template('{}/{}'.format(key, k))
+                t = bsc_resource.RscExtendJinja.get_template('{}/{}'.format(key, k))
                 i_raw = t.render(
                     **c.value
                 )
                 i_usda_file_path = '{}/{}'.format(
                     component_usd_directory_path, i_file_base
                 )
-                i_file = utl_dcc_objects.OsFile(i_usda_file_path)
+                i_file = bsc_dcc_objects.StgFile(i_usda_file_path)
                 if i_file.get_is_exists() is False:
-                    utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                    bsc_dcc_objects.StgFile(i_usda_file_path).set_write(
                         i_raw
                     )
                 else:
@@ -1250,12 +1252,12 @@ class RsvUsdHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         i_raw = t.render(
                             **c.value
                         )
-                        utl_dcc_objects.OsFile(i_usda_file_path).set_write(
+                        bsc_dcc_objects.StgFile(i_usda_file_path).set_write(
                             i_raw
                         )
             #
             if workspace in [rsv_scene_properties.get('workspaces.release')]:
-                bsc_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'register usd',
                     'framework scheme use "{}"'.format(framework_scheme)
                 )

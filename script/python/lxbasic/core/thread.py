@@ -9,9 +9,9 @@ import subprocess
 
 import functools
 
-from ..core import configure as bsc_cor_configure
+from . import configure as bsc_cor_configure
 
-from ..core import process as bsc_cor_process
+from . import process as bsc_cor_process
 
 
 class TrdFnc(threading.Thread):

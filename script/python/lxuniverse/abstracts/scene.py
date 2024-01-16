@@ -4,10 +4,10 @@ import six
 import collections
 
 import lxcontent.core as ctt_core
+# universe
+from .. import core as unr_core
 
-import lxuniverse.core as unr_core
-
-from lxuniverse.abstracts import base as unr_abs_base
+from . import base as unr_abs_base
 
 
 # <obj-universe>

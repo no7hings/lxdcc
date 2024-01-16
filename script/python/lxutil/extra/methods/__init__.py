@@ -1,4 +1,6 @@
 # coding:utf-8
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
 
@@ -9,19 +11,19 @@ def get_module(framework_scheme):
 
 
 if bsc_core.EnvExtraMtd.get_scheme() == 'default':
-    bsc_core.Log.trace_method_result(
+    bsc_log.Log.trace_method_result(
         'extra script',
         'load scheme: "default"'
     )
     from .default import *
 elif bsc_core.EnvExtraMtd.get_scheme() == 'new':
-    bsc_core.Log.trace_method_result(
+    bsc_log.Log.trace_method_result(
         'extra script',
         'load scheme: "new"'
     )
     from .new import *
 else:
-    bsc_core.Log.trace_method_result(
+    bsc_log.Log.trace_method_result(
         'extra script',
         'load scheme: "new"'
     )

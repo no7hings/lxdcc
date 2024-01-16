@@ -46,6 +46,7 @@ class MsgBaseMtd(object):
         return session
 
     # new api
+    # noinspection PyUnusedLocal
     @classmethod
     def send_mail_(cls, sender='ple', addresses=None, subject=None, content=None, attachments=None):
         url = cls.MessageServer.MailUrl.format(
@@ -62,6 +63,7 @@ class MsgBaseMtd(object):
         )
         return result
 
+    # noinspection PyUnusedLocal
     @classmethod
     def send_feishu_(cls, sender='shotgun', receivers=None, subject=None, content=None, attachments=None):
         def to_receives_fnc_(receivers_):

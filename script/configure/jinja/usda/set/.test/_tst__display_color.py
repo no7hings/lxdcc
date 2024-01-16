@@ -1,13 +1,13 @@
 # coding:utf-8
-import lxresource.core as rsc_core
+import lxresource as bsc_resource
 
 key = 'usda/set/surface'
 
-c = rsc_core.ResourceJinja.get_configure(key)
+c = bsc_resource.RscExtendJinja.get_configure(key)
 
 k = 'geo_extra'
 
-t = rsc_core.Jinja.get_template('{}/{}'.format(key, k))
+t = bsc_resource.Jinja.get_template('{}/{}'.format(key, k))
 
 raw = t.render(
     **c.value

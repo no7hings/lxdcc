@@ -14,14 +14,14 @@ class Setup(object):
     def setup_qt_menu(cls):
         def fnc_():
             print 'lx-dcc menu setup: is started'
-            from lxmaya import ma_setup
+            import lxmaya.startup as mya_startup
 
-            ma_setup.MenuSetup().set_setup()
+            mya_startup.MenuSetup().set_setup()
             print 'lx-dcc menu setup: is completed'
 
-        from lxmaya import ma_core
+        import lxmaya.core as mya_core
 
-        if ma_core.get_is_ui_mode():
+        if mya_core.MyaUtil.get_is_ui_mode():
             # noinspection PyUnresolvedReferences
             from maya import cmds
 
@@ -31,9 +31,9 @@ class Setup(object):
     def setup_arnold(cls):
         def fnc_():
             print 'lx-arnold setup: is started'
-            from lxarnold import and_setup
+            import lxarnold.startup as and_startup
 
-            and_setup.MayaSetup().run()
+            and_startup.MayaSetup().run()
             print 'lx-arnold setup: is completed'
 
         # noinspection PyUnresolvedReferences
@@ -58,13 +58,14 @@ class Setup(object):
     @classmethod
     def setup_workspace_environment(cls):
         def fnc_():
-            from lxmaya import ma_core
+            import lxmaya.core as mya_core
+
             import lxmaya.scripts as mya_scripts
 
             _fnc = mya_scripts.ScpCbkEnvironment().execute
-            ma_core.CallbackOpt(_fnc, 'NewSceneOpened').register()
-            ma_core.CallbackOpt(_fnc, 'SceneOpened').register()
-            ma_core.CallbackOpt(_fnc, 'SceneSaved').register()
+            mya_core.CallbackOpt(_fnc, 'NewSceneOpened').register()
+            mya_core.CallbackOpt(_fnc, 'SceneOpened').register()
+            mya_core.CallbackOpt(_fnc, 'SceneSaved').register()
             cmds.evalDeferred(_fnc)
 
         # noinspection PyUnresolvedReferences
@@ -75,18 +76,16 @@ class Setup(object):
     @classmethod
     def setup_workspace_gui(cls):
         def fnc_():
-            from lxmaya import ma_core
-            import lxutil.scripts as utl_scripts
+            import lxbasic.dcc.scripts as bsd_dcc_scripts
 
-            _fnc = utl_scripts.ScpCbkGui().execute
-            ma_core.CallbackOpt(_fnc, 'NewSceneOpened').register()
-            ma_core.CallbackOpt(_fnc, 'SceneOpened').register()
-            ma_core.CallbackOpt(_fnc, 'SceneSaved').register()
+            _fnc = bsd_dcc_scripts.ScpCbkGui().execute
+            mya_core.CallbackOpt(_fnc, 'NewSceneOpened').register()
+            mya_core.CallbackOpt(_fnc, 'SceneOpened').register()
+            mya_core.CallbackOpt(_fnc, 'SceneSaved').register()
 
-        #
-        from lxmaya import ma_core
+        import lxmaya.core as mya_core
 
-        if ma_core.get_is_ui_mode():
+        if mya_core.MyaUtil.get_is_ui_mode():
             # noinspection PyUnresolvedReferences
             from maya import cmds
 

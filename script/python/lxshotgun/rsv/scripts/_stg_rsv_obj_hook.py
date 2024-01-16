@@ -1,5 +1,9 @@
 # coding:utf-8
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
 
 import lxsession.core as ssn_core
 
@@ -152,14 +156,13 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def execute_version_link(self):
-        import lxutil.dcc.dcc_objects as utl_dcc_objects
+        import lxbasic.dcc.objects as bsc_dcc_objects
 
-        #
         rsv_scene_properties = self._rsv_scene_properties
-        #
+
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
-        #
+
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = '{branch}-release-version-dir'
             keyword_1 = '{branch}-release-no-version-dir'
@@ -182,19 +185,16 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
-        utl_dcc_objects.StgDirectory(version_directory_path).link_to(
+        bsc_dcc_objects.StgDirectory(version_directory_path).link_to(
             no_version_directory_path, replace=True
         )
 
     def execute_version_lock(self):
-        import lxbasic.core as bsc_core
-
-        #
         rsv_scene_properties = self._rsv_scene_properties
-        #
+
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
-        #
+
         if workspace == rsv_scene_properties.get('workspaces.release'):
             keyword_0 = '{branch}-release-version-dir'
         elif workspace == rsv_scene_properties.get('workspaces.temporary'):
@@ -208,19 +208,19 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         directory_path = directory_rsv_unit.get_result(
             version=version
         )
-        bsc_core.StgPathPermissionMtd.lock_all_directories(
+        bsc_storage.StgPathPermissionMtd.lock_all_directories(
             directory_path
         )
-        bsc_core.StgPathPermissionMtd.lock_all_files(
+        bsc_storage.StgPathPermissionMtd.lock_all_files(
             directory_path
         )
 
     def execute_shotgun_file_export(self):
-        import lxbasic.shotgun.core as bsc_stg_core
+        import lxbasic.shotgun as bsc_shotgun
 
         rsv_scene_properties = self._rsv_scene_properties
 
-        stg_connector = bsc_stg_core.StgConnector()
+        stg_connector = bsc_shotgun.StgConnector()
 
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
@@ -244,17 +244,17 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
 
     def set_dependency_export(self):
-        import lxbasic.shotgun.core as bsc_stg_core
+        import lxbasic.shotgun as bsc_shotgun
 
         import lxresolver.core as rsv_core
 
-        stg_connector = bsc_stg_core.StgConnector()
+        stg_connector = bsc_shotgun.StgConnector()
         #
         stg_version_query = stg_connector.get_stg_version_query(
             **self._rsv_scene_properties.value
         )
         #
-        stg_version_opt = bsc_stg_core.StgVersionOpt(stg_version_query)
+        stg_version_opt = bsc_shotgun.StgVersionOpt(stg_version_query)
 
         resolver = rsv_core.RsvBase.generate_root()
         #
@@ -296,7 +296,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         mov_file_path = self._hook_option_opt.get('movie_file')
         if mov_file_path:
-            mov_file_opt = bsc_core.StgFileOpt(mov_file_path)
+            mov_file_opt = bsc_storage.StgFileOpt(mov_file_path)
             if mov_file_opt.get_is_exists() is True:
                 review_mov_file_rsv_unit = self._rsv_task.get_rsv_unit(
                     keyword=keyword
@@ -304,7 +304,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 review_mov_file_path = review_mov_file_rsv_unit.get_result(
                     version=version
                 )
-                mov_file_opt.set_copy_to_file(
+                mov_file_opt.copy_to_file(
                     review_mov_file_path
                 )
 
@@ -323,7 +323,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         #
         info_file_path = self._hook_option_opt.get('validation_info_file')
         if info_file_path:
-            info_file_opt = bsc_core.StgFileOpt(info_file_path)
+            info_file_opt = bsc_storage.StgFileOpt(info_file_path)
             if info_file_opt.get_is_exists() is True:
                 validation_info_file_rsv_unit = self._rsv_task.get_rsv_unit(
                     keyword=keyword
@@ -331,14 +331,12 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 validation_info_file_path = validation_info_file_rsv_unit.get_result(
                     version=version
                 )
-                info_file_opt.set_copy_to_file(
+                info_file_opt.copy_to_file(
                     validation_info_file_path
                 )
 
     def execute_qc_review_mov_export(self, version_qc):
         import lxbasic.core as bsc_core
-
-        from lxutil import utl_core
 
         rsv_scene_properties = self._rsv_scene_properties
 
@@ -379,16 +377,16 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         review_katana_mov_file_path = review_katana_mov_file_rsv_unit.get_result(
             version=version
         )
-        review_katana_mov_file_opt = bsc_core.StgFileOpt(
+        review_katana_mov_file_opt = bsc_storage.StgFileOpt(
             review_katana_mov_file_path
         )
         if review_katana_mov_file_opt.get_is_exists() is True:
-            review_katana_mov_file_opt.set_copy_to_file(
+            review_katana_mov_file_opt.copy_to_file(
                 review_mov_file_path_qc
             )
             return review_mov_file_path_qc
         else:
-            bsc_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 u'qc review mov export',
                 u'file="{}" is non-exists'.format(review_katana_mov_file_path)
             )
@@ -459,7 +457,7 @@ class RsvShotgunHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     user=self._hook_option_opt.get('user')
                 )
             )
-            bsc_core.StgFileOpt(file_path).set_write(
+            bsc_storage.StgFileOpt(file_path).set_write(
                 raw
             )
 

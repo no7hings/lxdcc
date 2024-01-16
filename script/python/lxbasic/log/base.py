@@ -15,7 +15,7 @@ import platform
 
 import getpass
 
-from ..log import bridge as log_bridge
+from . import bridge as log_bridge
 
 
 class LogBase(object):

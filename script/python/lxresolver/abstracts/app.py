@@ -7,8 +7,12 @@ import functools
 
 import lxcontent.core as ctt_core
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
+import lxbasic.storage as bsc_storage
+# resolver
 from .. import core as rsv_core
 
 
@@ -161,7 +165,7 @@ class AbsRsvAppDef(object):
             packages_extend=packages_extend
         )
         if cmd:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'execute app',
                 'command=`{}` is started'.format(cmd)
             )
@@ -172,7 +176,7 @@ class AbsRsvAppDef(object):
 
     @classmethod
     def execute_with_result(cls, command, **sub_progress_kwargs):
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'execute app',
             'command=`{}` is started'.format(command)
         )
@@ -217,7 +221,7 @@ class AbsRsvAppDefault(AbsRsvAppDef):
         list_ = []
         configure_file_path = self._get_configure_file()
         if configure_file_path:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'app resolved',
                 'app="{project}.{application}"'.format(
                     **dict(project=self._project, application=self._application)
@@ -269,13 +273,13 @@ class AbsRsvAppNew(AbsRsvAppDef):
         list_ = []
         configure_file_path = self._get_configure_file()
         if configure_file_path:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'app resolved',
                 'app="{project}.{application}"'.format(
                     **dict(project=self._project, application=self._application)
                 )
             )
-            data = bsc_core.StgFileOpt(configure_file_path).set_read()
+            data = bsc_storage.StgFileOpt(configure_file_path).set_read()
             key = self._application
             if data:
                 if key in data:

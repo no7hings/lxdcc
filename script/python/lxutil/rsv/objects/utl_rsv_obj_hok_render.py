@@ -6,12 +6,12 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccRenderHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
     
-    def set_asset_katana_render_create(self):
+    def do_create_asset_katana_render(self):
         import collections
+
+        import lxbasic.log as bsc_log
         #
         import lxbasic.core as bsc_core
-        #
-        from lxutil import utl_core
         #
         import lxsession.commands as ssn_commands
         #
@@ -48,7 +48,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         if layer_from_geometry_variant is True:
             geometry_variant_names = self.get_asset_exists_geometry_variant_names()
             layers = [layer_variant_mapper[i] for i in geometry_variant_names]
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'load layer form geometry variant',
                 'layers={}'.format(', '.join(map(lambda x: '"{}"'.format(x), layers)))
             )
@@ -79,7 +79,7 @@ class RsvDccRenderHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             variants_dic
         )
         render_ddl_job_ids = []
-        with bsc_core.LogProcessContext.create(maximum=len(combinations), label='cmb-render-create') as l_p:
+        with bsc_log.LogProcessContext.create(maximum=len(combinations), label='cmb-render-create') as l_p:
             for i_seq, i_variants in enumerate(combinations):
                 l_p.do_update()
                 #

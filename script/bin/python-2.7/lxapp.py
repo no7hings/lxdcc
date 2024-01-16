@@ -105,9 +105,9 @@ def __guess_by_kwargs(opt_string):
 
 
 def __guess_by_args(args):
-    import lxbasic.core as bsc_core
+    import lxbasic.log as bsc_log
 
-    bsc_core.Log.trace_method_result(
+    bsc_log.Log.trace_method_result(
         KEY,
         'execute from: {}'.format(__file__)
     )
@@ -184,11 +184,11 @@ def __print_help():
 
 def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
     import lxbasic.core as bsc_core
-    #
+
     import lxbasic.extra.methods as bsc_etr_methods
-    #
+
     import lxresolver.core as rsv_core
-    #
+
     option_opt = bsc_core.ArgDictStringOpt(option)
     # find project
     project = option_opt.get('project')
@@ -199,21 +199,21 @@ def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
     rsv_project = resolver.get_rsv_project(project=project)
     if not rsv_project:
         return
-    #
+
     application = option_opt.get('application')
     if not application:
         return
-    #
+
     opt_packages_extend = []
-    #
+
     framework_scheme = rsv_project.get_framework_scheme()
     m = bsc_etr_methods.get_module(framework_scheme)
     framework_packages_extend = m.EtrBase.get_base_packages_extend()
     if framework_packages_extend:
         opt_packages_extend.extend(framework_packages_extend)
-    #
+
     rsv_app = rsv_project.get_rsv_app(application=application)
-    #
+
     command = rsv_app.get_command(
         args_execute=args_execute,
         args_extend=args_extend,
@@ -229,12 +229,24 @@ def __execute(option, args_execute=None, args_extend=None, kwargs_task=None):
                 '\033[0m\n'
             ).format(command)
         )
-    #
+
     if kwargs_task:
         environs_extend = m.EtrBase.get_task_environs_extend_(**kwargs_task)
+        if 'project' in kwargs_task:
+            # noinspection PyBroadException
+            try:
+                import lxbasic.shotgun as bsc_shotgun
+                c = bsc_shotgun.StgConnector()
+                stg_task = c.find_stg_task(**kwargs_task)
+                if stg_task:
+                    task_id = stg_task['id']
+                    task_data = c.get_data_from_task_id(task_id)
+                    rsv_project.auto_create_user_task_directory_by_task_data(task_data)
+            except Exception:
+                bsc_core.ExceptionMtd.set_print()
     else:
         environs_extend = m.EtrBase.get_project_environs_extend(project)
-    #
+
     if environs_extend:
         sys.stdout.write(
             (

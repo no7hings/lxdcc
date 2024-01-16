@@ -12,4 +12,4 @@ if __arnold:
     # noinspection PyUnresolvedReferences
     import arnold
 
-    ai = _sys.modules['arnold']
+    ai = arnold

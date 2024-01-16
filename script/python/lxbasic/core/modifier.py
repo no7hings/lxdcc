@@ -5,7 +5,7 @@ import time
 
 import lxbasic.log as bsc_log
 
-from ..core import base as bsc_cor_base
+from . import base as bsc_cor_base
 
 
 class MdfBaseMtd(object):
@@ -151,7 +151,7 @@ class MdfBaseMtd(object):
                 return _fnc
             except Exception:
                 import lxbasic.core as bsc_core
-                bsc_core.LogException.trace()
+                bsc_log.LogException.trace()
                 raise
 
         return fnc_

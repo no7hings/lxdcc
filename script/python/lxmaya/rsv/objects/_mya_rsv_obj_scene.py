@@ -1,26 +1,26 @@
 # coding:utf-8
 from lxutil.rsv import utl_rsv_obj_abstract
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
-from lxutil import utl_core
+import lxbasic.storage as bsc_storage
 
-from lxmaya import ma_core
+import lxbasic.dcc.objects as bsc_dcc_objects
 
-import lxutil.dcc.dcc_objects as utl_dcc_objects
+import lxmaya.core as mya_core
 
-import lxmaya.dcc.dcc_objects as mya_dcc_objects
+import lxmaya.dcc.objects as mya_dcc_objects
 
-import lxmaya.fnc.exporters as mya_fnc_exporters
-
-import lxmaya.fnc.builders as mya_fnc_builders
+import lxmaya.fnc.objects as mya_fnc_objects
 
 
 class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccSceneHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def execute_asset_scene_export(self):
+    def do_export_asset_scene(self):
         key = 'asset scene export'
         rsv_scene_properties = self._rsv_scene_properties
         #
@@ -54,7 +54,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword_0
             )
             scene_file_path = scene_file_rsv_unit.get_result(version=version)
-            mya_fnc_exporters.FncSceneExporter(
+            mya_fnc_objects.FncExporterForScene(
                 option=dict(
                     file=scene_file_path,
                     location=location,
@@ -68,7 +68,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             return scene_file_path
         else:
             raise RuntimeError(
-                bsc_core.Log.trace_method_error(
+                bsc_log.Log.trace_method_error(
                     key,
                     u'obj="{}" is non-exists'.format(mya_group.path)
                 )
@@ -86,7 +86,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             mya_root_dag_opt.get_value()
         )
         if mya_root.get_is_exists() is True:
-            ma_core.CmdObjOpt(mya_root.path).create_customize_attribute(
+            mya_core.CmdObjOpt(mya_root.path).create_customize_attribute(
                 'pg_{}_version'.format(task),
                 version
             )
@@ -110,24 +110,24 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             raise TypeError()
         #
         orig_file_path = '/l/resource/td/asset/maya/asset-camera.ma'
-        orig_file_path = bsc_core.StgBasePathMapMtd.map_to_current(orig_file_path)
+        orig_file_path = bsc_storage.StgPathMapper.map_to_current(orig_file_path)
 
         scene_src_file_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_0
         )
         scene_src_file_path = scene_src_file_rsv_unit.get_result(version=version)
-        orig_file = utl_dcc_objects.OsFile(orig_file_path)
+        orig_file = bsc_dcc_objects.StgFile(orig_file_path)
         if orig_file.get_is_exists() is True:
-            orig_file.set_copy_to_file(scene_src_file_path, replace=True)
+            orig_file.copy_to_file(scene_src_file_path, replace=True)
             #
-            scene_src_file = utl_dcc_objects.OsFile(scene_src_file_path)
+            scene_src_file = bsc_dcc_objects.StgFile(scene_src_file_path)
             if scene_src_file.get_is_exists() is True:
                 mya_dcc_objects.Scene.open_file(scene_src_file_path)
                 camera_location = camera_root
                 mya_camera_location = bsc_core.PthNodeOpt(camera_location).translate_to(pathsep).to_string()
                 mya_camera_group = mya_dcc_objects.Group(mya_camera_location)
                 if mya_camera_group.get_is_exists() is True:
-                    mya_fnc_builders.AssetBuilder(
+                    mya_fnc_objects.FncBuilderForAssetOld(
                         option=dict(
                             project=project,
                             asset=asset,
@@ -149,14 +149,14 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                             )
                     else:
                         raise RuntimeError(
-                            bsc_core.Log.trace_method_error(
+                            bsc_log.Log.trace_method_error(
                                 'camera scene create',
                                 u'obj="{}" is non-exists'.format(mya_root)
                             )
                         )
                 else:
                     raise RuntimeError(
-                        bsc_core.Log.trace_method_error(
+                        bsc_log.Log.trace_method_error(
                             'camera scene create',
                             u'obj="{}" is non-exists'.format(mya_camera_location)
                         )
@@ -193,14 +193,14 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         mya_root = bsc_core.PthNodeOpt(root).translate_to(pathsep).to_string()
 
-        mya_fnc_exporters.PreviewExporter(
-            file_path=preview_mov_file_path,
-            root=mya_root,
+        mya_fnc_objects.FncExporterForPreview(
             option=dict(
+                file=preview_mov_file_path,
+                root=mya_root,
                 use_render=False,
                 convert_to_dot_mov=True,
             )
-        ).set_run()
+        ).execute()
 
         create_review_link = self._hook_option_opt.get('create_review_link') or False
         if create_review_link is True:
@@ -210,10 +210,10 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             review_mov_file_path = review_mov_file_rsv_unit.get_result(
                 version=version
             )
-            preview_mov_file = utl_dcc_objects.OsFile(
+            preview_mov_file = bsc_dcc_objects.StgFile(
                 preview_mov_file_path
             )
-            review_mov_file = utl_dcc_objects.OsFile(review_mov_file_path)
+            review_mov_file = bsc_dcc_objects.StgFile(review_mov_file_path)
             if preview_mov_file.get_is_exists() is True:
                 if review_mov_file.get_is_exists() is False:
                     preview_mov_file.link_to(
@@ -240,7 +240,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         )
         scene_src_file_path = scene_src_file_rsv_unit.get_result(version=version)
         #
-        mya_fnc_builders.AssetBuilder(
+        mya_fnc_objects.FncBuilderForAssetOld(
             option=dict(
                 project=project,
                 asset=asset,
@@ -255,7 +255,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).set_run()
         mya_dcc_objects.Scene.save_to_file(scene_src_file_path)
 
-    def execute_asset_scene_src_create(self):
+    def do_create_asset_scene_src(self):
         rsv_scene_properties = self._rsv_scene_properties
         #
         project = rsv_scene_properties.get('project')
@@ -279,7 +279,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
         with_build = self._hook_option_opt.get_as_boolean('with_build')
         if with_build is True:
-            mya_fnc_builders.FncAssetBuilderNew(
+            mya_fnc_objects.FncBuilderForAssetNew(
                 option=dict(
                     # resource
                     project=self._rsv_task.get('project'),
@@ -324,8 +324,8 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 keyword=keyword_1
             )
             scene_file_path = scene_file_rsv_unit.get_result(version=version)
-            bsc_core.StgFileOpt(scene_file_path).create_directory()
-            bsc_core.StgPathLinkMtd.link_file_to(
+            bsc_storage.StgFileOpt(scene_file_path).create_directory()
+            bsc_storage.StgPathLinkMtd.link_file_to(
                 scene_src_file_path, scene_file_path
             )
 
@@ -399,7 +399,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
         else:
             raise RuntimeError(
-                bsc_core.Log.trace_method_error(
+                bsc_log.Log.trace_method_error(
                     key,
                     u'obj="{}" is non-exists'.format(mya_group.path)
                 )
@@ -441,7 +441,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             include_indices = all_indices[int(start_index):int(end_index)+1]
             bake_resolution = self._hook_option_opt.get('bake_resolution', as_integer=True)
             #
-            mya_fnc_exporters.TextureBaker(
+            mya_fnc_objects.TextureBaker(
                 option=dict(
                     directory=texture_directory_path_tgt,
                     location=root,
@@ -490,7 +490,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             #
             bake_resolution = self._hook_option_opt.get('bake_resolution', as_integer=True)
             #
-            mya_fnc_exporters.TextureBaker(
+            mya_fnc_objects.TextureBaker(
                 option=dict(
                     directory=texture_directory_path_tgt,
                     location=root,
@@ -529,18 +529,18 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version='latest'
         )
         if latest_work_scene_src_file_path:
-            if bsc_core.StgPathLinkMtd.get_is_link_source_to(
+            if bsc_storage.StgPathLinkMtd.get_is_link_source_to(
                     scene_file_path, latest_work_scene_src_file_path
             ) is False:
                 new_work_scene_src_file_path = work_scene_src_file_rsv_unit.get_result(
                     version='new'
                 )
                 #
-                utl_dcc_objects.OsFile(
+                bsc_dcc_objects.StgFile(
                     scene_file_path
                 ).link_to(new_work_scene_src_file_path)
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'preview work-scene-src link create',
                     u'link="{}" >> "{}" is exists'.format(
                         scene_file_path, latest_work_scene_src_file_path
@@ -550,7 +550,7 @@ class RsvDccSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             new_work_scene_src_file_path = work_scene_src_file_rsv_unit.get_result(
                 version='new'
             )
-            utl_dcc_objects.OsFile(
+            bsc_dcc_objects.StgFile(
                 scene_file_path
             ).link_to(new_work_scene_src_file_path)
 
@@ -627,9 +627,9 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
         )
         #
-        utl_dcc_objects.OsFile(
+        bsc_dcc_objects.StgFile(
             shot_scene_file_path
-        ).set_copy_to_file(
+        ).copy_to_file(
             asset_shot_scene_src_file_path
         )
 
@@ -696,10 +696,10 @@ class RsvDccShotSceneHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         reference_dict = mya_dcc_objects.References().get_reference_dict_()
         if namespace in reference_dict:
             namespace, root, obj = reference_dict[namespace]
-            obj.set_replace(file_path)
+            obj.do_replace(file_path)
         else:
             raise RuntimeError(
-                bsc_core.Log.trace_method_error(
+                bsc_log.Log.trace_method_error(
                     'usd export',
                     'namespace="{}" is non-exists'.format(namespace)
                 )

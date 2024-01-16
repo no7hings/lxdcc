@@ -4,10 +4,10 @@ import maya.cmds as cmds
 # noinspection PyUnresolvedReferences
 import maya.mel as mel
 
-from lxmaya import ma_ae
+from lxmaya.node_template import base as mya_node_template_base
 
 
-{{ 'class %s(ma_ae.AbsNodeTemplate):' | format(name) }}
+{{ 'class %s(mya_node_template_base.AbsNodeTemplate):' | format(name) }}
     def setup(self):
         self._create_dict = {}
         #

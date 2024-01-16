@@ -1,8 +1,12 @@
 # coding:utf-8
-from ._and_cor_configure import *
+# do not import wrap and startup to here
+from .configure import *
 
-from ._and_cor_base import *
+from .base import *
 
-from ._and_cor_texture import *
+from .texture import *
+
+from .stats_and_profile import *
+
 
 

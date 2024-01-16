@@ -11,15 +11,17 @@ import shutil
 
 import subprocess
 
-import lxbasic.log as bsc_log
-
 import lxcontent.core as ctt_core
 
+import lxbasic.log as bsc_log
+
+import lxbasic.storage as bsc_storage
+
 import lxbasic.core as bsc_core
+# universe
+from .. import core as unr_core
 
-import lxuniverse.core as unr_core
-
-from ..abstracts import base as unr_abs_base
+from . import base as unr_abs_base
 
 
 # obj/type/def
@@ -325,7 +327,7 @@ class AbsObjDagExtraDef(object):
 class AbsObjPortExtraDef(object):
     OBJ_TOKEN = None
     #
-    PORT_CLS = None
+    DCC_PORT_CLS = None
     PORT_STACK_CLS = None
 
     def _init_obj_port_extra_def_(self):
@@ -384,14 +386,14 @@ class AbsObjPortExtraDef(object):
     def generate_variant_port(self, type_args, port_path):
         return self.generate_port(type_args, port_path, unr_core.UnrPortAssign.VARIANTS)
 
-    def generate_input_port(self, type_args, port_path):
+    def create_input_port(self, type_args, port_path):
         return self.generate_port(type_args, port_path, unr_core.UnrPortAssign.INPUTS)
 
-    def generate_output_port(self, type_args, port_path):
+    def create_output_port(self, type_args, port_path):
         return self.generate_port(type_args, port_path, unr_core.UnrPortAssign.OUTPUTS)
 
     def _create_port_(self, type_args, port_path, port_assign):
-        port = self.PORT_CLS(
+        port = self.DCC_PORT_CLS(
             self, type_args, port_path, port_assign
         )
         return port
@@ -507,13 +509,13 @@ class AbsObjPortExtraDef(object):
         return self._port_stack.get_objects(regex=regex)
 
     def get_variant(self, port_path):
-        port_path = port_path.replace('/', self.PORT_CLS.PATHSEP)
+        port_path = port_path.replace('/', self.DCC_PORT_CLS.PATHSEP)
         port = self.get_variant_port(port_path)
         if port is not None:
             return port.get()
 
     def set_variant(self, port_path, raw):
-        port_path = port_path.replace('/', self.PORT_CLS.PATHSEP)
+        port_path = port_path.replace('/', self.DCC_PORT_CLS.PATHSEP)
         port = self.get_variant_port(port_path)
         if port:
             return port.set(raw)
@@ -856,16 +858,16 @@ class AbsObjStgExtraDef(object):
         return platform.system() == 'Windows'
 
     def _init_obj_storage_extra_def_(self):
-        self._root = bsc_core.StgBaseMtd.get_root(
+        self._root = bsc_storage.StgPathMtd.get_root(
             self.path
         )
 
     @classmethod
-    def create_symlink_fnc(cls, src_path, tgt_path):
-        tgt_dir_path = os.path.dirname(tgt_path)
-        src_rel_path = os.path.relpath(src_path, tgt_dir_path)
-        if os.path.exists(tgt_path) is False:
-            os.symlink(src_rel_path, tgt_path)
+    def create_symlink_fnc(cls, path_src, path_tgt):
+        tgt_dir_path = os.path.dirname(path_tgt)
+        src_rel_path = os.path.relpath(path_src, tgt_dir_path)
+        if os.path.exists(path_tgt) is False:
+            os.symlink(src_rel_path, path_tgt)
 
     @property
     def root_name(self):
@@ -933,13 +935,13 @@ class AbsObjStgExtraDef(object):
         return os.path.normpath(self.path) == os.path.normpath(file_path)
 
     def get_permission(self):
-        return bsc_core.StgBaseMtd.get_permission(self.path)
+        return bsc_storage.StgPathMtd.get_permission(self.path)
 
     def get_is_writable(self):
-        return bsc_core.StgBaseMtd.get_is_writable(self.path)
+        return bsc_storage.StgPathMtd.get_is_writable(self.path)
 
     def get_is_readable(self):
-        return bsc_core.StgBaseMtd.get_is_readable(self.path)
+        return bsc_storage.StgPathMtd.get_is_readable(self.path)
 
     def link_to(self, *args, **kwargs):
         pass
@@ -953,7 +955,7 @@ class AbsStgDirectory(
     # <obj-pathsep>
     PATHSEP = '/'
 
-    OS_FILE_CLS = None
+    STG_FILE_CLS = None
 
     def __init__(self, path):
         self._init_obj_dag_extra_def_(path)
@@ -967,7 +969,7 @@ class AbsStgDirectory(
         return self.__class__(path)
 
     def _get_child_paths_(self, path, includes=None):
-        return bsc_core.StgDirectoryMtd.get_directory_paths__(
+        return bsc_storage.StgDirectoryMtd.get_directory_paths__(
             path
         )
 
@@ -1009,7 +1011,7 @@ class AbsStgDirectory(
         raise NotImplementedError()
 
     def get_child_file_paths(self):
-        return bsc_core.StgDirectoryMtd.get_file_paths__(
+        return bsc_storage.StgDirectoryMtd.get_file_paths__(
             self.path
         )
 
@@ -1020,19 +1022,19 @@ class AbsStgDirectory(
             )
 
     def get_file_paths(self, ext_includes=None):
-        return bsc_core.StgDirectoryMtd.get_file_paths__(
+        return bsc_storage.StgDirectoryMtd.get_file_paths__(
             self.path, ext_includes
         )
 
     def get_files(self, ext_includes=None):
-        return [self.OS_FILE_CLS(i) for i in self.get_file_paths(ext_includes)]
+        return [self.STG_FILE_CLS(i) for i in self.get_file_paths(ext_includes)]
 
     def get_all_file_paths(self, ext_includes=None):
-        return bsc_core.StgDirectoryMtd.get_all_file_paths__(
+        return bsc_storage.StgDirectoryMtd.get_all_file_paths__(
             self.path, ext_includes
         )
 
-    def set_copy_to_directory(self, directory_path_tgt):
+    def copy_to_directory(self, directory_path_tgt):
         def copy_fnc_(src_file_path_, tgt_file_path_):
             shutil.copy2(src_file_path_, tgt_file_path_)
             bsc_log.Log.trace_method_result(
@@ -1068,7 +1070,7 @@ class AbsStgDirectory(
 
     def set_open(self):
         if self.get_path():
-            bsc_core.StgSystem.open_directory(self.get_path())
+            bsc_storage.StgSystem.open_directory(self.get_path())
 
     def __str__(self):
         return u'{}(path="{}")'.format(
@@ -1088,7 +1090,7 @@ class AbsStgFile(
     # dag
     PATHSEP = '/'
     # os
-    OS_DIRECTORY_CLS = None
+    STG_DIRECTORY_CLS = None
     #
     LOG = None
 
@@ -1108,7 +1110,7 @@ class AbsStgFile(
 
     # dag
     def create_dag_fnc(self, path):
-        return self.OS_DIRECTORY_CLS(path)
+        return self.STG_DIRECTORY_CLS(path)
 
     def _get_child_(self, path):
         raise RuntimeError(
@@ -1229,7 +1231,7 @@ class AbsStgFile(
             bsc_log.Log.trace_warning('file copy: source "{}" is Non-exist.'.format(self.path))
 
     def get_target_file_path(self, directory_path_tgt, fix_name_blank=False, ignore_structure=True, ext_override=None):
-        directory_path_tgt = bsc_core.StgPathOpt(directory_path_tgt).__str__()
+        directory_path_tgt = bsc_storage.StgPathOpt(directory_path_tgt).__str__()
         if ignore_structure is True:
             name = self.name
             if fix_name_blank is True:
@@ -1250,36 +1252,36 @@ class AbsStgFile(
     def create_directory(self):
         self.directory.set_create()
 
-    def set_delete(self):
+    def do_delete(self):
         if self.get_is_exists() is True:
             if self.get_is_writable() is True:
                 os.remove(self.path)
                 bsc_log.Log.trace_method_result(
                     'file delete',
-                    u'file="{}"'.format(self.path)
+                    'file="{}"'.format(self.path)
                 )
             else:
                 bsc_log.Log.trace_method_error(
                     'file delete',
-                    u'file="{}" is not writable'.format(self.path)
+                    'file="{}" is not writable'.format(self.path)
                 )
 
-    def set_copy_to_file(self, file_path_tgt, replace=False):
+    def copy_to_file(self, file_path_tgt, replace=False):
         if self.get_is_exists() is True:
             file_tgt = self.__class__(file_path_tgt)
             if replace is True:
-                if bsc_core.StgBaseMtd.get_is_exists(file_path_tgt) is True:
-                    if bsc_core.StgBaseMtd.get_is_writable(file_path_tgt) is True:
+                if bsc_storage.StgPathMtd.get_is_exists(file_path_tgt) is True:
+                    if bsc_storage.StgPathMtd.get_is_writable(file_path_tgt) is True:
                         os.remove(file_tgt.path)
                         shutil.copy2(self.path, file_tgt.path)
                         return True, bsc_log.Log.trace_method_result(
                             'file copy replace',
-                            u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
+                            'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
                         )
                     #
                     return False, bsc_log.Log.trace_method_error(
                         'file copy replace',
-                        u'file="{}" is not writable'.format(file_tgt.path)
+                        'file="{}" is not writable'.format(file_tgt.path)
                     )
             #
             if file_tgt.get_is_exists() is False:
@@ -1290,38 +1292,38 @@ class AbsStgFile(
                         shutil.copy2(self.path, file_path_tgt)
                         return True, bsc_log.Log.trace_method_result(
                             'file copy',
-                            u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
+                            'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
                         )
                     else:
-                        bsc_core.StgPathPermissionMtd.unlock(
+                        bsc_storage.StgPathPermissionMtd.unlock(
                             self.path
                         )
                         shutil.copy2(self.path, file_path_tgt)
                         return True, bsc_log.Log.trace_method_result(
                             'file copy',
-                            u'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
+                            'relation="{}" >> "{}"'.format(self.path, file_path_tgt)
                         )
                 except Exception:
                     bsc_core.ExceptionMtd.set_print()
                     return False, bsc_log.Log.trace_method_error(
                         'file copy',
-                        u'file="{}" is exception'.format(self.path)
+                        'file="{}" is exception'.format(self.path)
                     )
         return False, None
 
-    def set_copy_to_directory(self, directory_path_tgt, replace=False):
-        file_path_tgt = u'{}/{}'.format(
+    def copy_to_directory(self, directory_path_tgt, replace=False):
+        file_path_tgt = '{}/{}'.format(
             directory_path_tgt, self.name
         )
-        self.set_copy_to_file(
+        self.copy_to_file(
             file_path_tgt, replace=replace
         )
 
     def get_orig_file(self, ext):
         if self.ext == ext:
             base, ext = os.path.splitext(self.path)
-            glob_pattern = u'{}.*'.format(base)
-            _ = bsc_core.StgDirectoryMtd.find_file_paths(
+            glob_pattern = '{}.*'.format(base)
+            _ = bsc_storage.StgDirectoryMtd.find_file_paths(
                 glob_pattern
             )
             lis = []
@@ -1337,10 +1339,10 @@ class AbsStgFile(
         return self.ext == ext
 
     def __str__(self):
-        return u'{}(path="{}")'.format(
+        return '{}(path="{}")'.format(
             self.__class__.__name__,
-            self.path
-        ).encode('utf-8')
+            bsc_core.auto_encode(self.get_path())
+        )
 
     def __repr__(self):
         return self.__str__()

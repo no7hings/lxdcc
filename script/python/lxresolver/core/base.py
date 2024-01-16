@@ -3,8 +3,9 @@ import collections
 
 import parse
 
+import lxresource as bsc_resource
 
-import lxbasic.core as bsc_core
+import lxbasic.storage as bsc_storage
 
 
 class RsvConfigure(object):
@@ -26,9 +27,9 @@ class RsvConfigure(object):
     def get_raw(cls, scheme):
         raw = collections.OrderedDict()
         for i_key in cls.MainKeys:
-            i_file = bsc_core.ResourceConfigure.get_yaml('resolver/{}/{}'.format(scheme, i_key))
+            i_file = bsc_resource.RscExtendConfigure.get_yaml('resolver/{}/{}'.format(scheme, i_key))
             if i_file is not None:
-                i_raw = bsc_core.StgFileOpt(i_file).set_read() or {}
+                i_raw = bsc_storage.StgFileOpt(i_file).set_read() or {}
                 raw.update(i_raw)
         return raw
 
@@ -77,11 +78,8 @@ class RsvBase(object):
         if cls.RSV_ROOT is not None:
             return cls.RSV_ROOT
 
-        import lxresolver.objects as rsv_objects
+        from .. import objects as rsv_objects
+
         rsv_root = rsv_objects.RsvRoot()
         cls.RSV_ROOT = rsv_root
         return cls.RSV_ROOT
-
-
-if __name__ == '__main__':
-    print RsvConfigure.get_basic_raw()

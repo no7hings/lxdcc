@@ -7,14 +7,16 @@ import lxbasic.log as bsc_log
 
 import lxbasic.core as bsc_core
 
+import lxbasic.storage as bsc_storage
+
 import lxusd.core as usd_core
 
 import lxusd.dcc.dcc_operators as usd_dcc_operators
 
-from lxutil.fnc import utl_fnc_obj_abs
+import lxbasic.fnc.abstracts as bsc_fnc_abstracts
 
 
-class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+class GeometryUvMapExporter(bsc_fnc_abstracts.AbsFncOptionBase):
     OPTION = dict(
         file_0=None,
         file_1=None,
@@ -90,11 +92,11 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         #
         self._output_stage_opt.set_default_prim(self._root)
         # create directory
-        # bsc_core.StgFileOpt(self._file_path).create_directory()
+        # bsc_storage.StgFileOpt(self._file_path).create_directory()
         #
         self._output_stage_opt.export_to(self._file_path)
         #
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'fnc-geometry-usd-uv-map-export',
             u'file="{}"'.format(self._file_path)
         )
@@ -103,7 +105,7 @@ class GeometryUvMapExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self.set_uv_map_export()
 
 
-class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+class GeometryLookPropertyExporter(bsc_fnc_abstracts.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -222,7 +224,7 @@ class GeometryLookPropertyExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._usd_stage_opt_tgt.export_to(self._file_path)
 
 
-class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+class GeometryDisplayColorExporter(bsc_fnc_abstracts.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',
@@ -325,7 +327,7 @@ class GeometryDisplayColorExporter(utl_fnc_obj_abs.AbsFncOptionBase):
         self._usd_stage_opt_tgt.export_to(self._file_path)
 
 
-class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
+class GeometryDebugger(bsc_fnc_abstracts.AbsFncOptionBase):
     OPTION = dict(
         input_file='',
         output_file='',
@@ -356,7 +358,7 @@ class GeometryDebugger(utl_fnc_obj_abs.AbsFncOptionBase):
                     print i_input_mesh_opt.get_face_vertex_indices()
 
 
-class FncGeometryExporter(utl_fnc_obj_abs.AbsFncOptionBase):
+class FncGeometryExporter(bsc_fnc_abstracts.AbsFncOptionBase):
     OPTION = dict(
         file='',
         location='',

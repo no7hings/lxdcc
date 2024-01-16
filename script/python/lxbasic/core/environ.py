@@ -3,19 +3,19 @@ import sys
 
 import os
 
-from ..core import base as bsc_cor_base
+from . import base as bsc_cor_base
 
 
 class EnvBaseMtd(object):
-    TEMPORARY_ROOT_KEY = 'LYNXI_TEMPORARY_ROOT'
+    TEMPORARY_ROOT_KEY = 'PAPER_EXTEND_TEMPORARY_ROOT'
     TEMPORARY_ROOT_DEFAULT = '/l/resource/temporary/.lynxi'
-    #
-    DATABASE_PATH_KEY = 'LYNXI_DATABASE_PATH'
+
+    DATABASE_PATH_KEY = 'PAPER_EXTEND_DATABASE_PATH'
     DATABASE_PATH_DEFAULT = '/l/resource/database/.lynxi'
-    #
-    SESSION_ROOT_KEY = 'LYNXI_SESSION_ROOT'
+
+    SESSION_ROOT_KEY = 'PAPER_EXTEND_SESSION_ROOT'
     SESSION_ROOT_DEFAULT = '/l/resource/temporary/.lynxi'
-    #
+
     TRUE = 'true'
     FALSE = 'false'
 

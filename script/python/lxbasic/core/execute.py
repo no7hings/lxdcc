@@ -1,13 +1,13 @@
 # coding:utf-8
 import lxbasic.log as bsc_log
 
-from ..core import configure as bsc_cor_configure
+from . import configure as bsc_cor_configure
 
-from ..core import base as bsc_cor_base
+from . import base as bsc_cor_base
 
-from ..core import environ as bsc_cor_environ
+from . import environ as bsc_cor_environ
 
-from ..core import process as bsc_cor_process
+from . import process as bsc_cor_process
 
 
 class ExcBaseMtd(object):

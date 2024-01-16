@@ -6,16 +6,16 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccLookHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def set_asset_look_ass_export(self, force=False, texture_use_environ_map=True):
+    def do_export_asset_look_ass(self, force=False, texture_use_environ_map=True):
+        import lxbasic.log as bsc_log
+
         import lxbasic.core as bsc_core
 
-        from lxutil import utl_core
+        import lxbasic.dcc.objects as bsc_dcc_objects
 
-        import lxutil.dcc.dcc_objects as utl_dcc_objects
+        import lxmaya.fnc.objects as mya_fnc_objects
 
-        import lxmaya.fnc.exporters as mya_fnc_exporters
-
-        import lxmaya.dcc.dcc_objects as mya_dcc_objects
+        import lxmaya.dcc.objects as mya_dcc_objects
 
         force = False
 
@@ -60,9 +60,9 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         version=version, variants_extend=dict(look_pass=i_look_pass_name)
                     )
                 # main-file(s)
-                i_look_ass_file = utl_dcc_objects.OsFile(i_look_ass_file_path)
+                i_look_ass_file = bsc_dcc_objects.StgFile(i_look_ass_file_path)
                 if i_look_ass_file.get_is_exists() is False or force is True:
-                    mya_fnc_exporters.FncLookAssExporter(
+                    mya_fnc_objects.FncExporterForLookAss(
                         option=dict(
                             file=i_look_ass_file_path,
                             location=root,
@@ -70,15 +70,15 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
                     ).execute()
                 else:
-                    bsc_core.Log.trace_method_warning(
+                    bsc_log.Log.trace_method_warning(
                         'look-ass export',
-                        u'file="{}" is exists'.format(i_look_ass_file_path)
+                        'file="{}" is exists'.format(i_look_ass_file_path)
                     )
                 #
                 if start_frame is not None and end_frame is not None:
                     i_frame = start_frame, end_frame
                     #
-                    mya_fnc_exporters.FncLookAssExporter(
+                    mya_fnc_objects.FncExporterForLookAss(
                         option=dict(
                             file=i_look_ass_file_path,
                             location=root,
@@ -87,19 +87,19 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         )
                     ).execute()
         else:
-            bsc_core.Log.trace_method_error(
+            bsc_log.Log.trace_method_error(
                 'ass export',
                 'obj="{}" is non-exists'.format(mya_root.path)
             )
 
     def execute_asset_look_yml_export(self):
+        import lxbasic.log as bsc_log
+
         import lxbasic.core as bsc_core
 
-        from lxutil import utl_core
+        import lxmaya.fnc.objects as mya_fnc_objects
 
-        import lxmaya.fnc.exporters as mya_fnc_exporters
-
-        import lxmaya.dcc.dcc_objects as mya_dcc_objects
+        import lxmaya.dcc.objects as mya_dcc_objects
 
         rsv_scene_properties = self._rsv_scene_properties
 
@@ -125,7 +125,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version=version
             )
             #
-            mya_fnc_exporters.FncLookYamlExporter(
+            mya_fnc_objects.FncExporterForLookYml(
                 option=dict(
                     file=look_yml_file_path,
                     root=root,
@@ -133,7 +133,7 @@ class RsvDccLookHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
             ).execute()
         else:
-            bsc_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 'look-yml export',
                 'obj="{}" is non-exists'.format(root)
             )

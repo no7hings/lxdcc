@@ -3,6 +3,8 @@ import six
 
 import lxbasic.core as bsc_core
 
+import lxbasic.storage as bsc_storage
+
 import lxbasic.extra.abstracts as bsc_etr_abstracts
 
 
@@ -72,7 +74,7 @@ class EtrRv(bsc_etr_abstracts.AbsEtrRv):
                     default_kwargs['input'] = '"{}"'.format(input_)
 
         output = kwargs['output']
-        output_opt = bsc_core.StgFileOpt(output)
+        output_opt = bsc_storage.StgFileOpt(output)
         output_opt.create_directory()
         default_kwargs['output'] = output
         bsc_core.PrcBaseMtd.execute_with_result(

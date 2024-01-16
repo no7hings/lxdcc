@@ -6,13 +6,13 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvDccTextureHookOpt, self).__init__(rsv_scene_properties, hook_option_opt)
 
-    def execute_asset_render_texture_export(self):
-        import lxbasic.core as bsc_core
-        #
-        import lxmaya.fnc.exporters as mya_fnc_exporters
-        #
+    def do_export_asset_render_texture(self):
+        import lxbasic.storage as bsc_storage
+
+        import lxmaya.fnc.objects as mya_fnc_objects
+
         rsv_scene_properties = self._rsv_scene_properties
-        #
+
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
@@ -32,7 +32,7 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         texture_base_directory = texture_base_directory_rsv_unit.get_result(
             version=version
         )
-        bsc_core.StgPathPermissionMtd.create_directory(texture_base_directory)
+        bsc_storage.StgPathPermissionMtd.create_directory(texture_base_directory)
         #
         texture_directory_tgt_unit = self._rsv_task.get_rsv_unit(
             keyword=keyword_1
@@ -40,9 +40,9 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         texture_directory_path = texture_directory_tgt_unit.get_result(
             version=version
         )
-        bsc_core.StgPathPermissionMtd.create_directory(texture_directory_path)
+        bsc_storage.StgPathPermissionMtd.create_directory(texture_directory_path)
         #
-        mya_fnc_exporters.FncRenderTextureExporter(
+        mya_fnc_objects.FncExporterForRenderTexture(
             option=dict(
                 directory_base=texture_base_directory,
                 directory=texture_directory_path,
@@ -59,12 +59,12 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).execute()
 
     def execute_preview_texture_export(self):
-        import lxbasic.core as bsc_core
-        #
-        import lxmaya.fnc.exporters as mya_fnc_exporters
-        #
+        import lxbasic.storage as bsc_storage
+
+        import lxmaya.fnc.objects as mya_fnc_objects
+
         rsv_scene_properties = self._rsv_scene_properties
-        #
+
         workspace = rsv_scene_properties.get('workspace')
         version = rsv_scene_properties.get('version')
         root = rsv_scene_properties.get('dcc.root')
@@ -82,9 +82,9 @@ class RsvDccTextureHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         texture_directory_path = texture_directory_tgt_unit.get_result(
             version=version
         )
-        bsc_core.StgPathPermissionMtd.create_directory(texture_directory_path)
+        bsc_storage.StgPathPermissionMtd.create_directory(texture_directory_path)
 
-        mya_fnc_exporters.FncGeneralTextureExporter(
+        mya_fnc_objects.FncGeneralTextureExporter(
             option=dict(
                 directory=texture_directory_path,
                 location='/master',

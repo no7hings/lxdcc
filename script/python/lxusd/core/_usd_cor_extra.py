@@ -9,7 +9,11 @@ import fnmatch
 
 import os
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
 
 import lxuniverse.core as unr_core
 
@@ -27,13 +31,13 @@ class UsdBasic(object):
     def copy_with_references_fnc(cls, file_path_src, directory_tgt, replace=False):
         s = Usd.Stage.Open(file_path_src, Usd.Stage.LoadAll)
         layers = s.GetUsedLayers()
-        directory_src = bsc_core.StgFileOpt(file_path_src).get_directory_path()
+        directory_src = bsc_storage.StgFileOpt(file_path_src).get_directory_path()
         for i in layers:
             i_file_path_src = i.realPath
             if i_file_path_src:
                 i_name = i_file_path_src[len(directory_src)+1:]
                 i_file_path_tgt = '{}/{}'.format(directory_tgt, i_name)
-                bsc_core.StgFileOpt(i_file_path_src).set_copy_to_file(
+                bsc_storage.StgFileOpt(i_file_path_src).copy_to_file(
                     i_file_path_tgt, replace=replace
                 )
 
@@ -50,13 +54,13 @@ class UsdStageOpt(UsdBasic):
             elif isinstance(args[0], six.string_types):
                 file_path = args[0]
                 if os.path.isfile(file_path) is True:
-                    # bsc_core.Log.trace_method_result(
+                    # bsc_log.Log.trace_method_result(
                     #     self.KEY, 'open file is started: "{}"'.format(
                     #         file_path
                     #     )
                     # )
                     stage = self._open_file_(file_path)
-                    # bsc_core.Log.trace_method_result(
+                    # bsc_log.Log.trace_method_result(
                     #     self.KEY, 'open file is completed: "{}"'.format(
                     #         file_path
                     #     )
@@ -81,12 +85,12 @@ class UsdStageOpt(UsdBasic):
         root_layer = self._usd_stage.GetRootLayer()
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.append(file_path)
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'usd-layer-append',
                 u'file="{}"'.format(file_path)
             )
         else:
-            bsc_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 'usd-layer-append',
                 u'file="{}" is non-exist'.format(file_path)
             )
@@ -98,12 +102,12 @@ class UsdStageOpt(UsdBasic):
         root_layer = self._usd_stage.GetRootLayer()
         if os.path.isfile(file_path) is True:
             root_layer.subLayerPaths.insert(0, file_path)
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'usd-layer prepend',
                 u'file="{}"'.format(file_path)
             )
         else:
-            bsc_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 'usd-layer prepend',
                 u'file="{}" is non-exist'.format(file_path)
             )
@@ -112,7 +116,7 @@ class UsdStageOpt(UsdBasic):
         prim = self._usd_stage.GetPrimAtPath(path_text)
         self._usd_stage.SetDefaultPrim(prim)
         #
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'default-prim set',
             u'obj="{}"'.format(path_text)
         )
@@ -122,7 +126,7 @@ class UsdStageOpt(UsdBasic):
 
     def export_to(self, file_path):
         self._usd_stage.Export(file_path)
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'usd-export',
             u'file="{}"'.format(file_path)
         )
@@ -131,13 +135,13 @@ class UsdStageOpt(UsdBasic):
         # base, ext = os.path.splitext(file_path)
         # self._usd_stage.Export(base + '.usda')
         # #
-        # bsc_core.Log.trace_method_result(
+        # bsc_log.Log.trace_method_result(
         #     'usd-geometry-export',
         #     'file-path: "{}"'.format(file_path)
         # )
 
     def set_obj_create_as_override(self, path_text):
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'override-prim create',
             u'obj="{}"'.format(path_text)
         )
@@ -254,8 +258,8 @@ class UsdStageOpt(UsdBasic):
             )
 
     def set_copy_to_new_stage(self, file_path):
-        src_path = '/assets/chr/laohu_xiao'
-        tgt_path = '/master/hi'
+        path_src = '/assets/chr/laohu_xiao'
+        path_tgt = '/master/hi'
         #
         src_file_path = '/data/f/usd-cpy/test_src_1.usda'
         tgt_file_path = '/data/f/usd-cpy/test_tgt_3.usda'
@@ -263,12 +267,12 @@ class UsdStageOpt(UsdBasic):
         src_stage_opt = self.__class__(src_file_path)
         src_stage = src_stage_opt.usd_instance
         src_layer = src_stage.GetRootLayer()
-        src_obj = src_stage_opt.get_obj(src_path)
+        src_obj = src_stage_opt.get_obj(path_src)
         #
         tgt_stage_opt = self.__class__()
         tgt_stage = tgt_stage_opt.usd_instance
         tgt_layer = tgt_stage.GetRootLayer()
-        tgt_obj = tgt_stage_opt.create_obj(tgt_path)
+        tgt_obj = tgt_stage_opt.create_obj(path_tgt)
         tgt_stage_opt.set_default_prim(
             '/master'
         )
@@ -522,10 +526,10 @@ class UsdFileWriteOpt(object):
         self._usd_stage.DefinePrim(path, usd_cor_configure.UsdNodeTypes.Xform)
 
     def set_save(self):
-        file_opt = bsc_core.StgFileOpt(self._file_path)
+        file_opt = bsc_storage.StgFileOpt(self._file_path)
         file_opt.create_directory()
         self._usd_stage.Export(self._file_path)
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'usd-export',
             u'file="{}"'.format(self._file_path)
         )
@@ -937,35 +941,35 @@ class UsdGeometryOpt(UsdPrimOpt):
             UsdGeom.Tokens.inherited if boolean is True else UsdGeom.Tokens.invisible
         )
 
-    def create_primvar_as_point(self, port_path, values):
+    def create_primvar_as_point_as_uniform(self, port_path, values):
         p = self._usd_fnc.GetPrimvar(port_path)
         if not p:
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 Sdf.ValueTypeNames.Point3dArray,
-                UsdGeom.Tokens.constant
+                UsdGeom.Tokens.uniform
             )
 
         p.Set(Vt.Vec3fArray(values))
 
-    def create_primvar_as_float(self, port_path, values):
+    def create_primvar_as_float_as_uniform(self, port_path, values):
         p = self._usd_fnc.GetPrimvar(port_path)
         if not p:
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 Sdf.ValueTypeNames.FloatArray,
-                UsdGeom.Tokens.constant
+                UsdGeom.Tokens.uniform
             )
 
         p.Set(Vt.FloatArray(values))
 
-    def create_primvar_as_integer(self, port_path, values):
+    def create_primvar_as_integer_as_uniform(self, port_path, values):
         p = self._usd_fnc.GetPrimvar(port_path)
         if not p:
             p = self._usd_fnc.CreatePrimvar(
                 port_path,
                 Sdf.ValueTypeNames.IntArray,
-                UsdGeom.Tokens.constant
+                UsdGeom.Tokens.uniform
             )
 
         p.Set(Vt.IntArray(values))
@@ -1234,9 +1238,9 @@ class ImageOpt(object):
     def __init__(self, file_path):
         from PIL import Image
 
-        self.__is_udim = bsc_core.StgTextureMtd.get_is_udim(file_path)
+        self.__is_udim = bsc_storage.StgTextureMtd.get_is_udim(file_path)
 
-        unit_args = bsc_core.StgTextureMtd.get_udim_region_args(file_path)
+        unit_args = bsc_storage.StgTextureMtd.get_udim_region_args(file_path)
         if not unit_args:
             raise RuntimeError()
 
@@ -1585,7 +1589,7 @@ class UsdMeshOpt(UsdGeometryOpt):
 
         face_points = self.compute_face_points()
         kd_tree = NpKDTree(face_points)
-        bsc_core.Log.debug('generator KDTree: "{}"'.format(self.get_path()))
+        bsc_log.Log.debug('generator KDTree: "{}"'.format(self.get_path()))
         self.__cache[key] = kd_tree
         return kd_tree
 

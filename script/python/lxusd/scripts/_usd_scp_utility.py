@@ -1,9 +1,11 @@
 # coding:utf-8
 import copy
 
-from lxutil import utl_core
+import lxbasic.log as bsc_log
 
 import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
 
 import lxusd.core as usd_core
 
@@ -12,13 +14,14 @@ class ShotUsdCombine(object):
     def __init__(self, file_path_src, location):
         self._file_path_src = file_path_src
         self._location = location
+
     @classmethod
     def _get_tmp_file_(cls, file_path_src):
-        user_directory_path = bsc_core.StgTmpBaseMtd.get_user_directory('shot-usd-combine')
+        user_directory_path = bsc_storage.StgTmpBaseMtd.get_user_directory('shot-usd-combine')
         return '{}/{}.usda'.format(
             user_directory_path,
             bsc_core.TimestampOpt(
-                bsc_core.StgFileOpt(file_path_src).get_modify_timestamp()
+                bsc_storage.StgFileOpt(file_path_src).get_modify_timestamp()
             ).get_as_tag_36()
         )
 
@@ -35,7 +38,7 @@ class ShotUsdCombine(object):
 
         list_ = []
         cs = prim_opt.get_children()
-        with bsc_core.LogProcessContext.create_as_bar(maximum=len(cs), label='usd combine') as l_p:
+        with bsc_log.LogProcessContext.create_as_bar(maximum=len(cs), label='usd combine') as l_p:
             for i_prim in cs:
                 l_p.do_update()
                 #
@@ -46,29 +49,29 @@ class ShotUsdCombine(object):
                     i_path
                 )
                 if i_port is None:
-                    bsc_core.Log.trace_error(
+                    bsc_log.Log.trace_error(
                         'attribute="{}.fileName" is non-exists'.format(i_path)
                     )
                     continue
                 if i_port.Get() is None:
-                    bsc_core.Log.trace_error(
+                    bsc_log.Log.trace_error(
                         'attribute="{}.fileName" is non-data'.format(i_path)
                     )
                     continue
                 i_file_path = i_port.Get().resolvedPath
 
-                i_yaml_file_path = bsc_core.StgTmpYamlMtd.get_file_path(
+                i_yaml_file_path = bsc_storage.StgTmpYamlMtd.get_file_path(
                     i_file_path, 'usd-hierarchy-cacher'
                 )
-                i_yaml_file_opt = bsc_core.StgFileOpt(i_yaml_file_path)
+                i_yaml_file_opt = bsc_storage.StgFileOpt(i_yaml_file_path)
                 if i_yaml_file_opt.get_is_exists() is True:
                     i_list = i_yaml_file_opt.set_read()
-                    list_.extend([i_path + j for j in i_list])
+                    list_.extend([i_path+j for j in i_list])
                 else:
-                    i_file_path_ = bsc_core.StgFileMtdForMultiply.convert_to(
+                    i_file_path_ = bsc_storage.StgFileMtdForMultiply.convert_to(
                         i_file_path, ['*.####.{format}']
                     )
-                    i_file_tile_paths = bsc_core.StgFileMtdForMultiply.get_exists_unit_paths(
+                    i_file_tile_paths = bsc_storage.StgFileMtdForMultiply.get_exists_unit_paths(
                         i_file_path_
                     )
                     i_list = []
@@ -80,17 +83,17 @@ class ShotUsdCombine(object):
                     i_list_ = list(set(i_list))
                     i_list_.sort(key=i_list.index)
                     #
-                    bsc_core.StgFileOpt(i_yaml_file_path).set_write(
+                    bsc_storage.StgFileOpt(i_yaml_file_path).set_write(
                         i_list_
                     )
                     #
-                    list_.extend([i_path + j for j in i_list_])
+                    list_.extend([i_path+j for j in i_list_])
 
         file_write_opt = usd_core.UsdFileWriteOpt(file_path_tgt)
 
         file_write_opt.set_location_add(location)
 
-        with bsc_core.LogProcessContext.create_as_bar(maximum=len(list_), label='usd create') as l_p:
+        with bsc_log.LogProcessContext.create_as_bar(maximum=len(list_), label='usd create') as l_p:
             for i in list_:
                 l_p.do_update()
                 file_write_opt.set_obj_add(i)
@@ -104,6 +107,7 @@ class UsdMeshSubdiv(object):
         root_prefix_src='',
         root_prefix_tgt=''
     )
+
     def __init__(self, file_path_src, file_path_tgt, option=None):
         self._file_path_src = file_path_src
         self._file_path_tgt = file_path_tgt
@@ -111,6 +115,7 @@ class UsdMeshSubdiv(object):
         self._option = copy.copy(self.OPTION)
         if option is not None:
             self._option.update(option)
+
     @classmethod
     def _get_face_count_tuple_(cls, face_counts):
         list_ = []
@@ -119,10 +124,11 @@ class UsdMeshSubdiv(object):
         for i_key in keys:
             list_.append((i_key, face_counts.count(i_key)))
         return tuple(list_)
+
     @classmethod
     def _get_subdiv_face_count_(cls, face_count_tuple, subdiv_count):
         def rcs_fnc_(face_count_tuple_):
-            return ((4, sum([_i_key*_i_count for _i_key, _i_count in face_count_tuple_])), )
+            return ((4, sum([_i_key*_i_count for _i_key, _i_count in face_count_tuple_])),)
 
         face_count_tuple__ = face_count_tuple
         for i in range(subdiv_count):
@@ -153,7 +159,9 @@ class UsdMeshSubdiv(object):
                 i_face_count_tgt = dict_tgt[k]
                 if i_face_count_src != i_face_count_tgt:
                     for j_subdiv in range(1, 5):
-                        j_count_src = sum([j_c for j_k, j_c in self._get_subdiv_face_count_(i_face_count_src, j_subdiv)])
+                        j_count_src = sum(
+                            [j_c for j_k, j_c in self._get_subdiv_face_count_(i_face_count_src, j_subdiv)]
+                            )
                         j_count_tgt = sum([j_c for j_k, j_c in i_face_count_tgt])
                         if j_count_src == j_count_tgt:
                             dict_[k] = j_subdiv
@@ -186,6 +194,7 @@ class UsdMeshSubdiv(object):
 
 class UsdMeshCompare(object):
     OPTION = dict()
+
     def __init__(self, file_path_src, file_path_tgt, option=None):
         self._file_path_src = file_path_src
         self._file_path_tgt = file_path_tgt
@@ -220,9 +229,9 @@ class UsdMeshCompare(object):
         )
 
         # a_src = m_opt_src.get_face_vertex_indices()
-        # bsc_core.StgFileOpt('/data/f/usd_uv_map_export_test/a_0.yml').set_write(a_src)
+        # bsc_storage.StgFileOpt('/data/f/usd_uv_map_export_test/a_0.yml').set_write(a_src)
         # a_tgt = m_opt_tgt.get_face_vertex_indices()
-        # bsc_core.StgFileOpt('/data/f/usd_uv_map_export_test/a_1.yml').set_write(a_tgt)
+        # bsc_storage.StgFileOpt('/data/f/usd_uv_map_export_test/a_1.yml').set_write(a_tgt)
         print m_opt_src.get_face_vertices_as_uuid()
         print m_opt_tgt.get_face_vertices_as_uuid()
         print len(m_opt_src.get_face_vertex_counts())

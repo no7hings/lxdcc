@@ -7,9 +7,13 @@ import datetime
 
 import six
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
-import lxbasic.shotgun.core as bsc_stg_core
+import lxbasic.storage as bsc_storage
+
+import lxbasic.shotgun as bsc_shotgun
 
 import lxresolver.core as rsv_core
 
@@ -18,7 +22,7 @@ class RsvStgProjectOpt(object):
     def __init__(self, rsv_project):
         self._resolver = rsv_core.RsvBase.generate_root()
         self._rsv_project = rsv_project
-        self._stg_connector = bsc_stg_core.StgConnector()
+        self._stg_connector = bsc_shotgun.StgConnector()
 
     def get_default_light_rig_rsv_asset(self):
         properties = self._rsv_project.properties
@@ -81,7 +85,7 @@ class RsvStgProjectOpt(object):
 class RsvStgTaskOpt(object):
     def __init__(self, rsv_task):
         self._rsv_task = rsv_task
-        self._stg_connector = bsc_stg_core.StgConnector()
+        self._stg_connector = bsc_shotgun.StgConnector()
 
     def get_version_name(self, version):
         p = self._rsv_task.properties
@@ -103,8 +107,6 @@ class RsvStgTaskOpt(object):
         )
 
     def create_stg_task(self):
-        from lxutil import utl_core
-        #
         kwargs = self._rsv_task.properties.value
         #
         stg_project = self._stg_connector.get_stg_project(
@@ -129,12 +131,12 @@ class RsvStgTaskOpt(object):
                         **kwargs
                     )
             else:
-                bsc_core.Log.trace_method_error(
+                bsc_log.Log.trace_method_error(
                     'shotgun-entity create',
                     'step="{}" is non-exists.'.format(kwargs['step'])
                 )
         else:
-            bsc_core.Log.trace_method_error(
+            bsc_log.Log.trace_method_error(
                 'shotgun-entity create',
                 'project="{}" is non-exists.'.format(kwargs['project'])
             )
@@ -160,7 +162,7 @@ class RsvStgTaskOpt(object):
         stg_task_query = self._stg_connector.get_stg_task_query(
             **stg_version_kwargs
         )
-        stg_task_opt = bsc_stg_core.StgTaskOpt(stg_task_query)
+        stg_task_opt = bsc_shotgun.StgTaskOpt(stg_task_query)
         #
         stg_version_query = self._stg_connector.get_stg_version_query(
             **stg_version_kwargs
@@ -175,7 +177,7 @@ class RsvStgTaskOpt(object):
         # task set last version
         stg_task_opt.set_last_stg_version(stg_version_query.stg_obj)
         # version
-        stg_version_opt = bsc_stg_core.StgVersionOpt(stg_version_query)
+        stg_version_opt = bsc_shotgun.StgVersionOpt(stg_version_query)
         #
         version_rsv_unit = self._rsv_task.get_rsv_unit(
             keyword='{}-release-version-dir'.format(branch)
@@ -201,18 +203,18 @@ class RsvStgTaskOpt(object):
             stg_version_opt.set_stg_user(stg_user)
         #
         if movie_file:
-            movie_file_opt = bsc_core.StgFileOpt(movie_file)
+            movie_file_opt = bsc_storage.StgFileOpt(movie_file)
             if movie_file_opt.get_is_exists() is True:
                 stg_version_opt.upload_stg_movie(movie_file)
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'shotgun movie upload',
                     'file="{}" is non-exists'.format(movie_file)
                 )
         else:
             if not stg_version_opt.get_stg_movie():
                 f = '/l/resource/td/media_place_holder/no_prevew.mov'
-                f_opt = bsc_core.StgFileOpt(
+                f_opt = bsc_storage.StgFileOpt(
                     f
                 )
                 f_opt.map_to_current()

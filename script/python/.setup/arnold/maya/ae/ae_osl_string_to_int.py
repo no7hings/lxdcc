@@ -4,11 +4,11 @@ import maya.cmds as cmds
 # noinspection PyUnresolvedReferences
 import maya.mel as mel
 
-from lxmaya import ma_ae
+from lxmaya.node_template import base as mya_node_template_base
 
 
 # build by lynxi
-class osl_string_to_int(ma_ae.AbsNodeTemplate):
+class osl_string_to_int(mya_node_template_base.AbsNodeTemplate):
     def setup(self):
         self._create_dict = {}
         with self.scroll_layout():

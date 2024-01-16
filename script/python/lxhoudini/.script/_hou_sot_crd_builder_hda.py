@@ -32,10 +32,10 @@ class Command(object):
 
     def _set_raw_update_(self):
         subnet_dcc_path = self._subnet_dcc_path
-        file_plf_path = self._hou_obj.parm('file_path').eval()
+        file_path = self._hou_obj.parm('file_path').eval()
         self._build_dict = {}
-        if os.path.isdir(file_plf_path):
-            abc_file_paths = glob.glob('{}/*'.format(file_plf_path))
+        if os.path.isdir(file_path):
+            abc_file_paths = glob.glob('{}/*'.format(file_path))
             for abc_file_path in abc_file_paths:
                 file_name = os.path.basename(abc_file_path)
                 p_format = '{asset_name}__{asset_index}.abc'
@@ -59,7 +59,7 @@ class Command(object):
                     )
         else:
             hou.ui.displayMessage(
-                u'''error: "{}" is Non-exists'''.format(file_plf_path)
+                u'''error: "{}" is Non-exists'''.format(file_path)
             )
 
     def _set_obj_clear_(self):

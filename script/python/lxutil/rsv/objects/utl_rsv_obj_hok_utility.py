@@ -1,5 +1,9 @@
 # coding:utf-8
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
 
 from lxutil.rsv import utl_rsv_obj_abstract
 
@@ -15,10 +19,6 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     #
     def set_texture_recycles(self):
-        import lxbasic.core as bsc_core
-
-        from lxutil import utl_core
-
         directory_paths_src = self._hook_option_opt.get_as_array('recycles_texture_directories')
         if directory_paths_src:
             keyword = 'asset-source-texture-version-dir'
@@ -35,20 +35,20 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
             directory_path_src = directory_paths_src[0]
 
-            directory_path_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
+            directory_path_opt_src = bsc_storage.StgDirectoryOpt(directory_path_src)
             directory_path_opt_src.map_to_current()
             if directory_path_opt_src.get_is_exists() is True:
-                directory_path_opt_src.set_copy_to_directory(
+                directory_path_opt_src.copy_to_directory(
                     directory_path_tgt
                 )
-                bsc_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'asset texture recycles',
                     u'directory="{}" >> directory="{}"'.format(
                         directory_path_src, directory_path_tgt
                     )
                 )
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'asset texture recycles',
                     u'directory="{}" is non-exists'.format(
                         directory_path_src
@@ -56,23 +56,19 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_maya_recycles(self):
-        import lxbasic.core as bsc_core
+        import lxbasic.fnc.objects as bsc_fnc_objects
 
-        from lxutil import utl_core
+        import lxmaya.dcc.objects as mya_dcc_objects
 
-        import lxutil.fnc.exporters as utl_fnc_exporters
+        import lxmaya.core as mya_core
 
-        import lxmaya.dcc.dcc_objects as mya_dcc_objects
-
-        from lxmaya import ma_core
-
-        ma_core.set_stack_trace_enable(True)
+        mya_core.MyaUtil.set_stack_trace_enable(True)
 
         keyword_0 = 'asset-source-maya-scene-src-file'
         file_paths_src = self._hook_option_opt.get_as_array('recycles_maya_files')
         if file_paths_src:
             file_path_src = file_paths_src[0]
-            file_path_opt_src = bsc_core.StgFileOpt(file_path_src)
+            file_path_opt_src = bsc_storage.StgFileOpt(file_path_src)
             file_path_opt_src.map_to_current()
             if file_path_opt_src.get_is_exists() is True:
                 version = self._rsv_scene_properties.get('version')
@@ -84,14 +80,14 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     version=version
                 )
 
-                utl_fnc_exporters.DotMaExporter(
+                bsc_fnc_objects.FncExporterForDotMa(
                     option=dict(
                         file_path_src=file_path_src,
                         file_path_tgt=file_path_tgt
                     )
-                ).set_run()
+                ).execute()
 
-                bsc_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'asset maya recycles',
                     u'file="{}" '.format(
                         file_path_tgt
@@ -112,7 +108,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 if convert_maya_to_katana_enable is True:
                     self.set_maya_ass_export()
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'asset maya recycles',
                     u'file="{}" is non-exists'.format(
                         file_path_src
@@ -120,13 +116,9 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_xgen_recycles(self):
-        import lxbasic.core as bsc_core
+        import lxmaya.core as mya_core
 
-        from lxutil import utl_core
-
-        from lxmaya import ma_core
-
-        ma_core.set_stack_trace_enable(True)
+        mya_core.MyaUtil.set_stack_trace_enable(True)
 
         variant = 'outsource'
         version = self._rsv_scene_properties.get('version')
@@ -143,20 +135,20 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
             #
             directory_path_src = directory_paths_src[0]
-            directory_path_opt_src = bsc_core.StgDirectoryOpt(directory_path_src)
+            directory_path_opt_src = bsc_storage.StgDirectoryOpt(directory_path_src)
             directory_path_opt_src.map_to_current()
             if directory_path_opt_src.get_is_exists() is True:
-                directory_path_opt_src.set_copy_to_directory(
+                directory_path_opt_src.copy_to_directory(
                     directory_path_tgt
                 )
-                bsc_core.Log.trace_method_result(
+                bsc_log.Log.trace_method_result(
                     'asset xgen cache recycles',
                     u'directory="{}" >> directory="{}"'.format(
                         directory_path_src, directory_path_tgt
                     )
                 )
             else:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'asset xgen cache recycles',
                     u'directory="{}" is non-exists'.format(
                         directory_path_src
@@ -164,10 +156,6 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 )
 
     def set_sp_recycles(self):
-        import lxbasic.core as bsc_core
-
-        from lxutil import utl_core
-
         keyword = 'asset-source-sp-scene-src-dir'
         file_paths_src = self._hook_option_opt.get_as_array('recycles_sp_files')
         if file_paths_src:
@@ -181,20 +169,20 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version=version, variants_extend=dict(variant=variant)
             )
             for i_file_path_src in file_paths_src:
-                i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
+                i_file_path_opt_src = bsc_storage.StgFileOpt(i_file_path_src)
                 i_file_path_opt_src.map_to_current()
                 if i_file_path_opt_src.get_is_exists() is True:
-                    i_file_path_opt_src.set_copy_to_directory(
+                    i_file_path_opt_src.copy_to_directory(
                         directory_path_tgt
                     )
-                    bsc_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'asset sp recycles',
                         u'file="{}" >> directory="{}"'.format(
                             i_file_path_opt_src, directory_path_tgt
                         )
                     )
                 else:
-                    bsc_core.Log.trace_method_warning(
+                    bsc_log.Log.trace_method_warning(
                         'asset sp recycles',
                         u'file="{}" is non-exists'.format(
                             i_file_path_src
@@ -202,10 +190,6 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                     )
 
     def set_zb_recycles(self):
-        import lxbasic.core as bsc_core
-
-        from lxutil import utl_core
-
         keyword = 'asset-source-zbrush-scene-src-dir'
         file_paths_src = self._hook_option_opt.get_as_array('recycles_zb_files')
         if file_paths_src:
@@ -219,21 +203,21 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                 version=version, variants_extend=dict(variant=variant)
             )
             for i_file_path_src in file_paths_src:
-                i_file_path_opt_src = bsc_core.StgFileOpt(i_file_path_src)
+                i_file_path_opt_src = bsc_storage.StgFileOpt(i_file_path_src)
                 # map path to current platform first
                 i_file_path_opt_src.map_to_current()
                 if i_file_path_opt_src.get_is_exists() is True:
-                    i_file_path_opt_src.set_copy_to_directory(
+                    i_file_path_opt_src.copy_to_directory(
                         directory_path_tgt
                     )
-                    bsc_core.Log.trace_method_result(
+                    bsc_log.Log.trace_method_result(
                         'asset zb recycles',
                         u'file="{}" >> directory="{}"'.format(
                             i_file_path_opt_src, directory_path_tgt
                         )
                     )
                 else:
-                    bsc_core.Log.trace_method_warning(
+                    bsc_log.Log.trace_method_warning(
                         'asset zb recycles',
                         u'file="{}" is non-exists'.format(
                             i_file_path_src
@@ -242,15 +226,11 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     # maya
     def set_maya_xgen_repath(self):
-        import lxutil.fnc.exporters as utl_fnc_exporters
+        import lxbasic.fnc.objects as bsc_fnc_objects
 
-        import lxbasic.core as bsc_core
+        import lxmaya.core as mya_core
 
-        from lxutil import utl_core
-
-        from lxmaya import ma_core
-
-        ma_core.set_stack_trace_enable(True)
+        mya_core.MyaUtil.set_stack_trace_enable(True)
 
         variant = 'outsource'
         version = self._rsv_scene_properties.get('version')
@@ -283,12 +263,12 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version
         )
 
-        if bsc_core.StgDirectoryOpt(xgen_main_directory_path_tgt).get_is_exists() is False:
+        if bsc_storage.StgDirectoryOpt(xgen_main_directory_path_tgt).get_is_exists() is False:
             directory_path_0 = xgen_main_directory_rsv_unit_tgt.get_exists_result(
                 version='latest', variants_extend=dict(variant=variant)
             )
             if directory_path_0:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'asset xgen repath',
                     u'directory="{}" is not found, use "{}" instance'.format(
                         xgen_main_directory_path_tgt, directory_path_0
@@ -299,15 +279,15 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             else:
                 return False
 
-        e = utl_fnc_exporters.DotXgenExporter
+        e = bsc_fnc_objects.FncExporterForDotXgen
 
-        xgen_collection_file_paths = e._get_xgen_collection_file_paths_(
+        xgen_collection_file_paths = e._find_scene_xgen_collection_file_paths(
             maya_scene_file_path
         )
         for i_xgen_collection_file_path in xgen_collection_file_paths:
-            i_xgen_collection_name = e._get_xgen_collection_name_(i_xgen_collection_file_path)
+            i_xgen_collection_name = e._get_xgen_collection_name(i_xgen_collection_file_path)
 
-            e._set_xgen_collection_file_repath_(
+            e._repath_xgen_collection_file_to(
                 i_xgen_collection_file_path,
                 xgen_project_directory_path_tgt,
                 # convert to collection directory
@@ -316,15 +296,13 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             )
 
     def set_maya_texture_repath(self):
-        import lxutil.dcc.dcc_operators as utl_dcc_operators
+        import lxbasic.dcc.scripts as bsc_dcc_scripts
 
-        import lxmaya.dcc.dcc_objects as mya_dcc_objects
+        import lxmaya.dcc.objects as mya_dcc_objects
 
-        from lxutil import utl_core
+        import lxmaya.core as mya_core
 
-        from lxmaya import ma_core
-
-        ma_core.set_stack_trace_enable(True)
+        mya_core.MyaUtil.set_stack_trace_enable(True)
 
         keyword = 'asset-source-texture-dir'
 
@@ -339,33 +317,33 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version, variants_extend=dict(variant=variant)
         )
         if directory_path_tgt:
-            utl_dcc_operators.DccTexturesOpt(
+            bsc_dcc_scripts.ScpDccTextures(
                 mya_dcc_objects.TextureReferences(
                     option=dict(
                         with_reference=False
                     )
                 )
-            ).set_search_from_(
+            ).auto_search_from(
                 [
                     directory_path_tgt
                 ]
             )
         else:
-            bsc_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 'texture search',
                 'texture directory is not found'
             )
         #
-        utl_dcc_operators.DccTexturesOpt(
+        bsc_dcc_scripts.ScpDccTextures(
             mya_dcc_objects.TextureReferences(
                 option=dict(
                     with_reference=False
                 )
             )
-        ).set_tx_repath_to_orig()
+        ).auto_repath_tx_to_original()
 
     def set_maya_ass_export(self):
-        import lxmaya.fnc.exporters as mya_fnc_exporters
+        import lxmaya.fnc.objects as mya_fnc_objects
 
         keyword = 'asset-source-maya-ass-file'
 
@@ -382,7 +360,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version, variants_extend=dict(variant=variant)
         )
 
-        mya_fnc_exporters.FncLookAssExporter(
+        mya_fnc_objects.FncExporterForLookAss(
             option=dict(
                 file=ass_file_path,
                 location=root,
@@ -392,7 +370,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
     # katana
     def set_katana_create(self):
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        import lxkatana.dcc.objects as ktn_dcc_objects
 
         keyword = 'asset-source-katana-scene-src-file'
 
@@ -414,9 +392,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ktn_dcc_objects.Scene.save_to_file(katana_scene_src_file_path)
 
     def set_katana_load_workspace(self):
-        from lxutil import utl_core
-
-        import lxkatana.dcc.dcc_objects as ktn_dcc_objects
+        import lxkatana.dcc.objects as ktn_dcc_objects
 
         r = self._resolver
 
@@ -439,11 +415,11 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
 
             ms = [
                 (ktn_dcc_objects.Scene.import_from_file, (file_path,)),
-                (ktn_dcc_objects.AssetWorkspace().set_all_executes_run, ()),
-                (ktn_dcc_objects.AssetWorkspace().set_variables_registry, ())
+                (ktn_dcc_objects.AssetWorkspaceOld().set_all_executes_run, ()),
+                (ktn_dcc_objects.AssetWorkspaceOld().set_variables_registry, ())
             ]
 
-            with bsc_core.LogProcessContext.create(maximum=len(ms), label='execute workspace load method') as g_p:
+            with bsc_log.LogProcessContext.create(maximum=len(ms), label='execute workspace load method') as g_p:
                 for i_m, i_as in ms:
                     g_p.do_update()
                     if i_as:
@@ -452,7 +428,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
                         i_m()
 
     def set_katana_import_ass(self):
-        import lxkatana.fnc.importers as ktn_fnc_importers
+        import lxkatana.fnc.objects as ktn_fnc_objects
 
         keyword = 'asset-source-maya-ass-file'
 
@@ -466,7 +442,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             version=version, variants_extend=dict(variant=variant)
         )
 
-        ktn_fnc_importers.LookAssImporter(
+        ktn_fnc_objects.FncImporterForLookAssOld(
             option=dict(
                 file=ass_file_path,
                 location='/root/materials',
@@ -475,6 +451,7 @@ class RsvRecyclerHookOpt(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         ).set_run()
 
 
+# noinspection PyUnusedLocal
 class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
     def __init__(self, rsv_scene_properties, hook_option_opt=None):
         super(RsvVedioComposite, self).__init__(rsv_scene_properties, hook_option_opt)
@@ -483,10 +460,6 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         import itertools
 
         import collections
-
-        import lxbasic.core as bsc_core
-
-        from lxutil import utl_core
 
         rsv_scene_properties = self._rsv_scene_properties
 
@@ -526,8 +499,8 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
             for j_match in i_matchers:
                 j_option = {}
                 j_file_path = j_match['result']
-                j_file_opt = bsc_core.StgFileOpt(j_file_path)
-                i_f_name_new, i_numbers = bsc_core.StgFileMtdForMultiply.get_number_args(
+                j_file_opt = bsc_storage.StgFileOpt(j_file_path)
+                i_f_name_new, i_numbers = bsc_storage.StgFileMtdForMultiply.get_number_args(
                     j_file_opt.name, '*.%04d.exr'
                 )
                 i_f_new = '{}/{}'.format(j_file_opt.directory_path, i_f_name_new)
@@ -539,13 +512,13 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # resize use fit
         for k, i_v in dict_.items():
             i_f_src = k
-            i_f_opt_src = bsc_core.StgFileOpt(k)
+            i_f_opt_src = bsc_storage.StgFileOpt(k)
             i_f_tgt = '{}/resize/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
-            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_storage.StgFileOpt(i_f_tgt)
             i_v['image_resize'] = i_f_tgt
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.fit_to(i_f_src, i_f_tgt, (2048, 2048))
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'image resize',
                 u'file="{}"'.format(
                     i_f_tgt
@@ -555,13 +528,13 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         for k, i_v in dict_.items():
             i_name = i_v['name']
             i_f_src = k
-            i_f_opt_src = bsc_core.StgFileOpt(k)
+            i_f_opt_src = bsc_storage.StgFileOpt(k)
             i_f_tgt = '{}/background/{}.exr'.format(i_f_opt_src.directory_path, i_name)
-            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_storage.StgFileOpt(i_f_tgt)
             i_v['image_background'] = i_f_tgt
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.create_as_flat_color(i_f_tgt, (2048, 2048), (.25, .25, .25, 1))
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'image background create',
                 u'file="{}"'.format(
                     i_f_tgt
@@ -570,15 +543,15 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # add background
         for k, i_v in dict_.items():
             i_f_src = k
-            i_f_opt_src = bsc_core.StgFileOpt(k)
+            i_f_opt_src = bsc_storage.StgFileOpt(k)
             i_f_tgt = '{}/base/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
-            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_storage.StgFileOpt(i_f_tgt)
             i_v['image_base'] = i_f_tgt
             i_resize = i_v['image_resize']
             i_background = i_v['image_background']
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.over_by(i_resize, i_background, i_f_tgt, (0, 0))
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'image background add',
                 u'file="{}"'.format(
                     i_f_tgt
@@ -587,15 +560,15 @@ class RsvVedioComposite(utl_rsv_obj_abstract.AbsRsvObjHookOpt):
         # add foreground
         for k, i_v in dict_.items():
             i_f_src = k
-            i_f_opt_src = bsc_core.StgFileOpt(k)
+            i_f_opt_src = bsc_storage.StgFileOpt(k)
             i_f_tgt = '{}/final/{}'.format(i_f_opt_src.directory_path, i_f_opt_src.name)
-            i_f_opt_tgt = bsc_core.StgFileOpt(i_f_tgt)
+            i_f_opt_tgt = bsc_storage.StgFileOpt(i_f_tgt)
             i_v['image_final'] = i_f_tgt
             i_base = i_v['image_base']
             i_foreground = i_v['image_foreground']
             i_f_opt_tgt.create_directory()
             bsc_core.ImgOiioMtd.over_by(i_foreground, i_base, i_f_tgt, (0, 0))
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'image foreground add',
                 u'file="{}"'.format(
                     i_f_tgt

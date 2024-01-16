@@ -3,9 +3,7 @@ import fnmatch
 
 import re
 
-from ..core import raw as bsc_cor_raw
-
-from ..core import pattern as bsc_cor_pattern
+from . import raw as bsc_cor_raw
 
 
 class PthNodeMtd(object):
@@ -165,12 +163,14 @@ class PthNodeMtd(object):
         """
         return [cls.get_dag_name(x) for x in cls.find_dag_sibling_paths(path, paths, pathsep)]
 
+    # replace word to '_' unless it's "a-z, A-Z, 0-9"
     @classmethod
     def cleanup_dag_path(cls, path, pathsep='/'):
         return re.sub(
             ur'[^\u4e00-\u9fa5a-zA-Z0-9{}]'.format(pathsep), '_', path
         )
 
+    # leaf path is which path has no children
     @classmethod
     def to_leaf_paths(cls, paths):
         list_ = []
@@ -514,11 +514,11 @@ class PthPortOpt(object):
 
 class PthAttributeMtd(object):
     @classmethod
-    def get_atr_path(cls, obj_path, port_path, port_pathsep='.'):
+    def join_by(cls, obj_path, port_path, port_pathsep='.'):
         return port_pathsep.join([obj_path, port_path])
 
     @classmethod
-    def set_atr_path_split(cls, path, pathsep='.'):
+    def split_by(cls, path, pathsep='.'):
         _ = path.split(pathsep)
         return _[0], pathsep.join(_[1:])
 

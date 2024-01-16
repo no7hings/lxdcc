@@ -3,6 +3,8 @@ import lxbasic.log as bsc_log
 
 import lxbasic.core as bsc_core
 
+import lxbasic.storage as bsc_storage
+
 import lxbasic.extra.abstracts as bsc_etr_abstracts
 
 
@@ -41,9 +43,9 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def get_task_environs_extend(cls, project, resource, task):
-        import lxbasic.shotgun.core as bsc_stg_core
+        import lxbasic.shotgun as bsc_shotgun
 
-        c = bsc_stg_core.StgConnector()
+        c = bsc_shotgun.StgConnector()
         task_id = c.find_task_id(
             project=project,
             resource=resource,
@@ -63,8 +65,8 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
     @classmethod
     def get_task_environs_extend_(cls, **kwargs):
         if 'project' in kwargs:
-            import lxbasic.shotgun.core as bsc_stg_core
-            c = bsc_stg_core.StgConnector()
+            import lxbasic.shotgun as bsc_shotgun
+            c = bsc_shotgun.StgConnector()
             stg_task = c.find_stg_task(**kwargs)
             if stg_task:
                 task_id = stg_task['id']
@@ -114,7 +116,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
         package_data = rsv_project.get_package_data()
         cfg_file_path = package_data['application-configure-file'][platform]
         cfg_file_path = bsc_core.PtnParseMtd.update_variants(cfg_file_path, project=rsv_project.get_name())
-        data = bsc_core.StgFileOpt(cfg_file_path).set_read()
+        data = bsc_storage.StgFileOpt(cfg_file_path).set_read()
         if data:
             for i_app, i_data in data.items():
                 i_e_main = i_data.get('cmd')
@@ -224,12 +226,3 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
             'register dependency failed', 'module "cosmos" is not found'
         )
         return False
-
-
-if __name__ == '__main__':
-    print EtrBase.packages_completed_to(
-        ['lxdcc', 'arnold']
-    )
-    print EtrBase.get_base_command(
-        ['-- lxhook-command']
-    )

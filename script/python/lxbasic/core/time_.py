@@ -3,7 +3,7 @@ import time
 
 import datetime
 
-from ..core import raw as bsc_cor_raw
+from . import raw as bsc_cor_raw
 
 
 class TimeExtraMtd(object):
@@ -12,11 +12,11 @@ class TimeExtraMtd(object):
     DATA_TAG_FORMAT = '%Y_%m%d'
 
     @classmethod
-    def get_time_tag_36(cls, multiply=1):
+    def generate_time_tag_36(cls, multiply=1):
         return bsc_cor_raw.RawIntegerOpt(int(time.time()*multiply)).set_encode_to_36()
 
     @classmethod
-    def get_time_tag_36_(cls, multiply=1):
+    def generate_time_tag_36_(cls, multiply=1):
         s = time.time()
         y = time.localtime().tm_year
         m = time.localtime().tm_mon

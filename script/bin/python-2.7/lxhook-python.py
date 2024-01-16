@@ -45,9 +45,11 @@ def __print_help():
 
 
 def __execute_with_option(option):
+    import lxbasic.log as bsc_log
+
     import lxbasic.core as bsc_core
     #
-    bsc_core.Log.trace_method_result(
+    bsc_log.Log.trace_method_result(
         KEY,
         'execute from: {}'.format(__file__)
     )

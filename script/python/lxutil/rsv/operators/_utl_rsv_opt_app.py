@@ -3,6 +3,8 @@ import threading
 
 import functools
 
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
 
 import lxbasic.extra.methods as bsc_etr_methods
@@ -15,17 +17,18 @@ class AbsRsvAppOpt(object):
 
     @classmethod
     def _execute_command_(cls, cmd, **sub_progress_kwargs):
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'sub-process',
             'command=`{}` is started'.format(cmd.decode('utf-8'))
         )
         bsc_core.PrcBaseMtd.execute_with_result(
             cmd, **sub_progress_kwargs
         )
-        bsc_core.Log.trace_method_result(
+        bsc_log.Log.trace_method_result(
             'sub-process',
             'command=`{}` is completed'.format(cmd.decode('utf-8'))
         )
+
     @classmethod
     def _execute_command_use_thread_(cls, cmd, **sub_progress_kwargs):
         t_0 = threading.Thread(
@@ -79,7 +82,7 @@ class RsvMayaOpt(AbsRsvAppOpt):
         cmd = self._rsv_app.get_command(
             args_execute=[
                 '-- maya',
-                r'-command "python(\"import lxmaya.dcc.dcc_objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open_as_project(\\\"{}\\\")\")"'.format(
+                r'-command "python(\"import lxmaya.dcc.objects as mya_dcc_objects; mya_dcc_objects.Scene.set_file_open_as_project(\\\"{}\\\")\")"'.format(
                     file_path
                 )
             ],

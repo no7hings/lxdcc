@@ -1,12 +1,9 @@
 # coding:utf-8
-import functools
-import multiprocessing
+import lxbasic.log as bsc_log
 
-import lxbasic.core as bsc_core
+import lxbasic.storage as bsc_storage
 
 import lxusd.core as usd_core
-
-from lxutil import utl_core
 
 
 class ScpInstance(object):
@@ -31,7 +28,7 @@ class ScpInstance(object):
         mesh_prims = grow_usd_stage_opt.get_all_mesh_objs()
 
         cache_usd_opt = usd_core.UsdStageOpt()
-        with bsc_core.LogProcessContext.create_as_bar(maximum=len(mesh_prims), label='generator grow cache') as g_p:
+        with bsc_log.LogProcessContext.create_as_bar(maximum=len(mesh_prims), label='generator grow cache') as g_p:
             for i_seq, i_prim in enumerate(mesh_prims):
                 i_mesh_opt = usd_core.UsdMeshOpt(i_prim)
 
@@ -71,7 +68,7 @@ class ScpInstance(object):
 
         color_dict = {}
         instance_prims = instance_usd_stage_opt.get_all_instance_objs()
-        with bsc_core.LogProcessContext.create_as_bar(maximum=len(instance_prims), label='generator instance cache') as g_p:
+        with bsc_log.LogProcessContext.create_as_bar(maximum=len(instance_prims), label='generator instance cache') as g_p:
             for i_seq, i_instance_prim in enumerate(instance_prims):
                 i_instance_opt = usd_core.UsdInstancerOpt(i_instance_prim)
                 i_matched_point_p = cache_usd_opt.create_one(
@@ -87,14 +84,14 @@ class ScpInstance(object):
                     i_point_dict = {_j: _j_seq for _j_seq, _j in enumerate(i_points)}
                     i_points_remaining = {_j: _j_seq for _j_seq, _j in enumerate(i_points)}
 
-                    bsc_core.Log.trace_method_result(cls.KEY, 'start instance: "{}"'.format(i_instance_opt.get_path()))
-                    bsc_core.Log.trace_method_result(cls.KEY, 'point count: {}'.format(i_p_c))
+                    bsc_log.Log.trace_method_result(cls.KEY, 'start instance: "{}"'.format(i_instance_opt.get_path()))
+                    bsc_log.Log.trace_method_result(cls.KEY, 'point count: {}'.format(i_p_c))
                     for j_seq, j_mesh_prim in enumerate(mesh_prims):
                         if i_points_remaining:
                             j_prim_opt = usd_core.UsdPrimOpt(j_mesh_prim)
                             j_key = j_prim_opt.get_path()
                             j_mesh_opt = mesh_opt_dict[j_key]
-                            bsc_core.Log.trace_method_result(cls.KEY, 'start mesh: "{}"'.format(j_mesh_opt.get_path()))
+                            bsc_log.Log.trace_method_result(cls.KEY, 'start mesh: "{}"'.format(j_mesh_opt.get_path()))
 
                             j_mesh_face_extra = j_mesh_opt.generate_face_extra(uv_map_name)
                             j_face_points_kd_tree = j_mesh_opt.generate_face_points_kd_tree()
@@ -124,7 +121,7 @@ class ScpInstance(object):
 
                                     [i_points_remaining.pop(_k) for _k in j_points_closed]
                 else:
-                    bsc_core.Log.trace_method_warning(
+                    bsc_log.Log.trace_method_warning(
                         cls.KEY, 'instance is nested: "{}"'.format(i_instance_opt.get_path())
                     )
 
@@ -136,7 +133,7 @@ class ScpInstance(object):
 
                 g_p.do_update()
 
-        bsc_core.StgFileOpt(cache_json_file_path).set_write(
+        bsc_storage.StgFileOpt(cache_json_file_path).set_write(
             color_dict
         )
 
@@ -146,8 +143,8 @@ class ScpInstance(object):
 
 
 if __name__ == '__main__':
-    bsc_core.Log.DEBUG = True
-    bsc_core.Log.TEST = True
+    bsc_log.Log.DEBUG = True
+    bsc_log.Log.TEST = True
 
     # ScpInstance.generate_grow_cache(
     #     '/l/prod/cgm/work/assets/env/env_waterfall/srf/surfacing/maya/scenes/usd/env_waterfall_002.usd',

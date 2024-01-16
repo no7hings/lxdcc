@@ -21,20 +21,24 @@ import copy
 
 import threading
 
-import lxbasic.core as bsc_core
-
 import lxcontent.core as ctt_core
 
+import lxresource as bsc_resource
+
+import lxbasic.log as bsc_log
+
+import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
+
 import lxuniverse.abstracts as unr_abstracts
-
-import lxresolver.core as rsv_core
-
-THREAD_MAXIMUM = threading.Semaphore(1024)
-
-MATCH_CACHE = dict()
+# resolver
+from .. import core as rsv_core
 
 
 class RsvThread(threading.Thread):
+    THREAD_MAXIMUM = threading.Semaphore(1024)
+
     def __init__(self, fnc, *args, **kwargs):
         super(RsvThread, self).__init__()
         self._fnc = fnc
@@ -50,11 +54,11 @@ class RsvThread(threading.Thread):
         return self._data
 
     def run(self):
-        THREAD_MAXIMUM.acquire()
+        RsvThread.THREAD_MAXIMUM.acquire()
         self.set_data(
             self._fnc(*self._args, **self._kwargs)
         )
-        THREAD_MAXIMUM.release()
+        RsvThread.THREAD_MAXIMUM.release()
 
 
 class RsvConfigureOpt(object):
@@ -464,7 +468,7 @@ class AbsRsvMatcher(object):
         for i in keys:
             if i not in format_dict:
                 raise RuntimeError(
-                    bsc_core.Log.trace_method_error(
+                    bsc_log.Log.trace_method_error(
                         'path resolver',
                         'key "{}" in pattern "{}" is not value assigned'.format(
                             i,
@@ -696,11 +700,11 @@ class AbsRsvEntity(
 
     def _get_source_directory_is_enable(self):
         directory_path = self._get_source_directory_path()
-        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
+        return bsc_storage.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _open_source_directory(self):
         directory_path = self._get_source_directory_path()
-        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
+        bsc_storage.StgDirectoryOpt(directory_path).open_in_system()
 
     # user
     def _get_user_directory_path(self):
@@ -713,11 +717,11 @@ class AbsRsvEntity(
 
     def _get_user_directory_is_enable(self):
         directory_path = self._get_user_directory_path()
-        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
+        return bsc_storage.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _open_user_directory(self):
         directory_path = self._get_user_directory_path()
-        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
+        bsc_storage.StgDirectoryOpt(directory_path).open_in_system()
 
     # release
     def _get_release_directory_path(self):
@@ -729,11 +733,11 @@ class AbsRsvEntity(
 
     def _get_release_directory_is_enable(self):
         directory_path = self._get_release_directory_path()
-        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
+        return bsc_storage.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _open_release_directory(self):
         directory_path = self._get_release_directory_path()
-        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
+        bsc_storage.StgDirectoryOpt(directory_path).open_in_system()
 
     # temporary
     def _get_temporary_directory_path(self):
@@ -745,11 +749,11 @@ class AbsRsvEntity(
 
     def _get_temporary_directory_is_enable(self):
         directory_path = self._get_temporary_directory_path()
-        return bsc_core.StgDirectoryOpt(directory_path).get_is_exists()
+        return bsc_storage.StgDirectoryOpt(directory_path).get_is_exists()
 
     def _open_temporary_directory(self):
         directory_path = self._get_temporary_directory_path()
-        bsc_core.StgDirectoryOpt(directory_path).open_in_system()
+        bsc_storage.StgDirectoryOpt(directory_path).open_in_system()
 
     def get_rsv_project(self):
         return self._rsv_project
@@ -758,7 +762,7 @@ class AbsRsvEntity(
 
     @property
     def icon(self):
-        return bsc_core.ResourceIcon.get('file/folder')
+        return bsc_resource.RscExtendIcon.get('file/folder')
 
     def create_dag_fnc(self, path):
         return self.rsv_project.get_rsv_entity(path)
@@ -841,7 +845,7 @@ class AbsRsvUnit(AbsRsvEntity):
         result = self.get_result(*args, **kwargs)
         if result:
             if isinstance(result, six.string_types):
-                if bsc_core.StgBaseMtd.get_is_exists(result):
+                if bsc_storage.StgPathMtd.get_is_exists(result):
                     return result
             elif isinstance(result, (tuple, list)):
                 return result
@@ -1023,7 +1027,7 @@ class AbsRsvUnitVersion(AbsRsvEntity):
 
     def open_directory(self):
         if self._result:
-            bsc_core.StgPathOpt(self._result).open_in_system()
+            bsc_storage.StgPathOpt(self._result).open_in_system()
 
 
 class AbsRsvTaskVersion(AbsRsvEntity):
@@ -1060,15 +1064,15 @@ class AbsRsvTask(AbsRsvEntity):
 
     @property
     def icon(self):
-        return bsc_core.ResourceIcon.get('file/file')
+        return bsc_resource.RscExtendIcon.get('file/file')
 
     def get_work_scene_src_directory_open_menu_raw(self):
         def add_fnc_(application_):
             def get_directory_is_exists_fnc_():
-                return bsc_core.StgDirectoryOpt(_directory_path).get_is_exists()
+                return bsc_storage.StgDirectoryOpt(_directory_path).get_is_exists()
 
             def set_directory_open_fnc_():
-                bsc_core.StgDirectoryOpt(_directory_path).open_in_system()
+                bsc_storage.StgDirectoryOpt(_directory_path).open_in_system()
 
             #
             _branch = self.properties.get('branch')
@@ -1256,10 +1260,10 @@ class AbsRsvTask(AbsRsvEntity):
         # version use new for create
         directory_path = rsv_unit.get_result(version='new')
 
-        bsc_core.StgPathPermissionMtd.create_directory(
+        bsc_storage.StgPathPermissionMtd.create_directory(
             directory_path
         )
-        # bsc_core.StgPathPermissionMtd.change_owner(
+        # bsc_storage.StgPathPermissionMtd.change_owner(
         #
         # )
 
@@ -1308,7 +1312,7 @@ class AbsRsvResource(AbsRsvEntity):
 
     @property
     def icon(self):
-        return bsc_core.ResourceIcon.get('resolver/asset')
+        return bsc_resource.RscExtendIcon.get('resolver/asset')
 
     def get_rsv_steps(self, **kwargs):
         self._completion_kwargs_from_parent(self, kwargs)
@@ -1451,7 +1455,7 @@ class AbsRsvConfigureExtraDef(AbsRsvBaseDef):
         )
         if _:
             if rsv_core.WARNING_ENABLE is True:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'name check',
                     u'{}-name="{}" is not available'.format(entity_type, name)
                 )
@@ -1507,12 +1511,12 @@ class AbsRsvConfigureExtraDef(AbsRsvBaseDef):
     @staticmethod
     def _completion_rsv_entity_extend_create_kwargs(kwargs, result, kwargs_extend):
         update = bsc_core.TimePrettifyMtd.to_prettify_by_timestamp(
-            bsc_core.StgFileOpt(
+            bsc_storage.StgFileOpt(
                 result
             ).get_modify_timestamp(),
             language=1
         )
-        user = bsc_core.StgPathOpt(
+        user = bsc_storage.StgPathOpt(
             result
         ).get_user()
         #
@@ -1622,12 +1626,12 @@ class AbsRsvConfigureExtraDef(AbsRsvBaseDef):
         kwargs['category'] = rsv_category
         kwargs['type'] = entity_type
         kwargs['path'] = rsv_path
-        user = bsc_core.StgPathOpt(result).get_user()
+        user = bsc_storage.StgPathOpt(result).get_user()
         #
         kwargs['result'] = result
-        if bsc_core.StgFileOpt(result).get_is_exists() is True:
+        if bsc_storage.StgFileOpt(result).get_is_exists() is True:
             update = bsc_core.TimePrettifyMtd.to_prettify_by_timestamp(
-                bsc_core.StgFileOpt(
+                bsc_storage.StgFileOpt(
                     result
                 ).get_modify_timestamp(),
                 language=1
@@ -1928,7 +1932,7 @@ class AbsRsvProject(
 
     @property
     def icon(self):
-        return bsc_core.ResourceIcon.get('resolver/project')
+        return bsc_resource.RscExtendIcon.get('resolver/project')
 
     def get_all_workspaces(self):
         return self._rsv_properties.get(
@@ -2885,7 +2889,7 @@ class AbsRsvProject(
     def _project__add_rsv_entity(self, rsv_obj):
         self._rsv_obj_stack.set_object_add(rsv_obj)
         if rsv_core.RESULT_ENABLE is True:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'resolver',
                 '{}="{}"'.format(rsv_obj.type, rsv_obj.path)
             )
@@ -3010,10 +3014,37 @@ class AbsRsvProject(
             **create_kwargs
         )
         if not p_o.get_keys():
-            path = p_o.get_value()
-            bsc_core.StgPathPermissionMtd.create_directory(
-                path
-            )
+            stg_path = p_o.get_value()
+            if bsc_storage.StgFileMtd.get_is_exists(stg_path) is False:
+                bsc_storage.StgPathPermissionMtd.create_directory(
+                    stg_path
+                )
+
+    def auto_create_user_task_directory_by_task_data(self, task_data):
+        branch = self._guess_entity_type_force(**task_data)
+        variants_over = copy.copy(task_data)
+
+        user = bsc_core.SysBaseMtd.get_user_name()
+        variants_over['artist'] = user
+        keyword = '{branch}-user-task-dir'.format(branch=branch)
+
+        self._project__completion_main_rsv_matcher_variants(variants_over)
+
+        workspace = self._project__guess_workspace(keyword=keyword)
+        variants_over['workspace'] = workspace
+
+        ptn = self.get_pattern(keyword)
+        ptn_opt = bsc_core.PtnParseOpt(ptn)
+        ptn_opt.set_update(**variants_over)
+        if not ptn_opt.get_keys():
+            directory_path = ptn_opt.get_value()
+            if bsc_storage.StgPathMtd.get_is_exists(directory_path) is False:
+                bsc_storage.StgPathPermissionMtd.create_directory(
+                    directory_path, mode='755'
+                )
+                bsc_storage.StgPathPermissionMtd.change_owner(
+                    directory_path, user=user, group='artists'
+                )
 
     def __str__(self):
         return '{}(type="{}", path="{}")'.format(
@@ -3101,7 +3132,7 @@ class AbsRsvRoot(
 
     @property
     def icon(self):
-        return bsc_core.ResourceIcon.get('resolver/root')
+        return bsc_resource.RscExtendIcon.get('resolver/root')
 
     def create_dag_fnc(self, path):
         if path == self.path:
@@ -3191,7 +3222,7 @@ class AbsRsvRoot(
         obj_path = rsv_project.path
         self._rsv_project_stack.set_object_add(rsv_project)
         if rsv_core.RESULT_ENABLE is True:
-            bsc_core.Log.trace_method_result(
+            bsc_log.Log.trace_method_result(
                 'resolver',
                 u'{}="{}"'.format(obj_type, obj_path)
             )
@@ -3298,7 +3329,7 @@ class AbsRsvRoot(
             )
         else:
             if rsv_core.WARNING_ENABLE is True:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'project-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3312,7 +3343,7 @@ class AbsRsvRoot(
             )
         else:
             if rsv_core.WARNING_ENABLE is True:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'project-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3326,7 +3357,7 @@ class AbsRsvRoot(
             )
         else:
             if rsv_core.WARNING_ENABLE is True:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'project-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3349,7 +3380,7 @@ class AbsRsvRoot(
                     i_project_properties = i_rsv_matcher._generate_default_project_properties_by_result(file_path)
                     i_project = i_project_properties.get('project')
                     if rsv_core.RESULT_ENABLE is True:
-                        bsc_core.Log.trace_method_result(
+                        bsc_log.Log.trace_method_result(
                             'resolver project create',
                             'project-name="{}", create use "default"'.format(i_project)
                         )
@@ -3361,7 +3392,7 @@ class AbsRsvRoot(
             return _
         else:
             if rsv_core.WARNING_ENABLE is True:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'work-scene-src-file-resolver',
                     u'file="{}" is not available'.format(file_path)
                 )
@@ -3378,9 +3409,9 @@ class AbsRsvRoot(
             return _
         else:
             if rsv_core.WARNING_ENABLE is True:
-                bsc_core.Log.trace_method_warning(
+                bsc_log.Log.trace_method_warning(
                     'scene-src-file-resolver',
-                    u'file="{}" is not available'.format(file_path)
+                    'file="{}" is not available'.format(file_path)
                 )
         return None
 
@@ -3414,7 +3445,7 @@ class AbsRsvRoot(
         ]
         for method in methods:
             # noinspection PyArgumentList
-            result = method(bsc_core.StgPathOpt(file_path).get_path())
+            result = method(bsc_storage.StgPathOpt(file_path).get_path())
             if result is not None:
                 # print(';'.join(['{}={}'.format(k, v) for k, v in result.value.items() if isinstance(v, six.string_types)]))
                 return result

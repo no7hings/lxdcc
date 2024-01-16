@@ -3,15 +3,15 @@ import fnmatch
 
 import lxbasic.log as bsc_log
 
-from ..core import base as bsc_cor_base
+from lxbasic.storage import base as bsc_stg_base
 
-from ..core import raw as bsc_cor_raw
+from . import base as bsc_cor_base
 
-from ..core import storage as bsc_cor_storage
+from . import raw as bsc_cor_raw
 
-from ..core import pattern as bsc_cor_pattern
+from . import pattern as bsc_cor_pattern
 
-from ..core import process as bsc_cor_process
+from . import process as bsc_cor_process
 
 
 class PkgContextNew(object):
@@ -149,7 +149,7 @@ class PkgContextNew(object):
             package_roots += pre_release_package_roots
         package_file_patterns = self._get_package_file_patterns()
         for i_index, i_package_root in enumerate(package_roots):
-            if bsc_cor_base.StgBaseMtd.get_is_exists(i_package_root):
+            if bsc_stg_base.StgPathMtd.get_is_exists(i_package_root):
                 i_variants = dict(
                     root=i_package_root,
                     package_name=package_name
@@ -160,7 +160,7 @@ class PkgContextNew(object):
                     j_results = j_p_opt.get_exists_results()
                     if j_results:
                         for k_package_file in j_results:
-                            k_package_directory = bsc_cor_storage.StgFileMtd.get_directory(k_package_file)
+                            k_package_directory = bsc_stg_base.StgFileMtd.get_directory(k_package_file)
                             k_package_variants = j_p_opt.get_variants(k_package_file)
                             if 'version' not in k_package_variants:
                                 continue
@@ -192,7 +192,7 @@ class PkgContextNew(object):
             package_file_patterns = self._get_package_file_patterns()
             #
             for i_index, i_package_root in enumerate(package_roots):
-                if bsc_cor_base.StgBaseMtd.get_is_exists(i_package_root):
+                if bsc_stg_base.StgPathMtd.get_is_exists(i_package_root):
                     i_variants = dict(
                         root=i_package_root,
                         package_name=package_name
@@ -203,7 +203,7 @@ class PkgContextNew(object):
                         j_results = j_p_opt.get_exists_results()
                         if j_results:
                             for k_package_file in j_results:
-                                k_package_directory = bsc_cor_storage.StgFileMtd.get_directory(k_package_file)
+                                k_package_directory = bsc_stg_base.StgFileMtd.get_directory(k_package_file)
                                 k_package_variants = j_p_opt.get_variants(k_package_file)
                                 if 'version' not in k_package_variants:
                                     continue

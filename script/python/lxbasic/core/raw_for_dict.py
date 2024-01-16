@@ -5,7 +5,7 @@ import collections
 
 import lxcontent.core as ctt_core
 
-from ..core import raw as bsc_cor_raw
+from . import raw as bsc_cor_raw
 
 
 class DictMtd(object):

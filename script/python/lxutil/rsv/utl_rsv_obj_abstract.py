@@ -147,12 +147,11 @@ class AbsRsvObjHookOpt(object):
 
     def get_asset_exists_look_pass_names(self):
         import os
-        #
+
         import fnmatch
 
-        import lxbasic.core as bsc_core
+        import lxbasic.storage as bsc_storage
 
-        #
         rsv_scene_properties = self._rsv_scene_properties
         #
         step = rsv_scene_properties.get('step')
@@ -176,7 +175,7 @@ class AbsRsvObjHookOpt(object):
         )
 
         if file_path:
-            element_names = bsc_core.StgZipFileOpt(file_path).get_element_names()
+            element_names = bsc_storage.StgZipFileOpt(file_path).get_element_names()
             look_pass_names = [os.path.splitext(i)[0] for i in fnmatch.filter(element_names, '*.klf')]
             return look_pass_names
         return ['default']

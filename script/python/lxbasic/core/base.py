@@ -5,8 +5,6 @@ import sys
 
 import os
 
-import collections
-
 import six
 
 import getpass
@@ -33,7 +31,9 @@ import glob
 
 import socket
 
-from ..core import configure as bsc_cor_configure
+import collections
+
+from . import configure as bsc_cor_configure
 
 
 class SysPlatformMtd(object):
@@ -289,159 +289,16 @@ class SysBaseMtd(object):
         return sys.stderr.write(text+'\n')
 
 
-class StgPathMapDict(object):
-    def __init__(self, raw):
-        self._raw = raw
-        if SysBaseMtd.get_is_windows() is True:
-            p = 'windows'
-        elif SysBaseMtd.get_is_linux() is True:
-            p = 'linux'
-        else:
-            raise TypeError()
-        #
-        self._windows_dict = self._generate_mapper_dict('windows')
-        self._linux_dict = self._generate_mapper_dict('linux')
-        #
-        self._current_dict = self._generate_mapper_dict(p)
-
-    def __contains__(self, item):
-        return item in self._current_dict
-
-    def __getitem__(self, item):
-        return self._current_dict[item]
-
-    def _generate_mapper_dict(self, platform_):
-        dict_ = collections.OrderedDict()
-        raw_platform = self._raw[platform_]
-        for k, v in raw_platform.items():
-            for i in v:
-                dict_[i] = k
-        return dict_
-
-
-class StgEnvPathMapDict(object):
-    def __init__(self, raw):
-        self._raw = raw
-        if SysBaseMtd.get_is_windows() is True:
-            p = 'windows'
-        elif SysBaseMtd.get_is_linux() is True:
-            p = 'linux'
-        else:
-            raise TypeError()
-
-        self._path_dict = self._generate_path_dict(p)
-        self._env_dict = self._generate_env_dict(p)
-
-    def _generate_path_dict(self, platform_):
-        dict_ = collections.OrderedDict()
-        raw_platform = self._raw[platform_]
-        for k, v in raw_platform.items():
-            for i in v:
-                dict_[i] = k
-        return dict_
-
-    def _generate_env_dict(self, platform_):
-        dict_ = collections.OrderedDict()
-        raw_platform = self._raw[platform_]
-        for k, v in raw_platform.items():
-            dict_[k] = v[0]
-        return dict_
-
-
-class StgBasePathMapMtd(object):
-    PATHSEP = '/'
-    MAPPER = StgPathMapDict(
-        {
-            "windows": {
-                "L:": [
-                    "/l"
-                ],
-                "O:": [
-                    "/o"
-                ],
-                "Q:": [
-                    "/depts"
-                ],
-                "Z:": [
-                    "/production"
-                ],
-                "X:": [
-                    "/job"
-                ]
-            },
-            "linux": {
-                "/l": [
-                    "L:",
-                    "l:"
-                ],
-                "/o": [
-                    "O:",
-                    "o:"
-                ],
-                "/depts": [
-                    "Q:",
-                    "q:"
-                ],
-                "/production": [
-                    "Z:",
-                    "z:"
-                ],
-                "/job": [
-                    "X:",
-                    "x:"
-                ]
-            }
-        }
-    )
-
-    @classmethod
-    def map_to_current(cls, path):
-        if path is not None:
-            if SysBaseMtd.get_is_windows():
-                return cls.map_to_windows(path)
-            elif SysBaseMtd.get_is_linux():
-                return cls.map_to_linux(path)
-            return StgBaseMtd.clear_pathsep_to(path)
-        return path
-
-    @classmethod
-    def map_to_windows(cls, path):
-        # clear first
-        path = StgBaseMtd.clear_pathsep_to(path)
-        if StgBaseMtd.get_path_is_linux(path):
-            mapper_dict = cls.MAPPER._windows_dict
-            for i_root_src, i_root_tgt in mapper_dict.items():
-                if path == i_root_src:
-                    return i_root_tgt
-                elif path.startswith(i_root_src+cls.PATHSEP):
-                    return i_root_tgt+path[len(i_root_src):]
-            return path
-        return path
-
-    @classmethod
-    def map_to_linux(cls, path):
-        """
-        print Path.map_to_linux(
-            'l:/a'
-        )
-        :param path:
-        :return:
-        """
-        # clear first
-        path = StgBaseMtd.clear_pathsep_to(path)
-        if StgBaseMtd.get_path_is_windows(path):
-            mapper_dict = cls.MAPPER._linux_dict
-            for i_root_src, i_root_tgt in mapper_dict.items():
-                if path == i_root_src:
-                    return i_root_tgt
-                elif path.startswith(i_root_src+cls.PATHSEP):
-                    return i_root_tgt+path[len(i_root_src):]
-            return path
-        return path
-
-
 class StgBaseMtd(object):
     PATHSEP = '/'
+
+    @staticmethod
+    def get_platform_is_linux():
+        return platform.system() == 'Linux'
+
+    @staticmethod
+    def get_platform_is_windows():
+        return platform.system() == 'Windows'
 
     @classmethod
     def glob_fnc(cls, p_str):
@@ -449,7 +306,7 @@ class StgBaseMtd(object):
             p_str
         )
         if _:
-            if platform.system() == 'Windows':
+            if cls.get_platform_is_windows():
                 _ = map(lambda x: x.replace('\\', '/'), _)
             return _
         return []
@@ -563,7 +420,7 @@ class StgBaseMtd(object):
         if os.path.exists(path) is True:
             s = os.stat(path)
             uid = s.st_uid
-            if SysBaseMtd.get_is_linux():
+            if StgBaseMtd.get_platform_is_linux():
                 import pwd
 
                 try:
@@ -579,7 +436,7 @@ class StgBaseMtd(object):
         if os.path.exists(path) is True:
             stat_info = os.stat(path)
             gid = stat_info.st_gid
-            if SysBaseMtd.get_is_linux():
+            if StgBaseMtd.get_platform_is_linux():
                 import grp
 
                 group_name = grp.getgrgid(gid)[0]
@@ -657,6 +514,157 @@ class StgBaseMtd(object):
             v.sort(key=fs.index)
             list_.append('{}.{}'.format(k, v[0]))
         return list_
+
+
+class StgPathMapDict(object):
+    def __init__(self, raw):
+        self._raw = raw
+        if StgBaseMtd.get_platform_is_windows() is True:
+            p = 'windows'
+        elif StgBaseMtd.get_platform_is_linux() is True:
+            p = 'linux'
+        else:
+            raise TypeError()
+        #
+        self._windows_dict = self._generate_mapper_dict('windows')
+        self._linux_dict = self._generate_mapper_dict('linux')
+        #
+        self._current_dict = self._generate_mapper_dict(p)
+
+    def __contains__(self, item):
+        return item in self._current_dict
+
+    def __getitem__(self, item):
+        return self._current_dict[item]
+
+    def _generate_mapper_dict(self, platform_):
+        dict_ = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            for i in v:
+                dict_[i] = k
+        return dict_
+
+
+class StgEnvPathMapDict(object):
+    def __init__(self, raw):
+        self._raw = raw
+        if StgBaseMtd.get_platform_is_windows() is True:
+            p = 'windows'
+        elif StgBaseMtd.get_platform_is_linux() is True:
+            p = 'linux'
+        else:
+            raise TypeError()
+
+        self._path_dict = self._generate_path_dict(p)
+        self._env_dict = self._generate_env_dict(p)
+
+    def _generate_path_dict(self, platform_):
+        dict_ = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            for i in v:
+                dict_[i] = k
+        return dict_
+
+    def _generate_env_dict(self, platform_):
+        dict_ = collections.OrderedDict()
+        raw_platform = self._raw[platform_]
+        for k, v in raw_platform.items():
+            dict_[k] = v[0]
+        return dict_
+
+
+class StgBasePathMapMtd(object):
+    PATHSEP = '/'
+    MAPPER = StgPathMapDict(
+        {
+            "windows": {
+                "L:": [
+                    "/l"
+                ],
+                "O:": [
+                    "/o"
+                ],
+                "Q:": [
+                    "/depts"
+                ],
+                "Z:": [
+                    "/production"
+                ],
+                "X:": [
+                    "/job"
+                ]
+            },
+            "linux": {
+                "/l": [
+                    "L:",
+                    "l:"
+                ],
+                "/o": [
+                    "O:",
+                    "o:"
+                ],
+                "/depts": [
+                    "Q:",
+                    "q:"
+                ],
+                "/production": [
+                    "Z:",
+                    "z:"
+                ],
+                "/job": [
+                    "X:",
+                    "x:"
+                ]
+            }
+        }
+    )
+
+    @classmethod
+    def map_to_current(cls, path):
+        if path is not None:
+            if StgBaseMtd.get_platform_is_windows():
+                return cls.map_to_windows(path)
+            elif StgBaseMtd.get_platform_is_linux():
+                return cls.map_to_linux(path)
+            return StgBaseMtd.clear_pathsep_to(path)
+        return path
+
+    @classmethod
+    def map_to_windows(cls, path):
+        # clear first
+        path = StgBaseMtd.clear_pathsep_to(path)
+        if StgBaseMtd.get_path_is_linux(path):
+            mapper_dict = cls.MAPPER._windows_dict
+            for i_root_src, i_root_tgt in mapper_dict.items():
+                if path == i_root_src:
+                    return i_root_tgt
+                elif path.startswith(i_root_src+cls.PATHSEP):
+                    return i_root_tgt+path[len(i_root_src):]
+            return path
+        return path
+
+    @classmethod
+    def map_to_linux(cls, path):
+        """
+        print Path.map_to_linux(
+            'l:/a'
+        )
+        :param path:
+        :return:
+        """
+        # clear first
+        path = StgBaseMtd.clear_pathsep_to(path)
+        if StgBaseMtd.get_path_is_windows(path):
+            mapper_dict = cls.MAPPER._linux_dict
+            for i_root_src, i_root_tgt in mapper_dict.items():
+                if path == i_root_src:
+                    return i_root_tgt
+                elif path.startswith(i_root_src+cls.PATHSEP):
+                    return i_root_tgt+path[len(i_root_src):]
+            return path
+        return path
 
 
 class HashMtd(object):
@@ -761,12 +769,13 @@ class ExceptionMtd(object):
         #
         exc_type, exc_value, exc_stack = sys.exc_info()
         exc_texts = []
-        # value = '{}: "{}"'.format(exc_type.__name__, repr(exc_value))
+        value = '{}: "{}"'.format(exc_type.__name__, repr(exc_value))
         for seq, stk in enumerate(traceback.extract_tb(exc_stack)):
             i_file_path, i_line, i_fnc, i_fnc_line = stk
             exc_texts.append(
                 '    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
+        exc_texts.append(value)
         if exc_texts:
             sys.stdout.write('\n'.join(exc_texts)+'\n')
 
@@ -785,8 +794,8 @@ class ExceptionMtd(object):
             exc_texts.append(
                 u'    file "{}" line {} in {}\n        {}'.format(i_file_path, i_line, i_fnc, i_fnc_line)
             )
-            #
-            exc_texts.append(value)
+
+        exc_texts.append(value)
         return '\n'.join(exc_texts)
 
     @classmethod

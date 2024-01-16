@@ -3,7 +3,7 @@ import os
 
 import lxbasic.log as bsc_log
 
-from ..core import base as bsc_cor_base
+from . import base as bsc_cor_base
 
 
 class UrlMtd(object):

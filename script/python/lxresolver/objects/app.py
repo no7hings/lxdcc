@@ -1,5 +1,6 @@
 # coding:utf-8
-import lxresolver.abstracts as rsv_abstracts
+# resolver
+from .. import abstracts as rsv_abstracts
 
 
 class RsvAppDefault(rsv_abstracts.AbsRsvAppDefault):

@@ -880,10 +880,20 @@ class RawStrUnderlineOpt(object):
     def __init__(self, string):
         self.__raw = string
 
-    def to_prettify(self, capitalize=True):
+    def to_prettify(self, capitalize=True, word_count_limit=None):
         if capitalize is True:
-            return ' '.join([i if i.isupper() else i.capitalize() for i in self.__raw.split('_')])
-        return ' '.join([i if i.isupper() else i.lower() for i in self.__raw.split('_')])
+            _ = ' '.join([i if i.isupper() else i.capitalize() for i in self.__raw.split('_')])
+            if isinstance(word_count_limit, int):
+                c = len(_)
+                if c >= word_count_limit+3:
+                    return '{}...'.format(_[:word_count_limit])
+            return _
+        _ = ' '.join([i if i.isupper() else i.lower() for i in self.__raw.split('_')])
+        if isinstance(word_count_limit, int):
+            c = len(_)
+            if c >= word_count_limit+3:
+                return '{}...'.format(_[:word_count_limit])
+        return _
 
     def to_camelcase(self):
         return re.sub(r'_(\w)', lambda x: x.group(1).upper(), self.__raw)

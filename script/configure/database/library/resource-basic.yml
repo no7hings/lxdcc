@@ -161,6 +161,13 @@ option:
                 entity_type: 'tag'
                 options: {kind: 'resource-file-tag', group: '<....key>'}
                 names: ['fbx', 'abc', 'usd']
+    #
+    tag_group_includes: [
+        '/color', '/environment', '/state', '/orientation', '/descriptive', '/theme',
+        '/resolution',
+        '/favorite',
+        '/texture', '/geometry'
+    ]
 #
 patterns:
     root-dir: '{root}'
@@ -205,8 +212,13 @@ patterns:
     # hdri
     hdri-dir: '<.version-dir>/hdri'
     hdri-original-dir: '<.hdri-dir>/original'
+    #   src
     hdri-original-src-dir: '<.hdri-original-dir>/src'
     hdri-original-src-file: '<.hdri-original-src-dir>/{resource}.{format}'
+    #   jpg
+    hdri-original-jpg-dir: '<.hdri-original-dir>/jpg'
+    hdri-original-jpg-file: '<.hdri-original-jpg-dir>/{resource}.jpg'
+    #   tx
     hdri-acescg-tx-dir: '<.hdri-acescg-dir>/tx'
     hdri-acescg-tx-file: '<.hdri-acescg-tx-dir>/{resource}.tx'
     #
@@ -262,6 +274,10 @@ storages:
     hdri_original_src_directory:
         kind: directory
         keyword: 'hdri-original-src-dir'
+
+    hdri_original_jpg_directory:
+        kind: directory
+        keyword: 'hdri-original-jpg-dir'
 
     hdri_acescg_src_directory:
         kind: directory

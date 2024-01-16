@@ -7,7 +7,7 @@ import collections
 
 import re
 
-from ..core import raw as bsc_cor_raw
+from . import raw as bsc_cor_raw
 
 
 class ArgDictStringMtd(object):

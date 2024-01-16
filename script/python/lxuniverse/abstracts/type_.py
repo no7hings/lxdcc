@@ -1,7 +1,7 @@
 # coding:utf-8
 import six
-
-import lxuniverse.core as unr_core
+# universe
+from .. import core as unr_core
 
 
 # type/def

@@ -1,5 +1,9 @@
 # coding:utf-8
+import lxbasic.log as bsc_log
+
 import lxbasic.core as bsc_core
+
+import lxbasic.storage as bsc_storage
 
 import lxusd.core as usd_core
 
@@ -9,7 +13,7 @@ class UsdScpForClarisseCleanup(object):
 
     def __init__(self, file_path):
         self._file_path = file_path
-        f_o = bsc_core.StgFileOpt(self._file_path)
+        f_o = bsc_storage.StgFileOpt(self._file_path)
         self._file_path_out = '{}.fix{}'.format(
             f_o.path_base, f_o.ext
         )
@@ -33,7 +37,7 @@ class UsdScpForClarisseCleanup(object):
         marks = []
         prims = self._stage_opt.get_all_objs()
         c = len(prims)
-        with bsc_core.LogProcessContext.create(maximum=c, label='transfer process') as g_p:
+        with bsc_log.LogProcessContext.create(maximum=c, label='transfer process') as g_p:
             for i_prim in prims:
                 i_prim_opt = usd_core.UsdPrimOpt(i_prim)
                 if self.__filter_fnc(marks, i_prim_opt.get_path()) is True:
@@ -189,7 +193,10 @@ class UsdScpForClarisseCleanup(object):
             translates = opt.get('positions')
             if not translates:
                 translates = usd_core.Vt.QuathArray([usd_core.Gf.Vec3f((0, 0, 0))]*c)
-            opt.create_primvar_as_point('ist_translate', translates)
+            opt.create_primvar_as_point_as_uniform(
+                'ist_translate',
+                translates
+            )
 
             # rotate
             orientations = opt.get('orientations')
@@ -203,31 +210,31 @@ class UsdScpForClarisseCleanup(object):
                 if i_geometry is not None:
                     dimensions.append(usd_core.Gf.Vec3f(*i_geometry[2]))
                 else:
-                    dimensions.append(usd_core.Gf.Vec3f(0, 0))
+                    dimensions.append(usd_core.Gf.Vec3f(0, 0, 0))
 
-            opt.create_primvar_as_point(
+            opt.create_primvar_as_point_as_uniform(
                 'ist_dimensions', dimensions
             )
-            opt.create_primvar_as_point(
+            opt.create_primvar_as_point_as_uniform(
                 'ist_rotate', map(lambda x: tuple(usd_core.UsdQuaternion(x).to_rotate()), orientations)
             )
-            opt.create_primvar_as_point(
+            opt.create_primvar_as_point_as_uniform(
                 'ist_axis', map(lambda x: tuple(usd_core.UsdQuaternion(x).to_axis()), orientations)
             )
-            opt.create_primvar_as_float(
+            opt.create_primvar_as_float_as_uniform(
                 'ist_angle', map(lambda x: usd_core.UsdQuaternion(x).to_angle(), orientations)
             )
             # scale
             scales = opt.get('scales')
             if not scales:
                 scales = usd_core.Vt.Vec3fArray([usd_core.Gf.Vec3f((1, 1, 1))]*c)
-            opt.create_primvar_as_point('ist_scale', scales)
+            opt.create_primvar_as_point_as_uniform('ist_scale', scales)
             # id
             proto_indices = opt.get('protoIndices')
-            opt.create_primvar_as_integer('ist_id', range(len(proto_indices)))
+            opt.create_primvar_as_integer_as_uniform('ist_id', range(len(proto_indices)))
             return opt.create_child('protos', 'Xform')
         else:
-            bsc_core.Log.trace_method_warning(
+            bsc_log.Log.trace_method_warning(
                 self.KEY, 'instance error: proto is not found for "{}"'.format(opt.get_path())
             )
 
@@ -352,9 +359,10 @@ class UsdScpForClarisseCleanup(object):
 
 if __name__ == '__main__':
     cc = UsdScpForClarisseCleanup(
-        '/data/f/clarisse_usd_convert/plants.test.usda'
+        '/l/prod/cgm/work/assets/env/env_waterfall/srf/surfacing/clarisse/plants_047_test.usd'
+        # '/data/f/clarisse_usd_convert/plants.test.usda'
         # '/data/f/clarisse_usd_convert/plants_039.usd'
         # '/data/f/clarisse_usd_convert/plants.v001.test.usda'
     )
     cc.transfer()
-    cc.save_as_usda()
+    cc.save_as_usd()

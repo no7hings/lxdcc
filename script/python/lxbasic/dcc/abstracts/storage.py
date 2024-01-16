@@ -1079,7 +1079,7 @@ class AbsStgTexture(
                 )
             # other use oiio
             else:
-                return bsc_core.ImgOiioMtd.generate_create_cmd_as_ext_tgt(
+                return bsc_storage.ImgOiioMtd.generate_create_cmd_as_ext_tgt(
                     file_path_src,
                     ext_tgt,
                     search_directory_path,
@@ -1091,12 +1091,12 @@ class AbsStgTexture(
         path_base, ext_any = os.path.splitext(file_path)
         if ext_any != cls.JPG_EXT:
             if cls._get_unit_is_exists_as_ext_tgt_(file_path, ext_tgt=cls.JPG_EXT) is False:
-                return bsc_core.ImgOiioOptForThumbnail(file_path).generate_as_jpg(width=2048, block=block)
+                return bsc_storage.ImgOiioOptForThumbnail(file_path).generate_as_jpg(width=2048, block=block)
         return True
 
     @classmethod
     def _generate_unit_jpg_create_cmd(cls, file_path_src, file_path_tgt, use_update_mode=True):
-        return bsc_core.ImgOiioMtd.generate_create_cmd_as_ext_tgt_(
+        return bsc_storage.ImgOiioMtd.generate_create_cmd_as_ext_tgt_(
             file_path_src, file_path_tgt, use_update_mode
         )
 
@@ -1417,7 +1417,7 @@ class AbsStgTexture(
         _ = self._get_exists_file_paths_(self._path)
         if _:
             file_path = _[0]
-            return bsc_core.ImgOiioOptForThumbnail(
+            return bsc_storage.ImgOiioOptForThumbnail(
                 file_path
             ).generate_thumbnail()
 
@@ -1428,4 +1428,4 @@ class AbsStgTexture(
         pass
 
     def get_info(self):
-        return bsc_core.ImgOiioOpt(self.path).info
+        return bsc_storage.ImgOiioOpt(self.path).info

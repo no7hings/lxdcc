@@ -3,15 +3,15 @@ import fnmatch
 
 import lxbasic.log as bsc_log
 
-from lxbasic.storage import base as bsc_stg_base
+from lxbasic.core import base as bsc_cor_base
 
-from . import base as bsc_cor_base
+from lxbasic.core import raw as bsc_cor_raw
 
-from . import raw as bsc_cor_raw
+from lxbasic.core import pattern as bsc_cor_pattern
 
-from . import pattern as bsc_cor_pattern
+from lxbasic.core import process as bsc_cor_process
 
-from . import process as bsc_cor_process
+from . import base as bsc_stg_base
 
 
 class PkgContextNew(object):

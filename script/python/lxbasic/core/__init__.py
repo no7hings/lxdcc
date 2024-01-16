@@ -29,16 +29,8 @@ from .execute import *
 
 from .message import *
 
-from .image import *
-
-from .video import *
-
-from .osl import *
-
 from .color_space import *
 
 from .url import *
-
-from .package import *
 
 from .dcc import *

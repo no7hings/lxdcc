@@ -3,11 +3,11 @@ import six
 
 
 def get_menu_content_by_hooks(hooks):
-    import lxbasic.core as bsc_core
-
     import lxcontent.core as ctt_core
 
-    from lxsession.commands import _ssn_cmd_hook
+    import lxbasic.core as bsc_core
+
+    from . import hook as ssn_cmd_hook
 
     d_ = ctt_core.Dict()
     for i_hook in hooks:
@@ -20,7 +20,7 @@ def get_menu_content_by_hooks(hooks):
         else:
             raise RuntimeError()
         #
-        i_hook_args = _ssn_cmd_hook.get_hook_args(i_hook_key)
+        i_hook_args = ssn_cmd_hook.get_hook_args(i_hook_key)
         if i_hook_args:
             i_session, i_execute_fnc = i_hook_args
             if i_session.get_is_loadable() is True:
@@ -82,15 +82,15 @@ def get_menu_content_by_hooks(hooks):
 
 
 def get_menu_content_by_hook_options(hook_options):
+    import lxcontent.core as ctt_core
+
     import lxbasic.core as bsc_core
 
-    from lxsession.commands import _ssn_cmd_hook
-
-    import lxcontent.core as ctt_core
+    from . import hook as ssn_cmd_hook
 
     d_ = ctt_core.Dict()
     for i_hook_option in hook_options:
-        i_hook_args = _ssn_cmd_hook.get_option_hook_args(i_hook_option)
+        i_hook_args = ssn_cmd_hook.get_option_hook_args(i_hook_option)
         if i_hook_args:
             i_session, i_execute_fnc = i_hook_args
             if i_session.get_is_loadable() is True:
@@ -158,11 +158,11 @@ def get_menu_content_by_hook_options(hook_options):
 
 
 def get_menu_content_by_hook_options_(hook_options):
+    import lxcontent.core as ctt_core
+
     import lxbasic.core as bsc_core
 
-    from lxsession.commands import _ssn_cmd_hook
-
-    import lxcontent.core as ctt_core
+    from . import hook as ssn_cmd_hook
 
     d_ = ctt_core.Dict()
     for i_key in hook_options:
@@ -175,7 +175,7 @@ def get_menu_content_by_hook_options_(hook_options):
         else:
             raise RuntimeError()
         #
-        i_hook_args = _ssn_cmd_hook.get_option_hook_args(i_hook_option)
+        i_hook_args = ssn_cmd_hook.get_option_hook_args(i_hook_option)
         if i_hook_args:
             i_session, i_execute_fnc = i_hook_args
             if i_session.get_is_loadable() is True:

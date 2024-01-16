@@ -3,11 +3,11 @@ import collections
 
 import parse
 
-from lxbasic.storage import base as bsc_stg_base
+from lxbasic.core import process as bsc_cor_process
 
-from . import process as bsc_cor_process
+from lxbasic.core import execute as bsc_cor_execute
 
-from . import execute as bsc_cor_execute
+from . import base as bsc_stg_base
 
 
 class OslFileMtd(object):

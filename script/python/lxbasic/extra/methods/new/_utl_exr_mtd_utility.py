@@ -19,12 +19,12 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def get_base_command(cls, args_execute=None, packages_extend=None):
-        args_execute = bsc_core.PkgContextNew.convert_args_execute(
+        args_execute = bsc_storage.PkgContextNew.convert_args_execute(
             args_execute
         )
 
         args = [
-            bsc_core.PkgContextNew.get_bin_source(),
+            bsc_storage.PkgContextNew.get_bin_source(),
             ' '.join(packages_extend or []),
             ' '.join(args_execute or [])
         ]
@@ -32,7 +32,7 @@ class EtrBase(bsc_etr_abstracts.AbsEtrBase):
 
     @classmethod
     def packages_completed_to(cls, packages):
-        return bsc_core.PkgContextNew()._completed_packages_to(packages)
+        return bsc_storage.PkgContextNew()._completed_packages_to(packages)
 
     @classmethod
     def get_project_environs_extend(cls, project):

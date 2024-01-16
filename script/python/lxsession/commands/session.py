@@ -8,13 +8,12 @@ def set_session_option_hooks_execute_by_deadline(session):
     :param session: <instance of session>
     :return: None
     """
-    from lxsession.commands import _ssn_cmd_hook
-
     import lxbasic.log as bsc_log
-    #
+
     import lxbasic.core as bsc_core
 
-    #
+    from . import hook as ssn_cmd_hook
+
     def run_branch_fnc_(batch_option_hook_key_, option_hook_key_, batch_hook_option_, hook_option_override_):
         _batch_hook_option_opt = bsc_core.ArgDictStringOpt(batch_hook_option_)
         _batch_choice_scheme = _batch_hook_option_opt.get('choice_scheme')
@@ -70,11 +69,10 @@ def set_session_option_hooks_execute_by_deadline(session):
                     _i_key, _batch_hook_option_opt.get(_i_key)
                 )
         #
-        _ssn_cmd_hook.set_option_hook_execute_by_deadline(
+        ssn_cmd_hook.set_option_hook_execute_by_deadline(
             option=_hook_option_opt.to_string()
         )
 
-    #
     c = session.configure
     option_hook_keys = c.get('option_hooks')
     main_key = session.option_opt.get('option_hook_key')

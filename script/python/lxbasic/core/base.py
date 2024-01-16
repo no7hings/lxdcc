@@ -515,6 +515,22 @@ class StgBaseMtd(object):
             list_.append('{}.{}'.format(k, v[0]))
         return list_
 
+    @classmethod
+    def get_modify_timestamp(cls, path):
+        return os.stat(path).st_mtime
+
+    @classmethod
+    def get_file_timestamp_is_same_to(cls, file_path_src, file_path_tgt):
+        if file_path_src is not None and file_path_tgt is not None:
+            if cls.get_is_file(file_path_src) is True and cls.get_is_file(file_path_tgt) is True:
+                return int(cls.get_modify_timestamp(file_path_src)) == int(cls.get_modify_timestamp(file_path_tgt))
+            return False
+        return False
+
+    @classmethod
+    def rename_file_ext_to(cls, file_path, ext_tgt):
+        return
+
 
 class StgPathMapDict(object):
     def __init__(self, raw):

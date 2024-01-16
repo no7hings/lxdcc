@@ -344,7 +344,7 @@ class FncExporterForPreview(
         jpg_seq_file = bsc_dcc_objects.StgFile(jpg_seq_file_path)
         if self._option.get('convert_to_dot_mov') is True:
             if jpg_seq_file.get_exists_units():
-                bsc_core.VdoFileOpt(
+                bsc_storage.VdoFileOpt(
                     mov_file_path
                 ).set_create_from(
                     jpg_seq_file_path
@@ -374,7 +374,7 @@ class FncExporterForPreview(
         jpg_seq_file = bsc_dcc_objects.StgFile(jpg_seq_file_path)
         if self._option.get('convert_to_dot_mov') is True:
             if jpg_seq_file.get_exists_units():
-                bsc_core.VdoFileOpt(
+                bsc_storage.VdoFileOpt(
                     mov_file_path
                 ).set_create_from(
                     jpg_seq_file_path

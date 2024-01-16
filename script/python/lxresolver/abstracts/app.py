@@ -260,7 +260,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
 
     def __init__(self, *args, **kwargs):
         super(AbsRsvAppNew, self).__init__(*args, **kwargs)
-        self._bin_source = bsc_core.PkgContextNew.get_bin_source()
+        self._bin_source = bsc_storage.PkgContextNew.get_bin_source()
 
     def get_args(self, packages_extend=None):
         if self._application == self.Applications.Lynxi:
@@ -285,7 +285,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
                 if key in data:
                     app_data = data[key]
                     p_args = app_data['pipeline']
-                    p_c = bsc_core.PkgContextNew(
+                    p_c = bsc_storage.PkgContextNew(
                         p_args
                     )
                     args = p_c.get_args(packages_extend)
@@ -299,7 +299,7 @@ class AbsRsvAppNew(AbsRsvAppDef):
 
     def get_command(self, args_execute=None, args_extend=None, packages_extend=None):
         if isinstance(args_execute, (set, tuple, list)):
-            args_execute = bsc_core.PkgContextNew.convert_args_execute(args_execute)
+            args_execute = bsc_storage.PkgContextNew.convert_args_execute(args_execute)
         #
         args = self.get_args(packages_extend)
         if args:

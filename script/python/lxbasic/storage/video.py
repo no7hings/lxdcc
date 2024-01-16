@@ -1,15 +1,15 @@
 # coding:utf-8
 import os.path
 
-from lxbasic.storage import base as bsc_stg_base
+from lxbasic.core import base as bsc_cor_base
 
-from lxbasic.storage import extend as bsc_stg_extend
+from lxbasic.core import process as bsc_cor_process
 
-from . import base as bsc_cor_base
+from lxbasic.core import execute as bsc_cor_execute
 
-from . import process as bsc_cor_process
+from . import base as bsc_stg_base
 
-from . import execute as bsc_cor_execute
+from . import extend as bsc_stg_extend
 
 
 class VdoFileOpt(object):

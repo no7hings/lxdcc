@@ -4,9 +4,9 @@
 class MayaProcess(object):
     @classmethod
     def generate_command(cls, option):
-        import lxbasic.core as bsc_core
+        import lxbasic.storage as bsc_storage
 
-        c = bsc_core.PkgContextNew(
+        c = bsc_storage.PkgContextNew(
             ' '.join(['lxdcc', 'maya', 'maya@2019.2', 'usd', 'mtoa@4.2.1.1'])
         ).get_command(
             args_execute=[
@@ -29,9 +29,9 @@ class PythonProcess(object):
     def generate_command(cls, option):
         import lxresource as bsc_resource
 
-        import lxbasic.core as bsc_core
+        import lxbasic.storage as bsc_storage
 
-        c = bsc_core.PkgContextNew(
+        c = bsc_storage.PkgContextNew(
             ' '.join(['lxdcc', 'usd'])
         ).get_command(
             args_execute=[

@@ -30,7 +30,7 @@ bsc_scripts.ScpOslBuilder(
     def generate_katana_ui_template(cls, file_path, file_path_output):
         output_file_opt = bsc_storage.StgFileOpt(file_path_output)
         output_file_opt.create_directory()
-        info = bsc_core.OslFileMtd.get_info(file_path)
+        info = bsc_storage.OslFileMtd.get_info(file_path)
         if info:
             j2_template = bsc_resource.RscExtendJinja.get_template('arnold/katana-ui-template-v002')
             raw = j2_template.render(
@@ -43,7 +43,7 @@ bsc_scripts.ScpOslBuilder(
     def generate_maya_ui_template(cls, file_path, file_path_output):
         output_file_opt = bsc_storage.StgFileOpt(file_path_output)
         output_file_opt.create_directory()
-        info = bsc_core.OslFileMtd.get_info(file_path)
+        info = bsc_storage.OslFileMtd.get_info(file_path)
         if info:
             j2_template = bsc_resource.RscExtendJinja.get_template('arnold/maya-ui-template-v002')
             raw = j2_template.render(
@@ -61,7 +61,7 @@ bsc_scripts.ScpOslBuilder(
         for i_f_p in d.get_child_file_paths():
             i_f = bsc_dcc_objects.StgFile(i_f_p)
             if i_f.ext == '.osl':
-                bsc_core.OslFileMtd.compile(
+                bsc_storage.OslFileMtd.compile(
                     i_f.path
                 )
 

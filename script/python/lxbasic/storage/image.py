@@ -5,21 +5,21 @@ import parse
 
 import subprocess
 
-from lxbasic.storage import base as bsc_stg_base
+from lxbasic.core import configure as bsc_cor_configure
 
-from lxbasic.storage import extend as bsc_stg_extend
+from lxbasic.core import base as bsc_cor_base
 
-from . import configure as bsc_cor_configure
+from lxbasic.core import raw as bsc_cor_raw
 
-from . import base as bsc_cor_base
+from lxbasic.core import time_ as bsc_cor_time
 
-from . import raw as bsc_cor_raw
+from lxbasic.core import process as bsc_cor_process
 
-from . import time_ as bsc_cor_time
+from lxbasic.core import execute as bsc_cor_execute
 
-from . import process as bsc_cor_process
+from . import base as bsc_stg_base
 
-from . import execute as bsc_cor_execute
+from . import extend as bsc_stg_extend
 
 
 class ImgOiioMtd(object):

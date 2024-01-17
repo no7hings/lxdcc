@@ -19,7 +19,7 @@ import lxbasic.fnc.abstracts as bsc_fnc_abstracts
 
 import lxusd.core as usd_core
 
-import lxusd.fnc.exporters as usd_fnc_exporters
+import lxusd.fnc.objects as usd_fnc_objects
 # maya
 from ...core.wrap import *
 
@@ -533,7 +533,7 @@ class FncExporterForGeometryUsd(bsc_fnc_abstracts.AbsFncOptionBase):
         if root_mya_obj.get_is_exists() is True:
             mya_objs = root_mya_obj.get_descendants()
             if mya_objs:
-                usd_geometry_exporter = usd_fnc_exporters.FncGeometryExporter(
+                usd_geometry_exporter = usd_fnc_objects.FncGeometryExporter(
                     option=dict(
                         file=file_path,
                         location=location,
@@ -778,7 +778,7 @@ class FncExporterForGeometryUvMapUsd(bsc_fnc_abstracts.AbsFncOptionBase):
         # print temp_usd_file_path
         # temp_usd_file_path = '/l/temp/temporary/usd-export/2022_0913-dongchangbao/RI58SQ.usd'
 
-        usd_fnc_exporters.GeometryUvMapExporter(
+        usd_fnc_objects.GeometryUvMapExporter(
             file_path=file_path,
             root=root,
             option=dict(

@@ -17,7 +17,7 @@ import lxbasic.fnc.abstracts as bsc_fnc_abstracts
 
 import lxusd.core as usd_core
 
-import lxusd.dcc.dcc_operators as usd_dcc_operators
+import lxusd.dcc.operators as usd_dcc_operators
 # maya
 from ...core.wrap import *
 

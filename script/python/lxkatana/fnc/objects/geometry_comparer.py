@@ -29,9 +29,9 @@ class FncComparerForGeometry(bsc_fnc_abstracts.AbsFncComparerForDccGeometry):
     def _update_target_fnc(self):
         import lxbasic.core as bsc_core
 
-        import lxusd.dcc.dcc_objects as usd_dcc_objects
+        import lxusd.dcc.objects as usd_dcc_objects
 
-        import lxusd.dcc.dcc_operators as usd_dcc_operators
+        import lxusd.dcc.operators as usd_dcc_operators
 
         w_s = ktn_core.WorkspaceSetting()
         opt = w_s.get_current_look_output_opt_force()

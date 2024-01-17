@@ -343,9 +343,9 @@ class AbsFncComparerForUsdGeometry(bsc_fnc_abs_base.AbsFncOptionBase):
     @classmethod
     def _generate_data(cls, file_path, location):
         if file_path is not None:
-            import lxusd.dcc.dcc_objects as usd_dcc_objects
+            import lxusd.dcc.objects as usd_dcc_objects
 
-            import lxusd.dcc.dcc_operators as usd_dcc_operators
+            import lxusd.dcc.operators as usd_dcc_operators
 
             hash_key = bsc_core.UuidMtd.generate_by_file(file_path)
 
@@ -503,9 +503,9 @@ class AbsFncComparerForDccGeometry(bsc_fnc_abs_base.AbsFncOptionBase):
         self._source_file_path = file_path
 
     def _init_source_fnc(self):
-        import lxusd.dcc.dcc_objects as usd_dcc_objects
+        import lxusd.dcc.objects as usd_dcc_objects
         #
-        import lxusd.dcc.dcc_operators as usd_dcc_operators
+        import lxusd.dcc.operators as usd_dcc_operators
 
         #
         self._dcc_scene_src = usd_dcc_objects.Scene()
@@ -518,9 +518,9 @@ class AbsFncComparerForDccGeometry(bsc_fnc_abs_base.AbsFncOptionBase):
         self._dcc_geometries_src = []
 
     def _init_target_fnc(self):
-        import lxusd.dcc.dcc_objects as usd_dcc_objects
+        import lxusd.dcc.objects as usd_dcc_objects
         #
-        import lxusd.dcc.dcc_operators as usd_dcc_operators
+        import lxusd.dcc.operators as usd_dcc_operators
 
         #
         self._dcc_scene_tgt = usd_dcc_objects.Scene()
@@ -533,9 +533,9 @@ class AbsFncComparerForDccGeometry(bsc_fnc_abs_base.AbsFncOptionBase):
         self._dcc_geometries_tgt = []
 
     def _update_source_fnc(self):
-        import lxusd.dcc.dcc_objects as usd_dcc_objects
+        import lxusd.dcc.objects as usd_dcc_objects
         #
-        import lxusd.dcc.dcc_operators as usd_dcc_operators
+        import lxusd.dcc.operators as usd_dcc_operators
 
         #
         usd_file_path = self._source_file_path

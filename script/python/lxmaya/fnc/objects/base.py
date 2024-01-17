@@ -1,7 +1,7 @@
 # coding:utf-8
 import lxbasic.core as bsc_core
 
-import lxusd.dcc.dcc_operators as usd_dcc_operators
+import lxusd.dcc.operators as usd_dcc_operators
 # maya dcc
 from ...dcc import objects as mya_dcc_objects
 

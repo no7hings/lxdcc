@@ -45,9 +45,9 @@ class Setup(object):
     def setup_usd(cls):
         def fnc_():
             print 'lx-usd setup: is started'
-            from lxusd import usd_setup
+            import lxusd.startup as usd_startup
 
-            usd_setup.UsdSetup.build_environ()
+            usd_startup.UsdSetup.build_environ()
             print 'lx-usd setup: is completed'
 
         # noinspection PyUnresolvedReferences

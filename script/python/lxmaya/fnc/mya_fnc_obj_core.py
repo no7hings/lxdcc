@@ -5,7 +5,7 @@ import lxmaya.dcc.objects as mya_dcc_objects
 
 import lxmaya.dcc.operators as mya_dcc_operators
 
-import lxusd.dcc.dcc_operators as usd_dcc_operators
+import lxusd.dcc.operators as usd_dcc_operators
 
 
 class FncNodeForUsdBase(object):
